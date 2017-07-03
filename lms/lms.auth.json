@@ -1,0 +1,73 @@
+{
+  "SECRET_KEY": "7i#nri2i@--brp0sri9qf@ewlj1qxghv0%af$sk4ntn9pv$8t#",
+  "AWS_ACCESS_KEY_ID": "",
+  "AWS_SECRET_ACCESS_KEY": "",
+  "XQUEUE_INTERFACE": {
+    "basic_auth": ["edx", "edx"],
+    "django_auth": {
+      "username": "lms",
+      "password": "password"
+    },
+    "url": "http://localhost:18040"
+  },
+  "CONTENTSTORE": { 
+    "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",                       
+    "DOC_STORE_CONFIG": {                                                           
+      "db": "edxapp",                                                               
+      "host": "mongodb"
+    } 
+  },  
+  "DOC_STORE_CONFIG": {
+    "db": "edxapp",
+    "host": "mongodb"  
+  },
+  "DATABASES": {
+    "default": {
+      "ENGINE": "django.db.backends.mysql",
+      "NAME": "openedx",
+      "USER": "openedx",
+      "PASSWORD": "password",
+      "HOST": "mysql",
+      "PORT": "3306",
+      "ATOMIC_REQUESTS": true
+    }
+  },
+  "MODULESTORE": {
+    "default": {
+        "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
+        "OPTIONS": {
+            "mappings": {},
+            "stores": [
+                {
+                    "NAME": "split",
+                    "ENGINE": "xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore",
+                    "DOC_STORE_CONFIG": {
+                        "host": "mongodb",
+                        "db": "xmodule",
+                        "collection": "modulestore"
+                    },
+                    "OPTIONS": {
+                        "default_class": "xmodule.hidden_module.HiddenDescriptor",
+                        "fs_root": "/openedx/data",
+                        "render_template": "edxmako.shortcuts.render_to_string"
+                    }
+                },
+                {
+                    "NAME": "draft",
+                    "ENGINE": "xmodule.modulestore.mongo.DraftMongoModuleStore",
+                    "DOC_STORE_CONFIG": {
+                        "host": "mongodb",
+                        "db": "xmodule",
+                        "collection": "modulestore"
+                    },
+                    "OPTIONS": {
+                        "default_class": "xmodule.hidden_module.HiddenDescriptor",
+                        "fs_root": "/opt/openedx/data",
+                        "render_template": "edxmako.shortcuts.render_to_string"
+                    }
+                }
+            ]
+        }
+    }
+}
+}

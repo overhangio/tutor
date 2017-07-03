@@ -1,0 +1,53 @@
+version: "3"
+services:
+
+  memcached:
+    image: memcached:1.4.38
+
+  mongodb:
+    # Use WiredTiger in all environments, just like at edx.org
+    command: mongod --smallfiles --nojournal --storageEngine wiredTiger
+    image: mongo:3.0.14
+    volumes:
+      - ./data/mongodb:/data/db
+
+  mysql:
+    image: mysql:5.6.36
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: "openedx"
+      MYSQL_USER: "openedx"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./data/lms/course_static:/openedx/course_static:ro
+      - ./data/lms/staticfiles:/openedx/staticfiles:ro
+      - ./data/lms/uploads:/openedx/uploads:ro
+    depends_on:
+      - lms
+
+  lms:
+    build:
+      context: ./lms
+      args:
+        RUN_MIGRATIONS: 1
+        COLLECT_STATIC: 1
+    volumes:
+      - ./data/lms/course_static:/openedx/course_static
+      - ./data/lms/data:/openedx/data
+      - ./data/lms/logs:/openedx/logs
+      - ./data/lms/staticfiles:/openedx/staticfiles
+      - ./data/lms/uploads:/openedx/uploads
+    depends_on:
+      - memcached
+      - mongodb
+      - mysql
+      
+
+# TODO rabbitmq and celery workers
