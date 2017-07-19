@@ -17,6 +17,11 @@ Create necessary data folders:
 
 The LMS will be reachable at the following url: [http://openedx.localhost](http://openedx.localhost).
 
+On the first run you will need to migrate the database and collect static assets:
+
+    make migrate
+    make assets
+
 ## Development tips & tricks
 
 Open a bash in the lms:

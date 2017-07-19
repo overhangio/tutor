@@ -53,16 +53,4 @@ ENV SERVICE_VARIANT lms
 
 # Run server
 EXPOSE 8000
-
-# Migrate
-ARG RUN_MIGRATIONS=0
-ENV RUN_MIGRATIONS ${RUN_MIGRATIONS}
-# Collect static assets
-ARG COLLECT_STATIC=0
-ENV COLLECT_STATIC ${COLLECT_STATIC}
-
-# TODO Here we wait until mysql and mongodb become available but it's a terrible solution
-CMD sleep 5 && \
-  if [ "$RUN_MIGRATIONS" = "1" ] ; then ./manage.py lms migrate --settings=production ; fi && \
-  if [ "$COLLECT_STATIC" = "1" ] ; then paver update_assets lms --settings=production ; fi && \
-  gunicorn --name lms --bind=0.0.0.0:8000 --max-requests=1000 lms.wsgi:application
+CMD gunicorn --name lms --bind=0.0.0.0:8000 --max-requests=1000 lms.wsgi:application

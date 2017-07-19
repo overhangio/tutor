@@ -35,9 +35,6 @@ services:
   lms:
     build:
       context: ./lms
-      args:
-        RUN_MIGRATIONS: 1
-        COLLECT_STATIC: 1
     volumes:
       - ./data/lms/course_static:/openedx/course_static
       - ./data/lms/data:/openedx/data
