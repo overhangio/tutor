@@ -1,4 +1,7 @@
 from .aws import *
+
+update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
+
 MEDIA_ROOT = "/openedx/uploads/"
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
