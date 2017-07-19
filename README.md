@@ -15,7 +15,7 @@ Create necessary data folders:
 
     docker-compose up --build
 
-Container data is in `./data`.
+The LMS will be reachable at the following url: [http://openedx.localhost](http://openedx.localhost).
 
 ## Development tips & tricks
 
