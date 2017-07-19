@@ -43,9 +43,9 @@ RUN pip install -r requirements/edx/paver.txt
 RUN paver install_prereqs
 
 # Copy configuration files
-COPY ./lms.env.json /openedx/
-COPY ./lms.auth.json /openedx/
-COPY ./production.py /openedx/edx-platform/lms/envs/
+COPY ./config/lms.env.json /openedx/
+COPY ./config/lms.auth.json /openedx/
+COPY ./config/production.py /openedx/edx-platform/lms/envs/
 
 # Configure environment
 ENV DJANGO_SETTINGS_MODULE lms.envs.production
