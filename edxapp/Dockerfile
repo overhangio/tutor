@@ -1,33 +1,29 @@
 FROM ubuntu:16.04
 
+############ common to lms & cms
+
 # Install system requirements
 RUN apt update
 RUN apt upgrade -y
 # Global requirements
 RUN apt install -y language-pack-en git python-virtualenv build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev python-pip libmysqlclient-dev python-apt python-dev libxmlsec1-dev libfreetype6-dev swig gcc g++
-# lms requirements
+# edxapp requirements
 RUN apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng12-dev libxml2-dev libxmlsec1-dev libxslt1-dev nodejs npm ntp pkg-config 
 
 # Install symlink so that we have access to 'node' binary without virtualenv.
 # This replaces the "nodeenv" install.
 RUN apt install -y nodejs-legacy
 
-# Create necessary folders
-RUN mkdir /openedx
-RUN mkdir /openedx/data
-RUN mkdir /openedx/logs
-RUN mkdir /openedx/uploads
-RUN mkdir /openedx/staticfiles
+# Static assets will reside in /openedx/data and edx-platform will be
+# checked-out in /openedx
 VOLUME /openedx/data
-VOLUME /openedx/logs
-VOLUME /openedx/staticfiles
-VOLUME /openedx/uploads
 WORKDIR /openedx
 
 # Checkout edx-platform code
 RUN git clone https://github.com/edx/edx-platform.git
 WORKDIR /openedx/edx-platform
-RUN git checkout open-release/ficus.master 
+RUN git fetch && \
+  git checkout open-release/ginkgo.master 
 
 # Install python requirements
 RUN pip install pip==8.1.2
@@ -44,13 +40,21 @@ RUN paver install_prereqs
 
 # Copy configuration files
 COPY ./config/lms.env.json /openedx/
+COPY ./config/cms.env.json /openedx/
 COPY ./config/lms.auth.json /openedx/
-COPY ./config/production.py /openedx/edx-platform/lms/envs/
+COPY ./config/cms.auth.json /openedx/
+COPY ./config/production_lms.py /openedx/edx-platform/lms/envs/production.py
+COPY ./config/production_cms.py /openedx/edx-platform/cms/envs/production.py
+
+############ End of code common to lms & cms
+
+# service variang is "lms" or "cms"
+ARG service_variant
 
 # Configure environment
-ENV DJANGO_SETTINGS_MODULE lms.envs.production
-ENV SERVICE_VARIANT lms
+ENV DJANGO_SETTINGS_MODULE ${service_variant}.envs.production
+ENV SERVICE_VARIANT ${service_variant}
 
 # Run server
 EXPOSE 8000
-CMD gunicorn --name lms --bind=0.0.0.0:8000 --max-requests=1000 lms.wsgi:application
+CMD gunicorn --name ${SERVICE_VARIANT} --bind=0.0.0.0:8000 --max-requests=1000 ${SERVICE_VARIANT}.wsgi:application

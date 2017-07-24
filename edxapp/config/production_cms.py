@@ -7,9 +7,11 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 ALLOWED_HOSTS = [
     '*',
-    ENV_TOKENS.get('LMS_BASE'),
-    FEATURES['PREVIEW_LMS_BASE'],
+    ENV_TOKENS.get('CMS_BASE'),
 ]
+
+# Don't rely on AWS for sending email
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # We need to activate dev_env for logging, otherwise rsyslog is required (but
 # it is not available in docker).

@@ -1,6 +1,8 @@
 version: "3"
 services:
 
+  ############# External services
+
   memcached:
     image: memcached:1.4.38
 
@@ -25,26 +27,66 @@ services:
 
   nginx:
     build: ./nginx
+    restart: on-failure
+    ports:
+      - "8800:80"
     volumes:
-      - ./data/lms/course_static:/openedx/course_static:ro
-      - ./data/lms/staticfiles:/openedx/staticfiles:ro
-      - ./data/lms/uploads:/openedx/uploads:ro
+      - ./data/edxapp:/openedx/data:ro
     depends_on:
       - lms
 
+  rabbitmq:
+    image: rabbitmq:3.6.10
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+
+  # Simple SMTP server
+  smtp:
+    image: namshi/smtp
+    environment:
+      PORT: 9025
+
+  ############# LMS and CMS
+
   lms:
     build:
-      context: ./lms
+      context: ./edxapp
+      args:
+        service_variant: lms
+    restart: on-failure
     volumes:
-      - ./data/lms/course_static:/openedx/course_static
-      - ./data/lms/data:/openedx/data
-      - ./data/lms/logs:/openedx/logs
-      - ./data/lms/staticfiles:/openedx/staticfiles
-      - ./data/lms/uploads:/openedx/uploads
+      - ./data/edxapp:/openedx/data
     depends_on:
       - memcached
       - mongodb
       - mysql
-      
+      - rabbitmq
+      - smtp
 
-# TODO rabbitmq and celery workers
+  cms:
+    build:
+      context: ./edxapp
+      args:
+        service_variant: cms
+    restart: on-failure
+    volumes:
+      - ./data/edxapp:/openedx/data
+    depends_on:
+      - lms
+
+  ############# LMS and CMS workers
+
+  # TODO one service per queue?
+  lms_worker:
+    build:
+      context: ./edxapp
+      args:
+        service_variant: lms
+    command: ./manage.py lms --settings=production celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
+    environment:
+      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
+    restart: on-failure
+    volumes:
+      - ./data/edxapp:/openedx/data
+    depends_on:
+      - lms
