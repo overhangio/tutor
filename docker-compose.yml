@@ -27,7 +27,7 @@ services:
 
   nginx:
     build: ./nginx
-    restart: on-failure
+    #restart: on-failure
     ports:
       - "8800:80"
     volumes:
@@ -53,7 +53,7 @@ services:
       context: ./edxapp
       args:
         service_variant: lms
-    restart: on-failure
+    #restart: on-failure
     volumes:
       - ./data/edxapp:/openedx/data
     depends_on:
@@ -68,7 +68,7 @@ services:
       context: ./edxapp
       args:
         service_variant: cms
-    restart: on-failure
+    #restart: on-failure
     volumes:
       - ./data/edxapp:/openedx/data
     depends_on:
@@ -85,7 +85,7 @@ services:
     command: ./manage.py lms --settings=production celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    restart: on-failure
+    #restart: on-failure
     volumes:
       - ./data/edxapp:/openedx/data
     depends_on:
