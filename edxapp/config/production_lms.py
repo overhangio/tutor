@@ -6,7 +6,6 @@ MEDIA_ROOT = "/openedx/data/uploads/"
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 ALLOWED_HOSTS = [
-    '*',# TODO really?
     ENV_TOKENS.get('LMS_BASE'),
     FEATURES['PREVIEW_LMS_BASE'],
 ]
