@@ -34,9 +34,7 @@ RUN pip install -r requirements/edx/local.txt
 RUN pip install -r requirements/edx/base.txt
 RUN pip install -r requirements/edx/post.txt
 RUN pip install -r requirements/edx/paver.txt
-# TODO install ced from pip
-RUN curl https://raw.githubusercontent.com/regisb/ced/v0.2/ced/ced > /usr/local/bin/ced
-RUN chmod a+x /usr/local/bin/ced
+RUN pip install ced
 
 # Finish requirements install
 RUN paver install_prereqs

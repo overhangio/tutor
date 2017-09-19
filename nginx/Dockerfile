@@ -1,11 +1,10 @@
 FROM nginx:1.13
 VOLUME /openedx/data
 
-# TODO install ced from pip
+# Install ced
 RUN apt update
-RUN apt install -y curl python
-RUN curl https://raw.githubusercontent.com/regisb/ced/v0.2/ced/ced > /usr/local/bin/ced
-RUN chmod a+x /usr/local/bin/ced
+RUN apt install -y python-pip
+RUN pip install ced
 
 ARG lms_host=localhost
 ARG cms_host=studio.$lms_host
