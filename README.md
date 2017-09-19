@@ -8,7 +8,7 @@ The production stack is sufficient for a minimal production deployment of Open e
 
 Prepare build:
 
-  make directories
+    make directories
 
 Build and run:
 
@@ -25,6 +25,10 @@ On the first run you will need to migrate the database and collect static assets
 
     make migrate
     make assets
+
+To import the Open edX demo course, run:
+
+    make import-demo-course
 
 To daemonize:
 

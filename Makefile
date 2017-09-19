@@ -10,3 +10,10 @@ lms-shell:
 	docker-compose run lms ./manage.py lms shell --settings=production
 cms-shell:
 	docker-compose run lms ./manage.py cms shell --settings=production
+
+import-demo-course:
+	docker-compose run cms git clone https://github.com/edx/edx-demo-course ../edx-demo-course && \
+		cd ../edx-demo-course && \
+		git checkout open-release/ginkgo.master && \
+		cd ../edx-platform && \
+	python ./manage.py cms --settings=production import ../data ../edx-demo-course
