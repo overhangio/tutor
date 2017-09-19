@@ -26,7 +26,11 @@ services:
       - ./data/mysql:/var/lib/mysql
 
   nginx:
-    build: ./nginx
+    build:
+      context: ./nginx
+      args:
+          lms_host: learn.overhang.io
+          cms_host: studio.learn.overhang.io
     #restart: on-failure
     ports:
       - "8800:80"
@@ -52,7 +56,10 @@ services:
     build:
       context: ./edxapp
       args:
+        lms_host: learn.overhang.io
+        cms_host: studio.learn.overhang.io
         service_variant: lms
+        secret_key: "12UyBHiBWxcPT1NP4prP5QhHc"
     #restart: on-failure
     volumes:
       - ./data/edxapp:/openedx/data
@@ -67,7 +74,10 @@ services:
     build:
       context: ./edxapp
       args:
+        lms_host: learn.overhang.io
+        cms_host: studio.learn.overhang.io
         service_variant: cms
+        secret_key: "12UyBHiBWxcPT1NP4prP5QhHc"
     #restart: on-failure
     volumes:
       - ./data/edxapp:/openedx/data
@@ -81,7 +91,10 @@ services:
     build:
       context: ./edxapp
       args:
+        lms_host: learn.overhang.io
+        cms_host: studio.learn.overhang.io
         service_variant: lms
+        secret_key: "12UyBHiBWxcPT1NP4prP5QhHc"
     command: ./manage.py lms --settings=production celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear

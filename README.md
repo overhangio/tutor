@@ -48,6 +48,7 @@ Open a python shell in the lms or the cms:
 ## TODO
 
 - Make sure that secret keys are not shared with the entire world
+- Don't duplicate args between containers
 - Add arguments to set domain name, platform name, etc.
 - Add documentation on host Nginx
 - Better readme

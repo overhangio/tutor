@@ -34,22 +34,35 @@ RUN pip install -r requirements/edx/local.txt
 RUN pip install -r requirements/edx/base.txt
 RUN pip install -r requirements/edx/post.txt
 RUN pip install -r requirements/edx/paver.txt
+# TODO install ced from pip
+RUN curl https://raw.githubusercontent.com/regisb/ced/v0.2/ced/ced > /usr/local/bin/ced
+RUN chmod a+x /usr/local/bin/ced
 
 # Finish requirements install
 RUN paver install_prereqs
 
-# Copy configuration files
-COPY ./config/lms.env.json /openedx/
-COPY ./config/cms.env.json /openedx/
-COPY ./config/lms.auth.json /openedx/
-COPY ./config/cms.auth.json /openedx/
-COPY ./config/production_lms.py /openedx/edx-platform/lms/envs/production.py
-COPY ./config/production_cms.py /openedx/edx-platform/cms/envs/production.py
-
-############ End of code common to lms & cms
-
+ARG lms_host=localhost:8000
+ARG cms_host=localhost:8000
+ARG platform_name="My Ginkgo Open edX"
 # service variang is "lms" or "cms"
 ARG service_variant
+ARG secret_key
+
+# Generate configuration files
+ENV LMS_HOST=$lms_host CMS_HOST=$cms_host PLATFORM_NAME=$platform_name SECRET_KEY=$secret_key
+COPY ./config/production_lms.py /openedx/edx-platform/lms/envs/production.py
+COPY ./config/production_cms.py /openedx/edx-platform/cms/envs/production.py
+COPY ./config/lms.env.json.templ /openedx/
+COPY ./config/cms.env.json.templ /openedx/
+COPY ./config/lms.auth.json.templ /openedx/
+COPY ./config/cms.auth.json.templ /openedx/
+RUN ced /openedx/lms.env.json.templ -o /openedx/lms.env.json
+RUN ced /openedx/cms.env.json.templ -o /openedx/cms.env.json
+RUN ced /openedx/lms.auth.json.templ -o /openedx/lms.auth.json
+RUN ced /openedx/cms.auth.json.templ -o /openedx/cms.auth.json
+
+
+############ End of code common to lms & cms
 
 # Configure environment
 ENV DJANGO_SETTINGS_MODULE ${service_variant}.envs.production
