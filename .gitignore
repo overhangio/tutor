@@ -1,2 +1,8 @@
 .*.swp
-data/*
+config.json
+edxapp/config/*.env.json
+edxapp/config/*.auth.json
+nginx/config/*.conf
+mysql/config/database
+mysql/config/username
+mysql/config/password

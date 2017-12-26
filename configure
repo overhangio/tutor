@@ -1,0 +1,198 @@
+#! /usr/bin/env python
+# coding: utf8
+from __future__ import unicode_literals, print_function
+import argparse
+import codecs
+import json
+import os
+import random
+import string
+import sys
+
+class Configurator(object):
+
+    def __init__(self, silent=False, **default_overrides):
+        self.__values = []
+        self.__default_overrides = default_overrides
+        if silent:
+            self.__input = None
+        else:
+            try:
+                self.__input = raw_input
+            except NameError:
+                self.__input = input
+
+    def as_dict(self):
+        return dict(self.__values)
+
+    def add(self, name, question, default=""):
+        default = self.__default_overrides.get(name, default)
+        message = question + " (default: \"{}\"): ".format(default)
+        value = self.ask(message, default)
+        self.set(name, value)
+
+        return self
+
+    def add_boolean(self, name, question, default=True):
+        default = self.__default_overrides.get(name, default)
+        message = question + " ({}) ".format("Y/n" if default else "y/N")
+        value = None
+        while value is None:
+            answer = self.ask(message, default)
+            value = {
+                "y": True,
+                "n": False,
+                default: default,
+            }.get(answer)
+        self.set(name, value)
+        return self
+
+    def ask(self, message, default):
+        if self.__input:
+            return self.__input(message) or default
+        return default
+
+    def get(self, name):
+        for key, value in self.__values:
+            if key == name:
+                return value
+        return None
+
+    def set(self, name, value):
+        self.__values.append((name, value))
+
+
+def substitute(src, dst, delimiter='$', **values):
+    Template = template_class(delimiter)
+
+    with codecs.open(src, encoding='utf-8') as fi:
+        template = Template(fi.read())
+    try:
+        substituted = template.substitute(**values)
+    except KeyError as e:
+        sys.stderr.write("ERROR Missing config value '{}' for template {}\n".format(e.args[0], src))
+        sys.exit(1)
+
+    with open(dst, 'w') as fo:
+        fo.write(substituted)
+
+    print("Generated config file {} (from template {})".format(dst, src))
+
+def template_class(user_delimiter='$'):
+    """
+    The default delimiter of the python Template class is '$'. Here, we
+    generate a Template class with a custom delimiter. This cannot be done
+    after the class creation because the Template metaclass uses the delimiter
+    value.
+    """
+    class Template(string.Template):
+        delimiter = user_delimiter
+    return Template
+
+
+def main():
+    parser = argparse.ArgumentParser("Config file generator for Open edX")
+    parser.add_argument('-c', '--config', default="config.json",
+                        help="Load default values from this file. Config values will be saved there.")
+    parser.add_argument('-s', '--silent', action='store_true',
+                        help=(
+                            "Be silent and accept all default values. "
+                            "This is good for debugging, but probably not what you want"
+                        ))
+    args = parser.parse_args()
+
+    # Load defaults
+    defaults = {}
+    if os.path.exists(args.config):
+        with open(args.config) as f:
+            defaults = json.load(f)
+
+    configurator = Configurator(silent=args.silent, **defaults).add(
+        'LMS_HOST', "Your website domain name for students (LMS)", 'www.myopenedx.com'
+    ).add_boolean(
+        'HTTPS_LMS', "Will you use https for the LMS?", False
+    ).add(
+        'CMS_HOST', "Your website domain name for teachers (CMS)", 'studio.myopenedx.com'
+    ).add_boolean(
+        'HTTPS_CMS', "Will you use https for the CMS?", False
+    ).add(
+        'SECRET_KEY', "Secret key -- if you don't know what this is, you can safely accept the default",
+        "".join([random.choice(string.ascii_letters + string.digits) for _ in range(24)])
+    ).add(
+        'PLATFORM_NAME', "Platform name/title", "My Open edX"
+    ).add(
+        'MYSQL_DATABASE', "MySQL database name", 'openedx'
+    ).add(
+        'MYSQL_USERNAME', "MySQL database username", 'openedx'
+    ).add(
+        'MYSQL_PASSWORD', "MySQL database password", 'password'
+    ).add(
+        'MONGODB_DATABASE', "MongoDb database name", 'openedx'
+    )
+
+    # Save values
+    with open(args.config, 'w') as f:
+        json.dump(configurator.as_dict(), f, sort_keys=True, indent=4)
+    print("\nConfiguration values were saved to ", args.config)
+
+    configurator.set('PROTOCOL_LMS', 'https' if configurator.get('HTTPS_LMS') else 'http')
+    configurator.set('PROTOCOL_CMS', 'https' if configurator.get('HTTPS_CMS') else 'http')
+
+    # Open edX
+    substitute(
+        os.path.join('edxapp', 'config', 'templates', 'lms.env.json.templ'),
+        os.path.join('edxapp', 'config', 'lms.env.json'),
+        **configurator.as_dict()
+    )
+    substitute(
+        os.path.join('edxapp', 'config', 'templates', 'cms.env.json.templ'),
+        os.path.join('edxapp', 'config', 'cms.env.json'),
+        **configurator.as_dict()
+    )
+    substitute(
+        os.path.join('edxapp', 'config', 'templates', 'lms.auth.json.templ'),
+        os.path.join('edxapp', 'config', 'lms.auth.json'),
+        **configurator.as_dict()
+    )
+    substitute(
+        os.path.join('edxapp', 'config', 'templates', 'cms.auth.json.templ'),
+        os.path.join('edxapp', 'config', 'cms.auth.json'),
+        **configurator.as_dict()
+    )
+
+    # MySQL
+    substitute(
+        os.path.join('mysql', 'config', 'templates', 'username.templ'),
+        os.path.join('mysql', 'config', 'username'),
+        **configurator.as_dict()
+    )
+    substitute(
+        os.path.join('mysql', 'config', 'templates', 'password.templ'),
+        os.path.join('mysql', 'config', 'password'),
+        **configurator.as_dict()
+    )
+    substitute(
+        os.path.join('mysql', 'config', 'templates', 'database.templ'),
+        os.path.join('mysql', 'config', 'database'),
+        **configurator.as_dict()
+    )
+
+    # Nginx
+    # We need a different delimiter in nginx config files, because the '$' sign
+    # is widely used there
+    substitute(
+        os.path.join('nginx', 'config', 'templates', 'lms.conf.templ'),
+        os.path.join('nginx', 'config', 'lms.conf'),
+        delimiter='£', **configurator.as_dict()
+    )
+    substitute(
+        os.path.join('nginx', 'config', 'templates', 'cms.conf.templ'),
+        os.path.join('nginx', 'config', 'cms.conf'),
+        delimiter='£', **configurator.as_dict()
+    )
+
+    print("\nConfiguration files were successfuly generated. You may now build the app containers.")
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,7 @@
+cms/
+cms_worker/
+lms/
+lms_worker/
+mysql/
+mongodb/
+rabbitmq/

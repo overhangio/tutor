@@ -13,7 +13,7 @@
   "CONTENTSTORE": { 
     "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",                       
     "DOC_STORE_CONFIG": {                                                           
-      "db": "edxapp",                                                               
+      "db": "${MONGODB_DATABASE}",
       "host": "mongodb"
     } 
   },  
@@ -24,9 +24,9 @@
   "DATABASES": {
     "default": {
       "ENGINE": "django.db.backends.mysql",
-      "NAME": "openedx",
-      "USER": "openedx",
-      "PASSWORD": "password",
+      "NAME": "${MYSQL_DATABASE}",
+      "USER": "${MYSQL_USERNAME}",
+      "PASSWORD": "${MYSQL_PASSWORD}",
       "HOST": "mysql",
       "PORT": "3306",
       "ATOMIC_REQUESTS": true
