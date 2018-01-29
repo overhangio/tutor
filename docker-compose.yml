@@ -44,7 +44,6 @@ services:
       - ./data/rabbitmq:/var/lib/rabbitmq
 
   # Simple SMTP server
-  # TODO this smtp server doesn't send any email. Fix this.
   smtp:
     image: namshi/smtp
 

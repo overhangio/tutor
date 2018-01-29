@@ -81,6 +81,16 @@ And then, to stop all services:
 
     make stop
 
+### Logging
+
+To view the logs from all containers:
+
+    docker-compose logs -f
+
+To view the logs from just one container, for instance the web server:
+
+    docker-compose logs -f
+
 ### Development
 
 Open a bash in the lms:
