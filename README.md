@@ -88,7 +88,24 @@ Open a python shell in the lms or the cms:
 
 This project is the follow-up of my work on an [install from scratch of Open edX](https://github.com/regisb/openedx-install). It does not rely on any hack or complex deployment script. In particular, we do not use the Open edX [Ansible deployment playbooks](https://github.com/edx/configuration/). That means that the folks at edX.org are *not* responsible for troubleshooting issues of this project. Please don't bother Ned ;-)
 
+## Missing features
+
+### Forums
+
+Forums are not installed in this proposed install of Open edX. They require a specific ruby install and settings. Unfortunately, there is no section dedicated specifically to the forums in the [Open edX documentation](http://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-ginkgo.master/).
+
+### SSL certificates
+
+We have decided not to include the installation of SSL certificates in this project for running an Open edX platform on HTTPS. This is because there are too many different ways to generate SSL certificates. In particular, we should not assume that everyone uses [Let's Encrypt](http://letsencrypt.org/) certificates. If you decide to run your Open edX platform behind HTTPS, you will have to modify:
+
+* the generated nginx configuration files 
+* the `lms.env.json` and `cms.env.json` files: look for the `LMS_ROOT_URL` and `CMS_ROOT_URL` variables and replace "http" by "https".
+
+## Contributing
+
 If you have a problem, feel free to open a [Github issue](https://github.com/regisb/openedx-docker/issues) that describes:
 - the problem you are facing: this includes the exact error message, or a screenshot of the error.
 - what action triggered the error: which command line instruction, which url you tried to access, etc.
 - any error logs that you may find: you may want to take a look at the files in `data/lms/logs`, for instance.
+
+Pull requests will be happily examined, too! However, we should be careful to keep the project lean and simple: both to use and to modify. Optional features should not make the user experience more complex. Instead, documentation on how to add the feature is preferred.
