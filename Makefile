@@ -11,8 +11,8 @@ build:
 	docker-compose build
 
 migrate:
-	docker-compose run --rm lms bash -c "./wait-for-mysql.sh && ./manage.py lms migrate --settings=production"
-	docker-compose run --rm cms bash -c "./wait-for-mysql.sh && ./manage.py cms migrate --settings=production"
+	docker-compose run --rm lms bash -c "./wait-for-mysql.sh && ./manage.py lms --settings=production migrate"
+	docker-compose run --rm cms bash -c "./wait-for-mysql.sh && ./manage.py cms --settings=production migrate"
 
 assets:
 	docker-compose run --rm lms paver update_assets lms --settings=production
@@ -33,9 +33,12 @@ stop:
 ##################### Additional commands
 
 lms-shell:
-	docker-compose run --rm lms ./manage.py lms shell --settings=production
+	docker-compose run --rm lms ./manage.py lms --settings=production shell
 cms-shell:
-	docker-compose run --rm lms ./manage.py cms shell --settings=production
+	docker-compose run --rm lms ./manage.py cms --settings=production shell
 
 import-demo-course:
 	docker-compose run --rm cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/ginkgo.master && python ./manage.py cms --settings=production import ../data ../edx-demo-course"
+
+create-staff-user:
+	docker-compose run --rm lms /bin/bash -c "./manage.py lms --settings=production manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms --settings=production changepassword ${USERNAME}"

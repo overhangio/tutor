@@ -57,6 +57,14 @@ This will launch the various docker containers required for your Open edX platfo
 
 ## Additional commands
 
+### Creating a new user with staff and admin rights
+
+You will most certainly need to create a user to administer the platform. Just run:
+
+    USERNAME=yourusername EMAIL=user@email.com make create-staff-user
+
+You will asked to set the user password interactively.
+
 ### Importing the demo course
 
 On a fresh install, your platform will not have a single course. To import the [Open edX demo course](https://github.com/edx/edx-demo-course ), run:

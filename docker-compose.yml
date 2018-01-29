@@ -33,7 +33,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./data/lms:/openedx/data:ro
+      - ./data/lms:/openedx/data/lms:ro
+      - ./data/cms:/openedx/data/cms:ro
     depends_on:
       - lms
 
