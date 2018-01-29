@@ -51,7 +51,7 @@ server {
   }
 
   location ~ ^/media/(?P<file>.*) {
-    root /openedx/uploads;
+    root /openedx/data/lms/uploads;
     try_files /$file =404;
     expires 31536000s;
   }
