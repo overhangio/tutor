@@ -34,8 +34,8 @@ RUN pip install -r requirements/edx/base.txt
 RUN pip install -r requirements/edx/post.txt
 RUN pip install -r requirements/edx/paver.txt
 
-# Finish requirements install
-RUN paver install_prereqs
+# Install nodejs requirements
+RUN npm install
 
 # Copy configuration files
 COPY ./config/production_lms.py /openedx/edx-platform/lms/envs/production.py
