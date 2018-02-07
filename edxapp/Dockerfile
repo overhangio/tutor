@@ -23,8 +23,7 @@ VOLUME /openedx/data
 WORKDIR /openedx/edx-platform
 
 ## Checkout edx-platform code
-RUN git clone https://github.com/edx/edx-platform.git . && \
-  git checkout open-release/ginkgo.master 
+RUN git clone https://github.com/edx/edx-platform.git --branch open-release/ginkgo.master --depth 1 .
 
 # Install python requirements
 RUN pip install -r requirements/edx/pre.txt
