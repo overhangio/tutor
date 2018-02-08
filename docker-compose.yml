@@ -5,17 +5,20 @@ services:
 
   memcached:
     image: memcached:1.4.38
+    restart: unless-stopped
 
   mongodb:
+    image: mongo:3.0.14
     # Use WiredTiger in all environments, just like at edx.org
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
-    image: mongo:3.0.14
+    restart: unless-stopped
     volumes:
       - ./data/mongodb:/data/db
 
   mysql:
     image: mysql:5.6.36
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
+    restart: unless-stopped
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./mysql/config/:/etc/mysql/conf.d/openedx
@@ -29,7 +32,7 @@ services:
   nginx:
     build:
       context: ./nginx
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
@@ -46,6 +49,7 @@ services:
   # Simple SMTP server
   smtp:
     image: namshi/smtp
+    restart: unless-stopped
 
   ############# LMS and CMS
 
@@ -54,7 +58,7 @@ services:
       context: ./edxapp
       args:
         service_variant: lms
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - ./data/lms:/openedx/data
     depends_on:
@@ -69,7 +73,7 @@ services:
       context: ./edxapp
       args:
         service_variant: cms
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - ./data/cms:/openedx/data
     depends_on:
@@ -84,9 +88,9 @@ services:
       args:
         service_variant: lms
     command: ./manage.py lms --settings=production celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
+    restart: unless-stopped
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    restart: on-failure
     volumes:
       - ./data/lms_worker:/openedx/data
     depends_on:
@@ -98,9 +102,9 @@ services:
       args:
         service_variant: cms
     command: ./manage.py cms --settings=production celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
+    restart: unless-stopped
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    restart: on-failure
     volumes:
       - ./data/cms_worker:/openedx/data
     depends_on:
