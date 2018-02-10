@@ -11,8 +11,8 @@ build:
 	docker-compose build
 
 migrate:
-	docker-compose run --rm lms bash -c "./wait-for-mysql.sh && ./manage.py lms --settings=production migrate"
-	docker-compose run --rm cms bash -c "./wait-for-mysql.sh && ./manage.py cms --settings=production migrate"
+	docker-compose run --rm lms bash -c "./wait-for-greenlight.sh && ./manage.py lms --settings=production migrate"
+	docker-compose run --rm cms bash -c "./wait-for-greenlight.sh && ./manage.py cms --settings=production migrate"
 
 assets:
 	docker-compose run --rm lms paver update_assets lms --settings=production

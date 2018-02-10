@@ -47,7 +47,7 @@ COPY ./config/lms.auth.json /openedx/
 COPY ./config/cms.auth.json /openedx/
 
 # Copy convenient script
-COPY ./wait-for-mysql.sh .
+COPY ./wait-for-greenlight.sh .
 
 ############ End of code common to lms & cms
 
