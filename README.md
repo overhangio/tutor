@@ -6,7 +6,7 @@ The deployment of a full-featured Open edX platform is a highly technical and co
 
 ## Quickstart
 
-All you have to do is [download the content of this repository](https://codeload.github.com/regisb/openedx-docker/zip/master), uncompress and run:
+All you have to do is [download the content of this repository](https://codeload.github.com/regisb/openedx-docker/zip/master), decompress and run:
 
     make all
 
