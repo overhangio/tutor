@@ -102,17 +102,22 @@ Open a python shell in the lms or the cms:
     make lms-shell
     make cms-shell
 
-## Disclaimers & Warnings
-
-This project is the follow-up of my work on an [install from scratch of Open edX](https://github.com/regisb/openedx-install). It does not rely on any hack or complex deployment script. In particular, we do not use the Open edX [Ansible deployment playbooks](https://github.com/edx/configuration/). That means that the folks at edX.org are *not* responsible for troubleshooting issues of this project. Please don't bother Ned ;-)
-
 ## Troubleshooting
 
 ### "Running migrations... Killed!"
 
 The LMS and CMS containers require at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the `make all` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. [Follow these instructions from the official Docker documentation](https://docs.docker.com/docker-for-mac/#advanced). 
 
-## Missing features
+## Disclaimers & Warnings
+
+This project is the follow-up of my work on an [install from scratch of Open edX](https://github.com/regisb/openedx-install). It does not rely on any hack or complex deployment script. In particular, we do not use the Open edX [Ansible deployment playbooks](https://github.com/edx/configuration/). That means that the folks at edX.org are *not* responsible for troubleshooting issues of this project. Please don't bother Ned ;-)
+
+If you have a problem, feel free to open a [Github issue](https://github.com/regisb/openedx-docker/issues) that describes:
+- the problem you are facing: this includes the exact error message, or a screenshot of the error.
+- what action triggered the error: which command line instruction, which url you tried to access, etc.
+- any error logs that you may find: you may want to take a look at the files in `data/lms/logs`, for instance.
+
+## Known missing features
 
 ### Forums
 
@@ -127,9 +132,4 @@ We have decided not to include the installation of SSL certificates in this proj
 
 ## Contributing
 
-If you have a problem, feel free to open a [Github issue](https://github.com/regisb/openedx-docker/issues) that describes:
-- the problem you are facing: this includes the exact error message, or a screenshot of the error.
-- what action triggered the error: which command line instruction, which url you tried to access, etc.
-- any error logs that you may find: you may want to take a look at the files in `data/lms/logs`, for instance.
-
-Pull requests will be happily examined, too! However, we should be careful to keep the project lean and simple: both to use and to modify. Optional features should not make the user experience more complex. Instead, documentation on how to add the feature is preferred.
+Pull requests will be happily examined! However, we should be careful to keep the project lean and simple: both to use and to modify. Optional features should not make the user experience more complex. Instead, documentation on how to add the feature is preferred.
