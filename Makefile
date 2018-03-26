@@ -39,6 +39,7 @@ cms-shell:
 
 import-demo-course:
 	docker-compose run --rm cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/ginkgo.master && python ./manage.py cms --settings=production import ../data ../edx-demo-course"
+	# Seed the course permissions: is it necessary? "./manage.py lms --settings=production seed_permissions_roles 'course-v1:edX+DemoX+Demo_Course'"
 
 create-staff-user:
 	docker-compose run --rm lms /bin/bash -c "./manage.py lms --settings=production manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms --settings=production changepassword ${USERNAME}"
