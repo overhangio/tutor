@@ -56,8 +56,8 @@ services:
   lms:
     build:
       context: ./edxapp
-      args:
-        service_variant: lms
+    environment:
+      SERVICE_VARIANT: lms
     restart: unless-stopped
     volumes:
       - ./data/lms:/openedx/data
@@ -71,8 +71,8 @@ services:
   cms:
     build:
       context: ./edxapp
-      args:
-        service_variant: cms
+    environment:
+      SERVICE_VARIANT: cms
     restart: unless-stopped
     volumes:
       - ./data/cms:/openedx/data
@@ -85,9 +85,9 @@ services:
   lms_worker:
     build:
       context: ./edxapp
-      args:
-        service_variant: lms
-    command: ./manage.py lms --settings=production celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
+    environment:
+      SERVICE_VARIANT: lms
+    command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
@@ -99,9 +99,9 @@ services:
   cms_worker:
     build:
       context: ./edxapp
-      args:
-        service_variant: cms
-    command: ./manage.py cms --settings=production celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
+    environment:
+      SERVICE_VARIANT: cms
+    command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
