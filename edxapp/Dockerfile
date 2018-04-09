@@ -23,15 +23,19 @@ VOLUME /openedx/data
 WORKDIR /openedx/edx-platform
 
 ## Checkout edx-platform code
-RUN git clone https://github.com/edx/edx-platform.git --branch open-release/ginkgo.master --depth 1 .
+ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
+ARG EDX_PLATFORM_VERSION=open-release/ginkgo.master
+RUN git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 .
+VOLUME /openedx/edx-platform
 
-# Install python requirements
-RUN pip install -r requirements/edx/pre.txt
-RUN pip install -r requirements/edx/github.txt
-RUN pip install -r requirements/edx/local.txt
-RUN pip install -r requirements/edx/base.txt
-RUN pip install -r requirements/edx/post.txt
-RUN pip install -r requirements/edx/paver.txt
+# Install python requirements (clone source repos in a separate dir, otherwise
+# will be overwritten when we mount edx-platform)
+RUN pip install --src ../venv/src -r requirements/edx/pre.txt
+RUN pip install --src ../venv/src -r requirements/edx/github.txt
+RUN pip install --src ../venv/src -r requirements/edx/local.txt
+RUN pip install --src ../venv/src -r requirements/edx/base.txt
+RUN pip install --src ../venv/src -r requirements/edx/post.txt
+RUN pip install --src ../venv/src -r requirements/edx/paver.txt
 
 # Install nodejs requirements
 RUN npm install
@@ -46,17 +50,16 @@ COPY ./config/cms.env.json /openedx/
 COPY ./config/lms.auth.json /openedx/
 COPY ./config/cms.auth.json /openedx/
 
-# Copy convenient script
-COPY ./wait-for-greenlight.sh .
-
-############ End of code common to lms & cms
+# Copy convenient scripts
+COPY ./wait-for-greenlight.sh /usr/local/bin/
+COPY ./docker-entrypoint.sh /usr/local/bin/
 
 # service variant is "lms" or "cms"
-ARG service_variant
+ENV SERVICE_VARIANT lms
+ENV SETTINGS production
 
-# Configure environment
-ENV DJANGO_SETTINGS_MODULE ${service_variant}.envs.production
-ENV SERVICE_VARIANT ${service_variant}
+# Entrypoint will fix permissiosn of all files and run commands as openedx
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Run server
 EXPOSE 8000

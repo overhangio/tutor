@@ -1,8 +1,19 @@
 .PHONY: all configure build migrate assets up daemon
 
+DOCKER_COMPOSE_RUN = docker-compose run --rm -e USERID="$$(id -u)"
+ifneq ($(EDX_PLATFORM_SETTINGS),)
+	DOCKER_COMPOSE_RUN += -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
+endif
+ifneq ($(EDX_PLATFORM_PATH),)
+	DOCKER_COMPOSE_RUN += --volume="$(EDX_PLATFORM_PATH):/openedx/edx-platform"
+endif
+
+DOCKER_COMPOSE_RUN_LMS = $(DOCKER_COMPOSE_RUN) -p 8000:8000 lms
+DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN) -p 8001:8001 cms
+
 all: configure build migrate assets daemon
 
-##################### Bootstrapping commands
+##################### Bootstrapping
 
 configure:
 	./configure
@@ -11,14 +22,14 @@ build:
 	docker-compose build
 
 migrate:
-	docker-compose run --rm lms bash -c "./wait-for-greenlight.sh && ./manage.py lms --settings=production migrate"
-	docker-compose run --rm cms bash -c "./wait-for-greenlight.sh && ./manage.py cms --settings=production migrate"
+	$(DOCKER_COMPOSE_RUN_LMS) bash -c "wait-for-greenlight.sh && ./manage.py lms migrate"
+	$(DOCKER_COMPOSE_RUN_CMS) bash -c "wait-for-greenlight.sh && ./manage.py cms migrate"
 
 assets:
-	docker-compose run --rm lms paver update_assets lms --settings=production
-	docker-compose run --rm cms paver update_assets cms --settings=production
+	$(DOCKER_COMPOSE_RUN_LMS) paver update_assets lms
+	$(DOCKER_COMPOSE_RUN_CMS) paver update_assets cms
 
-##################### Running commands
+##################### Running
 
 up:
 	docker-compose up
@@ -30,16 +41,24 @@ daemon:
 stop:
 	docker-compose stop
 
-##################### Additional commands
-
-lms-shell:
-	docker-compose run --rm lms ./manage.py lms --settings=production shell
-cms-shell:
-	docker-compose run --rm lms ./manage.py cms --settings=production shell
+##################### Extra
 
 import-demo-course:
-	docker-compose run --rm cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/ginkgo.master && python ./manage.py cms --settings=production import ../data ../edx-demo-course"
-	# Seed the course permissions: is it necessary? "./manage.py lms --settings=production seed_permissions_roles 'course-v1:edX+DemoX+Demo_Course'"
+	$(DOCKER_COMPOSE_RUN_CMS) /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/ginkgo.master && python ./manage.py cms import ../data ../edx-demo-course"
+	# Seed the course permissions: is it necessary? "./manage.py lms seed_permissions_roles 'course-v1:edX+DemoX+Demo_Course'"
 
 create-staff-user:
-	docker-compose run --rm lms /bin/bash -c "./manage.py lms --settings=production manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms --settings=production changepassword ${USERNAME}"
+	$(DOCKER_COMPOSE_RUN_LMS) /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
+
+
+##################### Development
+
+lms:
+	$(DOCKER_COMPOSE_RUN_LMS) bash
+cms:
+	$(DOCKER_COMPOSE_RUN_CMS) bash
+
+lms-shell:
+	$(DOCKER_COMPOSE_RUN_LMS) ./manage.py lms shell
+cms-shell:
+	$(DOCKER_COMPOSE_RUN_LMS) ./manage.py cms shell

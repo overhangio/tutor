@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Checking system..."
-until ./manage.py lms --settings=production check
+until ./manage.py $SERVICE_VARIANT check
 do
   printf "."
   sleep 1

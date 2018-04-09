@@ -1,8 +1,13 @@
 # Open edX quick install (in Docker containers)
 
-This is a **one-click production install of [Open edX](https://openedx.org)**.
+This is a **one-click install of [Open edX](https://openedx.org), both for production and local development**.
 
-The deployment of a full-featured Open edX platform is a highly technical and complex project... but we can remove most of the complexity by relying on pre-configured Docker containers and by using only a subset of all possible features. We made this so that non-technical people could still install Open edX by themselves: knowing how to launch a server and ssh into it should be enough. But we also made sure that every step of the deploy process could be customized if you have the technical skills.
+The deployment of a full-featured Open edX platform is a highly technical and complex project. Here, we greatly simplify it by:
+
+1. relying on pre-configured Docker containers for external services, such as MySQL and MongoDb
+2. activating only a subset of all Open edX features
+
+We made this project so that non-technical people could still install Open edX by themselves: knowing how to launch a server and ssh into it should be enough. But we also made sure that every step of the deploy process could be customized if you have the technical skills.
 
 ## Quickstart
 
@@ -10,9 +15,9 @@ All you have to do is [download the content of this repository](https://codeload
 
     make all
 
-There is no step #2. You will be asked some questions about the configuration of your Open edX platform. The build step will take some time, but then you will have both an LMS and a CMS running behind a web server on port 80. You should be able to access your platform at the address you gave during the configuration phase.
+You will be asked some questions about the configuration of your Open edX platform. The build step will take some time, but then you will have both an LMS and a CMS running behind a web server on port 80, ready for production. You should be able to access your platform at the address you gave during the configuration phase.
 
-To be honest, I really don't like 1-click installs :-p They tend to hide much of the important details. So I strongly recommend you read the more detailed instructions below to understand what is going on exactly and to troubleshoot potential issues.
+To be honest, I really don't like 1-click installs :-p They tend to hide much of the important details. So I strongly recommend you read the more detailed instructions below to understand what is going on exactly and to troubleshoot potential issues. Also, instructions are given to setup a local development environment.
 
 ## Requirements
 
@@ -22,7 +27,7 @@ The only prerequisite for running this is Python and a working docker install. Y
 - [Docker install](https://docs.docker.com/engine/installation/)
 - [Docker compose install](https://docs.docker.com/compose/install/)
 
-Note that the web server container will bind to port 80, so if you already have a web server running (Apache or Nginx, for instance), you should stop it.
+Note that the production web server container will bind to port 80, so if you already have a web server running (Apache or Nginx, for instance), you should stop it.
 
 You should be able to run Open edX on any platform that supports Docker and Python, including Mac OS and Windows. For now, only Ubuntu 16.04 was tested but we have no reason to believe the install would not work on a different OS.
 
@@ -48,6 +53,8 @@ Building the images may require a long time, depending on your bandwidth, as you
     make assets
 
 These commands should be run just once. They will create the database tables and generate static assets, such as images, stylesheets and Javascript dependencies.
+
+If migrations are stopped with a `Killed` message, this certainly means the docker containers don't have enough RAM. See the [troubleshooting](#troubleshooting) section.
 
 ### Running Open edX
 
@@ -83,15 +90,19 @@ And then, to stop all services:
 
 ### Logging
 
-To view the logs from all containers:
+To view the logs from all containers use the [`docker-compose logs`](https://docs.docker.com/compose/reference/logs/) command:
 
     docker-compose logs -f
 
 To view the logs from just one container, for instance the web server:
 
-    docker-compose logs -f
+    docker-compose logs -f nginx
 
-### Development
+The last commands produce the logs since the creation of the containers, which can be a lot. Similar to a `tail -f`, you can run:
+
+    docker-compose logs --tail=0 -f
+
+### Debugging
 
 Open a bash in the lms:
 
@@ -101,6 +112,74 @@ Open a python shell in the lms or the cms:
 
     make lms-shell
     make cms-shell
+
+## For developers
+
+In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
+
+First, configure your project such that the LMS and the CMS can be accessed locally:
+
+    make configure
+    ...
+    Your website domain name for students (LMS) (default: "www.myopenedx.com"): localhost:8000
+    Your website domain name for teachers (CMS) (default: "studio.myopenedx.com"): localhost:8001
+    ...
+
+Then, build the images and prepare the database:
+
+    make build
+    make migrate
+
+Point to your local install of [edx-platform](https://github.com/edx/edx-platform/) on your host machine:
+
+    export EDX_PLATFORM_PATH=/path/to/your/edx-platform
+
+Point to your settings file:
+
+    export EDX_PLATFORM_SETTINGS=development
+
+In this example, you should have a `development.py` file in `edx-platform/lms/envs` and `edx-platform/cms/envs`. Here is a minimal settings file:
+
+    from .devstack import *
+
+    # Load module store settings from config files
+    update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
+
+    # Set uploaded media file path
+    MEDIA_ROOT = "/openedx/data/uploads/"
+
+    # Deactivate forums
+    FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+
+    # Activate dev_env for logging, otherwise rsyslog is required (but it is
+    # not available in docker).
+    LOGGING = get_logger_config(LOG_DIR,
+                                logging_env=ENV_TOKENS['LOGGING_ENV'],
+                                debug=False,
+                                dev_env=True,
+                                service_variant=SERVICE_VARIANT)
+
+    # Create folders if necessary
+    import os
+    for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+You are ready to go! Run:
+
+    make lms
+
+Or:
+
+    make cms
+
+This will open a shell in the LMS container. You can then run just any command you are used to. For example:
+
+    paver lms
+
+This will collect assets and run a development server which will **automatically reload** after you make changes to your edx-platform repository.
+
+Note that the containers are built on the Ginkgo release. If you are working on a different version of Open edX, you will have to rebuild the images with a different `EDX_PLATFORM_VERSION` argument. You may also want to change the `EDX_PLATFORM_REPOSITORY` argument to point to your own fork of edx-platform.
 
 ## Troubleshooting
 
