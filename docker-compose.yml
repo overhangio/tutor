@@ -55,7 +55,7 @@ services:
 
   lms:
     build:
-      context: ./edxapp
+      context: ./openedx
     environment:
       SERVICE_VARIANT: lms
     restart: unless-stopped
@@ -70,7 +70,7 @@ services:
 
   cms:
     build:
-      context: ./edxapp
+      context: ./openedx
     environment:
       SERVICE_VARIANT: cms
     restart: unless-stopped
@@ -84,7 +84,7 @@ services:
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
     build:
-      context: ./edxapp
+      context: ./openedx
     environment:
       SERVICE_VARIANT: lms
     command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
@@ -98,7 +98,7 @@ services:
 
   cms_worker:
     build:
-      context: ./edxapp
+      context: ./openedx
     environment:
       SERVICE_VARIANT: cms
     command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100

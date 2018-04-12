@@ -133,23 +133,23 @@ def main():
 
     # Open edX
     substitute(
-        os.path.join('edxapp', 'config', 'templates', 'lms.env.json.templ'),
-        os.path.join('edxapp', 'config', 'lms.env.json'),
+        os.path.join('openedx', 'config', 'templates', 'lms.env.json.templ'),
+        os.path.join('openedx', 'config', 'lms.env.json'),
         **configurator.as_dict()
     )
     substitute(
-        os.path.join('edxapp', 'config', 'templates', 'cms.env.json.templ'),
-        os.path.join('edxapp', 'config', 'cms.env.json'),
+        os.path.join('openedx', 'config', 'templates', 'cms.env.json.templ'),
+        os.path.join('openedx', 'config', 'cms.env.json'),
         **configurator.as_dict()
     )
     substitute(
-        os.path.join('edxapp', 'config', 'templates', 'lms.auth.json.templ'),
-        os.path.join('edxapp', 'config', 'lms.auth.json'),
+        os.path.join('openedx', 'config', 'templates', 'lms.auth.json.templ'),
+        os.path.join('openedx', 'config', 'lms.auth.json'),
         **configurator.as_dict()
     )
     substitute(
-        os.path.join('edxapp', 'config', 'templates', 'cms.auth.json.templ'),
-        os.path.join('edxapp', 'config', 'cms.auth.json'),
+        os.path.join('openedx', 'config', 'templates', 'cms.auth.json.templ'),
+        os.path.join('openedx', 'config', 'cms.auth.json'),
         **configurator.as_dict()
     )
 
