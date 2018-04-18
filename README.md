@@ -134,6 +134,8 @@ Point to your local install of [edx-platform](https://github.com/edx/edx-platfor
 
     export EDX_PLATFORM_PATH=/path/to/your/edx-platform
 
+Note that you should use an absolute path here, not a relative path (e.g: `/path/to/edx-platform` and not `../edx-platform`).
+
 Point to your settings file:
 
     export EDX_PLATFORM_SETTINGS=development
@@ -173,11 +175,10 @@ Or:
 
     make cms
 
-This will open a shell in the LMS container. You can then run just any command you are used to. For example:
+This will open a shell in the LMS container. You can then run just any command you are used to. For example, collect assets and run a local server:
 
-    paver lms
-
-This will collect assets and run a development server which will **automatically reload** after you make changes to your edx-platform repository.
+    paver update_assets lms --settings=development
+    ./manage.py lms runserver 0.0.0.0:8000
 
 Note that the containers are built on the Ginkgo release. If you are working on a different version of Open edX, you will have to rebuild the images with a different `EDX_PLATFORM_VERSION` argument. You may also want to change the `EDX_PLATFORM_REPOSITORY` argument to point to your own fork of edx-platform.
 
@@ -186,6 +187,29 @@ Note that the containers are built on the Ginkgo release. If you are working on 
 ### "Running migrations... Killed!"
 
 The LMS and CMS containers require at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the `make all` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. [Follow these instructions from the official Docker documentation](https://docs.docker.com/docker-for-mac/#advanced). 
+
+
+### `Build failed running pavelib.servers.lms: Subprocess return code: 1`
+
+    python manage.py lms --settings=development print_setting STATIC_ROOT 2>/dev/null
+    ...
+    Build failed running pavelib.servers.lms: Subprocess return code: 1`"
+
+This might occur when you run a `paver` command. `/dev/null` eats the actual error, so you will have to run the command manually. Run `make lms` (or `make cms`) to open a bash session and then:
+
+    python manage.py lms --settings=development print_setting STATIC_ROOT
+
+Of course, you should replace `development` with your own settings. The error produced should help you better understand what is happening.
+
+### `ValueError: Unable to configure handler 'local'`
+
+    ValueError: Unable to configure handler 'local': [Errno 2] No such file or directory
+
+This will occur if you try to run a development environment without patching the LOGGING configuration, as indicated in the [development](#for-developers) section above. Maybe you correctly patched the development settings, but they are not taken into account? For instance, you might have correctly defined the `EDX_PLATFORM_SETTINGS` environment variable, but `paver` uses the `devstack` settings (which does not patch the LOGGING variable). This is because calling `paver lms --settings=development` or `paver cms --settings=development` ignores the `--settings` argument. Yes, it might be considered an edx-platform bug... Instead, you should run the `update_assets` and `runserver` commands, as explained above.
+
+### "`TypeError: get_logger_config() got an unexpected keyword argument 'debug'`"
+
+This might occur when you try to run the latest version of `edx-platform`, and not a version close to `gingko.master`. It is no longer necessary to patch the `LOGGING` configuration in the latest `edx-platform` releases, as indicated in the [development](#for-developers) section above, so you should remove the call to `get_logger_config` altogether from your development settings.
 
 ## Disclaimers & Warnings
 
