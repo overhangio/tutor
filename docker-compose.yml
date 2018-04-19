@@ -38,8 +38,6 @@ services:
     volumes:
       - ./data/lms:/openedx/data/lms:ro
       - ./data/cms:/openedx/data/cms:ro
-    depends_on:
-      - lms
 
   rabbitmq:
     image: rabbitmq:3.6.10
@@ -77,7 +75,11 @@ services:
     volumes:
       - ./data/cms:/openedx/data
     depends_on:
-      - lms
+      - memcached
+      - mongodb
+      - mysql
+      - rabbitmq
+      - smtp
 
   ############# LMS and CMS workers
 

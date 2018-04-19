@@ -1,7 +1,3 @@
-upstream lms-backend {
-  server lms:8000 fail_timeout=0;
-}
-
 server {
   listen 80;
   server_name £{LMS_HOST};
@@ -23,11 +19,13 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-Port $server_port;
     proxy_set_header X-Forwarded-For $remote_addr;
-    
     proxy_set_header Host $http_host;
-
     proxy_redirect off;
-    proxy_pass http://lms-backend;
+
+    # Docker resolver
+    resolver 127.0.0.11 valid=10s;
+    set $upstream lms;
+    proxy_pass http://$upstream:8000;
   }
 
   location / {
