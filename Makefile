@@ -45,7 +45,6 @@ stop:
 
 import-demo-course:
 	$(DOCKER_COMPOSE_RUN_CMS) /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/ginkgo.master && python ./manage.py cms import ../data ../edx-demo-course"
-	# Seed the course permissions: is it necessary? "./manage.py lms seed_permissions_roles 'course-v1:edX+DemoX+Demo_Course'"
 
 create-staff-user:
 	$(DOCKER_COMPOSE_RUN_LMS) /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
