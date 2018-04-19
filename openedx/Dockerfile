@@ -19,14 +19,12 @@ RUN apt install -y nodejs-legacy
 # Static assets will reside in /openedx/data and edx-platform will be
 # checked-out in /openedx/
 RUN mkdir /openedx /openedx/data /openedx/edx-platform
-VOLUME /openedx/data
 WORKDIR /openedx/edx-platform
 
 ## Checkout edx-platform code
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
 ARG EDX_PLATFORM_VERSION=open-release/ginkgo.master
 RUN git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 .
-VOLUME /openedx/edx-platform
 
 # Install python requirements (clone source repos in a separate dir, otherwise
 # will be overwritten when we mount edx-platform)
@@ -53,6 +51,11 @@ COPY ./config/cms.auth.json /openedx/
 # Copy convenient scripts
 COPY ./wait-for-greenlight.sh /usr/local/bin/
 COPY ./docker-entrypoint.sh /usr/local/bin/
+
+# Declare volumes as late as possible, otherwise steps that modify these
+# folders are discarded
+VOLUME /openedx/data
+VOLUME /openedx/edx-platform
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
