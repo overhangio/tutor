@@ -26,8 +26,8 @@ migrate:
 	$(DOCKER_COMPOSE_RUN_CMS) bash -c "wait-for-greenlight.sh && ./manage.py cms migrate"
 
 assets:
-	$(DOCKER_COMPOSE_RUN_LMS) paver update_assets lms
-	$(DOCKER_COMPOSE_RUN_CMS) paver update_assets cms
+	$(DOCKER_COMPOSE_RUN_LMS) paver update_assets lms --settings=production
+	$(DOCKER_COMPOSE_RUN_CMS) paver update_assets cms --settings=production
 
 ##################### Running
 
