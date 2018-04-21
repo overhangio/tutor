@@ -1,9 +1,8 @@
 .PHONY: all configure build migrate assets up daemon
 
 DOCKER_COMPOSE_RUN = docker-compose run --rm -e USERID="$$(id -u)"
-ifneq ($(EDX_PLATFORM_SETTINGS),)
-	DOCKER_COMPOSE_RUN += -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
-endif
+EDX_PLATFORM_SETTINGS = production
+DOCKER_COMPOSE_RUN += -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
 ifneq ($(EDX_PLATFORM_PATH),)
 	DOCKER_COMPOSE_RUN += --volume="$(EDX_PLATFORM_PATH):/openedx/edx-platform"
 endif
@@ -26,8 +25,8 @@ migrate:
 	$(DOCKER_COMPOSE_RUN_CMS) bash -c "wait-for-greenlight.sh && ./manage.py cms migrate"
 
 assets:
-	$(DOCKER_COMPOSE_RUN_LMS) paver update_assets lms --settings=production
-	$(DOCKER_COMPOSE_RUN_CMS) paver update_assets cms --settings=production
+	$(DOCKER_COMPOSE_RUN_LMS) paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
+	$(DOCKER_COMPOSE_RUN_CMS) paver update_assets cms --settings=$(EDX_PLATFORM_SETTINGS)
 
 ##################### Running
 
