@@ -39,8 +39,8 @@ migrate-xqueue:
 migrate: provision migrate-openedx migrate-forum migrate-xqueue
 
 assets:
-	$(DOCKER_COMPOSE_RUN_OPENEDX) lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
-	$(DOCKER_COMPOSE_RUN_OPENEDX) cms paver update_assets cms --settings=$(EDX_PLATFORM_SETTINGS)
+	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
+	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True cms paver update_assets cms --settings=$(EDX_PLATFORM_SETTINGS)
 
 ##################### Running
 
@@ -69,7 +69,7 @@ info:
 	echo $$EDX_PLATFORM_SETTINGS
 
 import-demo-course:
-	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/ginkgo.master && python ./manage.py cms import ../data ../edx-demo-course"
+	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/hawthorn.beta1 && python ./manage.py cms import ../data ../edx-demo-course"
 
 create-staff-user:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
@@ -109,16 +109,16 @@ android-dockerhub: android-build android-push
 
 build:
 	# We need to build with docker, as long as docker-compose cannot push to dockerhub
-	docker build -t regis/openedx:latest -t regis/openedx:ginkgo openedx/
-	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:ginkgo forum/
-	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:ginkgo xqueue/
+	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
+	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:hawthorn forum/
+	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
 
 push:
-	docker push regis/openedx:ginkgo
+	docker push regis/openedx:hawthorn
 	docker push regis/openedx:latest
-	docker push regis/openedx-forum:ginkgo
+	docker push regis/openedx-forum:hawthorn
 	docker push regis/openedx-forum:latest
-	docker push regis/openedx-xqueue:ginkgo
+	docker push regis/openedx-xqueue:hawthorn
 	docker push regis/openedx-xqueue:latest
 
 dockerhub: build push

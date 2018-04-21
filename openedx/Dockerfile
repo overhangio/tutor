@@ -8,7 +8,7 @@ RUN apt update && \
   # Global requirements
   apt install -y language-pack-en git python-virtualenv build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev python-pip libmysqlclient-dev python-apt python-dev libxmlsec1-dev libfreetype6-dev swig gcc g++ && \
   # openedx requirements
-  apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng12-dev libxml2-dev libxmlsec1-dev libxslt1-dev nodejs npm ntp pkg-config && \
+  apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng12-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev nodejs npm ntp pkg-config && \
   # Our requirements
   apt install -y mysql-client
 
@@ -23,20 +23,16 @@ WORKDIR /openedx/edx-platform
 
 ## Checkout edx-platform code
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
-ARG EDX_PLATFORM_VERSION=open-release/ginkgo.master
+ARG EDX_PLATFORM_VERSION=open-release/hawthorn.1
 RUN git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 .
 
 # Install python requirements (clone source repos in a separate dir, otherwise
 # will be overwritten when we mount edx-platform)
-RUN pip install --src ../venv/src -r requirements/edx/pre.txt
-RUN pip install --src ../venv/src -r requirements/edx/github.txt
-RUN pip install --src ../venv/src -r requirements/edx/local.txt
 RUN pip install --src ../venv/src -r requirements/edx/base.txt
-RUN pip install --src ../venv/src -r requirements/edx/post.txt
-RUN pip install --src ../venv/src -r requirements/edx/paver.txt
 
 # Install nodejs requirements
 RUN npm install
+ENV PATH ./node_modules/.bin:${PATH}
 
 # Link configuration files to common /openedx/config folder, which should later
 # be mounted as a volume. Note that this image will not be functional until

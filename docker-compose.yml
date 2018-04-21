@@ -60,7 +60,7 @@ services:
   ############# Forum
 
   forum:
-    image: regis/openedx-forum:ginkgo
+    image: regis/openedx-forum:hawthorn
     build:
       context: ./forum
     environment:
@@ -75,7 +75,7 @@ services:
   ############# LMS and CMS
 
   lms:
-    image: regis/openedx:ginkgo
+    image: regis/openedx:hawthorn
     build:
       context: ./openedx
     environment:
@@ -94,7 +94,7 @@ services:
       - smtp
 
   cms:
-    image: regis/openedx:ginkgo
+    image: regis/openedx:hawthorn
     build:
       context: ./openedx
     environment:
@@ -114,7 +114,7 @@ services:
 
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
-    image: regis/openedx:ginkgo
+    image: regis/openedx:hawthorn
     build:
       context: ./openedx
     environment:
@@ -130,7 +130,7 @@ services:
       - lms
 
   cms_worker:
-    image: regis/openedx:ginkgo
+    image: regis/openedx:hawthorn
     build:
       context: ./openedx
     environment:
@@ -147,7 +147,7 @@ services:
 
   ############# Xqueue: external grading of Open edX problems
   xqueue:
-    image: regis/openedx-xqueue:ginkgo
+    image: regis/openedx-xqueue:hawthorn
     build:
       context: ./xqueue
     volumes:
@@ -158,7 +158,7 @@ services:
       - mysql
 
   xqueue_consumer:
-    image: regis/openedx-xqueue:ginkgo
+    image: regis/openedx-xqueue:hawthorn
     build:
       context: ./xqueue
     volumes:

@@ -12,7 +12,7 @@ WORKDIR /openedx/ruby-build
 RUN PREFIX=/usr/local ./install.sh
 
 # Install ruby and some specific dependencies
-ENV RUBY_VERSION 1.9.3-p551
+ENV RUBY_VERSION 2.4.1
 ENV BUNDLER_VERSION 1.11.2
 ENV RAKE_VERSION 10.4.2
 RUN ruby-build $RUBY_VERSION /openedx/ruby
@@ -23,7 +23,7 @@ RUN gem install rake -v $RAKE_VERSION
 RUN gem install rubygems-update && update_rubygems
 
 # Install forum
-RUN git clone https://github.com/edx/cs_comments_service.git --branch open-release/ginkgo.master --depth 1 /openedx/cs_comments_service
+RUN git clone https://github.com/edx/cs_comments_service.git --branch open-release/hawthorn.1 --depth 1 /openedx/cs_comments_service
 WORKDIR /openedx/cs_comments_service
 RUN bundle install --deployment
 

@@ -6,13 +6,9 @@ update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
 # Set uploaded media file path
 MEDIA_ROOT = "/openedx/data/uploads/"
 
-# Activate dev_env for logging, otherwise rsyslog is required (but it is
-# not available in docker).
-LOGGING = get_logger_config(LOG_DIR,
-                            logging_env=ENV_TOKENS['LOGGING_ENV'],
-                            debug=False,
-                            dev_env=True,
-                            service_variant=SERVICE_VARIANT)
+# Change syslog-based loggers which don't work inside docker containers
+LOGGING['handlers']['local'] = LOGGING['handlers']['console'].copy()
+LOGGING['handlers']['tracking'] = LOGGING['handlers']['console'].copy()
 
 # Create folders if necessary
 import os
