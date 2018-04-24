@@ -1,7 +1,7 @@
 .PHONY: all configure build migrate assets up daemon
 
 DOCKER_COMPOSE_RUN = docker-compose run --rm -e USERID="$$(id -u)"
-EDX_PLATFORM_SETTINGS = production
+EDX_PLATFORM_SETTINGS ?= production
 DOCKER_COMPOSE_RUN += -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
 ifneq ($(EDX_PLATFORM_PATH),)
 	DOCKER_COMPOSE_RUN += --volume="$(EDX_PLATFORM_PATH):/openedx/edx-platform"
