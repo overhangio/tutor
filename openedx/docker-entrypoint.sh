@@ -6,11 +6,13 @@ USERID=${USERID:=1000}
 if [ "$USERID" -ne 1000 ]
     then
         echo "creating new user 'openedx' with UID $USERID"
-        useradd -m openedx -u $USERID
+        useradd --home-dir /openedx -u $USERID openedx
+
+        # Change file permissions
         chown --no-dereference -R openedx /openedx
 
         # Run CMD as different user
-        exec chroot --userspec="$USERID" --skip-chdir / "$@"
+        exec chroot --userspec="$USERID" --skip-chdir / env HOME=/openedx "$@"
 else 
         # Run CMD as root (business as usual)
         exec "$@"
