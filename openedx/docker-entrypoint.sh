@@ -7,7 +7,7 @@ if [ "$USERID" -ne 1000 ]
     then
         echo "creating new user 'openedx' with UID $USERID"
         useradd -m openedx -u $USERID
-        chown -R openedx /openedx
+        chown --no-dereference -R openedx /openedx
 
         # Run CMD as different user
         exec chroot --userspec="$USERID" --skip-chdir / "$@"
