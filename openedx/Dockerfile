@@ -38,15 +38,17 @@ RUN pip install --src ../venv/src -r requirements/edx/paver.txt
 # Install nodejs requirements
 RUN npm install
 
-# Copy configuration files
-COPY ./config/production_lms.py /openedx/edx-platform/lms/envs/production.py
-COPY ./config/production_cms.py /openedx/edx-platform/cms/envs/production.py
-COPY ./config/production_common.py /openedx/edx-platform/lms/envs/production_common.py
-COPY ./config/production_common.py /openedx/edx-platform/cms/envs/production_common.py
-COPY ./config/lms.env.json /openedx/
-COPY ./config/cms.env.json /openedx/
-COPY ./config/lms.auth.json /openedx/
-COPY ./config/cms.auth.json /openedx/
+# Copy configuration files in common folder (which can later be mounted as a volume)
+RUN mkdir /openedx/config
+COPY ./config/* /openedx/config/
+RUN ln -s /openedx/config/production_lms.py /openedx/edx-platform/lms/envs/production.py \
+  && ln -s /openedx/config/production_cms.py /openedx/edx-platform/cms/envs/production.py \
+  && ln -s /openedx/config/production_common.py /openedx/edx-platform/lms/envs/production_common.py \
+  && ln -s /openedx/config/production_common.py /openedx/edx-platform/cms/envs/production_common.py
+RUN ln -s /openedx/config/lms.env.json /openedx/ \
+  && ln -s /openedx/config/cms.env.json /openedx/ \
+  && ln -s /openedx/config/lms.auth.json /openedx/ \
+  && ln -s /openedx/config/cms.auth.json /openedx/
 
 # Copy convenient scripts
 COPY ./wait-for-greenlight.sh /usr/local/bin/

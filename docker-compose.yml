@@ -58,6 +58,7 @@ services:
       SERVICE_VARIANT: lms
     restart: unless-stopped
     volumes:
+      - ./openedx/config:/openedx/config
       - ./data/lms:/openedx/data
     depends_on:
       - memcached
@@ -73,6 +74,7 @@ services:
       SERVICE_VARIANT: cms
     restart: unless-stopped
     volumes:
+      - ./openedx/config:/openedx/config
       - ./data/cms:/openedx/data
     depends_on:
       - memcached
@@ -94,6 +96,7 @@ services:
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     volumes:
+      - ./openedx/config:/openedx/config
       - ./data/lms_worker:/openedx/data
     depends_on:
       - lms
@@ -108,6 +111,7 @@ services:
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     volumes:
+      - ./openedx/config:/openedx/config
       - ./data/cms_worker:/openedx/data
     depends_on:
       - cms
