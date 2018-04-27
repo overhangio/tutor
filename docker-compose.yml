@@ -30,12 +30,12 @@ services:
       MYSQL_ROOT_PASSWORD_FILE: /etc/mysql/conf.d/openedx/password
 
   nginx:
-    build:
-      context: ./nginx
+    image: nginx:1.13
     restart: unless-stopped
     ports:
       - "80:80"
     volumes:
+      - ./config/rendered/nginx:/etc/nginx/conf.d/
       - ./data/lms:/openedx/data/lms:ro
       - ./data/cms:/openedx/data/cms:ro
 

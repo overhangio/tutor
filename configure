@@ -174,13 +174,13 @@ def main():
     # We need a different delimiter in nginx config files, because the '$' sign
     # is widely used there
     substitute(
-        os.path.join('nginx', 'config', 'templates', 'lms.conf.templ'),
-        os.path.join('nginx', 'config', 'lms.conf'),
+        os.path.join('config', 'templates', 'nginx', 'lms.conf.templ'),
+        os.path.join('config', 'rendered', 'nginx', 'lms.conf'),
         delimiter='£', **configurator.as_dict()
     )
     substitute(
-        os.path.join('nginx', 'config', 'templates', 'cms.conf.templ'),
-        os.path.join('nginx', 'config', 'cms.conf'),
+        os.path.join('config', 'templates', 'nginx', 'cms.conf.templ'),
+        os.path.join('config', 'rendered', 'nginx', 'cms.conf'),
         delimiter='£', **configurator.as_dict()
     )
 
