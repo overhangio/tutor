@@ -52,11 +52,6 @@ COPY ./config/cms.auth.json /openedx/
 COPY ./wait-for-greenlight.sh /usr/local/bin/
 COPY ./docker-entrypoint.sh /usr/local/bin/
 
-# Declare volumes as late as possible, otherwise steps that modify these
-# folders are discarded
-VOLUME /openedx/data
-VOLUME /openedx/edx-platform
-
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
 ENV SETTINGS production
