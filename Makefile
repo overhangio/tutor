@@ -1,7 +1,7 @@
 .PHONY: all configure build migrate assets up daemon
 
-USER_ID ?= $$(id -u)
-DOCKER_COMPOSE_RUN = docker-compose run --rm -e USERID=$(USER_ID)
+USERID ?= $$(id -u)
+DOCKER_COMPOSE_RUN = docker-compose run --rm -e USERID=$(USERID)
 EDX_PLATFORM_SETTINGS ?= production
 DOCKER_COMPOSE_RUN += -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
 ifneq ($(EDX_PLATFORM_PATH),)
