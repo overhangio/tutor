@@ -1,9 +1,9 @@
 #!/bin/bash -e
 export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
-USERID=${USERID:=1000}
+USERID=${USERID:=0}
 
 ## Configure user with a different USERID if requested.
-if [ "$USERID" -ne 1000 ]
+if [ "$USERID" -ne 0 ]
     then
         echo "creating new user 'openedx' with UID $USERID"
         useradd --home-dir /openedx -u $USERID openedx
