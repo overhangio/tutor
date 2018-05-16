@@ -69,11 +69,11 @@ build:
 	docker-compose build
 
 tag:
-	docker tag openedx overhangio/openedx:ginkgo
-	docker tag openedx overhangio/openedx:latest
+	docker tag openedx regis/openedx:ginkgo
+	docker tag openedx regis/openedx:latest
 
 push:
-	docker push overhangio/openedx:ginkgo
-	docker push overhangio/openedx:latest
+	docker push regis/openedx:ginkgo
+	docker push regis/openedx:latest
 
 dockerhub: build tag push

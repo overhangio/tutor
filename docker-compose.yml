@@ -52,7 +52,7 @@ services:
   ############# LMS and CMS
 
   lms:
-    image: overhangio/openedx:ginkgo
+    image: regis/openedx:ginkgo
     build:
       context: ./openedx
     environment:
@@ -69,7 +69,7 @@ services:
       - smtp
 
   cms:
-    image: overhangio/openedx:ginkgo
+    image: regis/openedx:ginkgo
     build:
       context: ./openedx
     environment:
@@ -89,7 +89,7 @@ services:
 
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
-    image: overhangio/openedx:ginkgo
+    image: regis/openedx:ginkgo
     build:
       context: ./openedx
     environment:
@@ -105,7 +105,7 @@ services:
       - lms
 
   cms_worker:
-    image: overhangio/openedx:ginkgo
+    image: regis/openedx:ginkgo
     build:
       context: ./openedx
     environment:
