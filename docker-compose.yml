@@ -52,13 +52,14 @@ services:
   ############# LMS and CMS
 
   lms:
+    image: overhangio/openedx:ginkgo
     build:
       context: ./openedx
     environment:
       SERVICE_VARIANT: lms
     restart: unless-stopped
     volumes:
-      - ./openedx/config:/openedx/config
+      - ./config/openedx:/openedx/config
       - ./data/lms:/openedx/data
     depends_on:
       - memcached
@@ -68,13 +69,14 @@ services:
       - smtp
 
   cms:
+    image: overhangio/openedx:ginkgo
     build:
       context: ./openedx
     environment:
       SERVICE_VARIANT: cms
     restart: unless-stopped
     volumes:
-      - ./openedx/config:/openedx/config
+      - ./config/openedx:/openedx/config
       - ./data/cms:/openedx/data
     depends_on:
       - memcached
@@ -87,6 +89,7 @@ services:
 
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
+    image: overhangio/openedx:ginkgo
     build:
       context: ./openedx
     environment:
@@ -96,12 +99,13 @@ services:
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     volumes:
-      - ./openedx/config:/openedx/config
+      - ./config/openedx:/openedx/config
       - ./data/lms_worker:/openedx/data
     depends_on:
       - lms
 
   cms_worker:
+    image: overhangio/openedx:ginkgo
     build:
       context: ./openedx
     environment:
@@ -111,7 +115,7 @@ services:
     environment:
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     volumes:
-      - ./openedx/config:/openedx/config
+      - ./config/openedx:/openedx/config
       - ./data/cms_worker:/openedx/data
     depends_on:
       - cms

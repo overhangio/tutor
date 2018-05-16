@@ -15,7 +15,7 @@ All you have to do is [download the content of this repository](https://codeload
 
     make all
 
-You will be asked some questions about the configuration of your Open edX platform. The build step will take some time, but then you will have both an LMS and a CMS running behind a web server on port 80, ready for production. You should be able to access your platform at the address you gave during the configuration phase.
+You will be asked some questions about the configuration of your Open edX platform. You will have to download a ~900 Mb docker image, but then you will have both an LMS and a CMS running behind a web server on port 80, ready for production. You should be able to access your platform at the address you gave during the configuration phase.
 
 To be honest, I really don't like 1-click installs :-p They tend to hide much of the important details. So I strongly recommend you read the more detailed instructions below to understand what is going on exactly and to troubleshoot potential issues. Also, instructions are given to setup a local development environment.
 
@@ -41,11 +41,11 @@ At a minimum, the server running the containers should have 4 Gb of RAM.
 
 This is the only non-automatic step in the install process. You will be asked various questions about your Open edX platform and appropriate configuration files will be generated. If you would like to automate this step then you should run `make configure` interactively once. After that, you will have a `config.json` file at the root of the repository. Just upload it to wherever you want to run Open edX and then run `./configure --silent` instead of `make configure`. All values from `config.json` will be automatically loaded.
 
-### Build
+### Download
 
-    make build # go get a coffee
+    make update
 
-Building the images may require a long time, depending on your bandwidth, as you will have to checkout the `edx-platform` repository (> 1 Gb) as well as the python dependencies. Once the images have been built, this step can be repeated very quickly.
+You will need to download the docker images from [Docker Hub](https://hub.docker.com/r/overhangio/openedx/). Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
 
 ### Migrations and assets
 
@@ -113,9 +113,12 @@ Open a python shell in the lms or the cms:
     make lms-shell
     make cms-shell
 
+
 ## For developers
 
 In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
+
+(Note: containers are built on the Ginkgo release. If you are working on a different version of Open edX, you will have to rebuild the images with a different `EDX_PLATFORM_VERSION` argument. You may also want to change the `EDX_PLATFORM_REPOSITORY` argument to point to your own fork of edx-platform.)
 
 First, configure your project such that the LMS and the CMS can be accessed locally:
 
@@ -125,12 +128,24 @@ First, configure your project such that the LMS and the CMS can be accessed loca
     Your website domain name for teachers (CMS) (default: "studio.myopenedx.com"): localhost:8001
     ...
 
-Then, build the images and prepare the database:
+### Standard devstack
 
-    make build
-    make migrate
+Define development settings (on the host):
 
-Point to your local install of [edx-platform](https://github.com/edx/edx-platform/) on your host machine:
+    export EDX_PLATFORM_SETTINGS=universal.development
+
+Then open an LMS shell:
+
+    make lms
+
+You can then collect assets and run a local web server, as usual:
+
+    paver update_assets lms --settings=universal.development
+    ./manage.py lms runserver 0.0.0.0:8000
+
+### Custom devstack
+
+If you have one, you can point to a local version of [edx-platform](https://github.com/edx/edx-platform/) on your host machine:
 
     export EDX_PLATFORM_PATH=/path/to/your/edx-platform
 
@@ -138,34 +153,9 @@ Note that you should use an absolute path here, not a relative path (e.g: `/path
 
 Point to your settings file:
 
-    export EDX_PLATFORM_SETTINGS=development
+    export EDX_PLATFORM_SETTINGS=mysettings.py
 
-In this example, you should have a `development.py` file in `edx-platform/lms/envs` and `edx-platform/cms/envs`. Here is a minimal settings file:
-
-    from .devstack import *
-
-    # Load module store settings from config files
-    update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
-
-    # Set uploaded media file path
-    MEDIA_ROOT = "/openedx/data/uploads/"
-
-    # Deactivate forums
-    FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
-
-    # Activate dev_env for logging, otherwise rsyslog is required (but it is
-    # not available in docker).
-    LOGGING = get_logger_config(LOG_DIR,
-                                logging_env=ENV_TOKENS['LOGGING_ENV'],
-                                debug=False,
-                                dev_env=True,
-                                service_variant=SERVICE_VARIANT)
-
-    # Create folders if necessary
-    import os
-    for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+In this example, you should have a `mysettings.py` file in `edx-platform/lms/envs` and `edx-platform/cms/envs`. Development settings file for docker are a bit different from stock devstack settings. For valid development settings files, check [`config/openedx/universal/lms/development.py`](https://github.com/regisb/openedx-docker/blob/master/config/openedx/universal/lms/development.py) and [`config/openedx/universal/cms/development.py`](https://github.com/regisb/openedx-docker/blob/master/config/openedx/universal/cms/development.py)
 
 You are ready to go! Run:
 
@@ -175,13 +165,17 @@ Or:
 
     make cms
 
-This will open a shell in the LMS container. You can then run just any command you are used to. For example, collect assets and run a local server:
+This will open a shell in the LMS (or CMS) container. You can then run just any command you are used to. For example, collect assets and run a local server:
 
-    paver update_assets lms --settings=development
+    paver update_assets lms --settings=mysettings
     ./manage.py lms runserver 0.0.0.0:8000
 
-Note that the containers are built on the Ginkgo release. If you are working on a different version of Open edX, you will have to rebuild the images with a different `EDX_PLATFORM_VERSION` argument. You may also want to change the `EDX_PLATFORM_REPOSITORY` argument to point to your own fork of edx-platform.
+## Maintainers
 
+The images are built, tagged and uploaded to Docker Hub in one command:
+
+    make dockerhub
+  
 ## Troubleshooting
 
 ### "Running migrations... Killed!"

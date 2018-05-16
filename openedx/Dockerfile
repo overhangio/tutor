@@ -38,13 +38,12 @@ RUN pip install --src ../venv/src -r requirements/edx/paver.txt
 # Install nodejs requirements
 RUN npm install
 
-# Copy configuration files in common folder (which can later be mounted as a volume)
+# Link configuration files to common /openedx/config folder, which should later
+# be mounted as a volume. Note that this image will not be functional until
+# config files have been mounted inside the container
 RUN mkdir /openedx/config
-COPY ./config/* /openedx/config/
-RUN ln -s /openedx/config/production_lms.py /openedx/edx-platform/lms/envs/production.py \
-  && ln -s /openedx/config/production_cms.py /openedx/edx-platform/cms/envs/production.py \
-  && ln -s /openedx/config/production_common.py /openedx/edx-platform/lms/envs/production_common.py \
-  && ln -s /openedx/config/production_common.py /openedx/edx-platform/cms/envs/production_common.py
+RUN ln -s /openedx/config/universal/lms/ /openedx/edx-platform/lms/envs/universal \
+  && ln -s /openedx/config/universal/cms/ /openedx/edx-platform/cms/envs/universal
 RUN ln -s /openedx/config/lms.env.json /openedx/ \
   && ln -s /openedx/config/cms.env.json /openedx/ \
   && ln -s /openedx/config/lms.auth.json /openedx/ \
@@ -56,7 +55,7 @@ COPY ./bin/docker-entrypoint.sh /usr/local/bin/
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
-ENV SETTINGS production
+ENV SETTINGS universal.production
 
 # Entrypoint will fix permissiosn of all files and run commands as openedx
 ENTRYPOINT ["docker-entrypoint.sh"]

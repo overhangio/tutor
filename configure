@@ -91,8 +91,13 @@ def template_class(user_delimiter='$'):
 
 
 def main():
+    # Hack to handle older config.json files that used to be in a different location
+    # TODO remove me
+    if os.path.exists("config.json"):
+        os.rename("config.json", os.path.join("config", "openedx", "config.json"))
+
     parser = argparse.ArgumentParser("Config file generator for Open edX")
-    parser.add_argument('-c', '--config', default="config.json",
+    parser.add_argument('-c', '--config', default=os.path.join("config", "openedx", "config.json"),
                         help="Load default values from this file. Config values will be saved there.")
     parser.add_argument('-s', '--silent', action='store_true',
                         help=(
@@ -133,23 +138,23 @@ def main():
 
     # Open edX
     substitute(
-        os.path.join('openedx', 'config', 'templates', 'lms.env.json.templ'),
-        os.path.join('openedx', 'config', 'lms.env.json'),
+        os.path.join('config', 'openedx', 'templates', 'lms.env.json.templ'),
+        os.path.join('config', 'openedx', 'lms.env.json'),
         **configurator.as_dict()
     )
     substitute(
-        os.path.join('openedx', 'config', 'templates', 'cms.env.json.templ'),
-        os.path.join('openedx', 'config', 'cms.env.json'),
+        os.path.join('config', 'openedx', 'templates', 'cms.env.json.templ'),
+        os.path.join('config', 'openedx', 'cms.env.json'),
         **configurator.as_dict()
     )
     substitute(
-        os.path.join('openedx', 'config', 'templates', 'lms.auth.json.templ'),
-        os.path.join('openedx', 'config', 'lms.auth.json'),
+        os.path.join('config', 'openedx', 'templates', 'lms.auth.json.templ'),
+        os.path.join('config', 'openedx', 'lms.auth.json'),
         **configurator.as_dict()
     )
     substitute(
-        os.path.join('openedx', 'config', 'templates', 'cms.auth.json.templ'),
-        os.path.join('openedx', 'config', 'cms.auth.json'),
+        os.path.join('config', 'openedx', 'templates', 'cms.auth.json.templ'),
+        os.path.join('config', 'openedx', 'cms.auth.json'),
         **configurator.as_dict()
     )
 
@@ -174,17 +179,17 @@ def main():
     # We need a different delimiter in nginx config files, because the '$' sign
     # is widely used there
     substitute(
-        os.path.join('config', 'templates', 'nginx', 'lms.conf.templ'),
-        os.path.join('config', 'rendered', 'nginx', 'lms.conf'),
+        os.path.join('config', 'nginx', 'templates', 'lms.conf.templ'),
+        os.path.join('config', 'nginx', 'lms.conf'),
         delimiter='£', **configurator.as_dict()
     )
     substitute(
-        os.path.join('config', 'templates', 'nginx', 'cms.conf.templ'),
-        os.path.join('config', 'rendered', 'nginx', 'cms.conf'),
+        os.path.join('config', 'nginx', 'templates', 'cms.conf.templ'),
+        os.path.join('config', 'nginx', 'cms.conf'),
         delimiter='£', **configurator.as_dict()
     )
 
-    print("\nConfiguration files were successfuly generated. You may now build the app containers.")
+    print("\nConfiguration files were successfuly generated. You may now run the app containers.")
 
 
 if __name__ == '__main__':

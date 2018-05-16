@@ -1,8 +1,6 @@
 .*.swp
-config.json
-openedx/config/*.env.json
-openedx/config/*.auth.json
-config/rendered/nginx/*.conf
+config/openedx/*.json
+config/nginx/*.conf
 mysql/config/database
 mysql/config/username
 mysql/config/password
