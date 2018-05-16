@@ -51,8 +51,8 @@ RUN ln -s /openedx/config/lms.env.json /openedx/ \
   && ln -s /openedx/config/cms.auth.json /openedx/
 
 # Copy convenient scripts
-COPY ./wait-for-greenlight.sh /usr/local/bin/
-COPY ./docker-entrypoint.sh /usr/local/bin/
+COPY ./bin/wait-for-greenlight.sh /usr/local/bin/
+COPY ./bin/docker-entrypoint.sh /usr/local/bin/
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
