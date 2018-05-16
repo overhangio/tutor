@@ -22,8 +22,8 @@ update:
 	docker-compose pull
 
 migrate:
-	$(DOCKER_COMPOSE_RUN_LMS) bash -c "wait-for-greenlight.sh && ./manage.py lms migrate"
-	$(DOCKER_COMPOSE_RUN_CMS) bash -c "wait-for-greenlight.sh && ./manage.py cms migrate"
+	$(DOCKER_COMPOSE_RUN) lms bash -c "wait-for-greenlight.sh && ./manage.py lms migrate"
+	$(DOCKER_COMPOSE_RUN) cms bash -c "wait-for-greenlight.sh && ./manage.py cms migrate"
 
 assets:
 	$(DOCKER_COMPOSE_RUN) lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
