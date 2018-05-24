@@ -66,14 +66,10 @@ cms-shell:
 #################### Deploying to docker hub
 
 build:
-	docker-compose build
-
-tag:
-	docker tag openedx regis/openedx:ginkgo
-	docker tag openedx regis/openedx:latest
+	docker build -t regis/openedx:latest -t regis/openedx:ginkgo openedx/
 
 push:
 	docker push regis/openedx:ginkgo
 	docker push regis/openedx:latest
 
-dockerhub: build tag push
+dockerhub: build push
