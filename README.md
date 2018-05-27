@@ -230,3 +230,7 @@ We have decided not to include the installation of SSL certificates in this proj
 ## Contributing
 
 Pull requests will be happily examined! However, we should be careful to keep the project lean and simple: both to use and to modify. Optional features should not make the user experience more complex. Instead, documentation on how to add the feature is preferred.
+
+## License
+
+This work is licensed under the terms of the [MIT License](https://github.com/regisb/openedx-docker/blob/master/LICENSE.txt).
