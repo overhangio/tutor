@@ -50,6 +50,7 @@ You will need to download the docker images from [Docker Hub](https://hub.docker
 ### Migrations and assets
 
     make migrate
+    make migrate-forum
     make assets
 
 These commands should be run just once. They will create the database tables and generate static assets, such as images, stylesheets and Javascript dependencies.
@@ -216,16 +217,16 @@ If you have a problem, feel free to open a [Github issue](https://github.com/reg
 
 ## Known missing features
 
-### Forums
-
-Forums are not installed in this proposed install of Open edX. They require a specific ruby install and settings. Unfortunately, there is no section dedicated specifically to the forums in the [Open edX documentation](http://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-ginkgo.master/).
-
 ### SSL certificates
 
 We have decided not to include the installation of SSL certificates in this project for running an Open edX platform on HTTPS. This is because there are too many different ways to generate SSL certificates. In particular, we should not assume that everyone uses [Let's Encrypt](http://letsencrypt.org/) certificates. If you decide to run your Open edX platform behind HTTPS, you will have to modify:
 
 * the generated nginx configuration files 
 * the `lms.env.json` and `cms.env.json` files: look for the `LMS_ROOT_URL` and `CMS_ROOT_URL` variables and replace "http" by "https".
+
+### Discovery service, XQueue, edX Notes, Ecommerce, Notifier
+
+Those extra services were considered low priority while developing this project. However, most of them should not be too hard to add to a standard install. If you need one or more of these services, feel free to let me know by opening an issue.
 
 ## Contributing
 

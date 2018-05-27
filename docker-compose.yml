@@ -29,6 +29,20 @@ services:
       MYSQL_PASSWORD_FILE: /etc/mysql/conf.d/openedx/password
       MYSQL_ROOT_PASSWORD_FILE: /etc/mysql/conf.d/openedx/password
 
+  elasticsearch:
+    image: elasticsearch:1.5.2
+    environment:
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "cluster.name=openedx"
+      - "bootstrap.memory_lock=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: "unless-stopped"
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+
   nginx:
     image: nginx:1.13
     restart: unless-stopped
@@ -49,6 +63,21 @@ services:
     image: namshi/smtp
     restart: unless-stopped
 
+  ############# Forum
+
+  forum:
+    image: regis/openedx-forum:ginkgo
+    build:
+      context: ./forum
+    environment:
+      API_KEY: "forumapikey"
+      SEARCH_SERVER: "http://elasticsearch:9200"
+      MONGOHQ_URL: "mongodb://mongodb/cs_comments_service"
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
+      - mongodb
+
   ############# LMS and CMS
 
   lms:
@@ -62,6 +91,8 @@ services:
       - ./config/openedx:/openedx/config
       - ./data/lms:/openedx/data
     depends_on:
+      - elasticsearch
+      - forum
       - memcached
       - mongodb
       - mysql

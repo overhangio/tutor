@@ -2,6 +2,7 @@ cms/
 cms_worker/
 lms/
 lms_worker/
+elasticsearch/
 mysql/
 mongodb/
 rabbitmq/
