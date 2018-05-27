@@ -1,6 +1,7 @@
 .*.swp
 config/openedx/*.json
 config/nginx/*.conf
+config/android/*.yaml
 mysql/config/database
 mysql/config/username
 mysql/config/password

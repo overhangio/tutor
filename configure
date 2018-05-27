@@ -189,6 +189,13 @@ def main():
         delimiter='£', **configurator.as_dict()
     )
 
+    # Android
+    substitute(
+        os.path.join('config', 'android', 'templates', 'universal.yaml.templ'),
+        os.path.join('config', 'android', 'universal.yaml'),
+        **configurator.as_dict()
+    )
+
     print("\nConfiguration files were successfuly generated. You may now run the app containers.")
 
 

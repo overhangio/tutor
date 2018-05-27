@@ -1,0 +1,10 @@
+version: "3"
+services:
+
+  android:
+    image: regis/openedx-android:latest
+    build:
+      context: ./android
+    volumes:
+      - ./config/android/:/openedx/config/
+      - ./data/android/:/openedx/data

@@ -115,6 +115,19 @@ Open a python shell in the lms or the cms:
     make cms-shell
 
 
+## Android app (beta)
+
+The Android app for your platform can be easily built in just one command:
+
+    make android
+
+If all goes well, the debuggable APK for your platform should then be available in ./data/android. To obtain a release APK, you will need to obtain credentials from the app store and add them to `config/android/gradle.properties`. The, run:
+
+    make android-release
+
+Building the Android app for an Open edX platform is currently labeled as a **beta feature** because it was not fully tested yet. In particular, there is no easy mechanism for overriding the edX assets in the mobile app. This is still a work-in-progress.
+
+
 ## For developers
 
 In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.

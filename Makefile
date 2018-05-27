@@ -1,4 +1,4 @@
-.PHONY: all configure build update migrate assets up daemon
+.PHONY: all android configure build update migrate assets up daemon
 
 USERID ?= $$(id -u)
 EDX_PLATFORM_SETTINGS ?= universal.production
@@ -65,6 +65,23 @@ lms-shell:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms ./manage.py lms shell
 cms-shell:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms ./manage.py cms shell
+
+
+#################### Android app
+
+android:
+	docker-compose -f docker-compose-android.yml run --rm android
+	@echo "Your APK file is ready: ./data/android/edx-prod-debuggable-2.14.0.apk"
+
+android-release:
+	# Note that this requires that you edit ./config/android/gradle.properties
+	docker-compose -f docker-compose-android.yml run --rm android ./gradlew assembleProdRelease
+
+android-build:
+	docker build -t regis/openedx-android:latest android/
+android-push:
+	docker push regis/openedx-android:latest
+android-dockerhub: android-build android-push
 
 
 #################### Deploying to docker hub
