@@ -1,11 +1,8 @@
 # Open edX quick install (in Docker containers)
 
-This is a **one-click install of [Open edX](https://openedx.org), both for production and local development**.
+This is a **one-click install of [Open edX](https://openedx.org), both for production and local development**. As a bonus, this also builds **a mobile Android app for your platform**.
 
-The deployment of a full-featured Open edX platform is a highly technical and complex project. Here, we greatly simplify it by:
-
-1. relying on pre-configured Docker containers for external services, such as MySQL and MongoDb
-2. activating only a subset of all Open edX features
+The deployment of a full-featured Open edX platform is a highly technical and complex project. Here, we greatly simplify it by replacing ansible deployment playbooks by Dockerfiles.
 
 We made this project so that non-technical people could still install Open edX by themselves: knowing how to launch a server and ssh into it should be enough. But we also made sure that every step of the deploy process could be customized if you have the technical skills.
 
@@ -121,7 +118,7 @@ The Android app for your platform can be easily built in just one command:
 
     make android
 
-If all goes well, the debuggable APK for your platform should then be available in ./data/android. To obtain a release APK, you will need to obtain credentials from the app store and add them to `config/android/gradle.properties`. The, run:
+If all goes well, the debuggable APK for your platform should then be available in ./data/android. To obtain a release APK, you will need to obtain credentials from the app store and add them to `config/android/gradle.properties`. Then run:
 
     make android-release
 
@@ -179,8 +176,9 @@ Or:
 
     make cms
 
-This will open a shell in the LMS (or CMS) container. You can then run just any command you are used to. For example, collect assets and run a local server:
+This will open a shell in the LMS (or CMS) container. You can then run just any command you are used to. For example, install node requirements, collect assets and run a local server:
 
+    npm install
     paver update_assets lms --settings=mysettings
     ./manage.py lms runserver 0.0.0.0:8000
 
