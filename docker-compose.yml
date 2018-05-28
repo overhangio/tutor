@@ -35,7 +35,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./config/rendered/nginx:/etc/nginx/conf.d/
+      - ./config/nginx:/etc/nginx/conf.d/
       - ./data/lms:/openedx/data/lms:ro
       - ./data/cms:/openedx/data/cms:ro
 
