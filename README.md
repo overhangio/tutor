@@ -190,6 +190,12 @@ The images are built, tagged and uploaded to Docker Hub in one command:
   
 ## Troubleshooting
 
+### Help! Your containers are eating all my RAM/CPU/CHEESE
+
+You can identify which containers are consuming most resources by running:
+
+    docker stats
+
 ### "Running migrations... Killed!"
 
 The LMS and CMS containers require at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the `make all` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. [Follow these instructions from the official Docker documentation](https://docs.docker.com/docker-for-mac/#advanced). 
