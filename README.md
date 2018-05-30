@@ -1,25 +1,27 @@
-# Open edX quick install (in Docker containers) 
+# Open edX 1-click install for everyone
 ![Build status](https://img.shields.io/travis/regisb/openedx.svg)
 ![GitHub issues](https://img.shields.io/github/issues/regisb/openedx-docker.svg)
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/regisb/openedx-docker.svg?colorB=brightgreen)
 
-This is a **one-click install of [Open edX](https://openedx.org), both for production and local development**. As a bonus, this also builds **a mobile Android app for your platform**.
+This is a one-click install of [Open edX](https://openedx.org), both for production and local development, inside docker containers. As a bonus, this also builds a mobile Android app for your platform.
 
 [![asciicast](https://asciinema.org/a/6DowVk4iJf3AJ2m8xlXDWJKh3.png)](https://asciinema.org/a/6DowVk4iJf3AJ2m8xlXDWJKh3)
 
-The deployment of a full-featured Open edX platform is a highly technical and complex project. Here, we greatly simplify it by replacing ansible deployment playbooks by Dockerfiles.
+## Getting started
 
-We made this project so that non-technical people could still install Open edX by themselves: knowing how to launch a server and ssh into it should be enough. But we also made sure that every step of the deploy process could be customized if you have the technical skills.
-
-## Quickstart
-
-All you have to do is [download the content of this repository](https://codeload.github.com/regisb/openedx-docker/zip/master), decompress and run:
-
+    git clone https://github.com/regisb/openedx-docker
+    cd openedx-docker/
     make all
 
-You will be asked some questions about the configuration of your Open edX platform. You will have to download a ~900 Mb docker image, but then you will have both an LMS and a CMS running behind a web server on port 80, ready for production. You should be able to access your platform at the address you gave during the configuration phase.
+## That's it?
+
+Yes :) When running `make all`, you will be asked some questions about the configuration of your Open edX platform. Then, all the components for a functional Open edX platform will be downloaded and assembled to and you will have both an LMS and a CMS running behind a web server on port 80, ready for production. You should be able to access your platform at the address you gave during the configuration phase.
+
+All of this without touching your host environment! You don't even need root access.
 
 To be honest, I really don't like 1-click installs :-p They tend to hide much of the important details. So I strongly recommend you read the more detailed instructions below to understand what is going on exactly and to troubleshoot potential issues. Also, instructions are given to setup a local development environment.
+
+This might seem too simple to be true, but there's no magic -- just good packaging of already existing Open edX code. The code for building the Docker images is 100% available and fits in less than 1000 lines of code, in this repository.
 
 ## Requirements
 
@@ -33,7 +35,7 @@ Note that the production web server container will bind to port 80, so if you al
 
 You should be able to run Open edX on any platform that supports Docker and Python, including Mac OS and Windows. For now, only Ubuntu 16.04 was tested but we have no reason to believe the install would not work on a different OS.
 
-At a minimum, the server running the containers should have 4 Gb of RAM.
+At a minimum, the server running the containers should have 4 Gb of RAM; otherwise, the deployment procedure will crash during migrations (see the [troubleshooting](#troubleshooting) section).
 
 ## Step-by-step install
 
