@@ -5,6 +5,8 @@
 
 This is a **one-click install of [Open edX](https://openedx.org), both for production and local development**. As a bonus, this also builds **a mobile Android app for your platform**.
 
+[![asciicast](https://asciinema.org/a/6DowVk4iJf3AJ2m8xlXDWJKh3.png)](https://asciinema.org/a/6DowVk4iJf3AJ2m8xlXDWJKh3)
+
 The deployment of a full-featured Open edX platform is a highly technical and complex project. Here, we greatly simplify it by replacing ansible deployment playbooks by Dockerfiles.
 
 We made this project so that non-technical people could still install Open edX by themselves: knowing how to launch a server and ssh into it should be enough. But we also made sure that every step of the deploy process could be customized if you have the technical skills.
