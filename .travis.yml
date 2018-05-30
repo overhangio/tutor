@@ -1,0 +1,12 @@
+language: python
+services:
+  - docker
+env:
+  global:
+    - DOCKER_USERNAME=regis
+    - secure=bNAWUZVttQISBK+LC5wkVlCgcWoVe5lmBGoDG7UI0836BBhJU6yQrxcp1CL13C90nd4YXQP4SHbqGLwFPXTWrkf1gASJeohwhxbaZLnmNvtUsGL79RMLmQPxrOYZsuo20v1eplNGO/XVlV9uAsj8uFABoDRer7QuOrTehU+eMDXWo3Kn6dBpMmHI081/RpAovT27rhkqHoVUrjGXyMQH2FSnPqV0ZyWDKwPPexYDOUyE7sGd+WBi6XAl2a0/u938PlndpfMTcHV3+MNLcZZioXpGuYq42iABoKf24OP0nnvfqL1TPEKJS7qQzbrcEqQEZuWxnMJYSGp+X4JKgDqP32XQRvU7OXVbRZYRfkUt+nFaHDZBieqG3TS1fU3vNWxprna7/3r+V7yQP6oHAtAqdGrr8Eb82MPrSePlq2a+5UH06dBIfpQduEbPwgMlBFbXGXu0yv28dxIjykdc4oPgvtTJ13spDzw0go7RzC6C2EfZU0AviX/Q/YzVNCYHRuwblb+nkzL+wKdsPozsPuPxWWtrGMIQH+bCgwHFVIyBJKLJWodH4K/rg0OcLMqMO/xQCq48+CpuEMSdgzrxJlGVEqkbVGaJxsFXy7gSi2jcBI+DVqdp7ASH8m+gAqWu2xCEhOoXxgD2e19/pSdj94Qy7Ej6wLhcZnV6we6mUpvzjbM=
+script:
+  - make build
+deploy:
+  provider: script
+  script: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && make push

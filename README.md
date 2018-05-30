@@ -1,4 +1,5 @@
-# Open edX quick install (in Docker containers)
+# Open edX quick install (in Docker containers) 
+![Build status](https://img.shields.io/travis/regisb/openedx.svg)
 
 This is a **one-click install of [Open edX](https://openedx.org), both for production and local development**. As a bonus, this also builds **a mobile Android app for your platform**.
 
