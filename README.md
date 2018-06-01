@@ -1,5 +1,5 @@
 # Open edX 1-click install for everyone
-![Build status](https://img.shields.io/travis/regisb/openedx.svg)
+![Build status](https://img.shields.io/travis/regisb/openedx-docker.svg)
 ![GitHub issues](https://img.shields.io/github/issues/regisb/openedx-docker.svg)
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/regisb/openedx-docker.svg?colorB=brightgreen)
 
