@@ -1,7 +1,7 @@
 .*.swp
 config/openedx/*.json
+config/openedx/*.sh
+config/mysql/*.env
 config/nginx/*.conf
 config/android/*.yaml
-mysql/config/database
-mysql/config/username
-mysql/config/password
+config/xqueue/*.py

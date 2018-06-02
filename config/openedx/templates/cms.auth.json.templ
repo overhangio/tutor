@@ -3,12 +3,11 @@
   "AWS_ACCESS_KEY_ID": "",
   "AWS_SECRET_ACCESS_KEY": "",
   "XQUEUE_INTERFACE": {
-    "basic_auth": ["edx", "edx"],
     "django_auth": {
-      "username": "lms",
-      "password": "password"
+      "username": "${XQUEUE_AUTH_USERNAME}",
+      "password": "${XQUEUE_AUTH_PASSWORD}"
     },
-    "url": "http://localhost:18040"
+    "url": "http://xqueue:8040"
   },
   "CONTENTSTORE": { 
     "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",                       

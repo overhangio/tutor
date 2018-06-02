@@ -11,7 +11,7 @@ endif
 DOCKER_COMPOSE_RUN_LMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8000:8000 lms
 DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8001:8001 cms
 
-all: configure update migrate migrate-forum assets daemon
+all: configure update migrate assets daemon
 
 ##################### Bootstrapping
 
@@ -21,13 +21,21 @@ configure:
 update:
 	docker-compose pull
 
-migrate:
+provision:
+	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash /openedx/config/provision.sh
+
+migrate-openedx:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash -c "wait-for-greenlight.sh && ./manage.py lms migrate"
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms bash -c "wait-for-greenlight.sh && ./manage.py cms migrate"
 
 migrate-forum:
 	$(DOCKER_COMPOSE_RUN) forum bash -c "bundle exec rake search:initialize && \
 		bundle exec rake search:rebuild_index"
+
+migrate-xqueue:
+	$(DOCKER_COMPOSE_RUN) xqueue bash -c "./manage.py migrate"
+
+migrate: provision migrate-openedx migrate-forum migrate-xqueue
 
 assets:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
@@ -90,11 +98,14 @@ build:
 	# We need to build with docker, as long as docker-compose cannot push to dockerhub
 	docker build -t regis/openedx:latest -t regis/openedx:ginkgo openedx/
 	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:ginkgo forum/
+	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:ginkgo xqueue/
 
 push:
 	docker push regis/openedx:ginkgo
 	docker push regis/openedx:latest
 	docker push regis/openedx-forum:ginkgo
 	docker push regis/openedx-forum:latest
+	docker push regis/openedx-xqueue:ginkgo
+	docker push regis/openedx-xqueue:latest
 
 dockerhub: build push
