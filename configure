@@ -113,9 +113,9 @@ def main():
             defaults = json.load(f)
 
     configurator = Configurator(silent=args.silent, **defaults).add(
-        'LMS_HOST', "Your website domain name for students (LMS)", 'www.myopenedx.com'
+        'LMS_HOST', "Your website domain name for students (LMS). Set 'localhost' for local testing.", 'www.myopenedx.com'
     ).add(
-        'CMS_HOST', "Your website domain name for teachers (CMS)", 'studio.myopenedx.com'
+        'CMS_HOST', "Your website domain name for teachers (CMS). Set 'studio.localhost' for local testing.", 'studio.myopenedx.com'
     ).add(
         'SECRET_KEY', "Secret key -- if you don't know what this is, you can safely accept the default",
         "".join([random.choice(string.ascii_letters + string.digits) for _ in range(24)])
