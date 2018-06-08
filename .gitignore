@@ -6,3 +6,6 @@ config/mysql/*.env
 config/nginx/*.conf
 config/android/*.yaml
 config/xqueue/*.py
+
+data-*/
+TODO
