@@ -115,9 +115,9 @@ def main():
             defaults = json.load(f)
 
     configurator = Configurator(silent=args.silent, **defaults).add(
-        'LMS_HOST', "Your website domain name for students (LMS). Set 'localhost' for local testing.", 'www.myopenedx.com'
+        'LMS_HOST', "Your website domain name for students (LMS).", 'www.myopenedx.com'
     ).add(
-        'CMS_HOST', "Your website domain name for teachers (CMS). Set 'studio.localhost' for local testing.", 'studio.myopenedx.com'
+        'CMS_HOST', "Your website domain name for teachers (CMS).", 'studio.myopenedx.com'
     ).add(
         'PLATFORM_NAME', "Platform name/title", "My Open edX"
     ).add(

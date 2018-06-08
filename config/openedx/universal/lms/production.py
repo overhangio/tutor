@@ -21,6 +21,8 @@ for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
 ALLOWED_HOSTS = [
     ENV_TOKENS.get('LMS_BASE'),
     FEATURES['PREVIEW_LMS_BASE'],
+    '127.0.0.1', 'localhost',
+    '127.0.0.1:8000', 'localhost:8000',
 ]
 
 DEFAULT_FROM_EMAIL = 'registration@' + ENV_TOKENS['LMS_BASE']
