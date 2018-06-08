@@ -248,7 +248,7 @@ We have decided not to include the installation of SSL certificates in this proj
 * the generated nginx configuration files 
 * the `lms.env.json` and `cms.env.json` files: look for the `LMS_ROOT_URL` and `CMS_ROOT_URL` variables and replace "http" by "https".
 
-### Discovery service, XQueue, edX Notes, Ecommerce, Notifier
+### Discovery service, edX Notes, Ecommerce, Notifier
 
 Those extra services were considered low priority while developing this project. However, most of them should not be too hard to add to a standard install. If you need one or more of these services, feel free to let me know by opening an issue.
 
