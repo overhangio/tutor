@@ -95,11 +95,17 @@ def template_class(user_delimiter='$'):
 def main():
     # Hack to handle older config.json files that used to be in a different location
     # TODO remove me
-    if os.path.exists("config.json"):
-        os.rename("config.json", os.path.join("config", "openedx", "config.json"))
+    config_path = os.path.join("config", "config.json")
+    deprecated_paths = [
+        "config.json",
+        os.path.join("config", "openedx", "config.json"),
+    ]
+    for deprecated_path in deprecated_paths:
+        if os.path.exists(deprecated_path):
+            os.rename(deprecated_path, config_path)
 
     parser = argparse.ArgumentParser("Config file generator for Open edX")
-    parser.add_argument('-c', '--config', default=os.path.join("config", "openedx", "config.json"),
+    parser.add_argument('-c', '--config', default=config_path,
                         help="Load default values from this file. Config values will be saved there.")
     parser.add_argument('-s', '--silent', action='store_true',
                         help=(

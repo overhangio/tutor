@@ -1,4 +1,5 @@
 .*.swp
+config/config.json
 config/openedx/*.json
 config/openedx/*.sh
 config/mysql/*.env
