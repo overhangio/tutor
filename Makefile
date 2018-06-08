@@ -51,7 +51,7 @@ daemon:
 	echo "Daemon is up and running"
 
 stop:
-	docker-compose stop
+	docker-compose rm --stop --force
 
 ##################### Extra
 
