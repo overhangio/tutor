@@ -3,6 +3,9 @@ services:
   - docker
 script:
   - make build
+  - ./configure --silent
+  - make migrate
+  - make assets
   - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 deploy:
   provider: script
