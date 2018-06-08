@@ -53,11 +53,10 @@ You will need to download the docker images from [Docker Hub](https://hub.docker
 
 ### Migrations and assets
 
-    make provision
     make migrate
     make assets
 
-These commands should be run just once. They will create the databases, apply database migrations and generate static assets, such as images, stylesheets and Javascript dependencies.
+These commands should be run just once. They will create the required databases tables, apply database migrations and generate static assets, such as images, stylesheets and Javascript dependencies.
 
 If migrations are stopped with a `Killed` message, this certainly means the docker containers don't have enough RAM. See the [troubleshooting](#troubleshooting) section.
 
