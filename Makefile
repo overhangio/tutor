@@ -22,11 +22,11 @@ update:
 	docker-compose pull
 
 provision:
-	$(DOCKER_COMPOSE_RUN) lms bash /openedx/config/provision.sh
+	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 && bash /openedx/config/provision.sh"
 
 migrate-openedx:
-	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash -c "wait-for-greenlight.sh && ./manage.py lms migrate"
-	$(DOCKER_COMPOSE_RUN_OPENEDX) cms bash -c "wait-for-greenlight.sh && ./manage.py cms migrate"
+	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash -c "dockerize -wait tcp://mysql:3306 && ./manage.py lms migrate"
+	$(DOCKER_COMPOSE_RUN_OPENEDX) cms bash -c "dockerize -wait tcp://mysql:3306 && ./manage.py cms migrate"
 
 migrate-forum:
 	$(DOCKER_COMPOSE_RUN) forum bash -c "bundle exec rake search:initialize && \

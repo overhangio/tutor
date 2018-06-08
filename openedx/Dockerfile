@@ -49,8 +49,13 @@ RUN ln -s /openedx/config/lms.env.json /openedx/ \
   && ln -s /openedx/config/lms.auth.json /openedx/ \
   && ln -s /openedx/config/cms.auth.json /openedx/
 
+# Dockerize will be useful to wait for mysql DB availability
+ENV DOCKERIZE_VERSION v0.6.1
+RUN curl -L -o dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize.tar.gz \
+    && rm dockerize.tar.gz
+
 # Copy convenient scripts
-COPY ./bin/wait-for-greenlight.sh /usr/local/bin/
 COPY ./bin/docker-entrypoint.sh /usr/local/bin/
 
 # service variant is "lms" or "cms"
