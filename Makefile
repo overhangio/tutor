@@ -22,7 +22,7 @@ update:
 	docker-compose pull
 
 provision:
-	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash /openedx/config/provision.sh
+	$(DOCKER_COMPOSE_RUN) lms bash /openedx/config/provision.sh
 
 migrate-openedx:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash -c "wait-for-greenlight.sh && ./manage.py lms migrate"
