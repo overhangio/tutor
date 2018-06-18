@@ -55,7 +55,7 @@ stop:
 
 ##################### Extra
 
-debug:
+info:
 	uname -a
 	@echo "-------------------------"
 	docker version

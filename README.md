@@ -225,10 +225,12 @@ This might occur when you try to run the latest version of `edx-platform`, and n
 
 This project is the follow-up of my work on an [install from scratch of Open edX](https://github.com/regisb/openedx-install). It does not rely on any hack or complex deployment script. In particular, we do not use the Open edX [Ansible deployment playbooks](https://github.com/edx/configuration/). That means that the folks at edX.org are *not* responsible for troubleshooting issues of this project. Please don't bother Ned ;-)
 
-If you have a problem, feel free to open a [Github issue](https://github.com/regisb/openedx-docker/issues) that describes:
-- the problem you are facing: this includes the exact error message, or a screenshot of the error.
-- what action triggered the error: which command line instruction, which url you tried to access, etc.
-- any error logs that you may find: you may want to take a look at the files in `data/lms/logs`, for instance.
+Do you have a problem?
+
+1. Carefully read the README, and in particular the [troubleshooting](#troubleshooting) section
+2. Search for your problem among [open and closed Github issues](https://github.com/regisb/openedx-docker/issues?utf8=%E2%9C%93&q=is%3Aissue)
+3. If necessary, open an [issue on Github](https://github.com/regisb/openedx-docker/issues/new).
+
 
 ## Known missing features
 
