@@ -55,6 +55,18 @@ stop:
 
 ##################### Extra
 
+debug:
+	uname -a
+	@echo "-------------------------"
+	docker version
+	@echo "-------------------------"
+	docker-compose --version
+	@echo "-------------------------"
+	python --version
+	@echo "-------------------------"
+	echo $$EDX_PLATFORM_PATH
+	echo $$EDX_PLATFORM_SETTINGS
+
 import-demo-course:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/ginkgo.master && python ./manage.py cms import ../data ../edx-demo-course"
 
