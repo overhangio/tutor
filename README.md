@@ -66,7 +66,7 @@ If migrations are stopped with a `Killed` message, this certainly means the dock
 
     make up
 
-This will launch the various docker containers required for your Open edX platform. The LMS and the Studio will then be reachable at the domain name you specified during the configuration step.
+This will launch the various docker containers required for your Open edX platform. The LMS and the Studio will then be reachable at the domain name you specified during the configuration step. You can also access them at [http://localhost](http://localhost) and [http://studio.localhost](http://studio.localhost).
 
 ## Additional commands
 

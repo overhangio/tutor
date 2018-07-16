@@ -12,6 +12,7 @@ DOCKER_COMPOSE_RUN_LMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8000:8000 lms
 DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8001:8001 cms
 
 all: configure update migrate assets daemon
+	@echo "All set \o/ You can access the LMS at http://localhost and the CMS at http://studio.localhost"
 
 ##################### Bootstrapping
 
