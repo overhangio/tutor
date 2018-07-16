@@ -37,6 +37,8 @@ You should be able to run Open edX on any platform that supports Docker and Pyth
 
 At a minimum, the server running the containers should have 4 Gb of RAM; otherwise, the deployment procedure will crash during migrations (see the [troubleshooting](#troubleshooting) section).
 
+Also, the host running the containers should be a 64 bit platform. (images are not built for i386 systems)
+
 ## Step-by-step install
 
 ### Configure
