@@ -10,6 +10,8 @@ import sys
 
 from collections import OrderedDict
 
+import jinja2
+
 
 class Configurator:
 
@@ -82,7 +84,6 @@ def main():
     parser_interactive.set_defaults(func=interactive)
 
     parser_substitute = subparsers.add_parser('substitute')
-    parser_substitute.add_argument('--delimiter', default='$', help="Template file delimiter")
     parser_substitute.add_argument('src', help="Template source file")
     parser_substitute.add_argument('dst', help="Destination configuration file")
     parser_substitute.set_defaults(func=substitute)
@@ -140,10 +141,10 @@ def interactive(configurator, args):
 
 def substitute(configurator, args):
     with codecs.open(args.src, encoding='utf-8') as fi:
-        template = template_class(args.delimiter)(fi.read())
+        template = jinja2.Template(fi.read(), undefined=jinja2.StrictUndefined)
     try:
-        substituted = template.substitute(**configurator.as_dict())
-    except KeyError as e:
+        substituted = template.render(**configurator.as_dict())
+    except jinja2.exceptions.UndefinedError as e:
         sys.stderr.write("ERROR Missing config value '{}' for template {}\n".format(e.args[0], args.src))
         sys.exit(1)
 
@@ -151,18 +152,6 @@ def substitute(configurator, args):
         fo.write(substituted)
 
     print("Generated file {} from template {}".format(args.dst, args.src))
-
-
-def template_class(user_delimiter='$'):
-    """
-    The default delimiter of the python Template class is '$'. Here, we
-    generate a Template class with a custom delimiter. This cannot be done
-    after the class creation because the Template metaclass uses the delimiter
-    value.
-    """
-    class Template(string.Template):
-        delimiter = user_delimiter
-    return Template
 
 
 def random_string(length):

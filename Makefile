@@ -17,11 +17,13 @@ all: configure update migrate assets daemon
 ##################### Bootstrapping
 
 configure:
-	docker build -t regis/openedx-configurator:latest configurator/
-	docker run --rm -it --volume="$(PWD)/config:/openedx/config" -e USERID=$(USERID) -e SILENT=$(SILENT) regis/openedx-configurator
+	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
+		-e USERID=$(USERID) -e SILENT=$(SILENT) \
+		regis/openedx-configurator:hawthorn
 
 update:
 	docker-compose pull
+	docker pull regis/openedx-configurator:hawthorn
 
 provision:
 	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && bash /openedx/config/provision.sh"
@@ -103,20 +105,30 @@ android-push:
 	docker push regis/openedx-android:latest
 android-dockerhub: android-build android-push
 
+#################### Build images
+build: build-forum build-xqueue build-openedx
 
-#################### Deploying to docker hub
-
-build:
-	# We need to build with docker, as long as docker-compose cannot push to dockerhub
+build-openedx:
 	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
+build-configurator:
+	docker build -t regis/openedx-configurator:latest -t regis/openedx-configurator:hawthorn configurator/
+build-forum:
 	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:hawthorn forum/
+build-xqueue:
 	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
 
-push:
+#################### Deploying to docker hub
+push: push-openedx push-forum push-xqueue
+push-openedx:
 	docker push regis/openedx:hawthorn
 	docker push regis/openedx:latest
+push-configurator:
+	docker push regis/openedx-configurator:hawthorn
+	docker push regis/openedx-configurator:latest
+push-forum:
 	docker push regis/openedx-forum:hawthorn
 	docker push regis/openedx-forum:latest
+push-xqueue:
 	docker push regis/openedx-xqueue:hawthorn
 	docker push regis/openedx-xqueue:latest
 
