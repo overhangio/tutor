@@ -25,11 +25,10 @@ This might seem too simple to be true, but there's no magic -- just good packagi
 
 ## Requirements
 
-The only prerequisite for running this is Python and a working docker install. You will need both docker and docker-compose. Follow the instructions from the official documentation:
+The only prerequisite for running this is a working docker install. You will need both docker and docker-compose. Follow the instructions from the official documentation:
 
-- [Python](https://www.python.org/downloads/): all versions >= 2.7 are supported.
-- [Docker install](https://docs.docker.com/engine/installation/)
-- [Docker compose install](https://docs.docker.com/compose/install/)
+- [Docker](https://docs.docker.com/engine/installation/)
+- [Docker compose](https://docs.docker.com/compose/install/)
 
 Note that the production web server container will bind to port 80, so if you already have a web server running (Apache or Nginx, for instance), you should stop it.
 
@@ -45,7 +44,7 @@ Also, the host running the containers should be a 64 bit platform. (images are n
 
     make configure
 
-This is the only non-automatic step in the install process. You will be asked various questions about your Open edX platform and appropriate configuration files will be generated. If you would like to automate this step then you should run `make configure` interactively once. After that, you will have a `config.json` file at the root of the repository. Just upload it to wherever you want to run Open edX and then run `./configure --silent` instead of `make configure`. All values from `config.json` will be automatically loaded.
+This is the only non-automatic step in the install process. You will be asked various questions about your Open edX platform and appropriate configuration files will be generated. If you would like to automate this step then you should run `make configure` interactively once. After that, you will have a `config.json` file at the root of the repository. Just upload it to wherever you want to run Open edX and then run `make configure SILENT=1` instead of `make configure`. All values from `config.json` will be automatically loaded.
 
 ### Download
 

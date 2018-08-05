@@ -3,7 +3,7 @@ services:
   - docker
 script:
   - make build
-  - ./configure --silent
+  - make configure SILENT=1
   - make migrate
   #- make assets # too time-consuming
   - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"

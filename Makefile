@@ -17,7 +17,8 @@ all: configure update migrate assets daemon
 ##################### Bootstrapping
 
 configure:
-	./configure
+	docker build -t regis/openedx-configurator:latest configurator/
+	docker run --rm -it --volume="$(PWD)/config:/openedx/config" -e USERID=$(USERID) -e SILENT=$(SILENT) regis/openedx-configurator
 
 update:
 	docker-compose pull
@@ -62,8 +63,6 @@ info:
 	docker version
 	@echo "-------------------------"
 	docker-compose --version
-	@echo "-------------------------"
-	python --version
 	@echo "-------------------------"
 	echo $$EDX_PLATFORM_PATH
 	echo $$EDX_PLATFORM_SETTINGS
