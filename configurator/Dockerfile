@@ -11,6 +11,7 @@ COPY ./bin/docker-entrypoint.sh /openedx/docker-entrypoint.sh
 WORKDIR /openedx
 
 ENV SILENT=''
+ENV ACTIVATE_HTTPS=''
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ./configure.py interactive ${SILENT:+--silent} && \
   ./configure.py substitute ./config/openedx/templates/lms.env.json.templ ./config/openedx/lms.env.json && \
@@ -22,4 +23,5 @@ CMD ./configure.py interactive ${SILENT:+--silent} && \
   ./configure.py substitute ./config/mysql/templates/auth.env.templ ./config/mysql/auth.env && \
   ./configure.py substitute ./config/nginx/templates/lms.conf.templ ./config/nginx/lms.conf && \
   ./configure.py substitute ./config/nginx/templates/cms.conf.templ ./config/nginx/cms.conf && \
-  ./configure.py substitute ./config/android/templates/universal.yaml.templ ./config/android/universal.yaml
+  ./configure.py substitute ./config/android/templates/universal.yaml.templ ./config/android/universal.yaml && \
+  ./configure.py substitute ./config/letsencrypt/templates/certonly.sh.templ ./config/letsencrypt/certonly.sh

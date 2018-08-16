@@ -42,10 +42,12 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./config/nginx:/etc/nginx/conf.d/
       - ./data/lms:/openedx/data/lms:ro
       - ./data/cms:/openedx/data/cms:ro
+      - ./data/letsencrypt:/etc/letsencrypt/:ro
 
   rabbitmq:
     image: rabbitmq:3.6.10

@@ -1,10 +1,11 @@
 .*.swp
 config/config.json
-config/openedx/*.json
-config/openedx/*.sh
+config/android/*.yaml
+config/letsencrypt/*.sh
 config/mysql/*.env
 config/nginx/*.conf
-config/android/*.yaml
+config/openedx/*.json
+config/openedx/*.sh
 config/xqueue/*.py
 
 data-*/

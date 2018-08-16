@@ -24,10 +24,7 @@ class Configurator:
             self.__input = input
 
     def as_dict(self):
-        all_values = self.__values.copy()
-        for key, value in self.__default_values.items():
-            all_values.setdefault(key, value)
-        return all_values
+        return self.__values
 
     def mute(self):
         self.__input = None
@@ -35,29 +32,14 @@ class Configurator:
     def add(self, name, question="", default=""):
         default = self.__default_values.get(name, default)
         value = default
-        if question:
-            message = question + " (default: \"{}\"): ".format(default)
-            value = self.ask(message, default)
+        message = question + " (default: \"{}\"): ".format(default) if question else None
+        value = self.ask(message, default)
         self.set(name, value)
 
-        return self
-
-    def add_boolean(self, name, question, default=True):
-        default = self.__default_values.get(name, default)
-        message = question + " ({}) ".format("Y/n" if default else "y/N")
-        value = None
-        while value is None:
-            answer = self.ask(message, default)
-            value = {
-                "y": True,
-                "n": False,
-                default: default,
-            }.get(answer)
-        self.set(name, value)
         return self
 
     def ask(self, message, default):
-        if self.__input:
+        if self.__input and message:
             return self.__input(message) or default
         return default
 
@@ -66,6 +48,7 @@ class Configurator:
 
     def set(self, name, value):
         self.__values[name] = value
+        return self
 
 
 def main():
@@ -81,6 +64,7 @@ def main():
                                         "This is good for debugging and automation, but "
                                         "probably not what you want"
                                     ))
+    parser_interactive.add_argument('--activate-https', action='store_true', default=False, help='Activate https feature flag')
     parser_interactive.set_defaults(func=interactive)
 
     parser_substitute = subparsers.add_parser('substitute')
@@ -89,18 +73,20 @@ def main():
     parser_substitute.set_defaults(func=substitute)
 
     args = parser.parse_args()
+    args.func(args)
 
-    # Load defaults
-    defaults = {}
+def load_config(args):
     if os.path.exists(args.config):
         with open(args.config) as f:
-            defaults = json.load(f)
-    configurator = Configurator(**defaults)
+            return json.load(f)
+    return {}
 
-    args.func(configurator, args)
+def interactive(args):
+    print("\n====================================")
+    print("      Interactive configuration ")
+    print("====================================")
 
-
-def interactive(configurator, args):
+    configurator = Configurator(**load_config(args))
     if args.silent:
         configurator.mute()
     configurator.add(
@@ -131,6 +117,8 @@ def interactive(configurator, args):
         'XQUEUE_MYSQL_PASSWORD', "", random_string(8),
     ).add(
         'XQUEUE_SECRET_KEY', "", random_string(24),
+    ).set(
+        'ACTIVATE_HTTPS', bool(args.activate_https or os.environ.get('ACTIVATE_HTTPS'))
     )
 
     # Save values
@@ -139,17 +127,21 @@ def interactive(configurator, args):
     print("\nConfiguration values were saved to ", args.config)
 
 
-def substitute(configurator, args):
+def substitute(args):
+    config = load_config(args)
     with codecs.open(args.src, encoding='utf-8') as fi:
         template = jinja2.Template(fi.read(), undefined=jinja2.StrictUndefined)
     try:
-        substituted = template.render(**configurator.as_dict())
+        substituted = template.render(**config)
     except jinja2.exceptions.UndefinedError as e:
         sys.stderr.write("ERROR Missing config value '{}' for template {}\n".format(e.args[0], args.src))
         sys.exit(1)
 
     with codecs.open(args.dst, encoding='utf-8', mode='w') as fo:
         fo.write(substituted)
+
+    # Set same permissions as original file
+    os.chmod(args.dst, os.stat(args.src).st_mode)
 
     print("Generated file {} from template {}".format(args.dst, args.src))
 

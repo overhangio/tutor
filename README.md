@@ -23,6 +23,45 @@ To be honest, I really don't like 1-click installs :-p They tend to hide much of
 
 This might seem too simple to be true, but there's no magic -- just good packaging of already existing Open edX code. The code for building the Docker images is 100% available and fits in less than 1000 lines of code, in this repository.
 
+## Optional features
+
+Some optional features may be activated by defining `ACTIVATE_*` environment variables on the host. These features change configuration files (during the `configure` step) as well as make targets. For instance, to add SSL/TLS certificates, run:
+
+    ACTIVATE_HTTPS=1 make all
+
+### SSL/TLS certificates for HTTPS access (`ACTIVATE_HTTPS`)
+
+By activating this feature, a free SSL/TLS certificate from the [Let's Encrypt](https://letsencrypt.org/) certificate authority will be created for your platform. With this feature, **your platform will no longer be accessible in HTTP**. Calls to http urls will be redirected to https url.
+
+The following DNS records must exist and point to your server:
+
+    LMS_HOST (e.g: myopenedx.com)
+    preview.LMS_HOST (e.g: preview.myopenedx.com)
+    CMS_HOST (e.g: studio.myopenedx.com)
+
+Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
+
+To download the certificate manually, run:
+
+    make https-certificate
+
+To renew the certificate, run this command once per month:
+
+    make https-certificate-renew
+
+### Android app (beta)
+
+The Android app for your platform can be easily built in just one command:
+
+    make android
+
+If all goes well, the debuggable APK for your platform should then be available in ./data/android. To obtain a release APK, you will need to obtain credentials from the app store and add them to `config/android/gradle.properties`. Then run:
+
+    make android-release
+
+Building the Android app for an Open edX platform is currently labeled as a **beta feature** because it was not fully tested yet. In particular, there is no easy mechanism for overriding the edX assets in the mobile app. This is still a work-in-progress.
+
+
 ## Requirements
 
 The only prerequisite for running this is a working docker install. You will need both docker and docker-compose. Follow the instructions from the official documentation:
@@ -117,20 +156,6 @@ Open a python shell in the lms or the cms:
 
     make lms-shell
     make cms-shell
-
-
-## Android app (beta)
-
-The Android app for your platform can be easily built in just one command:
-
-    make android
-
-If all goes well, the debuggable APK for your platform should then be available in ./data/android. To obtain a release APK, you will need to obtain credentials from the app store and add them to `config/android/gradle.properties`. Then run:
-
-    make android-release
-
-Building the Android app for an Open edX platform is currently labeled as a **beta feature** because it was not fully tested yet. In particular, there is no easy mechanism for overriding the edX assets in the mobile app. This is still a work-in-progress.
-
 
 ## For developers
 
@@ -233,16 +258,7 @@ Do you have a problem?
 3. If necessary, open an [issue on Github](https://github.com/regisb/openedx-docker/issues/new).
 
 
-## Known missing features
-
-### SSL certificates
-
-We have decided not to include the installation of SSL certificates in this project for running an Open edX platform on HTTPS. This is because there are too many different ways to generate SSL certificates. In particular, we should not assume that everyone uses [Let's Encrypt](http://letsencrypt.org/) certificates. If you decide to run your Open edX platform behind HTTPS, you will have to modify:
-
-* the generated nginx configuration files 
-* the `lms.env.json` and `cms.env.json` files: look for the `LMS_ROOT_URL` and `CMS_ROOT_URL` variables and replace "http" by "https".
-
-### Discovery service, edX Notes, Ecommerce, Notifier
+## Known missing features: discovery service, edX notes, ecommerce, notifier
 
 Those extra services were considered low priority while developing this project. However, most of them should not be too hard to add to a standard install. If you need one or more of these services, feel free to let me know by opening an issue.
 
