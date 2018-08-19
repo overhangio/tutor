@@ -49,6 +49,12 @@ To renew the certificate, run this command once per month:
 
     make https-certificate-renew
 
+### Xqueue (`ACTIVATE_XQUEUE`)
+
+[Xqueue](https://github.com/edx/xqueue) is for grading problems with external services. If you don't know what it is, you probably don't need it.
+
+Note: in previous releases of openedx-docker, xqueue was run for all platforms. It is now an optional feature.
+
 ### Android app (beta)
 
 The Android app for your platform can be easily built in just one command:

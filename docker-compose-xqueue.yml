@@ -1,0 +1,27 @@
+version: "3"
+services:
+
+  ############# Xqueue: external grading of Open edX problems
+  xqueue:
+    image: regis/openedx-xqueue:hawthorn
+    build:
+      context: ./xqueue
+    volumes:
+      - ./config/xqueue:/openedx/config
+      - ./data/xqueue:/openedx/data
+    restart: unless-stopped
+    depends_on:
+      - mysql
+
+  xqueue_consumer:
+    image: regis/openedx-xqueue:hawthorn
+    build:
+      context: ./xqueue
+    volumes:
+      - ./config/xqueue:/openedx/config
+      - ./data/xqueue:/openedx/data
+    restart: unless-stopped
+    # Run 12 workers per queue
+    command: ./manage.py run_consumer 12
+    depends_on:
+      - mysql

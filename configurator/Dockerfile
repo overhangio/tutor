@@ -12,6 +12,7 @@ WORKDIR /openedx
 
 ENV SILENT=''
 ENV ACTIVATE_HTTPS=''
+ENV ACTIVATE_XQUEUE=''
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ./configure.py interactive ${SILENT:+--silent} && \
   ./configure.py substitute ./config/openedx/templates/lms.env.json.templ ./config/openedx/lms.env.json && \

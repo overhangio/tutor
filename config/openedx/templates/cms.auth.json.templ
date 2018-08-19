@@ -2,6 +2,7 @@
   "SECRET_KEY": "{{ SECRET_KEY }}",
   "AWS_ACCESS_KEY_ID": "",
   "AWS_SECRET_ACCESS_KEY": "",
+  {% if ACTIVATE_XQUEUE %}
   "XQUEUE_INTERFACE": {
     "django_auth": {
       "username": "{{ XQUEUE_AUTH_USERNAME }}",
@@ -9,6 +10,7 @@
     },
     "url": "http://xqueue:8040"
   },
+  {% endif %}
   "CONTENTSTORE": { 
     "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",                       
     "DOC_STORE_CONFIG": {                                                           

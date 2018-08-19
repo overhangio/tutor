@@ -65,6 +65,7 @@ def main():
                                         "probably not what you want"
                                     ))
     parser_interactive.add_argument('--activate-https', action='store_true', default=False, help='Activate https feature flag')
+    parser_interactive.add_argument('--activate-xqueue', action='store_true', default=False, help='Activate xqueue feature flag')
     parser_interactive.set_defaults(func=interactive)
 
     parser_substitute = subparsers.add_parser('substitute')
@@ -119,6 +120,8 @@ def interactive(args):
         'XQUEUE_SECRET_KEY', "", random_string(24),
     ).set(
         'ACTIVATE_HTTPS', bool(args.activate_https or os.environ.get('ACTIVATE_HTTPS'))
+    ).set(
+        'ACTIVATE_XQUEUE', bool(args.activate_xqueue or os.environ.get('ACTIVATE_XQUEUE'))
     )
 
     # Save values

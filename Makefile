@@ -2,7 +2,19 @@
 
 USERID ?= $$(id -u)
 EDX_PLATFORM_SETTINGS ?= universal.production
-DOCKER_COMPOSE_RUN = docker-compose run --rm
+DOCKER_COMPOSE = docker-compose -f docker-compose.yml
+
+post_configure_targets = 
+ifeq ($(ACTIVATE_HTTPS), 1)
+	post_configure_targets += https-certificate
+endif
+extra_migrate_targets = 
+ifeq ($(ACTIVATE_XQUEUE), 1)
+	extra_migrate_targets += migrate-xqueue
+	DOCKER_COMPOSE += -f docker-compose-xqueue.yml
+endif
+
+DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE) run --rm
 DOCKER_COMPOSE_RUN_OPENEDX = $(DOCKER_COMPOSE_RUN) -e USERID=$(USERID) -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
 ifneq ($(EDX_PLATFORM_PATH),)
 	DOCKER_COMPOSE_RUN_OPENEDX += --volume="$(EDX_PLATFORM_PATH):/openedx/edx-platform"
@@ -11,11 +23,6 @@ endif
 DOCKER_COMPOSE_RUN_LMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8000:8000 lms
 DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8001:8001 cms
 
-post_configure_targets = 
-ifeq ($(ACTIVATE_HTTPS), 1)
-	post_configure_targets += https-certificate
-endif
-
 all: configure $(post_configure_targets) update migrate assets daemon
 	@echo "All set \o/ You can access the LMS at http://localhost and the CMS at http://studio.localhost"
 
@@ -23,15 +30,17 @@ all: configure $(post_configure_targets) update migrate assets daemon
 
 configure:
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
-		-e USERID=$(USERID) -e SILENT=$(SILENT) -e ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) \
+		-e USERID=$(USERID) -e SILENT=$(SILENT) -e ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
 		regis/openedx-configurator
 
 update:
-	docker-compose pull
+	$(DOCKER_COMPOSE) pull
 	docker pull regis/openedx-configurator:hawthorn
 
 provision:
 	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && bash /openedx/config/provision.sh"
+
+migrate: provision migrate-openedx migrate-forum $(extra_migrate_targets)
 
 migrate-openedx:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py lms migrate"
@@ -44,8 +53,6 @@ migrate-forum:
 migrate-xqueue:
 	$(DOCKER_COMPOSE_RUN) xqueue bash -c "./manage.py migrate"
 
-migrate: provision migrate-openedx migrate-forum migrate-xqueue
-
 assets:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
 	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True cms paver update_assets cms --settings=$(EDX_PLATFORM_SETTINGS)
@@ -53,14 +60,14 @@ assets:
 ##################### Running
 
 up:
-	docker-compose up
+	$(DOCKER_COMPOSE) up
 
 daemon:
-	docker-compose up -d && \
+	$(DOCKER_COMPOSE) up -d && \
 	echo "Daemon is up and running"
 
 stop:
-	docker-compose rm --stop --force
+	$(DOCKER_COMPOSE) rm --stop --force
 
 ##################### Extra
 info:
@@ -123,7 +130,7 @@ android-push:
 android-dockerhub: android-build android-push
 
 #################### Build images
-build: build-forum build-xqueue build-openedx
+build: build-openedx build-configurator build-forum build-xqueue
 
 build-openedx:
 	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
