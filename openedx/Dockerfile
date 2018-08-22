@@ -45,6 +45,9 @@ RUN ln -s /openedx/config/lms.env.json /openedx/ \
   && ln -s /openedx/config/lms.auth.json /openedx/ \
   && ln -s /openedx/config/cms.auth.json /openedx/
 
+VOLUME /openedx/config
+VOLUME /openedx/data
+
 # Dockerize will be useful to wait for mysql DB availability
 ENV DOCKERIZE_VERSION v0.6.1
 RUN curl -L -o dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
