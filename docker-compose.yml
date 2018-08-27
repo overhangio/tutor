@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
 
   mongodb:
-    image: mongo:3.0.14
+    image: mongo:3.2.16
     # Use WiredTiger in all environments, just like at edx.org
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     restart: unless-stopped
