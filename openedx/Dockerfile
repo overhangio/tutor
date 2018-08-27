@@ -29,6 +29,7 @@ RUN git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 
 # Install python requirements (clone source repos in a separate dir, otherwise
 # will be overwritten when we mount edx-platform)
 RUN pip install --src ../venv/src -r requirements/edx/base.txt
+RUN pip install --src ../venv/src -r requirements/edx/development.txt
 
 # Install nodejs requirements
 RUN npm install
