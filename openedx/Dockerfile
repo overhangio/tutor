@@ -47,6 +47,7 @@ RUN ln -s /openedx/config/lms.env.json /openedx/ \
 
 VOLUME /openedx/config
 VOLUME /openedx/data
+VOLUME /openedx/edx-platform
 
 # Dockerize will be useful to wait for mysql DB availability
 ENV DOCKERIZE_VERSION v0.6.1
