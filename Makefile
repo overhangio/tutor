@@ -91,7 +91,7 @@ create-staff-user:
 https_command = docker run --rm -it \
 		--volume="$(PWD)/config/letsencrypt/:/openedx/letsencrypt/config/" \
 		--volume="$(PWD)/data/letsencrypt/:/etc/letsencrypt/" \
-		-p "80:80" \
+		-p "80:80"
 certbot_image = certbot/certbot:latest
 
 https-certificate:
