@@ -14,7 +14,7 @@ server {
   ssl_certificate /etc/letsencrypt/live/{{ LMS_HOST }}/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/{{ LMS_HOST }}/privkey.pem;
   {% endif %}
-  
+
   # Prevent invalid display courseware in IE 10+ with high privacy settings
   add_header P3P 'CP="Open edX does not have a P3P policy."';
 
