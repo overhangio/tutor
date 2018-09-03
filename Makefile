@@ -73,6 +73,8 @@ stop:
 info:
 	uname -a
 	@echo "-------------------------"
+	git rev-parse HEAD
+	@echo "-------------------------"
 	docker version
 	@echo "-------------------------"
 	docker-compose --version
