@@ -1,5 +1,6 @@
 .PHONY: all android configure build update migrate assets up daemon
 
+PWD ?= $$(pwd)
 USERID ?= $$(id -u)
 EDX_PLATFORM_SETTINGS ?= universal.production
 DOCKER_COMPOSE = docker-compose -f docker-compose.yml
