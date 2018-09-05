@@ -97,6 +97,8 @@ def interactive(args):
     ).add(
         'PLATFORM_NAME', "Platform name/title", "My Open edX"
     ).add(
+        'CONTACT_EMAIL', "Public contact email address", 'contact@' + configurator.get('LMS_HOST')
+    ).add(
         'SECRET_KEY', "", random_string(24)
     ).add(
         'MYSQL_DATABASE', "", 'openedx'
