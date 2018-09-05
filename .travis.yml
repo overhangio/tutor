@@ -1,14 +1,15 @@
-language: python
+language: minimal
 services:
   - docker
 script:
-  - make build
+  - make build-configurator
   - make configure SILENT=1
+  - make build
   - make migrate
   #- make assets # too time-consuming
-  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 deploy:
   provider: script
-  script: make push
+  script: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" && make push
   on:
-    branch: master
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^master|release\/.*$
