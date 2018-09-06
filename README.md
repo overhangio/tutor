@@ -118,7 +118,7 @@ This will launch the various docker containers required for your Open edX platfo
 
 You will most certainly need to create a user to administer the platform. Just run:
 
-    USERNAME=yourusername EMAIL=user@email.com make create-staff-user
+    make create-staff-user USERNAME=yourusername EMAIL=user@email.com
 
 You will asked to set the user password interactively.
 
