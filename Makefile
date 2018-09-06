@@ -32,10 +32,12 @@ all: configure $(post_configure_targets) update migrate assets daemon
 configure:
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
 		-e USERID=$(USERID) -e SILENT=$(SILENT) -e ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
-		regis/openedx-configurator
+		regis/openedx-configurator:hawthorn
 
-update:
+update: update-configurator
 	$(DOCKER_COMPOSE) pull
+
+update-configurator:
 	docker pull regis/openedx-configurator:hawthorn
 
 provision:
@@ -145,7 +147,7 @@ build-xqueue:
 	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
 
 #################### Deploying to docker hub
-push: push-openedx push-forum push-xqueue
+push: push-openedx push-forum push-xqueue push-configurator
 push-openedx:
 	docker push regis/openedx:hawthorn
 	docker push regis/openedx:latest
