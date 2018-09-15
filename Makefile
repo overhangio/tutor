@@ -31,7 +31,7 @@ all: configure $(post_configure_targets) update migrate assets daemonize
 
 configure: build-configurator
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
-		-e USERID=$(USERID) -e SILENT=$(SILENT) -e ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
+		-e USERID=$(USERID) -e SILENT=$(SILENT) -e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
 		regis/openedx-configurator:hawthorn bash -c "./configure.py interactive && \
       ./configure.py substitute ./config/openedx/templates/lms.env.json.templ ./config/openedx/lms.env.json && \
       ./configure.py substitute ./config/openedx/templates/cms.env.json.templ ./config/openedx/cms.env.json && \

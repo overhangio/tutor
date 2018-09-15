@@ -16,6 +16,12 @@ import jinja2
 class Configurator:
 
     def __init__(self, **default_overrides):
+        """
+        Default values are read, in decreasing order of priority, from:
+        - SETTING_<name> environment variable
+        - Existing config file (in `default_overrides`)
+        - Value passed to add()
+        """
         self.__values = OrderedDict()
         self.__default_values = default_overrides
         try:
@@ -30,13 +36,28 @@ class Configurator:
         self.__input = None
 
     def add(self, name, question="", default=""):
-        default = self.__default_values.get(name, default)
-        value = default
+        default = self.default_value(name) or default
         message = question + " (default: \"{}\"): ".format(default) if question else None
         value = self.ask(message, default)
         self.set(name, value)
 
         return self
+
+    def add_bool(self, name, question="", default=False):
+        self.add(name, question=question, default=default)
+        value = self.get(name)
+        if value in [1, '1']:
+            return self.set(name, True)
+        if value in [0, '0']:
+            return self.set(name, False)
+        return self
+
+    def default_value(self, name):
+        setting_name = 'SETTING_' + name.upper()
+        if setting_name in os.environ:
+            return os.environ[setting_name]
+
+        return self.__default_values.get(name)
 
     def ask(self, message, default):
         if self.__input and message:
@@ -64,8 +85,6 @@ def main():
                                         "This is good for debugging and automation, but "
                                         "probably not what you want"
                                     ))
-    parser_interactive.add_argument('--activate-https', action='store_true', default=False, help='Activate https feature flag')
-    parser_interactive.add_argument('--activate-xqueue', action='store_true', default=False, help='Activate xqueue feature flag')
     parser_interactive.set_defaults(func=interactive)
 
     parser_substitute = subparsers.add_parser('substitute')
@@ -105,25 +124,25 @@ def interactive(args):
     ).add(
         'MYSQL_USERNAME', "", 'openedx'
     ).add(
-        'MYSQL_PASSWORD', "", random_string(8),
+        'MYSQL_PASSWORD', "", random_string(8)
     ).add(
         'MONGODB_DATABASE', "", 'openedx'
     ).add(
         'XQUEUE_AUTH_USERNAME', "", 'lms'
     ).add(
-        'XQUEUE_AUTH_PASSWORD', "", random_string(8),
+        'XQUEUE_AUTH_PASSWORD', "", random_string(8)
     ).add(
         'XQUEUE_MYSQL_DATABASE', "", 'xqueue',
     ).add(
         'XQUEUE_MYSQL_USERNAME', "", 'xqueue',
     ).add(
-        'XQUEUE_MYSQL_PASSWORD', "", random_string(8),
+        'XQUEUE_MYSQL_PASSWORD', "", random_string(8)
     ).add(
-        'XQUEUE_SECRET_KEY', "", random_string(24),
-    ).set(
-        'ACTIVATE_HTTPS', bool(args.activate_https or os.environ.get('ACTIVATE_HTTPS'))
-    ).set(
-        'ACTIVATE_XQUEUE', bool(args.activate_xqueue or os.environ.get('ACTIVATE_XQUEUE'))
+        'XQUEUE_SECRET_KEY', "", random_string(24)
+    ).add_bool(
+        'ACTIVATE_HTTPS', "", False
+    ).add_bool(
+        'ACTIVATE_XQUEUE', "", False
     )
 
     # Save values
