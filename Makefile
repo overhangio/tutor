@@ -14,6 +14,10 @@ ifeq ($(ACTIVATE_XQUEUE), 1)
 	extra_migrate_targets += migrate-xqueue
 	DOCKER_COMPOSE += -f docker-compose-xqueue.yml
 endif
+ifeq ($(ACTIVATE_NOTES), 1)
+	extra_migrate_targets += migrate-notes
+	DOCKER_COMPOSE += -f docker-compose-notes.yml
+endif
 
 DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE) run --rm
 DOCKER_COMPOSE_RUN_OPENEDX = $(DOCKER_COMPOSE_RUN) -e USERID=$(USERID) -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
@@ -31,16 +35,18 @@ all: configure $(post_configure_targets) update migrate assets daemonize
 
 configure: build-configurator
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
-		-e USERID=$(USERID) -e SILENT=$(SILENT) -e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
+		-e USERID=$(USERID) -e SILENT=$(SILENT) \
+		-e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_NOTES=$(ACTIVATE_NOTES) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
 		regis/openedx-configurator:hawthorn
 
 update:
 	$(DOCKER_COMPOSE) pull
 
+migrate: provision migrate-openedx migrate-forum $(extra_migrate_targets) oauth2
 provision:
 	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && bash /openedx/config/provision.sh"
-
-migrate: provision migrate-openedx migrate-forum $(extra_migrate_targets)
+oauth2:
+	$(DOCKER_COMPOSE_RUN) lms /openedx/config/oauth2.sh
 
 migrate-openedx:
 	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py lms migrate"
@@ -50,6 +56,9 @@ migrate-openedx:
 migrate-forum:
 	$(DOCKER_COMPOSE_RUN) forum bash -c "bundle exec rake search:initialize && \
 		bundle exec rake search:rebuild_index"
+
+migrate-notes:
+	$(DOCKER_COMPOSE_RUN) notes ./manage.py migrate
 
 migrate-xqueue:
 	$(DOCKER_COMPOSE_RUN) xqueue ./manage.py migrate
@@ -140,7 +149,7 @@ android-push:
 android-dockerhub: android-build android-push
 
 #################### Build images
-build: build-openedx build-configurator build-forum build-xqueue
+build: build-openedx build-configurator build-forum build-notes build-xqueue
 
 build-openedx:
 	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
@@ -148,6 +157,8 @@ build-configurator:
 	docker build -t regis/openedx-configurator:latest -t regis/openedx-configurator:hawthorn configurator/
 build-forum:
 	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:hawthorn forum/
+build-notes:
+	docker build -t regis/openedx-notes:latest -t regis/openedx-notes:hawthorn notes/
 build-xqueue:
 	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
 
@@ -162,6 +173,9 @@ push-configurator:
 push-forum:
 	docker push regis/openedx-forum:hawthorn
 	docker push regis/openedx-forum:latest
+push-notes:
+	docker push regis/openedx-notes:hawthorn
+	docker push regis/openedx-notes:latest
 push-xqueue:
 	docker push regis/openedx-xqueue:hawthorn
 	docker push regis/openedx-xqueue:latest

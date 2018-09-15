@@ -49,6 +49,14 @@ To renew the certificate, run this command once per month:
 
     make https-certificate-renew
 
+### Student notes (`ACTIVATE_NOTES`)
+
+With [notes](https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/exercises_tools/notes.html?highlight=notes), students can annotate portions of the courseware. 
+
+![Notes in action](https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/_images/SFD_SN_bodyexample.png)
+
+You should beware that the `notes.<LMS_HOST>` domain name should be activated and point to your server. For instance, if your LMS is hosted at [myopenedx.com](), the notes service should be found at [notes.myopenedx.com](). Student browsers will access this domain name to fetch their notes.
+
 ### Xqueue (`ACTIVATE_XQUEUE`)
 
 [Xqueue](https://github.com/edx/xqueue) is for grading problems with external services. If you don't know what it is, you probably don't need it.

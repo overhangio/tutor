@@ -133,6 +133,16 @@ def interactive(args):
     ).add(
         'MONGODB_DATABASE', "", 'openedx'
     ).add(
+        'NOTES_MYSQL_DATABASE', "", 'notes',
+    ).add(
+        'NOTES_MYSQL_USERNAME', "", 'notes',
+    ).add(
+        'NOTES_MYSQL_PASSWORD', "", random_string(8)
+    ).add(
+        'NOTES_SECRET_KEY', "", random_string(24)
+    ).add(
+        'NOTES_OAUTH2_SECRET', "", random_string(24)
+    ).add(
         'XQUEUE_AUTH_USERNAME', "", 'lms'
     ).add(
         'XQUEUE_AUTH_PASSWORD', "", random_string(8)
@@ -144,6 +154,8 @@ def interactive(args):
         'XQUEUE_MYSQL_PASSWORD', "", random_string(8)
     ).add(
         'XQUEUE_SECRET_KEY', "", random_string(24)
+    ).add_bool(
+        'ACTIVATE_NOTES', "", False
     ).add_bool(
         'ACTIVATE_HTTPS', "", False
     ).add_bool(

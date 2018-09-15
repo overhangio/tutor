@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-09-15 [Feature] Add student notes as an optional feature
 - 2018-09-15 [Feature] Add templates to configurator container, which can now be run separately
 - 2018-09-15 [Improvement] Rename "up" and "daemon" commands to "run" and "daemonize"
 - 2018-09-15 [Feature] Activate course search and discovery
