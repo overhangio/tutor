@@ -29,16 +29,24 @@ all: configure $(post_configure_targets) update migrate assets daemon
 
 ##################### Bootstrapping
 
-configure:
+configure: build-configurator
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
 		-e USERID=$(USERID) -e SILENT=$(SILENT) -e ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
-		regis/openedx-configurator:hawthorn
+		regis/openedx-configurator:hawthorn bash -c "./configure.py interactive && \
+      ./configure.py substitute ./config/openedx/templates/lms.env.json.templ ./config/openedx/lms.env.json && \
+      ./configure.py substitute ./config/openedx/templates/cms.env.json.templ ./config/openedx/cms.env.json && \
+      ./configure.py substitute ./config/openedx/templates/lms.auth.json.templ ./config/openedx/lms.auth.json && \
+      ./configure.py substitute ./config/openedx/templates/cms.auth.json.templ ./config/openedx/cms.auth.json && \
+      ./configure.py substitute ./config/openedx/templates/provision.sh.templ ./config/openedx/provision.sh && \
+      ./configure.py substitute ./config/mysql/templates/auth.env.templ ./config/mysql/auth.env && \
+      ./configure.py substitute ./config/nginx/templates/lms.conf.templ ./config/nginx/lms.conf && \
+      ./configure.py substitute ./config/nginx/templates/cms.conf.templ ./config/nginx/cms.conf && \
+      ./configure.py substitute ./config/android/templates/universal.yaml.templ ./config/android/universal.yaml && \
+      ./configure.py substitute ./config/letsencrypt/templates/certonly.sh.templ ./config/letsencrypt/certonly.sh && \
+      ./configure.py substitute ./config/xqueue/templates/universal.py.templ ./config/xqueue/universal.py"
 
-update: update-configurator
+update:
 	$(DOCKER_COMPOSE) pull
-
-update-configurator:
-	docker pull regis/openedx-configurator:hawthorn
 
 provision:
 	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && bash /openedx/config/provision.sh"
@@ -46,15 +54,19 @@ provision:
 migrate: provision migrate-openedx migrate-forum $(extra_migrate_targets)
 
 migrate-openedx:
-	$(DOCKER_COMPOSE_RUN_OPENEDX) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py lms migrate"
-	$(DOCKER_COMPOSE_RUN_OPENEDX) cms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py cms migrate"
+	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py lms migrate"
+	$(DOCKER_COMPOSE_RUN) cms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py cms migrate"
+	$(MAKE) reindex-courses
 
 migrate-forum:
 	$(DOCKER_COMPOSE_RUN) forum bash -c "bundle exec rake search:initialize && \
 		bundle exec rake search:rebuild_index"
 
 migrate-xqueue:
-	$(DOCKER_COMPOSE_RUN) xqueue bash -c "./manage.py migrate"
+	$(DOCKER_COMPOSE_RUN) xqueue ./manage.py migrate
+
+reindex-courses:
+	$(DOCKER_COMPOSE_RUN) cms ./manage.py cms reindex_course --all --setup
 
 assets:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)

@@ -130,13 +130,21 @@ On a fresh install, your platform will not have a single course. To import the [
 
 ### Daemonizing
 
-Note that in production, you will probably want to daemonize the services. Instead of `make up`, run:
+In production, you will probably want to daemonize the services. Instead of `make up`, run:
 
     make daemon
 
 And then, to stop all services:
 
     make stop
+
+### Updating the course search index
+
+The course search index can be updated with:
+
+    make reindex-courses
+
+Run this command periodically to ensure that course search results are always up-to-date.
 
 ### Logging
 

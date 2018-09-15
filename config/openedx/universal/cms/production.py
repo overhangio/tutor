@@ -6,8 +6,12 @@ update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
 MEDIA_ROOT = "/openedx/data/uploads/"
 
 # Change syslog-based loggers which don't work inside docker containers
-LOGGING['handlers']['local'] = LOGGING['handlers']['console'].copy()
-LOGGING['handlers']['tracking'] = LOGGING['handlers']['console'].copy()
+LOGGING['handlers']['local'] = {'class': 'logging.NullHandler'}
+LOGGING['handlers']['tracking'] = {
+    'level': 'DEBUG',
+    'class': 'logging.StreamHandler',
+    'formatter': 'standard',
+}
 
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:

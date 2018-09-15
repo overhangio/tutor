@@ -88,7 +88,7 @@ def interactive(args):
     print("====================================")
 
     configurator = Configurator(**load_config(args))
-    if args.silent:
+    if args.silent or os.environ.get('SILENT'):
         configurator.mute()
     configurator.add(
         'LMS_HOST', "Your website domain name for students (LMS).", 'www.myopenedx.com'
