@@ -8,9 +8,9 @@ RUN mkdir /openedx
 VOLUME /openedx/config
 COPY ./bin/configure.py /openedx/configure.py
 COPY ./bin/docker-entrypoint.sh /openedx/docker-entrypoint.sh
+COPY ./templates /openedx/templates
 WORKDIR /openedx
 
-ENV SILENT=''
-ENV ACTIVATE_HTTPS=''
-ENV ACTIVATE_XQUEUE=''
 ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ./configure.py -c /openedx/config/config.json interactive && \
+    ./configure.py -c /openedx/config/config.json substitute ./templates/ /openedx/config

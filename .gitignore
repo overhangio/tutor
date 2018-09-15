@@ -1,12 +1,4 @@
 .*.swp
-config/config.json
-config/android/*.yaml
-config/letsencrypt/*.sh
-config/mysql/*.env
-config/nginx/*.conf
-config/openedx/*.json
-config/openedx/*.sh
-config/xqueue/*.py
-
+config/
 data-*/
 TODO
