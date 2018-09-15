@@ -272,7 +272,7 @@ Do you have a problem?
 3. If necessary, open an [issue on Github](https://github.com/regisb/openedx-docker/issues/new).
 
 
-## Known missing features: discovery service, edX notes, ecommerce, notifier
+## Known missing features: discovery service, edX notes, ecommerce
 
 Those extra services were considered low priority while developing this project. However, most of them should not be too hard to add to a standard install. If you need one or more of these services, feel free to let me know by opening an issue.
 
