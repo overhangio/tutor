@@ -68,8 +68,10 @@ migrate-xqueue:
 reindex-courses:
 	$(DOCKER_COMPOSE_RUN) cms ./manage.py cms reindex_course --all --setup
 
-assets:
+assets: assets-lms assets-cms
+assets-lms:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
+assets-cms:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True cms paver update_assets cms --settings=$(EDX_PLATFORM_SETTINGS)
 
 ##################### Running
