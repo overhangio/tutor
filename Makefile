@@ -1,4 +1,4 @@
-.PHONY: all android configure build update migrate assets up daemon
+.PHONY: all android configure build update migrate assets run daemonize
 
 PWD ?= $$(pwd)
 USERID ?= $$(id -u)
@@ -24,7 +24,7 @@ endif
 DOCKER_COMPOSE_RUN_LMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8000:8000 lms
 DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8001:8001 cms
 
-all: configure $(post_configure_targets) update migrate assets daemon
+all: configure $(post_configure_targets) update migrate assets daemonize
 	@echo "All set \o/ You can access the LMS at http://localhost and the CMS at http://studio.localhost"
 
 ##################### Bootstrapping
@@ -74,12 +74,14 @@ assets:
 
 ##################### Running
 
-up:
+run:
 	$(DOCKER_COMPOSE) up
+up: run
 
-daemon:
+daemonize:
 	$(DOCKER_COMPOSE) up -d && \
 	echo "Daemon is up and running"
+daemon: daemonize
 
 stop:
 	$(DOCKER_COMPOSE) rm --stop --force

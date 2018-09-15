@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-09-15 [Improvement] Rename "up" and "daemon" commands to "run" and "daemonize"
 - 2018-09-15 [Feature] Activate course search and discovery
 - 2018-09-15 [Bugfix] Deduplicate console logs from lms/cms
 - 2018-09-05 [Improvement] Use a single email address for all inbound email

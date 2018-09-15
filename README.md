@@ -108,7 +108,7 @@ If migrations are stopped with a `Killed` message, this certainly means the dock
 
 ### Running Open edX
 
-    make up
+    make run
 
 This will launch the various docker containers required for your Open edX platform. The LMS and the Studio will then be reachable at the domain name you specified during the configuration step. You can also access them at [http://localhost](http://localhost) and [http://studio.localhost](http://studio.localhost).
 
@@ -130,9 +130,9 @@ On a fresh install, your platform will not have a single course. To import the [
 
 ### Daemonizing
 
-In production, you will probably want to daemonize the services. Instead of `make up`, run:
+In production, you will probably want to daemonize the services. Instead of `make run`, run:
 
-    make daemon
+    make daemonize
 
 And then, to stop all services:
 
