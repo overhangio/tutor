@@ -42,10 +42,10 @@ configure: build-configurator
 update:
 	$(DOCKER_COMPOSE) pull
 
-migrate: provision migrate-openedx migrate-forum $(extra_migrate_targets) oauth2
-provision:
+migrate: provision-database migrate-openedx migrate-forum $(extra_migrate_targets) provision-oauth2
+provision-database:
 	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && bash /openedx/config/provision.sh"
-oauth2:
+provision-oauth2:
 	$(DOCKER_COMPOSE_RUN) lms /openedx/config/oauth2.sh
 
 migrate-openedx:
