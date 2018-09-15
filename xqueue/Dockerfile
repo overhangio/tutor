@@ -5,10 +5,9 @@ RUN apt update && \
   apt install -y language-pack-en git git-core python-pip libmysqlclient-dev
 
 RUN mkdir /openedx
-RUN git clone https://github.com/edx/xqueue --branch open-release/ginkgo.master --depth 1 /openedx/xqueue 
+RUN git clone https://github.com/edx/xqueue --branch open-release/hawthorn.1 --depth 1 /openedx/xqueue 
 WORKDIR /openedx/xqueue
 
-RUN pip install -r pre-requirements.txt
 RUN pip install -r requirements.txt
 
 ENV DJANGO_SETTINGS_MODULE xqueue.universal
