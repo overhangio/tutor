@@ -1,3 +1,11 @@
+#!/bin/bash -e
+dockerize -wait tcp://mysql:3306 -timeout 20s
+
+while ! mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e="\r"; do
+    echo "Waiting for mysql database to be ready..."
+    sleep 1
+done
+
 mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'CREATE DATABASE IF NOT EXISTS {{ MYSQL_DATABASE }};'
 mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'GRANT ALL ON {{ MYSQL_DATABASE }}.* TO "{{ MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ MYSQL_PASSWORD }}";'
 

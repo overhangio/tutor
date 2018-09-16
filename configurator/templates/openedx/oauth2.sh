@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 {% if ACTIVATE_NOTES %}
 ./manage.py lms manage_user notes notes@{{ LMS_HOST }} --staff --superuser

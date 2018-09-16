@@ -44,7 +44,7 @@ update:
 
 migrate: provision-database migrate-openedx migrate-forum $(extra_migrate_targets) provision-oauth2
 provision-database:
-	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && bash /openedx/config/provision.sh"
+	$(DOCKER_COMPOSE_RUN) lms /openedx/config/provision.sh
 provision-oauth2:
 	$(DOCKER_COMPOSE_RUN) lms /openedx/config/oauth2.sh
 
