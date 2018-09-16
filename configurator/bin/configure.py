@@ -117,11 +117,11 @@ def interactive(args):
     configurator.add(
         'LMS_HOST', "Your website domain name for students (LMS).", 'www.myopenedx.com'
     ).add(
-        'CMS_HOST', "Your website domain name for teachers (CMS).", 'studio.myopenedx.com'
+        'CMS_HOST', "Your website domain name for teachers (CMS).", 'studio.' + configurator.get('LMS_HOST')
     ).add(
-        'PLATFORM_NAME', "Platform name/title", "My Open edX"
+        'PLATFORM_NAME', "Your platform name/title", "My Open edX"
     ).add(
-        'CONTACT_EMAIL', "Public contact email address", 'contact@' + configurator.get('LMS_HOST')
+        'CONTACT_EMAIL', "Your public contact email address", 'contact@' + configurator.get('LMS_HOST')
     ).add(
         'SECRET_KEY', "", random_string(24)
     ).add(
