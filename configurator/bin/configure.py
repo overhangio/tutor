@@ -160,6 +160,8 @@ def interactive(args):
         'ACTIVATE_HTTPS', "", False
     ).add_bool(
         'ACTIVATE_XQUEUE', "", False
+    ).add(
+        'ID', "", random_string(8)
     )
 
     # Save values

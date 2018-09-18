@@ -75,6 +75,9 @@ If all goes well, the debuggable APK for your platform should then be available 
 
 Building the Android app for an Open edX platform is currently labeled as a **beta feature** because it was not fully tested yet. In particular, there is no easy mechanism for overriding the edX assets in the mobile app. This is still a work-in-progress.
 
+### Stats
+
+By default, the install script will collect some information about your install and send it to a private server. The only transmitted information are the LMS domain name and the ID of the install. If you do not wish to transmit these informations, set the environment variable `DISABLE_STATS=1`. But if you do that, please send me a message to tell me about your platform! 
 
 ## Requirements
 

@@ -5,7 +5,10 @@ USERID ?= $$(id -u)
 EDX_PLATFORM_SETTINGS ?= universal.production
 DOCKER_COMPOSE = docker-compose -f docker-compose.yml
 
-post_configure_targets = 
+post_configure_targets =
+ifneq ($(DISABLE_STATS), 1)
+	post_configure_targets += stats
+endif
 ifeq ($(ACTIVATE_HTTPS), 1)
 	post_configure_targets += https-certificate
 endif
@@ -38,6 +41,10 @@ configure: build-configurator
 		-e USERID=$(USERID) -e SILENT=$(SILENT) \
 		-e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_NOTES=$(ACTIVATE_NOTES) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
 		regis/openedx-configurator:hawthorn
+
+stats:
+	@docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
+		regis/openedx-configurator:hawthorn /openedx/config/openedx/stats 2> /dev/null|| true
 
 update:
 	$(DOCKER_COMPOSE) pull
