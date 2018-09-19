@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 RUN apt update && \
-  apt install -y python3 python3-pip
+  apt install -y python3 python3-pip curl
 RUN pip3 install jinja2
 
 RUN mkdir /openedx
