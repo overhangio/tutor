@@ -123,6 +123,16 @@ info: ## Print some information about the current install, for debugging
 	echo $$EDX_PLATFORM_PATH
 	echo $$EDX_PLATFORM_SETTINGS
 
+
+#################### Logging
+
+logs: ## Print all logs from a service since it started. E.g: "make logs service=lms", "make logs service=nginx"
+	$(DOCKER_COMPOSE) logs $(service)
+tail: ## Similar to "tail" on the logs of a service. E.g: "make tail service=lms", "make tail service=nginx"
+	$(DOCKER_COMPOSE) logs --tail=10 $(service)
+tail-follow: ## Similar to "tail -f" on the logs of a service. E.g: "make tail-follow service=lms", "make tail-follow service=nginx"
+	$(DOCKER_COMPOSE) logs --tail=10 -f $(service)
+
 #################### Docker image building & updating
 
 update: ## Download most recent images

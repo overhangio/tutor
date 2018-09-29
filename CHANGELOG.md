@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-09-29 [Improvement] Add logging commands
 - 2018-09-29 [Improvement] Add self-documented help with "make help"
 - 2018-09-29 [Feature] Add [Portainer](https://portainer.io) as an optional web UI to administer docker containers
 - 2018-09-15 [Feature] Add student notes as an optional feature
