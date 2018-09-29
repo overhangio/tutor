@@ -118,9 +118,9 @@ This is the only non-automatic step in the install process. You will be asked va
 
 You will need to download the docker images from [Docker Hub](https://hub.docker.com/r/regis/openedx/). Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
 
-### Migrations and assets
+### Database creation, migrations and collection of static assets
 
-    make migrate
+    make databases
     make assets
 
 These commands should be run just once. They will create the required databases tables, apply database migrations and generate static assets, such as images, stylesheets and Javascript dependencies.

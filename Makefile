@@ -43,7 +43,7 @@ DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8001:8001 cms
 all: configure ## Configure and run a full-featured platform
 	@$(MAKE) post_configure
 	@$(MAKE) update
-	@$(MAKE) migrate
+	@$(MAKE) databases
 	@$(MAKE) assets
 	@$(MAKE) daemonize
 	@echo "All set \o/ You can access the LMS at http://localhost and the CMS at http://studio.localhost"
@@ -72,27 +72,25 @@ post_configure: $(post_configure_targets)
 
 ##################### Database
 
-migrate: provision-database migrate-openedx migrate-forum $(extra_migrate_targets) provision-oauth2 ## Perform all database migrations
-provision-database: ## Create necessary databases and users
+databases: provision-databases migrate provision-oauth2 ## Bootstrap databases
+
+provision-databases: ## Create necessary databases and users
 	$(DOCKER_COMPOSE_RUN) lms /openedx/config/provision.sh
 provision-oauth2: ## Create users for SSO between services
 	$(DOCKER_COMPOSE_RUN) lms /openedx/config/oauth2.sh
 
+migrate: migrate-openedx migrate-forum $(extra_migrate_targets) ## Perform all database migrations
 migrate-openedx: ## Perform database migrations on LMS/CMS
 	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py lms migrate"
 	$(DOCKER_COMPOSE_RUN) cms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py cms migrate"
 	$(MAKE) reindex-courses
-
 migrate-forum: ## Perform database migrations on discussion forums
 	$(DOCKER_COMPOSE_RUN) forum bash -c "bundle exec rake search:initialize && \
 		bundle exec rake search:rebuild_index"
-
 migrate-notes: ## Perform database migrations for the Notes service
 	$(DOCKER_COMPOSE_RUN) notes ./manage.py migrate
-
 migrate-xqueue: ## Perform database migrations for the XQueue service
 	$(DOCKER_COMPOSE_RUN) xqueue ./manage.py migrate
-
 reindex-courses: ## Refresh course index so they can be found in the LMS search engine
 	$(DOCKER_COMPOSE_RUN) cms ./manage.py cms reindex_course --all --setup
 
@@ -131,7 +129,6 @@ update: ## Download most recent images
 	$(DOCKER_COMPOSE) pull
 
 build: build-openedx build-configurator build-forum build-notes build-xqueue build-android ## Build all docker images
-
 build-openedx: ## Build the Open edX docker image
 	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
 build-configurator: ## Build the configurator docker image

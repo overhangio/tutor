@@ -4,7 +4,7 @@ services:
 script:
   - make configure SILENT=1 ACTIVATE_NOTES=1 ACTIVATE_XQUEUE=1
   - make build
-  - make migrate
+  - make databases
   #- make assets # too time-consuming
 deploy:
   provider: script
