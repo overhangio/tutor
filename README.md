@@ -63,6 +63,14 @@ You should beware that the `notes.<LMS_HOST>` domain name should be activated an
 
 Note: in previous releases of openedx-docker, xqueue was run for all platforms. It is now an optional feature.
 
+### Docker container web UI with [Portainer](https://portainer.io/) (`ACTIVATE_PORTAINER`)
+
+Portainer is a web UI for managing docker containers. It lets you view your entire Open edX platform at a glace. Try it! It's really cool.
+
+![Portainer demo](https://portainer.io/images/screenshots/portainer.gif)
+
+After launching your platfom, the web UI will be available at [http://portainer.localhost](http://portainer.localhost) and http://portainer.YOUR_LMS_HOST. You will be asked to define a password for the admin user. Then, select a "Local environment" to work on and hit "Connect". You're done! Select the "local" group to view all running containers. Amon many other things, you'll be able to view the logs for each container, which is really useful.
+
 ### Android app (beta)
 
 The Android app for your platform can be easily built in just one command:

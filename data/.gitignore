@@ -7,5 +7,6 @@ lms_worker/
 elasticsearch/
 mysql/
 mongodb/
+portainer/
 rabbitmq/
 xqueue/

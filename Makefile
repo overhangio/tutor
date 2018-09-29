@@ -21,6 +21,9 @@ ifeq ($(ACTIVATE_NOTES), 1)
 	extra_migrate_targets += migrate-notes
 	DOCKER_COMPOSE += -f docker-compose-notes.yml
 endif
+ifeq ($(ACTIVATE_PORTAINER), 1)
+	DOCKER_COMPOSE += -f docker-compose-portainer.yml
+endif
 
 DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE) run --rm
 DOCKER_COMPOSE_RUN_OPENEDX = $(DOCKER_COMPOSE_RUN) -e USERID=$(USERID) -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
@@ -39,7 +42,7 @@ all: configure $(post_configure_targets) update migrate assets daemonize
 configure: build-configurator
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
 		-e USERID=$(USERID) -e SILENT=$(SILENT) \
-		-e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_NOTES=$(ACTIVATE_NOTES) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
+		-e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_NOTES=$(ACTIVATE_NOTES) -e SETTING_ACTIVATE_PORTAINER=$(ACTIVATE_PORTAINER) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
 		regis/openedx-configurator:hawthorn
 
 stats:
