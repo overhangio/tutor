@@ -29,6 +29,8 @@ Some optional features may be activated by defining `ACTIVATE_*` environment var
 
     ACTIVATE_HTTPS=1 make all
 
+Technically, the `ACTIVATE_*` environment variables are only required during `make configure`. After that, they will be automatically loaded from `config/Makefile.env`.
+
 ### SSL/TLS certificates for HTTPS access (`ACTIVATE_HTTPS`)
 
 By activating this feature, a free SSL/TLS certificate from the [Let's Encrypt](https://letsencrypt.org/) certificate authority will be created for your platform. With this feature, **your platform will no longer be accessible in HTTP**. Calls to http urls will be redirected to https url.

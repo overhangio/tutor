@@ -4,6 +4,7 @@ PWD ?= $$(pwd)
 USERID ?= $$(id -u)
 EDX_PLATFORM_SETTINGS ?= universal.production
 DOCKER_COMPOSE = docker-compose -f docker-compose.yml
+-include $(PWD)/config/Makefile.env
 
 post_configure_targets =
 ifneq ($(DISABLE_STATS), 1)
@@ -34,7 +35,12 @@ endif
 DOCKER_COMPOSE_RUN_LMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8000:8000 lms
 DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8001:8001 cms
 
-all: configure $(post_configure_targets) update migrate assets daemonize
+all: configure # other targets are not listed as requirements in order to reload the env file
+	@$(MAKE) post_configure
+	@$(MAKE) update
+	@$(MAKE) migrate
+	@$(MAKE) assets
+	@$(MAKE) daemonize
 	@echo "All set \o/ You can access the LMS at http://localhost and the CMS at http://studio.localhost"
 
 ##################### Bootstrapping
@@ -44,6 +50,8 @@ configure: build-configurator
 		-e USERID=$(USERID) -e SILENT=$(SILENT) \
 		-e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_NOTES=$(ACTIVATE_NOTES) -e SETTING_ACTIVATE_PORTAINER=$(ACTIVATE_PORTAINER) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
 		regis/openedx-configurator:hawthorn
+
+post_configure: $(post_configure_targets)
 
 stats:
 	@docker run --rm -it --volume="$(PWD)/config:/openedx/config" \

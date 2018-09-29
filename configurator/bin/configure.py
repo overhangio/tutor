@@ -155,6 +155,8 @@ def interactive(args):
     ).add(
         'XQUEUE_SECRET_KEY', "", random_string(24)
     ).add_bool(
+        'DISABLE_STATS', "", False
+    ).add_bool(
         'ACTIVATE_NOTES', "", False
     ).add_bool(
         'ACTIVATE_HTTPS', "", False

@@ -1,10 +1,8 @@
 language: minimal
 services:
   - docker
-env:
-  - ACTIVATE_NOTES=1 ACTIVATE_XQUEUE=1
 script:
-  - make configure SILENT=1
+  - make configure SILENT=1 ACTIVATE_NOTES=1 ACTIVATE_XQUEUE=1
   - make build
   - make migrate
   #- make assets # too time-consuming
