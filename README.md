@@ -135,6 +135,10 @@ This will launch the various docker containers required for your Open edX platfo
 
 ## Additional commands
 
+All available commands can be listed by running:
+
+    make help
+
 ### Creating a new user with staff and admin rights
 
 You will most certainly need to create a user to administer the platform. Just run:
