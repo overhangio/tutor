@@ -37,6 +37,8 @@ endif
 DOCKER_COMPOSE_RUN_LMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8000:8000 lms
 DOCKER_COMPOSE_RUN_CMS = $(DOCKER_COMPOSE_RUN_OPENEDX) -p 8001:8001 cms
 
+##################### Running Open edX
+
 # other targets are not listed as requirements in order to reload the env file
 all: configure ## Configure and run a full-featured platform
 	@$(MAKE) post_configure
@@ -46,7 +48,19 @@ all: configure ## Configure and run a full-featured platform
 	@$(MAKE) daemonize
 	@echo "All set \o/ You can access the LMS at http://localhost and the CMS at http://studio.localhost"
 
-##################### Bootstrapping
+run: ## Run the complete platform
+	$(DOCKER_COMPOSE) up
+up: run
+
+daemonize: ## Run the complete platform, with daemonization
+	$(DOCKER_COMPOSE) up -d
+	@echo "Daemon is up and running"
+daemon: daemonize
+
+stop: ## Stop all services
+	$(DOCKER_COMPOSE) rm --stop --force
+
+##################### Configuration
 
 configure: build-configurator ## Configure the environment prior to running the platform
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
@@ -56,14 +70,9 @@ configure: build-configurator ## Configure the environment prior to running the 
 
 post_configure: $(post_configure_targets)
 
-stats: ## Collect anonymous information about the platform
-	@docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
-		regis/openedx-configurator:hawthorn /openedx/config/openedx/stats 2> /dev/null|| true
+##################### Database
 
-update: ## Download most recent images
-	$(DOCKER_COMPOSE) pull
-
-migrate: provision-database migrate-openedx migrate-forum $(extra_migrate_targets) provision-oauth2 ## Perform database migration operations
+migrate: provision-database migrate-openedx migrate-forum $(extra_migrate_targets) provision-oauth2 ## Perform all database migrations
 provision-database: ## Create necessary databases and users
 	$(DOCKER_COMPOSE_RUN) lms /openedx/config/provision.sh
 provision-oauth2: ## Create users for SSO between services
@@ -87,27 +96,23 @@ migrate-xqueue: ## Perform database migrations for the XQueue service
 reindex-courses: ## Refresh course index so they can be found in the LMS search engine
 	$(DOCKER_COMPOSE_RUN) cms ./manage.py cms reindex_course --all --setup
 
+##################### Static assets
+
 assets: assets-lms assets-cms ## Collect static assets for the LMS and the CMS
 assets-lms: ## Collect static assets for the LMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
 assets-cms: ## Collect static assets for the CMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) -e NO_PREREQ_INSTALL=True cms paver update_assets cms --settings=$(EDX_PLATFORM_SETTINGS)
 
-##################### Running
+##################### Information
 
-run: ## Run the complete platform
-	$(DOCKER_COMPOSE) up
-up: run
+# Obtained by running "echo '\033' in a shell
+ESCAPE = 
+help: ## Print this help
+	@grep -E '^([a-zA-Z_-]+:.*?## .*|######* .+)$$' Makefile \
+		| sed 's/######* \(.*\)/\n               $(ESCAPE)[1;31m\1$(ESCAPE)[0m/g' \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%-30s\033[0m %s\n", $$1, $$2}'
 
-daemonize: ## Run the complete platform, with daemonization
-	$(DOCKER_COMPOSE) up -d
-	@echo "Daemon is up and running"
-daemon: daemonize
-
-stop: ## Stop all services
-	$(DOCKER_COMPOSE) rm --stop --force
-
-##################### Extra
 info: ## Print some information about the current install, for debugging
 	uname -a
 	@echo "-------------------------"
@@ -120,25 +125,23 @@ info: ## Print some information about the current install, for debugging
 	echo $$EDX_PLATFORM_PATH
 	echo $$EDX_PLATFORM_SETTINGS
 
-import-demo-course: ## Import the demo course from edX
-	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/hawthorn.beta1 && python ./manage.py cms import ../data ../edx-demo-course"
+#################### Docker image building & updating
 
-create-staff-user: ## Create a user with admin rights
-	$(DOCKER_COMPOSE_RUN_OPENEDX) lms /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
+update: ## Download most recent images
+	$(DOCKER_COMPOSE) pull
 
+build: build-openedx build-configurator build-forum build-notes build-xqueue ## Build all docker images
 
-##################### HTTPS
-https_command = docker run --rm -it \
-		--volume="$(PWD)/config/letsencrypt/:/openedx/letsencrypt/config/" \
-		--volume="$(PWD)/data/letsencrypt/:/etc/letsencrypt/" \
-		-p "80:80"
-certbot_image = certbot/certbot:latest
-
-https-certificate: ## Generate https certificates
-	$(https_command) --entrypoint "/openedx/letsencrypt/config/certonly.sh" $(certbot_image)
-
-https-certificate-renew: ## Renew https certificates
-	$(https_command) $(certbot_image) renew
+build-openedx: ## Build the Open edX docker image
+	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
+build-configurator: ## Build the configurator docker image
+	docker build -t regis/openedx-configurator:latest -t regis/openedx-configurator:hawthorn configurator/
+build-forum: ## Build the forum docker image
+	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:hawthorn forum/
+build-notes: ## Build the Notes docker image
+	docker build -t regis/openedx-notes:latest -t regis/openedx-notes:hawthorn notes/
+build-xqueue: ## Build the Xqueue docker image
+	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
 
 ##################### Development
 
@@ -152,8 +155,21 @@ lms-shell: ## Open a python shell in the LMS
 cms-shell: ## Open a python shell in the CMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms ./manage.py cms shell
 
+##################### SSL/TLS (HTTPS certificates)
 
-#################### Android app
+https_command = docker run --rm -it \
+		--volume="$(PWD)/config/letsencrypt/:/openedx/letsencrypt/config/" \
+		--volume="$(PWD)/data/letsencrypt/:/etc/letsencrypt/" \
+		-p "80:80"
+certbot_image = certbot/certbot:latest
+
+https-certificate: ## Generate https certificates
+	$(https_command) --entrypoint "/openedx/letsencrypt/config/certonly.sh" $(certbot_image)
+
+https-certificate-renew: ## Renew https certificates
+	$(https_command) $(certbot_image) renew
+
+#################### Android application
 
 android: ## Build the Android app, for development
 	docker-compose -f docker-compose-android.yml run --rm android
@@ -169,21 +185,8 @@ android-push: ## Push the Android image to dockerhub
 	docker push regis/openedx-android:latest
 android-dockerhub: android-build android-push ## Build and push the Android image to dockerhub
 
-#################### Build docker images
-build: build-openedx build-configurator build-forum build-notes build-xqueue ## Build all docker images
+################### Pushing to docker hub
 
-build-openedx: ## Build the Open edX docker image
-	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
-build-configurator: ## Build the configurator docker image
-	docker build -t regis/openedx-configurator:latest -t regis/openedx-configurator:hawthorn configurator/
-build-forum: ## Build the forum docker image
-	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:hawthorn forum/
-build-notes: ## Build the Notes docker image
-	docker build -t regis/openedx-notes:latest -t regis/openedx-notes:hawthorn notes/
-build-xqueue: ## Build the Xqueue docker image
-	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
-
-################### Deploying to docker hub
 push: push-openedx push-forum push-notes push-xqueue push-configurator ## Push all images to dockerhub
 push-openedx: ## Push Open edX images to dockerhub
 	docker push regis/openedx:hawthorn
@@ -203,9 +206,14 @@ push-xqueue: ## Push Xqueue image to dockerhub
 
 dockerhub: build push ## Build and push all images to dockerhub
 
-# Obtained by running "echo '\033' in a shell
-ESCAPE = 
-help: ## Print this help
-	@grep -E '^([a-zA-Z_-]+:.*?## .*|######* .+)$$' Makefile \
-		| sed 's/######* \(.*\)/\n               $(ESCAPE)[1;31m\1$(ESCAPE)[0m/g' \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%-30s\033[0m %s\n", $$1, $$2}'
+##################### Additional commands
+
+stats: ## Collect anonymous information about the platform
+	@docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
+		regis/openedx-configurator:hawthorn /openedx/config/openedx/stats 2> /dev/null|| true
+
+import-demo-course: ## Import the demo course from edX
+	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/hawthorn.beta1 && python ./manage.py cms import ../data ../edx-demo-course"
+
+create-staff-user: ## Create a user with admin rights
+	$(DOCKER_COMPOSE_RUN_OPENEDX) lms /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
