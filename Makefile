@@ -172,10 +172,12 @@ lms: ## Open a bash shell in the LMS
 cms: ## Open a bash shell in the CMS
 	$(DOCKER_COMPOSE_RUN_CMS) bash
 
-lms-shell: ## Open a python shell in the LMS
+lms-python: ## Open a python shell in the LMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms ./manage.py lms shell
-cms-shell: ## Open a python shell in the CMS
+lms-shell: lms-python
+cms-python: ## Open a python shell in the CMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms ./manage.py cms shell
+cms-shell: cms-python
 
 ##################### SSL/TLS (HTTPS certificates)
 

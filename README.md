@@ -187,14 +187,15 @@ The last commands produce the logs since the creation of the containers, which c
 
 ### Debugging
 
-Open a bash in the lms:
+Open a bash shell in the lms or the cms:
 
-    docker-compose run lms bash
+    make lms
+    make cms
 
 Open a python shell in the lms or the cms:
 
-    make lms-shell
-    make cms-shell
+    make lms-python
+    make cms-python
 
 ## For developers
 
