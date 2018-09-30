@@ -154,7 +154,7 @@ build-android: ## Build the docker image for Android
 
 ################### Pushing images to docker hub
 
-push: push-openedx push-configurator push-forum push-notes push-xqueue ## Push all images to dockerhub
+push: push-openedx push-configurator push-forum push-notes push-xqueue push-android ## Push all images to dockerhub
 push-openedx: ## Push Open edX images to dockerhub
 	docker push regis/openedx:hawthorn
 	docker push regis/openedx:latest
@@ -170,7 +170,7 @@ push-notes: ## Push notes image to dockerhub
 push-xqueue: ## Push Xqueue image to dockerhub
 	docker push regis/openedx-xqueue:hawthorn
 	docker push regis/openedx-xqueue:latest
-push-android: ## Push the Android image to dockerhub. Be careful! Customised settings will be added to this image.
+push-android: ## Push the Android image to dockerhub
 	docker push regis/openedx-android:latest
 
 dockerhub: build push ## Build and push all images to dockerhub
