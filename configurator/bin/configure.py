@@ -37,22 +37,19 @@ class Configurator:
 
     def add(self, name, question="", default=""):
         default = self.get_default_value(name, default)
-        message = question + " (default: \"{}\"): ".format(default) if question else None
-        value = self.ask(message, default)
+        value = self.ask(question, default)
         self.set(name, value)
 
         return self
 
     def add_bool(self, name, question="", default=False):
-        self.add(name, question=question, default=default)
-        value = self.get(name)
-        if value in [1, '1']:
-            return self.set(name, True)
-        if value in [0, '0', '']:
-            return self.set(name, False)
-        if value in [True, False]:
-            return self
-        return self.set(name, bool(value))
+        default = self.get_default_value(name, default)
+        if default in [1, '1']:
+            default = True
+        if default in [0, '0', '']:
+            default = False
+        value = self.ask_bool(question, default)
+        return self.set(name, value)
 
     def get_default_value(self, name, default):
         setting_name = 'SETTING_' + name.upper()
@@ -66,8 +63,24 @@ class Configurator:
 
     def ask(self, message, default):
         if self.__input and message:
+            message += " (default: \"{}\"): ".format(default)
             return self.__input(message) or default
         return default
+
+    def ask_bool(self, message, default):
+        if self.__input and message:
+            message += " [Y/n] " if default else " [y/N] "
+            while True:
+                answer = self.__input(message)
+                if answer is None or answer == '':
+                    return default
+                if answer.lower() in ['y', 'yes']:
+                    return True
+                if answer.lower() in ['n', 'no']:
+                    return False
+                print("'{}' is an invalid answer".format(answer))
+        return default
+
 
     def get(self, name):
         return self.__values.get(name)
@@ -155,15 +168,13 @@ def interactive(args):
     ).add(
         'XQUEUE_SECRET_KEY', "", random_string(24)
     ).add_bool(
-        'DISABLE_STATS', "", False
+        'ACTIVATE_HTTPS', "Activate SSL/TLS certificates for HTTPS access? Important note: this will NOT work in a development environment.", False
     ).add_bool(
-        'ACTIVATE_NOTES', "", False
+        'ACTIVATE_NOTES', "Activate Student Notes service (https://open.edx.org/features/student-notes)?", False
     ).add_bool(
-        'ACTIVATE_HTTPS', "", False
+        'ACTIVATE_PORTAINER', "Activate Portainer, a convenient Docker dashboard with a web UI (https://portainer.io)?", False
     ).add_bool(
-        'ACTIVATE_PORTAINER', "", False
-    ).add_bool(
-        'ACTIVATE_XQUEUE', "", False
+        'ACTIVATE_XQUEUE', "Activate Xqueue for external grader services? (https://github.com/edx/xqueue)", False
     ).add(
         'ID', "", random_string(8)
     )

@@ -64,8 +64,7 @@ stop: ## Stop all services
 
 configure: build-configurator ## Configure the environment prior to running the platform
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
-		-e USERID=$(USERID) -e SILENT=$(SILENT) \
-		-e SETTING_ACTIVATE_HTTPS=$(ACTIVATE_HTTPS) -e SETTING_ACTIVATE_NOTES=$(ACTIVATE_NOTES) -e SETTING_ACTIVATE_PORTAINER=$(ACTIVATE_PORTAINER) -e SETTING_ACTIVATE_XQUEUE=$(ACTIVATE_XQUEUE) \
+		-e USERID=$(USERID) -e SILENT=$(SILENT) $(CONFIGURE_OPTS) \
 		regis/openedx-configurator:hawthorn
 
 post_configure: $(post_configure_targets)

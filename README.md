@@ -25,13 +25,9 @@ This might seem too simple to be true, but there's no magic -- just good packagi
 
 ## Optional features
 
-Some optional features may be activated by defining `ACTIVATE_*` environment variables on the host. These features change configuration files (during the `configure` step) as well as make targets. For instance, to add SSL/TLS certificates, run:
+Some optional features may be activated or deactivated during the interactive configuration step. These features change configuration files (during the `configure` step) as well as make targets.
 
-    ACTIVATE_HTTPS=1 make all
-
-Technically, the `ACTIVATE_*` environment variables are only required during `make configure`. After that, they will be automatically loaded from `config/Makefile.env`.
-
-### SSL/TLS certificates for HTTPS access (`ACTIVATE_HTTPS`)
+### SSL/TLS certificates for HTTPS access
 
 By activating this feature, a free SSL/TLS certificate from the [Let's Encrypt](https://letsencrypt.org/) certificate authority will be created for your platform. With this feature, **your platform will no longer be accessible in HTTP**. Calls to http urls will be redirected to https url.
 
@@ -51,7 +47,7 @@ To renew the certificate, run this command once per month:
 
     make https-certificate-renew
 
-### Student notes (`ACTIVATE_NOTES`)
+### Student notes
 
 With [notes](https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/exercises_tools/notes.html?highlight=notes), students can annotate portions of the courseware. 
 
@@ -59,13 +55,13 @@ With [notes](https://edx.readthedocs.io/projects/open-edx-building-and-running-a
 
 You should beware that the `notes.<LMS_HOST>` domain name should be activated and point to your server. For instance, if your LMS is hosted at [myopenedx.com](), the notes service should be found at [notes.myopenedx.com](). Student browsers will access this domain name to fetch their notes.
 
-### Xqueue (`ACTIVATE_XQUEUE`)
+### Xqueue
 
 [Xqueue](https://github.com/edx/xqueue) is for grading problems with external services. If you don't know what it is, you probably don't need it.
 
 Note: in previous releases of openedx-docker, xqueue was run for all platforms. It is now an optional feature.
 
-### Docker container web UI with [Portainer](https://portainer.io/) (`ACTIVATE_PORTAINER`)
+### Docker container web UI with [Portainer](https://portainer.io/)
 
 Portainer is a web UI for managing docker containers. It lets you view your entire Open edX platform at a glace. Try it! It's really cool.
 
@@ -87,7 +83,11 @@ Building the Android app for an Open edX platform is currently labeled as a **be
 
 ### Stats
 
-By default, the install script will collect some information about your install and send it to a private server. The only transmitted information are the LMS domain name and the ID of the install. If you do not wish to transmit these informations, set the environment variable `DISABLE_STATS=1`. But if you do that, please send me a message to tell me about your platform! 
+By default, the install script will collect some information about your install and send it to a private server. The only transmitted information are the LMS domain name and the ID of the install. To disable stats collection, define the following environment variable:
+
+    export DISABLE_STATS=1
+
+If you decide to disable stats, please send me a message to tell me about your platform! 
 
 ## Requirements
 
