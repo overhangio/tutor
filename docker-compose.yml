@@ -121,10 +121,9 @@ services:
       context: ./openedx
     environment:
       SERVICE_VARIANT: lms
+      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
-    environment:
-      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     volumes:
       - ./config/openedx:/openedx/config
       - ./data/lms_worker:/openedx/data
@@ -137,10 +136,9 @@ services:
       context: ./openedx
     environment:
       SERVICE_VARIANT: cms
+      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
-    environment:
-      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     volumes:
       - ./config/openedx:/openedx/config
       - ./data/cms_worker:/openedx/data
