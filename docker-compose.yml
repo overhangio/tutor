@@ -126,7 +126,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./config/openedx:/openedx/config
-      - ./data/lms_worker:/openedx/data
+      - ./data/lms:/openedx/data
     depends_on:
       - lms
 
@@ -141,6 +141,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./config/openedx:/openedx/config
-      - ./data/cms_worker:/openedx/data
+      - ./data/cms:/openedx/data
     depends_on:
       - cms
