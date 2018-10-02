@@ -160,7 +160,7 @@ push-openedx: ## Push Open edX images to dockerhub
 push-configurator: ## Push configurator image to dockerhub
 	docker push regis/openedx-configurator:hawthorn
 	docker push regis/openedx-configurator:latest
-push-forum: ## Push dorum image to dockerhub
+push-forum: ## Push forum image to dockerhub
 	docker push regis/openedx-forum:hawthorn
 	docker push regis/openedx-forum:latest
 push-notes: ## Push notes image to dockerhub
