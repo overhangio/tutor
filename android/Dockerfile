@@ -17,17 +17,21 @@ RUN wget https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_
     unzip sdk-tools-linux-${ANDROID_SDK_VERSION}.zip && \
     rm sdk-tools-linux-${ANDROID_SDK_VERSION}.zip
 
+# Accept licenses
+RUN yes | /openedx/android-sdk/tools/bin/sdkmanager --licenses
+
 # Install android app repo
 RUN git clone https://github.com/edx/edx-app-android /openedx/edx-app-android
 WORKDIR /openedx/edx-app-android
+
+# Install gradle and all dependencies
+RUN ./gradlew -v
+RUN ./gradlew tasks
 
 # User-customized config
 COPY ./edx.properties ./OpenEdXMobile/edx.properties
 RUN mkdir /openedx/config
 RUN ln -s /openedx/config/gradle.properties ./OpenEdXMobile/gradle.properties
-
-# Accept licenses
-RUN yes | /openedx/android-sdk/tools/bin/sdkmanager --licenses
 
 CMD ./gradlew assembleProdDebuggable && \
   cp OpenEdXMobile/build/outputs/apk/prod/debuggable/*.apk /openedx/data/
