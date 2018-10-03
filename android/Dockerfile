@@ -30,4 +30,4 @@ RUN ln -s /openedx/config/gradle.properties ./OpenEdXMobile/gradle.properties
 RUN yes | /openedx/android-sdk/tools/bin/sdkmanager --licenses
 
 CMD ./gradlew assembleProdDebuggable && \
-  cp OpenEdXMobile/build/outputs/apk/*.apk /openedx/data/
+  cp OpenEdXMobile/build/outputs/apk/prod/debuggable/*.apk /openedx/data/

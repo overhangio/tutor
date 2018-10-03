@@ -205,8 +205,8 @@ https-certificate-renew: ## Renew https certificates
 #################### Android application
 
 android: ## Build the Android app, for development
-	docker-compose -f docker-compose-android.yml run --rm android
-	@echo "Your APK file is ready: ./data/android/edx-prod-debuggable-2.14.0.apk"
+	@docker-compose -f docker-compose-android.yml run --rm android
+	@echo "Your APK file is ready: ./data/android/$(shell ls data/android/*.apk)"
 
 android-release: ## Build the final Android app (beta)
 	# Note that this requires that you edit ./config/android/gradle.properties
