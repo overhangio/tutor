@@ -28,8 +28,8 @@ PROFILE_IMAGE_BACKEND['options']['location'] = os.path.join(MEDIA_ROOT, 'profile
 ALLOWED_HOSTS = [
     ENV_TOKENS.get('LMS_BASE'),
     FEATURES['PREVIEW_LMS_BASE'],
-    '127.0.0.1', 'localhost',
-    '127.0.0.1:8000', 'localhost:8000',
+    '127.0.0.1', 'localhost', 'preview.localhost',
+    '127.0.0.1:8000', 'localhost:8000', 'preview.localhost:8000',
 ]
 
 # Required to display all courses on start page
