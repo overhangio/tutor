@@ -33,7 +33,7 @@ services:
       memlock:
         soft: -1
         hard: -1
-    restart: "unless-stopped"
+    restart: unless-stopped
     volumes:
       - ./data/elasticsearch:/usr/share/elasticsearch/data
 
@@ -53,6 +53,7 @@ services:
     image: rabbitmq:3.6.10
     volumes:
       - ./data/rabbitmq:/var/lib/rabbitmq
+    restart: unless-stopped
 
   # Simple SMTP server
   smtp:

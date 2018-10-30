@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-10-30 [Bugfix] Fix rabbitmq restart policy
 - 2018-10-03 [Improvement/Bugfix] Fix and accelerate Android application build
 - 2018-10-02 [Improvement] Bump Open edX version to hawthorn.2
 - 2018-09-30 [Bugfix] Fix CMS celery worker, including export tasks
