@@ -41,8 +41,8 @@ services:
     image: nginx:1.13
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "${OPENEDX_NGINX_PORT:-80}:80"
+      - "${OPENEDX_NGINX_TLSPORT:-443}443:443"
     volumes:
       - ./config/nginx:/etc/nginx/conf.d/
       - ./data/lms:/openedx/data/lms:ro
