@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-1113 [Improvement] Facilitate install of extra XBlocks. Thanks @frob!
 - 2018-10-30 [Bugfix] Fix rabbitmq restart policy
 - 2018-10-03 [Improvement/Bugfix] Fix and accelerate Android application build
 - 2018-10-02 [Improvement] Bump Open edX version to hawthorn.2

@@ -47,18 +47,22 @@ RUN ln -s /openedx/config/lms.env.json /openedx/ \
   && ln -s /openedx/config/lms.auth.json /openedx/ \
   && ln -s /openedx/config/cms.auth.json /openedx/
 
-VOLUME /openedx/config
-VOLUME /openedx/data
-VOLUME /openedx/edx-platform
-
 # Dockerize will be useful to wait for mysql DB availability
 ENV DOCKERIZE_VERSION v0.6.1
 RUN curl -L -o dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize.tar.gz \
     && rm dockerize.tar.gz
 
+# Install private requirements as late as possible, so they can be modified frequently
+COPY ./requirements/private.txt /tmp/
+RUN pip install --src ../venv/src -r /tmp/private.txt
+
 # Copy convenient scripts
 COPY ./bin/docker-entrypoint.sh /usr/local/bin/
+
+VOLUME /openedx/config
+VOLUME /openedx/data
+VOLUME /openedx/edx-platform
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms

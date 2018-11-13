@@ -1,0 +1,3 @@
+# Add your additional requirements here, such as xblocks. This file is not
+# under version control, which means that your changes will not be committed to
+# the upstream repository.
