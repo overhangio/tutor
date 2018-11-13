@@ -188,6 +188,9 @@ cms-python: ## Open a python shell in the CMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms ./manage.py cms shell
 cms-shell: cms-python
 
+restart-openedx: ## Restart lms, cms, and workers
+	docker-compose restart lms lms_worker cms cms_worker
+
 ##################### SSL/TLS (HTTPS certificates)
 
 https_command = docker run --rm -it \
