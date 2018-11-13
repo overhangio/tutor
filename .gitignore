@@ -3,3 +3,4 @@ config/
 data-*/
 TODO
 openedx/requirements/private.*
+.env

@@ -262,6 +262,28 @@ Additional requirements can be added to the `openedx/requirements/private.txt` f
     make build-openedx
     make run
 
+### "Cannot start service nginx: driver failed programming external connectivity"
+
+The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. There are two solutions:
+
+1. Stop Apache or Nginx on the host:
+
+       sudo systemctl stop apache2
+       sudo systemctl stop nginx
+
+However, you might now want to do that if you need a webserver for running non-Open edX related applications. In such cases...
+
+2. Run the nginx container on different ports: you can create a `.env` file in the `openedx-docker` directory in which you indicate different ports. For instance:
+
+       cat .env
+       NGINX_HTTP_PORT=81
+       NGINX_HTTPS_PORT=444
+
+In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443.
+
+You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See [this](https://github.com/regisb/openedx-docker/issues/69#issuecomment-425916825) for http, and [this](https://github.com/regisb/openedx-docker/issues/90#issuecomment-437687294) for https.
+
+
 ### Help! Your containers are eating all my RAM/CPU/CHEESE
 
 You can identify which containers are consuming most resources by running:

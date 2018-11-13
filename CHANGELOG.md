@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-11-17 [Improvement] Custom nginx port mapping. :crossed_swords: @frob @frohro
 - 2018-11-17 [Improvement] Add "make restart-openedx" command. :+1: @frob
 - 2018-11-13 [Improvement] Facilitate install of extra XBlocks. Thanks @frob!
 - 2018-10-30 [Bugfix] Fix rabbitmq restart policy
