@@ -252,7 +252,15 @@ The images are built, tagged and uploaded to Docker Hub in one command:
 
     make dockerhub
   
-## Troubleshooting
+## Help/Troubleshooting
+
+### How to add extra XBlocks to the LMS/CMS?
+
+Additional requirements can be added to the `openedx/requirements/private.txt` file. Then, the `openedx` docker image must be rebuilt to include the new requirements. For instance:
+
+    echo "git+https://github.com/open-craft/xblock-poll.git" >> openedx/requirements/private.txt
+    make build-openedx
+    make run
 
 ### Help! Your containers are eating all my RAM/CPU/CHEESE
 
