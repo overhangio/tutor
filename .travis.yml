@@ -5,7 +5,7 @@ script:
   - make configure SILENT=1 CONFIGURE_OPTS="-e SETTING_ACTIVATE_NOTES=1 -e SETTING_ACTIVATE_XQUEUE=1"
   - make build
   - make databases
-  #- make assets # too time-consuming
+  - make assets
 deploy:
   provider: script
   script: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" && make push
