@@ -60,10 +60,6 @@ RUN touch /tmp/requirements/private.txt && pip install --src ../venv/src -r /tmp
 # Copy convenient scripts
 COPY ./bin/docker-entrypoint.sh /usr/local/bin/
 
-VOLUME /openedx/config
-VOLUME /openedx/data
-VOLUME /openedx/edx-platform
-
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
 ENV SETTINGS universal.production
