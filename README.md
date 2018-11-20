@@ -213,10 +213,13 @@ Then open an LMS shell:
 
     make lms
 
-You can then collect assets and run a local web server, as usual:
+You can then run a local web server, as usual:
 
     paver update_assets lms --settings=universal.development
-    ./manage.py lms runserver 0.0.0.0:8000
+
+Note that assets collection is made more difficult by the fact that development settings are [incorrectly loaded in hawthorn](https://github.com/edx/edx-platform/pull/18430/files). This should be fixed in the next release. Meanwhile, do not run `paver update_assets` while in development mode. Instead, run on the host:
+
+    make assets-development
 
 ### Custom devstack
 

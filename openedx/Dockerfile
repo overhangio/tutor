@@ -36,6 +36,11 @@ RUN pip install --src ../venv/src -r requirements/edx/development.txt
 RUN npm install
 ENV PATH ./node_modules/.bin:${PATH}
 
+# Some parts of assets collection can be run without relying on specific
+# settings, nor mounting the staticfiles/ folder
+RUN xmodule_assets common/static/xmodule
+RUN python -c "import pavelib.assets; pavelib.assets.process_npm_assets()"
+
 # Link configuration files to common /openedx/config folder, which should later
 # be mounted as a volume. Note that this image will not be functional until
 # config files have been mounted inside the container
@@ -63,6 +68,8 @@ COPY ./bin/docker-entrypoint.sh /usr/local/bin/
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
 ENV SETTINGS universal.production
+ENV STATIC_ROOT_LMS /openedx/data/staticfiles
+ENV STATIC_ROOT_CMS /openedx/data/staticfiles/studio 
 
 # Entrypoint will fix permissiosn of all files and run commands as openedx
 ENTRYPOINT ["docker-entrypoint.sh"]
