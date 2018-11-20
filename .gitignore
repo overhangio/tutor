@@ -2,5 +2,5 @@
 config/
 data-*/
 TODO
-openedx/requirements/private.*
+openedx/requirements/private.txt
 .env

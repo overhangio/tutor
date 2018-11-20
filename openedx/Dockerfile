@@ -54,8 +54,8 @@ RUN curl -L -o dockerize.tar.gz https://github.com/jwilder/dockerize/releases/do
     && rm dockerize.tar.gz
 
 # Install private requirements as late as possible, so they can be modified frequently
-COPY ./requirements/private.txt /tmp/
-RUN pip install --src ../venv/src -r /tmp/private.txt
+COPY ./requirements/ /tmp/requirements
+RUN touch /tmp/requirements/private.txt && pip install --src ../venv/src -r /tmp/requirements/private.txt
 
 # Copy convenient scripts
 COPY ./bin/docker-entrypoint.sh /usr/local/bin/
