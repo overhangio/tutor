@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-11-25 [Feature] Use local filesystem for open assessment file upload
 - 2018-11-23 [Improvement] Faster container bootstrapping without "chmod", as suggested by @silviot
 - 2018-11-20 [Bugfix] Fix cross-platform theme assets generation
 - 2018-11-17 [Improvement] Custom nginx port mapping. :crossed_swords: @frob @frohro

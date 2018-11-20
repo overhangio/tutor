@@ -14,12 +14,6 @@ LOGGING['handlers']['tracking'] = {
     'formatter': 'standard',
 }
 
-# Create folders if necessary
-import os
-for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
 # Fix media files paths
 VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location'] = MEDIA_ROOT
 VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['location'] = MEDIA_ROOT
@@ -50,3 +44,13 @@ PAYMENT_SUPPORT_EMAIL = ENV_TOKENS['CONTACT_EMAIL']
 BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@' + ENV_TOKENS['LMS_BASE']
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS['CONTACT_EMAIL']
 API_ACCESS_FROM_EMAIL = ENV_TOKENS['CONTACT_EMAIL']
+
+ORA2_FILEUPLOAD_BACKEND = 'filesystem'
+ORA2_FILEUPLOAD_ROOT = '/openedx/data/ora2'
+ORA2_FILEUPLOAD_CACHE_NAME = 'ora2-storage'
+
+# Create folders if necessary
+import os
+for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
