@@ -120,14 +120,14 @@ assets-cms:
 assets-development-lms:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps lms bash -c \
 		"xmodule_assets common/static/xmodule \
-		&& python -c \"import pavelib.assets; pavelib.assets.process_npm_assets()\"
+		&& python -c \"import pavelib.assets; pavelib.assets.process_npm_assets()\" \
 		&& NODE_ENV=development ./node_modules/.bin/webpack --config=webpack.dev.config.js \
 		&& ./manage.py lms --settings=$(EDX_PLATFORM_SETTINGS) compile_sass lms \
 		&& python -c \"import pavelib.assets; pavelib.assets.collect_assets(['lms'], '$(EDX_PLATFORM_SETTINGS)')\""
 assets-development-cms:
 	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps cms bash -c \
 		"xmodule_assets common/static/xmodule \
-		&& python -c \"import pavelib.assets; pavelib.assets.process_npm_assets()\"
+		&& python -c \"import pavelib.assets; pavelib.assets.process_npm_assets()\" \
 		&& NODE_ENV=development ./node_modules/.bin/webpack --config=webpack.dev.config.js \
 		&& ./manage.py cms --settings=$(EDX_PLATFORM_SETTINGS) compile_sass studio \
 		&& python -c \"import pavelib.assets; pavelib.assets.collect_assets(['studio'], '$(EDX_PLATFORM_SETTINGS)')\""
