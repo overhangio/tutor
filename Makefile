@@ -15,7 +15,7 @@ endif
 ifeq ($(ACTIVATE_HTTPS), 1)
 	post_configure_targets += https-certificate
 endif
-extra_migrate_targets = 
+extra_migrate_targets =
 ifeq ($(ACTIVATE_XQUEUE), 1)
 	extra_migrate_targets += migrate-xqueue
 	DOCKER_COMPOSE += -f docker-compose-xqueue.yml
@@ -131,7 +131,7 @@ assets-development-cms:
 		&& NODE_ENV=development ./node_modules/.bin/webpack --config=webpack.dev.config.js \
 		&& ./manage.py cms --settings=$(EDX_PLATFORM_SETTINGS) compile_sass studio \
 		&& python -c \"import pavelib.assets; pavelib.assets.collect_assets(['studio'], '$(EDX_PLATFORM_SETTINGS)')\""
-	
+
 
 ##################### Information
 
