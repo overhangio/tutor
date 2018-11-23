@@ -27,9 +27,17 @@ endif
 ifeq ($(ACTIVATE_PORTAINER), 1)
 	DOCKER_COMPOSE += -f docker-compose-portainer.yml
 endif
+DOCKER_USER_OPTIONS =
+ifeq ($(DONT_RUN_AS_ROOT), 1)
+	DOCKER_USER_OPTIONS = -e USERID=$(USERID)
+endif
+
+ifeq ($(ACTIVATE_PORTAINER), 1)
+	DOCKER_COMPOSE += -f docker-compose-portainer.yml
+endif
 
 DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE) run --rm
-DOCKER_COMPOSE_RUN_OPENEDX = $(DOCKER_COMPOSE_RUN) -e USERID=$(USERID) -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
+DOCKER_COMPOSE_RUN_OPENEDX = $(DOCKER_COMPOSE_RUN) $(DOCKER_USER_OPTIONS) -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
 ifneq ($(EDX_PLATFORM_PATH),)
 	DOCKER_COMPOSE_RUN_OPENEDX += --volume="$(EDX_PLATFORM_PATH):/openedx/edx-platform"
 endif
@@ -64,7 +72,7 @@ stop: ## Stop all services
 
 configure: build-configurator ## Configure the environment prior to running the platform
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
-		-e USERID=$(USERID) -e SILENT=$(SILENT) $(CONFIGURE_OPTS) \
+		$(DOCKER_USER_OPTIONS) -e SILENT=$(SILENT) $(CONFIGURE_OPTS) \
 		regis/openedx-configurator:hawthorn
 
 post_configure: $(post_configure_targets)
@@ -180,7 +188,7 @@ build-notes: ## Build the Notes docker image
 	docker build -t regis/openedx-notes:latest -t regis/openedx-notes:hawthorn notes/
 build-xqueue: ## Build the Xqueue docker image
 	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
-build-android: ## Build the docker image for Android 
+build-android: ## Build the docker image for Android
 	docker build -t regis/openedx-android:latest android/
 
 ################### Pushing images to docker hub

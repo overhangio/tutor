@@ -175,6 +175,8 @@ def interactive(args):
         'ACTIVATE_PORTAINER', "Activate Portainer, a convenient Docker dashboard with a web UI (https://portainer.io)?", False
     ).add_bool(
         'ACTIVATE_XQUEUE', "Activate Xqueue for external grader services? (https://github.com/edx/xqueue)", False
+    ).add_bool(
+        'DONT_RUN_AS_ROOT', "Do you want edx services inside the containers to run using the same id as the user launching the containers?", True
     ).add(
         'ID', "", random_string(8)
     )
