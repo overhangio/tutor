@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-11-23 [Improvement] Faster container bootstrapping without "chmod", as suggested by @silviot
 - 2018-11-20 [Bugfix] Fix cross-platform theme assets generation
 - 2018-11-17 [Improvement] Custom nginx port mapping. :crossed_swords: @frob @frohro
 - 2018-11-17 [Improvement] Add "make restart-openedx" command. :+1: @frob
