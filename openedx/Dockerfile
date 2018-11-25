@@ -33,7 +33,8 @@ RUN pip install --src ../venv/src -r requirements/edx/base.txt
 RUN pip install --src ../venv/src -r requirements/edx/development.txt
 
 # Install patched version of ora2
-RUN pip install --src ../venv/src git+https://github.com/regisb/edx-ora2.git@open-release/hawthorn.2#egg=ora2==2.1.17
+RUN pip uninstall -y ora2 && \
+    pip install --src ../venv/src git+https://github.com/regisb/edx-ora2.git@open-release/hawthorn.2#egg=ora2==2.1.17
 
 # Install nodejs requirements
 RUN npm install
