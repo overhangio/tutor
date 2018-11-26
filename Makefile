@@ -170,8 +170,17 @@ update: ## Download most recent images
 	$(DOCKER_COMPOSE) pull
 
 build: build-openedx build-configurator build-forum build-notes build-xqueue build-android ## Build all docker images
+
+openedx_build_args =
+ifdef EDX_PLATFORM_REPOSITORY
+	openedx_build_args += --build-arg="EDX_PLATFORM_REPOSITORY=$(EDX_PLATFORM_REPOSITORY)"
+endif
+ifdef EDX_PLATFORM_VERSION
+	openedx_build_args += --build-arg="EDX_PLATFORM_VERSION=$(EDX_PLATFORM_VERSION)"
+endif
+
 build-openedx: ## Build the Open edX docker image
-	docker build -t regis/openedx:latest -t regis/openedx:hawthorn openedx/
+	docker build -t regis/openedx:latest -t regis/openedx:hawthorn $(openedx_build_args) openedx/
 build-configurator: ## Build the configurator docker image
 	docker build -t regis/openedx-configurator:latest -t regis/openedx-configurator:hawthorn configurator/
 build-forum: ## Build the forum docker image

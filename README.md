@@ -265,6 +265,18 @@ Additional requirements can be added to the `openedx/requirements/private.txt` f
     make build-openedx
     make run
 
+### How to run Open edX from a forked version of edx-platform?
+
+You may want to run your own flavor of edx-platform instead of the [official version](https://github.com/edx/edx-platform/). To do so, you will have to re-build the openedx image with the proper environment variables pointing to your repository and version:
+
+    EDX_PLATFORM_REPOSITORY=https://mygitrepo/edx-platform.git EDX_PLATFORM_VERSION=my-tag-or-branch make build-openedx
+
+You can then restart the services which will now be running your forked version of edx-platform:
+
+    make restart-openedx
+
+Note that your release must be a fork of Hawthorn in order to work. Otherwise, you may have important compatibility issues with other services.
+
 ### "Cannot start service nginx: driver failed programming external connectivity"
 
 The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. There are two solutions:
