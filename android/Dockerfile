@@ -1,8 +1,8 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN apt update && \
   apt upgrade -y && \
-  apt install -y wget unzip git default-jre default-jdk
+  apt install -y wget unzip git openjdk-8-jre openjdk-8-jdk
 
 RUN mkdir /openedx
 

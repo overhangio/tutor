@@ -1,8 +1,8 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN apt update && \
   apt upgrade -y && \
-  apt install -y language-pack-en git git-core python-pip libmysqlclient-dev
+  apt install -y language-pack-en git python-pip libmysqlclient-dev
 
 RUN mkdir /openedx
 RUN git clone https://github.com/edx/xqueue --branch open-release/hawthorn.2 --depth 1 /openedx/xqueue 

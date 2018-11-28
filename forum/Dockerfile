@@ -1,10 +1,10 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN mkdir /openedx
 
 RUN apt update && \
   apt upgrade -y && \
-  apt install -y git wget autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev
+  apt install -y git wget autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm-dev
 
 # Install ruby-build for building specific version of ruby
 RUN git clone https://github.com/sstephenson/ruby-build.git /openedx/ruby-build
