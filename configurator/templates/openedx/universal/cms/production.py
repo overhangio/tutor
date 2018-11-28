@@ -1,6 +1,8 @@
 import os
 from ..aws import *
 
+INSTALLED_APPS.remove('openedx.core.djangoapps.datadog.apps.DatadogConfig')
+
 update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
 
 MEDIA_ROOT = "/openedx/data/uploads/"

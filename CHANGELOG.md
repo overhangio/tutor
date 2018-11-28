@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-11-28 [Improvement] Get rid of datadog
 - 2018-11-28 [Improvement] Upgrade docker images to ubuntu 18.04 for android, forum, notes, xqueue
 - 2018-11-28 [Feature] Make it possible to define default platform language interactively
 - 2018-11-26 [Improvement] Make it easier to run a forked version of edx-platform
