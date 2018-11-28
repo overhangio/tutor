@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-11-28 [Feature] Make it possible to define default platform language interactively
 - 2018-11-26 [Improvement] Make it easier to run a forked version of edx-platform
 - 2018-11-25 [Feature] Use local filesystem for open assessment file upload
 - 2018-11-23 [Improvement] Faster container bootstrapping without "chmod", as suggested by @silviot

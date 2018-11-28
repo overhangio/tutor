@@ -35,52 +35,51 @@ class Configurator:
     def mute(self):
         self.__input = None
 
-    def add(self, name, question="", default=""):
+    def get_default_value(self, name, default):
+        setting_name = 'SETTING_' + name.upper()
+        if os.environ.get(setting_name):
+            return os.environ[setting_name]
+        if name in self.__default_values:
+            return self.__default_values[name]
+        return default
+
+    def add(self, name, default, question=""):
         default = self.get_default_value(name, default)
-        value = self.ask(question, default)
-        self.set(name, value)
 
-        return self
+        if not self.__input or not question:
+            return self.set(name, default)
 
-    def add_bool(self, name, question="", default=False):
+        question += " (default: \"{}\"): ".format(default)
+        return self.set(name, self.__input(question) or default)
+
+    def add_bool(self, name, default, question=""):
         default = self.get_default_value(name, default)
         if default in [1, '1']:
             default = True
         if default in [0, '0', '']:
             default = False
-        value = self.ask_bool(question, default)
-        return self.set(name, value)
+        if not self.__input or not question:
+            return self.set(name, default)
+        question += " [Y/n] " if default else " [y/N] "
+        while True:
+            answer = self.__input(question)
+            if answer is None or answer == '':
+                return self.set(name, default)
+            if answer.lower() in ['y', 'yes']:
+                return self.set(name, True)
+            if answer.lower() in ['n', 'no']:
+                return self.set(name, False)
 
-    def get_default_value(self, name, default):
-        setting_name = 'SETTING_' + name.upper()
-        if os.environ.get(setting_name):
-            return os.environ[setting_name]
-
-        if name in self.__default_values:
-            return self.__default_values[name]
-
-        return default
-
-    def ask(self, message, default):
-        if self.__input and message:
-            message += " (default: \"{}\"): ".format(default)
-            return self.__input(message) or default
-        return default
-
-    def ask_bool(self, message, default):
-        if self.__input and message:
-            message += " [Y/n] " if default else " [y/N] "
-            while True:
-                answer = self.__input(message)
-                if answer is None or answer == '':
-                    return default
-                if answer.lower() in ['y', 'yes']:
-                    return True
-                if answer.lower() in ['n', 'no']:
-                    return False
-                print("'{}' is an invalid answer".format(answer))
-        return default
-
+    def add_choice(self, name, default, choices, question=""):
+        default = self.get_default_value(name, default)
+        if not self.__input or not question:
+            return self.set(name, default)
+        question += " (default: \"{}\"): ".format(default)
+        while True:
+            answer = self.__input(question) or default
+            if answer in choices:
+                return self.set(name, answer)
+            print("Invalid value. Choices are: {}".format(", ".join(choices)))
 
     def get(self, name):
         return self.__values.get(name)
@@ -128,55 +127,59 @@ def interactive(args):
     if args.silent or os.environ.get('SILENT'):
         configurator.mute()
     configurator.add(
-        'LMS_HOST', "Your website domain name for students (LMS).", 'www.myopenedx.com'
+        'LMS_HOST', 'www.myopenedx.com', "Your website domain name for students (LMS)."
     ).add(
-        'CMS_HOST', "Your website domain name for teachers (CMS).", 'studio.' + configurator.get('LMS_HOST')
+        'CMS_HOST', 'studio.' + configurator.get('LMS_HOST'), "Your website domain name for teachers (CMS)."
     ).add(
-        'PLATFORM_NAME', "Your platform name/title", "My Open edX"
+        'PLATFORM_NAME', "My Open edX", "Your platform name/title"
     ).add(
-        'CONTACT_EMAIL', "Your public contact email address", 'contact@' + configurator.get('LMS_HOST')
+        'CONTACT_EMAIL', 'contact@' + configurator.get('LMS_HOST'), "Your public contact email address",
+    ).add_choice(
+        'LANGUAGE_CODE', 'en',
+        ['en', 'am', 'ar', 'az', 'bg-bg', 'bn-bd', 'bn-in', 'bs', 'ca', 'ca@valencia', 'cs', 'cy', 'da', 'de-de', 'el', 'en-uk', 'en@lolcat', 'en@pirate', 'es-419', 'es-ar', 'es-ec', 'es-es', 'es-mx', 'es-pe', 'et-ee', 'eu-es', 'fa', 'fa-ir', 'fi-fi', 'fil', 'fr', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy-am', 'id', 'it-it', 'ja-jp', 'kk-kz', 'km-kh', 'kn', 'ko-kr', 'lt-lt', 'ml', 'mn', 'mr', 'ms', 'nb', 'ne', 'nl-nl', 'or', 'pl', 'pt-br', 'pt-pt', 'ro', 'ru', 'si', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'th', 'tr-tr', 'uk', 'ur', 'vi', 'uz', 'zh-cn', 'zh-hk', 'zh-tw'],
+        "The default language code for the platform"
     ).add(
-        'SECRET_KEY', "", random_string(24)
+        'SECRET_KEY', random_string(24)
     ).add(
-        'MYSQL_DATABASE', "", 'openedx'
+        'MYSQL_DATABASE', 'openedx'
     ).add(
-        'MYSQL_USERNAME', "", 'openedx'
+        'MYSQL_USERNAME', 'openedx'
     ).add(
-        'MYSQL_PASSWORD', "", random_string(8)
+        'MYSQL_PASSWORD', random_string(8)
     ).add(
-        'MONGODB_DATABASE', "", 'openedx'
+        'MONGODB_DATABASE', 'openedx'
     ).add(
-        'NOTES_MYSQL_DATABASE', "", 'notes',
+        'NOTES_MYSQL_DATABASE', 'notes',
     ).add(
-        'NOTES_MYSQL_USERNAME', "", 'notes',
+        'NOTES_MYSQL_USERNAME', 'notes',
     ).add(
-        'NOTES_MYSQL_PASSWORD', "", random_string(8)
+        'NOTES_MYSQL_PASSWORD', random_string(8)
     ).add(
-        'NOTES_SECRET_KEY', "", random_string(24)
+        'NOTES_SECRET_KEY', random_string(24)
     ).add(
-        'NOTES_OAUTH2_SECRET', "", random_string(24)
+        'NOTES_OAUTH2_SECRET', random_string(24)
     ).add(
-        'XQUEUE_AUTH_USERNAME', "", 'lms'
+        'XQUEUE_AUTH_USERNAME', 'lms'
     ).add(
-        'XQUEUE_AUTH_PASSWORD', "", random_string(8)
+        'XQUEUE_AUTH_PASSWORD', random_string(8)
     ).add(
-        'XQUEUE_MYSQL_DATABASE', "", 'xqueue',
+        'XQUEUE_MYSQL_DATABASE', 'xqueue',
     ).add(
-        'XQUEUE_MYSQL_USERNAME', "", 'xqueue',
+        'XQUEUE_MYSQL_USERNAME', 'xqueue',
     ).add(
-        'XQUEUE_MYSQL_PASSWORD', "", random_string(8)
+        'XQUEUE_MYSQL_PASSWORD', random_string(8)
     ).add(
-        'XQUEUE_SECRET_KEY', "", random_string(24)
+        'XQUEUE_SECRET_KEY', random_string(24)
     ).add_bool(
-        'ACTIVATE_HTTPS', "Activate SSL/TLS certificates for HTTPS access? Important note: this will NOT work in a development environment.", False
+        'ACTIVATE_HTTPS', False, "Activate SSL/TLS certificates for HTTPS access? Important note: this will NOT work in a development environment.",
     ).add_bool(
-        'ACTIVATE_NOTES', "Activate Student Notes service (https://open.edx.org/features/student-notes)?", False
+        'ACTIVATE_NOTES', False, "Activate Student Notes service (https://open.edx.org/features/student-notes)?",
     ).add_bool(
-        'ACTIVATE_PORTAINER', "Activate Portainer, a convenient Docker dashboard with a web UI (https://portainer.io)?", False
+        'ACTIVATE_PORTAINER', False, "Activate Portainer, a convenient Docker dashboard with a web UI (https://portainer.io)?",
     ).add_bool(
-        'ACTIVATE_XQUEUE', "Activate Xqueue for external grader services? (https://github.com/edx/xqueue)", False
+        'ACTIVATE_XQUEUE', False, "Activate Xqueue for external grader services? (https://github.com/edx/xqueue)",
     ).add(
-        'ID', "", random_string(8)
+        'ID', random_string(8)
     )
 
     # Save values
