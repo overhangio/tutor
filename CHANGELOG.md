@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-11-28 [Feature] Easily change openedx docker image
 - 2018-11-28 [Feature] Enable comprehensive theming!
 - 2018-11-28 [Improvement] Get rid of datadog
 - 2018-11-28 [Improvement] Upgrade docker images to ubuntu 18.04 for android, forum, notes, xqueue

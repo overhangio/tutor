@@ -285,6 +285,14 @@ You can then restart the services which will now be running your forked version 
 
 Note that your release must be a fork of Hawthorn in order to work. Otherwise, you may have important compatibility issues with other services.
 
+### How to run a customized Docker image instead of [regis/openedx](https://hub.docker.com/r/regis/openedx/)?
+
+Add the following content to the `.env` file:
+
+    OPENEDX_DOCKER_IMAGE=myusername/myimage:mytag
+
+Note that the `make build` and `make push` command will no longer work.
+
 ### "Cannot start service nginx: driver failed programming external connectivity"
 
 The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. There are two solutions:
