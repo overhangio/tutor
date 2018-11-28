@@ -87,6 +87,7 @@ services:
     volumes:
       - ./config/openedx:/openedx/config
       - ./data/lms:/openedx/data
+      - ./data/themes:/openedx/themes
     depends_on:
       - elasticsearch
       - forum
@@ -106,6 +107,7 @@ services:
     volumes:
       - ./config/openedx:/openedx/config
       - ./data/cms:/openedx/data
+      - ./data/themes:/openedx/themes
     depends_on:
       - memcached
       - mongodb
@@ -128,6 +130,7 @@ services:
     volumes:
       - ./config/openedx:/openedx/config
       - ./data/lms:/openedx/data
+      - ./data/themes:/openedx/themes
     depends_on:
       - lms
 
@@ -143,5 +146,6 @@ services:
     volumes:
       - ./config/openedx:/openedx/config
       - ./data/cms:/openedx/data
+      - ./data/themes:/openedx/themes
     depends_on:
       - cms

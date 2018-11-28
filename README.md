@@ -257,6 +257,14 @@ The images are built, tagged and uploaded to Docker Hub in one command:
   
 ## Help/Troubleshooting
 
+### How to add custom themes?
+
+Comprehensive theming is enabled by default. Just drop your themes in `data/themes` and compile assets:
+
+    make assets
+
+Then, follow the [Open edX documentation to enable your themes](https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site).
+
 ### How to add extra XBlocks to the LMS/CMS?
 
 Additional requirements can be added to the `openedx/requirements/private.txt` file. Then, the `openedx` docker image must be rebuilt to include the new requirements. For instance:

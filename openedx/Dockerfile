@@ -16,9 +16,9 @@ RUN apt update && \
 # This replaces the "nodeenv" install.
 RUN apt install -y nodejs-legacy
 
-# Static assets will reside in /openedx/data and edx-platform will be
-# checked-out in /openedx/
-RUN mkdir /openedx /openedx/data /openedx/edx-platform
+# Static assets will reside in /openedx/data, themes in /openedx/themes and
+# edx-platform will be checked-out in /openedx/
+RUN mkdir /openedx /openedx/data /openedx/themes /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
 ## Checkout edx-platform code

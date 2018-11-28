@@ -1,4 +1,3 @@
-import os
 from ..aws import *
 
 INSTALLED_APPS.remove('openedx.core.djangoapps.datadog.apps.DatadogConfig')
@@ -15,11 +14,6 @@ LOGGING['handlers']['tracking'] = {
     'formatter': 'standard',
 }
 
-# Create folders if necessary
-for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
 ALLOWED_HOSTS = [
     ENV_TOKENS.get('CMS_BASE'),
     '127.0.0.1', 'localhost', 'studio.localhost',
@@ -30,3 +24,9 @@ ALLOWED_HOSTS = [
 DEFAULT_FROM_EMAIL = ENV_TOKENS['CONTACT_EMAIL']
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS['CONTACT_EMAIL']
 SERVER_EMAIL = ENV_TOKENS['CONTACT_EMAIL']
+
+# Create folders if necessary
+import os
+for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
