@@ -314,8 +314,7 @@ In this example, the nginx container ports would be mapped to 81 and 444, instea
 
 You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See [this](https://github.com/regisb/openedx-docker/issues/69#issuecomment-425916825) for http, and [this](https://github.com/regisb/openedx-docker/issues/90#issuecomment-437687294) for https.
 
-
-### Help! Your containers are eating all my RAM/CPU/CHEESE
+### Help! The Docker containers are eating all my RAM/CPU/CHEESE
 
 You can identify which containers are consuming most resources by running:
 
@@ -347,6 +346,10 @@ This will occur if you try to run a development environment without patching the
 ### "`TypeError: get_logger_config() got an unexpected keyword argument 'debug'`"
 
 This might occur when you try to run the latest version of `edx-platform`, and not a version close to `gingko.master`. It is no longer necessary to patch the `LOGGING` configuration in the latest `edx-platform` releases, as indicated in the [development](#for-developers) section above, so you should remove the call to `get_logger_config` altogether from your development settings.
+
+### The chosen default language does not display properly
+
+By default, Open edX comes with a [very limited set](https://github.com/edx/edx-platform/blob/master/conf/locale/config.yaml) of translation/localization files. To complement these languages, we add locales from the [openedx-i18n project](https://github.com/regisb/openedx-i18n/blob/master/edx-platform/locale/config-extra.yaml). But not all supported locales are downloaded. In some cases, the chosen default language will not display properly because if was not packaged in either edx-platform or openedx-i18n. If you feel like your language should be packaged, please [open an issue on the openedx-i18n project](https://github.com/regisb/openedx-i18n/issues).
 
 ## Disclaimers & Warnings
 

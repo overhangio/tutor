@@ -56,6 +56,13 @@ RUN ln -s /openedx/config/lms.env.json /openedx/ \
   && ln -s /openedx/config/lms.auth.json /openedx/ \
   && ln -s /openedx/config/cms.auth.json /openedx/
 
+# Download extra locales
+RUN cd /tmp \
+    && curl -L -o openedx-i18n.tar.gz https://github.com/regisb/openedx-i18n/archive/hawthorn.tar.gz \
+    && tar xzf /tmp/openedx-i18n.tar.gz \
+    && cp -r openedx-i18n-hawthorn/edx-platform/locale/* /openedx/edx-platform/conf/locale/ \
+    && rm -rf openedx-i18n*
+
 # Dockerize will be useful to wait for mysql DB availability
 ENV DOCKERIZE_VERSION v0.6.1
 RUN curl -L -o dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
