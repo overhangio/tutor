@@ -13,15 +13,15 @@ services:
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     restart: unless-stopped
     volumes:
-      - ./data/mongodb:/data/db
+      - ../../data/mongodb:/data/db
 
   mysql:
     image: mysql:5.6.36
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     restart: unless-stopped
     volumes:
-      - ./data/mysql:/var/lib/mysql
-    env_file: ./config/mysql/auth.env
+      - ../../data/mysql:/var/lib/mysql
+    env_file: ../env/mysql/auth.env
 
   elasticsearch:
     image: elasticsearch:1.5.2
@@ -35,7 +35,7 @@ services:
         hard: -1
     restart: unless-stopped
     volumes:
-      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ../../data/elasticsearch:/usr/share/elasticsearch/data
 
   nginx:
     image: nginx:1.13
@@ -44,14 +44,14 @@ services:
       - "${NGINX_HTTP_PORT:-80}:80"
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
-      - ./config/nginx:/etc/nginx/conf.d/
-      - ./data/openedx:/var/www/openedx:ro
-      - ./data/letsencrypt:/etc/letsencrypt/:ro
+      - ../env/nginx:/etc/nginx/conf.d/
+      - ../../data/openedx:/var/www/openedx:ro
+      - ../../data/letsencrypt:/etc/letsencrypt/:ro
 
   rabbitmq:
     image: rabbitmq:3.6.10
     volumes:
-      - ./data/rabbitmq:/var/lib/rabbitmq
+      - ../../data/rabbitmq:/var/lib/rabbitmq
     restart: unless-stopped
 
   # Simple SMTP server
@@ -63,8 +63,6 @@ services:
 
   forum:
     image: regis/openedx-forum:hawthorn
-    build:
-      context: ./forum
     environment:
       API_KEY: "forumapikey"
       SEARCH_SERVER: "http://elasticsearch:9200"
@@ -78,14 +76,12 @@ services:
 
   lms:
     image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
-    build:
-      context: ./openedx
     environment:
       SERVICE_VARIANT: lms
     restart: unless-stopped
     volumes:
-      - ./config/openedx:/openedx/config
-      - ./data/lms:/openedx/data
+      - ../env/openedx:/openedx/env
+      - ../../data/lms:/openedx/data
     depends_on:
       - elasticsearch
       - forum
@@ -97,14 +93,12 @@ services:
 
   cms:
     image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
-    build:
-      context: ./openedx
     environment:
       SERVICE_VARIANT: cms
     restart: unless-stopped
     volumes:
-      - ./config/openedx:/openedx/config
-      - ./data/cms:/openedx/data
+      - ../env/openedx:/openedx/env
+      - ../../data/cms:/openedx/data
     depends_on:
       - memcached
       - mongodb
@@ -117,30 +111,77 @@ services:
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
     image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
-    build:
-      context: ./openedx
     environment:
       SERVICE_VARIANT: lms
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     volumes:
-      - ./config/openedx:/openedx/config
-      - ./data/lms:/openedx/data
+      - ../env/openedx:/openedx/env
+      - ../../data/lms:/openedx/data
     depends_on:
       - lms
 
   cms_worker:
     image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
-    build:
-      context: ./openedx
     environment:
       SERVICE_VARIANT: cms
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     volumes:
-      - ./config/openedx:/openedx/config
-      - ./data/cms:/openedx/data
+      - ../env/openedx:/openedx/env
+      - ../../data/cms:/openedx/data
     depends_on:
       - cms
+
+  {% if ACTIVATE_NOTES %}
+  ############# Notes: backend store for edX Student Notes
+  notes:
+    image: regis/openedx-notes:hawthorn
+    networks:
+      default:
+        aliases:
+          - notes.openedx
+    volumes:
+      - ../env/notes:/openedx/env
+      - ../../data/notes:/openedx/data
+    restart: unless-stopped
+    depends_on:
+      - mysql
+  {% endif %}
+
+  {% if ACTIVATE_XQUEUE %}
+  ############# Xqueue: external grading of Open edX problems
+  xqueue:
+    image: regis/openedx-xqueue:hawthorn
+    volumes:
+      - ../env/xqueue:/openedx/env
+      - ../../data/xqueue:/openedx/data
+    restart: unless-stopped
+    depends_on:
+      - mysql
+
+  xqueue_consumer:
+    image: regis/openedx-xqueue:hawthorn
+    volumes:
+      - ../env/xqueue:/openedx/env
+      - ../../data/xqueue:/openedx/data
+    restart: unless-stopped
+    # Run 12 workers per queue
+    command: ./manage.py run_consumer 12
+    depends_on:
+      - mysql
+  {% endif %}
+
+  {% if ACTIVATE_PORTAINER %}
+  ############# Portainer: container supervision with a web UI
+  portainer:
+    image: portainer/portainer:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../../data/portainer:/data
+    restart: unless-stopped
+    depends_on:
+      - nginx
+  {% endif %}

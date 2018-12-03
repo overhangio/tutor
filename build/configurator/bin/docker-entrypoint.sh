@@ -4,7 +4,6 @@ USERID=${USERID:=0}
 ## Configure user with a different USERID if requested.
 if [ "$USERID" -ne 0 ]
     then
-        echo "creating new user 'openedx' with UID $USERID"
         useradd --home-dir /openedx -u $USERID openedx
 
         # Change file permissions

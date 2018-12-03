@@ -1,0 +1,84 @@
+Customising the ``openedx`` docker image
+========================================
+
+The LMS and the CMS all run from the ``openedx`` docker image. The base image is downloaded from `Docker Hub <https://hub.docker.com/r/regis/openedx/>`_ when we run ``make update`` (or ``make all``). But you can also customise and build the image yourself. The base image is built with::
+
+    make build-openedx
+
+The following sections describe how to modify various aspects of the docker image. After you have built your own image, you can run it as usual::
+
+    make run
+
+Custom themes
+-------------
+
+Comprehensive theming is enabled by default. Put your themes in ``openedx/themes/``::
+
+    openedx/themes/
+        mycustomtheme1/
+            cms/
+                ...
+            lms/
+                ...
+        mycustomtheme2/
+            ...
+
+Then you must rebuild the openedx Docker image::
+
+    make build-openedx
+
+Make sure the assets can be served by the web server::
+
+    make assets
+
+Finally, follow the `Open edX documentation to enable your themes <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site>`_.
+
+Extra xblocks and requirements
+------------------------------
+
+Additional requirements can be added to the ``openedx/requirements/private.txt`` file. For instance::
+
+    echo "git+https://github.com/open-craft/xblock-poll.git" >> openedx/requirements/private.txt
+
+Then, the ``openedx`` docker image must be rebuilt::
+
+    make build-openedx
+
+To install xblocks from a private repository that requires authentication, you must first clone the repository inside the ``openedx/requirements`` folder on the host::
+
+    git clone git@github.com:me/myprivaterepo.git ./openedx/requirements/myprivaterepo
+
+Then, declare your extra requirements with the ``-e`` flag in ``openedx/requirements/private.txt``::
+
+    echo "-e ./myprivaterepo" >> openedx/requirements/private.txt
+
+Forked version of edx-platform
+------------------------------
+
+You may want to run your own flavor of edx-platform instead of the `official version <https://github.com/edx/edx-platform/>`_. To do so, you will have to re-build the openedx image with the proper environment variables pointing to your repository and version::
+
+    EDX_PLATFORM_REPOSITORY=https://mygitrepo/edx-platform.git EDX_PLATFORM_VERSION=my-tag-or-branch make build-openedx
+
+You can then restart the services which will now be running your forked version of edx-platform::
+
+    make restart-openedx
+
+Note that your release must be a fork of Hawthorn in order to work. Otherwise, you may have important compatibility issues with other services.
+
+Running a different Docker image instead of `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_
+------------------------------------------------------------------------------------------------------
+
+This is for people who have an account on `hub.docker.com <https://hub.docker.com>`_ or a private image registry. You can build your image and push it to your repo. Then add the following content to the ``.env`` file::
+
+    OPENEDX_DOCKER_IMAGE=myusername/myimage:mytag
+
+Your own image will be used next time you run ``make run``.
+
+Note that the ``make build`` and ``make push`` command will no longer work as you expect and that you are responsible for building and pushing the image yourself.
+
+Maintainers
+-----------
+
+The images are built, tagged and uploaded to Docker Hub in one command::
+
+    make dockerhub
