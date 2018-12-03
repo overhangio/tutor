@@ -1,7 +1,5 @@
 .*.swp
-config/
-data-*/
-TODO
-openedx/requirements/private.txt
-.env
 !.gitignore
+/config.json
+/data*/
+/TODO
