@@ -16,6 +16,8 @@ LOGGING['handlers']['tracking'] = {
     'formatter': 'standard',
 }
 
+LOCALE_PATHS.append('/openedx/locale')
+
 # Create folders if necessary
 import os
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:

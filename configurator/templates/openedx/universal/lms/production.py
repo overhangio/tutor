@@ -51,6 +51,8 @@ ORA2_FILEUPLOAD_BACKEND = 'filesystem'
 ORA2_FILEUPLOAD_ROOT = '/openedx/data/ora2'
 ORA2_FILEUPLOAD_CACHE_NAME = 'ora2-storage'
 
+LOCALE_PATHS.append('/openedx/locale')
+
 # Create folders if necessary
 import os
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:

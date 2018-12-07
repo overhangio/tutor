@@ -123,7 +123,7 @@ You will need to download the docker images from [Docker Hub](https://hub.docker
     make databases
     make assets
 
-These commands should be run just once. They will create the required databases tables, apply database migrations and generate static assets, such as images, stylesheets and Javascript dependencies.
+These commands should be run just once. They will create the required databases tables, apply database migrations and make sure that static assets, such as images, stylesheets and Javascript dependencies, can be served by the nginx container.
 
 If migrations are stopped with a `Killed` message, this certainly means the docker containers don't have enough RAM. See the [troubleshooting](#troubleshooting) section.
 
@@ -254,26 +254,59 @@ This will open a shell in the LMS (or CMS) container. You can then run just any 
 The images are built, tagged and uploaded to Docker Hub in one command:
 
     make dockerhub
-  
-## Help/Troubleshooting
 
-### How to add custom themes?
+## Customising the `openedx` docker image
 
-Comprehensive theming is enabled by default. Just drop your themes in `data/themes` and compile assets:
+The LMS and the CMS all run from the `openedx` docker image. The base image is downloaded from [Docker Hub](https://hub.docker.com/r/regis/openedx/) when we run `make update` (or `make all`). But you can also customise and build the image yourself. The base image is built with:
+
+    make build-openedx
+
+The following sections describe how to modify various aspects of the docker image. After you have built your own image, you can run it as usual:
+
+    make run
+
+### Custom themes
+
+Comprehensive theming is enabled by default. Put your themes in `openedx/themes`:
+
+    openedx/themes/
+        mycustomtheme1/
+            cms/
+                ...
+            lms/
+                ...
+        mycustomtheme2/
+            ...
+
+Then you must rebuild the openedx Docker image and indicate which themes you want to build:
+
+    make build-openedx THEMES=mycustomtheme1,mycustomtheme2,dark-theme
+
+Make sure the assets can be served by the web server:
 
     make assets
 
-Then, follow the [Open edX documentation to enable your themes](https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site).
+Finally, follow the [Open edX documentation to enable your themes](https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site).
 
-### How to add extra XBlocks to the LMS/CMS?
+### Extra xblocks and requirements
 
-Additional requirements can be added to the `openedx/requirements/private.txt` file. Then, the `openedx` docker image must be rebuilt to include the new requirements. For instance:
+Additional requirements can be added to the `openedx/requirements/private.txt` file. For instance:
 
     echo "git+https://github.com/open-craft/xblock-poll.git" >> openedx/requirements/private.txt
-    make build-openedx
-    make run
 
-### How to run Open edX from a forked version of edx-platform?
+Then, the `openedx` docker image must be rebuilt:
+
+    make build-openedx
+
+To install xblocks from a private repository that requires authentication, you must first clone the repository inside the `openedx/requirements` folder on the host:
+
+    git clone git@github.com:me/myprivaterepo.git ./openedx/requirements/myprivaterepo
+
+Then, declare your extra requirements with the `-e` flag in `openedx/requirements/private.txt` :
+
+    echo "-e ./myprivaterepo" >> openedx/requirements/private.txt
+
+### Forked version of edx-platform
 
 You may want to run your own flavor of edx-platform instead of the [official version](https://github.com/edx/edx-platform/). To do so, you will have to re-build the openedx image with the proper environment variables pointing to your repository and version:
 
@@ -285,13 +318,17 @@ You can then restart the services which will now be running your forked version 
 
 Note that your release must be a fork of Hawthorn in order to work. Otherwise, you may have important compatibility issues with other services.
 
-### How to run a customized Docker image instead of [regis/openedx](https://hub.docker.com/r/regis/openedx/)?
+### Running a different Docker image instead of [regis/openedx](https://hub.docker.com/r/regis/openedx/)
 
-Add the following content to the `.env` file:
+This is for people who have an account on [hub.docker.com](https://hub.docker.com) or a private image registry. You can build your image and push it to your repo. Then add the following content to the `.env` file:
 
     OPENEDX_DOCKER_IMAGE=myusername/myimage:mytag
 
-Note that the `make build` and `make push` command will no longer work.
+Your own image will be used next time you run `make run`.
+
+Note that the `make build` and `make push` command will no longer work as you expect and that you are responsible for building and pushing the image yourself.
+
+## Help/Troubleshooting
 
 ### "Cannot start service nginx: driver failed programming external connectivity"
 
