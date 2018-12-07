@@ -4,3 +4,4 @@ data-*/
 TODO
 openedx/requirements/private.txt
 .env
+!.gitignore
