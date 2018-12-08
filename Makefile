@@ -261,7 +261,9 @@ stats: ## Collect anonymous information about the platform
 		regis/openedx-configurator:hawthorn /openedx/config/openedx/stats 2> /dev/null|| true
 
 import-demo-course: ## Import the demo course from edX
-	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c "git clone https://github.com/edx/edx-demo-course ../edx-demo-course && git -C ../edx-demo-course checkout open-release/hawthorn.beta1 && python ./manage.py cms import ../data ../edx-demo-course"
+	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c " \
+		git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course \
+		&& python ./manage.py cms import ../data ../edx-demo-course"
 
 create-staff-user: ## Create a user with admin rights
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
