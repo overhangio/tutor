@@ -53,7 +53,8 @@ RUN pip uninstall -y ora2 && \
     pip install --src ../venv/src git+https://github.com/regisb/edx-ora2.git@open-release/hawthorn.2#egg=ora2==2.1.17
 
 # Install nodejs requirements
-RUN npm install
+RUN npm set progress=false \
+    && npm install
 ENV PATH ./node_modules/.bin:${PATH}
 
 # Install private requirements: this is useful for installing custom xblocks.
