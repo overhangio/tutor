@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/
+              name: config
+            - mountPath: /openedx/data/lms
+              name: data
+          ports:
+            - containerPort: 80
+              name: http-port
+            - containerPort: 443
+              name: https-port
+      volumes:
+        - name: config
+          configMap:
+            name: nginx-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: lms-data

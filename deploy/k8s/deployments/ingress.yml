@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+spec:
+  rules:
+  - host: overhang.io
+    http:
+      paths:
+      - backend:
+          serviceName: nginx
+          servicePort: 80
+      - backend:
+          serviceName: nginx
+          servicePort: 443
