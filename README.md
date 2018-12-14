@@ -278,9 +278,9 @@ Comprehensive theming is enabled by default. Put your themes in `openedx/themes`
         mycustomtheme2/
             ...
 
-Then you must rebuild the openedx Docker image and indicate which themes you want to build:
+Then you must rebuild the openedx Docker image:
 
-    make build-openedx THEMES=mycustomtheme1,mycustomtheme2,dark-theme
+    make build-openedx
 
 Make sure the assets can be served by the web server:
 

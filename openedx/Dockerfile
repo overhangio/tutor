@@ -80,9 +80,7 @@ COPY settings/cms/*.py /openedx/config/universal/cms/
 
 # Collect production assets. By default, only assets from the default theme
 # will be processed. This makes the docker image lighter and faster to build.
-# To compile assets from other themes, build the image with the THEMES
-# argument: THEMES=dark-theme,edx.org
-# Custom themes added to /openedx/themes can also be compiled.
+# Only the custom themes added to /openedx/themes will be compiled.
 # Here, we don't run "paver update_assets" which is slow, compiles all themes
 # and requires a complex settings file. Instead, we decompose the commands
 # and run each one individually to collect the production static assets to
@@ -95,9 +93,8 @@ COPY settings/cms/*.py /openedx/config/universal/cms/
 RUN xmodule_assets common/static/xmodule \
     && python -c "import pavelib.assets; pavelib.assets.process_npm_assets()" \ 
     && STATIC_ROOT_LMS=/openedx/data/staticfiles STATIC_ROOT_CMS=/openedx/data/staticfiles/studio NODE_ENV=production ./node_modules/.bin/webpack --config=webpack.prod.config.js
-ARG THEMES=open-edx
 COPY ./themes/ /openedx/themes/
-RUN paver compile_sass --theme-dirs=/openedx/edx-platform/themes,/openedx/themes --themes=$THEMES \
+RUN paver compile_sass --theme-dirs=/openedx/edx-platform/themes,/openedx/themes --themes=open-edx,$(ls /openedx/themes | paste -s -d, -) \
     && python -c "import pavelib.assets; pavelib.assets.collect_assets(['lms', 'cms'], 'universal.assets')"
 
 # service variant is "lms" or "cms"
