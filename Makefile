@@ -173,9 +173,6 @@ endif
 ifdef EDX_PLATFORM_VERSION
 	openedx_build_args += --build-arg="EDX_PLATFORM_VERSION=$(EDX_PLATFORM_VERSION)"
 endif
-ifdef THEMES
-	openedx_build_args += --build-arg="THEMES=$(THEMES)"
-endif
 
 build-openedx: ## Build the Open edX docker image
 	docker build -t regis/openedx:latest -t regis/openedx:hawthorn $(openedx_build_args) openedx/
