@@ -95,6 +95,14 @@ migrate-xqueue: ## Perform database migrations for the XQueue service
 reindex-courses: ## Refresh course index so they can be found in the LMS search engine
 	$(DOCKER_COMPOSE_RUN) cms ./manage.py cms reindex_course --all --setup
 
+##################### Backup Utilities
+
+backup-lms: ## Backup the mysql database used for the lms.
+	@echo "Exporting mysql database..."
+	$(DOCKER_COMPOSE_RUN) lms bash -c "export $(shell cat ${PWD}/config/mysql/auth.env); \
+	$(DOCKERIZEWAIT) && mysqldump -u root -p\$$MYSQL_ROOT_PASSWORD --host mysql openedx > \
+	/openedx/backups/lms$(shell date -u "+%Y-%m-%d--%H:%M:%S%z--%Z").sql 2>/dev/null || true"
+
 ##################### Static assets
 
 # To collect assets we don't rely on the "paver update_assets" command because
