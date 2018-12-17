@@ -71,6 +71,8 @@ post_configure: $(post_configure_targets)
 
 ##################### Database
 
+DOCKERIZEWAIT = dockerize -wait tcp://mysql:3306 -timeout 20s
+
 databases: provision-databases migrate provision-oauth2 ## Bootstrap databases
 
 provision-databases: ## Create necessary databases and users
