@@ -97,11 +97,14 @@ reindex-courses: ## Refresh course index so they can be found in the LMS search 
 
 ##################### Backup Utilities
 
+ISO_NOW=$(shell date -u "+%Y-%m-%d--%H:%M:%S%z--%Z")
 backup-lms: ## Backup the mysql database used for the lms.
 	@echo "Exporting mysql database..."
 	@$(DOCKER_COMPOSE_RUN) lms bash -c "export $(shell cat ${PWD}/config/mysql/auth.env); \
 	$(DOCKERIZEWAIT) && mysqldump -u root -p\$$MYSQL_ROOT_PASSWORD --host mysql openedx > \
-	/openedx/backups/lms$(shell date -u "+%Y-%m-%d--%H:%M:%S%z--%Z").sql 2>/dev/null || true"
+	/openedx/backups/lms$(ISO_NOW).sql 2>/dev/null || true"
+	@echo "Backup Complete!"
+	@echo "Created file: lms$(ISO_NOW).sql"
 
 ##################### Static assets
 
