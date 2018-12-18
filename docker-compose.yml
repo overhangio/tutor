@@ -14,6 +14,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/mongodb:/data/db
+      - ./data/backups/cms:/openedx/backups
 
   mysql:
     image: mysql:5.6.36
@@ -109,7 +110,6 @@ services:
       - ./config/openedx:/openedx/config
       - ./data/cms:/openedx/data
       - ./data/themes:/openedx/themes
-      - ./data/backups/cms:/openedx/backups
     depends_on:
       - memcached
       - mongodb

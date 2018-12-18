@@ -106,6 +106,21 @@ backup-lms: ## Backup the mysql database used for the lms.
 	@echo "Backup Complete!"
 	@echo "Created file: lms$(ISO_NOW).sql"
 
+# We need this conditional to see if mongodb is running.
+# When the mongodb container is not running, we need to run it to backup.
+# When the mongodb container is running we can use the running container.
+backup-cms: ## Backup the MongoDB database used for Studio.
+	@echo "Exporting MongoDB database..."
+	@if [ -z `docker ps -q --no-trunc | grep $$(docker-compose ps -q mongodb)` ]; \
+	then echo "mongodb container not running, starting container..."; \
+	docker-compose run --rm mongodb bash -c " \
+	mongod --smallfiles --nojournal --storageEngine wiredTiger --fork --logpath=/var/log/mongodb/mongod.log && \
+	mongodump --out=/openedx/backups/cms$(ISO_NOW)/dump"; \
+	echo "Terminated container"; \
+	else docker-compose exec mongodb bash -c "mongodump --out=/openedx/backups/cms$(ISO_NOW)/dump"; fi
+	@echo "Backup Complete!"
+	@echo "Created backup: cms$(ISO_NOW)"
+
 ##################### Static assets
 
 # To collect assets we don't rely on the "paver update_assets" command because
