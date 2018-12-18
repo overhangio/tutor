@@ -97,7 +97,7 @@ reindex-courses: ## Refresh course index so they can be found in the LMS search 
 
 ##################### Backup Utilities
 
-ISO_NOW=$(shell date -u "+%Y-%m-%d--%H:%M:%S%z--%Z")
+ISO_NOW=$(shell date -u "+%Y-%m-%dT%H:%M:%S%z")
 backup-lms: ## Backup the mysql database used for the lms.
 	@echo "Exporting mysql database..."
 	@$(DOCKER_COMPOSE_RUN) lms bash -c "export $(shell cat ${PWD}/config/mysql/auth.env); \
