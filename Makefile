@@ -82,8 +82,8 @@ provision-oauth2: ## Create users for SSO between services
 
 migrate: migrate-openedx migrate-forum $(extra_migrate_targets) ## Perform all database migrations
 migrate-openedx: ## Perform database migrations on LMS/CMS
-	$(DOCKER_COMPOSE_RUN) lms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py lms migrate"
-	$(DOCKER_COMPOSE_RUN) cms bash -c "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py cms migrate"
+	$(DOCKER_COMPOSE_RUN) lms bash -c "$(DOCKERIZEWAIT) && ./manage.py lms migrate"
+	$(DOCKER_COMPOSE_RUN) cms bash -c "$(DOCKERIZEWAIT) && ./manage.py cms migrate"
 	$(MAKE) reindex-courses
 migrate-forum: ## Perform database migrations on discussion forums
 	$(DOCKER_COMPOSE_RUN) forum bash -c "bundle exec rake search:initialize && \
