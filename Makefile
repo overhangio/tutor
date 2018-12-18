@@ -121,6 +121,27 @@ backup-cms: ## Backup the MongoDB database used for Studio.
 	@echo "Backup Complete!"
 	@echo "Created backup: cms$(ISO_NOW)"
 
+restore-lms: backup-lms ## Restor the lms mysql db from a dump on the disk. Specify DUMP. A backup will be made first.
+	@echo "Restoring from file ${DUMP}"
+	@$(DOCKER_COMPOSE_RUN) lms bash -c "export $(shell cat ${PWD}/config/mysql/auth.env); \
+	if [ -f /openedx/backups/${DUMP} ]; \
+	then echo 'Importing dump file ${DUMP}...'; $(DOCKERIZEWAIT) && mysql --user=root --host=mysql --password-p\$$MYSQL_ROOT_PASSWORD openedx < /openedx/backups/${DUMP} 2>/dev/null || true; \
+	echo 'Restore Complete! Used backup ${DUMP}'; \
+	else echo 'File \`${DUMP}\` does not exist! Nothing imported.'; fi"
+
+# The conditional is the same used in the backup mongodb command. See backup-cms
+restore-cms: backup-cms ## Restor the cms mongo db from a dump on the disk. Specify DUMP. A backup will be made first.
+	@echo "Restoring from file ${DUMP}"
+	@if [ -z `docker ps -q --no-trunc | grep $$(docker-compose ps -q mongodb)` ]; \
+	then echo "mongodb container not running, starting container..."; \
+	docker-compose run --rm mongodb bash -c " \
+	mongod --smallfiles --nojournal --storageEngine wiredTiger --fork --logpath=/var/log/mongodb/mongod.log && \
+	mongorestore /openedx/backups/${DUMP}/dump"; \
+	echo "Terminated container"; \
+	else docker-compose exec mongodb bash -c "mongorestore /openedx/backups/${DUMP}/dump"; fi
+	@echo "Restore Complete!"
+	@echo "Used backup: ${DUMP}"
+
 ##################### Static assets
 
 # To collect assets we don't rely on the "paver update_assets" command because
