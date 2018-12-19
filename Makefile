@@ -121,7 +121,8 @@ backup-cms: ## Backup the MongoDB database used for Studio.
 	@echo "Backup Complete!"
 	@echo "Created backup: cms$(ISO_NOW)"
 
-restore-lms: backup-lms ## Restor the lms mysql db from a dump on the disk. Specify DUMP. A backup will be made first.
+restore-lms: backup-lms restore-lms-dangerous## Restor the lms mysql db from a dump on the disk. Specify DUMP. A backup will be made first.
+restore-lms-dangerous:
 	@echo "Restoring from file ${DUMP}"
 	@$(DOCKER_COMPOSE_RUN) lms bash -c "export $(shell cat ${PWD}/config/mysql/auth.env); \
 	if [ -f /openedx/backups/${DUMP} ]; \
@@ -130,7 +131,8 @@ restore-lms: backup-lms ## Restor the lms mysql db from a dump on the disk. Spec
 	else echo 'File \`${DUMP}\` does not exist! Nothing imported.'; fi"
 
 # The conditional is the same used in the backup mongodb command. See backup-cms
-restore-cms: backup-cms ## Restor the cms mongo db from a dump on the disk. Specify DUMP. A backup will be made first.
+restore-cms: backup-cms restore-cms-dangerous ## Restor the cms mongo db from a dump on the disk. Specify DUMP. A backup will be made first.
+restore-cms-dangerous:
 	@echo "Restoring from file ${DUMP}"
 	@if [ -z `docker ps -q --no-trunc | grep $$(docker-compose ps -q mongodb)` ]; \
 	then echo "mongodb container not running, starting container..."; \
