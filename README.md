@@ -197,6 +197,32 @@ Open a python shell in the lms or the cms:
     make lms-python
     make cms-python
 
+### Database backup utilities
+
+Backup the mysql database for the lms:
+
+    make backup-lms
+
+Mysql backups are created with `mysqldump` and backups are stored in the `./backups/lms` directory uncompressed. The dump files are automatically timestamped.
+
+Restore a previous backup to the lms:
+
+    make restore-lms DUMP=<name of dumpfile>
+
+By default a backup is made just before restoration is done. If you do not want to backup first run the `restore-lms-dangerous` command. Any backup made with `mysqldump` should be able to be placed in the `./backups/lms` directory and restored with this command.
+
+Backup the MongoDB database for the cms:
+
+    make backup-cms
+
+MongoDB backups are created with `mongodump` and backups are stored in the `./backups/cms` directory uncompressed. The dump files are automatically timestamped.
+
+Restore a previous backup to the lms:
+
+    make restore-cms DUMP=<name of dumpfile>
+
+By default a backup is made just before restoration is done. If you do not want to backup first run the `restore-cms-dangerous` command. Any backup made with `mongodump` should be able to be placed in the `./backups/cms` directory and restored with this command.
+
 ## For developers
 
 In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
