@@ -63,7 +63,7 @@ services:
   ############# Forum
 
   forum:
-    image: regis/openedx-forum:hawthorn
+    image: ${OPENEDX_DOCKER_NAMESPACE:-regis}/${OPENEDX_DOCKER_IMAGE_PREFIX:-''}openedx-forum:${OPENEDX_DOCKER_TAG:-hawthorn}
     build:
       context: ./forum
     environment:
@@ -78,7 +78,7 @@ services:
   ############# LMS and CMS
 
   lms:
-    image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
+    image: ${OPENEDX_DOCKER_NAMESPACE:-regis}/${OPENEDX_DOCKER_IMAGE_PREFIX:-''}openedx:${OPENEDX_DOCKER_TAG:-hawthorn}
     build:
       context: ./openedx
     environment:
@@ -98,7 +98,7 @@ services:
       - smtp
 
   cms:
-    image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
+    image: ${OPENEDX_DOCKER_NAMESPACE:-regis}/${OPENEDX_DOCKER_IMAGE_PREFIX:-''}openedx:${OPENEDX_DOCKER_TAG:-hawthorn}
     build:
       context: ./openedx
     environment:
@@ -119,7 +119,7 @@ services:
 
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
-    image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
+    image: ${OPENEDX_DOCKER_NAMESPACE:-regis}/${OPENEDX_DOCKER_IMAGE_PREFIX:-''}openedx:${OPENEDX_DOCKER_TAG:-hawthorn}
     build:
       context: ./openedx
     environment:
@@ -135,7 +135,7 @@ services:
       - lms
 
   cms_worker:
-    image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
+    image: ${OPENEDX_DOCKER_NAMESPACE:-regis}/${OPENEDX_DOCKER_IMAGE_PREFIX:-''}openedx:${OPENEDX_DOCKER_TAG:-hawthorn}
     build:
       context: ./openedx
     environment:

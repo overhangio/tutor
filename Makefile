@@ -7,6 +7,11 @@ USERID ?= $$(id -u)
 EDX_PLATFORM_SETTINGS ?= universal.production
 DOCKER_COMPOSE = docker-compose -f docker-compose.yml
 -include $(PWD)/config/Makefile.env
+-include $(PWD)/.env
+
+OPENEDX_DOCKER_NAMESPACE ?= regis
+OPENEDX_DOCKER_IMAGE_PREFIX ?= ''
+OPENEDX_DOCKER_TAG ?= hawthorn
 
 post_configure_targets =
 ifneq ($(DISABLE_STATS), 1)
@@ -15,7 +20,7 @@ endif
 ifeq ($(ACTIVATE_HTTPS), 1)
 	post_configure_targets += https-certificate
 endif
-extra_migrate_targets = 
+extra_migrate_targets =
 ifeq ($(ACTIVATE_XQUEUE), 1)
 	extra_migrate_targets += migrate-xqueue
 	DOCKER_COMPOSE += -f docker-compose-xqueue.yml
@@ -65,7 +70,7 @@ stop: ## Stop all services
 configure: build-configurator ## Configure the environment prior to running the platform
 	docker run --rm -it --volume="$(PWD)/config:/openedx/config" \
 		-e USERID=$(USERID) -e SILENT=$(SILENT) $(CONFIGURE_OPTS) \
-		regis/openedx-configurator:hawthorn
+		$(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-configurator:$(OPENEDX_DOCKER_TAG)
 
 post_configure: $(post_configure_targets)
 
@@ -131,7 +136,7 @@ assets-development-cms:
 		&& NODE_ENV=development ./node_modules/.bin/webpack --config=webpack.dev.config.js \
 		&& ./manage.py cms --settings=$(EDX_PLATFORM_SETTINGS) compile_sass studio \
 		&& python -c \"import pavelib.assets; pavelib.assets.collect_assets(['studio'], '$(EDX_PLATFORM_SETTINGS)')\""
-	
+
 
 ##################### Information
 
@@ -153,6 +158,9 @@ info: ## Print some information about the current install, for debugging
 	@echo "-------------------------"
 	echo $$EDX_PLATFORM_PATH
 	echo $$EDX_PLATFORM_SETTINGS
+	@echo "-------------------------"
+	@echo "Docker Image Details:"
+	@echo $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx:$(OPENEDX_DOCKER_TAG)
 
 
 #################### Logging
@@ -180,38 +188,39 @@ ifdef EDX_PLATFORM_VERSION
 endif
 
 build-openedx: ## Build the Open edX docker image
-	docker build -t regis/openedx:latest -t regis/openedx:hawthorn $(openedx_build_args) openedx/
+	docker build -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx:latest -t regis/openedx:hawthorn $(openedx_build_args) openedx/
 build-configurator: ## Build the configurator docker image
-	docker build -t regis/openedx-configurator:latest -t regis/openedx-configurator:hawthorn configurator/
+	docker build -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-configurator:latest -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-configurator:$(OPENEDX_DOCKER_TAG) configurator/
 build-forum: ## Build the forum docker image
-	docker build -t regis/openedx-forum:latest -t regis/openedx-forum:hawthorn forum/
+	docker build -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-forum:latest -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-forum:$(OPENEDX_DOCKER_TAG) forum/
 build-notes: ## Build the Notes docker image
-	docker build -t regis/openedx-notes:latest -t regis/openedx-notes:hawthorn notes/
+	docker build -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-notes:latest -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-notes:$(OPENEDX_DOCKER_TAG) notes/
 build-xqueue: ## Build the Xqueue docker image
-	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
-build-android: ## Build the docker image for Android 
-	docker build -t regis/openedx-android:latest android/
+	docker build -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-xqueue:latest -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-xqueue:$(OPENEDX_DOCKER_TAG) xqueue/
+build-android: ## Build the docker image for Android
+	docker build -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-android:latest -t $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-android:$(OPENEDX_DOCKER_TAG) android/
 
 ################### Pushing images to docker hub
 
 push: push-openedx push-configurator push-forum push-notes push-xqueue push-android ## Push all images to dockerhub
 push-openedx: ## Push Open edX images to dockerhub
-	docker push regis/openedx:hawthorn
-	docker push regis/openedx:latest
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx:$(OPENEDX_DOCKER_TAG)
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx:latest
 push-configurator: ## Push configurator image to dockerhub
-	docker push regis/openedx-configurator:hawthorn
-	docker push regis/openedx-configurator:latest
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-configurator:$(OPENEDX_DOCKER_TAG)
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-configurator:latest
 push-forum: ## Push forum image to dockerhub
-	docker push regis/openedx-forum:hawthorn
-	docker push regis/openedx-forum:latest
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-forum:$(OPENEDX_DOCKER_TAG)
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-forum:latest
 push-notes: ## Push notes image to dockerhub
-	docker push regis/openedx-notes:hawthorn
-	docker push regis/openedx-notes:latest
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-notes:$(OPENEDX_DOCKER_TAG)
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-notes:latest
 push-xqueue: ## Push Xqueue image to dockerhub
-	docker push regis/openedx-xqueue:hawthorn
-	docker push regis/openedx-xqueue:latest
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-xqueue:$(OPENEDX_DOCKER_TAG)
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-xqueue:latest
 push-android: ## Push the Android image to dockerhub
-	docker push regis/openedx-android:latest
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-android:$(OPENEDX_DOCKER_TAG)
+	docker push $(OPENEDX_DOCKER_NAMESPACE)/$(OPENEDX_DOCKER_IMAGE_PREFIX)openedx-android:latest
 
 dockerhub: build push ## Build and push all images to dockerhub
 

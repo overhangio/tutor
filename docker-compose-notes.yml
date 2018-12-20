@@ -3,7 +3,7 @@ services:
 
   ############# Notes: backend store for edX Student Notes
   notes:
-    image: regis/openedx-notes:hawthorn
+    image: $(OPENEDX_DOCKER_NAMESPACE:-regis)/$(OPENEDX_DOCKER_IMAGE_PREFIX:-'')openedx-notes:$(OPENEDX_DOCKER_TAG:-hawthorn)
     build:
       context: ./notes
     networks:

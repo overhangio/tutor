@@ -3,7 +3,7 @@ services:
 
   ############# Xqueue: external grading of Open edX problems
   xqueue:
-    image: regis/openedx-xqueue:hawthorn
+    image: $(OPENEDX_DOCKER_NAMESPACE:-regis)/$(OPENEDX_DOCKER_IMAGE_PREFIX:-'')openedx-xqueue:$(OPENEDX_DOCKER_TAG:-hawthorn)
     build:
       context: ./xqueue
     volumes:
@@ -14,7 +14,7 @@ services:
       - mysql
 
   xqueue_consumer:
-    image: regis/openedx-xqueue:hawthorn
+    image: $(OPENEDX_DOCKER_NAMESPACE:-regis)/$(OPENEDX_DOCKER_IMAGE_PREFIX:-'')openedx-xqueue:$(OPENEDX_DOCKER_TAG:-hawthorn)
     build:
       context: ./xqueue
     volumes:

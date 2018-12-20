@@ -2,7 +2,7 @@ version: "3"
 services:
 
   android:
-    image: regis/openedx-android:latest
+    image: $(OPENEDX_DOCKER_NAMESPACE:-regis)/$(OPENEDX_DOCKER_IMAGE_PREFIX:-'')openedx-android:$(OPENEDX_DOCKER_TAG:-hawthorn)
     build:
       context: ./android
     volumes:
