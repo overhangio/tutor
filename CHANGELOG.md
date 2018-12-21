@@ -1,5 +1,6 @@
 # Changelog
 
+- 2018-12-21 [Feature] Add fine-grain control of docker image namespace
 - 2018-12-02 [Feature] Download extra locales from [openedx-i18n](https://github.com/regisb/openedx-i18n/) to the Open edX Docker image
 - 2018-11-28 [Feature] Easily change openedx docker image
 - 2018-11-28 [Feature] Enable comprehensive theming!

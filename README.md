@@ -49,7 +49,7 @@ To renew the certificate, run this command once per month:
 
 ### Student notes
 
-With [notes](https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/exercises_tools/notes.html?highlight=notes), students can annotate portions of the courseware. 
+With [notes](https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/exercises_tools/notes.html?highlight=notes), students can annotate portions of the courseware.
 
 ![Notes in action](https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/_images/SFD_SN_bodyexample.png)
 
@@ -87,7 +87,7 @@ By default, the install script will collect some information about your install 
 
     export DISABLE_STATS=1
 
-If you decide to disable stats, please send me a message to tell me about your platform! 
+If you decide to disable stats, please send me a message to tell me about your platform!
 
 ## Requirements
 
@@ -254,7 +254,7 @@ This will open a shell in the LMS (or CMS) container. You can then run just any 
 The images are built, tagged and uploaded to Docker Hub in one command:
 
     make dockerhub
-  
+
 ## Help/Troubleshooting
 
 ### How to add custom themes?
@@ -289,9 +289,11 @@ Note that your release must be a fork of Hawthorn in order to work. Otherwise, y
 
 Add the following content to the `.env` file:
 
-    OPENEDX_DOCKER_IMAGE=myusername/myimage:mytag
+    OPENEDX_DOCKER_NAMESPACE=<Docker Image Namespace>
+    OPENEDX_DOCKER_IMAGE_PREFIX=<Prefix for Image Name>
+    OPENEDX_DOCKER_TAG=<Docker Tag Name>
 
-Note that the `make build` and `make push` command will no longer work.
+You can change the namespace for the docker image by changing `OPENEDX_DOCKER_NAMESPACE`. This is useful if you would like to change the user the docker images are pushed to.
 
 ### "Cannot start service nginx: driver failed programming external connectivity"
 
@@ -322,7 +324,7 @@ You can identify which containers are consuming most resources by running:
 
 ### "Running migrations... Killed!"
 
-The LMS and CMS containers require at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the `make all` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. [Follow these instructions from the official Docker documentation](https://docs.docker.com/docker-for-mac/#advanced). 
+The LMS and CMS containers require at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the `make all` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. [Follow these instructions from the official Docker documentation](https://docs.docker.com/docker-for-mac/#advanced).
 
 
 ### `Build failed running pavelib.servers.lms: Subprocess return code: 1`
