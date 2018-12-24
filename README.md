@@ -201,27 +201,21 @@ Open a python shell in the lms or the cms:
 
 In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
-(Note: containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the images with a different `EDX_PLATFORM_VERSION` argument. You may also want to change the `EDX_PLATFORM_REPOSITORY` argument to point to your own fork of edx-platform.)
-
-### Standard devstack
-
-Define development settings (on the host):
+To begin with, define development settings:
 
     export EDX_PLATFORM_SETTINGS=universal.development
 
-Then open an LMS shell:
+### Run a local webserver
+
+    make lms-runserver
+    make cms-runserver
+
+### Open a bash shell
 
     make lms
+    make cms
 
-You can then run a local web server, as usual:
-
-    paver update_assets lms --settings=universal.development
-
-Note that assets collection is made more difficult by the fact that development settings are [incorrectly loaded in hawthorn](https://github.com/edx/edx-platform/pull/18430/files). This should be fixed in the next release. Meanwhile, do not run `paver update_assets` while in development mode. Instead, run on the host:
-
-    make assets-development
-
-### Custom devstack
+### Debug edx-platform
 
 If you have one, you can point to a local version of [edx-platform](https://github.com/edx/edx-platform/) on your host machine:
 
@@ -229,31 +223,38 @@ If you have one, you can point to a local version of [edx-platform](https://gith
 
 Note that you should use an absolute path here, not a relative path (e.g: `/path/to/edx-platform` and not `../edx-platform`).
 
-Point to your settings file:
+All development commands will then automatically mount your local repo. For instance, you can add a `import pdb; pdb.set_trace()` breakpoint anywhere in your code and run:
 
-    export EDX_PLATFORM_SETTINGS=mysettings.py
+    make lms-runserver
 
-In this example, you should have a `mysettings.py` file in `edx-platform/lms/envs` and `edx-platform/cms/envs`. Development settings file for docker are a bit different from stock devstack settings. For valid development settings files, check [`config/openedx/universal/lms/development.py`](https://github.com/regisb/openedx-docker/blob/master/config/openedx/universal/lms/development.py) and [`config/openedx/universal/cms/development.py`](https://github.com/regisb/openedx-docker/blob/master/config/openedx/universal/cms/development.py)
+Note: containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the images with the right `EDX_PLATFORM_VERSION` argument. You may also want to change the `EDX_PLATFORM_REPOSITORY` argument to point to your own fork of edx-platform.
 
-You are ready to go! Run:
+With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the `universal.development` settings files to our own repo:
 
-    make lms
+    cp -r config/openedx/universal/lms/ /path/to/edx-platform/lms/envs/universal
+    cp -r config/openedx/universal/cms/ /path/to/edx-platform/cms/envs/universal
 
-Or:
+You can then run your platform with the `universal.development` settings.
 
-    make cms
+### Develop customised themes
 
-This will open a shell in the LMS (or CMS) container. You can then run just any command you are used to. For example, install node requirements, collect assets and run a local server:
+Run a local webserver:
 
-    npm install
-    paver update_assets lms --settings=mysettings
-    ./manage.py lms runserver 0.0.0.0:8000
+    make lms-runserver
 
-## Maintainers
+Watch the themes folders for changes:
 
-The images are built, tagged and uploaded to Docker Hub in one command:
+    make watch-themes
 
-    make dockerhub
+Make changes to `openedx/themes/yourtheme`: the theme assets should be automatically recompiled and visible at http://localhost:8000.
+
+### Assets management
+
+Assets building and collecting is made more difficult by the fact that development settings are [incorrectly loaded in Hawthorn](https://github.com/edx/edx-platform/pull/18430/files). This should be fixed in the next Open edX release. Meanwhile, do not run `paver update_assets` while in development mode. When working locally on a theme, build assets by running in the container:
+
+    openedx-assets build
+
+This command will take quite some time to run. You can speed up this process by running only part of the full build. Run `openedx-assets -h` for more information.
 
 ## Customising the `openedx` docker image
 
@@ -327,6 +328,12 @@ This is for people who have an account on [hub.docker.com](https://hub.docker.co
 Your own image will be used next time you run `make run`.
 
 Note that the `make build` and `make push` command will no longer work as you expect and that you are responsible for building and pushing the image yourself.
+
+## Maintainers
+
+The images are built, tagged and uploaded to Docker Hub in one command:
+
+    make dockerhub
 
 ## Help/Troubleshooting
 

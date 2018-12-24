@@ -45,8 +45,7 @@ services:
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./config/nginx:/etc/nginx/conf.d/
-      - ./data/lms:/openedx/data/lms:ro
-      - ./data/cms:/openedx/data/cms:ro
+      - ./data/openedx:/var/www/openedx:ro
       - ./data/letsencrypt:/etc/letsencrypt/:ro
 
   rabbitmq:
