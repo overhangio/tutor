@@ -63,7 +63,7 @@ ENV PATH ./node_modules/.bin:${PATH}
 # ./requirements/private.txt.
 COPY ./requirements/ /openedx/requirements
 RUN touch /openedx/requirements/private.txt \
-    && pip install --src ../venv/src -r /openedx/requirements/private.txt
+    && pip install -r /openedx/requirements/private.txt
 
 # Link configuration files to common /openedx/config folder, which should later
 # be mounted as a volume. Note that this image will not be functional until
@@ -84,18 +84,15 @@ COPY settings/cms/*.py /openedx/config/universal/cms/
 # Here, we don't run "paver update_assets" which is slow, compiles all themes
 # and requires a complex settings file. Instead, we decompose the commands
 # and run each one individually to collect the production static assets to
-# /openedx/data/staticfiles.
-# 1. xmodule_assets: run xmodule.static_content.main, which lists all xblocks and generates webpack manifest in common/static/xmodule
-# 2. pavelib.assets.process_npm_assets: copy libraries installed via npm to common/static/common/*/vendor
-# 3. webpack: generate webpack-stats.json
-# 4. compile_sass: compile each sass file individually with libsass.
-# 5. pavelib.assets.collect_assets: run ./manage.py lms/cms collectstatic. This is the only command that requires a settings file.
-RUN xmodule_assets common/static/xmodule \
-    && python -c "import pavelib.assets; pavelib.assets.process_npm_assets()" \ 
-    && STATIC_ROOT_LMS=/openedx/data/staticfiles STATIC_ROOT_CMS=/openedx/data/staticfiles/studio NODE_ENV=production ./node_modules/.bin/webpack --config=webpack.prod.config.js
+# /openedx/staticfiles.
+COPY ./bin/openedx-assets /usr/local/bin/
+RUN openedx-assets xmodule \
+    && openedx-assets npm \
+    && openedx-assets webpack --env=prod \
+    && openedx-assets common
 COPY ./themes/ /openedx/themes/
-RUN paver compile_sass --theme-dirs=/openedx/edx-platform/themes,/openedx/themes --themes=open-edx,$(ls /openedx/themes | paste -s -d, -) \
-    && python -c "import pavelib.assets; pavelib.assets.collect_assets(['lms', 'cms'], 'universal.assets')"
+RUN openedx-assets themes \
+    && openedx-assets collect --settings=universal.assets
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms

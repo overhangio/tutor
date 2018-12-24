@@ -15,7 +15,7 @@ endif
 ifeq ($(ACTIVATE_HTTPS), 1)
 	post_configure_targets += https-certificate
 endif
-extra_migrate_targets = 
+extra_migrate_targets =
 ifeq ($(ACTIVATE_XQUEUE), 1)
 	extra_migrate_targets += migrate-xqueue
 	DOCKER_COMPOSE += -f docker-compose-xqueue.yml
@@ -29,7 +29,8 @@ ifeq ($(ACTIVATE_PORTAINER), 1)
 endif
 
 DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE) run --rm
-DOCKER_COMPOSE_RUN_OPENEDX = $(DOCKER_COMPOSE_RUN) -e SETTINGS=$(EDX_PLATFORM_SETTINGS)
+DOCKER_COMPOSE_RUN_OPENEDX = $(DOCKER_COMPOSE_RUN) -e SETTINGS=$(EDX_PLATFORM_SETTINGS) \
+							 --volume="$(PWD)/openedx/themes:/openedx/themes"
 ifneq ($(EDX_PLATFORM_PATH),)
 	DOCKER_COMPOSE_RUN_OPENEDX += -e USERID=$(USERID) --volume="$(EDX_PLATFORM_PATH):/openedx/edx-platform"
 endif
@@ -99,34 +100,20 @@ reindex-courses: ## Refresh course index so they can be found in the LMS search 
 # webpack collection incorrectly sets the NODE_ENV variable when using custom
 # settings. Thus, each step must be performed separately. This should be fixed
 # in the next edx-platform release thanks to https://github.com/edx/edx-platform/pull/18430/
-#assets-lms: ## Collect static assets for the LMS
-#	$(DOCKER_COMPOSE_RUN_OPENEDX) lms -e NO_PREREQ_INSTALL=True lms paver update_assets lms --settings=$(EDX_PLATFORM_SETTINGS)
-#assets-cms: ## Collect static assets for the CMS
-#	$(DOCKER_COMPOSE_RUN_OPENEDX) cms -e NO_PREREQ_INSTALL=True cms paver update_assets cms --settings=$(EDX_PLATFORM_SETTINGS)
-
-assets-development: assets-development-lms assets-development-cms ## Generate static assets for local development
 
 assets: ## Generate production-ready static assets
 	docker-compose -f docker-compose-scripts.yml run --rm \
-		--volume=$(PWD)/data/lms/:/data/lms/ --volume=$(PWD)/data/cms/:/data/cms/ openedx bash -c \
-		"rm -rf /data/lms/staticfiles /data/cms/staticfiles \
-		&& cp -r /openedx/data/staticfiles /data/lms/ \
-		&& cp -r /openedx/data/staticfiles /data/cms/"
+		--volume=$(PWD)/data/openedx:/tmp/openedx/ openedx bash -c \
+		"rm -rf /tmp/openedx/staticfiles \
+		&& cp -r /openedx/staticfiles /tmp/openedx"
+assets-development: ## Generate static assets for local development
+	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps lms bash -c "openedx-assets build --env=dev"
 assets-development-lms:
-	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps lms bash -c \
-		"xmodule_assets common/static/xmodule \
-		&& python -c \"import pavelib.assets; pavelib.assets.process_npm_assets()\" \
-		&& NODE_ENV=development ./node_modules/.bin/webpack --config=webpack.dev.config.js \
-		&& ./manage.py lms --settings=$(EDX_PLATFORM_SETTINGS) compile_sass lms \
-		&& python -c \"import pavelib.assets; pavelib.assets.collect_assets(['lms'], '$(EDX_PLATFORM_SETTINGS)')\""
+	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps lms bash -c "openedx-assets build --env=dev --system lms"
 assets-development-cms:
-	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps cms bash -c \
-		"xmodule_assets common/static/xmodule \
-		&& python -c \"import pavelib.assets; pavelib.assets.process_npm_assets()\" \
-		&& NODE_ENV=development ./node_modules/.bin/webpack --config=webpack.dev.config.js \
-		&& ./manage.py cms --settings=$(EDX_PLATFORM_SETTINGS) compile_sass studio \
-		&& python -c \"import pavelib.assets; pavelib.assets.collect_assets(['studio'], '$(EDX_PLATFORM_SETTINGS)')\""
-	
+	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps lms bash -c "openedx-assets build --env=dev --system cms"
+watch-themes: ## Watch for changes in your themes and build development assets
+	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps lms openedx-assets watch-themes --env dev
 
 ##################### Information
 
@@ -184,7 +171,7 @@ build-notes: ## Build the Notes docker image
 	docker build -t regis/openedx-notes:latest -t regis/openedx-notes:hawthorn notes/
 build-xqueue: ## Build the Xqueue docker image
 	docker build -t regis/openedx-xqueue:latest -t regis/openedx-xqueue:hawthorn xqueue/
-build-android: ## Build the docker image for Android 
+build-android: ## Build the docker image for Android
 	docker build -t regis/openedx-android:latest android/
 
 ################### Pushing images to docker hub
@@ -220,9 +207,13 @@ cms: ## Open a bash shell in the CMS
 lms-python: ## Open a python shell in the LMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms ./manage.py lms shell
 lms-shell: lms-python
+lms-runserver: ## Run a local webserver, useful for debugging
+	$(DOCKER_COMPOSE_RUN_LMS) ./manage.py lms runserver 0.0.0.0:8000
 cms-python: ## Open a python shell in the CMS
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms ./manage.py cms shell
 cms-shell: cms-python
+cms-runserver: ## Run a local webserver, useful for debugging
+	$(DOCKER_COMPOSE_RUN_CMS) ./manage.py cms runserver 0.0.0.0:8001
 
 restart-openedx: ## Restart lms, cms, and workers
 	docker-compose restart lms lms_worker cms cms_worker
