@@ -59,18 +59,12 @@ COPY ./requirements/ /openedx/requirements
 RUN touch /openedx/requirements/private.txt \
     && pip install -r /openedx/requirements/private.txt
 
-# Link configuration files to common /openedx/config folder, which should later
-# be mounted as a volume. Note that this image will not be functional until
-# config files have been mounted inside the container
-RUN mkdir -p /openedx/env/tutor/lms /openedx/env/tutor/cms \
-    && ln -s /openedx/env/tutor/lms/ /openedx/edx-platform/lms/envs/tutor \
-    && ln -s /openedx/env/tutor/cms/ /openedx/edx-platform/cms/envs/tutor \
-    && ln -s /openedx/env/lms.env.json /openedx/ \
-    && ln -s /openedx/env/cms.env.json /openedx/ \
-    && ln -s /openedx/env/lms.auth.json /openedx/ \
-    && ln -s /openedx/env/cms.auth.json /openedx/
-COPY settings/lms/*.py /openedx/env/tutor/lms/
-COPY settings/cms/*.py /openedx/env/tutor/cms/
+# Create folder that will store *.env.json and *.auth.json files, as well as
+# the tutor-specific settings files.
+RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
+ENV CONFIG_ROOT /openedx/config
+COPY settings/lms/*.py ./lms/envs/tutor/
+COPY settings/cms/*.py ./cms/envs/tutor/
 
 # Copy scripts
 COPY ./bin /openedx/bin

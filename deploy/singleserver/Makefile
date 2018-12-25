@@ -59,9 +59,9 @@ env:
 databases: provision-databases migrate provision-oauth2 ## Bootstrap databases
 
 provision-databases: ## Create necessary databases and users
-	$(DOCKER_COMPOSE_RUN) lms /openedx/env/provision.sh
+	$(DOCKER_COMPOSE_RUN) -v $(PWD)/../env/openedx/scripts:/openedx/scripts lms /openedx/scripts/provision.sh
 provision-oauth2: ## Create users for SSO between services
-	$(DOCKER_COMPOSE_RUN) lms /openedx/env/oauth2.sh
+	$(DOCKER_COMPOSE_RUN) -v $(PWD)/../env/openedx/scripts:/openedx/scripts lms /openedx/scripts/oauth2.sh
 
 migrate: migrate-openedx migrate-forum ## Perform all database migrations
 	@if [ "$(ACTIVATE_XQUEUE)" = "1" ] ; then \
@@ -156,8 +156,8 @@ https-certificate-renew: ## Renew https certificates
 
 stats: ## Collect anonymous information about the platform
 	@if [ "$(DISABLE_STATS)" != "1" ] ; then \
-		docker run --rm -it --volume="$(PWD)/../env:/openedx/env" \
-			regis/openedx-configurator:hawthorn /openedx/env/openedx/stats 2> /dev/null || true ; \
+		docker run --rm -it --volume="$(PWD)/../env/openedx/scripts:/openedx/scripts" \
+			regis/openedx-configurator:hawthorn /openedx/scripts/stats 2> /dev/null || true ; \
 	fi
 
 import-demo-course: ## Import the demo course from edX
