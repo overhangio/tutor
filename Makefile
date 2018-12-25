@@ -7,12 +7,21 @@ USERID ?= $$(id -u)
 build: ## Build all docker images
 	cd build/ && make build
 
-configure:
+config.json:
 	@$(MAKE) -s -C build/ build-configurator 1> /dev/null
 	@docker run --rm -it \
 		--volume="$(PWD):/openedx/config/" \
 		-e USERID=$(USERID) -e SILENT=$(SILENT) \
 		regis/openedx-configurator:hawthorn
+
+substitute: config.json
+	@docker run --rm -it \
+		--volume="$(PWD)/config.json:/openedx/config/config.json" \
+		--volume="$(TEMPLATES):/openedx/templates" \
+		--volume="$(OUTPUT):/openedx/output" \
+		-e USERID=$(USERID) -e SILENT=$(SILENT) $(CONFIGURE_OPTS) \
+		regis/openedx-configurator:hawthorn \
+		configurator substitute /openedx/templates/ /openedx/output/
 
 singleserver: ## Configure and run a ready-to-go Open edX platform
 	cd deploy/ && make all
