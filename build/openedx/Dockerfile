@@ -62,15 +62,15 @@ RUN touch /openedx/requirements/private.txt \
 # Link configuration files to common /openedx/config folder, which should later
 # be mounted as a volume. Note that this image will not be functional until
 # config files have been mounted inside the container
-RUN mkdir -p /openedx/env/universal/lms /openedx/env/universal/cms \
-    && ln -s /openedx/env/universal/lms/ /openedx/edx-platform/lms/envs/universal \
-    && ln -s /openedx/env/universal/cms/ /openedx/edx-platform/cms/envs/universal \
+RUN mkdir -p /openedx/env/tutor/lms /openedx/env/tutor/cms \
+    && ln -s /openedx/env/tutor/lms/ /openedx/edx-platform/lms/envs/tutor \
+    && ln -s /openedx/env/tutor/cms/ /openedx/edx-platform/cms/envs/tutor \
     && ln -s /openedx/env/lms.env.json /openedx/ \
     && ln -s /openedx/env/cms.env.json /openedx/ \
     && ln -s /openedx/env/lms.auth.json /openedx/ \
     && ln -s /openedx/env/cms.auth.json /openedx/
-COPY settings/lms/*.py /openedx/env/universal/lms/
-COPY settings/cms/*.py /openedx/env/universal/cms/
+COPY settings/lms/*.py /openedx/env/tutor/lms/
+COPY settings/cms/*.py /openedx/env/tutor/cms/
 
 # Copy scripts
 COPY ./bin /openedx/bin
@@ -89,11 +89,11 @@ RUN openedx-assets xmodule \
     && openedx-assets common
 COPY ./themes/ /openedx/themes/
 RUN openedx-assets themes \
-    && openedx-assets collect --settings=universal.assets
+    && openedx-assets collect --settings=tutor.assets
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
-ENV SETTINGS universal.production
+ENV SETTINGS tutor.production
 
 # Entrypoint will fix permissions of all files and run commands as openedx
 ENTRYPOINT ["docker-entrypoint.sh"]

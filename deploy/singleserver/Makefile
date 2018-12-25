@@ -3,7 +3,7 @@
 
 PWD = $$(pwd)
 USERID ?= $$(id -u)
-EDX_PLATFORM_SETTINGS ?= universal.production
+EDX_PLATFORM_SETTINGS ?= tutor.production
 -include $(PWD)/Makefile.env
 
 DOCKER_COMPOSE_RUN = docker-compose run --rm
