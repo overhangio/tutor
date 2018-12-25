@@ -103,6 +103,7 @@ def main():
     parser_substitute.set_defaults(func=substitute)
 
     args = parser.parse_args()
+
     args.func(args)
 
 def load_config(path):
@@ -183,6 +184,7 @@ def interactive_configuration(config_path):
     # Save values
     with open(config_path, 'w') as f:
         json.dump(configurator.as_dict(), f, sort_keys=True, indent=4)
+    set_owner(config_path)
 
 
 def substitute(args):
@@ -206,14 +208,35 @@ def substitute_file(config, src, dst):
         sys.exit(1)
 
     dst_dir = os.path.dirname(dst)
-    if not os.path.exists(dst_dir):
-        os.makedirs(dst_dir)
+    ensure_path_exists(dst_dir)
     with codecs.open(dst, encoding='utf-8', mode='w') as fo:
         fo.write(substituted)
+    set_owner(dst)
 
     # Set same permissions as original file
     os.chmod(dst, os.stat(src).st_mode)
 
+def ensure_path_exists(directory):
+    """
+    Create the required subfolders one by one, if necessary, and assign them
+    the right uid/gid.
+    """
+    to_create = []
+    while not os.path.exists(directory):
+        to_create.append(directory)
+        directory = os.path.dirname(directory)
+    for d in to_create[::-1]:
+        os.mkdir(d)
+        set_owner(d)
+
+def set_owner(path):
+    """
+    If the USER_ID environment variable is defined, use it to set the
+    owner/group of the given file path.
+    """
+    user_id = int(os.environ.get('USERID', 0))
+    if user_id:
+        os.chown(path, user_id, user_id)
 
 def random_string(length):
     return "".join([random.choice(string.ascii_letters + string.digits) for _ in range(length)])
