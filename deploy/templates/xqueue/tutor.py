@@ -13,7 +13,7 @@ DATABASES = {
 
 LOGGING = get_logger_config(
     log_dir="/openedx/data/",
-    logging_env="universal",
+    logging_env="tutor",
     dev_env=True,
 )
 

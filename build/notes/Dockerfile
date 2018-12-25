@@ -10,8 +10,8 @@ WORKDIR /openedx/edx-notes-api
 
 RUN pip install -r requirements/base.txt
 
-ENV DJANGO_SETTINGS_MODULE notesserver.settings.universal
-RUN ln -s /openedx/config/universal.py notesserver/settings/universal.py
+ENV DJANGO_SETTINGS_MODULE notesserver.settings.tutor
+RUN ln -s /openedx/config/tutor.py notesserver/settings/tutor.py
 
 EXPOSE 8000
 CMD gunicorn --name notes --bind=0.0.0.0:8000 --max-requests=1000 notesserver.wsgi:application

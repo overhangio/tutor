@@ -7,7 +7,7 @@ In addition to running Open edX in production, you can use the docker containers
 
 To begin with, define development settings::
 
-    export EDX_PLATFORM_SETTINGS=universal.development
+    export EDX_PLATFORM_SETTINGS=tutor.development
 
 Run a local webserver
 ---------------------
@@ -40,12 +40,12 @@ All development commands will then automatically mount your local repo. For inst
 
 Note: containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the images with the right ``EDX_PLATFORM_VERSION`` argument. You may also want to change the ``EDX_PLATFORM_REPOSITORY`` argument to point to your own fork of edx-platform.
 
-With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the ``universal.development`` settings files to our own repo:
+With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the ``tutor.development`` settings files to our own repo:
 
-    cp -r config/openedx/universal/lms/ /path/to/edx-platform/lms/envs/universal
-    cp -r config/openedx/universal/cms/ /path/to/edx-platform/cms/envs/universal
+    cp -r config/openedx/tutor/lms/ /path/to/edx-platform/lms/envs/tutor
+    cp -r config/openedx/tutor/cms/ /path/to/edx-platform/cms/envs/tutor
 
-You can then run your platform with the ``universal.development`` settings.
+You can then run your platform with the ``tutor.development`` settings.
 
 Develop customised themes
 -------------------------
