@@ -10,9 +10,6 @@ RUN apt update && \
     gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng12-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev nodejs npm ntp pkg-config \
     # Our requirements
     mysql-client \
-    # Install symlink so that we have access to 'node' binary without virtualenv.
-    # This replaces the "nodeenv" install.
-    nodejs-legacy \
     && rm -rf /var/lib/apt/lists/*
 
 # Dockerize will be useful to wait for mysql DB availability
@@ -44,6 +41,10 @@ RUN pip install --src ../venv/src -r requirements/edx/development.txt
 # Install patched version of ora2
 RUN pip uninstall -y ora2 && \
     pip install --src ../venv/src git+https://github.com/regisb/edx-ora2.git@open-release/hawthorn.2#egg=ora2==2.1.17
+
+# Install a recent version of nodejs
+RUN nodeenv /openedx/nodeenv --node=8.9.3 --prebuilt
+ENV PATH /openedx/nodeenv/bin:${PATH}
 
 # Install nodejs requirements
 RUN npm set progress=false \
