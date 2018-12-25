@@ -3,17 +3,8 @@ PWD ?= $$(pwd)
 
 all: environment update android ## Configure and build a development Android app
 
-configure:
-	@$(MAKE) -C .. configure
-
-env: configure ## Generate the environment
-	@docker run --rm -it \
-		--volume="$(PWD)/../:/openedx/config/" \
-		--volume="$(PWD)/templates:/openedx/templates" \
-		--volume="$(PWD)/config:/openedx/output" \
-		-e USERID=$(USERID) \
-		regis/openedx-configurator:hawthorn \
-    	configurator substitute /openedx/templates/ /openedx/output/
+env: ## Generate the environment
+	@$(MAKE) -s -C .. substitute TEMPLATES=$(PWD)/templates OUTPUT=$(PWD)/config
 
 update: ## Download most recent Android image
 	docker pull regis/openedx-android:latest

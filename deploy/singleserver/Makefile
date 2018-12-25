@@ -47,17 +47,12 @@ update: ## Download most recent images
 ##################### Configuration
 
 configure:
-	@$(MAKE) -s -C .. configure
+	@$(MAKE) -s -C ../.. --always-make config.json
+	@$(MAKE) -s env
 
 env:
 	@$(MAKE) -s -C .. env
-	@docker run --rm -it \
-		--volume="$(PWD)/../../:/openedx/config/" \
-		--volume="$(PWD)/templates/:/openedx/templates" \
-		--volume="$(PWD):/openedx/output" \
-		-e USERID=$(USERID) \
-		regis/openedx-configurator:hawthorn \
-		configurator substitute /openedx/templates/ /openedx/output/
+	@$(MAKE) -s -C ../.. substitute TEMPLATES=$(PWD)/templates OUTPUT=$(PWD)
 
 ##################### Database
 
