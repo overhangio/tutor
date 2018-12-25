@@ -10,8 +10,5 @@ WORKDIR /openedx/xqueue
 
 RUN pip install -r requirements.txt
 
-ENV DJANGO_SETTINGS_MODULE xqueue.tutor
-RUN ln -s /openedx/config/tutor.py xqueue/tutor.py
-
 EXPOSE 8040
 CMD gunicorn --name xqueue --bind=0.0.0.0:8040 --max-requests=1000 xqueue.wsgi:application

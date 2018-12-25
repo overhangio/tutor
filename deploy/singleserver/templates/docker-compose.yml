@@ -80,7 +80,9 @@ services:
       SERVICE_VARIANT: lms
     restart: unless-stopped
     volumes:
-      - ../env/openedx:/openedx/env
+      - ../env/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../env/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../env/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
     depends_on:
       - elasticsearch
@@ -97,7 +99,9 @@ services:
       SERVICE_VARIANT: cms
     restart: unless-stopped
     volumes:
-      - ../env/openedx:/openedx/env
+      - ../env/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../env/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../env/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
     depends_on:
       - memcached
@@ -117,7 +121,9 @@ services:
     command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     volumes:
-      - ../env/openedx:/openedx/env
+      - ../env/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../env/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../env/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
     depends_on:
       - lms
@@ -130,7 +136,9 @@ services:
     command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     volumes:
-      - ../env/openedx:/openedx/env
+      - ../env/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../env/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../env/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
     depends_on:
       - cms
@@ -143,8 +151,10 @@ services:
       default:
         aliases:
           - notes.openedx
+    environment:
+      DJANGO_SETTINGS_MODULE: notesserver.settings.tutor
     volumes:
-      - ../env/notes:/openedx/env
+      - ../env/notes/tutor.py:/openedx/edx-notes-api/notesserver/settings/tutor.py
       - ../../data/notes:/openedx/data
     restart: unless-stopped
     depends_on:
@@ -156,8 +166,10 @@ services:
   xqueue:
     image: regis/openedx-xqueue:hawthorn
     volumes:
-      - ../env/xqueue:/openedx/env
+      - ../env/xqueue/tutor.py:/openedx/xqueue/xqueue/tutor.py
       - ../../data/xqueue:/openedx/data
+    environment:
+      DJANGO_SETTINGS_MODULE: xqueue.tutor
     restart: unless-stopped
     depends_on:
       - mysql
@@ -165,8 +177,10 @@ services:
   xqueue_consumer:
     image: regis/openedx-xqueue:hawthorn
     volumes:
-      - ../env/xqueue:/openedx/env
+      - ../env/xqueue/tutor.py:/openedx/xqueue/xqueue/tutor.py
       - ../../data/xqueue:/openedx/data
+    environment:
+      DJANGO_SETTINGS_MODULE: xqueue.tutor
     restart: unless-stopped
     # Run 12 workers per queue
     command: ./manage.py run_consumer 12
