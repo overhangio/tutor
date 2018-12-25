@@ -78,6 +78,10 @@ RUN mkdir -p /openedx/config/universal/lms /openedx/config/universal/cms \
 COPY settings/lms/*.py /openedx/config/universal/lms/
 COPY settings/cms/*.py /openedx/config/universal/cms/
 
+# Copy scripts
+COPY ./bin /openedx/bin
+ENV PATH /openedx/bin:${PATH}
+
 # Collect production assets. By default, only assets from the default theme
 # will be processed. This makes the docker image lighter and faster to build.
 # Only the custom themes added to /openedx/themes will be compiled.
@@ -85,7 +89,6 @@ COPY settings/cms/*.py /openedx/config/universal/cms/
 # and requires a complex settings file. Instead, we decompose the commands
 # and run each one individually to collect the production static assets to
 # /openedx/staticfiles.
-COPY ./bin/openedx-assets /usr/local/bin/
 RUN openedx-assets xmodule \
     && openedx-assets npm \
     && openedx-assets webpack --env=prod \
