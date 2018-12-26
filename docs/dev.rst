@@ -1,7 +1,7 @@
 .. _development:
 
-Open edX development
-====================
+Using Tutor for Open edX development
+====================================
 
 In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
@@ -38,14 +38,15 @@ All development commands will then automatically mount your local repo. For inst
 
     make lms-runserver
 
-Note: containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the images with the right ``EDX_PLATFORM_VERSION`` argument. You may also want to change the ``EDX_PLATFORM_REPOSITORY`` argument to point to your own fork of edx-platform.
-
-With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the ``tutor.development`` settings files to our own repo:
+With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the ``tutor.development`` settings files to our own repo::
 
     cp -r config/openedx/tutor/lms/ /path/to/edx-platform/lms/envs/tutor
     cp -r config/openedx/tutor/cms/ /path/to/edx-platform/cms/envs/tutor
 
 You can then run your platform with the ``tutor.development`` settings.
+
+**Note**: containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the images with the right ``EDX_PLATFORM_VERSION`` argument. You may also want to change the ``EDX_PLATFORM_REPOSITORY`` argument to point to your own fork of edx-platform.
+
 
 Develop customised themes
 -------------------------
@@ -54,7 +55,7 @@ Run a local webserver::
 
     make lms-runserver
 
-Watch the themes folders for changes::
+Watch the themes folders for changes (in a different terminal)::
 
     make watch-themes
 
@@ -68,3 +69,13 @@ Assets building and collecting is made more difficult by the fact that developme
     openedx-assets build
 
 This command will take quite some time to run. You can speed up this process by running only part of the full build. Run ``openedx-assets -h`` for more information.
+
+Running python commands
+-----------------------
+
+These commands will open a python shell in the lms or the cms::
+
+    make lms-python
+    make cms-python
+
+You can then import edx-platform and django modules and execute python code.

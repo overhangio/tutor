@@ -1,8 +1,3 @@
-.. Tutor documentation master file, created by
-   sphinx-quickstart on Mon Dec  3 21:36:51 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Tutor 🎓 Open edX 1-click install for everyone
 ==============================================
 
@@ -24,40 +19,21 @@ Tutor 🎓 Open edX 1-click install for everyone
     :alt: asciicast
     :target: https://asciinema.org/a/6DowVk4iJf3AJ2m8xlXDWJKh3
 
-----------------------------------
+Quickstart
+----------
 
-.. include:: quickstart.rst
-    :start-line: 1
+::
 
-For more advanced usage of Tutor, please refer to the following sections.
+    git clone https://github.com/regisb/openedx-docker
+    cd openedx-docker/
+    make singleserver
 
-.. toctree::
-   :maxdepth: 2
-   :caption: User guide
+Documentation
+-------------
 
-   quickstart
-   requirements
-   step
-   options
-   customise
-   dev
-   troubleshooting
-   missing
-   tutor
+Extensive documentation is available online: https://tutor.readthedocs.io/
 
-Disclaimers & Warnings
-----------------------
-
-This project is the follow-up of my work on an `install from scratch of Open edX <https://github.com/regisb/openedx-install>`_. It does not rely on any hack or complex deployment script. In particular, we do not use the Open edX `Ansible deployment playbooks <https://github.com/edx/configuration/>`_. That means that the folks at edX.org are *not* responsible for troubleshooting issues of this project. Please don't bother Ned ;-)
-
-In case of trouble, please follow the instructions in the :ref:`troubleshooting` section.
-
-Contributing
-------------
+How to contribute
+-----------------
 
 We go to great lengths to make it as easy as possible for people to run Open edX inside Docker containers. If you have an improvement idea, feel free to `open an issue on Github <https://github.com/regisb/openedx-docker/issues/new>`_ so that we can discuss it. `Pull requests <https://github.com/regisb/openedx-docker/pulls>`_ will be happily examined, too! However, we should be careful to keep the project lean and simple: both to use and to modify. Optional features should not make the user experience more complex. Instead, documentation on how to add the feature is preferred.
-
-License
--------
-
-This work is licensed under the terms of the `MIT License <https://github.com/regisb/openedx-docker/blob/master/LICENSE.txt>`_.

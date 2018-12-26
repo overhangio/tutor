@@ -1,3 +1,5 @@
+.. _options:
+
 Optional features
 =================
 

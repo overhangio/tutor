@@ -1,5 +1,9 @@
+.. _missing:
+
 Missing features
 ================
+
+Those features are currently not available in Tutor:
 
 - `discovery service <https://github.com/edx/course-discovery/>`_
 - `ecommerce <https://github.com/edx/ecommerce>`_

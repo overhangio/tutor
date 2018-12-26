@@ -7,7 +7,7 @@ USERID ?= $$(id -u)
 build: ## Build all docker images
 	cd build/ && make build
 
-config.json:
+config.json: upgrade-to-tutor
 	@$(MAKE) -s -C build/ build-configurator 1> /dev/null
 	@docker run --rm -it \
 		--volume="$(PWD):/openedx/config/" \
@@ -23,20 +23,23 @@ substitute: config.json
 		regis/openedx-configurator:hawthorn \
 		configurator substitute /openedx/templates/ /openedx/output/
 
-singleserver: ## Configure and run a ready-to-go Open edX platform
-	cd deploy/ && make all
+singleserver: upgrade-to-tutor ## Configure and run a ready-to-go Open edX platform
+	$(MAKE) -C deploy/singleserver all
 
-android: ## Configure and build a development Android app
+stop: ## Stop all single server services
+	$(MAKE) -C deploy/singleserver stop
+
+android: upgrade-to-tutor ## Configure and build a development Android app
 	cd android/ && make all
 
-travis:
+travis: upgrade-to-tutor
 	cd build && make build
 	cd deploy/singleserver \
 		&& make configure SILENT=1 CONFIGURE_OPTS="-e SETTING_ACTIVATE_NOTES=1 -e SETTING_ACTIVATE_XQUEUE=1" \
 		&& make databases \
 		&& make assets
 
-upgrade-to-tutor:
+upgrade-to-tutor: ## Upgrade from earlier versions of tutor
 	@(stat config/config.json > /dev/null 2>&1 && (\
 		echo "You are running an older version of Tutor. Now migrating to the latest version" \
 		&& echo "Moving config/config.json to ./config.json" && mv config/config.json config.json \

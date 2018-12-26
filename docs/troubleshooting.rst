@@ -3,6 +3,31 @@
 Troubleshooting
 ===============
 
+What should you do if you have a problem?
+
+1. Read the error logs that appear in the console. When running a single server platform as daemon, you can view the logs with the ``docker-compose logs`` command. (see :ref:`logging` below)
+2. Check if your problem already has a solution right here in the :ref:`troubleshooting` section.
+3. Search for your problem in the `open and closed Github issues <https://github.com/regisb/openedx-docker/issues?utf8=%E2%9C%93&q=is%3Aissue>`_.
+4. If, despite all your efforts, you can't solve the problem, decide if the issue is related to Open edX or if it's specific to Tutor. In the latter case, you are most welcome to open an `issue on Github <https://github.com/regisb/openedx-docker/issues/new>`_. **Please follow the instructions from the issue template!!!** Your issue will be examined in all cases, but you can make my life much easier by giving me as much background information as possible.
+
+.. _logging:
+
+Logging
+-------
+
+To view the logs from all containers use the `docker-compose logs <https://docs.docker.com/compose/reference/logs/>`_ command::
+
+    docker-compose logs -f
+
+To view the logs from just one container, for instance the web server::
+
+    docker-compose logs -f nginx
+
+The last commands produce the logs since the creation of the containers, which can be a lot. Similar to a ``tail -f``, you can run::
+
+    docker-compose logs --tail=0 -f
+
+
 "Cannot start service nginx: driver failed programming external connectivity"
 -----------------------------------------------------------------------------
 
