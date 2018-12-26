@@ -41,16 +41,6 @@ Xqueue
 
 `Xqueue <https://github.com/edx/xqueue>`_ is for grading problems with external services. If you don't know what it is, you probably don't need it.
 
-Docker container web UI with `Portainer <https://portainer.io/>`_
------------------------------------------------------------------
-
-Portainer is a web UI for managing docker containers. It lets you view your entire Open edX platform at a glace. Try it! It's really cool.
-
-.. image:: https://portainer.io/images/screenshots/portainer.gif
-    :alt: Portainer demo
-
-After launching your platfom, the web UI will be available at `http://portainer.localhost <http://portainer.localhost>`_ and http://portainer.YOUR_LMS_HOST. You will be asked to define a password for the admin user. Then, select a "Local environment" to work on and hit "Connect". You're done! Select the "local" group to view all running containers. Amon many other things, you'll be able to view the logs for each container, which is really useful.
-
 Android app (beta)
 ------------------
 

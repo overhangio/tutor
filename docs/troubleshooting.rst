@@ -27,6 +27,8 @@ The last commands produce the logs since the creation of the containers, which c
 
     docker-compose logs --tail=0 -f
 
+If you'd rather use a graphical user interface for viewing logs, you are encouraged to try out :ref:`Portainer <portainer>`.
+
 
 "Cannot start service nginx: driver failed programming external connectivity"
 -----------------------------------------------------------------------------

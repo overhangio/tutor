@@ -174,8 +174,6 @@ def interactive_configuration(config_path):
     ).add_bool(
         'ACTIVATE_NOTES', False, "Activate Student Notes service (https://open.edx.org/features/student-notes)?",
     ).add_bool(
-        'ACTIVATE_PORTAINER', False, "Activate Portainer, a convenient Docker dashboard with a web UI (https://portainer.io)?",
-    ).add_bool(
         'ACTIVATE_XQUEUE', False, "Activate Xqueue for external grader services? (https://github.com/edx/xqueue)",
     ).add(
         'ID', random_string(8)

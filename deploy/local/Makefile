@@ -168,6 +168,14 @@ import-demo-course: ## Import the demo course from edX
 create-staff-user: ## Create a user with admin rights
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
 
+portainer: ## Run Portainer (https://portainer.io), a UI for container supervision
+	docker run --rm -it \
+		--volume=/var/run/docker.sock:/var/run/docker.sock \
+		--volume=$(PWD)/../../data/portainer:/data \
+		-p 9000:9000 \
+		portainer/portainer:latest
+	@echo "View the Portainer UI at http://localhost:9000"
+
 ##################### Information
 
 # Obtained by running "echo '\033' in a shell
