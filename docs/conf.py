@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Tutor'
-copyright = '2018, Régis Behmo'
-author = 'Régis Behmo'
+copyright = u'2018, Régis Behmo'
+author = u'Régis Behmo'
 
 # The short X.Y version
 version = ''
@@ -129,7 +129,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'tutor.tex', 'Tutor Documentation',
-     'Régis Behmo', 'manual'),
+     u'Régis Behmo', 'manual'),
 ]
 
 
