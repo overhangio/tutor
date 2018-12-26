@@ -26,7 +26,7 @@ Quickstart
 
     git clone https://github.com/regisb/openedx-docker
     cd openedx-docker/
-    make singleserver
+    make local
 
 Documentation
 -------------

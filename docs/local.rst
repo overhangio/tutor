@@ -1,11 +1,15 @@
-Step-by-step install
-====================
+.. _local:
 
-The following commands should be run inside the ``deploy/singlerver`` folder::
+Local deployment
+================
 
-    cd deploy/singleserver
+This method is for deploying Open edX locally on a single server. Docker images are orchestrated with `docker-compose <https://docs.docker.com/compose/overview/>`_.
 
-You can use these individual commands instead of running the full installation with ``make all``.
+The following commands should be run inside the ``deploy/local`` folder::
+
+    cd deploy/local
+
+You can use these commands individually instead of running the full installation with ``make all``.
 
 Configure
 ---------

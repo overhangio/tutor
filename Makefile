@@ -23,18 +23,18 @@ substitute: config.json
 		regis/openedx-configurator:hawthorn \
 		configurator substitute /openedx/templates/ /openedx/output/
 
-singleserver: upgrade-to-tutor ## Configure and run a ready-to-go Open edX platform
-	$(MAKE) -C deploy/singleserver all
+local: upgrade-to-tutor ## Configure and run a ready-to-go Open edX platform
+	$(MAKE) -C deploy/local all
 
 stop: ## Stop all single server services
-	$(MAKE) -C deploy/singleserver stop
+	$(MAKE) -C deploy/local stop
 
 android: upgrade-to-tutor ## Configure and build a development Android app
 	cd android/ && make all
 
 travis: upgrade-to-tutor
 	cd build && make build
-	cd deploy/singleserver \
+	cd deploy/local \
 		&& make configure SILENT=1 CONFIGURE_OPTS="-e SETTING_ACTIVATE_NOTES=1 -e SETTING_ACTIVATE_XQUEUE=1" \
 		&& make databases \
 		&& make assets

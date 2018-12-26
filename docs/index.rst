@@ -37,7 +37,8 @@ For more advanced usage of Tutor, please refer to the following sections.
 
    quickstart
    requirements
-   step
+   local
+   k8s
    options
    customise
    dev
