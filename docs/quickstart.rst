@@ -5,8 +5,8 @@ Quickstart
 
 ::
 
-    git clone https://github.com/regisb/openedx-docker
-    cd openedx-docker/
+    git clone https://github.com/regisb/tutor
+    cd tutor/
     make local
 
 **That's it?**

@@ -7,8 +7,8 @@ What should you do if you have a problem?
 
 1. Read the error logs that appear in the console. When running a single server platform as daemon, you can view the logs with the ``docker-compose logs`` command. (see :ref:`logging` below)
 2. Check if your problem already has a solution right here in the :ref:`troubleshooting` section.
-3. Search for your problem in the `open and closed Github issues <https://github.com/regisb/openedx-docker/issues?utf8=%E2%9C%93&q=is%3Aissue>`_.
-4. If, despite all your efforts, you can't solve the problem, decide if the issue is related to Open edX or if it's specific to Tutor. In the latter case, you are most welcome to open an `issue on Github <https://github.com/regisb/openedx-docker/issues/new>`_. **Please follow the instructions from the issue template!!!** Your issue will be examined in all cases, but you can make my life much easier by giving me as much background information as possible.
+3. Search for your problem in the `open and closed Github issues <https://github.com/regisb/tutor/issues?utf8=%E2%9C%93&q=is%3Aissue>`_.
+4. If, despite all your efforts, you can't solve the problem, decide if the issue is related to Open edX or if it's specific to Tutor. In the latter case, you are most welcome to open an `issue on Github <https://github.com/regisb/tutor/issues/new>`_. **Please follow the instructions from the issue template!!!** Your issue will be examined in all cases, but you can make my life much easier by giving me as much background information as possible.
 
 .. _logging:
 
@@ -42,7 +42,7 @@ The containerized Nginx needs to listen to ports 80 and 443 on the host. If ther
 
 However, you might now want to do that if you need a webserver for running non-Open edX related applications. In such cases...
 
-2. Run the nginx container on different ports: you can create a ``.env`` file in the ``openedx-docker`` directory in which you indicate different ports. For instance::
+2. Run the nginx container on different ports: you can create a ``.env`` file in the ``tutor`` directory in which you indicate different ports. For instance::
 
        cat .env
        NGINX_HTTP_PORT=81
@@ -50,7 +50,7 @@ However, you might now want to do that if you need a webserver for running non-O
 
 In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443.
 
-You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See `this <https://github.com/regisb/openedx-docker/issues/69#issuecomment-425916825>`_ for http, and `this <https://github.com/regisb/openedx-docker/issues/90#issuecomment-437687294>`_ for https.
+You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See `this <https://github.com/regisb/tutor/issues/69#issuecomment-425916825>`_ for http, and `this <https://github.com/regisb/tutor/issues/90#issuecomment-437687294>`_ for https.
 
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------
