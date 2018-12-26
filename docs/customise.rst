@@ -79,7 +79,7 @@ Note that your release must be a fork of Hawthorn in order to work. Otherwise, y
 Running a different ``openedx`` Docker image
 --------------------------------------------
 
-By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry. Then add the following content to the ``deploy/singleserver/.env`` file::
+By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry. Then add the following content to the ``deploy/local/.env`` file::
 
     OPENEDX_DOCKER_IMAGE=myusername/myimage:mytag
 
