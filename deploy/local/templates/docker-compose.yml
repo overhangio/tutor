@@ -187,15 +187,3 @@ services:
     depends_on:
       - mysql
   {% endif %}
-
-  {% if ACTIVATE_PORTAINER %}
-  ############# Portainer: container supervision with a web UI
-  portainer:
-    image: portainer/portainer:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ../../data/portainer:/data
-    restart: unless-stopped
-    depends_on:
-      - nginx
-  {% endif %}

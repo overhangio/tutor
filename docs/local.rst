@@ -96,6 +96,22 @@ The course search index can be updated with::
 
 Run this command periodically to ensure that course search results are always up-to-date.
 
+.. _portainer:
+
+Docker container web UI with `Portainer <https://portainer.io/>`_
+-----------------------------------------------------------------
+
+Portainer is a web UI for managing docker containers. It lets you view your entire Open edX platform at a glace. Try it! It's really cool::
+
+    make portainer
+
+.. .. image:: https://portainer.io/images/screenshots/portainer.gif
+    ..:alt: Portainer demo
+
+After launching your platfom, the web UI will be available at `http://localhost:9000 <http://localhost:9000>`_. You will be asked to define a password for the admin user. Then, select a "Local environment" to work on and hit "Connect" and select the "local" group to view all running containers.
+
+Among many other things, you'll be able to view the logs for each container, which is really useful.
+
 Additional commands
 -------------------
 
