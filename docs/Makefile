@@ -1,5 +1,4 @@
-# Minimal makefile for Sphinx documentation
-#
+.DEFAULT_GOAL := html
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -10,6 +9,12 @@ BUILDDIR      = _build
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+browse:
+	sensible-browser _build/html/index.html
+
+watch:
+	while true; do inotifywait -e modify *.rst; $(MAKE) html; done
 
 .PHONY: help Makefile
 

@@ -1,7 +1,13 @@
+.. _customise:
+
 Customising the ``openedx`` docker image
 ========================================
 
-The LMS and the CMS all run from the ``openedx`` docker image. The base image is downloaded from `Docker Hub <https://hub.docker.com/r/regis/openedx/>`_ when we run ``make update`` (or ``make all``). But you can also customise and build the image yourself. The base image is built with::
+The LMS and the CMS all run from the ``openedx`` docker image. The base image is downloaded from `Docker Hub <https://hub.docker.com/r/regis/openedx/>`_ when we run ``make update`` (or ``make all``). But you can also customise and build the image yourself. All image-building commands must be run inside the ``build`` folder::
+
+    cd build
+
+Build the base image with::
 
     make build-openedx
 
@@ -12,7 +18,11 @@ The following sections describe how to modify various aspects of the docker imag
 Custom themes
 -------------
 
-Comprehensive theming is enabled by default. Put your themes in ``openedx/themes/``::
+Comprehensive theming is enabled by default, but only the default theme is compiled. To compile your own theme, add it to the ``build/openedx/themes/`` folder::
+
+    git clone https://github.com/me/myopenedxtheme.git build/openedx/themes/
+
+The ``themes`` folder should have the following structure::
 
     openedx/themes/
         mycustomtheme1/
@@ -36,7 +46,7 @@ Finally, follow the `Open edX documentation to enable your themes <https://edx.r
 Extra xblocks and requirements
 ------------------------------
 
-Additional requirements can be added to the ``openedx/requirements/private.txt`` file. For instance::
+Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``openedx/requirements/private.txt`` file. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_::
 
     echo "git+https://github.com/open-craft/xblock-poll.git" >> openedx/requirements/private.txt
 
@@ -57,28 +67,22 @@ Forked version of edx-platform
 
 You may want to run your own flavor of edx-platform instead of the `official version <https://github.com/edx/edx-platform/>`_. To do so, you will have to re-build the openedx image with the proper environment variables pointing to your repository and version::
 
-    EDX_PLATFORM_REPOSITORY=https://mygitrepo/edx-platform.git EDX_PLATFORM_VERSION=my-tag-or-branch make build-openedx
+    export EDX_PLATFORM_REPOSITORY=https://mygitrepo/edx-platform.git EDX_PLATFORM_VERSION=my-tag-or-branch
+    make build-openedx
 
 You can then restart the services which will now be running your forked version of edx-platform::
 
     make restart-openedx
 
-Note that your release must be a fork of Hawthorn in order to work. Otherwise, you may have important compatibility issues with other services.
+Note that your release must be a fork of Hawthorn in order to work. Otherwise, you may have important compatibility issues with other services. In particular, **don't try to run Tutor with older versions of Open edX**.
 
-Running a different Docker image instead of `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_
-------------------------------------------------------------------------------------------------------
+Running a different ``openedx`` Docker image
+--------------------------------------------
 
-This is for people who have an account on `hub.docker.com <https://hub.docker.com>`_ or a private image registry. You can build your image and push it to your repo. Then add the following content to the ``.env`` file::
+By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry. Then add the following content to the ``deploy/singleserver/.env`` file::
 
     OPENEDX_DOCKER_IMAGE=myusername/myimage:mytag
 
 Your own image will be used next time you run ``make run``.
 
-Note that the ``make build`` and ``make push`` command will no longer work as you expect and that you are responsible for building and pushing the image yourself.
-
-Maintainers
------------
-
-The images are built, tagged and uploaded to Docker Hub in one command::
-
-    make dockerhub
+Note that the ``make build`` and ``make push`` commands (from the ``build/`` folder) will no longer work as you expect and that you are responsible for building and pushing the image yourself.
