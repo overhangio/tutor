@@ -6,8 +6,8 @@ Quickstart
 ::
 
     git clone https://github.com/regisb/tutor
-    cd tutor/
-    make local
+    cd tutor/local
+    make all
 
 **That's it?**
 
