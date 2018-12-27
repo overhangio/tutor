@@ -103,7 +103,6 @@ def main():
     parser_substitute.set_defaults(func=substitute)
 
     args = parser.parse_args()
-
     args.func(args)
 
 def load_config(path):

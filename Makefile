@@ -7,12 +7,13 @@ USERID ?= $$(id -u)
 build: ## Build all docker images
 	cd build/ && make build
 
-config.json: upgrade-to-tutor
+config.json:
 	@$(MAKE) -s -C build/ build-configurator 1> /dev/null
 	@docker run --rm -it \
 		--volume="$(PWD):/openedx/config/" \
 		-e USERID=$(USERID) -e SILENT=$(SILENT) \
-		regis/openedx-configurator:hawthorn
+		regis/openedx-configurator:hawthorn \
+		configurator interactive
 
 substitute: config.json
 	@docker run --rm -it \
