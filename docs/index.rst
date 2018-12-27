@@ -20,9 +20,9 @@ Tutor 🎓 Open edX 1-click install for everyone
 
 **Tutor** is a one-click install of `Open edX <https://openedx.org>`_, both for production and local development, inside docker containers. Tutor is easy to run, fast, full of cool features, and it is already used by dozens of Open edX platforms in the world.
 
-.. image:: https://asciinema.org/a/6DowVk4iJf3AJ2m8xlXDWJKh3.png
+.. image:: https://asciinema.org/a/octNfEnvIA6jNohCBmODBKizE.png
     :alt: asciicast
-    :target: https://asciinema.org/a/6DowVk4iJf3AJ2m8xlXDWJKh3
+    :target: https://asciinema.org/a/octNfEnvIA6jNohCBmODBKizE
 
 ----------------------------------
 
