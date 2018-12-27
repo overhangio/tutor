@@ -25,7 +25,7 @@ Quickstart
 ::
 
     git clone https://github.com/regisb/tutor
-    cd tutor/local
+    cd tutor/deploy/local
     make all
 
 Documentation
