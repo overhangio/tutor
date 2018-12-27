@@ -146,7 +146,7 @@ certbot_image = certbot/certbot:latest
 
 https-certificate: ## Generate https certificates
 	@if [ "$(ACTIVATE_HTTPS)" = "1" ] ; then \
-		$(https_command) --entrypoint "/openedx/letsencrypt/env/certonly.sh" $(certbot_image)
+		$(https_command) --entrypoint "/openedx/letsencrypt/env/certonly.sh" $(certbot_image); \
 	fi
 
 https-certificate-renew: ## Renew https certificates
