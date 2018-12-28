@@ -31,7 +31,7 @@ Quickstart
 Documentation
 -------------
 
-Extensive documentation is available online: https://docs.tutor.overhang.io/
+Extensive documentation is available online: http://docs.tutor.overhang.io/
 
 How to contribute
 -----------------
