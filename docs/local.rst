@@ -11,8 +11,8 @@ The following commands should be run inside the ``deploy/local`` folder::
 
 You can use these commands individually instead of running the full installation with ``make all``.
 
-Configure
----------
+Configuration
+-------------
 
 ::
 
@@ -22,8 +22,8 @@ This is the only non-automatic step in the install process. You will be asked va
 
 If you want to run a fully automated install, upload the ``config.json`` file to wherever you want to run Open edX, and then run ``make configure SILENT=1`` instead of ``make configure``. All values from ``config.json`` will be automatically loaded.
 
-Download docker images
-----------------------
+Downloading docker images
+-------------------------
 
 ::
 
@@ -31,8 +31,8 @@ Download docker images
 
 You will need to download the docker images from `Docker Hub <https://hub.docker.com/r/regis/openedx/>`_. Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
 
-Database creation, migrations and collection of static assets
--------------------------------------------------------------
+Database management
+-------------------
 
 ::
 
