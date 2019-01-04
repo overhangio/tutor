@@ -182,8 +182,7 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: xqueue.tutor
     restart: unless-stopped
-    # Run 12 workers per queue
-    command: ./manage.py run_consumer 12
+    command: ./manage.py run_consumer
     depends_on:
       - mysql
   {% endif %}

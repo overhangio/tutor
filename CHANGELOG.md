@@ -1,5 +1,6 @@
 # Changelog
 
+- 2019-01-04 [Bugfix] Fix xqueue consumer command
 - 2018-12-26 [Improvement] Upgrade nodejs to 5.5.1
 - 2018-12-07 [Improvement] Bundle theme and production static assets in the openedx docker image
 - 2018-12-02 [Feature] Download extra locales from [openedx-i18n](https://github.com/regisb/openedx-i18n/) to the Open edX Docker image
