@@ -1,20 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lms
+  name: cms
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: lms
+      app: cms
   template:
     metadata:
       labels:
-        app: lms
+        app: cms
     spec:
       containers:
-        - name: lms
+        - name: cms
           image: regis/openedx:hawthorn
+          env:
+          - name: SERVICE_VARIANT
+            value: cms
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -28,7 +31,7 @@ spec:
               name: scripts
             - mountPath: /openedx/data
               name: data
-          imagePullPolicy: Always
+          #imagePullPolicy: Always
       volumes:
         - name: settings-lms
           configMap:
@@ -44,4 +47,4 @@ spec:
             name: openedx-scripts
         - name: data
           persistentVolumeClaim:
-            claimName: lms-data
+            claimName: cms-data

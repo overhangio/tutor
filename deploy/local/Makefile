@@ -165,7 +165,7 @@ import-demo-course: ## Import the demo course from edX
 		git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course \
 		&& python ./manage.py cms import ../data ../edx-demo-course"
 
-create-staff-user: ## Create a user with admin rights
+create-staff-user: ## Create a user with admin rights: make create-staff-user USERNAME=... EMAIL=...
 	$(DOCKER_COMPOSE_RUN_OPENEDX) lms /bin/bash -c "./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} && ./manage.py lms changepassword ${USERNAME}"
 
 portainer: ## Run Portainer (https://portainer.io), a UI for container supervision

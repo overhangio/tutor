@@ -1,10 +1,13 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingress
+  name: web
 spec:
   rules:
-  - host: overhang.io
+  {% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}
+  {% if ACTIVATE_NOTES %}{% set hosts = hosts + ["notes." + LMS_HOST] %}{% endif %}
+  {% for host in hosts %}
+  - host: {{ host }}
     http:
       paths:
       - backend:
@@ -13,3 +16,4 @@ spec:
       - backend:
           serviceName: nginx
           servicePort: 443
+  {% endfor %}

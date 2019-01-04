@@ -12,12 +12,29 @@ spec:
       labels:
         app: nginx
     spec:
+      initContainers:
+        - name: clean-openedx-staticfiles
+          image: regis/openedx:hawthorn
+          command: ['rm', '-rf', '/var/www/openedx/staticfiles']
+          volumeMounts:
+            - mountPath: /var/www/openedx/
+              name: openedx-staticfiles
+          imagePullPolicy: Always
+        - name: init-openedx-staticfiles
+          image: regis/openedx:hawthorn
+          command: ['cp', '-r', '/openedx/staticfiles', '/var/www/openedx/']
+          volumeMounts:
+            - mountPath: /var/www/openedx/
+              name: openedx-staticfiles
+          imagePullPolicy: Always
       containers:
         - name: nginx
-          image: nginx:latest
+          image: nginx:1.13
           volumeMounts:
             - mountPath: /etc/nginx/conf.d/
               name: config
+            - mountPath: /var/www/openedx/
+              name: openedx-staticfiles
             - mountPath: /openedx/data/lms
               name: data
           ports:
@@ -29,6 +46,9 @@ spec:
         - name: config
           configMap:
             name: nginx-config
+        - name: openedx-staticfiles
+          persistentVolumeClaim:
+            claimName: openedx-staticfiles
         - name: data
           persistentVolumeClaim:
             claimName: lms-data

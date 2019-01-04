@@ -2,4 +2,4 @@
 !.gitignore
 /config.json
 /data*/
-/TODO
+TODO
