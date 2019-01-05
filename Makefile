@@ -47,6 +47,7 @@ upgrade-to-tutor: ## Upgrade from earlier versions of tutor
 		&& echo "Moving config/config.json to ./config.json" && mv config/config.json config.json \
 		&& echo "Moving config/ to deploy/env/" && mv config/ deploy/env/ \
 		&& ((ls openedx/themes/* > /dev/null 2>&1 && echo "Moving openedx/themes/* to build/openedx/themes/" && mv openedx/themes/* build/openedx/themes/) || true) \
+		&& (mv .env deploy/local/ > /dev/null 2>&1 || true)\
 		&& echo "Done migrating to tutor. This command will not be run again."\
 	)) || true
 
