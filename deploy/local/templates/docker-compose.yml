@@ -47,6 +47,10 @@ services:
       - ../env/nginx:/etc/nginx/conf.d/
       - ../../data/openedx:/var/www/openedx:ro
       - ../../data/letsencrypt:/etc/letsencrypt/:ro
+    depends_on:
+      - lms
+      - cms
+      {% if ACTIVATE_NOTES %}- notes{% endif %}
 
   rabbitmq:
     image: rabbitmq:3.6.10
