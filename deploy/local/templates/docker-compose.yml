@@ -67,10 +67,6 @@ services:
 
   forum:
     image: regis/openedx-forum:hawthorn
-    environment:
-      API_KEY: "forumapikey"
-      SEARCH_SERVER: "http://elasticsearch:9200"
-      MONGOHQ_URL: "mongodb://mongodb/cs_comments_service"
     restart: unless-stopped
     depends_on:
       - elasticsearch

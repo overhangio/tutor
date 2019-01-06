@@ -29,5 +29,8 @@ RUN bundle install --deployment
 
 ENV RACK_ENV staging
 ENV NEW_RELIC_ENABLE false
+ENV API_KEY forumapikey
+ENV SEARCH_SERVER "http://elasticsearch:9200"
+ENV MONGOHQ_URL "mongodb://mongodb/cs_comments_service"
 EXPOSE 4567
 CMD ./bin/unicorn -c config/unicorn_tcp.rb -I '.'
