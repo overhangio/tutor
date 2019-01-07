@@ -23,7 +23,7 @@ In the following, we assume you have a working Kubernetes platform. For a start,
 
 Start Minikube::
 
-    minikube start
+    make minikube-start
 
 When minikube starts, it spawns a virtual machine (VM) which you can configure in your VM manager: on most platforms, this is Virtualbox. You should configure your VM to have at least 4Gb RAM; otherwise, database migrations will crash halfway, and that's a nasty issue...
 

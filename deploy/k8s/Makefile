@@ -6,11 +6,11 @@ podexec = kubectl exec -n openedx -it $$($(call podname,$(1))) -- $(2)
 
 all: configure deploy databases ## Provision a full platform from scratch
 
-configure:
+configure: ## Interactive configuration
 	@$(MAKE) -s -C ../.. --always-make config.json
 	@$(MAKE) -s env
 
-env:
+env: ## Generate the environment from templates and configuration values
 	@$(MAKE) -s -C .. env
 	@$(MAKE) -s -C ../.. substitute TEMPLATES=$(PWD)/templates OUTPUT=$(PWD)/env
 
@@ -96,8 +96,14 @@ create-staff-user: ## Create a user with admin rights: make create-staff-user US
 
 ##################### Various minikube command
 
-minikube-open:
-	minikube service nginx --namespace=openedx
+minikube-start: ## Start minikube
+	minikube start
+minikube-stop: ## Stop minikube
+	minikube stop
+minikube-dashboard: ## Open the minikube dashboard
+	minikube dashboard
+minikube-ingress: ## Enable the ingress addon
+	minikube addons enable ingress
 
 ##################### Various k8s commands
 
@@ -114,6 +120,6 @@ k8s-admin-token: ## Print the admin token required to log in the dashboard
 
 ESCAPE = 
 help: ## Print this help
-	@grep -E '^([a-zA-Z_-]+:.*?## .*|######* .+)$$' Makefile \
+	@grep -E '^([a-zA-Z0-9_-]+:.*?## .*|######* .+)$$' Makefile \
 		| sed 's/######* \(.*\)/\n               $(ESCAPE)[1;31m\1$(ESCAPE)[0m/g' \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%-30s\033[0m %s\n", $$1, $$2}'

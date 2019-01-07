@@ -7,7 +7,7 @@ USERID ?= $$(id -u)
 build: ## Build all docker images
 	cd build/ && make build
 
-config.json:
+config.json: ## Generate config.json configuration file interactively
 	@$(MAKE) -s upgrade-to-tutor
 	@$(MAKE) -s -C build/ build-configurator 1> /dev/null
 	@docker run --rm -it \

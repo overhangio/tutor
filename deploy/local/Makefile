@@ -46,11 +46,11 @@ update: ## Download most recent images
 
 ##################### Configuration
 
-configure:
+configure: ## Interactive configuration
 	@$(MAKE) -s -C ../.. --always-make config.json
 	@$(MAKE) -s env
 
-env:
+env: ## Generate the environment from templates and configuration values
 	@$(MAKE) -s -C .. env
 	@$(MAKE) -s -C ../.. substitute TEMPLATES=$(PWD)/templates OUTPUT=$(PWD)
 

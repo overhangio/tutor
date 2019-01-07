@@ -1,5 +1,5 @@
 .PHONY: env
 PWD = $$(pwd)
 
-env: ## Create the platform environment
+env: ## Generate the environment from templates and configuration values
 	@$(MAKE) -s -C .. substitute TEMPLATES=$(PWD)/templates OUTPUT=$(PWD)/env
