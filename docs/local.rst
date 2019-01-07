@@ -118,3 +118,13 @@ Additional commands
 All available commands can be listed by running::
 
     make help
+
+How to upgrade from `openedx-docker`
+------------------------------------
+
+Before this project was renamed to Tutor, it was called "openedx-docker", and many additional changes were introduced at the same time. If you checked out openedx-docker before the rename, you can upgrade by running the following commands::
+
+    make stop               # Stop all services
+    git pull                # Upgrade to the latest version of Tutor
+    make upgrade-to-tutor   # Move some configuration files
+    make local              # Re-configure and restart the platform
