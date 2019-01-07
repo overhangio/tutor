@@ -89,7 +89,7 @@ import-demo-course: ## Import the demo course from edX
 		git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course \
 		&& python ./manage.py cms import ../data ../edx-demo-course")
 
-create-staff-user: ## Create a user with admin rights: make create-staff-user USERNAME=... EMAIL=...
+staff-user: ## Create a user with admin rights: make staff-user USERNAME=... EMAIL=...
 	$(call podexec,lms,/bin/bash -c "\
 		./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} \
 		&& ./manage.py lms changepassword ${USERNAME}")

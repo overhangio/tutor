@@ -76,7 +76,7 @@ Creating a new user with staff and admin rights
 
 You will most certainly need to create a user to administer the platform. Just run::
 
-    make create-staff-user USERNAME=yourusername EMAIL=user@email.com
+    make staff-user USERNAME=yourusername EMAIL=user@email.com
 
 You will asked to set the user password interactively.
 
