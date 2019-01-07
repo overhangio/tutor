@@ -85,7 +85,7 @@ Importing the demo course
 
 On a fresh install, your platform will not have a single course. To import the `Open edX demo course <https://github.com/edx/edx-demo-course>`_, run::
 
-    make import-demo-course
+    make demo-course
 
 Updating the course search index
 --------------------------------

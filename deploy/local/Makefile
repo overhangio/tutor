@@ -160,7 +160,7 @@ stats: ## Collect anonymous information about the platform
 			regis/openedx-configurator:hawthorn /openedx/scripts/stats 2> /dev/null || true ; \
 	fi
 
-import-demo-course: ## Import the demo course from edX
+demo-course: ## Import the demo course from edX
 	$(DOCKER_COMPOSE_RUN_OPENEDX) cms /bin/bash -c " \
 		git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course \
 		&& python ./manage.py cms import ../data ../edx-demo-course"

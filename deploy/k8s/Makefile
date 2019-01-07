@@ -84,7 +84,7 @@ pod-exec: ## Execute a command inside an arbitrary pod: make pod-exec APP=appnam
 	$(call podexec,$(APP),$(COMMAND))
 
 # TODO replace these tasks with Job objects
-import-demo-course: ## Import the demo course from edX
+demo-course: ## Import the demo course from edX
 	$(call podexec,cms,/bin/bash -c "\
 		git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course \
 		&& python ./manage.py cms import ../data ../edx-demo-course")
