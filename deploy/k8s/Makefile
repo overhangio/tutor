@@ -4,7 +4,7 @@
 podname = kubectl get pods -n openedx --selector=app=$(1) -o name | head -1 | cut -d '/' -f 2
 podexec = kubectl exec -n openedx -it $$($(call podname,$(1))) -- $(2)
 
-all: configure deploy
+all: configure deploy databases ## Provision a full platform from scratch
 
 configure:
 	@$(MAKE) -s -C ../.. --always-make config.json
