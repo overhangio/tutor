@@ -136,7 +136,7 @@ restart-openedx: ## Restart lms, cms, and workers
 
 https_command = docker run --rm -it \
 		--volume="$(PWD)/../env/letsencrypt/:/openedx/letsencrypt/env/" \
-		--volume="$(PWD)/data/letsencrypt/:/etc/letsencrypt/" \
+		--volume="$(PWD)/../../data/letsencrypt/:/etc/letsencrypt/" \
 		-p "80:80"
 certbot_image = certbot/certbot:latest
 
