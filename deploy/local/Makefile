@@ -130,7 +130,7 @@ cms-runserver: ## Run a local webserver, useful for debugging
 	$(DOCKER_COMPOSE_RUN_CMS) ./manage.py cms runserver 0.0.0.0:8001
 
 restart-openedx: ## Restart lms, cms, and workers
-	docker-compose restart lms lms_worker cms cms_worker
+	docker-compose restart openedx-assets lms lms_worker cms cms_worker
 
 ##################### SSL/TLS (HTTPS certificates)
 
