@@ -84,15 +84,18 @@ pod-exec: ## Execute a command inside an arbitrary pod: make pod-exec APP=appnam
 	$(call podexec,$(APP),$(COMMAND))
 
 # TODO replace these tasks with Job objects
+# Note that here, settings must be defined manually because "exec" does not use
+# the docker entrypoint, and thus does not define the DJANGO_SETTINGS_MODULE
+# environment variable.
 demo-course: ## Import the demo course from edX
 	$(call podexec,cms,/bin/bash -c "\
 		git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course \
-		&& python ./manage.py cms import ../data ../edx-demo-course")
+		&& python ./manage.py cms --settings=tutor.production import ../data ../edx-demo-course")
 
 staff-user: ## Create a user with admin rights: make staff-user USERNAME=... EMAIL=...
 	$(call podexec,lms,/bin/bash -c "\
 		./manage.py lms manage_user --superuser --staff ${USERNAME} ${EMAIL} \
-		&& ./manage.py lms changepassword ${USERNAME}")
+		&& ./manage.py lms --settings=tutor.production changepassword ${USERNAME}")
 
 ##################### Various minikube command
 
