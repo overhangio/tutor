@@ -23,7 +23,6 @@ all: env ## Configure and run a full-featured platform
 	@$(MAKE) https-certificate
 	@$(MAKE) update
 	@$(MAKE) databases
-	@$(MAKE) assets
 	@$(MAKE) daemonize
 	@echo "All set \o/ You can access the LMS at http://localhost and the CMS at http://studio.localhost"
 
@@ -92,11 +91,8 @@ reindex-courses: ## Refresh course index so they can be found in the LMS search 
 # settings. Thus, each step must be performed separately. This should be fixed
 # in the next edx-platform release thanks to https://github.com/edx/edx-platform/pull/18430/
 
-assets: ## Generate production-ready static assets
-	docker-compose -f scripts.yml run --rm \
-		--volume=$(PWD)/../../data/openedx:/tmp/openedx/ openedx bash -c \
-		"rm -rf /tmp/openedx/staticfiles \
-		&& cp -r /openedx/staticfiles /tmp/openedx"
+assets: ## Copy production-ready static assets. Note that you should not have to run this command yourself: all assets should be sent to nginx on boot.
+	docker-compose run --rm openedx-assets
 assets-development: ## Generate static assets for local development
 	$(DOCKER_COMPOSE_RUN_OPENEDX) --no-deps lms bash -c "openedx-assets build --env=dev"
 assets-development-lms:

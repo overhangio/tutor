@@ -38,8 +38,7 @@ travis:
 	cd build && make build
 	cd deploy/local \
 		&& make configure SILENT=1 CONFIGURE_OPTS="-e SETTING_ACTIVATE_NOTES=1 -e SETTING_ACTIVATE_XQUEUE=1" \
-		&& make databases \
-		&& make assets
+		&& make databases
 
 upgrade-to-tutor: ## Upgrade from earlier versions of tutor
 	@(stat config/config.json > /dev/null 2>&1 && (\

@@ -37,10 +37,6 @@ Then you must rebuild the openedx Docker image::
 
     make build-openedx
 
-Make sure the assets can be served by the web server::
-
-    make assets
-
 Finally, follow the `Open edX documentation to enable your themes <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site>`_.
 
 Extra xblocks and requirements

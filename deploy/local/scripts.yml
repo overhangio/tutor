@@ -1,6 +1,0 @@
-version: "3"
-services:
-
-  # Useful for running one-off scripts
-  openedx:
-    image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}

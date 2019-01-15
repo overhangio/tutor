@@ -43,15 +43,6 @@ This command should be run just once. It will create the required databases tabl
 
 If migrations are stopped with a ``Killed`` message, this certainly means the docker containers don't have enough RAM. See the :ref:`troubleshooting` section.
 
-Collecting static assets
-------------------------
-
-::
-
-    make assets
-
-This command also needs to be run just once. It will make sure that static assets, such as images, stylesheets and Javascript dependencies, can be served by the nginx container.
-
 Running Open edX
 ----------------
 

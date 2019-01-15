@@ -37,6 +37,12 @@ services:
     volumes:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
 
+  openedx-assets:
+    image: ${OPENEDX_DOCKER_IMAGE:-regis/openedx:hawthorn}
+    volumes:
+      - ../../data/openedx:/var/www/openedx
+    command: bash -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
+
   nginx:
     image: nginx:1.13
     restart: unless-stopped
