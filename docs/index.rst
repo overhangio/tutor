@@ -61,4 +61,4 @@ We go to great lengths to make it as easy as possible for people to run Open edX
 License
 -------
 
-This work is licensed under the terms of the `MIT License <https://github.com/regisb/tutor/blob/master/LICENSE.txt>`_.
+This work is licensed under the terms of the `GNU Affero General Public License (AGPL) <https://github.com/regisb/tutor/blob/master/LICENSE.txt>`_.
