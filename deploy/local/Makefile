@@ -174,21 +174,12 @@ portainer: ## Run Portainer (https://portainer.io), a UI for container supervisi
 
 ##################### Information
 
+info:
+	$(MAKE) -s -C ../.. info
+
 # Obtained by running "echo '\033' in a shell
 ESCAPE = 
 help: ## Print this help
 	@grep -E '^([a-zA-Z_-]+:.*?## .*|######* .+)$$' Makefile \
 		| sed 's/######* \(.*\)/\n               $(ESCAPE)[1;31m\1$(ESCAPE)[0m/g' \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%-30s\033[0m %s\n", $$1, $$2}'
-
-info: ## Print some information about the current install, for debugging
-	uname -a
-	@echo "-------------------------"
-	git rev-parse HEAD
-	@echo "-------------------------"
-	docker version
-	@echo "-------------------------"
-	docker-compose --version
-	@echo "-------------------------"
-	echo $$EDX_PLATFORM_PATH
-	echo $$EDX_PLATFORM_SETTINGS

@@ -50,6 +50,18 @@ upgrade-to-tutor: ## Upgrade from earlier versions of tutor
 		&& echo "Done migrating to tutor. This command will not be run again."\
 	)) || true
 
+info: ## Print some information about the current install, for debugging
+	uname -a
+	@echo "-------------------------"
+	git rev-parse HEAD
+	@echo "-------------------------"
+	docker version
+	@echo "-------------------------"
+	docker-compose --version
+	@echo "-------------------------"
+	echo $$EDX_PLATFORM_PATH
+	echo $$EDX_PLATFORM_SETTINGS
+
 ESCAPE = 
 help: ## Print this help
 	@grep -E '^([a-zA-Z_-]+:.*?## .*|######* .+)$$' Makefile \
