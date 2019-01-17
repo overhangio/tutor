@@ -5,6 +5,7 @@ Requirements
 
 The only prerequisite for running this is a working docker install. You will need both docker and docker-compose. Follow the instructions from the official documentation:
 
+- `make <https://www.gnu.org/software/make/>`_
 - `Docker <https://docs.docker.com/engine/installation/>`_
 - `Docker compose <https://docs.docker.com/compose/install/>`_
 
