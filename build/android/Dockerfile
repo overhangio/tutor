@@ -8,7 +8,7 @@ RUN mkdir /openedx
 
 # Install Android SDK
 # Inspired from https://github.com/LiveXP/docker-android-sdk/blob/master/Dockerfile
-ENV ANDROID_SDK_VERSION 3859397
+ENV ANDROID_SDK_VERSION 4333796
 ENV ANDROID_SDK_PATH /openedx/android-sdk
 ENV ANDROID_HOME /openedx/android-sdk
 RUN mkdir /openedx/android-sdk
@@ -18,7 +18,7 @@ RUN wget https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_
     rm sdk-tools-linux-${ANDROID_SDK_VERSION}.zip
 
 # Accept licenses
-RUN yes | /openedx/android-sdk/tools/bin/sdkmanager --licenses
+RUN yes | /openedx/android-sdk/tools/bin/sdkmanager "platforms;android-27"
 
 # Install android app repo
 RUN git clone https://github.com/edx/edx-app-android /openedx/edx-app-android
