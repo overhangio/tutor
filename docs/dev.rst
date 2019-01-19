@@ -9,6 +9,8 @@ To begin with, define development settings::
 
     export EDX_PLATFORM_SETTINGS=tutor.development
 
+These settings are necessary to run a local platform in debug mode.
+
 Run a local webserver
 ---------------------
 
@@ -48,18 +50,26 @@ You can then run your platform with the ``tutor.development`` settings.
 **Note**: containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the images with the right ``EDX_PLATFORM_VERSION`` argument. You may also want to change the ``EDX_PLATFORM_REPOSITORY`` argument to point to your own fork of edx-platform.
 
 
-Develop customised themes
--------------------------
+Customised themes
+-----------------
 
-Run a local webserver::
+With Tutor, it's pretty easy to develop your own themes. Start by placing your files inside the ``build/openedx/themes`` directory. For instance, you could start from the ``edx.org`` theme present inside the ``edx-platform`` repository::
+
+    cp -r /path/to/edx-platform/themes/edx.org /path/to/tutor/build/openedx/themes/
+
+Don't forget to set the ``EDX_PLATFORM_SETTINGS`` environment variable, as explained above. Then, run a local webserver inside the ``deploy/local`` folder::
 
     make lms-runserver
+
+The LMS can then be accessed at http://localhost:8000.
+
+You should follow the `Open edX documentation to enable your themes <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site>`_. In a nutshell, you should create a site theme that corresponds to the ``localhost:8000`` site in the site admin: http://localhost:8000/admin/theming/sitetheme/.
 
 Watch the themes folders for changes (in a different terminal)::
 
     make watch-themes
 
-Make changes to ``openedx/themes/yourtheme``: the theme assets should be automatically recompiled and visible at http://localhost:8000.
+Make changes to some of the files inside your theme directory: the theme assets should be automatically recompiled and visible at http://localhost:8000.
 
 Assets management
 -----------------
