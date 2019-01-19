@@ -21,12 +21,13 @@ RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releas
 
 ## Checkout edx-platform code
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
-ARG EDX_PLATFORM_VERSION=open-release/hawthorn.2
+ARG EDX_PLATFORM_VERSION=open-release/ironwood.1
 RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
 # Download extra locales to /openedx/locale
+# TODO upgrade this to ironwood
 RUN cd /tmp \
     && curl -L -o openedx-i18n.tar.gz https://github.com/regisb/openedx-i18n/archive/hawthorn.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
@@ -41,10 +42,6 @@ ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 RUN pip install setuptools==39.0.1 pip==9.0.3
 RUN pip install -r requirements/edx/development.txt
-
-# Install patched version of ora2
-RUN pip uninstall -y ora2 && \
-    pip install git+https://github.com/regisb/edx-ora2.git@open-release/hawthorn.2#egg=ora2==2.1.17
 
 # Install a recent version of nodejs
 RUN nodeenv /openedx/nodeenv --node=8.9.3 --prebuilt

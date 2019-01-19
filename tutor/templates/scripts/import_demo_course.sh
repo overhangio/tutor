@@ -1,2 +1,2 @@
-git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course
+git clone https://github.com/edx/edx-demo-course --branch open-release/ironwood.1 --depth 1 ../edx-demo-course
 python ./manage.py cms --settings=tutor.production import ../data ../edx-demo-course

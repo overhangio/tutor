@@ -68,7 +68,7 @@ You may want to run your own flavor of edx-platform instead of the `official ver
         --build-arg EDX_PLATFORM_REPOSITORY=https://mygitrepo/edx-platform.git \
         --build-arg EDX_PLATFORM_VERSION=my-tag-or-branch
 
-Note that your release must be a fork of Hawthorn in order to work. Otherwise, you may have important compatibility issues with other services. In particular, **don't try to run Tutor with older versions of Open edX**.
+Note that your release must be a fork of Ironwood in order to work. Otherwise, you may have important compatibility issues with other services. In particular, **don't try to run Tutor with older versions of Open edX**.
 
 Running a different ``openedx`` Docker image
 --------------------------------------------

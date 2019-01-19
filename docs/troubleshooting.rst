@@ -78,7 +78,7 @@ This will occur if you try to run a development environment without patching the
 "TypeError: get_logger_config() got an unexpected keyword argument 'debug'"
 -------------------------------------------------------------------------------
 
-This might occur when you try to run the latest version of ``edx-platform``, and not a version close to ``hawthorn.master``. It is no longer necessary to patch the ``LOGGING`` configuration in the latest ``edx-platform`` releases, as indicated in the `development_` section, so you should remove the call to ``get_logger_config`` altogether from your development settings.
+This might occur when you try to run the latest version of ``edx-platform``, and not a version close to ``ironwood.1``. It is no longer necessary to patch the ``LOGGING`` configuration in the latest ``edx-platform`` releases, as indicated in the `development_` section, so you should remove the call to ``get_logger_config`` altogether from your development settings.
 
 The chosen default language does not display properly
 -----------------------------------------------------
