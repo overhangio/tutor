@@ -34,7 +34,7 @@ If you don't want to rewrite this option every time, you can instead define the 
 
 All development commands will then automatically mount your local repo.
 
-**Note:** containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the ":ref:`fork edx-platform <edx_platform_fork>`.
+**Note:** containers are built on the Ironwood release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the ":ref:`fork edx-platform <edx_platform_fork>`.
 
 Prepare the edx-platform repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +78,7 @@ Make changes to some of the files inside the theme directory: the theme assets s
 Assets management
 -----------------
 
-Assets building and collecting is made more difficult by the fact that development settings are `incorrectly loaded in Hawthorn <https://github.com/edx/edx-platform/pull/18430/files>`_. This should be fixed in the next Open edX release. Meanwhile, do not run ``paver update_assets`` while in development mode. When working locally on a theme, build assets by running in the container::
+Assets building and collecting is made more difficult by the fact that development settings are `incorrectly loaded in Ironwood <https://github.com/edx/edx-platform/pull/18430/files>`_. This should be fixed in the next Open edX release. Meanwhile, do not run ``paver update_assets`` while in development mode. When working locally on a theme, build assets by running in the container::
 
     openedx-assets build
 
