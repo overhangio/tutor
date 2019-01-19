@@ -18,7 +18,8 @@ RUN wget https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_
     rm sdk-tools-linux-${ANDROID_SDK_VERSION}.zip
 
 # Accept licenses
-RUN yes | /openedx/android-sdk/tools/bin/sdkmanager "platforms;android-27"
+# https://developer.android.com/studio/command-line/sdkmanager
+RUN yes | /openedx/android-sdk/tools/bin/sdkmanager "platforms;android-27" 1> /dev/null
 
 # Install android app repo
 RUN git clone https://github.com/edx/edx-app-android /openedx/edx-app-android
