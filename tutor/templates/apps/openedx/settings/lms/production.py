@@ -1,7 +1,5 @@
 import os
-from lms.envs.aws import *
-
-INSTALLED_APPS.remove('openedx.core.djangoapps.datadog.apps.DatadogConfig')
+from lms.envs.production import *
 
 # Load module store settings from config files
 update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
