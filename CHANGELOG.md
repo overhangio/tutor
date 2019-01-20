@@ -1,5 +1,6 @@
 # Changelog
 
+- 2019-01-20 [Improvement] Make it easy to load custom settings for the local production install
 - 2019-01-16 [Improvement] Switch license from MIT to AGPL
 - 2019-01-04 [Bugfix] Fix xqueue consumer command
 - 2018-12-26 [Improvement] Upgrade nodejs to 5.5.1
