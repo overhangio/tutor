@@ -1,0 +1,315 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cms
+  template:
+    metadata:
+      labels:
+        app: cms
+    spec:
+      containers:
+        - name: cms
+          image: regis/openedx:hawthorn
+          env:
+          - name: SERVICE_VARIANT
+            value: cms
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /openedx/edx-platform/lms/envs/tutor/
+              name: settings-lms
+            - mountPath: /openedx/edx-platform/cms/envs/tutor/
+              name: settings-cms
+            - mountPath: /openedx/config
+              name: config
+            - mountPath: /openedx/data
+              name: data
+          #imagePullPolicy: Always
+      volumes:
+        - name: settings-lms
+          configMap:
+            name: openedx-settings-lms
+        - name: settings-cms
+          configMap:
+            name: openedx-settings-cms
+        - name: config
+          configMap:
+            name: openedx-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: cms-data
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forum
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forum
+  template:
+    metadata:
+      labels:
+        app: forum
+    spec:
+      containers:
+        - name: forum
+          image: regis/openedx-forum:hawthorn
+          ports:
+            - containerPort: 4567
+          imagePullPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lms
+  template:
+    metadata:
+      labels:
+        app: lms
+    spec:
+      containers:
+        - name: lms
+          image: regis/openedx:hawthorn
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /openedx/edx-platform/lms/envs/tutor/
+              name: settings-lms
+            - mountPath: /openedx/edx-platform/cms/envs/tutor/
+              name: settings-cms
+            - mountPath: /openedx/config
+              name: config
+            - mountPath: /openedx/data
+              name: data
+          imagePullPolicy: Always
+      volumes:
+        - name: settings-lms
+          configMap:
+            name: openedx-settings-lms
+        - name: settings-cms
+          configMap:
+            name: openedx-settings-cms
+        - name: config
+          configMap:
+            name: openedx-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: lms-data
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: elasticsearch:1.5.2
+          env:
+            - name: ES_JAVA_OPTS
+              value: "-Xms1g -Xmx1g"
+            - name: "cluster.name"
+              value: openedx
+            - name: "bootstrap.memory_lock"
+              value: "true"
+          ports:
+            - containerPort: 9200
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: elasticsearch
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memcached
+  template:
+    metadata:
+      labels:
+        app: memcached
+    spec:
+      containers:
+        - name: memcached
+          image: memcached:1.4.38
+          ports:
+            - containerPort: 11211
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:3.2.16
+          command: ["mongod", "--smallfiles", "--nojournal", "--storageEngine", "wiredTiger"]
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - mountPath: /data/db
+              name: data
+      volumes:
+        - name: data
+          emptyDir: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.6.36
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-config
+                  key: MYSQL_ROOT_PASSWORD
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mysql
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      initContainers:
+        - name: clean-openedx-staticfiles
+          image: regis/openedx:hawthorn
+          command: ['rm', '-rf', '/var/www/openedx/staticfiles']
+          volumeMounts:
+            - mountPath: /var/www/openedx/
+              name: openedx-staticfiles
+          imagePullPolicy: Always
+        - name: init-openedx-staticfiles
+          image: regis/openedx:hawthorn
+          command: ['cp', '-r', '/openedx/staticfiles', '/var/www/openedx/']
+          volumeMounts:
+            - mountPath: /var/www/openedx/
+              name: openedx-staticfiles
+          imagePullPolicy: Always
+      containers:
+        - name: nginx
+          image: nginx:1.13
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/
+              name: config
+            - mountPath: /var/www/openedx/
+              name: openedx-staticfiles
+            - mountPath: /openedx/data/lms
+              name: data
+          ports:
+            - containerPort: 80
+              name: http-port
+            - containerPort: 443
+              name: https-port
+      volumes:
+        - name: config
+          configMap:
+            name: nginx-config
+        - name: openedx-staticfiles
+          persistentVolumeClaim:
+            claimName: openedx-staticfiles
+        - name: data
+          persistentVolumeClaim:
+            claimName: lms-data
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.6.10
+          ports:
+            - containerPort: 5672
+          volumeMounts:
+            - mountPath: /var/lib/rabbitmq
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rabbitmq
+

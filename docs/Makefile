@@ -13,7 +13,7 @@ help:
 browse:
 	sensible-browser _build/html/index.html
 
-watch:
+watch: html
 	while true; do inotifywait -e modify *.rst; $(MAKE) html; done
 
 .PHONY: help Makefile

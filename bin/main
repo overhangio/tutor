@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+
+from tutor.cli import main
+main()

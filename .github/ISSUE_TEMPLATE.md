@@ -6,8 +6,8 @@ Include the exact command that you are running and that is causing an error. In 
 
 ## Unexpected behavior
 
-Include the full, exact output from the command that is causing your issue. Also include relevant error logs; for instance, to debug the LMS take a look at the files in `data/lms/logs`.
+Include the full, exact output from the command that is causing your issue. Also include relevant error logs; for instance, to debug the LMS provide the output of `tutor local logs lms --tail=100`
 
 ## Additional info (IMPORTANT)
 
-Include the output of the `make info` command.
+Provide the output of `tutor --version`.

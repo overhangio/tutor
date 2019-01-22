@@ -15,20 +15,19 @@ What should you do if you have a problem?
 Logging
 -------
 
-To view the logs from all containers use the `docker-compose logs <https://docs.docker.com/compose/reference/logs/>`_ command::
+To view the logs from all containers use the ``tutor local logs`` command, which was modeled on the standard `docker-compose logs <https://docs.docker.com/compose/reference/logs/>`_ command::
 
-    docker-compose logs -f
+    tutor local logs --follow
 
 To view the logs from just one container, for instance the web server::
 
-    docker-compose logs -f nginx
+    tutor local logs --follow nginx
 
 The last commands produce the logs since the creation of the containers, which can be a lot. Similar to a ``tail -f``, you can run::
 
-    docker-compose logs --tail=0 -f
+    tutor local logs--tail=0 -f
 
 If you'd rather use a graphical user interface for viewing logs, you are encouraged to try out :ref:`Portainer <portainer>`.
-
 
 "Cannot start service nginx: driver failed programming external connectivity"
 -----------------------------------------------------------------------------
@@ -42,15 +41,14 @@ The containerized Nginx needs to listen to ports 80 and 443 on the host. If ther
 
 However, you might not want to do that if you need a webserver for running non-Open edX related applications. In such cases...
 
-2. Run the nginx container on different ports: you can create a ``.env`` file in the ``tutor`` directory in which you indicate different ports. For instance::
+2. Run the nginx container on different ports: to do so, indicate different ports in the ``config.yml`` file. For instance::
 
-       cat .env
-       NGINX_HTTP_PORT=81
-       NGINX_HTTPS_PORT=444
+       NGINX_HTTP_PORT: 81
+       NGINX_HTTPS_PORT: 444
 
-In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443.
+In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. Then, re-generate the environment with ``tutor local env`` and restart nginx with ``tutor local restart nginx``.
 
-You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See `this <https://github.com/regisb/tutor/issues/69#issuecomment-425916825>`_ for http, and `this <https://github.com/regisb/tutor/issues/90#issuecomment-437687294>`_ for https.
+You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See `this github issue <https://github.com/regisb/tutor/issues/69#issuecomment-425916825>`_ for http, and `this other github issue <https://github.com/regisb/tutor/issues/90#issuecomment-437687294>`_ for https.
 
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------
@@ -62,7 +60,7 @@ You can identify which containers are consuming most resources by running::
 "Running migrations... Killed!"
 -------------------------------
 
-The LMS and CMS containers require at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the ``make all`` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. Follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`_.
+Older versions of Open edX required at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. Follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`_.
 
 
 ``Build failed running pavelib.servers.lms: Subprocess return code: 1``
@@ -70,15 +68,15 @@ The LMS and CMS containers require at least 4 GB RAM, in particular to run the O
 
 ::
 
-    python manage.py lms --settings=development print_setting STATIC_ROOT 2>/dev/null
+    python manage.py lms print_setting STATIC_ROOT 2>/dev/null
     ...
     Build failed running pavelib.servers.lms: Subprocess return code: 1`"
 
-This might occur when you run a ``paver`` command. ``/dev/null`` eats the actual error, so you will have to run the command manually. Run ``make lms`` (or ``make cms``) to open a bash session and then::
+This might occur when you run a ``paver`` command. ``/dev/null`` eats the actual error, so you will have to run the command manually. Run ``tutor dev shell lms`` (or ``tutor dev shell cms``) to open a bash session and then::
 
-    python manage.py lms --settings=development print_setting STATIC_ROOT
+    python manage.py lms print_setting STATIC_ROOT
 
-Of course, you should replace `development` with your own settings. The error produced should help you better understand what is happening.
+The error produced should help you better understand what is happening.
 
 ``ValueError: Unable to configure handler 'local'``
 ---------------------------------------------------
