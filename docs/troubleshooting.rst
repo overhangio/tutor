@@ -40,7 +40,7 @@ The containerized Nginx needs to listen to ports 80 and 443 on the host. If ther
        sudo systemctl stop apache2
        sudo systemctl stop nginx
 
-However, you might now want to do that if you need a webserver for running non-Open edX related applications. In such cases...
+However, you might not want to do that if you need a webserver for running non-Open edX related applications. In such cases...
 
 2. Run the nginx container on different ports: you can create a ``.env`` file in the ``tutor`` directory in which you indicate different ports. For instance::
 
