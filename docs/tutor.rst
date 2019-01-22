@@ -3,9 +3,34 @@
 Tutor development
 =================
 
-Pushing to Docker Hub
----------------------
+Start by cloning the Tutor repository::
 
-The images are built, tagged and uploaded to Docker Hub in one command::
+    git clone https://github.com/regisb/tutor.git
+    cd tutor/
 
-    make dockerhub
+Install requirements
+--------------------
+
+::
+
+    pip install -r requirements/dev.txt
+
+Bundle ``tutor`` executable
+---------------------------
+
+::
+
+    make bundle
+
+Generate the documentation
+--------------------------
+
+::
+
+    pip install sphinx sphinx_rtd_theme
+    cd docs/
+    make html
+
+You can then browse the documentation with::
+
+    make browse

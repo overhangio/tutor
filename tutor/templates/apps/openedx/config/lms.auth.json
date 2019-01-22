@@ -1,0 +1,34 @@
+{
+  "SECRET_KEY": "{{ SECRET_KEY }}",
+  "AWS_ACCESS_KEY_ID": "",
+  "AWS_SECRET_ACCESS_KEY": "",
+  "XQUEUE_INTERFACE": {
+    "django_auth": {
+      "username": "{{ XQUEUE_AUTH_USERNAME }}",
+      "password": "{{ XQUEUE_AUTH_PASSWORD }}"
+    },
+    "url": "http://xqueue:8040"
+  },
+  "CONTENTSTORE": { 
+    "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",                       
+    "DOC_STORE_CONFIG": {                                                           
+      "db": "{{ MONGODB_DATABASE }}",
+      "host": "mongodb"
+    } 
+  },  
+  "DOC_STORE_CONFIG": {
+    "db": "{{ MONGODB_DATABASE }}",
+    "host": "mongodb"  
+  },
+  "DATABASES": {
+    "default": {
+      "ENGINE": "django.db.backends.mysql",
+      "NAME": "{{ MYSQL_DATABASE }}",
+      "USER": "{{ MYSQL_USERNAME }}",
+      "PASSWORD": "{{ MYSQL_PASSWORD }}",
+      "HOST": "mysql",
+      "PORT": "3306",
+      "ATOMIC_REQUESTS": true
+    }
+  }
+}

@@ -1,11 +1,23 @@
-language: minimal
+language: python3.6
+os:
+  - linux
+  - osx
 services:
   - docker
 script:
+  - pip install -r requirements/dev.txt
   - make travis
 deploy:
-  provider: script
-  script: cd build/ && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" && make push
-  on:
-    all_branches: true
-    condition: $TRAVIS_BRANCH =~ ^master|release\/.*$
+  - provider: script
+    script: cd build/ && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" && ./dist/tutor images push all
+    on:
+      all_branches: true
+      condition: "$TRAVIS_BRANCH =~ ^master|release\/.*$ && $TRAVIS_OS_NAME = linux"
+  - provider: releases
+    api_key:
+      secure: ffrhGvgxHf3WVnKsKiJZTUoEf3+ZBtIydPHQoTDmHiYMyPnaO6RJWxq5PnoDRr47b1vnvbCE0lhNsGr3sgnruQSN3xHYfT4wz1F6Lz7Y5Jt7Uq1W0/UfSRlB3BwYcFpkUb5fSXLSku+QrV8OTk/yItlY9tppnvXA9h4CZjQqgJYHYc1DRKWQVYnVs/dCttUpiPV3eyIFeQoPKFsHwZXKcm9cVzom5r+lkjwpw3AIuAutPd71jyj/Va/By6B/43yAIqw3sA/thBeL76vqd8C4cMeWE00of1EWnH+sx6pKz32Fqe/o6dVop5PZPCiI+TVIDxR8oLevHtPTCfIwRDg60y23DdH3bMGSw1bAyjeWTnhRGcdYQJi1NKq3hJ0ldy0lOFlUiMkKPdQBtU7i0xIpoXTIhnro0YUUtjbh/QEtyRn8nbMVeenId42Bymah5P8srhE8S2z0x0mirIqNlM/tgLKEOJXdSL4sPKCMwRLcTUIc0fCiwLeHJnHIrMNEfnWsqO1odzv/PS5nLsdiGHBmC63d+xLNllzincIV1djyi5SEzMZxcqmjX1n/G3nKYVXhaIQE0wWQSHqNwLlKluY0kPXCNtU1TPr5SJHGnomQKizVaEsDrdAjylBL+rPwVCAv9z8FCtyOg7uMx2WdD0pvky2Iy4rbl2RBLUHmUZoAjPY=
+    file: dist/tutor
+    skip_cleanup: true
+    on:
+      branch: v3
+      repo: regisb/tutor

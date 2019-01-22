@@ -1,5 +1,0 @@
-#!/bin/sh
-# This is a small script that helps me collect stats about who is using this
-# project and understand how they are using it. Please don't remove me! As you
-# can see, no personal data is leaked.
-curl --silent -X POST --max-time 5 "https://openedx.overhang.io/stats?id={{ ID }}&lms={{ LMS_HOST|urlencode }}" 2> /dev/null || true

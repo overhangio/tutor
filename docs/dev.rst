@@ -5,61 +5,56 @@ Using Tutor for Open edX development
 
 In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
-To begin with, define development settings::
-
-    export EDX_PLATFORM_SETTINGS=tutor.development
-
-These settings are necessary to run a local platform in debug mode.
-
-Run a local webserver
----------------------
+Run a local development webserver
+---------------------------------
 
 ::
 
-    make lms-runserver
-    make cms-runserver
+    tutor dev runserver lms # Access the lms at http://localhost:8000
+    tutor dev runserver cms # Access the cms at http://localhost:8001
 
 Open a bash shell
 -----------------
 
 ::
 
-    make lms
-    make cms
+    tutor dev shell lms
+    tutor dev shell cms
 
 Debug edx-platform
 ------------------
 
-If you have one, you can point to a local version of `edx-platform <https://github.com/edx/edx-platform/>`_ on your host machine::
+If you have one, you can point to a local version of `edx-platform <https://github.com/edx/edx-platform/>`_ on your host machine. To do so, pass a ``-P/--edx-platform-path`` option to the commands. For instance::
 
-    export EDX_PLATFORM_PATH=/path/to/your/edx-platform
+    tutor dev shell lms --edx-platform-path=/path/to/edx-platform
 
-Note that you should use an absolute path here, not a relative path (e.g: ``/path/to/edx-platform`` and not ``../edx-platform``).
+If you don't want to rewrite this option every time, you can instead define the environment variable::
+
+    export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
 
 All development commands will then automatically mount your local repo. For instance, you can add a ``import pdb; pdb.set_trace()`` breakpoint anywhere in your code and run::
 
-    make lms-runserver
+    tutor dev runserver lms --edx-platform-path=/path/to/edx-platform
 
 With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the ``tutor.development`` settings files to our own repo::
 
-    cp -r config/openedx/tutor/lms/ /path/to/edx-platform/lms/envs/tutor
-    cp -r config/openedx/tutor/cms/ /path/to/edx-platform/cms/envs/tutor
+    cp -r $(tutor config printroot)/env/apps/openedx/tutor/lms/ /path/to/edx-platform/lms/envs/tutor
+    cp -r $(tutor config printroot)/env/apps/openedx/tutor/cms/ /path/to/edx-platform/cms/envs/tutor
 
-You can then run your platform with the ``tutor.development`` settings.
+You can then run your platform with the ``tutor.development`` settings. See :ref:`the custom settings section <custom_edx_platform_settings>` for settings that are named differently.
 
-**Note**: containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the images with the right ``EDX_PLATFORM_VERSION`` argument. You may also want to change the ``EDX_PLATFORM_REPOSITORY`` argument to point to your own fork of edx-platform.
-
+**Note:** containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the ":ref:`fork edx-platform <edx_platform_fork>`.
 
 Customised themes
 -----------------
 
-With Tutor, it's pretty easy to develop your own themes. Start by placing your files inside the ``build/openedx/themes`` directory. For instance, you could start from the ``edx.org`` theme present inside the ``edx-platform`` repository::
+With Tutor, it's pretty easy to develop your own themes. Start by placing your files inside the ``env/build/openedx/themes`` directory. For instance, you could start from the ``edx.org`` theme present inside the ``edx-platform`` repository::
 
-    cp -r /path/to/edx-platform/themes/edx.org /path/to/tutor/build/openedx/themes/
+    cp -r /path/to/edx-platform/themes/edx.org $(tutor config printroot)/env/build/openedx/themes/
 
-Don't forget to set the ``EDX_PLATFORM_SETTINGS`` environment variable, as explained above. Then, run a local webserver inside the ``deploy/local`` folder::
+Then, run a local webserver::
 
-    make lms-runserver
+    tutor dev runserver lms
 
 The LMS can then be accessed at http://localhost:8000.
 
@@ -67,7 +62,7 @@ You should follow the `Open edX documentation to enable your themes <https://edx
 
 Watch the themes folders for changes (in a different terminal)::
 
-    make watch-themes
+    tutor dev watchthemes
 
 Make changes to some of the files inside your theme directory: the theme assets should be automatically recompiled and visible at http://localhost:8000.
 
@@ -85,7 +80,14 @@ Running python commands
 
 These commands will open a python shell in the lms or the cms::
 
-    make lms-python
-    make cms-python
+    tutor dev run lms python
+    tutor dev run cms python
 
 You can then import edx-platform and django modules and execute python code.
+
+.. _custom_edx_platform_settings:
+
+Custom edx-platform settings
+----------------------------
+
+In the various ``dev`` commands, the default ``edx-platform`` settings module is ``tutor.development``. If, for some reason, you want to use different settings, you will need to pass the ``-S/--edx-platform-settings`` option to each command. Alternatively, you can define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.

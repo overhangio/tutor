@@ -23,7 +23,7 @@ In the following, we assume you have a working Kubernetes platform. For a start,
 
 Start Minikube::
 
-    make minikube-start
+    minikube start
 
 When minikube starts, it spawns a virtual machine (VM) which you can configure in your VM manager: on most platforms, this is Virtualbox. You should configure your VM to have at least 4Gb RAM; otherwise, database migrations will crash halfway, and that's a nasty issue...
 
@@ -44,16 +44,12 @@ With Kubernetes, your Open edX platform will not be available at localhost or st
 
 where ``MINIKUBEIP`` should be replaced by the result of the command ``minikube ip``.
 
-In the following, all commands should be run inside the ``deploy/k8s`` folder::
-
-    cd deploy/k8s
-
 Quickstart
 ----------
 
 Launch the platform on k8s in 1 click::
 
-    make all
+    tutor k8s quickstart
 
 All Kubernetes resources are associated to the "openedx" namespace. If you don't see anything in the Kubernetes dashboard, you are probably looking at the wrong namespace... 😉
 
@@ -65,26 +61,27 @@ Upgrading
 
 After pulling updates from the Tutor repository, you can apply changes with::
 
-    make upgrade
+    tutor k8s stop
+    tutor k8s start
 
 Accessing the Kubernetes dashboard
 ----------------------------------
 
 Depending on your Kubernetes provider, you may need to create a dashboard yourself. To do so, run::
 
-    make k8s-dashboard
+	kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
 
 Then, you will have to create an admin user::
 
-    make k8s-admin
+    tutor k8s adminuser
 
 Print the admin token required for authentication, and copy its value::
 
-    make k8s-admin-token
+    tutor k8s admintoken
 
 Create a proxy to the Kubernetes API server::
 
-    k8s-proxy
+	kubectl proxy
 
 Use the token to log in the dashboard at the following url: http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
 

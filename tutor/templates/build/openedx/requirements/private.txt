@@ -1,0 +1,6 @@
+# Add your additional requirements, such as xblocks, to this file. For
+# requirements coming from private repositories, clone the repository to this
+# folder and then add your requirement with the `-e` flag. Ex:
+#
+#   git clone git@myserver:myprivaterepo.git
+#   echo "-e ./myprivaterepo/" >> private.txt
