@@ -18,13 +18,13 @@ The following DNS records must exist and point to your server::
 
 Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
 
-To download the certificate manually, run::
+To create the certificate manually, run::
 
-    make https-certificate
+    tutor local https create
 
 To renew the certificate, run this command once per month::
 
-    make https-certificate-renew
+    tutor local https renew
 
 Student notes
 -------------
@@ -46,19 +46,10 @@ Android app (beta)
 
 The Android app for your platform can be easily built in just one command::
 
-    make android
+    tutor android build debug
 
 If all goes well, the debuggable APK for your platform should then be available in ./data/android. To obtain a release APK, you will need to obtain credentials from the app store and add them to ``config/android/gradle.properties``. Then run::
 
-    make android-release
+    tutor android build release
 
 Building the Android app for an Open edX platform is currently labeled as a **beta feature** because it was not fully tested yet. In particular, there is no easy mechanism for overriding the edX assets in the mobile app. This is still a work-in-progress.
-
-Stats
------
-
-By default, the install script will collect some information about your install and send it to a private server. The only transmitted information are the LMS domain name and the ID of the install. To disable stats collection, define the following environment variable::
-
-    export DISABLE_STATS=1
-
-If you decide to disable stats, please send me a message to tell me about your platform! 

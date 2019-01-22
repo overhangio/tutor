@@ -3,18 +3,16 @@
 Quickstart
 ==========
 
-::
-
-    git clone https://github.com/regisb/tutor
-    cd tutor/deploy/local
-    make all
+1. `Download <https://github.com/regisb/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path.
+2. Run ``tutor local quickstart``
+3. You're done!
 
 **That's it?**
 
-Yes :) This is what happens when you run ``make all``:
+Yes :) This is what happens when you run ``tutor local quickstart``:
 
 1. You answer a few questions about the configuration of your Open edX platform and your :ref:`selected options <options>`
-2. Configuration files are generated.
+2. Configuration files are generated from templates.
 3. Docker images are downloaded.
 4. Docker containers are provisioned.
 5. A full, production-ready platform is run with docker-compose.

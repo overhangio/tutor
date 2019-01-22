@@ -1,0 +1,20 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: web
+spec:
+  rules:
+  {% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}
+  {% if ACTIVATE_NOTES %}{% set hosts = hosts + ["notes." + LMS_HOST] %}{% endif %}
+  {% for host in hosts %}
+  - host: {{ host }}
+    http:
+      paths:
+      - backend:
+          serviceName: nginx
+          servicePort: 80
+      - backend:
+          serviceName: nginx
+          servicePort: 443
+  {% endfor %}

@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.0 (2019-06-09)
+
+- [Improvement] Complete rewrite of Tutor: switch from a make-based project to a single binary which runs all commands.
+- [Feature] An web user interface can be created with `tutor webui start`
+- [Bugfix] Add missing elasticsearch to Kubernetes deployment (#147)
+- [Improvement] Upload `tutor-openedx` to pypi
+
+## Older changes
+
 - 2019-01-27 [Bugfix] Fix video transcript/srt upload and download of user-uploaded files. Thanks @dannielariola!
 - 2019-01-20 [Improvement] Make it easy to load custom settings for the local production install
 - 2019-01-16 [Improvement] Switch license from MIT to AGPL

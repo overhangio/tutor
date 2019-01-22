@@ -1,5 +1,7 @@
 .*.swp
 !.gitignore
-/config.json
-/data*/
 TODO
+
+/build/tutor
+/dist/
+/tutor_openedx.egg-info/

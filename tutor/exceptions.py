@@ -1,0 +1,2 @@
+class TutorError(Exception):
+    pass

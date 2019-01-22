@@ -1,0 +1,201 @@
+version: "3"
+services:
+
+  ############# External services
+
+  memcached:
+    image: memcached:1.4.38
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:3.2.16
+    # Use WiredTiger in all environments, just like at edx.org
+    command: mongod --smallfiles --nojournal --storageEngine wiredTiger
+    restart: unless-stopped
+    volumes:
+      - ../../data/mongodb:/data/db
+
+  mysql:
+    image: mysql:5.6.36
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
+    restart: unless-stopped
+    volumes:
+      - ../../data/mysql:/var/lib/mysql
+    env_file: ../apps/mysql/auth.env
+
+  elasticsearch:
+    image: elasticsearch:1.5.2
+    environment:
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "cluster.name=openedx"
+      - "bootstrap.memory_lock=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: unless-stopped
+    volumes:
+      - ../../data/elasticsearch:/usr/share/elasticsearch/data
+
+  openedx-assets:
+    image: {{ OPENEDX_DOCKER_IMAGE }}
+    volumes:
+      - ../../data/openedx:/var/www/openedx
+    command: bash -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
+
+  nginx:
+    image: nginx:1.13
+    restart: unless-stopped
+    ports:
+      - "{{ NGINX_HTTP_PORT }}:80"
+      - "{{ NGINX_HTTPS_PORT }}:443"
+    volumes:
+      - ../apps/nginx:/etc/nginx/conf.d/
+      - ../../data/openedx:/var/www/openedx:ro
+      - ../../data/cms:/openedx/data/cms/:ro
+      - ../../data/lms:/openedx/data/lms/:ro
+      - ../../data/letsencrypt:/etc/letsencrypt/:ro
+    depends_on:
+      - lms
+      - cms
+      {% if ACTIVATE_NOTES %}- notes{% endif %}
+
+  rabbitmq:
+    image: rabbitmq:3.6.10
+    volumes:
+      - ../../data/rabbitmq:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  # Simple SMTP server
+  smtp:
+    image: namshi/smtp
+    restart: unless-stopped
+
+  ############# Forum
+
+  forum:
+    image: regis/openedx-forum:hawthorn
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
+      - mongodb
+
+  ############# LMS and CMS
+
+  lms:
+    image: {{ OPENEDX_DOCKER_IMAGE }}
+    environment:
+      SERVICE_VARIANT: lms
+      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+    restart: unless-stopped
+    volumes:
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../apps/openedx/config/:/openedx/config/
+      - ../../data/lms:/openedx/data
+    depends_on:
+      - elasticsearch
+      - forum
+      - memcached
+      - mongodb
+      - mysql
+      - rabbitmq
+      - smtp
+
+  cms:
+    image: {{ OPENEDX_DOCKER_IMAGE }}
+    environment:
+      SERVICE_VARIANT: cms
+      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+    restart: unless-stopped
+    volumes:
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../apps/openedx/config/:/openedx/config/
+      - ../../data/cms:/openedx/data
+    depends_on:
+      - elasticsearch
+      - memcached
+      - mongodb
+      - mysql
+      - rabbitmq
+      - smtp
+
+  ############# LMS and CMS workers
+
+  # We could probably create one service per queue here. For small instances, it is not necessary.
+  lms_worker:
+    image: {{ OPENEDX_DOCKER_IMAGE }}
+    environment:
+      SERVICE_VARIANT: lms
+      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
+    command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
+    restart: unless-stopped
+    volumes:
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../apps/openedx/config/:/openedx/config/
+      - ../../data/lms:/openedx/data
+    depends_on:
+      - lms
+
+  cms_worker:
+    image: {{ OPENEDX_DOCKER_IMAGE }}
+    environment:
+      SERVICE_VARIANT: cms
+      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
+    command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
+    restart: unless-stopped
+    volumes:
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+      - ../apps/openedx/config/:/openedx/config/
+      - ../../data/cms:/openedx/data
+    depends_on:
+      - cms
+
+  {% if ACTIVATE_NOTES %}
+  ############# Notes: backend store for edX Student Notes
+  notes:
+    image: regis/openedx-notes:hawthorn
+    networks:
+      default:
+        aliases:
+          - notes.openedx
+    environment:
+      DJANGO_SETTINGS_MODULE: notesserver.settings.tutor
+    volumes:
+      - ../apps/notes/settings/tutor.py:/openedx/edx-notes-api/notesserver/settings/tutor.py
+      - ../../data/notes:/openedx/data
+    restart: unless-stopped
+    depends_on:
+      - mysql
+  {% endif %}
+
+  {% if ACTIVATE_XQUEUE %}
+  ############# Xqueue: external grading of Open edX problems
+  xqueue:
+    image: regis/openedx-xqueue:hawthorn
+    volumes:
+      - ../apps/xqueue/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
+      - ../../data/xqueue:/openedx/data
+    environment:
+      DJANGO_SETTINGS_MODULE: xqueue.tutor
+    restart: unless-stopped
+    depends_on:
+      - mysql
+
+  xqueue_consumer:
+    image: regis/openedx-xqueue:hawthorn
+    volumes:
+      - ../apps/xqueue/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
+      - ../../data/xqueue:/openedx/data
+    environment:
+      DJANGO_SETTINGS_MODULE: xqueue.tutor
+    restart: unless-stopped
+    command: ./manage.py run_consumer
+    depends_on:
+      - mysql
+  {% endif %}
