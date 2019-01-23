@@ -59,6 +59,9 @@ databases: init-mysql provision-databases migrate provision-oauth2 ## Bootstrap 
 
 init-mysql: ## Make sure that mysql is properly initialized
 	docker-compose up -d mysql
+	until docker-compose logs mysql | grep "MySQL init process done. Ready for start up."; do \
+		sleep 1;\
+	done
 	docker-compose stop mysql
 provision-databases: ## Create necessary databases and users
 	$(DOCKER_COMPOSE_RUN) -v $(PWD)/../env/openedx/scripts:/openedx/scripts lms /openedx/scripts/provision.sh
