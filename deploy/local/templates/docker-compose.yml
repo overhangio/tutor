@@ -52,6 +52,8 @@ services:
     volumes:
       - ../env/nginx:/etc/nginx/conf.d/
       - ../../data/openedx:/var/www/openedx:ro
+      - ../../data/cms:/openedx/data/cms/:ro
+      - ../../data/lms:/openedx/data/lms/:ro
       - ../../data/letsencrypt:/etc/letsencrypt/:ro
     depends_on:
       - lms

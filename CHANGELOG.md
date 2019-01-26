@@ -1,5 +1,6 @@
 # Changelog
 
+- 2019-01-27 [Bugfix] Fix video transcript/srt upload and download of user-uploaded files. Thanks @dannielariola!
 - 2019-01-20 [Improvement] Make it easy to load custom settings for the local production install
 - 2019-01-16 [Improvement] Switch license from MIT to AGPL
 - 2019-01-04 [Bugfix] Fix xqueue consumer command
