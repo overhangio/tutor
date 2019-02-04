@@ -114,6 +114,7 @@ services:
       - ../env/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
     depends_on:
+      - elasticsearch
       - memcached
       - mongodb
       - mysql
