@@ -1,4 +1,5 @@
 FROM ubuntu:18.04
+MAINTAINER Régis Behmo <regis@behmo.com>
 
 RUN apt update && \
   apt upgrade -y && \

@@ -1,4 +1,5 @@
 FROM python:3.6-alpine
+MAINTAINER Régis Behmo <regis@behmo.com>
 
 RUN apk add --no-cache curl
 RUN pip install jinja2

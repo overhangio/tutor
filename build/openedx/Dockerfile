@@ -1,4 +1,5 @@
 FROM ubuntu:16.04
+MAINTAINER Régis Behmo <regis@behmo.com>
 
 ############ common to lms & cms
 
