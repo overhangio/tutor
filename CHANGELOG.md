@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Feature] Enable grade downloads by default (#143)
 - [Improvement] Remove orphan containers on `local start`
 
 ## 3.2.0 (2019-03-18)
