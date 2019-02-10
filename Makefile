@@ -13,6 +13,33 @@ travis: bundle ## Run tests on travis-ci
 	./dist/tutor images build all
 	./dist/tutor local databases
 
+ci-info: ## Print info about environment
+	python3 --version
+	pip3 --version
+
+ci-bundle: ## Create bundle
+	pip3 install -U setuptools
+	pip3 install -r requirements/dev.txt
+	$(MAKE) bundle
+	cp ./dist/tutor ./dist/tutor-$$TRAVIS_OS_NAME
+
+ci-test: ## Run basic tests
+	./dist/tutor config noninteractive
+	./dist/tutor images env
+	./dist/tutor local env
+
+ci-images: ## Build and push docker images to hub.docker.com
+	python setup.py develop
+	tutor images build all
+	tutor local databases
+	docker login -u "$$DOCKER_USERNAME" -p "$$DOCKER_PASSWORD"
+	tutor images push all
+
+ci-pypi: ## Push release to pypi
+	pip install twine
+	python setup.py sdist
+	twine upload dist/*.tar.gz
+
 ESCAPE = 
 help: ## Print this help
 	@grep -E '^([a-zA-Z_-]+:.*?## .*|######* .+)$$' Makefile \

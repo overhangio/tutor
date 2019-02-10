@@ -28,18 +28,11 @@ matrix:
       language: generic
       env:
         BUILD_BINARY: "true"
-script:
-  - python3 --version
-  - pip3 --version
-  - pip3 install -U setuptools
-  - pip3 install -r requirements/dev.txt
-  - make bundle
-  - ./dist/tutor config noninteractive
-  - ./dist/tutor images env
-  - ./dist/tutor local env
 
-before_deploy:
-  - cp ./dist/tutor ./dist/tutor-$TRAVIS_OS_NAME
+script:
+  - make ci-info
+  - make ci-bundle
+  - make ci-test
 
 deploy:
   # Push tutor binary to github releases
@@ -54,10 +47,7 @@ deploy:
 
   # Push docker images to docker hub
   - provider: script
-    script: ./dist/tutor images build all && \
-      ./dist/tutor local databases && \
-      docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" && \
-      ./dist/tutor images push all
+    script: make ci-images
     skip_cleanup: true
     on:
       tags: true
@@ -65,7 +55,7 @@ deploy:
 
   # Push to pypi
   - provider: script
-    script: pip install twine && python setup.py sdist && twine upload dist/*.tar.gz
+    script: make ci-pypi
     skip_cleanup: true
     on:
       tags: true

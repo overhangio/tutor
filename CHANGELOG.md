@@ -1,5 +1,11 @@
 # Changelog
 
+## Latest
+
+- [Improvement] Better handling of continuous integration
+- [Bugfix] fix `tutor --version` (#156)
+- [Improvement] Absolute settings imports -- 📯 thanks @tonytan4ever!
+
 ## 3.0.0 (2019-06-09)
 
 - [Improvement] Complete rewrite of Tutor: switch from a make-based project to a single binary which runs all commands.
