@@ -1,4 +1,4 @@
-from ..aws import *
+from lms.env.aws import *
 
 INSTALLED_APPS.remove('openedx.core.djangoapps.datadog.apps.DatadogConfig')
 
