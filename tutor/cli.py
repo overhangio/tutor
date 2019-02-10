@@ -4,6 +4,7 @@ import sys
 import click
 import click_repl
 
+from .__about__ import __version__
 from .android import android
 from .config import config
 from .dev import dev
@@ -24,7 +25,7 @@ def main():
         sys.exit(1)
 
 @click.group(context_settings={'help_option_names': ['-h', '--help', 'help']})
-@click.version_option()
+@click.version_option(version=__version__)
 def cli():
     pass
 
