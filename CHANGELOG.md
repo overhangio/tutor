@@ -1,8 +1,8 @@
 # Changelog
 
-## Latest
+## 3.0.1 (2019-06-11)
 
-- [Bugfix] fix mysql initialization (#156, #160)
+- [Bugfix] fix mysql initialization (#159, #160)
 - [Improvement] Better handling of continuous integration
 - [Bugfix] fix `tutor --version` (#156)
 - [Improvement] Absolute settings imports -- 📯 thanks @tonytan4ever!
