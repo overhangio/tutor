@@ -1,4 +1,5 @@
 import os
+import subprocess
 from time import sleep
 
 import click
@@ -130,16 +131,26 @@ def run(root, service, command, args):
 )
 @opts.root
 def databases(root):
-    mysql_data_path = tutor_env.data_path(root, "mysql", "mysql")
-    if not os.path.exists(mysql_data_path):
-        click.echo(fmt.info("Initializing MySQL database..."))
-        docker_compose(root, "up", "-d", "mysql")
-        while not os.path.exists(mysql_data_path):
-            click.echo(fmt.info("    waiting for creation of {}".format(mysql_data_path)))
-            sleep(4)
-        click.echo(fmt.info("MySQL database initialized"))
-        docker_compose(root, "stop", "mysql")
+    init_mysql(root)
     ops.migrate(root, run_bash)
+
+def init_mysql(root):
+    mysql_data_path = tutor_env.data_path(root, "mysql", "mysql")
+    if os.path.exists(mysql_data_path):
+        return
+    click.echo(fmt.info("Initializing MySQL database..."))
+    docker_compose(root, "up", "-d", "mysql")
+    while True:
+        click.echo(fmt.info("    waiting for mysql initialization"))
+        logs = subprocess.check_output([
+            "docker-compose", "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+            "logs", "mysql",
+        ])
+        if b"MySQL init process done. Ready for start up." in logs:
+            click.echo(fmt.info("MySQL database initialized"))
+            docker_compose(root, "stop", "mysql")
+            return
+        sleep(4)
 
 @click.group(help="Manage https certificates")
 def https():

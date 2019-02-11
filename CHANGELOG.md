@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Bugfix] fix mysql initialization (#156, #160)
 - [Improvement] Better handling of continuous integration
 - [Bugfix] fix `tutor --version` (#156)
 - [Improvement] Absolute settings imports -- 📯 thanks @tonytan4ever!
