@@ -144,7 +144,7 @@ def init_mysql(root):
         click.echo(fmt.info("    waiting for mysql initialization"))
         logs = subprocess.check_output([
             "docker-compose", "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-            "logs", "mysql",
+            "--project-name", "tutor_local", "logs", "mysql",
         ])
         if b"MySQL init process done. Ready for start up." in logs:
             click.echo(fmt.info("MySQL database initialized"))
