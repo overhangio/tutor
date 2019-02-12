@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Bugfix] Add missing template data to pypi package
+
 ## 3.0.2 (2019-02-12)
 
 - [Bugfix] Fix import paths -- 🚀 thanks @silviot!
