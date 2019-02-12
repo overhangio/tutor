@@ -24,7 +24,7 @@ def quickstart(root):
     click.echo(fmt.title("Environment generation"))
     env.callback(root)
     click.echo(fmt.title("Stopping any existing platform"))
-    stop.callback(root)
+    stop.callback()
     click.echo(fmt.title("Starting the platform"))
     start.callback(root)
 
