@@ -1,4 +1,4 @@
-from lms.env.devstack import *
+from lms.envs.devstack import *
 
 INSTALLED_APPS.remove('openedx.core.djangoapps.datadog.apps.DatadogConfig')
 

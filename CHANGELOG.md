@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Bugfix] Fix import paths -- 🚀 thanks @silviot!
+
 ## 3.0.1 (2019-06-11)
 
 - [Bugfix] fix mysql initialization (#159, #160)

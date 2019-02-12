@@ -1,4 +1,4 @@
-from cms.env.devstack import *
+from cms.envs.devstack import *
 
 INSTALLED_APPS.remove('openedx.core.djangoapps.datadog.apps.DatadogConfig')
 
