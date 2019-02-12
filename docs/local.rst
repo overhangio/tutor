@@ -80,7 +80,7 @@ Creating a new user with staff and admin rights
 
 You will most certainly need to create a user to administer the platform. Just run::
 
-    tutor createuser --staff --superuser yourusername user@email.com
+    tutor local createuser --staff --superuser yourusername user@email.com
 
 You will asked to set the user password interactively.
 
