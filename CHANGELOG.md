@@ -1,5 +1,10 @@
 # Changelog
 
+# Latest
+
+- [Minor] Fix non-https link to documentation in pypi
+- [Minor] Fix `createuser` documentation
+
 ## 3.0.3 (2019-02-12)
 
 - [Bugfix] Add missing template data to pypi package

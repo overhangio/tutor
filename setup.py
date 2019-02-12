@@ -16,7 +16,7 @@ setup(
     version=about["__version__"],
     url="http://docs.tutor.overhang.io/",
     project_urls={
-        "Documentation": "https://docs.tutor.overhang.io/",
+        "Documentation": "http://docs.tutor.overhang.io/",
         "Code": "https://github.com/regisb/tutor",
         "Issue tracker": "https://github.com/regisb/tutor/issues",
     },
