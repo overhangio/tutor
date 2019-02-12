@@ -1,17 +1,18 @@
 # Changelog
 
-## Latest
+## 3.0.2 (2019-02-12)
 
 - [Bugfix] Fix import paths -- 🚀 thanks @silviot!
+- [Bugfix] Properly set docker project name in mysql logs -- 🦊 thanks again @silviot!
 
-## 3.0.1 (2019-06-11)
+## 3.0.1 (2019-02-11)
 
 - [Bugfix] fix mysql initialization (#159, #160)
 - [Improvement] Better handling of continuous integration
 - [Bugfix] fix `tutor --version` (#156)
 - [Improvement] Absolute settings imports -- 📯 thanks @tonytan4ever!
 
-## 3.0.0 (2019-06-09)
+## 3.0.0 (2019-02-09)
 
 - [Improvement] Complete rewrite of Tutor: switch from a make-based project to a single binary which runs all commands.
 - [Feature] An web user interface can be created with `tutor webui start`
