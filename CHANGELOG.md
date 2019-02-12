@@ -4,6 +4,7 @@
 
 - [Bugfix] Add missing template data to pypi package
 - [Bugfix] Fix quickstart on Kubernetes (#164)
+- [Improvement] Add datatases task to Kubernetes quickstart (#167)
 
 ## 3.0.2 (2019-02-12)
 

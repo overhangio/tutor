@@ -27,6 +27,8 @@ def quickstart(root):
     stop.callback()
     click.echo(fmt.title("Starting the platform"))
     start.callback(root)
+    click.echo(fmt.title("Running migrations. NOTE: this might fail. If it does, please retry 'tutor k9s databases later'"))
+    databases.callback(root)
 
 @click.command(
     short_help="Generate environment",
