@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## 3.0.3 (2019-02-12)
 
 - [Bugfix] Add missing template data to pypi package
 - [Bugfix] Fix quickstart on Kubernetes (#164)
