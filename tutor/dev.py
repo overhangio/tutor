@@ -43,7 +43,7 @@ def runserver(root, edx_platform_path, edx_platform_settings, service):
     port = service_port(service)
     docker_compose_run_with_port(
         root, edx_platform_path, edx_platform_settings, port,
-        service, "./manage.py", "runserver", "0.0.0.0:{}".format(port),
+        service, "./manage.py", service, "runserver", "0.0.0.0:{}".format(port),
     )
 
 @click.command(

@@ -2,6 +2,7 @@
 
 # Latest
 
+- [Bugfix] Fix `runserver` dev command (#172)
 - [Minor] Fix non-https link to documentation in pypi
 - [Minor] Fix `createuser` documentation
 
