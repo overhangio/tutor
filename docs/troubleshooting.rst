@@ -29,6 +29,8 @@ The last commands produce the logs since the creation of the containers, which c
 
 If you'd rather use a graphical user interface for viewing logs, you are encouraged to try out :ref:`Portainer <portainer>`.
 
+.. _webserver:
+
 "Cannot start service nginx: driver failed programming external connectivity"
 -----------------------------------------------------------------------------
 
@@ -57,13 +59,15 @@ You can identify which containers are consuming most resources by running::
 
     docker stats
 
+.. _migrations_killed:
+
 "Running migrations... Killed!"
 -------------------------------
 
 Older versions of Open edX required at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. Follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`_.
 
 
-``Build failed running pavelib.servers.lms: Subprocess return code: 1``
+"Build failed running pavelib.servers.lms: Subprocess return code: 1"
 -----------------------------------------------------------------------
 
 ::
@@ -78,7 +82,7 @@ This might occur when you run a ``paver`` command. ``/dev/null`` eats the actual
 
 The error produced should help you better understand what is happening.
 
-``ValueError: Unable to configure handler 'local'``
+"ValueError: Unable to configure handler 'local'"
 ---------------------------------------------------
 
 ::
@@ -87,7 +91,7 @@ The error produced should help you better understand what is happening.
 
 This will occur if you try to run a development environment without patching the LOGGING configuration, as indicated in the `development_` section. Maybe you correctly patched the development settings, but they are not taken into account? For instance, you might have correctly defined the ``EDX_PLATFORM_SETTINGS`` environment variable, but ``paver`` uses the ``devstack`` settings (which does not patch the ``LOGGING`` variable). This is because calling ``paver lms --settings=development`` or ``paver cms --settings=development`` ignores the ``--settings`` argument. Yes, it might be considered an edx-platform bug... Instead, you should run the ``update_assets`` and ``runserver`` commands, as explained above.
 
-"``TypeError: get_logger_config() got an unexpected keyword argument 'debug'``"
+"TypeError: get_logger_config() got an unexpected keyword argument 'debug'"
 -------------------------------------------------------------------------------
 
 This might occur when you try to run the latest version of ``edx-platform``, and not a version close to ``hawthorn.master``. It is no longer necessary to patch the ``LOGGING`` configuration in the latest ``edx-platform`` releases, as indicated in the `development_` section, so you should remove the call to ``get_logger_config`` altogether from your development settings.

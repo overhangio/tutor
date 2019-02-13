@@ -103,4 +103,5 @@ def image_list(image):
 images.add_command(env)
 images.add_command(download)
 images.add_command(build)
+images.add_command(pull)
 images.add_command(push)

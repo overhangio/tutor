@@ -34,3 +34,12 @@ Generate the documentation
 You can then browse the documentation with::
 
     make browse
+
+Releasing a new version
+-----------------------
+
+- Bump the ``__version`` value in ``tutor/__about__.py``.
+- Replace "Latest" by the version name in CHANGELOG.md.
+- Upgrade the tutor version for the cloud.
+- Create a commit with the version changelog.
+- ``git push && git push --tags``

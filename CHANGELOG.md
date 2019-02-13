@@ -2,7 +2,10 @@
 
 ## Latest
 
-- [Improvement] Add `runserver top` command
+- [Feature] Add cloud deployment script
+- [Improvement] Run `images pull` command
+- [Improvement] Run `indexcourses` on importing demo course 
+- [Improvement] Add `runserver stop` command
 
 ## 3.0.4 (2019-02-13)
 
