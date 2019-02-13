@@ -38,6 +38,6 @@ https_certificates_create = """certbot certonly --standalone -n --agree-tos -m a
 
 create_user = """./manage.py lms --settings=tutor.production manage_user {{ OPTS }} {{ USERNAME }} {{ EMAIL }}
 ./manage.py lms --settings=tutor.production changepassword {{ USERNAME }}"""
-import_demo_course = """git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course
+import_demo_course = """git clone https://github.com/edx/edx-demo-course --branch open-release/ironwood.1rc1 --depth 1 ../edx-demo-course
 python ./manage.py cms --settings=tutor.production import ../data ../edx-demo-course"""
 index_courses = "./manage.py cms --settings=tutor.production reindex_course --all --setup"
