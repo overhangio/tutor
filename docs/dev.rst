@@ -58,7 +58,7 @@ Then, run a local webserver::
 
 The LMS can then be accessed at http://localhost:8000.
 
-You should follow the `Open edX documentation to enable your themes <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site>`_. In a nutshell, you should create a site theme that corresponds to the ``localhost:8000`` site in the site admin: http://localhost:8000/admin/theming/sitetheme/.
+Then, follow the `Open edX documentation to apply your themes <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site>`_. You will not have to modify the ``lms.env.json``/``cms.env.json`` files; just follow the instructions to add a site theme in http://localhost:8000/admin (starting from step 3).
 
 Watch the themes folders for changes (in a different terminal)::
 
