@@ -1,5 +1,5 @@
 appdirs
-click
+click>=7.0
 click_repl
 jinja2
 kubernetes

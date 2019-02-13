@@ -2,6 +2,7 @@
 
 # Latest
 
+- [Minor] Minimum required `click` version is 7.0 (#171)
 - [Bugfix] Fix `runserver` dev command (#172)
 - [Minor] Fix non-https link to documentation in pypi
 - [Minor] Fix `createuser` documentation

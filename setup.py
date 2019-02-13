@@ -30,7 +30,7 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "appdirs",
-        "click",
+        "click>=7.0",
         "click_repl",
         "jinja2",
         "kubernetes",
