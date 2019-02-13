@@ -40,7 +40,8 @@ def download(namespace, version, image):
 @click.command(
     short_help="Build docker images",
     help=("""Build the docker images necessary for an Open edX platform.
-          The images will be tagged as {namespace}/{image}:{version}."""))
+          The images will be tagged as {namespace}/{image}:{version}.""")
+)
 @opts.root
 @option_namespace
 @option_version
@@ -62,6 +63,18 @@ def build(root, namespace, version, image, build_arg):
                 "--build-arg", arg
             ]
         utils.docker(*command)
+
+@click.command(
+    short_help="Pull images from hub.docker.com",
+)
+@option_namespace
+@option_version
+@argument_image
+def pull(namespace, version, image):
+    for image in image_list(image):
+        tag = get_tag(namespace, image, version)
+        click.echo(fmt.info("Pulling image {}".format(tag)))
+        utils.execute("docker", "pull", tag)
 
 @click.command(
     short_help="Push images to hub.docker.com",
