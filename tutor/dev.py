@@ -46,6 +46,11 @@ def runserver(root, edx_platform_path, edx_platform_settings, service):
         service, "./manage.py", service, "runserver", "0.0.0.0:{}".format(port),
     )
 
+@click.command(help="Stop a running development platform",)
+@opts.root
+def stop(root):
+    docker_compose(root, "rm", "--stop", "--force")
+
 @click.command(
     help="Launch a shell",
 )
@@ -86,10 +91,13 @@ def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command)
     if edx_platform_path:
         run_command.append("--volume={}:/openedx/edx-platform".format(edx_platform_path))
     run_command += command
+    docker_compose(root, *run_command)
+
+def docker_compose(root, *command):
     return utils.docker_compose(
         "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
         "--project-name", "tutor_dev",
-        *run_command
+        *command
     )
 
 def service_port(service):
@@ -97,5 +105,6 @@ def service_port(service):
 
 dev.add_command(run)
 dev.add_command(runserver)
+dev.add_command(stop)
 dev.add_command(shell)
 dev.add_command(watchthemes)

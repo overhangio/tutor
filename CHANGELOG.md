@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Improvement] Add `runserver top` command
+
 ## 3.0.4 (2019-02-13)
 
 - [Minor] Minimum required `click` version is 7.0 (#171)
