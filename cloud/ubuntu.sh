@@ -3,7 +3,7 @@
 # Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/ubuntu.sh | sudo bash -e
 
 export TUTOR_VERSION="v3.0.5"
-export USER="$SUDO_USER"
+export TUTOR_USER="$SUDO_USER"
 export DEBIAN_FRONTEND=noninteractive 
 
 echo "=============== Installing system dependencies"
@@ -26,7 +26,7 @@ add-apt-repository \
 apt update
 apt install -y docker-ce docker-ce-cli containerd.io
 docker run hello-world
-usermod -aG docker $USER
+usermod -aG docker $TUTOR_USER
 
 echo "=============== Installing docker-compose"
 curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -39,7 +39,7 @@ chmod +x /usr/local/bin/tutor
 echo "=============== Configuring supervisor"
 echo "[program:tutor]
 command=/usr/local/bin/tutor webui start
-environment=HOME=/home/$USER
+environment=HOME=/home/$TUTOR_USER
 autorestart=true
-user=$USER" > /etc/supervisor/conf.d/tutor.conf
+user=$TUTOR_USER" > /etc/supervisor/conf.d/tutor.conf
 supervisorctl update
