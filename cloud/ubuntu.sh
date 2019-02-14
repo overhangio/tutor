@@ -2,7 +2,7 @@
 # Provision an AWS cloud instance with tutor.
 # Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/ubuntu.sh | sudo bash -e
 
-export TUTOR_VERSION="v3.0.4"
+export TUTOR_VERSION="v3.0.5"
 export USER="$SUDO_USER"
 export DEBIAN_FRONTEND=noninteractive 
 

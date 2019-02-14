@@ -2,6 +2,8 @@
 
 ## Latest
 
+## 3.0.5 (2019-02-14)
+
 - [Feature] Add cloud deployment script
 - [Improvement] Run `images pull` command
 - [Improvement] Run `indexcourses` on importing demo course 
