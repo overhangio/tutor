@@ -3,7 +3,7 @@
 # Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/ubuntu.sh | sudo bash -e
 
 export TUTOR_VERSION="v3.0.4"
-export USER=ubuntu
+export USER="$SUDO_USER"
 export DEBIAN_FRONTEND=noninteractive 
 
 echo "=============== Installing system dependencies"
