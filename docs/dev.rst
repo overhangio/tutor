@@ -21,8 +21,8 @@ Open a bash shell
     tutor dev shell lms
     tutor dev shell cms
 
-Debug edx-platform
-------------------
+Point to a local edx-platform
+-----------------------------
 
 If you have one, you can point to a local version of `edx-platform <https://github.com/edx/edx-platform/>`_ on your host machine. To do so, pass a ``-P/--edx-platform-path`` option to the commands. For instance::
 
@@ -32,9 +32,12 @@ If you don't want to rewrite this option every time, you can instead define the 
 
     export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
 
-All development commands will then automatically mount your local repo. For instance, you can add a ``import pdb; pdb.set_trace()`` breakpoint anywhere in your code and run::
+All development commands will then automatically mount your local repo.
 
-    tutor dev runserver lms --edx-platform-path=/path/to/edx-platform
+**Note:** containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the ":ref:`fork edx-platform <edx_platform_fork>`.
+
+Set up settings
+~~~~~~~~~~~~~~~
 
 With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the ``tutor.development`` settings files to our own repo::
 
@@ -43,7 +46,21 @@ With a customised edx-platform repo, you must be careful to have settings that a
 
 You can then run your platform with the ``tutor.development`` settings. See :ref:`the custom settings section <custom_edx_platform_settings>` for settings that are named differently.
 
-**Note:** containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the ":ref:`fork edx-platform <edx_platform_fork>`.
+Prepare the edx-platform repo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to run a fork of edx-platform, dependencies need to be properly installed and assets compiled in that repo. To do so, run::
+
+    tutor dev run  --edx-platform-path=/path/to/edx-platform lms npm install
+    tutor dev run  --edx-platform-path=/path/to/edx-platform lms python setup.py
+    tutor dev run  --edx-platform-path=/path/to/edx-platform lms openedx-assets build
+
+Debug edx-platform
+~~~~~~~~~~~~~~~~~~
+
+To debug a local edx-platform repository, add a ``import pdb; pdb.set_trace()`` breakpoint anywhere in your code and run::
+
+    tutor dev runserver lms --edx-platform-path=/path/to/edx-platform
 
 Customised themes
 -----------------
@@ -72,6 +89,10 @@ Assets management
 Assets building and collecting is made more difficult by the fact that development settings are `incorrectly loaded in Hawthorn <https://github.com/edx/edx-platform/pull/18430/files>`_. This should be fixed in the next Open edX release. Meanwhile, do not run ``paver update_assets`` while in development mode. When working locally on a theme, build assets by running in the container::
 
     openedx-assets build
+
+Alternatively, run from the host::
+    
+    tutor dev run lms openedx-assets build
 
 This command will take quite some time to run. You can speed up this process by running only part of the full build. Run ``openedx-assets -h`` for more information.
 
