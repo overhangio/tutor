@@ -12,10 +12,10 @@ tag: ## Create a release, update the "latest" tag and push them to origin
 	$(MAKE) retag TAG=latest
 
 retag:
-	echo "=== Creating tag $(TAG)"
+	@echo "=== Creating tag $(TAG)"
 	git tag -d $(TAG) || true
 	git tag $(TAG)
-	echo "=== Pushing tag $(TAG)"
+	@echo "=== Pushing tag $(TAG)"
 	git push origin :$(TAG) || true
 	git push origin $(TAG)
 
