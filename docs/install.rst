@@ -24,7 +24,10 @@ Also, the host running the containers should be a 64 bit platform. (images are n
 Direct binary downloads
 -----------------------
 
-The latest binaries can be downloaded from https://github.com/regisb/tutor/releases.
+The latest binaries can be downloaded from https://github.com/regisb/tutor/releases. From the command line::
+
+       sudo curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
+       sudo chmod +x /usr/local/bin/tutor
 
 Installing from pip
 -------------------
