@@ -38,8 +38,9 @@ You can then browse the documentation with::
 Releasing a new version
 -----------------------
 
-- Bump the ``__version`` value in ``tutor/__about__.py``.
+- Bump the ``__version__`` value in ``tutor/__about__.py``.
 - Replace "Latest" by the version name in CHANGELOG.md.
 - Upgrade the tutor version for the cloud.
 - Create a commit with the version changelog.
-- ``git push && git push --tags``
+- ``git push``
+- ``make tag TAG=vxxx``

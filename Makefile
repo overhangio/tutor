@@ -7,6 +7,18 @@ compile-requirements: ## Compile requirements files
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main
 
+tag: ## Create a release, update the "latest" tag and push them to origin
+	$(MAKE) retag TAG=$(TAG)
+	$(MAKE) retag TAG=latest
+
+retag:
+	echo "=== Creating tag $(TAG)"
+	git tag -d $(TAG) || true
+	git tag $(TAG)
+	echo "=== Pushing tag $(TAG)"
+	git push origin :$(TAG) || true
+	git push origin $(TAG)
+
 travis: bundle ## Run tests on travis-ci
 	./dist/tutor config noninteractive
 	./dist/tutor images env
@@ -21,7 +33,8 @@ ci-bundle: ## Create bundle
 	pip3 install -U setuptools
 	pip3 install -r requirements/dev.txt
 	$(MAKE) bundle
-	cp ./dist/tutor ./dist/tutor-$$TRAVIS_OS_NAME
+	mkdir -p releases/
+	cp ./dist/tutor ./releases/tutor-$$(uname -s)_$$(uname -m)
 
 ci-test: ## Run basic tests
 	./dist/tutor config noninteractive
