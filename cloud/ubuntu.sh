@@ -2,7 +2,6 @@
 # Provision an AWS cloud instance with tutor.
 # Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/ubuntu.sh | sudo bash -e
 
-export TUTOR_VERSION="v3.0.5"
 export TUTOR_USER="$SUDO_USER"
 export DEBIAN_FRONTEND=noninteractive 
 
@@ -33,7 +32,7 @@ curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compo
 chmod +x /usr/local/bin/docker-compose
 
 echo "=============== Installing tutor"
-curl -L "https://github.com/regisb/tutor/releases/download/$TUTOR_VERSION/tutor-linux" -o /usr/local/bin/tutor
+curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
 chmod +x /usr/local/bin/tutor
 
 echo "=============== Configuring supervisor"
