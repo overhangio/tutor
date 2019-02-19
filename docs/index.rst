@@ -10,6 +10,10 @@ Tutor 🎓 Open edX 1-click install for everyone
     :alt: Build status
     :target: https://travis-ci.org/regisb/tutor
 
+.. image:: https://readthedocs.org/projects/tutor/badge/?version=latest
+    :alt: Documentation Status
+    :target: https://docs.tutor.overhang.io/en/latest/?badge=latest
+
 .. image:: https://img.shields.io/github/stars/regisb/tutor.svg?style=social
     :alt: Github stars
     :target: https://github.com/regisb/tutor/
