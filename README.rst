@@ -39,7 +39,12 @@ Documentation
 
 Extensive documentation is available online: http://docs.tutor.overhang.io/
 
+Support
+-------
+
+To get community support, go to the official discussion forums: https://discuss.overhang.io.
+
 Contributing
 ------------
 
-We go to great lengths to make it as easy as possible for people to run Open edX inside Docker containers. If you have an improvement idea, feel free to `open an issue on Github <https://github.com/regisb/tutor/issues/new>`_ so that we can discuss it. `Pull requests <https://github.com/regisb/tutor/pulls>`_ will be happily examined, too!
+We go to great lengths to make it as easy as possible for people to run Open edX inside Docker containers. If you have an improvement idea, feel free to first discuss it on the `Tutor forum <https://discuss.overhang.io>`_. Did you find an issue with Tutor? Please first make sure that it's related to Tutor, and not an issue with Open edX. Then, `open an issue on Github <https://github.com/regisb/tutor/issues/new>`_. `Pull requests <https://github.com/regisb/tutor/pulls>`_ will be happily examined, too!
