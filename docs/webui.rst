@@ -16,6 +16,12 @@ You can then access the interface at http://localhost:3737, or http://youserveru
 
 .. image:: img/webui.png
 
+All ``tutor`` commands can be executed from this web UI: you just don't need to prefix the commands with ``tutor``. For instance, to deploy a local Open edX instance, run::
+
+    local quickstart
+
+instead of ``tutor local quickstart``.
+
 Authentication
 --------------
 
