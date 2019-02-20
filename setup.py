@@ -14,11 +14,12 @@ with io.open(os.path.join(here, "tutor", "__about__.py"), "rt", encoding="utf-8"
 setup(
     name="tutor-openedx",
     version=about["__version__"],
-    url="http://docs.tutor.overhang.io/",
+    url="https://docs.tutor.overhang.io/",
     project_urls={
-        "Documentation": "http://docs.tutor.overhang.io/",
+        "Documentation": "https://docs.tutor.overhang.io/",
         "Code": "https://github.com/regisb/tutor",
         "Issue tracker": "https://github.com/regisb/tutor/issues",
+        "Community": "https://discuss.overhang.io",
     },
     license="AGPLv3",
     author="Régis Behmo",

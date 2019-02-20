@@ -5,9 +5,9 @@ Tutor 🎓 Open edX 1-click install for everyone
     :alt: Build status
     :target: https://travis-ci.org/regisb/tutor
 
-.. image:: https://readthedocs.org/projects/tutor/badge/?version=latest
-    :alt: Documentation Status
-    :target: http://docs.tutor.overhang.io/en/latest/?badge=latest
+.. image:: https://img.shields.io/badge/docs-current-brightgreen.svg
+    :alt: Documentation
+    :target: https://docs.tutor.overhang.io
 
 .. image:: https://img.shields.io/github/issues/regisb/tutor.svg
     :alt: GitHub issues
@@ -41,7 +41,7 @@ Quickstart
 Documentation
 -------------
 
-Extensive documentation is available online: http://docs.tutor.overhang.io/
+Extensive documentation is available online: https://docs.tutor.overhang.io/
 
 Support
 -------
