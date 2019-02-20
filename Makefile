@@ -3,6 +3,7 @@
 compile-requirements: ## Compile requirements files
 	pip-compile -o requirements/base.txt requirements/base.in
 	pip-compile -o requirements/dev.txt requirements/dev.in
+	pip-compile -o requirements/docs.txt requirements/docs.in
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main
