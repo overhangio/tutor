@@ -10,3 +10,6 @@ XQUEUE_MYSQL_USERNAME: "xqueue"
 OPENEDX_DOCKER_IMAGE: "regis/openedx:hawthorn"
 NGINX_HTTP_PORT: 80
 NGINX_HTTPS_PORT: 443
+ANDROID_RELEASE_STORE_PASSWORD: "android store password"
+ANDROID_RELEASE_KEY_PASSWORD: "android release key password"
+ANDROID_RELEASE_KEY_ALIAS: "android release key alias"

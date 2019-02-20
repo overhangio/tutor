@@ -40,16 +40,3 @@ Xqueue
 ------
 
 `Xqueue <https://github.com/edx/xqueue>`_ is for grading problems with external services. If you don't know what it is, you probably don't need it.
-
-Android app (beta)
-------------------
-
-The Android app for your platform can be easily built in just one command::
-
-    tutor android build debug
-
-If all goes well, the debuggable APK for your platform should then be available in ./data/android. To obtain a release APK, you will need to obtain credentials from the app store and add them to ``config/android/gradle.properties``. Then run::
-
-    tutor android build release
-
-Building the Android app for an Open edX platform is currently labeled as a **beta feature** because it was not fully tested yet. In particular, there is no easy mechanism for overriding the edX assets in the mobile app. This is still a work-in-progress.

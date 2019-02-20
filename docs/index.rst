@@ -55,6 +55,7 @@ But there's a lot more to Tutor than that! For more advanced usage, please refer
    dev
    k8s
    webui
+   mobile
    troubleshooting
    tutor
    faq

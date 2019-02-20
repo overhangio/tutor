@@ -1,6 +1,6 @@
 import click
 
-from . import config
+from . import config as tutor_config
 from . import env as tutor_env
 from . import fmt
 from . import opts
@@ -20,7 +20,12 @@ def android():
 )
 @opts.root
 def env(root):
-    tutor_env.render_target(root, config.load(root), "android")
+    config = tutor_config.load(root)
+    # sub.domain.com -> com.domain.sub
+    config["LMS_HOST_REVERSE"] = ".".join(config["LMS_HOST"].split(".")[::-1])
+    tutor_env.render_target(root, config, "build")
+    tutor_env.render_target(root, config, "android")
+    click.echo(fmt.info("Environment generated in {}".format(root)))
 
 @click.group(
     help="Build the application"
@@ -33,10 +38,7 @@ def build():
 )
 @opts.root
 def debug(root):
-    docker_run(
-        root, "./gradlew", "assembleProdDebuggable", "&&",
-        "cp", "OpenEdXMobile/build/outputs/apk/prod/debuggable/*.apk", "/openedx/data/"
-    )
+    docker_run(root)
     click.echo(fmt.info("The debuggable APK file is available in {}".format(tutor_env.data_path(root, "android"))))
 
 @click.command(
@@ -56,8 +58,8 @@ def pullimage():
 
 def docker_run(root, *command):
     utils.docker_run(
-        "--volume={}/:/openedx/config/".format(tutor_env.pathjoin(root, "android")),
-        "--volume={}:/openedx/data".format(tutor_env.data_path(root, "android")),
+        "--volume={}:/openedx/config/".format(tutor_env.pathjoin(root, "android")),
+        "--volume={}:/openedx/data/".format(tutor_env.data_path(root, "android")),
         DOCKER_IMAGE,
         *command
     )
