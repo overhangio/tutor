@@ -7,9 +7,14 @@ compile-requirements: ## Compile requirements files
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main
+dist/tutor:
+	$(MAKE) bundle
+
+version: ## Print the current tutor version
+	@python -c 'import io, os; about = {}; exec(io.open(os.path.join("tutor", "__about__.py"), "rt", encoding="utf-8").read(), about); print(about["__version__"])'
 
 tag: ## Create a release, update the "latest" tag and push them to origin
-	$(MAKE) retag TAG=$(TAG)
+	$(MAKE) retag TAG=$(shell make version)
 	$(MAKE) retag TAG=latest
 
 retag:

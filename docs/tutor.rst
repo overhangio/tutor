@@ -42,4 +42,4 @@ Releasing a new version
 - Replace "Latest" by the version name in CHANGELOG.md.
 - Create a commit with the version changelog.
 - ``git push``
-- ``make tag TAG=vxxx``
+- ``make tag``
