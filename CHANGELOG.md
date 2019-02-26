@@ -2,6 +2,10 @@
 
 ## Latest
 
+## 3.0.6 (2019-02-26)
+
+- [Bugfix] Fix import/export of demo course (#175)
+
 ## 3.0.5 (2019-02-14)
 
 - [Feature] Add cloud deployment script
