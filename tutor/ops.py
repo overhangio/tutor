@@ -40,7 +40,7 @@ def create_user(root, run_func, superuser, staff, name, email):
     run_template(config, root, "lms", scripts.create_user, run_func)
 
 def import_demo_course(root, run_func):
-    run_template({}, root, "lms", scripts.import_demo_course, run_func)
+    run_template({}, root, "cms", scripts.import_demo_course, run_func)
 
 def index_courses(root, run_func):
     run_template({}, root, "cms", scripts.index_courses, run_func)
