@@ -6,7 +6,7 @@ RUN apt update && \
   apt install -y language-pack-en git python-pip libmysqlclient-dev
 
 RUN mkdir /openedx
-RUN git clone https://github.com/edx/edx-notes-api --branch open-release/ironwood.1rc1 --depth 1 /openedx/edx-notes-api
+RUN git clone https://github.com/edx/edx-notes-api --branch open-release/ironwood.1rc2 --depth 1 /openedx/edx-notes-api
 WORKDIR /openedx/edx-notes-api
 
 RUN pip install -r requirements/base.txt

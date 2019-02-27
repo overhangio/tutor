@@ -23,8 +23,7 @@ RUN wget https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_
 RUN yes | /openedx/android-sdk/tools/bin/sdkmanager "platforms;android-27" 1> /dev/null
 
 # Install android app repo
-# release/2.16.4 is the last know release to work with hawthorn
-RUN git clone https://github.com/edx/edx-app-android --branch release/2.16.4 --depth 1 /openedx/edx-app-android
+RUN git clone https://github.com/edx/edx-app-android --branch master --depth 1 /openedx/edx-app-android
 WORKDIR /openedx/edx-app-android
 
 # Install gradle and all dependencies
