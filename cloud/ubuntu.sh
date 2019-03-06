@@ -35,6 +35,10 @@ echo "=============== Installing tutor"
 curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
 chmod +x /usr/local/bin/tutor
 
+echo "=============== Building docker images"
+tutor images env
+tutor images build all
+
 echo "=============== Configuring supervisor"
 echo "[program:tutor]
 command=/usr/local/bin/tutor webui start

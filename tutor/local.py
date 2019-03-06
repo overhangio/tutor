@@ -23,16 +23,18 @@ def local():
 @click.command(
     help="Configure and run Open edX from scratch"
 )
+@click.option("-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images")
 @opts.root
-def quickstart(root):
+def quickstart(pullimages_, root):
     click.echo(fmt.title("Interactive platform configuration"))
     tutor_config.interactive.callback(root, [])
     click.echo(fmt.title("Environment generation"))
     env.callback(root)
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback(root)
-    click.echo(fmt.title("Docker image updates"))
-    pullimages.callback(root)
+    if pullimages_:
+        click.echo(fmt.title("Docker image updates"))
+        pullimages.callback(root)
     click.echo(fmt.title("Database creation and migrations"))
     databases.callback(root)
     click.echo(fmt.title("HTTPS certificates generation"))
