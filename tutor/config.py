@@ -23,10 +23,10 @@ def config(root):
 )
 @opts.root
 @opts.key_value
-def interactive(root, s):
+def interactive(root, set_):
     config = {}
     load_files(config, root)
-    for k, v in s:
+    for k, v in set_:
         config[k] = v
     load_interactive(config)
     save(config, root)
@@ -36,10 +36,10 @@ def interactive(root, s):
 )
 @opts.root
 @opts.key_value
-def noninteractive(root, s):
+def noninteractive(root, set_):
     config = {}
     load_files(config, root)
-    for k, v in s:
+    for k, v in set_:
         config[k] = v
     save(config, root)
 

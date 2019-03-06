@@ -15,7 +15,7 @@ Quickstart
 
 Yes :) This is what happens when you run ``tutor local quickstart``:
 
-1. You answer a few questions about the configuration of your Open edX platform and your :ref:`selected options <options>`
+1. You answer a few questions about the :ref:`configuration` of your Open edX platform.
 2. Configuration files are generated from templates.
 3. Docker images are downloaded.
 4. Docker containers are provisioned.

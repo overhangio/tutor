@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Configurable docker images (#122)
 - [Bugfix] Fix "android pullimage" command
 - [Improvement] Do not upgrade images as part of quickstart
 - [Bugfix] Fix USERID setup in development mode and various dev-related docs (#177)

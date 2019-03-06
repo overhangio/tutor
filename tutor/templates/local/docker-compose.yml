@@ -38,7 +38,7 @@ services:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
 
   openedx-assets:
-    image: {{ OPENEDX_DOCKER_IMAGE }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     volumes:
       - ../../data/openedx:/var/www/openedx
     command: bash -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
@@ -74,7 +74,7 @@ services:
   ############# Forum
 
   forum:
-    image: regis/openedx-forum:hawthorn
+    image: {{ DOCKER_IMAGE_FORUM }}
     restart: unless-stopped
     depends_on:
       - elasticsearch
@@ -83,7 +83,7 @@ services:
   ############# LMS and CMS
 
   lms:
-    image: {{ OPENEDX_DOCKER_IMAGE }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -103,7 +103,7 @@ services:
       - smtp
 
   cms:
-    image: {{ OPENEDX_DOCKER_IMAGE }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -125,7 +125,7 @@ services:
 
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
-    image: {{ OPENEDX_DOCKER_IMAGE }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -141,7 +141,7 @@ services:
       - lms
 
   cms_worker:
-    image: {{ OPENEDX_DOCKER_IMAGE }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -159,7 +159,7 @@ services:
   {% if ACTIVATE_NOTES %}
   ############# Notes: backend store for edX Student Notes
   notes:
-    image: regis/openedx-notes:hawthorn
+    image: {{ DOCKER_IMAGE_NOTES }}
     networks:
       default:
         aliases:
@@ -177,7 +177,7 @@ services:
   {% if ACTIVATE_XQUEUE %}
   ############# Xqueue: external grading of Open edX problems
   xqueue:
-    image: regis/openedx-xqueue:hawthorn
+    image: {{ DOCKER_IMAGE_XQUEUE }}
     volumes:
       - ../apps/xqueue/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
       - ../../data/xqueue:/openedx/data
@@ -188,7 +188,7 @@ services:
       - mysql
 
   xqueue_consumer:
-    image: regis/openedx-xqueue:hawthorn
+    image: {{ DOCKER_IMAGE_XQUEUE }}
     volumes:
       - ../apps/xqueue/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
       - ../../data/xqueue:/openedx/data

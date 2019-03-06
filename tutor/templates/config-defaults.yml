@@ -1,4 +1,9 @@
 ---
+DOCKER_IMAGE_OPENEDX: "regis/openedx:hawthorn"
+DOCKER_IMAGE_ANDROID: "regis/openedx-android:hawthorn"
+DOCKER_IMAGE_FORUM: "regis/openedx-forum:hawthorn"
+DOCKER_IMAGE_NOTES: "regis/openedx-notes:hawthorn"
+DOCKER_IMAGE_XQUEUE: "regis/openedx-xqueue:hawthorn"
 MYSQL_DATABASE: "openedx"
 MYSQL_USERNAME: "openedx"
 MONGODB_DATABASE: "openedx"
@@ -7,7 +12,6 @@ NOTES_MYSQL_USERNAME: "notes"
 XQUEUE_AUTH_USERNAME: "lms"
 XQUEUE_MYSQL_DATABASE: "xqueue"
 XQUEUE_MYSQL_USERNAME: "xqueue"
-OPENEDX_DOCKER_IMAGE: "regis/openedx:hawthorn"
 NGINX_HTTP_PORT: 80
 NGINX_HTTPS_PORT: 443
 ANDROID_RELEASE_STORE_PASSWORD: "android store password"

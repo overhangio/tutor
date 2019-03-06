@@ -84,7 +84,9 @@ By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/opened
 
 Then add the following value to your ``config.yml``::
 
-    OPENEDX_DOCKER_IMAGE: myusername/openedx:mytag
+    DOCKER_IMAGE_OPENEDX: myusername/openedx:mytag
+
+See the relevant :ref:`configuration parameters <docker_images>`.
 
 This value will then be used by Tutor when generating your environment. For instance, this is how you would use your image in a local deployment::
 

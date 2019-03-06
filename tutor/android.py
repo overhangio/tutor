@@ -7,8 +7,6 @@ from . import opts
 from . import utils
 
 
-DOCKER_IMAGE = "regis/openedx-android:hawthorn"
-
 @click.group(
     help="Build an Android app for your Open edX platform [BETA FEATURE]"
 )
@@ -54,13 +52,15 @@ def release(root):
 )
 @opts.root
 def pullimage(root):
-    utils.execute("docker", "pull", DOCKER_IMAGE)
+    config = tutor_config.load(root)
+    utils.execute("docker", "pull", config['DOCKER_IMAGE_ANDROID'])
 
 def docker_run(root, *command):
+    config = tutor_config.load(root)
     utils.docker_run(
         "--volume={}:/openedx/config/".format(tutor_env.pathjoin(root, "android")),
         "--volume={}:/openedx/data/".format(tutor_env.data_path(root, "android")),
-        DOCKER_IMAGE,
+        config['DOCKER_IMAGE_ANDROID'],
         *command
     )
 

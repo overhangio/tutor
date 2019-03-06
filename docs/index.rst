@@ -49,8 +49,8 @@ But there's a lot more to Tutor than that! For more advanced usage, please refer
 
    install
    quickstart
+   configuration
    local
-   options
    customise
    dev
    k8s

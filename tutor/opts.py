@@ -38,6 +38,6 @@ class YamlParamType(click.ParamType):
         return (k, v)
 
 key_value = click.option(
-    "-s", type=YamlParamType(), multiple=True, metavar="KEY=VAL",
+    "-s", "--set", "set_", type=YamlParamType(), multiple=True, metavar="KEY=VAL",
     help="Set a configuration value (can be used multiple times)"
 )
