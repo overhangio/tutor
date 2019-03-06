@@ -2,6 +2,7 @@
 !.gitignore
 TODO
 
+/tutor.spec
 /build/tutor
 /dist/
 /releases/
