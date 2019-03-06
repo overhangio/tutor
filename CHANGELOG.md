@@ -2,6 +2,8 @@
 
 ## Latest
 
+- [Bugfix] Fix "android pullimage" command
+- [Improvement] Do not upgrade images as part of quickstart
 - [Bugfix] Fix USERID setup in development mode and various dev-related docs (#177)
 
 ## 3.0.6 (2019-02-26)

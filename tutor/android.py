@@ -53,7 +53,7 @@ def release(root):
     help="Pull the docker image"
 )
 @opts.root
-def pullimage():
+def pullimage(root):
     utils.execute("docker", "pull", DOCKER_IMAGE)
 
 def docker_run(root, *command):
