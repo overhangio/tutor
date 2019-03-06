@@ -23,7 +23,6 @@ def env(root):
     config["LMS_HOST_REVERSE"] = ".".join(config["LMS_HOST"].split(".")[::-1])
     tutor_env.render_target(root, config, "build")
     tutor_env.render_target(root, config, "android")
-    click.echo(fmt.info("Environment generated in {}".format(root)))
 
 @click.group(
     help="Build the application"

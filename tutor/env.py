@@ -2,9 +2,11 @@ import codecs
 import os
 import shutil
 
+import click
 import jinja2
 
 from . import exceptions
+from . import fmt
 from . import utils
 
 
@@ -21,6 +23,7 @@ def render_target(root, config, target):
                 substituted = render_str(fi.read(), config)
             with open(dst, "w") as of:
                 of.write(substituted)
+    click.echo(fmt.info("Environment generated in {}".format(pathjoin(root, target))))
 
 def render_dict(config):
     """
@@ -67,6 +70,7 @@ def copy_target(root, target):
     for src, dst in walk_templates(root, target):
         if is_part_of_env(src):
             shutil.copy(src, dst)
+    click.echo(fmt.info("Environment generated in {}".format(pathjoin(root, target))))
 
 def is_part_of_env(path):
     return not os.path.basename(path).startswith(".")

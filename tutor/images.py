@@ -23,7 +23,6 @@ argument_image = click.argument(
 @opts.root
 def env(root):
     tutor_env.copy_target(root, "build")
-    click.echo(fmt.info("Environment generated in {}".format(root)))
 
 @click.command(
     short_help="Download docker images",

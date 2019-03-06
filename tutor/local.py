@@ -51,7 +51,6 @@ def env(root):
     config = tutor_config.load(root)
     tutor_env.render_target(root, config, "apps")
     tutor_env.render_target(root, config, "local")
-    click.echo(fmt.info("Environment generated in {}".format(root)))
 
 @click.command(
     help="Update docker images",
