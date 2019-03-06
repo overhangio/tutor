@@ -3,7 +3,7 @@
 Configuration
 =============
 
-With Tutor, all Open edX deployment parameters are stored in a single ``config.yml`` file. This is the file that is generated when you run ``tutor local quickstart`` or ``tutor config interactive``. To view the content of this file, run::
+With Tutor, all Open edX deployment parameters are stored in a single ``config.yml`` file. This is the file that is generated when you run ``tutor local quickstart`` or ``tutor config save``. To view the content of this file, run::
 
     cat $(tutor config printroot)/config.yml
 
@@ -13,7 +13,7 @@ By default, this file contains only the required configuration parameters for ru
 
 Alternatively, you can set each parameter from the command line::
 
-    tutor config noninteractive --set PARAM1=VALUE1 --set PARAM2=VALUE2
+    tutor config save --silent --set PARAM1=VALUE1 --set PARAM2=VALUE2
 
 After changing a configuration parameter, it will be taken into account next time the environment is generated. For instance, in a local installation::
 

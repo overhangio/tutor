@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Rename "config [non]interactive" command to "config save [--silent]"
 - [Improvement] More explicit logging during environment generation
 - [Improvement] Configurable docker images (#122)
 - [Bugfix] Fix "android pullimage" command

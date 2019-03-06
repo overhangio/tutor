@@ -27,7 +27,7 @@ def local():
 @opts.root
 def quickstart(pullimages_, root):
     click.echo(fmt.title("Interactive platform configuration"))
-    tutor_config.interactive.callback(root, [])
+    tutor_config.save.callback(root, False, [])
     click.echo(fmt.title("Environment generation"))
     env.callback(root)
     click.echo(fmt.title("Stopping any existing platform"))

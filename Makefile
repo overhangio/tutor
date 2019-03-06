@@ -26,7 +26,7 @@ retag:
 	git push origin $(TAG)
 
 travis: bundle ## Run tests on travis-ci
-	./dist/tutor config noninteractive
+	./dist/tutor config save --silent
 	./dist/tutor images env
 	./dist/tutor images build all
 	./dist/tutor local databases
@@ -43,7 +43,7 @@ ci-bundle: ## Create bundle
 	cp ./dist/tutor ./releases/tutor-$$(uname -s)_$$(uname -m)
 
 ci-test: ## Run basic tests
-	./dist/tutor config noninteractive
+	./dist/tutor config save --silent
 	./dist/tutor images env
 	./dist/tutor local env
 

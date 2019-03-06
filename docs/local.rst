@@ -21,9 +21,9 @@ Configuration
 
 ::
 
-    tutor config interactive
+    tutor config save
 
-This is the only non-automatic step in the install process. You will be asked various questions about your Open edX platform and appropriate configuration files will be generated. If you would like to automate this step then you should run ``tutor config interactive`` once. After that, there will be a ``config.yml`` file at the root of the project folder: this file contains all the configuration values for your platform, such as randomly generated passwords, domain names, etc.
+This is the only non-automatic step in the install process. You will be asked various questions about your Open edX platform and appropriate configuration files will be generated. If you would like to automate this step then you should run ``tutor config save`` once. After that, there will be a ``config.yml`` file at the root of the project folder: this file contains all the configuration values for your platform, such as randomly generated passwords, domain names, etc.
 
 If you want to run a fully automated install, upload the ``config.yml`` file to wherever you want to run Open edX. You can then entirely skip the configuration step.
 

@@ -14,37 +14,24 @@ from . import opts
     short_help="Configure Open edX",
     help="""Configure Open edX and store configuration values in $TUTOR_ROOT/config.yml"""
 )
-@opts.root
-def config(root):
+def config():
     pass
 
-@click.command(
-    help="Create and save configuration interactively",
-)
+@click.command(help="Create and save configuration interactively")
 @opts.root
+@click.option("--silent", is_flag=True, help="Run non-interactively")
 @opts.key_value
-def interactive(root, set_):
+def save(root, silent, set_):
     config = {}
     load_files(config, root)
     for k, v in set_:
         config[k] = v
-    load_interactive(config)
-    save(config, root)
+    if not silent:
+        load_interactive(config)
+    save_config(config, root)
 
 @click.command(
-    help="Create and save configuration without user interaction",
-)
-@opts.root
-@opts.key_value
-def noninteractive(root, set_):
-    config = {}
-    load_files(config, root)
-    for k, v in set_:
-        config[k] = v
-    save(config, root)
-
-@click.command(
-    help="Print the tutor project root",
+    help="Print the project root",
 )
 @opts.root
 def printroot(root):
@@ -60,7 +47,7 @@ def load(root):
 
     if not os.path.exists(config_path(root)):
         load_interactive(config)
-        save(config, root)
+        save_config(config, root)
 
     load_defaults(config)
 
@@ -156,11 +143,11 @@ def convert_json2yml(root):
         )
     with open(json_path) as fi:
         config = json.load(fi)
-        save(config, root)
+        save_config(config, root)
     os.remove(json_path)
     click.echo(fmt.info("File config.json detected in {} and converted to config.yml".format(root)))
 
-def save(config, root):
+def save_config(config, root):
     env.render_dict(config)
     path = config_path(root)
     directory = os.path.dirname(path)
@@ -173,6 +160,5 @@ def save(config, root):
 def config_path(root):
     return os.path.join(root, "config.yml")
 
-config.add_command(interactive)
-config.add_command(noninteractive)
+config.add_command(save)
 config.add_command(printroot)
