@@ -2,6 +2,8 @@
 
 ## Latest
 
+- [Bugfix] Fix USERID setup in development mode and various dev-related docs (#177)
+
 ## 3.0.6 (2019-02-26)
 
 - [Bugfix] Fix import/export of demo course (#175)

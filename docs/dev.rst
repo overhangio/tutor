@@ -36,24 +36,16 @@ All development commands will then automatically mount your local repo.
 
 **Note:** containers are built on the Hawthorn release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the ":ref:`fork edx-platform <edx_platform_fork>`.
 
-Set up settings
-~~~~~~~~~~~~~~~
-
-With a customised edx-platform repo, you must be careful to have settings that are compatible with the docker environment. You are encouraged to copy the ``tutor.development`` settings files to our own repo::
-
-    cp -r $(tutor config printroot)/env/apps/openedx/tutor/lms/ /path/to/edx-platform/lms/envs/tutor
-    cp -r $(tutor config printroot)/env/apps/openedx/tutor/cms/ /path/to/edx-platform/cms/envs/tutor
-
-You can then run your platform with the ``tutor.development`` settings. See :ref:`the custom settings section <custom_edx_platform_settings>` for settings that are named differently.
-
 Prepare the edx-platform repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to run a fork of edx-platform, dependencies need to be properly installed and assets compiled in that repo. To do so, run::
 
-    tutor dev run  --edx-platform-path=/path/to/edx-platform lms npm install
-    tutor dev run  --edx-platform-path=/path/to/edx-platform lms python setup.py
-    tutor dev run  --edx-platform-path=/path/to/edx-platform lms openedx-assets build
+    export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
+    tutor dev run lms npm install
+    tutor dev run lms pip install --src ../venv/src --requirement requirements/edx/development.txt
+    tutor dev run lms python setup.py install
+    tutor dev run lms openedx-assets build
 
 Debug edx-platform
 ~~~~~~~~~~~~~~~~~~
@@ -106,9 +98,27 @@ These commands will open a python shell in the lms or the cms::
 
 You can then import edx-platform and django modules and execute python code.
 
-.. _custom_edx_platform_settings:
-
 Custom edx-platform settings
 ----------------------------
 
-In the various ``dev`` commands, the default ``edx-platform`` settings module is ``tutor.development``. If, for some reason, you want to use different settings, you will need to pass the ``-S/--edx-platform-settings`` option to each command. Alternatively, you can define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
+By default, tutor settings files are mounted inside the docker images at ``/openedx/edx-platform/lms/envs/tutor/`` and ``/openedx/edx-platform/cms/envs/tutor/``. In the various ``dev`` commands, the default ``edx-platform`` settings module is set to ``tutor.development`` and you don't have to do anything to set up these settings.
+
+If, for some reason, you want to use different settings, you will need to pass the ``-S/--edx-platform-settings`` option to each command. Alternatively, you can define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
+
+For instance, let's assume you have created the ``/path/to/edx-platform/lms/envs/mysettings.py`` and ``/path/to/edx-platform/cms/envs/mysettings.py`` modules. These settings should be pretty similar to the following files::
+
+    $(tutor config printroot)/env/apps/openedx/tutor/lms/development.py
+    $(tutor config printroot)/env/apps/openedx/tutor/cms/development.py
+
+Alternatively, the ``mysettings.py`` files can import the tutor development settings::
+
+    # Beginning of mysettings.py
+    from .tutor.development import *
+
+You should then specify the settings to use on the host::
+
+    export TUTOR_EDX_PLATFORM_SETTINGS=mysettings
+
+From then on, all ``dev`` commands will use the ``mysettings`` module. For instance::
+
+    tutor dev runserver lms --edx-platform-path=/path/to/edx-platform

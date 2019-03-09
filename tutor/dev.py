@@ -1,3 +1,5 @@
+import subprocess
+
 import click
 
 from . import env as tutor_env
@@ -89,7 +91,10 @@ def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command)
         "-e", "SETTINGS={}".format(edx_platform_settings),
     ]
     if edx_platform_path:
-        run_command.append("--volume={}:/openedx/edx-platform".format(edx_platform_path))
+        run_command += [
+            "--volume={}:/openedx/edx-platform".format(edx_platform_path),
+            "-e", "USERID={}".format(subprocess.check_output(["id", "-u"]).strip().decode())
+        ]
     run_command += command
     docker_compose(root, *run_command)
 
