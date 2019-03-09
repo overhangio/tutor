@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## 3.1.0 (2019-03-09)
 
 - [Improvement] Install python requirements in virtual env in docker image
 - [Bugfix] Add missing volume for theme development
