@@ -6,7 +6,7 @@ MAINTAINER Régis Behmo <regis@behmo.com>
 # Install system requirements
 RUN apt update && \
     # Global requirements
-    apt install -y language-pack-en git python-virtualenv build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev python-pip libmysqlclient-dev python-apt python-dev libxmlsec1-dev libfreetype6-dev swig gcc g++ \
+    apt install -y language-pack-en git python-virtualenv build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev python-virtualenv libmysqlclient-dev python-apt python-dev libxmlsec1-dev libfreetype6-dev swig gcc g++ \
     # openedx requirements
     gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng12-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev lynx nodejs npm ntp pkg-config \
     # Our requirements
@@ -36,12 +36,15 @@ RUN cd /tmp \
 # Install python requirements (clone source repos in a separate dir, otherwise
 # they will be overwritten when we mount edx-platform)
 ENV NO_PYTHON_UNINSTALL 1
-RUN pip install --src ../venv/src -r requirements/edx/base.txt
-RUN pip install --src ../venv/src -r requirements/edx/development.txt
+RUN virtualenv /openedx/venv
+ENV PATH /openedx/venv/bin:${PATH}
+ENV VIRTUAL_ENV /openedx/venv/
+RUN pip install setuptools==39.0.1 pip==9.0.3
+RUN pip install -r requirements/edx/development.txt
 
 # Install patched version of ora2
 RUN pip uninstall -y ora2 && \
-    pip install --src ../venv/src git+https://github.com/regisb/edx-ora2.git@open-release/hawthorn.2#egg=ora2==2.1.17
+    pip install git+https://github.com/regisb/edx-ora2.git@open-release/hawthorn.2#egg=ora2==2.1.17
 
 # Install a recent version of nodejs
 RUN nodeenv /openedx/nodeenv --node=8.9.3 --prebuilt

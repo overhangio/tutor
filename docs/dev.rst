@@ -43,7 +43,7 @@ In order to run a fork of edx-platform, dependencies need to be properly install
 
     export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
     tutor dev run lms npm install
-    tutor dev run lms pip install --src ../venv/src --requirement requirements/edx/development.txt
+    tutor dev run lms pip install --requirement requirements/edx/development.txt
     tutor dev run lms python setup.py install
     tutor dev run lms openedx-assets build
 
@@ -73,7 +73,7 @@ Watch the themes folders for changes (in a different terminal)::
 
     tutor dev watchthemes
 
-Make changes to some of the files inside your theme directory: the theme assets should be automatically recompiled and visible at http://localhost:8000.
+Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://localhost:8000.
 
 Assets management
 -----------------
