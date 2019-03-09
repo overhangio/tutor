@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Bugfix] Add missing volume for theme development
 - [Improvement] Rename "config [non]interactive" command to "config save [--silent]"
 - [Improvement] More explicit logging during environment generation
 - [Improvement] Configurable docker images (#122)

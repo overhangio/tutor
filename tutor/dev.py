@@ -89,6 +89,7 @@ def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command)
     run_command = [
         "run", "--rm",
         "-e", "SETTINGS={}".format(edx_platform_settings),
+        "--volume={}:/openedx/themes".format(tutor_env.pathjoin(root, "build", "openedx", "themes")),
     ]
     if edx_platform_path:
         run_command += [
