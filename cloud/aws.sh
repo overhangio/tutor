@@ -1,6 +1,6 @@
 #! /bin/bash -e
 # Provision an AWS cloud instance with tutor.
-# Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/ubuntu.sh | sudo bash -e
+# Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/aws.sh | sudo bash -e
 
 export TUTOR_USER="$SUDO_USER"
 export DEBIAN_FRONTEND=noninteractive 
@@ -38,6 +38,9 @@ chmod +x /usr/local/bin/tutor
 echo "=============== Building docker images"
 tutor images env
 tutor images build all
+
+echo "=============== Configure Web UI login/password"
+tutor webui configure --user tutor --password "$(curl http://169.254.169.254/latest/meta-data/public-hostname)"
 
 echo "=============== Configuring supervisor"
 echo "[program:tutor]
