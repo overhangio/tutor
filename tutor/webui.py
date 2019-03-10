@@ -118,7 +118,11 @@ def load_config(root):
         return yaml.load(f)
 
 def save_config(root, config):
-    with open(config_path(root), "w") as of:
+    path = config_path(root)
+    directory = os.path.dirname(path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    with open(path, "w") as of:
         yaml.dump(config, of, default_flow_style=False)
 
 def gotty_path(root):
