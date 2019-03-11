@@ -13,8 +13,7 @@ sudo apt update \
         ca-certificates \
         curl \
         gnupg-agent \
-        software-properties-common \
-        supervisor
+        software-properties-common
 
 echo "=============== Installing docker"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -48,9 +47,18 @@ fi
 tutor webui start' | sudo tee /usr/local/bin/tutor-webui
 sudo chmod +x /usr/local/bin/tutor-webui
 
-echo "=============== Configuring supervisor"
-echo "[program:tutor]
-command=/usr/local/bin/tutor-webui
-environment=HOME=/home/$TUTOR_USER
-autorestart=true
-user=$TUTOR_USER" | sudo tee /etc/supervisor/conf.d/tutor.conf
+echo "=============== Configuring systemd"
+echo "[Unit]
+Description=Tutor web UI
+After=network.target
+
+[Service]
+User=$TUTOR_USER
+WorkingDirectory=/home/$TUTOR_USER
+Environment="HOME=/home/$TUTOR_USER"
+ExecStart=/usr/local/bin/tutor-webui
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target" | sudo tee /etc/systemd/system/tutor-webui.service
+sudo systemctl enable tutor-webui
