@@ -23,6 +23,7 @@ sudo add-apt-repository \
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io
 sudo usermod -aG docker $TUTOR_USER
+sudo su - $TUTOR_USER
 docker run hello-world
 
 echo "=============== Installing docker-compose"
