@@ -7,7 +7,6 @@ export DEBIAN_FRONTEND=noninteractive
 
 echo "=============== Installing system dependencies"
 sudo apt update \
-    && sudo apt upgrade -y \
     && sudo apt install -y \
         apt-transport-https \
         ca-certificates \
