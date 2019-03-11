@@ -42,6 +42,7 @@ tutor images build all
 echo "=============== Create Web UI script"
 echo '#! /bin/bash
 if [ ! -f $(tutor config printroot)/env/webui/config.yml ]; then
+    mkdir -p $(tutor config printroot)/env/webui
     tutor webui configure --user tutor --password "$(curl http://169.254.169.254/latest/meta-data/instance-id)"
 fi
 tutor webui start' | sudo tee /usr/local/bin/tutor-webui
@@ -53,4 +54,3 @@ command=/usr/local/bin/tutor-webui
 environment=HOME=/home/$TUTOR_USER
 autorestart=true
 user=$TUTOR_USER" | sudo tee /etc/supervisor/conf.d/tutor.conf
-sudo supervisorctl update
