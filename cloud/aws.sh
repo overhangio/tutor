@@ -71,3 +71,9 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target" | sudo tee /etc/systemd/system/tutor-webui.service
 sudo systemctl enable tutor-webui
+
+echo "=============== Clean authorized keys"
+sudo find / -name "authorized_keys" -exec rm -f {} \;
+
+echo "=============== Clean history"
+sudo find /root/.*history /home/*/.*history -exec rm -f {} \;
