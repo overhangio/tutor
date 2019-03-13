@@ -34,6 +34,15 @@ echo "=============== Installing tutor"
 sudo curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
 sudo chmod +x /usr/local/bin/tutor
 
+echo "=============== Pulling vendor docker images"
+docker pull memcached:1.4.38
+docker pull mongo:3.2.16
+docker pull mysql:5.6.36
+docker pull elasticsearch:1.5.2
+docker pull nginx:1.13
+docker pull rabbitmq:3.6.10
+docker pull namshi/smtp:latest
+
 echo "=============== Building docker images"
 tutor images env
 tutor images build all

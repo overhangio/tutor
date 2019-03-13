@@ -68,7 +68,7 @@ services:
 
   # Simple SMTP server
   smtp:
-    image: namshi/smtp
+    image: namshi/smtp:latest
     restart: unless-stopped
 
   ############# Forum
