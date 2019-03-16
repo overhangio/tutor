@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Error and interrupt handling in UI and web UI
 - [Bugfix] Fix missing webui env directory
 
 ## 3.1.0 (2019-03-09)

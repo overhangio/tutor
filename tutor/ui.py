@@ -9,5 +9,10 @@ def ui():
     click.echo("""Welcome to the Tutor interactive shell UI!
 Type "help" to view all available commands.
 Type "local quickstart" to configure and launch a new platform from scratch.
-""")
-    click_repl.repl(click.get_current_context())
+Type <ctrl-d> to exit.""")
+    while True:
+        try:
+            click_repl.repl(click.get_current_context())
+            return  # this happens on a ctrl+d
+        except Exception:
+            pass
