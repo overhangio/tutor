@@ -28,9 +28,6 @@ retag:
 
 ###### Continuous integration tasks
 
-ci-config: ## Generate configuration and environment
-	./dist/tutor config save --silent --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
-
 ci-info: ## Print info about environment
 	python3 --version
 	pip3 --version
@@ -43,6 +40,7 @@ ci-bundle: ## Create bundle and run basic tests
 	cp ./dist/tutor ./releases/tutor-$$(uname -s)_$$(uname -m)
 	./dist/tutor --version
 	./dist/tutor config printroot
+	./dist/tutor config save --silent --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
 
 ci-images: ## Build and push docker images to hub.docker.com
 	python setup.py develop
