@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: cms
-          image: {{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
           env:
           - name: SERVICE_VARIANT
             value: cms
@@ -62,7 +62,7 @@ spec:
     spec:
       containers:
         - name: forum
-          image: {{ DOCKER_IMAGE_FORUM }}
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
           ports:
             - containerPort: 4567
           imagePullPolicy: Always
@@ -84,7 +84,7 @@ spec:
     spec:
       containers:
         - name: lms
-          image: {{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -128,7 +128,7 @@ spec:
     spec:
       containers:
         - name: elasticsearch
-          image: elasticsearch:1.5.2
+          image: {{ DOCKER_REGISTRY }}elasticsearch:1.5.2
           env:
             - name: ES_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
@@ -163,7 +163,7 @@ spec:
     spec:
       containers:
         - name: memcached
-          image: memcached:1.4.38
+          image: {{ DOCKER_REGISTRY }}memcached:1.4.38
           ports:
             - containerPort: 11211
 
@@ -184,7 +184,7 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: mongo:3.2.16
+          image: {{ DOCKER_REGISTRY }}mongo:3.2.16
           command: ["mongod", "--smallfiles", "--nojournal", "--storageEngine", "wiredTiger"]
           ports:
             - containerPort: 27017
@@ -212,7 +212,7 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:5.6.36
+          image: {{ DOCKER_REGISTRY }}mysql:5.6.36
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -246,14 +246,14 @@ spec:
     spec:
       initContainers:
         - name: clean-openedx-staticfiles
-          image: {{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
           command: ['rm', '-rf', '/var/www/openedx/staticfiles']
           volumeMounts:
             - mountPath: /var/www/openedx/
               name: openedx-staticfiles
           imagePullPolicy: Always
         - name: init-openedx-staticfiles
-          image: {{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
           command: ['cp', '-r', '/openedx/staticfiles', '/var/www/openedx/']
           volumeMounts:
             - mountPath: /var/www/openedx/
@@ -261,7 +261,7 @@ spec:
           imagePullPolicy: Always
       containers:
         - name: nginx
-          image: nginx:1.13
+          image: {{ DOCKER_REGISTRY }}nginx:1.13
           volumeMounts:
             - mountPath: /etc/nginx/conf.d/
               name: config
@@ -302,7 +302,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          image: rabbitmq:3.6.10
+          image: {{ DOCKER_REGISTRY }}rabbitmq:3.6.10
           ports:
             - containerPort: 5672
           volumeMounts:

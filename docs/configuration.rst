@@ -38,6 +38,15 @@ These configuration parameters define which image to run for each service.
 - ``DOCKER_IMAGE_NOTES`` (default: ``regis/openedx-notes:hawthorn``)
 - ``DOCKER_IMAGE_XQUEUE`` (default: ``regis/openedx-xqueue:hawthorn``)
 
+``DOCKER_REGISTRY`` Custom Docker registry
+------------------------------------------
+
+You may want to pull/push images from/to a custom docker registry. For instance, for a registry running on ``localhost:5000``, define::
+
+    DOCKER_REGISTRY: localhost:5000/
+
+(the trailing ``/`` is important)
+
 ``ACTIVATE_*`` Optional features
 --------------------------------
 

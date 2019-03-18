@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Feature] Customize docker registry
 - [Feature] Load configuration parameters from the system environment
 - [Improvement] Automatic environment re-generation after re-configuration
 - [Improvement] Error and interrupt handling in UI and web UI

@@ -10,44 +10,25 @@ from . import utils
 def images():
     pass
 
-option_namespace = click.option("-n", "--namespace", default="regis", show_default=True)
-option_version = click.option("-V", "--version", default="hawthorn", show_default=True)
 all_images = ["openedx", "forum", "notes", "xqueue", "android"]
 argument_image = click.argument(
     "image", type=click.Choice(["all"] + all_images),
 )
 
 @click.command(
-    short_help="Download docker images",
-    help=("""Download the docker images from hub.docker.com.
-          The images will come from {namespace}/{image}:{version}.""")
-)
-@opts.root
-@option_namespace
-@option_version
-@argument_image
-def download(root, namespace, version, image):
-    config = tutor_config.load(root)
-    for image in image_list(config, image):
-        utils.docker('image', 'pull', get_tag(namespace, image, version))
-
-@click.command(
     short_help="Build docker images",
-    help=("""Build the docker images necessary for an Open edX platform.
-          The images will be tagged as {namespace}/{image}:{version}.""")
+    help="Build the docker images necessary for an Open edX platform."
 )
 @opts.root
-@option_namespace
-@option_version
 @argument_image
 @click.option(
     "-a", "--build-arg", multiple=True,
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times."
 )
-def build(root, namespace, version, image, build_arg):
+def build(root, image, build_arg):
     config = tutor_config.load(root)
     for image in image_list(config, image):
-        tag = get_tag(namespace, image, version)
+        tag = get_tag(config, image)
         click.echo(fmt.info("Building image {}".format(tag)))
         command = [
             "build", "-t", tag,
@@ -59,41 +40,31 @@ def build(root, namespace, version, image, build_arg):
             ]
         utils.docker(*command)
 
-@click.command(
-    short_help="Pull images from hub.docker.com",
-)
+@click.command(short_help="Pull images from the docker registry")
 @opts.root
-@option_namespace
-@option_version
 @argument_image
-def pull(root, namespace, version, image):
+def pull(root, image):
     config = tutor_config.load(root)
     for image in image_list(config, image):
-        tag = get_tag(namespace, image, version)
+        tag = get_tag(config, image)
         click.echo(fmt.info("Pulling image {}".format(tag)))
         utils.execute("docker", "pull", tag)
 
-@click.command(
-    short_help="Push images to hub.docker.com",
-)
+@click.command(short_help="Push images to the Docker registry")
 @opts.root
-@option_namespace
-@option_version
 @argument_image
-def push(root, namespace, version, image):
+def push(root, image):
     config = tutor_config.load(root)
     for image in image_list(config, image):
-        tag = get_tag(namespace, image, version)
+        tag = get_tag(config, image)
         click.echo(fmt.info("Pushing image {}".format(tag)))
         utils.execute("docker", "push", tag)
 
-def get_tag(namespace, image, version):
-    name = "openedx" if image == "openedx" else "openedx-{}".format(image)
-    return "{namespace}{sep}{image}:{version}".format(
-        namespace=namespace,
-        sep="/" if namespace else "",
-        image=name,
-        version=version,
+def get_tag(config, name):
+    image = config["DOCKER_IMAGE_" + name.upper()]
+    return "{registry}{image}".format(
+        registry=config["DOCKER_REGISTRY"],
+        image=image,
     )
 
 def image_list(config, image):
@@ -106,7 +77,6 @@ def image_list(config, image):
         return images
     return [image]
 
-images.add_command(download)
 images.add_command(build)
 images.add_command(pull)
 images.add_command(push)

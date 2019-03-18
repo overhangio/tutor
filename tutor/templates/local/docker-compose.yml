@@ -4,11 +4,11 @@ services:
   ############# External services
 
   memcached:
-    image: memcached:1.4.38
+    image: {{ DOCKER_REGISTRY }}memcached:1.4.38
     restart: unless-stopped
 
   mongodb:
-    image: mongo:3.2.16
+    image: {{ DOCKER_REGISTRY }}mongo:3.2.16
     # Use WiredTiger in all environments, just like at edx.org
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     restart: unless-stopped
@@ -16,7 +16,7 @@ services:
       - ../../data/mongodb:/data/db
 
   mysql:
-    image: mysql:5.6.36
+    image: {{ DOCKER_REGISTRY }}mysql:5.6.36
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     restart: unless-stopped
     volumes:
@@ -24,7 +24,7 @@ services:
     env_file: ../apps/mysql/auth.env
 
   elasticsearch:
-    image: elasticsearch:1.5.2
+    image: {{ DOCKER_REGISTRY }}elasticsearch:1.5.2
     environment:
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
       - "cluster.name=openedx"
@@ -38,13 +38,13 @@ services:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
 
   openedx-assets:
-    image: {{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     volumes:
       - ../../data/openedx:/var/www/openedx
     command: bash -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
 
   nginx:
-    image: nginx:1.13
+    image: {{ DOCKER_REGISTRY }}nginx:1.13
     restart: unless-stopped
     ports:
       - "{{ NGINX_HTTP_PORT }}:80"
@@ -61,20 +61,20 @@ services:
       {% if ACTIVATE_NOTES %}- notes{% endif %}
 
   rabbitmq:
-    image: rabbitmq:3.6.10
+    image: {{ DOCKER_REGISTRY }}rabbitmq:3.6.10
     volumes:
       - ../../data/rabbitmq:/var/lib/rabbitmq
     restart: unless-stopped
 
   # Simple SMTP server
   smtp:
-    image: namshi/smtp:latest
+    image: {{ DOCKER_REGISTRY }}namshi/smtp:latest
     restart: unless-stopped
 
   ############# Forum
 
   forum:
-    image: {{ DOCKER_IMAGE_FORUM }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
     restart: unless-stopped
     depends_on:
       - elasticsearch
@@ -83,7 +83,7 @@ services:
   ############# LMS and CMS
 
   lms:
-    image: {{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -103,7 +103,7 @@ services:
       - smtp
 
   cms:
-    image: {{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -125,7 +125,7 @@ services:
 
   # We could probably create one service per queue here. For small instances, it is not necessary.
   lms_worker:
-    image: {{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -141,7 +141,7 @@ services:
       - lms
 
   cms_worker:
-    image: {{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -159,7 +159,7 @@ services:
   {% if ACTIVATE_NOTES %}
   ############# Notes: backend store for edX Student Notes
   notes:
-    image: {{ DOCKER_IMAGE_NOTES }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NOTES }}
     networks:
       default:
         aliases:
@@ -177,7 +177,7 @@ services:
   {% if ACTIVATE_XQUEUE %}
   ############# Xqueue: external grading of Open edX problems
   xqueue:
-    image: {{ DOCKER_IMAGE_XQUEUE }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_XQUEUE }}
     volumes:
       - ../apps/xqueue/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
       - ../../data/xqueue:/openedx/data
@@ -188,7 +188,7 @@ services:
       - mysql
 
   xqueue_consumer:
-    image: {{ DOCKER_IMAGE_XQUEUE }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_XQUEUE }}
     volumes:
       - ../apps/xqueue/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
       - ../../data/xqueue:/openedx/data
