@@ -128,7 +128,7 @@ spec:
     spec:
       containers:
         - name: elasticsearch
-          image: {{ DOCKER_REGISTRY }}elasticsearch:1.5.2
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_ELASTICSEARCH }}
           env:
             - name: ES_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
@@ -163,7 +163,7 @@ spec:
     spec:
       containers:
         - name: memcached
-          image: {{ DOCKER_REGISTRY }}memcached:1.4.38
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MEMCACHED }}
           ports:
             - containerPort: 11211
 
@@ -184,7 +184,7 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: {{ DOCKER_REGISTRY }}mongo:3.2.16
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MONGODB }}
           command: ["mongod", "--smallfiles", "--nojournal", "--storageEngine", "wiredTiger"]
           ports:
             - containerPort: 27017
@@ -212,7 +212,7 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: {{ DOCKER_REGISTRY }}mysql:5.6.36
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -261,7 +261,7 @@ spec:
           imagePullPolicy: Always
       containers:
         - name: nginx
-          image: {{ DOCKER_REGISTRY }}nginx:1.13
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NGINX }}
           volumeMounts:
             - mountPath: /etc/nginx/conf.d/
               name: config
@@ -302,7 +302,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          image: {{ DOCKER_REGISTRY }}rabbitmq:3.6.10
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_RABBITMQ }}
           ports:
             - containerPort: 5672
           volumeMounts:

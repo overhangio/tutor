@@ -10,9 +10,13 @@ from . import utils
 def images():
     pass
 
-all_images = ["openedx", "forum", "notes", "xqueue", "android"]
+OPENEDX_IMAGES = ["openedx", "forum", "notes", "xqueue", "android"]
+VENDOR_IMAGES = ["elasticsearch", "memcached", "mongodb", "mysql", "namshi", "nginx", "rabbitmq"]
+argument_openedx_image = click.argument(
+    "image", type=click.Choice(["all"] + OPENEDX_IMAGES),
+)
 argument_image = click.argument(
-    "image", type=click.Choice(["all"] + all_images),
+    "image", type=click.Choice(["all"] + OPENEDX_IMAGES + VENDOR_IMAGES),
 )
 
 @click.command(
@@ -20,14 +24,14 @@ argument_image = click.argument(
     help="Build the docker images necessary for an Open edX platform."
 )
 @opts.root
-@argument_image
+@argument_openedx_image
 @click.option(
     "-a", "--build-arg", multiple=True,
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times."
 )
 def build(root, image, build_arg):
     config = tutor_config.load(root)
-    for image in image_list(config, image):
+    for image in openedx_image_names(config, image):
         tag = get_tag(config, image)
         click.echo(fmt.info("Building image {}".format(tag)))
         command = [
@@ -40,22 +44,22 @@ def build(root, image, build_arg):
             ]
         utils.docker(*command)
 
-@click.command(short_help="Pull images from the docker registry")
+@click.command(short_help="Pull images from the Docker registry")
 @opts.root
 @argument_image
 def pull(root, image):
     config = tutor_config.load(root)
-    for image in image_list(config, image):
+    for image in image_names(config, image):
         tag = get_tag(config, image)
         click.echo(fmt.info("Pulling image {}".format(tag)))
         utils.execute("docker", "pull", tag)
 
 @click.command(short_help="Push images to the Docker registry")
 @opts.root
-@argument_image
+@argument_openedx_image
 def push(root, image):
     config = tutor_config.load(root)
-    for image in image_list(config, image):
+    for image in openedx_image_names(config, image):
         tag = get_tag(config, image)
         click.echo(fmt.info("Pushing image {}".format(tag)))
         utils.execute("docker", "push", tag)
@@ -67,15 +71,21 @@ def get_tag(config, name):
         image=image,
     )
 
-def image_list(config, image):
+def image_names(config, image):
+    return openedx_image_names(config, image) + vendor_image_names(config, image)
+
+def openedx_image_names(config, image):
     if image == "all":
-        images = all_images[:]
+        images = OPENEDX_IMAGES[:]
         if not config['ACTIVATE_XQUEUE']:
             images.remove('xqueue')
         if not config['ACTIVATE_NOTES']:
             images.remove('notes')
         return images
     return [image]
+
+def vendor_image_names(config, image):
+    return VENDOR_IMAGES if image == "all" else image
 
 images.add_command(build)
 images.add_command(pull)

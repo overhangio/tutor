@@ -4,11 +4,11 @@ services:
   ############# External services
 
   memcached:
-    image: {{ DOCKER_REGISTRY }}memcached:1.4.38
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MEMCACHED }}
     restart: unless-stopped
 
   mongodb:
-    image: {{ DOCKER_REGISTRY }}mongo:3.2.16
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MONGODB }}
     # Use WiredTiger in all environments, just like at edx.org
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     restart: unless-stopped
@@ -16,7 +16,7 @@ services:
       - ../../data/mongodb:/data/db
 
   mysql:
-    image: {{ DOCKER_REGISTRY }}mysql:5.6.36
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     restart: unless-stopped
     volumes:
@@ -24,7 +24,7 @@ services:
     env_file: ../apps/mysql/auth.env
 
   elasticsearch:
-    image: {{ DOCKER_REGISTRY }}elasticsearch:1.5.2
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_ELASTICSEARCH }}
     environment:
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
       - "cluster.name=openedx"
@@ -44,7 +44,7 @@ services:
     command: bash -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
 
   nginx:
-    image: {{ DOCKER_REGISTRY }}nginx:1.13
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NGINX }}
     restart: unless-stopped
     ports:
       - "{{ NGINX_HTTP_PORT }}:80"
@@ -61,14 +61,14 @@ services:
       {% if ACTIVATE_NOTES %}- notes{% endif %}
 
   rabbitmq:
-    image: {{ DOCKER_REGISTRY }}rabbitmq:3.6.10
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_RABBITMQ }}
     volumes:
       - ../../data/rabbitmq:/var/lib/rabbitmq
     restart: unless-stopped
 
   # Simple SMTP server
   smtp:
-    image: {{ DOCKER_REGISTRY }}namshi/smtp:latest
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NAMSHI }}
     restart: unless-stopped
 
   ############# Forum

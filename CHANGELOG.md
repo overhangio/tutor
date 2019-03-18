@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] `images pull` now also pulls vendor images
 - [Feature] Add convenient `config printvalue` command
 - [Feature] Customize docker registry
 - [Feature] Load configuration parameters from the system environment
