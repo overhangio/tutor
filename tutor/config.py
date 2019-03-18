@@ -8,6 +8,7 @@ from . import exceptions
 from . import env
 from . import fmt
 from . import opts
+from . import utils
 from .__about__ import __version__
 
 
@@ -24,7 +25,7 @@ def config():
 @opts.key_value
 def save(root, silent, set_):
     config = {}
-    load_files(config, root)
+    load_current(config, root)
     for k, v in set_:
         config[k] = v
     if not silent:
@@ -47,7 +48,7 @@ def load(root):
     exist.
     """
     config = {}
-    load_files(config, root)
+    load_current(config, root)
 
     should_update_env = False
     if not os.path.exists(config_path(root)):
@@ -72,15 +73,29 @@ def load(root):
 
     return config
 
-def load_files(config, root):
+def load_current(config, root):
     convert_json2yml(root)
+    load_base(config, root)
+    load_user(config, root)
+    load_env(config, root)
 
-    # Load base values
-    base = yaml.load(env.read("config.yml"))
+def load_base(config, root):
+    base = yaml.load(env.read("config-base.yml"))
     for k, v in base.items():
         config[k] = v
 
-    # Load user file
+def load_env(config, root):
+    base_config = yaml.load(env.read("config-base.yml"))
+    default_config = yaml.load(env.read("config-defaults.yml"))
+    keys = set(list(base_config.keys()) + list(default_config.keys()))
+
+    for k in keys:
+        env_var = "TUTOR_" + k
+        if env_var in os.environ:
+            print(k, os.environ[env_var])
+            config[k] = utils.parse_yaml_value(os.environ[env_var])
+
+def load_user(config, root):
     path = config_path(root)
     if os.path.exists(path):
         with open(path) as fi:

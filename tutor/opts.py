@@ -1,6 +1,9 @@
 import appdirs
 import click
 
+from . import utils
+
+
 root = click.option(
     "-r", "--root",
     envvar="TUTOR_ROOT",
@@ -31,11 +34,7 @@ class YamlParamType(click.ParamType):
             k, v = value.split("=")
         except ValueError:
             self.fail("'{}' is not of the form 'key=value'.".format(value), param, ctx)
-        if v.isdigit():
-            v = int(v)
-        elif v in ["true", "false"]:
-            v = (v == "true")
-        return (k, v)
+        return k, utils.parse_yaml_value(v)
 
 key_value = click.option(
     "-s", "--set", "set_", type=YamlParamType(), multiple=True, metavar="KEY=VAL",

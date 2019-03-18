@@ -11,6 +11,16 @@ from . import fmt
 def random_string(length):
     return "".join([random.choice(string.ascii_letters + string.digits) for _ in range(length)])
 
+def parse_yaml_value(v):
+    """
+    Parse a yaml-formatted string
+    """
+    if v.isdigit():
+        v = int(v)
+    elif v in ["true", "false"]:
+        v = (v == "true")
+    return v
+
 def docker_run(*command):
     return docker("run", "--rm", "-it", *command)
 
