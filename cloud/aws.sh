@@ -2,7 +2,6 @@
 # Provision an AWS cloud instance with tutor.
 # Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/aws.sh | bash -e
 
-export TUTOR_USER="$USER"
 export DEBIAN_FRONTEND=noninteractive 
 
 echo "=============== Installing system dependencies"
@@ -22,8 +21,8 @@ sudo add-apt-repository \
    stable"
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io
-sudo usermod -aG docker $TUTOR_USER
-sudo su - $TUTOR_USER
+sudo usermod -aG docker $USER
+sudo su - $USER
 docker run hello-world
 
 echo "=============== Installing docker-compose"
@@ -62,9 +61,9 @@ Description=Tutor web UI
 After=network.target
 
 [Service]
-User=$TUTOR_USER
-WorkingDirectory=/home/$TUTOR_USER
-Environment="HOME=/home/$TUTOR_USER"
+User=$USER
+WorkingDirectory=/home/$USER
+Environment="HOME=/home/$USER"
 ExecStart=/usr/local/bin/tutor-webui
 Restart=on-failure
 
