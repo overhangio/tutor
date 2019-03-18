@@ -84,7 +84,8 @@ After=network.target
 [Service]
 User=$USER
 WorkingDirectory=/home/$USER
-Environment="HOME=/home/$USER"
+Environment=HOME=/home/$USER
+Environment=TUTOR_DOCKER_REGISTRY=localhost:5000/
 ExecStart=/usr/local/bin/tutor-webui
 Restart=on-failure
 
