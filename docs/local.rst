@@ -27,15 +27,6 @@ This is the only non-automatic step in the install process. You will be asked va
 
 If you want to run a fully automated install, upload the ``config.yml`` file to wherever you want to run Open edX. You can then entirely skip the configuration step.
 
-Environment files generation
-----------------------------
-
-::
-
-    tutor local env
-
-This command generates environment files, such as the ``*.env.json``, ``*.auth.json`` files, the ``docker-compose.yml`` file, etc. They are generated from templates and the configuration values stored in ``config.yml``. The generated files are placed in the ``env/local`` subfolder of the project root. You may modify and delete those files at will, since they can be easily re-generated with the same ``tutor local env`` command.
-
 Update docker images
 --------------------
 

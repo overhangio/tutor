@@ -44,7 +44,7 @@ docker pull rabbitmq:3.6.10
 docker pull namshi/smtp:latest
 
 echo "=============== Building docker images"
-tutor images env
+tutor config save --silent --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
 tutor images build all
 
 echo "=============== Create Web UI script"

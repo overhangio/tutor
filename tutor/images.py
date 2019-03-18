@@ -1,5 +1,6 @@
 import click
 
+from . import config as tutor_config
 from . import env as tutor_env
 from . import fmt
 from . import opts
@@ -17,23 +18,17 @@ argument_image = click.argument(
 )
 
 @click.command(
-    short_help="Generate environment",
-    help="""Generate the environment files required to build and customise the docker images."""
-)
-@opts.root
-def env(root):
-    tutor_env.copy_target(root, "build")
-
-@click.command(
     short_help="Download docker images",
     help=("""Download the docker images from hub.docker.com.
           The images will come from {namespace}/{image}:{version}.""")
 )
+@opts.root
 @option_namespace
 @option_version
 @argument_image
-def download(namespace, version, image):
-    for image in image_list(image):
+def download(root, namespace, version, image):
+    config = tutor_config.load(root)
+    for image in image_list(config, image):
         utils.docker('image', 'pull', get_tag(namespace, image, version))
 
 @click.command(
@@ -50,7 +45,8 @@ def download(namespace, version, image):
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times."
 )
 def build(root, namespace, version, image, build_arg):
-    for image in image_list(image):
+    config = tutor_config.load(root)
+    for image in image_list(config, image):
         tag = get_tag(namespace, image, version)
         click.echo(fmt.info("Building image {}".format(tag)))
         command = [
@@ -66,11 +62,13 @@ def build(root, namespace, version, image, build_arg):
 @click.command(
     short_help="Pull images from hub.docker.com",
 )
+@opts.root
 @option_namespace
 @option_version
 @argument_image
-def pull(namespace, version, image):
-    for image in image_list(image):
+def pull(root, namespace, version, image):
+    config = tutor_config.load(root)
+    for image in image_list(config, image):
         tag = get_tag(namespace, image, version)
         click.echo(fmt.info("Pulling image {}".format(tag)))
         utils.execute("docker", "pull", tag)
@@ -78,11 +76,13 @@ def pull(namespace, version, image):
 @click.command(
     short_help="Push images to hub.docker.com",
 )
+@opts.root
 @option_namespace
 @option_version
 @argument_image
-def push(namespace, version, image):
-    for image in image_list(image):
+def push(root, namespace, version, image):
+    config = tutor_config.load(root)
+    for image in image_list(config, image):
         tag = get_tag(namespace, image, version)
         click.echo(fmt.info("Pushing image {}".format(tag)))
         utils.execute("docker", "push", tag)
@@ -96,10 +96,16 @@ def get_tag(namespace, image, version):
         version=version,
     )
 
-def image_list(image):
-    return all_images if image == "all" else [image]
+def image_list(config, image):
+    if image == "all":
+        images = all_images[:]
+        if not config['ACTIVATE_XQUEUE']:
+            images.remove('xqueue')
+        if not config['ACTIVATE_NOTES']:
+            images.remove('notes')
+        return images
+    return [image]
 
-images.add_command(env)
 images.add_command(download)
 images.add_command(build)
 images.add_command(pull)

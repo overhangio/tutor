@@ -22,23 +22,12 @@ def quickstart(root):
     click.echo(fmt.title("Interactive platform configuration"))
     tutor_config.save.callback(root, False, [])
     click.echo(fmt.title("Environment generation"))
-    env.callback(root)
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback()
     click.echo(fmt.title("Starting the platform"))
     start.callback(root)
     click.echo(fmt.title("Running migrations. NOTE: this might fail. If it does, please retry 'tutor k9s databases later'"))
     databases.callback(root)
-
-@click.command(
-    short_help="Generate environment",
-    help="Generate the environment files required to run Open edX",
-)
-@opts.root
-def env(root):
-    config = tutor_config.load(root)
-    tutor_env.render_target(root, config, "apps")
-    tutor_env.render_target(root, config, "k8s")
 
 @click.command(help="Run all configured Open edX services")
 @opts.root
@@ -177,7 +166,6 @@ def run_bash(root, service, command):
     K8s().execute(service, "bash", "-e", "-c", command)
 
 k8s.add_command(quickstart)
-k8s.add_command(env)
 k8s.add_command(start)
 k8s.add_command(stop)
 k8s.add_command(delete)

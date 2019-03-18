@@ -29,7 +29,6 @@ def quickstart(pullimages_, root):
     click.echo(fmt.title("Interactive platform configuration"))
     tutor_config.save.callback(root, False, [])
     click.echo(fmt.title("Environment generation"))
-    env.callback(root)
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback(root)
     if pullimages_:
@@ -41,16 +40,6 @@ def quickstart(pullimages_, root):
     https_create.callback(root)
     click.echo(fmt.title("Starting the platform in detached mode"))
     start.callback(root, True)
-
-@click.command(
-    short_help="Generate environment",
-    help="Generate the environment files required to run Open edX",
-)
-@opts.root
-def env(root):
-    config = tutor_config.load(root)
-    tutor_env.render_target(root, config, "apps")
-    tutor_env.render_target(root, config, "local")
 
 @click.command(
     help="Update docker images",
@@ -261,7 +250,6 @@ https.add_command(https_create)
 https.add_command(https_renew)
 
 local.add_command(quickstart)
-local.add_command(env)
 local.add_command(pullimages)
 local.add_command(start)
 local.add_command(stop)

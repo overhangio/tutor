@@ -13,17 +13,6 @@ from . import utils
 def android():
     pass
 
-@click.command(
-    help="Generate the environment required for building the application"
-)
-@opts.root
-def env(root):
-    config = tutor_config.load(root)
-    # sub.domain.com -> com.domain.sub
-    config["LMS_HOST_REVERSE"] = ".".join(config["LMS_HOST"].split(".")[::-1])
-    tutor_env.render_target(root, config, "build")
-    tutor_env.render_target(root, config, "android")
-
 @click.group(
     help="Build the application"
 )
@@ -66,5 +55,4 @@ def docker_run(root, *command):
 build.add_command(debug)
 build.add_command(release)
 android.add_command(build)
-android.add_command(env)
 android.add_command(pullimage)

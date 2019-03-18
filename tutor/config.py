@@ -8,6 +8,7 @@ from . import exceptions
 from . import env
 from . import fmt
 from . import opts
+from .__about__ import __version__
 
 
 @click.group(
@@ -28,7 +29,10 @@ def save(root, silent, set_):
         config[k] = v
     if not silent:
         load_interactive(config)
-    save_config(config, root)
+    save_config(root, config)
+
+    load_defaults(config)
+    save_env(root, config)
 
 @click.command(
     help="Print the project root",
@@ -45,11 +49,26 @@ def load(root):
     config = {}
     load_files(config, root)
 
+    should_update_env = False
     if not os.path.exists(config_path(root)):
         load_interactive(config)
-        save_config(config, root)
+        should_update_env = True
+        save_config(root, config)
 
     load_defaults(config)
+
+    if not env.is_up_to_date(root):
+        click.echo(fmt.alert(
+            "The current environment stored at {} is not up-to-date: it is at "
+            "v{} while the 'tutor' binary is at v{}. The environment will be "
+            "upgraded now. Any change you might have made will be overwritten.".format(
+                env.base_dir(root), env.version(root), __version__
+            )
+        ))
+        should_update_env = True
+
+    if should_update_env:
+        save_env(root, config)
 
     return config
 
@@ -143,11 +162,11 @@ def convert_json2yml(root):
         )
     with open(json_path) as fi:
         config = json.load(fi)
-        save_config(config, root)
+        save_config(root, config)
     os.remove(json_path)
     click.echo(fmt.info("File config.json detected in {} and converted to config.yml".format(root)))
 
-def save_config(config, root):
+def save_config(root, config):
     env.render_dict(config)
     path = config_path(root)
     directory = os.path.dirname(path)
@@ -156,6 +175,10 @@ def save_config(config, root):
     with open(path, "w") as of:
         yaml.dump(config, of, default_flow_style=False)
     click.echo(fmt.info("Configuration saved to {}".format(path)))
+
+def save_env(root, config):
+    env.render_full(root, config)
+    click.echo(fmt.info("Environment generated in {}".format(env.base_dir(root))))
 
 def config_path(root):
     return os.path.join(root, "config.yml")

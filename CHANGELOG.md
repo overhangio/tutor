@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Automatic environment re-generation after re-configuration
 - [Improvement] Error and interrupt handling in UI and web UI
 - [Bugfix] Fix missing webui env directory
 

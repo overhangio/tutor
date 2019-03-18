@@ -2,15 +2,25 @@ import codecs
 import os
 import shutil
 
-import click
 import jinja2
 
 from . import exceptions
-from . import fmt
 from . import utils
+from .__about__ import __version__
 
 
 TEMPLATES_ROOT = os.path.join(os.path.dirname(__file__), "templates")
+VERSION_FILENAME = "version"
+
+def render_full(root, config):
+    """
+    Render the full environment, including version information.
+    """
+    for target in ["apps", "k8s", "local", "webui"]:
+        render_target(root, config, target)
+    copy_target(root, "build")
+    with open(pathjoin(root, VERSION_FILENAME), 'w') as f:
+        f.write(__version__)
 
 def render_target(root, config, target):
     """
@@ -23,7 +33,6 @@ def render_target(root, config, target):
                 substituted = render_str(fi.read(), config)
             with open(dst, "w") as of:
                 of.write(substituted)
-    click.echo(fmt.info("Environment generated in {}".format(pathjoin(root, target))))
 
 def render_dict(config):
     """
@@ -70,10 +79,21 @@ def copy_target(root, target):
     for src, dst in walk_templates(root, target):
         if is_part_of_env(src):
             shutil.copy(src, dst)
-    click.echo(fmt.info("Environment generated in {}".format(pathjoin(root, target))))
 
 def is_part_of_env(path):
     return not os.path.basename(path).startswith(".")
+
+def is_up_to_date(root):
+    return version(root) == __version__
+
+def version(root):
+    """
+    Return the current environment version.
+    """
+    path = pathjoin(root, VERSION_FILENAME)
+    if not os.path.exists(path):
+        return "0"
+    return open(path).read().strip()
 
 def read(*path):
     """
@@ -108,4 +128,7 @@ def data_path(root, *path):
     return os.path.join(os.path.abspath(root), "data", *path)
 
 def pathjoin(root, target, *path):
-    return os.path.join(root, "env", target, *path)
+    return os.path.join(base_dir(root), target, *path)
+
+def base_dir(root):
+    return os.path.join(root, "env")

@@ -31,8 +31,8 @@ matrix:
 
 script:
   - make ci-info
+  - make ci-config
   - make ci-bundle
-  - make ci-test
 
 deploy:
   # Push tutor binary to github releases

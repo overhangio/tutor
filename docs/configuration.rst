@@ -15,9 +15,9 @@ Alternatively, you can set each parameter from the command line::
 
     tutor config save --silent --set PARAM1=VALUE1 --set PARAM2=VALUE2
 
-After changing a configuration parameter, it will be taken into account next time the environment is generated. For instance, in a local installation::
+Once the base configuration is created or updated, the environment is automatically re-generated. The environment is the set of all files required to manage an Open edX platform: Dockerfile, ``lms.env.json``, settings files... You can view the environment files in the ``env`` folder::
 
-    tutor local env
+    ls $(tutor config printroot)/env
 
 .. _docker_images:
 

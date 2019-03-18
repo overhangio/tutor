@@ -3,11 +3,7 @@
 Mobile Android application
 ==========================
 
-With Tutor, you can build an Android mobile application for your platform. First, generate the required environment::
-
-    tutor android env
-
-Then, build the app in debug mode::
+With Tutor, you can build an Android mobile application for your platform. To build the application in debug mode, run::
 
     tutor android build debug
 

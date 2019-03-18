@@ -43,12 +43,11 @@ The containerized Nginx needs to listen to ports 80 and 443 on the host. If ther
 
 However, you might not want to do that if you need a webserver for running non-Open edX related applications. In such cases...
 
-2. Run the nginx container on different ports: to do so, indicate different ports in the ``config.yml`` file. For instance::
+2. Run the nginx container on different ports: to do so, configure different ports for the dockerized ngins::
 
-       NGINX_HTTP_PORT: 81
-       NGINX_HTTPS_PORT: 444
+       tutor config save --silentn --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
 
-In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. Then, re-generate the environment with ``tutor local env`` and restart nginx with ``tutor local restart nginx``.
+In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. Then, restart nginx with ``tutor local restart nginx``.
 
 You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See `this github issue <https://github.com/regisb/tutor/issues/69#issuecomment-425916825>`_ for http, and `this other github issue <https://github.com/regisb/tutor/issues/90#issuecomment-437687294>`_ for https.
 

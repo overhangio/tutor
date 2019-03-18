@@ -5,11 +5,7 @@ Open edX platform customisation
 
 There are different ways you can customise your Open edX platform. For instance, optional features can be activated during configuration. But if you want to add unique features to your Open edX platform, you are going to have to modify and re-build the ``openedx`` docker image. This is the image that contains the ``edx-platform`` repository: it is in charge of running the web application for the Open edX "core". Both the LMS and the CMS run from the ``openedx`` docker image. 
 
-On a vanilla platform deployed by Tutor, the image that is run is downloaded from the `regis/openedx repository on Docker Hub <https://hub.docker.com/r/regis/openedx/>`_. This is also the image that is downloaded whenever we run ``tutor local pullimages``. But you can decide to build the image locally instead of downloading it. To do so, generate the image-building environment::
-
-    tutor images env
-
-Then, build and tag the ``openedx`` image::
+On a vanilla platform deployed by Tutor, the image that is run is downloaded from the `regis/openedx repository on Docker Hub <https://hub.docker.com/r/regis/openedx/>`_. This is also the image that is downloaded whenever we run ``tutor local pullimages``. But you can decide to build the image locally instead of downloading it. To do so, build and tag the ``openedx`` image::
 
     tutor images build openedx
 
@@ -23,7 +19,7 @@ Adding custom themes
 
 Comprehensive theming is enabled by default, but only the default theme is compiled. To compile your own theme, add it to the ``env/build/openedx/themes/`` folder::
 
-    git clone https://github.com/me/myopenedxtheme.git env/build/openedx/themes/
+    git clone https://github.com/me/myopenedxtheme.git $(tutor config printroot)/env/build/openedx/themes/
 
 The ``themes`` folder should have the following structure::
 
@@ -47,7 +43,7 @@ Installing extra xblocks and requirements
 
 Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``env/build/openedx/requirements/private.txt`` file. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_::
 
-    echo "git+https://github.com/open-craft/xblock-poll.git" >> env/build/openedx/requirements/private.txt
+    echo "git+https://github.com/open-craft/xblock-poll.git" >> $(tutor config printroot)/env/build/openedx/requirements/private.txt
 
 Then, the ``openedx`` docker image must be rebuilt::
 
@@ -59,7 +55,7 @@ To install xblocks from a private repository that requires authentication, you m
 
 Then, declare your extra requirements with the ``-e`` flag in ``openedx/requirements/private.txt``::
 
-    echo "-e ./myprivaterepo" >> env/build/openedx/requirements/private.txt
+    echo "-e ./myprivaterepo" >> $(tutor config printroot)/env/build/openedx/requirements/private.txt
 
 .. _edx_platform_fork:
 
@@ -82,13 +78,10 @@ By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/opened
     tutor images build openedx --namespace=myusername --version=mytag
     tutor images push openedx --namespace=myusername --version=mytag
 
-Then add the following value to your ``config.yml``::
+Then, set the following configuration parameter::
 
-    DOCKER_IMAGE_OPENEDX: myusername/openedx:mytag
+    tutor config save --silent --set DOCKER_IMAGE_OPENEDX=myusername/openedx:mytag
 
 See the relevant :ref:`configuration parameters <docker_images>`.
 
-This value will then be used by Tutor when generating your environment. For instance, this is how you would use your image in a local deployment::
-
-    tutor local env
-    tutor local quickstart
+This value will then be used by Tutor to run the platform, for instance when running ``tutor local quickstart``.
