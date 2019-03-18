@@ -54,7 +54,7 @@ def pullimages(root):
 @opts.root
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 def start(root, detach):
-    command = ["up"]
+    command = ["up", "--remove-orphans"]
     if detach:
         command.append("-d")
     docker_compose(root, *command)

@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Improvement] Remove orphan containers on `local start`
+
 ## 3.2.0 (2019-03-18)
 
 - [Improvement] `images pull` now also pulls vendor images
