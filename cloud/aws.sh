@@ -23,7 +23,9 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io
 sudo usermod -aG docker $USER
 sudo su - $USER
-docker run hello-world
+
+echo "=============== Run local docker registry on port 5000"
+docker run -d -p 5000:5000 --restart=always --name docker_registry registry:2.7.1
 
 echo "=============== Installing docker-compose"
 sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -34,16 +36,35 @@ sudo curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(u
 sudo chmod +x /usr/local/bin/tutor
 
 echo "=============== Pulling vendor docker images"
-docker pull memcached:1.4.38
-docker pull mongo:3.2.16
-docker pull mysql:5.6.36
-docker pull elasticsearch:1.5.2
-docker pull nginx:1.13
-docker pull rabbitmq:3.6.10
-docker pull namshi/smtp:latest
+tutor config save --silent
+tutor images pull elasticsearch
+tutor images pull memcached
+tutor images pull mongodb
+tutor images pull mysql
+tutor images pull namshi
+tutor images pull nginx
+tutor images pull rabbitmq
 
-echo "=============== Building docker images"
-tutor config save --silent --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
+echo "=============== Tagging vendor docker images"
+docker tag $(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH)
+docker tag $(tutor config printvalue DOCKER_IMAGE_MEMCACHED) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MEMCACHED)
+docker tag $(tutor config printvalue DOCKER_IMAGE_MONGODB) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MONGODB)
+docker tag $(tutor config printvalue DOCKER_IMAGE_MYSQL) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MYSQL)
+docker tag $(tutor config printvalue DOCKER_IMAGE_NAMSHI) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NAMSHI)
+docker tag $(tutor config printvalue DOCKER_IMAGE_NGINX) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NGINX)
+docker tag $(tutor config printvalue DOCKER_IMAGE_RABBITMQ) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_RABBITMQ)
+
+echo "=============== Pushing vendor docker images to the local registry"
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH)
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MEMCACHED)
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MONGODB)
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MYSQL)
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NAMSHI)
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NGINX)
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_RABBITMQ)
+
+echo "=============== Building openedx docker images"
+tutor config save --silent --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true --set DOCKER_REGISTRY=localhost:5000/
 tutor images build all
 
 echo "=============== Create Web UI script"
@@ -70,6 +91,9 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target" | sudo tee /etc/systemd/system/tutor-webui.service
 sudo systemctl enable tutor-webui
+
+echo "=============== Clean tutor environment, configuration and data"
+sudo rm -rf $(tutor config printroot)
 
 echo "=============== Clean authorized keys"
 sudo find / -name "authorized_keys" -exec rm -f {} \;

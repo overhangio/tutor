@@ -85,7 +85,7 @@ def openedx_image_names(config, image):
     return [image]
 
 def vendor_image_names(config, image):
-    return VENDOR_IMAGES if image == "all" else image
+    return VENDOR_IMAGES if image == "all" else [image]
 
 images.add_command(build)
 images.add_command(pull)
