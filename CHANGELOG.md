@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Feature] Add convenient `config printvalue` command
 - [Feature] Customize docker registry
 - [Feature] Load configuration parameters from the system environment
 - [Improvement] Automatic environment re-generation after re-configuration

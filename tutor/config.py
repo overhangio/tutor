@@ -42,6 +42,18 @@ def save(root, silent, set_):
 def printroot(root):
     click.echo(root)
 
+@click.command(help="Print a configuration value")
+@opts.root
+@click.argument("key")
+def printvalue(root, key):
+    config = {}
+    load_current(config, root)
+    load_defaults(config)
+    try:
+        print(config[key])
+    except KeyError:
+        raise exceptions.TutorError("Missing configuration value: {}".format(key))
+
 def load(root):
     """
     Load configuration, and generate it interactively if the file does not
@@ -200,3 +212,4 @@ def config_path(root):
 
 config.add_command(save)
 config.add_command(printroot)
+config.add_command(printvalue)
