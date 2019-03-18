@@ -104,7 +104,6 @@ def load_env(config, root):
     for k in keys:
         env_var = "TUTOR_" + k
         if env_var in os.environ:
-            print(k, os.environ[env_var])
             config[k] = utils.parse_yaml_value(os.environ[env_var])
 
 def load_user(config, root):

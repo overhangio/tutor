@@ -28,7 +28,6 @@ def local():
 def quickstart(pullimages_, root):
     click.echo(fmt.title("Interactive platform configuration"))
     tutor_config.save.callback(root, False, [])
-    click.echo(fmt.title("Environment generation"))
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback(root)
     if pullimages_:
