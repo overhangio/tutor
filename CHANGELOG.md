@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## 3.2.1 (2019-03-19)
 
 - [Feature] Enable grade downloads by default (#143)
 - [Improvement] Remove orphan containers on `local start`
