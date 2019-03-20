@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Feature] Configurable and pluggable data storage backends (#114)
+
 ## 3.2.1 (2019-03-19)
 
 - [Feature] Enable grade downloads by default (#143)

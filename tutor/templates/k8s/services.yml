@@ -131,6 +131,7 @@ spec:
     app: rabbitmq
 {% endif %}
 
+{% if ACTIVATE_SMTP %}
 ---
 apiVersion: v1
 kind: Service
@@ -143,3 +144,4 @@ spec:
       protocol: TCP
   selector:
     app: smtp
+{% endif %}

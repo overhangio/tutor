@@ -41,16 +41,16 @@ tutor images pull elasticsearch
 tutor images pull memcached
 tutor images pull mongodb
 tutor images pull mysql
-tutor images pull namshi
 tutor images pull nginx
 tutor images pull rabbitmq
+tutor images pull smtp
 
 echo "=============== Tagging vendor docker images"
 docker tag $(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH)
 docker tag $(tutor config printvalue DOCKER_IMAGE_MEMCACHED) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MEMCACHED)
 docker tag $(tutor config printvalue DOCKER_IMAGE_MONGODB) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MONGODB)
 docker tag $(tutor config printvalue DOCKER_IMAGE_MYSQL) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MYSQL)
-docker tag $(tutor config printvalue DOCKER_IMAGE_NAMSHI) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NAMSHI)
+docker tag $(tutor config printvalue DOCKER_IMAGE_SMTP) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_SMTP)
 docker tag $(tutor config printvalue DOCKER_IMAGE_NGINX) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NGINX)
 docker tag $(tutor config printvalue DOCKER_IMAGE_RABBITMQ) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_RABBITMQ)
 
@@ -59,7 +59,7 @@ docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MEMCACHED)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MONGODB)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_MYSQL)
-docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NAMSHI)
+docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_SMTP)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NGINX)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_RABBITMQ)
 

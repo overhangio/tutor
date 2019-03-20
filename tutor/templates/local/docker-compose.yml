@@ -78,7 +78,7 @@ services:
 
   # Simple SMTP server
   smtp:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NAMSHI }}
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_SMTP }}
     restart: unless-stopped
 
   ############# Forum

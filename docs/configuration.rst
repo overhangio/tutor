@@ -95,6 +95,12 @@ Rabbitmq
 
 - ``RABBITMQ_HOST`` (default: ``"rabbitmq"``)
 
+SMTP
+~~~~
+
+- ``SMTP_HOST`` (default: ``"smtp"``)
+- ``SMTP_PORT`` (default: ``25``)
+
 Optional features
 -----------------
 

@@ -11,7 +11,7 @@ def images():
     pass
 
 OPENEDX_IMAGES = ["openedx", "forum", "notes", "xqueue", "android"]
-VENDOR_IMAGES = ["elasticsearch", "memcached", "mongodb", "mysql", "namshi", "nginx", "rabbitmq"]
+VENDOR_IMAGES = ["elasticsearch", "memcached", "mongodb", "mysql", "nginx", "rabbitmq", "smtp"]
 argument_openedx_image = click.argument(
     "image", type=click.Choice(["all"] + OPENEDX_IMAGES),
 )

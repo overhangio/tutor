@@ -242,6 +242,7 @@ spec:
             claimName: mysql
 {% endif %}
 
+{% if ACTIVATE_SMTP %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -262,6 +263,7 @@ spec:
           image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_SMTP }}
           ports:
             - containerPort: 25
+{% endif %}
 
 ---
 apiVersion: apps/v1
