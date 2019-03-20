@@ -98,6 +98,8 @@ SMTP
 
 - ``SMTP_HOST`` (default: ``"smtp"``)
 - ``SMTP_PORT`` (default: ``25``)
+- ``SMTP_USERNAME`` (default: ``""``)
+- ``SMTP_PASSWORD`` (default: ``""``)
 
 Optional features
 -----------------

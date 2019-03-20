@@ -30,5 +30,7 @@
       "PASSWORD": "{{ OPENEDX_MYSQL_PASSWORD }}",
       "ATOMIC_REQUESTS": true
     }
-  }
+  },
+  "EMAIL_HOST_USER": "{{ SMTP_USERNAME }}",
+  "EMAIL_HOST_PASSWORD": "{{ SMTP_PASSWORD }}"
 }
