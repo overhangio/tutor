@@ -25,9 +25,9 @@
       "ENGINE": "django.db.backends.mysql",
       "HOST": "{{ MYSQL_HOST }}",
       "PORT": {{ MYSQL_PORT }},
-      "NAME": "{{ MYSQL_DATABASE }}",
-      "USER": "{{ MYSQL_USERNAME }}",
-      "PASSWORD": "{{ MYSQL_PASSWORD }}",
+      "NAME": "{{ OPENEDX_MYSQL_DATABASE }}",
+      "USER": "{{ OPENEDX_MYSQL_USERNAME }}",
+      "PASSWORD": "{{ OPENEDX_MYSQL_PASSWORD }}",
       "ATOMIC_REQUESTS": true
     }
   }

@@ -114,6 +114,16 @@ def load_user(config, root):
         for key, value in loaded.items():
             config[key] = value
 
+    # Here, we migrate obsolete configuration parameters
+    if "MYSQL_PASSWORD" in config:
+        config["MYSQL_ROOT_PASSWORD"] = config["MYSQL_PASSWORD"]
+        config["OPENEDX_MYSQL_PASSWORD"] = config["MYSQL_PASSWORD"]
+        config.pop("MYSQL_PASSWORD")
+    if "MYSQL_DATABASE" in config:
+        config["OPENEDX_MYSQL_DATABASE"] = config.pop("MYSQL_DATABASE")
+    if "MYSQL_USERNAME" in config:
+        config["OPENEDX_MYSQL_USERNAME"] = config.pop("MYSQL_USERNAME")
+
 def load_interactive(config):
     ask("Your website domain name for students (LMS)", "LMS_HOST", config)
     ask("Your website domain name for teachers (CMS)", "CMS_HOST", config)

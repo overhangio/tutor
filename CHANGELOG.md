@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Harmonize mysql username/password configuration parameters
 - [Feature] Configurable and pluggable data storage backends (#114)
 
 ## 3.2.1 (2019-03-19)
