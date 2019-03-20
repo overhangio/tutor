@@ -48,8 +48,4 @@ Installing from source
 Cloud deployment
 ----------------
 
-Are you deploying Tutor to a Ubuntu cloud server? The `ubuntu.sh <https://github.com/regisb/tutor/blob/master/cloud/ubuntu.sh>`_ installs Tutor and creates a service under supervision that runs the Tutor :ref:`web UI <webui>`. To run this script, just connect to your server and run::
-
-    curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/ubuntu.sh | sudo bash -e
-
-After the script finishes, you should be able to access the web UI at http://server_ip_address:3737. For security reasons, you should immediately set a password for accessing the UI by running ``webui configure`` from the web UI, or ``tutor webui configure`` from the server shell.
+Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. This is a commercial offer priced at $50/month ($500/year) that was created to support the development of Tutor.
