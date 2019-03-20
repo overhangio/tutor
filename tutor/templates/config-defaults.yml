@@ -1,4 +1,7 @@
 ---
+ANDROID_RELEASE_STORE_PASSWORD: "android store password"
+ANDROID_RELEASE_KEY_PASSWORD: "android release key password"
+ANDROID_RELEASE_KEY_ALIAS: "android release key alias"
 DOCKER_IMAGE_OPENEDX: "regis/openedx:hawthorn"
 DOCKER_IMAGE_ANDROID: "regis/openedx-android:hawthorn"
 DOCKER_IMAGE_FORUM: "regis/openedx-forum:hawthorn"
@@ -12,16 +15,21 @@ DOCKER_IMAGE_NGINX: "nginx:1.13"
 DOCKER_IMAGE_RABBITMQ: "rabbitmq:3.6.10"
 DOCKER_IMAGE_NAMSHI: "namshi/smtp:latest"
 DOCKER_REGISTRY: ""
+ELASTICSEARCH_HOST: "elasticsearch"
+ELASTICSEARCH_PORT: 9200
+MEMCACHED_HOST: "memcached"
+MEMCACHED_PORT: 11211
+MONGODB_HOST: "mongodb"
+MONGODB_DATABASE: "openedx"
+MYSQL_HOST: "mysql"
+MYSQL_PORT: 3306
 MYSQL_DATABASE: "openedx"
 MYSQL_USERNAME: "openedx"
-MONGODB_DATABASE: "openedx"
+NGINX_HTTP_PORT: 80
+NGINX_HTTPS_PORT: 443
 NOTES_MYSQL_DATABASE: "notes"
 NOTES_MYSQL_USERNAME: "notes"
+RABBITMQ_HOST: "rabbitmq"
 XQUEUE_AUTH_USERNAME: "lms"
 XQUEUE_MYSQL_DATABASE: "xqueue"
 XQUEUE_MYSQL_USERNAME: "xqueue"
-NGINX_HTTP_PORT: 80
-NGINX_HTTPS_PORT: 443
-ANDROID_RELEASE_STORE_PASSWORD: "android store password"
-ANDROID_RELEASE_KEY_PASSWORD: "android release key password"
-ANDROID_RELEASE_KEY_ALIAS: "android release key alias"

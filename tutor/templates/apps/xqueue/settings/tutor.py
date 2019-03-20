@@ -3,11 +3,11 @@ from .settings import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'HOST': '{{ MYSQL_HOST }}',
+        'PORT': {{ MYSQL_PORT }},
         'NAME': '{{ XQUEUE_MYSQL_DATABASE }}',
         'USER': '{{ XQUEUE_MYSQL_USERNAME }}',
         'PASSWORD': '{{ XQUEUE_MYSQL_PASSWORD }}',
-        'HOST': 'mysql',
-        'PORT': '3306',
     }
 }
 
@@ -17,7 +17,7 @@ LOGGING = get_logger_config(
     dev_env=True,
 )
 
-RABBIT_HOST = 'rabbitmq'
+RABBIT_HOST = '{{ RABBITMQ_HOST }}'
 RABBIT_PORT = 5672
 SECRET_KEY = '{{ XQUEUE_SECRET_KEY }}'
 

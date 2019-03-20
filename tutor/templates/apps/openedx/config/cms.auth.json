@@ -13,21 +13,21 @@
     "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",                       
     "DOC_STORE_CONFIG": {                                                           
       "db": "{{ MONGODB_DATABASE }}",
-      "host": "mongodb"
+      "host": "{{ MONGODB_HOST }}"
     } 
   },  
   "DOC_STORE_CONFIG": {
     "db": "{{ MONGODB_DATABASE }}",
-    "host": "mongodb"  
+    "host": "{{ MONGODB_HOST }}"  
   },
   "DATABASES": {
     "default": {
       "ENGINE": "django.db.backends.mysql",
+      "HOST": "{{ MYSQL_HOST }}",
+      "PORT": {{ MYSQL_PORT }},
       "NAME": "{{ MYSQL_DATABASE }}",
       "USER": "{{ MYSQL_USERNAME }}",
       "PASSWORD": "{{ MYSQL_PASSWORD }}",
-      "HOST": "mysql",
-      "PORT": "3306",
       "ATOMIC_REQUESTS": true
     }
   }

@@ -6,10 +6,11 @@ ALLOWED_HOSTS = ['localhost', 'notes', 'notes.openedx', 'notes.localhost', 'note
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'HOST': '{{ MYSQL_HOST }}',
+        'PORT': {{ MYSQL_PORT }},
         'NAME': '{{ NOTES_MYSQL_DATABASE }}',
         'USER': '{{ NOTES_MYSQL_USERNAME }}',
         'PASSWORD': '{{ NOTES_MYSQL_PASSWORD }}',
-        'HOST': 'mysql',
     }
 }
 
@@ -19,7 +20,7 @@ CLIENT_SECRET = '{{ NOTES_OAUTH2_SECRET }}'
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'notesserver.highlight.ElasticsearchSearchEngine',
-        'URL': 'http://elasticsearch:9200/',
+        'URL': 'http://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}/',
         'INDEX_NAME': 'notes',
     },
 }

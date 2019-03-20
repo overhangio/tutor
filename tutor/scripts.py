@@ -1,20 +1,20 @@
-create_databases = """dockerize -wait tcp://mysql:3306 -timeout 20s
-mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'CREATE DATABASE IF NOT EXISTS {{ MYSQL_DATABASE }};'
-mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'GRANT ALL ON {{ MYSQL_DATABASE }}.* TO "{{ MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ MYSQL_PASSWORD }}";'
+create_databases = """dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
+mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'CREATE DATABASE IF NOT EXISTS {{ MYSQL_DATABASE }};'
+mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'GRANT ALL ON {{ MYSQL_DATABASE }}.* TO "{{ MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ MYSQL_PASSWORD }}";'
 
 {% if ACTIVATE_NOTES %}
-mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'CREATE DATABASE IF NOT EXISTS {{ NOTES_MYSQL_DATABASE }};'
-mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'GRANT ALL ON {{ NOTES_MYSQL_DATABASE }}.* TO "{{ NOTES_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ NOTES_MYSQL_PASSWORD }}";'
+mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'CREATE DATABASE IF NOT EXISTS {{ NOTES_MYSQL_DATABASE }};'
+mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'GRANT ALL ON {{ NOTES_MYSQL_DATABASE }}.* TO "{{ NOTES_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ NOTES_MYSQL_PASSWORD }}";'
 {% endif %}
 
 {% if ACTIVATE_XQUEUE %}
-mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'CREATE DATABASE IF NOT EXISTS {{ XQUEUE_MYSQL_DATABASE }};'
-mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "mysql" -e 'GRANT ALL ON {{ XQUEUE_MYSQL_DATABASE }}.* TO "{{ XQUEUE_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ XQUEUE_MYSQL_PASSWORD }}";'
+mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'CREATE DATABASE IF NOT EXISTS {{ XQUEUE_MYSQL_DATABASE }};'
+mysql -u root --password="{{ MYSQL_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'GRANT ALL ON {{ XQUEUE_MYSQL_DATABASE }}.* TO "{{ XQUEUE_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ XQUEUE_MYSQL_PASSWORD }}";'
 {% endif %}
 """
 
-migrate_lms = "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py lms migrate"
-migrate_cms = "dockerize -wait tcp://mysql:3306 -timeout 20s && ./manage.py cms migrate"
+migrate_lms = "dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s && ./manage.py lms migrate"
+migrate_cms = "dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s && ./manage.py cms migrate"
 migrate_forum = "bundle exec rake search:initialize && bundle exec rake search:rebuild_index"
 migrate_notes = "./manage.py migrate"
 migrate_xqueue = "./manage.py migrate"

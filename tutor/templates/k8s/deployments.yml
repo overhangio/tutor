@@ -66,6 +66,11 @@ spec:
           ports:
             - containerPort: 4567
           imagePullPolicy: Always
+          env:
+            - name: SEARCH_SERVER
+              value: "http://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
+            - name: MONGOHQ_URL
+              value: "mongodb://{{ MONGODB_HOST }}/cs_comments_service"
 
 ---
 apiVersion: apps/v1
