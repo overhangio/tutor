@@ -87,6 +87,9 @@ Mongodb
 - ``ACTIVATE_MONGODB`` (default: ``true``)
 - ``MONGODB_HOST`` (default: ``"mongodb"``)
 - ``MONGODB_DATABASE`` (default: ``"openedx"``)
+- ``MONGODB_PORT`` (default: ``27017``)
+- ``MONGODB_USERNAME`` (default: ``""``)
+- ``MONGODB_PASSWORD`` (default: ``""``)
 
 Rabbitmq
 ~~~~~~~~

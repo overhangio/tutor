@@ -12,13 +12,23 @@
   "CONTENTSTORE": { 
     "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",                       
     "DOC_STORE_CONFIG": {                                                           
-      "db": "{{ MONGODB_DATABASE }}",
-      "host": "{{ MONGODB_HOST }}"
+      "host": "{{ MONGODB_HOST }}",
+      "port": {{ MONGODB_PORT }},
+      {% if MONGODB_USERNAME and MONGODB_PASSWORD %}
+      "user": "{{ MONGODB_USERNAME }}",
+      "password": "{{ MONGODB_PASSWORD }}",
+      {% endif %}
+      "db": "{{ MONGODB_DATABASE }}"
     } 
   },  
   "DOC_STORE_CONFIG": {
-    "db": "{{ MONGODB_DATABASE }}",
-    "host": "{{ MONGODB_HOST }}"  
+    "host": "{{ MONGODB_HOST }}",
+    "port": {{ MONGODB_PORT }},
+    {% if MONGODB_USERNAME and MONGODB_PASSWORD %}
+    "user": "{{ MONGODB_USERNAME }}",
+    "password": "{{ MONGODB_PASSWORD }}",
+    {% endif %}
+    "db": "{{ MONGODB_DATABASE }}"
   },
   "DATABASES": {
     "default": {
