@@ -246,6 +246,27 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: smtp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smtp
+  template:
+    metadata:
+      labels:
+        app: smtp
+    spec:
+      containers:
+        - name: smtp
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_SMTP }}
+          ports:
+            - containerPort: 25
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: nginx
 spec:
   replicas: 1

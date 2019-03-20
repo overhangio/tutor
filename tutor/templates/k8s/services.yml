@@ -130,3 +130,16 @@ spec:
   selector:
     app: rabbitmq
 {% endif %}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smtp
+spec:
+  type: NodePort
+  ports:
+    - port: 25
+      protocol: TCP
+  selector:
+    app: smtp
