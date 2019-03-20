@@ -92,6 +92,8 @@ Rabbitmq
 ~~~~~~~~
 
 - ``RABBITMQ_HOST`` (default: ``"rabbitmq"``)
+- ``RABBITMQ_USERNAME`` (default: ``""``)
+- ``RABBITMQ_PASSWORD`` (default: ``""``)
 
 SMTP
 ~~~~

@@ -2,7 +2,7 @@
 
 ## Latest
 
-- [Improvement] Add configurable SMTP authentication
+- [Improvement] Add configurable SMTP and Rabbitmq authentication
 - [Improvement] Harmonize mysql username/password configuration parameters
 - [Feature] Configurable and pluggable data storage backends (#114)
 

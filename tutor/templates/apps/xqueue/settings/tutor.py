@@ -17,8 +17,6 @@ LOGGING = get_logger_config(
     dev_env=True,
 )
 
-RABBIT_HOST = '{{ RABBITMQ_HOST }}'
-RABBIT_PORT = 5672
 SECRET_KEY = '{{ XQUEUE_SECRET_KEY }}'
 
 XQUEUE_USERS = {
