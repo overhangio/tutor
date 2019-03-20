@@ -85,7 +85,19 @@ def openedx_image_names(config, image):
     return [image]
 
 def vendor_image_names(config, image):
-    return VENDOR_IMAGES if image == "all" else [image]
+    if image == "all":
+        images = VENDOR_IMAGES[:]
+        if not config['ACTIVATE_ELASTICSEARCH']:
+            images.remove('elasticsearch')
+        if not config['ACTIVATE_MEMCACHED']:
+            images.remove('memcached')
+        if not config['ACTIVATE_MONGODB']:
+            images.remove('mongodb')
+        if not config['ACTIVATE_MYSQL']:
+            images.remove('mysql')
+        if not config['ACTIVATE_RABBITMQ']:
+            images.remove('rabbitmq')
+    return [image]
 
 images.add_command(build)
 images.add_command(pull)

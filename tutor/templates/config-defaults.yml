@@ -1,4 +1,9 @@
 ---
+ACTIVATE_ELASTICSEARCH: true
+ACTIVATE_MEMCACHED: true
+ACTIVATE_MONGODB: true
+ACTIVATE_MYSQL: true
+ACTIVATE_RABBITMQ: true
 ANDROID_RELEASE_STORE_PASSWORD: "android store password"
 ANDROID_RELEASE_KEY_PASSWORD: "android release key password"
 ANDROID_RELEASE_KEY_ALIAS: "android release key alias"

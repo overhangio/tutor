@@ -116,6 +116,7 @@ spec:
           persistentVolumeClaim:
             claimName: lms-data
 
+{% if ACTIVATE_ELASTICSEARCH %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -150,7 +151,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: elasticsearch
+{% endif %}
 
+{% if ACTIVATE_MEMCACHED %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -171,7 +174,9 @@ spec:
           image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MEMCACHED }}
           ports:
             - containerPort: 11211
+{% endif %}
 
+{% if ACTIVATE_MONGODB %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -199,7 +204,9 @@ spec:
       volumes:
         - name: data
           emptyDir: {}
+{% endif %}
 
+{% if ACTIVATE_MYSQL %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -233,6 +240,7 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mysql
+{% endif %}
 
 ---
 apiVersion: apps/v1
@@ -290,6 +298,7 @@ spec:
           persistentVolumeClaim:
             claimName: lms-data
 
+{% if ACTIVATE_RABBITMQ %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -317,4 +326,4 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: rabbitmq
-
+{% endif %}

@@ -124,6 +124,9 @@ def databases(root):
     ops.migrate(root, run_bash)
 
 def init_mysql(root):
+    config = tutor_config.load(root)
+    if not config['ACTIVATE_MYSQL']:
+        return
     mysql_data_path = tutor_env.data_path(root, "mysql", "mysql")
     if os.path.exists(mysql_data_path):
         return

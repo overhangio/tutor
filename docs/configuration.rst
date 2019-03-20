@@ -25,21 +25,26 @@ Once the base configuration is created or updated, the environment is automatica
 
 With an up-to-date environment, Tutor is ready to launch an Open edX platform and perform usual operations. Below, we document some of the configuration parameters.
 
+Docker
+------
+
 .. _docker_images:
 
-``DOCKER_IMAGE_*`` Custom Docker images
----------------------------------------
+Custom images
+-------------
+
+- ``DOCKER_IMAGE_OPENEDX`` (default: ``"regis/openedx:hawthorn"``)
+- ``DOCKER_IMAGE_ANDROID`` (default: ``"regis/openedx-android:hawthorn"``)
+- ``DOCKER_IMAGE_FORUM`` (default: ``"regis/openedx-forum:hawthorn"``)
+- ``DOCKER_IMAGE_NOTES`` (default: ``"regis/openedx-notes:hawthorn"``)
+- ``DOCKER_IMAGE_XQUEUE`` (default: ``"regis/openedx-xqueue:hawthorn"``)
 
 These configuration parameters define which image to run for each service.
 
-- ``DOCKER_IMAGE_OPENEDX`` (default: ``regis/openedx:hawthorn``)
-- ``DOCKER_IMAGE_ANDROID`` (default: ``regis/openedx-android:hawthorn``)
-- ``DOCKER_IMAGE_FORUM`` (default: ``regis/openedx-forum:hawthorn``)
-- ``DOCKER_IMAGE_NOTES`` (default: ``regis/openedx-notes:hawthorn``)
-- ``DOCKER_IMAGE_XQUEUE`` (default: ``regis/openedx-xqueue:hawthorn``)
+Custom registry
+---------------
 
-``DOCKER_REGISTRY`` Custom Docker registry
-------------------------------------------
+- ``DOCKER_REGISTRY`` (default: ``""``)
 
 You may want to pull/push images from/to a custom docker registry. For instance, for a registry running on ``localhost:5000``, define::
 
@@ -47,13 +52,58 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 
 (the trailing ``/`` is important)
 
-``ACTIVATE_*`` Optional features
---------------------------------
+Vendor services
+---------------
 
-Some optional features may be activated or deactivated during the interactive configuration step. These features change configuration files (during the ``configure`` step) as well as make targets.
+MySQL
+~~~~~
 
-``ACTIVATE_HTTPS`` SSL/TLS certificates for HTTPS access
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- ``ACTIVATE_MYSQL`` (default: ``true``)
+- ``MYSQL_HOST`` (default: ``"mysql"``)
+- ``MYSQL_PORT`` (default: ``3306``)
+- ``MYSQL_DATABASE`` (default: ``"openedx"``)
+- ``MYSQL_USERNAME`` (default: ``"openedx"``)
+- ``MYSQL_PASSWORD`` (default: randomly generated): root user password. Note that you are responsible for creating the root user if you are using a managed database.
+
+By default, a running Open edX platform deployed with Tutor includes all necessary 3rd-party services, such as MySQL, MongoDb, etc. But it's also possible to store data on a separate database, such as `Amazon RDS <https://aws.amazon.com/rds/>`_. For instance, to store data on an external MySQL database, set the following configuration::
+
+    ACTIVATE_MYSQL: false
+    MYSQL_HOST: yourhost
+    MYSQL_PASSWORD: <root user password>
+
+Elasticsearch
+~~~~~~~~~~~~~
+
+- ``ELASTICSEARCH_HOST`` (default: ``"elasticsearch"``)
+- ``ELASTICSEARCH_PORT`` (default: ``9200``)
+
+Memcached
+~~~~~~~~~
+
+- ``MEMCACHED_HOST`` (default: ``"memcached"``)
+- ``MEMCACHED_PORT`` (default: ``11211``)
+
+Mongodb
+~~~~~~~
+
+- ``ACTIVATE_MONGODB`` (default: ``true``)
+- ``MONGODB_HOST`` (default: ``"mongodb"``)
+- ``MONGODB_DATABASE`` (default: ``"openedx"``)
+
+Rabbitmq
+~~~~~~~~
+
+- ``RABBITMQ_HOST`` (default: ``"rabbitmq"``)
+
+Optional features
+-----------------
+
+Some optional features may be activated or deactivated during the interactive configuration step (``tutor config save``).
+
+SSL/TLS certificates for HTTPS access
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``ACTIVATE_HTTPS`` (default: ``false``)
 
 By activating this feature, a free SSL/TLS certificate from the `Let's Encrypt <https://letsencrypt.org/>`_ certificate authority will be created for your platform. With this feature, **your platform will no longer be accessible in HTTP**. Calls to http urls will be redirected to https url.
 
@@ -73,8 +123,10 @@ To renew the certificate, run this command once per month::
 
     tutor local https renew
 
-``ACTIVATE_NOTES`` Student notes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Student notes
+~~~~~~~~~~~~~
+
+- ``ACTIVATE_NOTES`` (default: ``false``)
 
 With `notes <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/exercises_tools/notes.html?highlight=notes>`_, students can annotate portions of the courseware. 
 
@@ -83,7 +135,9 @@ With `notes <https://edx.readthedocs.io/projects/open-edx-building-and-running-a
 
 You should beware that the ``notes.<LMS_HOST>`` domain name should be activated and point to your server. For instance, if your LMS is hosted at http://myopenedx.com, the notes service should be found at http://notes.myopenedx.com.
 
-``ACTIVATE_XQUEUE`` Xqueue
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Xqueue
+~~~~~~
+
+- ``ACTIVATE_XQUEUE`` (default: ``false``)
 
 `Xqueue <https://github.com/edx/xqueue>`_ is for grading problems with external services. If you don't know what it is, you probably don't need it.

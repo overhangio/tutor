@@ -3,10 +3,13 @@ services:
 
   ############# External services
 
+  {% if ACTIVATE_MEMCACHED %}
   memcached:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MEMCACHED }}
     restart: unless-stopped
+  {% endif %}
 
+  {% if ACTIVATE_MONGODB %}
   mongodb:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MONGODB }}
     # Use WiredTiger in all environments, just like at edx.org
@@ -14,7 +17,9 @@ services:
     restart: unless-stopped
     volumes:
       - ../../data/mongodb:/data/db
+  {% endif %}
 
+  {% if ACTIVATE_MYSQL %}
   mysql:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
@@ -22,7 +27,9 @@ services:
     volumes:
       - ../../data/mysql:/var/lib/mysql
     env_file: ../apps/mysql/auth.env
+  {% endif %}
 
+  {% if ACTIVATE_ELASTICSEARCH %}
   elasticsearch:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_ELASTICSEARCH }}
     environment:
@@ -36,6 +43,7 @@ services:
     restart: unless-stopped
     volumes:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
+  {% endif %}
 
   openedx-assets:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
@@ -60,11 +68,13 @@ services:
       - cms
       {% if ACTIVATE_NOTES %}- notes{% endif %}
 
+  {% if ACTIVATE_RABBITMQ %}
   rabbitmq:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_RABBITMQ }}
     volumes:
       - ../../data/rabbitmq:/var/lib/rabbitmq
     restart: unless-stopped
+  {% endif %}
 
   # Simple SMTP server
   smtp:
@@ -80,8 +90,8 @@ services:
       MONGOHQ_URL: "mongodb://{{ MONGODB_HOST }}/cs_comments_service"
     restart: unless-stopped
     depends_on:
-      - elasticsearch
-      - mongodb
+      {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
+      {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
 
   ############# LMS and CMS
 
@@ -97,12 +107,12 @@ services:
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
     depends_on:
-      - elasticsearch
+      {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       - forum
-      - memcached
-      - mongodb
-      - mysql
-      - rabbitmq
+      {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
+      {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
+      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
+      {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       - smtp
 
   cms:
@@ -117,11 +127,11 @@ services:
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
     depends_on:
-      - elasticsearch
-      - memcached
-      - mongodb
-      - mysql
-      - rabbitmq
+      {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
+      {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
+      {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
+      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
+      {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       - smtp
 
   ############# LMS and CMS workers
@@ -174,7 +184,7 @@ services:
       - ../../data/notes:/openedx/data
     restart: unless-stopped
     depends_on:
-      - mysql
+      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
   {% endif %}
 
   {% if ACTIVATE_XQUEUE %}
@@ -188,7 +198,7 @@ services:
       DJANGO_SETTINGS_MODULE: xqueue.tutor
     restart: unless-stopped
     depends_on:
-      - mysql
+      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
 
   xqueue_consumer:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_XQUEUE }}
@@ -200,5 +210,5 @@ services:
     restart: unless-stopped
     command: ./manage.py run_consumer
     depends_on:
-      - mysql
+      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
   {% endif %}

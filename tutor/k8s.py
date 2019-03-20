@@ -21,7 +21,6 @@ def k8s():
 def quickstart(root):
     click.echo(fmt.title("Interactive platform configuration"))
     tutor_config.save.callback(root, False, [])
-    click.echo(fmt.title("Environment generation"))
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback()
     click.echo(fmt.title("Starting the platform"))
@@ -32,10 +31,12 @@ def quickstart(root):
 @click.command(help="Run all configured Open edX services")
 @opts.root
 def start(root):
+    config = tutor_config.load(root)
     kubectl_no_fail("create", "-f", tutor_env.pathjoin(root, "k8s", "namespace.yml"))
 
     kubectl("create", "configmap", "nginx-config", "--from-file", tutor_env.pathjoin(root, "apps", "nginx"))
-    kubectl("create", "configmap", "mysql-config", "--from-env-file", tutor_env.pathjoin(root, "apps", "mysql", "auth.env"))
+    if config['ACTIVATE_MYSQL']:
+        kubectl("create", "configmap", "mysql-config", "--from-env-file", tutor_env.pathjoin(root, "apps", "mysql", "auth.env"))
     kubectl("create", "configmap", "openedx-settings-lms", "--from-file", tutor_env.pathjoin(root, "apps", "openedx", "settings", "lms"))
     kubectl("create", "configmap", "openedx-settings-cms", "--from-file", tutor_env.pathjoin(root, "apps", "openedx", "settings", "cms"))
     kubectl("create", "configmap", "openedx-config", "--from-file", tutor_env.pathjoin(root, "apps", "openedx", "config"))
