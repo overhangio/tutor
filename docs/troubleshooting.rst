@@ -45,7 +45,7 @@ However, you might not want to do that if you need a webserver for running non-O
 
 2. Run the nginx container on different ports: to do so, configure different ports for the dockerized ngins::
 
-       tutor config save --silentn --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
+       tutor config save --silent --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
 
 In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. Then, restart nginx with ``tutor local restart nginx``.
 
