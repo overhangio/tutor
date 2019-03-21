@@ -182,7 +182,7 @@ See the official certbot documentation for your platform: https://certbot.eff.or
         "-p", "80:80",
         "--entrypoint=sh",
         "certbot/certbot:latest",
-        "-c", script,
+        "-e", "-c", script,
     )
 
 @click.command(help="Renew https certificates", name="renew")
