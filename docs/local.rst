@@ -7,8 +7,15 @@ This method is for deploying Open edX locally on a single server, where docker i
 
 In the following, environment and data files will be generated in a user-specific project folder which will be referred to as the "**project root**". On Linux, the default project root is ``~/.local/share/tutor``. An alternative project root can be defined by passing the ``--root=...`` option to most commands, or define the ``TUTOR_ROOT=...`` environment variable.
 
+Main commands
+-------------
+
+All available commands can be listed by running::
+
+    tutor local help
+
 All-in-one command
-------------------
+~~~~~~~~~~~~~~~~~~
 
 A fully-functional platform can be configured and run in one command::
 
@@ -17,7 +24,7 @@ A fully-functional platform can be configured and run in one command::
 But you may want to run commands one at a time: it's faster when you need to run only part of the local deployment process, and it helps you understand how your platform works. In the following we decompose the ``quickstart`` command.
 
 Configuration
--------------
+~~~~~~~~~~~~~
 
 ::
 
@@ -28,7 +35,7 @@ This is the only non-automatic step in the install process. You will be asked va
 If you want to run a fully automated install, upload the ``config.yml`` file to wherever you want to run Open edX. You can then entirely skip the configuration step.
 
 Update docker images
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -37,7 +44,7 @@ Update docker images
 This downloads the latest version of the docker images from `Docker Hub <https://hub.docker.com/r/regis/openedx/>`_. Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
 
 Database management
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -48,7 +55,7 @@ This command should be run just once. It will create the required databases tabl
 If migrations are stopped with a ``Killed`` message, this certainly means the docker containers don't have enough RAM. See the :ref:`troubleshooting` section.
 
 Running Open edX
-----------------
+~~~~~~~~~~~~~~~~
 
 ::
 
@@ -66,8 +73,11 @@ And then, to stop all services::
 
     tutor local stop
 
+Extra commands
+--------------
+
 Creating a new user with staff and admin rights
------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will most certainly need to create a user to administer the platform. Just run::
 
@@ -76,14 +86,14 @@ You will most certainly need to create a user to administer the platform. Just r
 You will asked to set the user password interactively.
 
 Importing the demo course
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 On a fresh install, your platform will not have a single course. To import the `Open edX demo course <https://github.com/edx/edx-demo-course>`_, run::
 
     tutor local importdemocourse
 
 Updating the course search index
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The course search index can be updated with::
 
@@ -94,7 +104,7 @@ Run this command periodically to ensure that course search results are always up
 .. _portainer:
 
 Docker container web UI with `Portainer <https://portainer.io/>`__
-------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Portainer is a web UI for managing docker containers. It lets you view your entire Open edX platform at a glace. Try it! It's really cool::
 
@@ -107,25 +117,49 @@ After launching your platfom, the web UI will be available at `http://localhost:
 
 Among many other things, you'll be able to view the logs for each container, which is really useful.
 
+Recipes
+-------
+
+.. _web_proxy:
+
+Running Open edX behind a web proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The containerized web server (nginx) needs to listen to ports 80 and 443 on the host. If there is already a webserver running on the host, such as Apache or Nginx, the nginx container will not be able to start. Tutor supports running behind a web proxy. To do so, add the following configuration::
+
+       tutor config save --silent --set WEB_PROXY=true --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
+
+In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. You must then configure the web proxy on the host. Basic configuration files are provided by Tutor which can be used directly by your web proxy.
+
+For nginx::
+
+    sudo ln -s $(tutor config printroot)/env/local/proxy/nginx/openedx.conf /etc/nginx/sites-enabled/
+    sudo systemctl reload nginx
+
+For apache::
+
+    sudo a2enmod proxy
+    sudo a2enmod proxy_http
+    sudo ln -s $(tutor config printroot)/env/local/proxy/apache2/openedx.conf /etc/apache2/sites-enabled/
+    sudo systemctl reload apache2
+
+If you have configured your platform to use SSL/TLS certificates for HTTPS access, the generation and renewal of certificates will not be managed by Tutor: you are supposed to take care of it yourself. Suggestions for generating and renewing these certificates with `Let's Encrypt <https://letsencrypt.org/>`_ are given by::
+
+    tutor local https create
+    tutor local https renew
+
 Loading different production settings for ``edx-platform``
-----------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default settings module loaded by ``edx-platform`` is ``tutor.production``. The folders ``tutor/deploy/env/openedx/settings/lms`` and ``tutor/deploy/env/openedx/settings/cms`` are mounted as ``edx-platform/lms/envs/tutor`` and ``edx-platform/cms/envs/tutor`` inside the docker containers. Thus, to use your own settings, you must do two things:
+The default settings module loaded by ``edx-platform`` is ``tutor.production``. The folders ``$(tutor config printroot)/env/apps/openedx/settings/lms`` and ``$(tutor config printroot)/env/apps/openedx/settings/cms`` are mounted as ``edx-platform/lms/envs/tutor`` and ``edx-platform/cms/envs/tutor`` inside the docker containers. Thus, to use your own settings, you must do two things:
 
-1. Copy your settings files for the lms and the cms to ``tutor/deploy/env/openedx/settings/lms/mysettings.py`` and ``tutor/deploy/env/openedx/settings/cms/mysettings.py``.
-2. Load your settings by adding ``EDX_PLATFORM_SETTINGS=tutor.mysettings`` to ``tutor/deploy/local/.env``.
+1. Copy your settings files for the lms and the cms to ``$(tutor config printroot)/env/apps/openedx/settings/lms/mysettings.py`` and ``$(tutor config printroot)/env/apps/openedx/settings/cms/mysettings.py``.
+2. Load your settings by adding ``EDX_PLATFORM_SETTINGS=tutor.mysettings`` to ``$(tutor config printroot)/env/local/.env``.
 
-Of course, your settings should be compatible with the docker install. You can get some inspiration from the ``production.py`` settings modules generated by Tutor.
-
-Additional commands
--------------------
-
-All available commands can be listed by running::
-
-    tutor local help
+Of course, your settings should be compatible with the docker install. You can get some inspiration from the ``production.py`` settings modules generated by Tutor, or just import it as a base by adding ``from .production import *`` at the top of ``mysettings.py``.
 
 Upgrading from earlier versions
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Versions 1 and 2 of Tutor were organized differently: they relied on many different ``Makefile`` and ``make`` commands instead of a single ``tutor`` executable. To migrate from an earlier version, you should first stop your platform::
 

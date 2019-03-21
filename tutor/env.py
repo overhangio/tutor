@@ -30,7 +30,11 @@ def render_target(root, config, target):
     for src, dst in walk_templates(root, target):
         if is_part_of_env(src):
             with codecs.open(src, encoding='utf-8') as fi:
-                substituted = render_str(fi.read(), config)
+                try:
+                    substituted = render_str(fi.read(), config)
+                except jinja2.exceptions.TemplateError:
+                    print("Error rendering template", src)
+                    raise
             with open(dst, "w") as of:
                 of.write(substituted)
 

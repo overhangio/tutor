@@ -34,22 +34,7 @@ If you'd rather use a graphical user interface for viewing logs, you are encoura
 "Cannot start service nginx: driver failed programming external connectivity"
 -----------------------------------------------------------------------------
 
-The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. There are two solutions:
-
-1. Stop Apache or Nginx on the host::
-
-       sudo systemctl stop apache2
-       sudo systemctl stop nginx
-
-However, you might not want to do that if you need a webserver for running non-Open edX related applications. In such cases...
-
-2. Run the nginx container on different ports: to do so, configure different ports for the dockerized ngins::
-
-       tutor config save --silent --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
-
-In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. Then, restart nginx with ``tutor local restart nginx``.
-
-You should note that with the latter solution, it is your responsibility to configure the webserver on the host as a proxy to the nginx container. See `this github issue <https://github.com/regisb/tutor/issues/69#issuecomment-425916825>`_ for http, and `this other github issue <https://github.com/regisb/tutor/issues/90#issuecomment-437687294>`_ for https.
+The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. To solve this issue, check :ref:`web_proxy`.
 
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------

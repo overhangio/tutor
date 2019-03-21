@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Feature] Easily configure web proxy on the host
 - [Bugfix] Fix `images pull all` command which failed on "all" image
 - [Improvement] Add configurable mongodb, SMTP and rabbitmq authentication
 - [Improvement] Harmonize mysql username/password configuration parameters

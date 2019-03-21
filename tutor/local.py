@@ -1,10 +1,12 @@
 import os
 import subprocess
+from textwrap import indent
 from time import sleep
 
 import click
 
 from . import config as tutor_config
+from . import exceptions
 from . import fmt
 from . import opts
 from . import scripts
@@ -56,6 +58,7 @@ def start(root, detach):
     command = ["up", "--remove-orphans"]
     if detach:
         command.append("-d")
+
     docker_compose(root, *command)
 
     if detach:
@@ -63,7 +66,7 @@ def start(root, detach):
         config = tutor_config.load(root)
         http = "https" if config["ACTIVATE_HTTPS"] else "http"
         urls = []
-        if not config["ACTIVATE_HTTPS"]:
+        if not config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
             urls += [
                 "http://localhost",
                 "http://studio.localhost",
@@ -163,12 +166,23 @@ def https_create(root):
         click.echo(fmt.info("HTTPS is not activated: certificate generation skipped"))
         return
 
+    script = tutor_env.render_str(scripts.https_certificates_create, config)
+
+    if config['WEB_PROXY']:
+        click.echo(fmt.info(
+            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS certificates must be generated on the host. For instance, to generate certificates with Let's Encrypt, run:
+
+{}
+
+See the official certbot documentation for your platform: https://certbot.eff.org/""".format(indent(script, "    "))))
+        return
+
     utils.docker_run(
         "--volume", "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
         "-p", "80:80",
         "--entrypoint=sh",
         "certbot/certbot:latest",
-        "-c", tutor_env.render_str(scripts.https_certificates_create, config),
+        "-c", script,
     )
 
 @click.command(help="Renew https certificates", name="renew")
@@ -177,6 +191,14 @@ def https_renew(root):
     config = tutor_config.load(root)
     if not config['ACTIVATE_HTTPS']:
         click.echo(fmt.info("HTTPS is not activated: certificate renewal skipped"))
+        return
+    if config['WEB_PROXY']:
+        click.echo(fmt.info(
+            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS certificates must be renewed on the host. For instance, to renew Let's Encrypt certificates, run:
+
+    certbot renew
+
+See the official certbot documentation: for your platform https://certbot.eff.org/"""))
         return
     docker_run = [
         "--volume", "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),

@@ -34,9 +34,7 @@ oauth2 = """
 {% endif %}"""
 
 https_certificates_create = """certbot certonly --standalone -n --agree-tos -m admin@{{ LMS_HOST }} -d {{ LMS_HOST }} -d {{ CMS_HOST }} -d preview.{{ LMS_HOST }}
-{% if ACTIVATE_NOTES %}
-certbot certonly --standalone -n --agree-tos -m admin@{{ LMS_HOST }} -d notes.{{ LMS_HOST }}
-{% endif %}"""
+{% if ACTIVATE_NOTES %}certbot certonly --standalone -n --agree-tos -m admin@{{ LMS_HOST }} -d notes.{{ LMS_HOST }}{% endif %}"""
 
 create_user = """./manage.py lms --settings=tutor.production manage_user {{ OPTS }} {{ USERNAME }} {{ EMAIL }}
 ./manage.py lms --settings=tutor.production changepassword {{ USERNAME }}"""

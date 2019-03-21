@@ -50,7 +50,7 @@ def execute(*command):
             p.kill()
             p.wait()
             raise
-        except Exception as e:
+        except Exception:
             p.kill()
             p.wait()
             raise exceptions.TutorError("Command failed: {}".format(
