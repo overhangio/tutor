@@ -22,9 +22,7 @@ from . import ops
 def local():
     pass
 
-@click.command(
-    help="Configure and run Open edX from scratch"
-)
+@click.command(help="Configure and run Open edX from scratch")
 @click.option("-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images")
 @opts.root
 def quickstart(pullimages_, root):
@@ -42,16 +40,13 @@ def quickstart(pullimages_, root):
     click.echo(fmt.title("Starting the platform in detached mode"))
     start.callback(root, True)
 
-@click.command(
-    help="Update docker images",
-)
+@click.command(help="Update docker images")
 @opts.root
 def pullimages(root):
-    docker_compose(root, "pull")
+    config = tutor_config.load(root)
+    docker_compose(root, config, "pull")
 
-@click.command(
-    help="Run all configured Open edX services",
-)
+@click.command(help="Run all configured Open edX services")
 @opts.root
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 def start(root, detach):
@@ -59,11 +54,11 @@ def start(root, detach):
     if detach:
         command.append("-d")
 
-    docker_compose(root, *command)
+    config = tutor_config.load(root)
+    docker_compose(root, config, *command)
 
     if detach:
         click.echo(fmt.info("The Open edX platform is now running in detached mode"))
-        config = tutor_config.load(root)
         http = "https" if config["ACTIVATE_HTTPS"] else "http"
         urls = []
         if not config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
@@ -81,7 +76,8 @@ def start(root, detach):
 @click.command(help="Stop a running platform",)
 @opts.root
 def stop(root):
-    docker_compose(root, "rm", "--stop", "--force")
+    config = tutor_config.load(root)
+    docker_compose(root, config, "rm", "--stop", "--force")
 
 @click.command(
     help="""Restart some components from a running platform.
@@ -96,7 +92,8 @@ def restart(root, service):
         command += ["lms", "cms", "lms_worker", "cms_worker"]
     elif service != "all":
         command += [service]
-    docker_compose(root, *command)
+    config = tutor_config.load(root)
+    docker_compose(root, config, *command)
 
 @click.command(
     help="Run a command in one of the containers",
@@ -116,7 +113,8 @@ def run(root, service, command, args):
         run_command.append(command)
     if args:
         run_command += args
-    docker_compose(root, *run_command)
+    config = tutor_config.load(root)
+    docker_compose(root, config, *run_command)
 
 @click.command(
     help="Create databases and run database migrations",
@@ -134,16 +132,18 @@ def init_mysql(root):
     if os.path.exists(mysql_data_path):
         return
     click.echo(fmt.info("Initializing MySQL database..."))
-    docker_compose(root, "up", "-d", "mysql")
+    docker_compose(root, config, "up", "-d", "mysql")
     while True:
         click.echo(fmt.info("    waiting for mysql initialization"))
+        # TODO this is duplicate code with the docker_compose function. We
+        # should rely on a dedicated function in utils module.
         logs = subprocess.check_output([
             "docker-compose", "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-            "--project-name", "tutor_local", "logs", "mysql",
+            "--project-name", config["LOCAL_PROJECT_NAME"], "logs", "mysql",
         ])
         if b"MySQL init process done. Ready for start up." in logs:
             click.echo(fmt.info("MySQL database initialized"))
-            docker_compose(root, "stop", "mysql")
+            docker_compose(root, config, "stop", "mysql")
             return
         sleep(4)
 
@@ -219,7 +219,8 @@ def logs(root, follow, tail, service):
     if tail is not None:
         command += ["--tail", str(tail)]
     command += service
-    docker_compose(root, *command)
+    config = tutor_config.load(root)
+    docker_compose(root, config, *command)
 
 @click.command(help="Create an Open edX user and interactively set their password")
 @opts.root
@@ -261,12 +262,13 @@ def portainer(root, port):
     utils.docker_run(*docker_run)
 
 def run_bash(root, service, command):
-    docker_compose(root, "run", "--rm", service, "bash", "-e", "-c", command)
+    config = tutor_config.load(root)
+    docker_compose(root, config, "run", "--rm", service, "bash", "-e", "-c", command)
 
-def docker_compose(root, *command):
+def docker_compose(root, config, *command):
     return utils.docker_compose(
         "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-        "--project-name", "tutor_local",
+        "--project-name", config["LOCAL_PROJECT_NAME"],
         *command
     )
 

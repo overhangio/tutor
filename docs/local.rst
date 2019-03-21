@@ -148,6 +148,36 @@ If you have configured your platform to use SSL/TLS certificates for HTTPS acces
     tutor local https create
     tutor local https renew
 
+Running multiple Open edX platforms on a single server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With Tutor, it is easy to run multiple Open edX instances on a single server. To do so, the following configuration parameters must be different for all platforms:
+
+- ``TUTOR_ROOT``: so that configuration, environment and data are not mixed up between platforms.
+- ``LOCAL_PROJECT_NAME``: the various docker-compose projects cannot share the same name.
+- ``NGINX_HTTP_PORT``, ``NGINX_HTTPS_PORT``: ports cannot be shared by two different containers.
+- ``LMS_HOST``, ``CMS_HOST``: the different platforms must be accessible from different domain (or subdomain) names.
+
+In addition, a web proxy must be setup on the host, as described :ref:`above <web_proxy>`.
+
+As an example, here is how to launch two different platforms, with nginx running as a web proxy:
+
+    # platform 1
+    export TUTOR_ROOT=~/openedx/site1
+    tutor config save --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site1 --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=481
+    tutor local quickstart
+    sudo ln -s $(tutor config printroot)/env/local/proxy/nginx/openedx.conf /etc/nginx/sites-enabled/site1.conf
+
+
+    # platform 2
+    export TUTOR_ROOT=~/openedx/site2
+    tutor config save --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site2 --set NGINX_HTTP_PORT=82 --set NGINX_HTTPS_PORT=482
+    tutor local quickstart
+    sudo ln -s $(tutor config printroot)/env/local/proxy/nginx/openedx.conf /etc/nginx/sites-enabled/site2.conf
+
+You should then have two different platforms, completely isolated from one another, running on the same server.
+
+
 Loading different production settings for ``edx-platform``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

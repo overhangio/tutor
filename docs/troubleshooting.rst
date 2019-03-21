@@ -34,7 +34,7 @@ If you'd rather use a graphical user interface for viewing logs, you are encoura
 "Cannot start service nginx: driver failed programming external connectivity"
 -----------------------------------------------------------------------------
 
-The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. To solve this issue, check :ref:`web_proxy`.
+The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. To solve this issue, check :ref:`out to setup a web proxy <web_proxy>`.
 
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------
