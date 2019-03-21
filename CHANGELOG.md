@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## 3.2.2 (2019-03-21)
 
 - [Feature] Multiple platforms on a single server \o/
 - [Feature] Easily configure web proxy on the host
