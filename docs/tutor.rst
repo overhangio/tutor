@@ -42,4 +42,6 @@ Releasing a new version
 - Replace "Latest" by the version name in CHANGELOG.md.
 - Create a commit with the version changelog.
 - ``git push``
-- ``make tag``
+- ``make release``
+
+After a regular push to ``master``, run ``make nightly`` to update the "nightly" tag.

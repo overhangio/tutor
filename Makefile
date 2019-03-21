@@ -14,11 +14,14 @@ bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 dist/tutor:
 	$(MAKE) bundle
 
-tag: ## Create a release, update the "latest" tag and push them to origin
-	$(MAKE) retag TAG=v$(shell make version)
-	$(MAKE) retag TAG=latest
+nightly: ## Create a "nightly" release
+	$(MAKE) tag TAG=nightly
 
-retag:
+release: ## Create a release, update the "latest" tag and push them to origin
+	$(MAKE) tag TAG=v$(shell make version)
+	$(MAKE) tag TAG=latest
+
+tag:
 	@echo "=== Creating tag $(TAG)"
 	git tag -d $(TAG) || true
 	git tag $(TAG)
