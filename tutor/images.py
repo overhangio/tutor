@@ -97,6 +97,7 @@ def vendor_image_names(config, image):
             images.remove('mysql')
         if not config['ACTIVATE_RABBITMQ']:
             images.remove('rabbitmq')
+        return images
     return [image]
 
 images.add_command(build)
