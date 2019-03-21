@@ -94,6 +94,7 @@ Mongodb
 Rabbitmq
 ~~~~~~~~
 
+- ``ACTIVATE_RABBITMQ`` (default: ``true``)
 - ``RABBITMQ_HOST`` (default: ``"rabbitmq"``)
 - ``RABBITMQ_USERNAME`` (default: ``""``)
 - ``RABBITMQ_PASSWORD`` (default: ``""``)
@@ -101,6 +102,7 @@ Rabbitmq
 SMTP
 ~~~~
 
+- ``ACTIVATE_SMTP`` (default: ``true``)
 - ``SMTP_HOST`` (default: ``"smtp"``)
 - ``SMTP_PORT`` (default: ``25``)
 - ``SMTP_USERNAME`` (default: ``""``)
