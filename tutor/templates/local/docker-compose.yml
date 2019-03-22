@@ -60,12 +60,12 @@ services:
     volumes:
       - ../apps/nginx:/etc/nginx/conf.d/
       - ../../data/openedx:/var/www/openedx:ro
-      - ../../data/cms:/openedx/data/cms/:ro
-      - ../../data/lms:/openedx/data/lms/:ro
-      - ../../data/letsencrypt:/etc/letsencrypt/:ro
+      {% if ACTIVATE_CMS %}- ../../data/cms:/openedx/data/cms/:ro{% endif %}
+      {% if ACTIVATE_LMS %}- ../../data/lms:/openedx/data/lms/:ro{% endif %}
+      {% if ACTIVATE_HTTPS %}- ../../data/letsencrypt:/etc/letsencrypt/:ro{% endif %}
     depends_on:
-      - lms
-      - cms
+      {% if ACTIVATE_LMS %}- lms{% endif %}
+      {% if ACTIVATE_CMS %}- cms {% endif %}
       {% if ACTIVATE_NOTES %}- notes{% endif %}
 
   {% if ACTIVATE_RABBITMQ %}
@@ -84,6 +84,7 @@ services:
 
   ############# Forum
 
+  {% if ACTIVATE_FORUM %}
   forum:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
     environment:
@@ -93,9 +94,11 @@ services:
     depends_on:
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
+  {% endif %}
 
   ############# LMS and CMS
 
+  {% if ACTIVATE_LMS %}
   lms:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -109,13 +112,15 @@ services:
       - ../../data/lms:/openedx/data
     depends_on:
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
-      - forum
+      {% if ACTIVATE_FORUM %}- forum{% endif %}
       {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
       {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       {% if ACTIVATE_SMTP %}- smtp{% endif %}
+  {% endif %}
 
+  {% if ACTIVATE_CMS %}
   cms:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -134,10 +139,11 @@ services:
       {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       {% if ACTIVATE_SMTP %}- smtp{% endif %}
+  {% endif %}
 
   ############# LMS and CMS workers
 
-  # We could probably create one service per queue here. For small instances, it is not necessary.
+  {% if ACTIVATE_LMS %}
   lms_worker:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -152,8 +158,10 @@ services:
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
     depends_on:
-      - lms
+      {% if ACTIVATE_LMS %}- lms {% endif %}
+  {% endif %}
 
+  {% if ACTIVATE_CMS %}
   cms_worker:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -168,7 +176,8 @@ services:
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
     depends_on:
-      - cms
+      {% if ACTIVATE_CMS %}- cms {% endif %}
+  {% endif %}
 
   {% if ACTIVATE_NOTES %}
   ############# Notes: backend store for edX Student Notes

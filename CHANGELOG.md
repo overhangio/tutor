@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Feature] Pluggable LMS/CMS/forum
 - [Improvement] Safer environment overwrite. Thanks @silviot! 👐
 - [Security] Fix Jinja2 vulnerability
 - [Improvement] Improve CLI cold start performance

@@ -25,13 +25,31 @@ Once the base configuration is created or updated, the environment is automatica
 
 With an up-to-date environment, Tutor is ready to launch an Open edX platform and perform usual operations. Below, we document some of the configuration parameters.
 
+Individual service activation
+-----------------------------
+
+- ``ACTIVATE_LMS`` (default: ``true``)
+- ``ACTIVATE_CMS`` (default: ``true``)
+- ``ACTIVATE_FORUM`` (default: ``true``)
+- ``ACTIVATE_ELASTICSEARCH`` (default: ``true``)
+- ``ACTIVATE_MEMCACHED`` (default: ``true``)
+- ``ACTIVATE_MONGODB`` (default: ``true``)
+- ``ACTIVATE_MYSQL`` (default: ``true``)
+- ``ACTIVATE_RABBITMQ`` (default: ``true``)
+- ``ACTIVATE_SMTP`` (default: ``true``)
+- ``ACTIVATE_HTTPS`` (default: ``false``)
+- ``ACTIVATE_NOTES`` (default: ``false``)
+- ``ACTIVATE_XQUEUE`` (default: ``false``)
+
+Every single Open edX service may be (de)activated at will by these configuration parameters. This is useful if you want, for instance, to distribute the various Open edX services on different servers.
+
 Docker
 ------
 
 .. _docker_images:
 
 Custom images
--------------
+~~~~~~~~~~~~~
 
 - ``DOCKER_IMAGE_OPENEDX`` (default: ``"regis/openedx:ironwood"``)
 - ``DOCKER_IMAGE_ANDROID`` (default: ``"regis/openedx-android:ironwood"``)
@@ -42,7 +60,7 @@ Custom images
 These configuration parameters define which image to run for each service.
 
 Custom registry
----------------
+~~~~~~~~~~~~~~~
 
 - ``DOCKER_REGISTRY`` (default: ``""``)
 

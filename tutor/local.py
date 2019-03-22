@@ -6,11 +6,12 @@ from time import sleep
 import click
 
 from . import config as tutor_config
+from . import env as tutor_env
+from . import exceptions
 from . import fmt
 from . import opts
 from . import scripts
 from . import utils
-from . import env as tutor_env
 
 
 @click.group(
@@ -85,12 +86,15 @@ restart all services.""",
 @opts.root
 @click.argument('service')
 def restart(root, service):
+    config = tutor_config.load(root)
     command = ["restart"]
     if service == "openedx":
-        command += ["lms", "cms", "lms_worker", "cms_worker"]
+        if config["ACTIVATE_LMS"]:
+            command += ["lms", "lms_worker"]
+        if config["ACTIVATE_CMS"]:
+            command += ["cms", "cms_worker"]
     elif service != "all":
         command += [service]
-    config = tutor_config.load(root)
     docker_compose(root, config, *command)
 
 @click.command(
@@ -229,11 +233,15 @@ def logs(root, follow, tail, service):
 @click.argument("name")
 @click.argument("email")
 def createuser(root, superuser, staff, name, email):
+    config = tutor_config.load(root)
+    check_service_is_activated(config, "lms")
     scripts.create_user(root, run_bash, superuser, staff, name, email)
 
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
+    config = tutor_config.load(root)
+    check_service_is_activated(config, "cms")
     click.echo(fmt.info("Importing demo course"))
     scripts.import_demo_course(root, run_bash)
     click.echo(fmt.info("Re-indexing courses"))
@@ -242,6 +250,8 @@ def importdemocourse(root):
 @click.command(help="Re-index courses for better searching")
 @opts.root
 def indexcourses(root):
+    config = tutor_config.load(root)
+    check_service_is_activated(config, "cms")
     scripts.index_courses(root, run_bash)
 
 @click.command(
@@ -260,6 +270,10 @@ def portainer(root, port):
     ]
     click.echo(fmt.info("View the Portainer UI at http://localhost:{port}".format(port=port)))
     utils.docker_run(*docker_run)
+
+def check_service_is_activated(config, service):
+    if not config["ACTIVATE_" + service.upper()]:
+        raise exceptions.TutorError("This command may only be executed on the server where the {} is running".format(service))
 
 def run_bash(root, service, command):
     config = tutor_config.load(root)
