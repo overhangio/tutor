@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.0 (2019-03-22)
+
+- [Feature] Upgrade from Hawthorn to Ironwood
+
 ## 3.2.2 (2019-03-21)
 
 - [Feature] Multiple platforms on a single server \o/
