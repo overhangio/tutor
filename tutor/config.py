@@ -113,8 +113,10 @@ def load_user(config, root):
             loaded = yaml.load(fi.read())
         for key, value in loaded.items():
             config[key] = value
+    upgrade_obsolete(config)
 
-    # Here, we migrate obsolete configuration parameters
+def upgrade_obsolete(config):
+    # Openedx-specific mysql passwords
     if "MYSQL_PASSWORD" in config:
         config["MYSQL_ROOT_PASSWORD"] = config["MYSQL_PASSWORD"]
         config["OPENEDX_MYSQL_PASSWORD"] = config["MYSQL_PASSWORD"]

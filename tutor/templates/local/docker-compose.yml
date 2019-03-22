@@ -76,10 +76,11 @@ services:
     restart: unless-stopped
   {% endif %}
 
-  # Simple SMTP server
+  {% if ACTIVATE_SMTP %}
   smtp:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_SMTP }}
     restart: unless-stopped
+  {% endif %}
 
   ############# Forum
 
@@ -113,7 +114,7 @@ services:
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
       {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
-      - smtp
+      {% if ACTIVATE_SMTP %}- smtp{% endif %}
 
   cms:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
@@ -132,7 +133,7 @@ services:
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
       {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
-      - smtp
+      {% if ACTIVATE_SMTP %}- smtp{% endif %}
 
   ############# LMS and CMS workers
 
