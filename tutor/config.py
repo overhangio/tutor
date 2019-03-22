@@ -165,7 +165,7 @@ def load_defaults(config):
             config[k] = v
 
 def ask(question, key, config):
-    default = env.render_str(config[key], config)
+    default = env.render_str(config, config[key])
     config[key] = click.prompt(
         fmt.question(question),
         prompt_suffix=" ", default=default, show_default=True,

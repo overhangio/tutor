@@ -29,14 +29,17 @@ def render_target(root, config, target):
     """
     for src, dst in walk_templates(root, target):
         if is_part_of_env(src):
-            with codecs.open(src, encoding='utf-8') as fi:
-                try:
-                    substituted = render_str(fi.read(), config)
-                except jinja2.exceptions.TemplateError:
-                    print("Error rendering template", src)
-                    raise
+            rendered = render_file(config, src)
             with open(dst, "w") as of:
-                of.write(substituted)
+                of.write(rendered)
+
+def render_file(config, path):
+    with codecs.open(path, encoding='utf-8') as fi:
+        try:
+            return render_str(config, fi.read())
+        except jinja2.exceptions.TemplateError:
+            print("Error rendering template", path)
+            raise
 
 def render_dict(config):
     """
@@ -49,14 +52,14 @@ def render_dict(config):
     rendered = {}
     for key, value in config.items():
         if isinstance(value, str):
-            rendered[key] = render_str(value, config)
+            rendered[key] = render_str(config, value)
         else:
             rendered[key] = value
     for k, v in rendered.items():
         config[k] = v
     pass
 
-def render_str(text, config):
+def render_str(config, text):
     """
     Args:
         text (str)
@@ -103,7 +106,7 @@ def read(*path):
     """
     Read template content located at `path`.
     """
-    src = os.path.join(TEMPLATES_ROOT, *path)
+    src = template_path(*path)
     with codecs.open(src, encoding='utf-8') as fi:
         return fi.read()
 
@@ -115,8 +118,8 @@ def walk_templates(root, target):
         src: template path
         dst: destination path inside root
     """
-    target_root = os.path.join(TEMPLATES_ROOT, target)
-    for dirpath, _, filenames in os.walk(os.path.join(TEMPLATES_ROOT, target)):
+    target_root = template_path(target)
+    for dirpath, _, filenames in os.walk(target_root):
         dst_dir = pathjoin(
             root, target,
             os.path.relpath(dirpath, target_root)
@@ -127,6 +130,9 @@ def walk_templates(root, target):
             src = os.path.join(dirpath, filename)
             dst = os.path.join(dst_dir, filename)
             yield src, dst
+
+def template_path(*path):
+    return os.path.join(TEMPLATES_ROOT, *path)
 
 def data_path(root, *path):
     return os.path.join(os.path.abspath(root), "data", *path)

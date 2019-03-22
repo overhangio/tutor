@@ -6,13 +6,11 @@ from time import sleep
 import click
 
 from . import config as tutor_config
-from . import exceptions
 from . import fmt
 from . import opts
 from . import scripts
 from . import utils
 from . import env as tutor_env
-from . import ops
 
 
 @click.group(
@@ -122,7 +120,7 @@ def run(root, service, command, args):
 @opts.root
 def databases(root):
     init_mysql(root)
-    ops.migrate(root, run_bash)
+    scripts.migrate(root, run_bash)
 
 def init_mysql(root):
     config = tutor_config.load(root)
@@ -166,11 +164,13 @@ def https_create(root):
         click.echo(fmt.info("HTTPS is not activated: certificate generation skipped"))
         return
 
-    script = tutor_env.render_str(scripts.https_certificates_create, config)
+    script = scripts.render_template(config, 'https_create.sh')
 
     if config['WEB_PROXY']:
         click.echo(fmt.info(
-            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS certificates must be generated on the host. For instance, to generate certificates with Let's Encrypt, run:
+"""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+certificates must be generated on the host. For instance, to generate
+certificates with Let's Encrypt, run:
 
 {}
 
@@ -194,11 +194,13 @@ def https_renew(root):
         return
     if config['WEB_PROXY']:
         click.echo(fmt.info(
-            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS certificates must be renewed on the host. For instance, to renew Let's Encrypt certificates, run:
+"""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+certificates must be renewed on the host. For instance, to renew Let's Encrypt
+certificates, run:
 
     certbot renew
 
-See the official certbot documentation: for your platform https://certbot.eff.org/"""))
+See the official certbot documentation for your platform: https://certbot.eff.org/"""))
         return
     docker_run = [
         "--volume", "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
@@ -229,20 +231,20 @@ def logs(root, follow, tail, service):
 @click.argument("name")
 @click.argument("email")
 def createuser(root, superuser, staff, name, email):
-    ops.create_user(root, run_bash, superuser, staff, name, email)
+    scripts.create_user(root, run_bash, superuser, staff, name, email)
 
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
     click.echo(fmt.info("Importing demo course"))
-    ops.import_demo_course(root, run_bash)
+    scripts.import_demo_course(root, run_bash)
     click.echo(fmt.info("Re-indexing courses"))
     indexcourses.callback(root)
 
 @click.command(help="Re-index courses for better searching")
 @opts.root
 def indexcourses(root):
-    ops.index_courses(root, run_bash)
+    scripts.index_courses(root, run_bash)
 
 @click.command(
     help="Run Portainer (https://portainer.io), a UI for container supervision",

@@ -6,7 +6,7 @@ from . import env as tutor_env
 from . import exceptions
 from . import fmt
 from . import opts
-from . import ops
+from . import scripts
 from . import utils
 
 
@@ -62,7 +62,7 @@ def delete(yes):
 )
 @opts.root
 def databases(root):
-    ops.migrate(root, run_bash)
+    scripts.migrate(root, run_bash)
 
 @click.command(help="Create an Open edX user and interactively set their password")
 @opts.root
@@ -71,13 +71,13 @@ def databases(root):
 @click.argument("name")
 @click.argument("email")
 def createuser(root, superuser, staff, name, email):
-    ops.create_user(root, run_bash, superuser, staff, name, email)
+    scripts.create_user(root, run_bash, superuser, staff, name, email)
 
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
     click.echo(fmt.info("Importing demo course"))
-    ops.import_demo_course(root, run_bash)
+    scripts.import_demo_course(root, run_bash)
     click.echo(fmt.info("Re-indexing courses"))
     indexcourses.callback(root)
 
@@ -86,7 +86,7 @@ def importdemocourse(root):
 def indexcourses(root):
     # Note: this is currently broken with "pymongo.errors.ConnectionFailure: [Errno 111] Connection refused"
     # I'm not quite sure the settings are correctly picked up. Which is weird because migrations work very well.
-    ops.index_courses(root, run_bash)
+    scripts.index_courses(root, run_bash)
 
 @click.command(
     help="Launch a shell in LMS or CMS",

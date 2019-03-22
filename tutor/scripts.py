@@ -1,43 +1,52 @@
-create_databases = """dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
-mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'CREATE DATABASE IF NOT EXISTS {{ OPENEDX_MYSQL_DATABASE }};'
-mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'GRANT ALL ON {{ OPENEDX_MYSQL_DATABASE }}.* TO "{{ OPENEDX_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ OPENEDX_MYSQL_PASSWORD }}";'
+import click
 
-{% if ACTIVATE_NOTES %}
-mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'CREATE DATABASE IF NOT EXISTS {{ NOTES_MYSQL_DATABASE }};'
-mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'GRANT ALL ON {{ NOTES_MYSQL_DATABASE }}.* TO "{{ NOTES_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ NOTES_MYSQL_PASSWORD }}";'
-{% endif %}
+from . import config as tutor_config
+from . import env
+from . import fmt
 
-{% if ACTIVATE_XQUEUE %}
-mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'CREATE DATABASE IF NOT EXISTS {{ XQUEUE_MYSQL_DATABASE }};'
-mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'GRANT ALL ON {{ XQUEUE_MYSQL_DATABASE }}.* TO "{{ XQUEUE_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ XQUEUE_MYSQL_PASSWORD }}";'
-{% endif %}
-"""
+def migrate(root, run_func):
+    config = tutor_config.load(root)
+    click.echo(fmt.info("Creating lms/cms databases..."))
+    run_template(root, config, "lms", "create_databases.sh", run_func)
+    click.echo(fmt.info("Running lms migrations..."))
+    run_template(root, config, "lms", "migrate_lms.sh", run_func)
+    click.echo(fmt.info("Running cms migrations..."))
+    run_template(root, config, "cms", "migrate_cms.sh", run_func)
+    click.echo(fmt.info("Running forum migrations..."))
+    run_template(root, config, "forum", "migrate_forum.sh", run_func)
+    if config["ACTIVATE_NOTES"]:
+        click.echo(fmt.info("Running notes migrations..."))
+        run_template(root, config, "notes", "migrate_django.sh", run_func)
+    if config["ACTIVATE_XQUEUE"]:
+        click.echo(fmt.info("Running xqueue migrations..."))
+        run_template(root, config, "xqueue", "migrate_django.sh", run_func)
+    click.echo(fmt.info("Creating oauth2 users..."))
+    run_template(root, config, "lms", "oauth2.sh", run_func)
+    click.echo(fmt.info("Databases ready."))
 
-migrate_lms = "dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s && ./manage.py lms migrate"
-migrate_cms = "dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s && ./manage.py cms migrate"
-migrate_forum = "bundle exec rake search:initialize && bundle exec rake search:rebuild_index"
-migrate_notes = "./manage.py migrate"
-migrate_xqueue = "./manage.py migrate"
+def create_user(root, run_func, superuser, staff, name, email):
+    config = {
+        "OPTS": "",
+        "USERNAME": name,
+        "EMAIL": email,
+    }
+    if superuser:
+        config["OPTS"] += " --superuser"
+    if staff:
+        config["OPTS"] += " --staff"
+    run_template(root, config, "lms", "create_user.sh", run_func)
 
-oauth2 = """
-./manage.py lms create_oauth2_client \
-    "http://androidapp.com" "http://androidapp.com/redirect" public \
-    --client_id android --client_secret {{ ANDROID_OAUTH2_SECRET }} \
-    --trusted
+def import_demo_course(root, run_func):
+    run_template(root, {}, "cms", "import_demo_course.sh", run_func)
 
-{% if ACTIVATE_NOTES %}
-./manage.py lms manage_user notes notes@{{ LMS_HOST }} --staff --superuser
-./manage.py lms create_oauth2_client \
-    "http://notes.openedx:8000" "http://notes.openedx:8000/complete/edx-oidc/" confidential \
-    --client_name edx-notes --client_id notes --client_secret {{ NOTES_OAUTH2_SECRET }} \
-    --trusted --logout_uri "http://notes.openedx:8000/logout/" --username notes
-{% endif %}"""
+def index_courses(root, run_func):
+    run_template(root, {}, "cms", "index_courses.sh", run_func)
 
-https_certificates_create = """certbot certonly --standalone -n --agree-tos -m admin@{{ LMS_HOST }} -d {{ LMS_HOST }} -d {{ CMS_HOST }} -d preview.{{ LMS_HOST }}
-{% if ACTIVATE_NOTES %}certbot certonly --standalone -n --agree-tos -m admin@{{ LMS_HOST }} -d notes.{{ LMS_HOST }}{% endif %}"""
+def run_template(root, config, service, template, run_func):
+    command = render_template(config, template)
+    if command:
+        run_func(root, service, command)
 
-create_user = """./manage.py lms --settings=tutor.production manage_user {{ OPTS }} {{ USERNAME }} {{ EMAIL }}
-./manage.py lms --settings=tutor.production changepassword {{ USERNAME }}"""
-import_demo_course = """git clone https://github.com/edx/edx-demo-course --branch open-release/hawthorn.2 --depth 1 ../edx-demo-course
-python ./manage.py cms --settings=tutor.production import ../data ../edx-demo-course"""
-index_courses = "./manage.py cms --settings=tutor.production reindex_course --all --setup"
+def render_template(config, template):
+    path = env.template_path("scripts", template)
+    return env.render_file(config, path).strip()

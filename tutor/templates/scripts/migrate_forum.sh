@@ -1,0 +1,1 @@
+bundle exec rake search:initialize && bundle exec rake search:rebuild_index
