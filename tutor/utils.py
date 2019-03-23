@@ -21,6 +21,22 @@ def parse_yaml_value(v):
         v = (v == "true")
     return v
 
+def common_domain(d1, d2):
+    """
+    Return the common domain between two domain names.
+
+    Ex: "sub1.domain.com" and "sub2.domain.com" -> "domain.com"
+    """
+    components1 = d1.split(".")[::-1]
+    components2 = d2.split(".")[::-1]
+    common = []
+    for c in range(0, min(len(components1), len(components2))):
+        if components1[c] == components2[c]:
+            common.append(components1[c])
+        else:
+            break
+    return ".".join(common[::-1])
+
 def docker_run(*command):
     return docker("run", "--rm", "-it", *command)
 

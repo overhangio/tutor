@@ -164,6 +164,9 @@ def load_defaults(config):
         if k not in config:
             config[k] = v
 
+    # Add extra configuration parameters that need to be computed separately
+    config["lms_cms_common_domain"] = utils.common_domain(config["LMS_HOST"], config["CMS_HOST"])
+
 def ask(question, key, config):
     default = env.render_str(config, config[key])
     config[key] = click.prompt(

@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Improvement] Support CMS login when the CMS is not a subdomain of the LMS
+
 ## 3.3.0 (2019-03-22)
 
 - [Feature] Upgrade from Hawthorn to Ironwood
