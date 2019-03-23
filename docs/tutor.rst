@@ -15,6 +15,15 @@ Install requirements
 
     pip install -r requirements/dev.txt
 
+Run tests
+---------
+
+::
+
+    make test
+
+Yes, there are very few tests for now, but this is probably going to change.
+
 Bundle ``tutor`` executable
 ---------------------------
 

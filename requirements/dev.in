@@ -1,3 +1,4 @@
 -r base.txt
+nose
 pip-tools
 pyinstaller

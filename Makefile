@@ -7,6 +7,9 @@ compile-requirements: ## Compile requirements files
 	pip-compile -o requirements/dev.txt requirements/dev.in
 	pip-compile -o requirements/docs.txt requirements/docs.in
 
+test:
+	nosetests --nocapture tests/
+
 ###### Deployment
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
@@ -38,6 +41,7 @@ ci-info: ## Print info about environment
 ci-bundle: ## Create bundle and run basic tests
 	pip3 install -U setuptools
 	pip3 install -r requirements/dev.txt
+	$(MAKE) test
 	$(MAKE) bundle
 	mkdir -p releases/
 	cp ./dist/tutor ./releases/tutor-$$(uname -s)_$$(uname -m)
