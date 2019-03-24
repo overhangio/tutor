@@ -1,6 +1,5 @@
 import json
 import os
-import yaml
 
 import click
 
@@ -8,6 +7,7 @@ from . import exceptions
 from . import env
 from . import fmt
 from . import opts
+from . import serialize
 from . import utils
 from .__about__ import __version__
 
@@ -92,25 +92,25 @@ def load_current(config, root):
     load_env(config, root)
 
 def load_base(config, root):
-    base = yaml.load(env.read("config-base.yml"))
+    base = serialize.load(env.read("config-base.yml"))
     for k, v in base.items():
         config[k] = v
 
 def load_env(config, root):
-    base_config = yaml.load(env.read("config-base.yml"))
-    default_config = yaml.load(env.read("config-defaults.yml"))
+    base_config = serialize.load(env.read("config-base.yml"))
+    default_config = serialize.load(env.read("config-defaults.yml"))
     keys = set(list(base_config.keys()) + list(default_config.keys()))
 
     for k in keys:
         env_var = "TUTOR_" + k
         if env_var in os.environ:
-            config[k] = utils.parse_yaml_value(os.environ[env_var])
+            config[k] = serialize.parse_value(os.environ[env_var])
 
 def load_user(config, root):
     path = config_path(root)
     if os.path.exists(path):
         with open(path) as fi:
-            loaded = yaml.load(fi.read())
+            loaded = serialize.load(fi.read())
         for key, value in loaded.items():
             config[key] = value
     upgrade_obsolete(config)
@@ -159,7 +159,7 @@ def load_interactive(config):
     )
 
 def load_defaults(config):
-    defaults = yaml.load(env.read("config-defaults.yml"))
+    defaults = serialize.load(env.read("config-defaults.yml"))
     for k, v in defaults.items():
         if k not in config:
             config[k] = v
@@ -214,7 +214,7 @@ def save_config(root, config):
     if not os.path.exists(directory):
         os.makedirs(directory)
     with open(path, "w") as of:
-        yaml.dump(config, of, default_flow_style=False)
+        serialize.dump(config, of)
     click.echo(fmt.info("Configuration saved to {}".format(path)))
 
 def save_env(root, config):

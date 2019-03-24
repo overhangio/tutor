@@ -11,19 +11,6 @@ from . import fmt
 def random_string(length):
     return "".join([random.choice(string.ascii_letters + string.digits) for _ in range(length)])
 
-def parse_yaml_value(v):
-    """
-    Parse a yaml-formatted string. This is fairly basic and should only be used
-    for parsing of elementary values.
-    """
-    if v.isdigit():
-        v = int(v)
-    elif v == "null":
-        v = None
-    elif v in ["true", "false"]:
-        v = (v == "true")
-    return v
-
 def common_domain(d1, d2):
     """
     Return the common domain between two domain names.

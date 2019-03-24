@@ -1,6 +1,7 @@
 import unittest
 
 from tutor import utils
+from tutor import serialize
 
 
 class UtilsTests(unittest.TestCase):
@@ -11,7 +12,9 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual("com", utils.common_domain("domain1.com", "domain2.com"))
         self.assertEqual("domain.com", utils.common_domain("sub.domain.com", "ub.domain.com"))
 
-    def test_parse_yaml_value(self):
-        self.assertEqual(True, utils.parse_yaml_value("true"))
-        self.assertEqual(False, utils.parse_yaml_value("false"))
-        self.assertEqual(None, utils.parse_yaml_value("null"))
+class SerializeTests(unittest.TestCase):
+
+    def test_parse_value(self):
+        self.assertEqual(True, serialize.parse_value("true"))
+        self.assertEqual(False, serialize.parse_value("false"))
+        self.assertEqual(None, serialize.parse_value("null"))

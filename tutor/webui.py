@@ -4,7 +4,6 @@ import platform
 import subprocess
 import sys
 import tarfile
-import yaml
 from urllib.request import urlopen
 
 import click
@@ -14,6 +13,7 @@ import click
 from . import fmt
 from . import opts
 from . import env as tutor_env
+from . import serialize
 
 @click.group(
     short_help="Web user interface",
@@ -115,7 +115,7 @@ def load_config(root):
             "password": None,
         })
     with open(config_path(root)) as f:
-        return yaml.load(f)
+        return serialize.load(f)
 
 def save_config(root, config):
     path = config_path(root)
@@ -123,7 +123,7 @@ def save_config(root, config):
     if not os.path.exists(directory):
         os.makedirs(directory)
     with open(path, "w") as of:
-        yaml.dump(config, of, default_flow_style=False)
+        serialize.dump(config, of)
 
 def gotty_path(root):
     return get_path(root, "gotty")

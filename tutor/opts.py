@@ -1,7 +1,7 @@
 import appdirs
 import click
 
-from . import utils
+from . import serialize
 
 
 root = click.option(
@@ -34,7 +34,7 @@ class YamlParamType(click.ParamType):
             k, v = value.split("=")
         except ValueError:
             self.fail("'{}' is not of the form 'key=value'.".format(value), param, ctx)
-        return k, utils.parse_yaml_value(v)
+        return k, serialize.parse_value(v)
 
 key_value = click.option(
     "-s", "--set", "set_", type=YamlParamType(), multiple=True, metavar="KEY=VAL",
