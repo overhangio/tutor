@@ -7,7 +7,7 @@ compile-requirements: ## Compile requirements files
 	pip-compile -o requirements/dev.txt requirements/dev.in
 	pip-compile -o requirements/docs.txt requirements/docs.in
 
-test:
+test: ## Run unit tests
 	nosetests --nocapture tests/
 
 ###### Deployment
@@ -38,10 +38,13 @@ ci-info: ## Print info about environment
 	python3 --version
 	pip3 --version
 
+ci-test: ## Run unit tests but without nosetests, which is not available on Mac OS in travis-ci
+	python3 -m unittest discover tests
+
 ci-bundle: ## Create bundle and run basic tests
 	pip3 install -U setuptools
 	pip3 install -r requirements/dev.txt
-	$(MAKE) test
+	$(MAKE) ci-test
 	$(MAKE) bundle
 	mkdir -p releases/
 	cp ./dist/tutor ./releases/tutor-$$(uname -s)_$$(uname -m)
