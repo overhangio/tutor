@@ -1,7 +1,7 @@
 import yaml
 
 def load(stream):
-    return yaml.load(stream)
+    return yaml.load(stream, Loader=yaml.SafeLoader)
 
 def dump(content, fileobj):
     yaml.dump(content, fileobj, default_flow_style=False)

@@ -26,7 +26,7 @@ pyasn1==0.4.5             # via pyasn1-modules, rsa
 pycparser==2.19           # via cffi
 pyjwt==1.7.1              # via adal
 python-dateutil==2.8.0    # via adal, kubernetes
-pyyaml==4.2b4
+pyyaml==5.1
 requests-oauthlib==1.2.0  # via kubernetes
 requests==2.21.0          # via adal, kubernetes, requests-oauthlib
 rsa==4.0                  # via google-auth

@@ -33,7 +33,7 @@ pycparser==2.19
 pyinstaller==3.4
 pyjwt==1.7.1
 python-dateutil==2.8.0
-pyyaml==4.2b4
+pyyaml==5.1
 requests-oauthlib==1.2.0
 requests==2.21.0
 rsa==4.0
