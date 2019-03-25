@@ -38,6 +38,9 @@ GRADES_DOWNLOAD = {
 
 LOCALE_PATHS.append('/openedx/locale')
 
+# Setup correct webpack configuration file for development
+WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
+
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):

@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Improve assets building for development
 - [Improvement] Support CMS login when the CMS is not a subdomain of the LMS
 
 ## 3.3.0 (2019-03-22)

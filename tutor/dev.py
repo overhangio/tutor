@@ -54,20 +54,6 @@ def stop(root):
     docker_compose(root, "rm", "--stop", "--force")
 
 @click.command(
-    help="Launch a shell",
-)
-@opts.root
-@opts.edx_platform_path
-@opts.edx_platform_settings
-@click.argument("service", type=click.Choice(["lms", "cms"]))
-def shell(root, edx_platform_path, edx_platform_settings, service):
-    port = service_port(service)
-    docker_compose_run_with_port(
-        root, edx_platform_path, edx_platform_settings, port,
-        service, "bash"
-    )
-
-@click.command(
     help="Watch for changes in your themes and recompile assets when needed"
 )
 @opts.root
@@ -112,5 +98,4 @@ def service_port(service):
 dev.add_command(run)
 dev.add_command(runserver)
 dev.add_command(stop)
-dev.add_command(shell)
 dev.add_command(watchthemes)

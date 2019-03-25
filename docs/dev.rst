@@ -5,6 +5,16 @@ Using Tutor for Open edX development
 
 In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
+The following commands assume you have previously launched a local Open edX platform. If you have not done so already, you should run::
+
+    tutor local quickstart
+
+You should setup real host names for the LMS and the CMS (i.e: not "localhost"). It is not necessary to configure the DNS records for local development. You should *not* activate HTTPS certificates, which will not work locally.
+
+Once the local platform has been configured, you should stop it so that it does not interfere with the development environment::
+
+    tutor local stop
+
 Run a local development webserver
 ---------------------------------
 
@@ -13,20 +23,32 @@ Run a local development webserver
     tutor dev runserver lms # Access the lms at http://localhost:8000
     tutor dev runserver cms # Access the cms at http://localhost:8001
 
-Open a bash shell
------------------
+Running arbitrary commands
+--------------------------
 
-::
+To run any command inside one of the containers, run ``tutor dev run [OPTIONS] SERVICE [COMMAND] [ARGS]...``. For instance, to open a bash shell in the LMS or CMS containers::
 
-    tutor dev shell lms
-    tutor dev shell cms
+    tutor dev run lms bash
+    tutor dev run cms bash
+
+To open a python shell in the LMS or CMS, run::
+
+    tutor dev run lms ./manage.py lms shell
+    tutor dev run cms ./manage.py cms shell
+
+You can then import edx-platform and django modules and execute python code.
+
+To collect assets, you can use the standard ``update_assets`` Open edX command with the right settings::
+
+    tutor dev run lms paver update_assets --settings=tutor.development
+    tutor dev run cms paver update_assets --settings=tutor.development
 
 Point to a local edx-platform
 -----------------------------
 
 If you have one, you can point to a local version of `edx-platform <https://github.com/edx/edx-platform/>`_ on your host machine. To do so, pass a ``-P/--edx-platform-path`` option to the commands. For instance::
 
-    tutor dev shell lms --edx-platform-path=/path/to/edx-platform
+    tutor dev run --edx-platform-path=/path/to/edx-platform lms bash
 
 If you don't want to rewrite this option every time, you can instead define the environment variable::
 
@@ -34,7 +56,7 @@ If you don't want to rewrite this option every time, you can instead define the 
 
 All development commands will then automatically mount your local repo.
 
-**Note:** containers are built on the Ironwood release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the ":ref:`fork edx-platform <edx_platform_fork>`.
+**Note:** containers are built on the Ironwood release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the :ref:`fork edx-platform section <edx_platform_fork>`.
 
 Prepare the edx-platform repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,10 +64,9 @@ Prepare the edx-platform repo
 In order to run a fork of edx-platform, dependencies need to be properly installed and assets compiled in that repo. To do so, run::
 
     export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
-    tutor dev run lms npm install
     tutor dev run lms pip install --requirement requirements/edx/development.txt
     tutor dev run lms python setup.py install
-    tutor dev run lms openedx-assets build
+    tutor dev run lms paver update_assets --settings=tutor.development
 
 Debug edx-platform
 ~~~~~~~~~~~~~~~~~~
@@ -74,29 +95,6 @@ Watch the themes folders for changes (in a different terminal)::
     tutor dev watchthemes
 
 Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://localhost:8000.
-
-Assets management
------------------
-
-Assets building and collecting is made more difficult by the fact that development settings are `incorrectly loaded in Ironwood <https://github.com/edx/edx-platform/pull/18430/files>`_. This should be fixed in the next Open edX release. Meanwhile, do not run ``paver update_assets`` while in development mode. When working locally on a theme, build assets by running in the container::
-
-    openedx-assets build
-
-Alternatively, run from the host::
-    
-    tutor dev run lms openedx-assets build
-
-This command will take quite some time to run. You can speed up this process by running only part of the full build. Run ``openedx-assets -h`` for more information.
-
-Running python commands
------------------------
-
-These commands will open a python shell in the lms or the cms::
-
-    tutor dev run lms python
-    tutor dev run cms python
-
-You can then import edx-platform and django modules and execute python code.
 
 Custom edx-platform settings
 ----------------------------
