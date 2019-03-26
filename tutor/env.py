@@ -16,7 +16,7 @@ def render_full(root, config):
     """
     Render the full environment, including version information.
     """
-    for target in ["apps", "k8s", "local", "webui"]:
+    for target in ["android", "apps", "k8s", "local", "webui"]:
         render_target(root, config, target)
     copy_target(root, "build")
     with open(pathjoin(root, VERSION_FILENAME), 'w') as f:
