@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## v3.3.2 (2019-03-27)
 
 - [Bugfix] Fix Android app image build
 
