@@ -33,11 +33,11 @@ Docker
 Custom images
 -------------
 
-- ``DOCKER_IMAGE_OPENEDX`` (default: ``"regis/openedx:hawthorn"``)
-- ``DOCKER_IMAGE_ANDROID`` (default: ``"regis/openedx-android:hawthorn"``)
-- ``DOCKER_IMAGE_FORUM`` (default: ``"regis/openedx-forum:hawthorn"``)
-- ``DOCKER_IMAGE_NOTES`` (default: ``"regis/openedx-notes:hawthorn"``)
-- ``DOCKER_IMAGE_XQUEUE`` (default: ``"regis/openedx-xqueue:hawthorn"``)
+- ``DOCKER_IMAGE_OPENEDX`` (default: ``"regis/openedx:ironwood"``)
+- ``DOCKER_IMAGE_ANDROID`` (default: ``"regis/openedx-android:ironwood"``)
+- ``DOCKER_IMAGE_FORUM`` (default: ``"regis/openedx-forum:ironwood"``)
+- ``DOCKER_IMAGE_NOTES`` (default: ``"regis/openedx-notes:ironwood"``)
+- ``DOCKER_IMAGE_XQUEUE`` (default: ``"regis/openedx-xqueue:ironwood"``)
 
 These configuration parameters define which image to run for each service.
 
@@ -141,9 +141,9 @@ Student notes
 
 - ``ACTIVATE_NOTES`` (default: ``false``)
 
-With `notes <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/exercises_tools/notes.html?highlight=notes>`_, students can annotate portions of the courseware. 
+With `notes <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-ironwood.master/exercises_tools/notes.html?highlight=notes>`_, students can annotate portions of the courseware. 
 
-.. image:: https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-hawthorn.master/_images/SFD_SN_bodyexample.png
+.. image:: https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-ironwood.master/_images/SFD_SN_bodyexample.png
     :alt: Notes in action
 
 You should beware that the ``notes.<LMS_HOST>`` domain name should be activated and point to your server. For instance, if your LMS is hosted at http://myopenedx.com, the notes service should be found at http://notes.myopenedx.com.
