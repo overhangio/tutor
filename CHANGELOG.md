@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Bugfix] Fix Android app image build
+
 ## 3.3.1 (2019-03-25)
 
 - [Improvement] Improve assets building for development

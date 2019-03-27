@@ -166,7 +166,7 @@ def load_defaults(config):
 
     # Add extra configuration parameters that need to be computed separately
     config["lms_cms_common_domain"] = utils.common_domain(config["LMS_HOST"], config["CMS_HOST"])
-    config["lms_host_reverse"] = config["LMS_HOST"].split(".")[::-1]
+    config["lms_host_reverse"] = ".".join(config["LMS_HOST"].split(".")[::-1])
 
 def ask(question, key, config):
     default = env.render_str(config, config[key])
