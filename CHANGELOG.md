@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.3 (2019-03-27)
+
+- [Bugfix] Fix login from localhost
+
 ## v3.3.2 (2019-03-27)
 
 - [Bugfix] Fix Android app image build
