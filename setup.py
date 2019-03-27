@@ -35,7 +35,7 @@ setup(
         "click_repl",
         "jinja2",
         "kubernetes",
-        "pyyaml"
+        "pyyaml>=4.2b1",
     ],
     entry_points={
         'console_scripts': [

@@ -11,7 +11,9 @@ The only prerequisite for running this is a working docker install. Both docker 
 - `Docker <https://docs.docker.com/engine/installation/>`_
 - `Docker compose <https://docs.docker.com/compose/install/>`_
 
-Note that the production web server container will bind to port 80 and 443, so if there a web server is running on the same server (Apache or Nginx, for instance), it should be stopped prior to running tutor. See the :ref:`troubleshooting <webserver>` section for a workaround.
+⚠️ Warning: do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
+
+Note that the production web server container will bind to port 80 and 443, so if there a web server is running on the same server (Apache or Nginx, for instance), it should be stopped prior to running tutor. Check the section on :ref:`how to setup a web proxy <web_proxy>` for a workaround.
 
 With Tutor, Open edX can run on any platform that supports Docker, including Mac OS and Windows. Tutor was tested under various versions of Ubuntu and Mac OS.
 
@@ -29,23 +31,27 @@ The latest binaries can be downloaded from https://github.com/regisb/tutor/relea
        sudo curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
        sudo chmod +x /usr/local/bin/tutor
 
-Installing from pip
--------------------
-
-If, for some reason, you'd rather install from pypi instead of downloading a binary, run::
-
-    pip install tutor-openedx
-
-Installing from source
-----------------------
-
-::
-
-    git clone https://github.com/regisb/tutor
-    cd tutor
-    python setup.py develop
+This is the recommended installation method for most people.
 
 Cloud deployment
 ----------------
 
 Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. This is a commercial offer priced at $50/month ($500/year) that was created to support the development of Tutor.
+
+Installing from source
+----------------------
+
+If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/regisb/tutor>`_. You will need python >= 3.5 and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
+
+    sudo apt install python3 libyaml-dev
+
+Installing from pypi::
+
+    pip install tutor-openedx
+
+Installing from a local clone of the repository::
+
+    git clone https://github.com/regisb/tutor
+    cd tutor
+    pip install -r requirements/base.txt
+    python setup.py develop
