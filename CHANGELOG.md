@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Bugfix] Fix `pip install tutor-openedx`
+
 ## v3.3.3 (2019-03-27)
 
 - [Bugfix] Fix login from localhost

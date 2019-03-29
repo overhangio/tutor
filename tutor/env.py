@@ -28,10 +28,9 @@ def render_target(root, config, target):
     hierarchy at `root`.
     """
     for src, dst in walk_templates(root, target):
-        if is_part_of_env(src):
-            rendered = render_file(config, src)
-            with open(dst, "w") as of:
-                of.write(rendered)
+        rendered = render_file(config, src)
+        with open(dst, "w") as of:
+            of.write(rendered)
 
 def render_file(config, path):
     with codecs.open(path, encoding='utf-8') as fi:
@@ -39,6 +38,9 @@ def render_file(config, path):
             return render_str(config, fi.read())
         except jinja2.exceptions.TemplateError:
             print("Error rendering template", path)
+            raise
+        except Exception:
+            print("Unknown error rendering template", path)
             raise
 
 def render_dict(config):
@@ -84,11 +86,7 @@ def copy_target(root, target):
     at `root`.
     """
     for src, dst in walk_templates(root, target):
-        if is_part_of_env(src):
-            shutil.copy(src, dst)
-
-def is_part_of_env(path):
-    return not os.path.basename(path).startswith(".")
+        shutil.copy(src, dst)
 
 def is_up_to_date(root):
     return version(root) == __version__
@@ -120,6 +118,8 @@ def walk_templates(root, target):
     """
     target_root = template_path(target)
     for dirpath, _, filenames in os.walk(target_root):
+        if not is_part_of_env(dirpath):
+            continue
         dst_dir = pathjoin(
             root, target,
             os.path.relpath(dirpath, target_root)
@@ -129,7 +129,16 @@ def walk_templates(root, target):
         for filename in filenames:
             src = os.path.join(dirpath, filename)
             dst = os.path.join(dst_dir, filename)
-            yield src, dst
+            if is_part_of_env(src):
+                yield src, dst
+
+def is_part_of_env(path):
+    basename = os.path.basename(path)
+    return not (
+        basename.startswith(".") or
+        basename.endswith(".pyc") or
+        basename == "__pycache__"
+    )
 
 def template_path(*path):
     return os.path.join(TEMPLATES_ROOT, *path)
