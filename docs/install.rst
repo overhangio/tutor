@@ -53,5 +53,4 @@ Installing from a local clone of the repository::
 
     git clone https://github.com/regisb/tutor
     cd tutor
-    pip install -r requirements/base.txt
-    python setup.py develop
+    pip install -e .
