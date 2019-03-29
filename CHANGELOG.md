@@ -1,15 +1,12 @@
 # Changelog
 
-## Latest
+## v3.3.3 (2019-03-29)
 
 - [Bugfix] Fix `pip install tutor-openedx`
 
-## v3.3.3 (2019-03-27)
-
-- [Bugfix] Fix login from localhost
-
 ## v3.3.2 (2019-03-27)
 
+- [Bugfix] Fix login from localhost
 - [Bugfix] Fix Android app image build
 
 ## 3.3.1 (2019-03-25)
