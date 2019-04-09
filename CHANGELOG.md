@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## v3.3.4 (2019-04-09)
 
 - [Improvement] Rename `--silent` option to `-y/--yes`
 - [Bugfix] Fix (again) login from studio when https is activated (#193)
