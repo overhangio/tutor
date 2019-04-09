@@ -25,7 +25,7 @@ def local():
 @opts.root
 def quickstart(pullimages_, root):
     click.echo(fmt.title("Interactive platform configuration"))
-    tutor_config.save.callback(root, False, [])
+    tutor_config.save(root)
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback(root)
     if pullimages_:
@@ -167,8 +167,7 @@ def https_create(root):
     script = scripts.render_template(config, 'https_create.sh')
 
     if config['WEB_PROXY']:
-        click.echo(fmt.info(
-"""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+        click.echo(fmt.info("""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
 certificates must be generated on the host. For instance, to generate
 certificates with Let's Encrypt, run:
 
@@ -193,8 +192,7 @@ def https_renew(root):
         click.echo(fmt.info("HTTPS is not activated: certificate renewal skipped"))
         return
     if config['WEB_PROXY']:
-        click.echo(fmt.info(
-"""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+        click.echo(fmt.info("""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
 certificates must be renewed on the host. For instance, to renew Let's Encrypt
 certificates, run:
 

@@ -13,7 +13,7 @@ By default, this file contains only the required configuration parameters for ru
 
 Alternatively, you can set each parameter from the command line::
 
-    tutor config save --silent --set PARAM1=VALUE1 --set PARAM2=VALUE2
+    tutor config save -y --set PARAM1=VALUE1 --set PARAM2=VALUE2
 
 Or from the system environment::
 

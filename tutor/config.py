@@ -21,12 +21,18 @@ def config():
 
 @click.command(help="Create and save configuration interactively")
 @opts.root
-@click.option("--silent", is_flag=True, help="Run non-interactively")
+@click.option("-y", "--yes", "silent1", is_flag=True, help="Run non-interactively")
+@click.option("--silent", "silent2", is_flag=True, hidden=True)
 @opts.key_value
-def save(root, silent, set_):
+def save_command(root, silent1, silent2, set_):
+    silent = silent1 or silent2
+    save(root, silent=silent, keyvalues=set_)
+
+def save(root, silent=False, keyvalues=None):
+    keyvalues = keyvalues or []
     config = {}
     load_current(config, root)
-    for k, v in set_:
+    for k, v in keyvalues:
         config[k] = v
     if not silent:
         load_interactive(config)
@@ -225,6 +231,6 @@ def save_env(root, config):
 def config_path(root):
     return os.path.join(root, "config.yml")
 
-config.add_command(save)
+config.add_command(save_command, name="save")
 config.add_command(printroot)
 config.add_command(printvalue)

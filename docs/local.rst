@@ -127,7 +127,7 @@ Running Open edX behind a web proxy
 
 The containerized web server (nginx) needs to listen to ports 80 and 443 on the host. If there is already a webserver running on the host, such as Apache or Nginx, the nginx container will not be able to start. Tutor supports running behind a web proxy. To do so, add the following configuration::
 
-       tutor config save --silent --set WEB_PROXY=true --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
+       tutor config save -y --set WEB_PROXY=true --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
 
 In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. You must then configure the web proxy on the host. Basic configuration files are provided by Tutor which can be used directly by your web proxy.
 

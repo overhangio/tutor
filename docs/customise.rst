@@ -75,7 +75,7 @@ Running a different ``openedx`` Docker image
 
 By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry with::
 
-    tutor config save --silent --set DOCKER_IMAGE_OPENEDX=myusername/openedx:mytag
+    tutor config save -y --set DOCKER_IMAGE_OPENEDX=myusername/openedx:mytag
     tutor images build openedx
     tutor images push openedx
 

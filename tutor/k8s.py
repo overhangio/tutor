@@ -20,7 +20,7 @@ def k8s():
 @opts.root
 def quickstart(root):
     click.echo(fmt.title("Interactive platform configuration"))
-    tutor_config.save.callback(root, False, [])
+    tutor_config.save(root)
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback()
     click.echo(fmt.title("Starting the platform"))
