@@ -92,5 +92,6 @@ For now, the following features from the local deployment are not supported:
 
 - HTTPS certificates
 - Xqueue
+- Student notes
 
 Kubernetes deployment is under intense development, and these features should be implemented pretty soon. Stay tuned 🤓
