@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Bugfix] Fix (again) login from studio when https is activated (#193)
+
 ## v3.3.3 (2019-03-29)
 
 - [Bugfix] Fix `pip install tutor-openedx`
