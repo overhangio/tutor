@@ -5,11 +5,11 @@ Configuration
 
 With Tutor, all Open edX deployment parameters are stored in a single ``config.yml`` file. This is the file that is generated when you run ``tutor local quickstart`` or ``tutor config save``. To view the content of this file, run::
 
-    cat $(tutor config printroot)/config.yml
+    cat "$(tutor config printroot)/config.yml"
 
 By default, this file contains only the required configuration parameters for running the platform. Optional configuration parameters may also be specified to modify the default behaviour. To do so, you can edit the ``config.yml`` file manually::
 
-    vim $(tutor config printroot)/config.yml
+    vim "$(tutor config printroot)/config.yml"
 
 Alternatively, you can set each parameter from the command line::
 
@@ -21,7 +21,7 @@ Or from the system environment::
 
 Once the base configuration is created or updated, the environment is automatically re-generated. The environment is the set of all files required to manage an Open edX platform: Dockerfile, ``lms.env.json``, settings files, etc. You can view the environment files in the ``env`` folder::
 
-    ls $(tutor config printroot)/env
+    ls "$(tutor config printroot)/env"
 
 With an up-to-date environment, Tutor is ready to launch an Open edX platform and perform usual operations. Below, we document some of the configuration parameters.
 
