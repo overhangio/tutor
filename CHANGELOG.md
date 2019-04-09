@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Improvement] Allow uppercase "Y" and "N" as answers to boolean questions
+
 ## v3.3.4 (2019-04-09)
 
 - [Improvement] Rename `--silent` option to `-y/--yes`

@@ -186,9 +186,9 @@ def ask_bool(question, key, config):
     suffix = " [Yn]" if config[key] else " [yN]"
     answer = click.prompt(
         fmt.question(question) + suffix,
-        type=click.Choice(["y", "n"]),
+        type=click.Choice(["y", "Y", "n", "N"]),
         prompt_suffix=" ", default=default, show_default=False, show_choices=False,
-    )
+    ).lower()
     config[key] = answer == "y"
 
 def ask_choice(question, key, config, choices):
