@@ -1,5 +1,4 @@
 import click
-import kubernetes
 
 from . import config as tutor_config
 from . import env as tutor_env
@@ -138,6 +137,8 @@ class K8s:
     @property
     def client(self):
         if self.CLIENT is None:
+            # Import moved here for performance reasons
+            import kubernetes
             kubernetes.config.load_kube_config()
             self.CLIENT = kubernetes.client.CoreV1Api()
         return self.CLIENT
