@@ -89,6 +89,9 @@ ENV SETTINGS tutor.production
 # Entrypoint will fix permissions of all files and run commands as openedx
 ENTRYPOINT ["docker-entrypoint.sh"]
 
+# Copy gunicorn settings file
+COPY gunicorn_conf.py /openedx/gunicorn_conf.py
+
 # Run server
 EXPOSE 8000
-CMD gunicorn --name ${SERVICE_VARIANT} --bind=0.0.0.0:8000 --max-requests=1000 ${SERVICE_VARIANT}.wsgi:application
+CMD gunicorn -c file:/openedx/gunicorn_conf.py --name ${SERVICE_VARIANT} --bind=0.0.0.0:8000 --max-requests=1000 ${SERVICE_VARIANT}.wsgi:application
