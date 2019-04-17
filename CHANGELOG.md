@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Security] Fix Jinja2 vulnerability
 - [Improvement] Improve CLI cold start performance
 - [Improvement] Allow uppercase "Y" and "N" as answers to boolean questions
 
