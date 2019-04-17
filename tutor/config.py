@@ -77,13 +77,13 @@ def load(root):
     load_defaults(config)
 
     if not env.is_up_to_date(root):
-        click.echo(fmt.alert(
+        click.confirm(fmt.alert(
             "The current environment stored at {} is not up-to-date: it is at "
             "v{} while the 'tutor' binary is at v{}. The environment will be "
             "upgraded now. Any change you might have made will be overwritten.".format(
                 env.base_dir(root), env.version(root), __version__
             )
-        ))
+        ), abort=True)
         should_update_env = True
 
     if should_update_env:
