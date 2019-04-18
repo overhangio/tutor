@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 import click
 
@@ -77,14 +78,20 @@ def load(root):
     load_defaults(config)
 
     if not env.is_up_to_date(root):
-        click.confirm(fmt.alert(
-            "The current environment stored at {} is not up-to-date: it is at "
-            "v{} while the 'tutor' binary is at v{}. The environment will be "
-            "upgraded now. Any change you might have made will be overwritten.".format(
-                env.base_dir(root), env.version(root), __version__
-            )
-        ), abort=True)
         should_update_env = True
+        if os.isatty(sys.stdin.fileno()):
+            # Interactive mode: ask the user permission to proceed
+            click.confirm(fmt.alert(
+                "The current environment stored at {} is not up-to-date: it is at "
+                "v{} while the 'tutor' binary is at v{}. The environment will be "
+                "upgraded now. Any change you might have made will be overwritten.".format(
+                    env.base_dir(root), env.version(root), __version__
+                )
+            ), abort=True)
+        elif os.environ.get('TUTOR_OVERWRITE_ENV'):
+            pass  # Non-interactive mode with environment variable authorizing us to go
+        else:
+            raise click.Abort  # Non-interactive mode with no authorization: abort
 
     if should_update_env:
         save_env(root, config)
