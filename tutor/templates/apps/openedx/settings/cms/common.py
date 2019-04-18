@@ -1,7 +1,12 @@
 """Settings shared between production and development
 """
+# This file is not supposed to be imported, but rather exec'd
+# pylint: disable=undefined-variable
 import os
 
+
+# Load module store settings from config files
+update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
 
 # Set uploaded media file path
 MEDIA_ROOT = "/openedx/data/uploads/"
@@ -12,7 +17,7 @@ VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['location'] = MEDIA_ROOT
 
 # Change syslog-based loggers which don't work inside docker containers
 LOGGING_DEFAULT_LEVEL = os.environ.get('OPENEDX_LOGLEVEL', 'INFO')
-settings.LOGGING['loggers']['']['level'] = LOGGING_DEFAULT_LEVEL
+LOGGING['loggers']['']['level'] = LOGGING_DEFAULT_LEVEL
 
 LOGGING_FILENAME = os.path.join(LOG_DIR,
     '{}.log'.format(os.environ.get('SERVICE_VARIANT', 'other')))

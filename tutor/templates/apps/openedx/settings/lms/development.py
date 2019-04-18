@@ -1,10 +1,8 @@
 import os
 from lms.envs.devstack import *
-from .common import *
 
 
-# Load module store settings from config files
-update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
+execfile(os.path.join(os.path.dirname(__file__), 'common.py'), globals())
 
 ORA2_FILEUPLOAD_BACKEND = 'filesystem'
 ORA2_FILEUPLOAD_ROOT = '/openedx/data/ora2'
