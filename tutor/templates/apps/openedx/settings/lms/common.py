@@ -4,6 +4,9 @@ import os
 # This file is not supposed to be imported, but rather exec'd
 # pylint: disable=undefined-variable
 
+# Load module store settings from config files
+update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
+
 
 # Set uploaded media file path
 MEDIA_ROOT = "/openedx/data/uploads/"

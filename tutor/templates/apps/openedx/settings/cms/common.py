@@ -1,8 +1,8 @@
 """Settings shared between production and development
 """
+import os
 # This file is not supposed to be imported, but rather exec'd
 # pylint: disable=undefined-variable
-import os
 
 
 # Load module store settings from config files
