@@ -111,6 +111,7 @@ services:
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
+      - ../../data/logs/lms:/openedx/data/logs
     depends_on:
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       - forum
@@ -131,6 +132,7 @@ services:
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
+      - ../../data/logs/cms:/openedx/data/logs
     depends_on:
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
@@ -148,13 +150,14 @@ services:
       SERVICE_VARIANT: lms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
+    command: ./manage.py lms celery worker --loglevel=info --logfile=/openedx/data/logs/lms-worker.log  --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
+      - ../../data/logs/lms-worker:/openedx/data/logs
     depends_on:
       - lms
 
@@ -164,13 +167,14 @@ services:
       SERVICE_VARIANT: cms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
+    command: ./manage.py cms celery worker --loglevel=info --logfile=/openedx/data/logs/lms-worker.log --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
+      - ../../data/logs/cms-worker:/openedx/data/logs
     depends_on:
       - cms
 
