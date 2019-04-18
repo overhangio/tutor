@@ -1,6 +1,7 @@
 .*.swp
 !.gitignore
 TODO
+__pycache__
 
 /tutor.spec
 /build/tutor
