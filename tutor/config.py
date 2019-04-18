@@ -76,22 +76,27 @@ def load(root):
         save_config(root, config)
 
     load_defaults(config)
-
     if not env.is_up_to_date(root):
         should_update_env = True
+        message = (
+            "The current environment stored at {} is not up-to-date: it is at "
+            "v{} while the 'tutor' binary is at v{}.".format(
+                env.base_dir(root), env.version(root), __version__
+            )
+        )
         if os.isatty(sys.stdin.fileno()):
             # Interactive mode: ask the user permission to proceed
-            click.confirm(fmt.alert(
-                "The current environment stored at {} is not up-to-date: it is at "
-                "v{} while the 'tutor' binary is at v{}. The environment will be "
-                "upgraded now. Any change you might have made will be overwritten.".format(
-                    env.base_dir(root), env.version(root), __version__
-                )
-            ), abort=True)
+            confirmation_msg = ("If you choose Y The environment will be "
+                "upgraded now.\nAny change you might have made will be overwritten.\nProceed?")
+            click.confirm(fmt.alert(message + '\n' + confirmation_msg), abort=True)
         elif os.environ.get('TUTOR_OVERWRITE_ENV'):
             pass  # Non-interactive mode with environment variable authorizing us to go
         else:
-            raise click.Abort  # Non-interactive mode with no authorization: abort
+            # Non-interactive mode with no authorization: abort
+            post_message = ("Set the TUTOR_OVERWRITE_ENV variable "
+                "to allow tutor to rewrite the environment"
+                "in a non-interactive run.")
+            raise click.UsageError(message + "\n" + post_message)
 
     if should_update_env:
         save_env(root, config)
