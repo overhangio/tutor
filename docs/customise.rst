@@ -9,10 +9,11 @@ On a vanilla platform deployed by Tutor, the image that is run is downloaded fro
 
     tutor images build openedx
 
-The following sections describe how to modify various aspects of the docker image. Every time, you will have to re-build your own image with this command. Re-building should take ~20 minutes on a server with good bandwidth. After that, your custom image will be used for all commands. For instance:
+The following sections describe how to modify various aspects of the docker image. Every time, you will have to re-build your own image with this command. Re-building should take ~20 minutes on a server with good bandwidth. After building a custom image, you should stop the old running containers::
 
-1. you can start a local platform with ``tutor local start``
-2. restart the services that use the ``openedx`` image with ``tutor local restart openedx``
+    tutor local stop openedx
+
+The custom image will be used the next time you run ``tutor local quickstart`` or ``tutor local start``. Do not attempt to run ``tutor local restart``! Restarting will not pick up the new image and will continue to use the old image.
 
 Adding custom themes
 --------------------
