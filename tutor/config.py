@@ -20,6 +20,7 @@ from .__about__ import __version__
 def config():
     pass
 
+
 @click.command(help="Create and save configuration interactively")
 @opts.root
 @click.option("-y", "--yes", "silent1", is_flag=True, help="Run non-interactively")
@@ -28,6 +29,7 @@ def config():
 def save_command(root, silent1, silent2, set_):
     silent = silent1 or silent2
     save(root, silent=silent, keyvalues=set_)
+
 
 def save(root, silent=False, keyvalues=None):
     keyvalues = keyvalues or []
@@ -42,12 +44,14 @@ def save(root, silent=False, keyvalues=None):
     load_defaults(config)
     save_env(root, config)
 
+
 @click.command(
     help="Print the project root",
 )
 @opts.root
 def printroot(root):
     click.echo(root)
+
 
 @click.command(help="Print a configuration value")
 @opts.root
@@ -60,6 +64,7 @@ def printvalue(root, key):
         print(config[key])
     except KeyError:
         raise exceptions.TutorError("Missing configuration value: {}".format(key))
+
 
 def load(root):
     """
@@ -78,30 +83,41 @@ def load(root):
     load_defaults(config)
     if not env.is_up_to_date(root):
         should_update_env = True
-        message = (
-            "The current environment stored at {} is not up-to-date: it is at "
-            "v{} while the 'tutor' binary is at v{}.".format(
-                env.base_dir(root), env.version(root), __version__
-            )
-        )
-        if os.isatty(sys.stdin.fileno()):
-            # Interactive mode: ask the user permission to proceed
-            confirmation_msg = ("If you choose Y The environment will be "
-                "upgraded now.\nAny change you might have made will be overwritten.\nProceed?")
-            click.confirm(fmt.alert(message + '\n' + confirmation_msg), abort=True)
-        elif os.environ.get('TUTOR_OVERWRITE_ENV'):
-            pass  # Non-interactive mode with environment variable authorizing us to go
-        else:
-            # Non-interactive mode with no authorization: abort
-            post_message = ("Set the TUTOR_OVERWRITE_ENV variable "
-                "to allow tutor to rewrite the environment"
-                "in a non-interactive run.")
-            raise click.UsageError(message + "\n" + post_message)
+        pre_upgrade_announcement(root)
 
     if should_update_env:
         save_env(root, config)
 
     return config
+
+
+def pre_upgrade_announcement(root):
+    """
+    Inform the user that the current environment is not up-to-date. Crash if running in
+    non-interactive mode.
+    """
+    click.echo(fmt.alert(
+        "The current environment stored at {} is not up-to-date: it is at "
+        "v{} while the 'tutor' binary is at v{}.".format(
+            env.base_dir(root), env.version(root), __version__
+        )
+    ))
+    if os.isatty(sys.stdin.fileno()):
+        # Interactive mode: ask the user permission to proceed
+        click.confirm(fmt.question(
+            # every patch you take, every change you make, I'll be watching you
+            "Would you like to upgrade the environment? If you do, any change you"
+            " might have made will be overwritten."
+        ), default=True, abort=True)
+    else:
+        # Non-interactive mode with no authorization: abort
+        raise exceptions.TutorError(
+            "Running in non-interactive mode, the environment will not be upgraded"
+            " automatically. To upgrade the environment manually, run:\n"
+            "\n"
+            "    tutor config save -y"
+        )
+
 
 def load_current(config, root):
     convert_json2yml(root)
@@ -109,10 +125,12 @@ def load_current(config, root):
     load_user(config, root)
     load_env(config, root)
 
+
 def load_base(config, root):
     base = serialize.load(env.read("config-base.yml"))
     for k, v in base.items():
         config[k] = v
+
 
 def load_env(config, root):
     base_config = serialize.load(env.read("config-base.yml"))
@@ -124,6 +142,7 @@ def load_env(config, root):
         if env_var in os.environ:
             config[k] = serialize.parse_value(os.environ[env_var])
 
+
 def load_user(config, root):
     path = config_path(root)
     if os.path.exists(path):
@@ -132,6 +151,7 @@ def load_user(config, root):
         for key, value in loaded.items():
             config[key] = value
     upgrade_obsolete(config)
+
 
 def upgrade_obsolete(config):
     # Openedx-specific mysql passwords
@@ -143,6 +163,7 @@ def upgrade_obsolete(config):
         config["OPENEDX_MYSQL_DATABASE"] = config.pop("MYSQL_DATABASE")
     if "MYSQL_USERNAME" in config:
         config["OPENEDX_MYSQL_USERNAME"] = config.pop("MYSQL_USERNAME")
+
 
 def load_interactive(config):
     ask("Your website domain name for students (LMS)", "LMS_HOST", config)
@@ -176,6 +197,7 @@ def load_interactive(config):
         "ACTIVATE_XQUEUE", config
     )
 
+
 def load_defaults(config):
     defaults = serialize.load(env.read("config-defaults.yml"))
     for k, v in defaults.items():
@@ -186,6 +208,7 @@ def load_defaults(config):
     config["lms_cms_common_domain"] = utils.common_domain(config["LMS_HOST"], config["CMS_HOST"])
     config["lms_host_reverse"] = ".".join(config["LMS_HOST"].split(".")[::-1])
 
+
 def ask(question, key, config):
     default = env.render_str(config, config[key])
     config[key] = click.prompt(
@@ -193,24 +216,26 @@ def ask(question, key, config):
         prompt_suffix=" ", default=default, show_default=True,
     )
 
+
 def ask_bool(question, key, config):
-    default = "y" if config[key] else "n"
-    suffix = " [Yn]" if config[key] else " [yN]"
-    answer = click.prompt(
-        fmt.question(question) + suffix,
-        type=click.Choice(["y", "Y", "n", "N"]),
-        prompt_suffix=" ", default=default, show_default=False, show_choices=False,
-    ).lower()
-    config[key] = answer == "y"
+    return click.confirm(
+        fmt.question(question),
+        prompt_suffix=' ',
+        default=config[key],
+    )
+
 
 def ask_choice(question, key, config, choices):
     default = config[key]
     answer = click.prompt(
         fmt.question(question),
         type=click.Choice(choices),
-        prompt_suffix=" ", default=default, show_choices=False,
+        prompt_suffix=" ",
+        default=default,
+        show_choices=False,
     )
     config[key] = answer
+
 
 def convert_json2yml(root):
     json_path = os.path.join(root, "config.json")
@@ -226,6 +251,7 @@ def convert_json2yml(root):
     os.remove(json_path)
     click.echo(fmt.info("File config.json detected in {} and converted to config.yml".format(root)))
 
+
 def save_config(root, config):
     env.render_dict(config)
     path = config_path(root)
@@ -236,12 +262,15 @@ def save_config(root, config):
         serialize.dump(config, of)
     click.echo(fmt.info("Configuration saved to {}".format(path)))
 
+
 def save_env(root, config):
     env.render_full(root, config)
     click.echo(fmt.info("Environment generated in {}".format(env.base_dir(root))))
 
+
 def config_path(root):
     return os.path.join(root, "config.yml")
+
 
 config.add_command(save_command, name="save")
 config.add_command(printroot)

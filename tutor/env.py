@@ -12,6 +12,7 @@ from .__about__ import __version__
 TEMPLATES_ROOT = os.path.join(os.path.dirname(__file__), "templates")
 VERSION_FILENAME = "version"
 
+
 def render_full(root, config):
     """
     Render the full environment, including version information.
@@ -21,6 +22,7 @@ def render_full(root, config):
     copy_target(root, "build")
     with open(pathjoin(root, VERSION_FILENAME), 'w') as f:
         f.write(__version__)
+
 
 def render_target(root, config, target):
     """
@@ -32,6 +34,7 @@ def render_target(root, config, target):
         with open(dst, "w") as of:
             of.write(rendered)
 
+
 def render_file(config, path):
     with codecs.open(path, encoding='utf-8') as fi:
         try:
@@ -42,6 +45,7 @@ def render_file(config, path):
         except Exception:
             print("Unknown error rendering template", path)
             raise
+
 
 def render_dict(config):
     """
@@ -60,6 +64,7 @@ def render_dict(config):
     for k, v in rendered.items():
         config[k] = v
     pass
+
 
 def render_str(config, text):
     """
@@ -80,6 +85,7 @@ def render_str(config, text):
     except jinja2.exceptions.UndefinedError as e:
         raise exceptions.TutorError("Missing configuration value: {}".format(e.args[0]))
 
+
 def copy_target(root, target):
     """
     Copy the templates located in `path` and store them with the same hierarchy
@@ -88,8 +94,10 @@ def copy_target(root, target):
     for src, dst in walk_templates(root, target):
         shutil.copy(src, dst)
 
+
 def is_up_to_date(root):
     return version(root) == __version__
+
 
 def version(root):
     """
@@ -100,6 +108,7 @@ def version(root):
         return "0"
     return open(path).read().strip()
 
+
 def read(*path):
     """
     Read template content located at `path`.
@@ -107,6 +116,7 @@ def read(*path):
     src = template_path(*path)
     with codecs.open(src, encoding='utf-8') as fi:
         return fi.read()
+
 
 def walk_templates(root, target):
     """
@@ -132,6 +142,7 @@ def walk_templates(root, target):
             if is_part_of_env(src):
                 yield src, dst
 
+
 def is_part_of_env(path):
     basename = os.path.basename(path)
     return not (
@@ -140,14 +151,18 @@ def is_part_of_env(path):
         basename == "__pycache__"
     )
 
+
 def template_path(*path):
     return os.path.join(TEMPLATES_ROOT, *path)
+
 
 def data_path(root, *path):
     return os.path.join(os.path.abspath(root), "data", *path)
 
+
 def pathjoin(root, target, *path):
     return os.path.join(base_dir(root), target, *path)
+
 
 def base_dir(root):
     return os.path.join(root, "env")
