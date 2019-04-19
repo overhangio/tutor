@@ -5,20 +5,34 @@
 #    pip-compile --output-file requirements/docs.txt requirements/docs.in
 #
 alabaster==0.7.12         # via sphinx
+appdirs==1.4.3
 babel==2.6.0              # via sphinx
-certifi==2019.3.9         # via requests
-chardet==3.0.4            # via requests
+cachetools==3.1.0
+certifi==2019.3.9
+chardet==3.0.4
+click-repl==0.1.6
+click==7.0
 docutils==0.14            # via sphinx
-idna==2.8                 # via requests
+google-auth==1.6.3
+idna==2.8
 imagesize==1.1.0          # via sphinx
-jinja2==2.10.1            # via sphinx
-markupsafe==1.1.1         # via jinja2
+jinja2==2.10.1
+kubernetes==9.0.0
+markupsafe==1.1.1
+oauthlib==3.0.1
 packaging==19.0           # via sphinx
+prompt-toolkit==2.0.9
+pyasn1-modules==0.2.4
+pyasn1==0.4.5
 pygments==2.3.1           # via sphinx
 pyparsing==2.4.0          # via packaging
+python-dateutil==2.8.0
 pytz==2019.1              # via babel
-requests==2.21.0          # via sphinx
-six==1.12.0               # via packaging
+pyyaml==5.1
+requests-oauthlib==1.2.0
+requests==2.21.0
+rsa==4.0
+six==1.12.0
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.3
 sphinx==2.0.1
@@ -28,4 +42,6 @@ sphinxcontrib-htmlhelp==1.0.2  # via sphinx
 sphinxcontrib-jsmath==1.0.1  # via sphinx
 sphinxcontrib-qthelp==1.0.2  # via sphinx
 sphinxcontrib-serializinghtml==1.1.3  # via sphinx
-urllib3==1.24.1           # via requests
+urllib3==1.24.2
+wcwidth==0.1.7
+websocket-client==0.56.0
