@@ -25,6 +25,6 @@ requests-oauthlib==1.2.0  # via kubernetes
 requests==2.21.0          # via kubernetes, requests-oauthlib
 rsa==4.0                  # via google-auth
 six==1.12.0               # via click-repl, google-auth, kubernetes, prompt-toolkit, python-dateutil, websocket-client
-urllib3==1.24.1           # via kubernetes, requests
+urllib3==1.24.2           # via kubernetes, requests
 wcwidth==0.1.7            # via prompt-toolkit
 websocket-client==0.56.0  # via kubernetes
