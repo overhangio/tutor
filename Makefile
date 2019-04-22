@@ -50,22 +50,28 @@ ci-bundle: ## Create bundle and run basic tests
 	./dist/tutor config printroot
 	./dist/tutor config save --yes --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
 
-ci-github: ## Upload assets to github
-	cat docs/release.md > releases/description.md
+./releases/github-release: ## Download github-release binary
+	cd releases/ \
+		&& curl -sSL -o ./github-release.tar.bz2 "https://github.com/aktau/github-release/releases/download/v0.7.2/$(shell uname -s | tr "[:upper:]" "[:lower:]")-amd64-github-release.tar.bz2" \
+		&& bzip2 -d -f ./github-release.tar.bz2 \
+		&& tar xf github-release.tar \
+		&& mv "bin/$(shell uname -s | tr "[:upper:]" "[:lower:]")/amd64/github-release" .
+
+ci-github: ./releases/github-release ## Upload assets to github
+	sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md > releases/description.md
 	git log -1 --pretty=format:%b >> releases/description.md
-	sed -i "s/TUTOR_VERSION/v$$(make -s version)/g" releases/description.md
-	docker run --rm -e "GITHUB_TOKEN=$$GITHUB_TOKEN" regis/github-release:latest release \
+	./releases/github-release release \
 		--user regisb \
 		--repo tutor \
-		--tag "v$$(make -s version)" \
-		--name "v$$(make -s version)" \
+		--tag "v$(shell make version)" \
+		--name "v$(shell make version)" \
 		--description "$$(cat releases/description.md)" || true
-	docker run --rm -e "GITHUB_TOKEN=$$GITHUB_TOKEN" -v "$$(pwd)/dist:/tmp/dist" regis/github-release:latest upload \
+	./releases/github-release upload \
 	    --user regisb \
 	    --repo tutor \
-	    --tag "v$$(make -s version)" \
+	    --tag "v$(shell make version)" \
 	    --name "tutor-$$(uname -s)_$$(uname -m)" \
-	    --file /tmp/dist/tutor \
+	    --file ./dist/tutor \
 		--replace
 
 ci-images: ## Build and push docker images to hub.docker.com

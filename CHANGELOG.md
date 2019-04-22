@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## v3.3.5 (2019-04-22)
 
 - [Feature] Pluggable LMS/CMS/forum
 - [Improvement] Safer environment overwrite. Thanks @silviot! 👐
