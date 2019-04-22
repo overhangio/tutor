@@ -46,10 +46,27 @@ ci-bundle: ## Create bundle and run basic tests
 	$(MAKE) ci-test
 	$(MAKE) bundle
 	mkdir -p releases/
-	cp ./dist/tutor ./releases/tutor-$$(uname -s)_$$(uname -m)
 	./dist/tutor --version
 	./dist/tutor config printroot
 	./dist/tutor config save --yes --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
+
+ci-github: ## Upload assets to github
+	cat docs/release.md > releases/description.md
+	git log -1 --pretty=format:%b >> releases/description.md
+	sed -i "s/TUTOR_VERSION/v$$(make -s version)/g" releases/description.md
+	docker run --rm -e "GITHUB_TOKEN=$$GITHUB_TOKEN" regis/github-release:latest release \
+		--user regisb \
+		--repo tutor \
+		--tag "v$$(make -s version)" \
+		--name "v$$(make -s version)" \
+		--description "$$(cat releases/description.md)" || true
+	docker run --rm -e "GITHUB_TOKEN=$$GITHUB_TOKEN" -v "$$(pwd)/dist:/tmp/dist" regis/github-release:latest upload \
+	    --user regisb \
+	    --repo tutor \
+	    --tag "v$$(make -s version)" \
+	    --name "tutor-$$(uname -s)_$$(uname -m)" \
+	    --file /tmp/dist/tutor \
+		--replace
 
 ci-images: ## Build and push docker images to hub.docker.com
 	python setup.py develop

@@ -30,7 +30,7 @@ Tutor 🎓 Open edX 1-click install for everyone
 Quickstart
 ----------
 
-1. Install the `latest stable release <https://github.com/regisb/tutor/releases>`_ of Tutor (`Instructions for the command line <https://docs.tutor.overhang.io/install.html#direct-binary-downloads>`_)
+1. Install the `latest stable release <https://github.com/regisb/tutor/releases>`_ of Tutor
 2. Run ``tutor local quickstart``
 3. You're done!
 
