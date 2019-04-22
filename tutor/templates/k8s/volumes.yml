@@ -21,7 +21,6 @@ spec:
   resources:
     requests:
       storage: 2Gi
-
 {% if ACTIVATE_ELASTICSEARCH %}
 ---
 apiVersion: v1
@@ -35,7 +34,6 @@ spec:
     requests:
       storage: 2Gi
 {% endif %}
-
 {% if ACTIVATE_MYSQL %}
 ---
 apiVersion: v1
@@ -49,7 +47,6 @@ spec:
     requests:
       storage: 5Gi
 {% endif %}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -61,7 +58,6 @@ spec:
   resources:
     requests:
       storage: 1Gi
-
 {% if ACTIVATE_RABBITMQ %}
 ---
 apiVersion: v1

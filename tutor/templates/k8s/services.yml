@@ -10,7 +10,7 @@ spec:
       protocol: TCP
   selector:
     app: cms
-
+{% if ACTIVATE_FORUM %}
 ---
 apiVersion: v1
 kind: Service
@@ -23,7 +23,7 @@ spec:
       protocol: TCP
   selector:
     app: forum
-
+{% endif %}
 ---
 apiVersion: v1
 kind: Service
@@ -36,7 +36,6 @@ spec:
       protocol: TCP
   selector:
     app: lms
-
 {% if ACTIVATE_ELASTICSEARCH %}
 ---
 apiVersion: v1
@@ -51,7 +50,6 @@ spec:
   selector:
     app: elasticsearch
 {% endif %}
-
 {% if ACTIVATE_MEMCACHED %}
 ---
 apiVersion: v1
@@ -66,7 +64,6 @@ spec:
   selector:
     app: memcached
 {% endif %}
-
 {% if ACTIVATE_MONGODB %}
 ---
 apiVersion: v1
@@ -81,7 +78,6 @@ spec:
   selector:
     app: mongodb
 {% endif %}
-
 {% if ACTIVATE_MYSQL %}
 ---
 apiVersion: v1
@@ -96,7 +92,6 @@ spec:
   selector:
     app: mysql
 {% endif %}
-
 ---
 apiVersion: v1
 kind: Service
@@ -115,7 +110,6 @@ spec:
       targetPort: https-port
   selector:
     app: nginx
-
 {% if ACTIVATE_RABBITMQ %}
 ---
 apiVersion: v1
@@ -130,7 +124,6 @@ spec:
   selector:
     app: rabbitmq
 {% endif %}
-
 {% if ACTIVATE_SMTP %}
 ---
 apiVersion: v1
