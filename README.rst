@@ -30,11 +30,7 @@ Tutor 🎓 Open edX 1-click install for everyone
 Quickstart
 ----------
 
-1. `Download <https://github.com/regisb/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path. From the command line::
-
-       sudo curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
-       sudo chmod +x /usr/local/bin/tutor
-
+1. Install the `latest stable release <https://github.com/regisb/tutor/releases>`_ of Tutor (`Instructions for the command line <https://docs.tutor.overhang.io/install.html#direct-binary-downloads>`_)
 2. Run ``tutor local quickstart``
 3. You're done!
 

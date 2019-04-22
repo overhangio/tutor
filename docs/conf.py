@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Tutor'
-copyright = u'2018, Régis Behmo'
-author = u'Régis Behmo'
+copyright = '2018, Régis Behmo'
+author = 'Régis Behmo'
 
 # The short X.Y version
 version = ''
@@ -128,8 +128,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'tutor.tex', 'Tutor Documentation',
-     u'Régis Behmo', 'manual'),
+    (master_doc, 'tutor.tex', 'Tutor Documentation', 'Régis Behmo', 'manual'),
 ]
 
 
@@ -171,3 +170,16 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
+
+# Custom variables
+import io
+import os
+here = os.path.abspath(os.path.dirname(__file__))
+about = {}
+with io.open(os.path.join(here, "..", "tutor", "__about__.py"), "rt", encoding="utf-8") as f:
+    exec(f.read(), about)
+rst_prolog = """
+.. |tutor_version| replace:: {}
+""".format(
+    about['__version__'],
+)

@@ -52,7 +52,7 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-      condition: $BUILD_DOCKER = true && $TRAVIS_TAG != "latest" && $TRAVIS_TAG != "nightly"
+      condition: $BUILD_DOCKER = true && $TRAVIS_TAG != "nightly"
 
   # Push to pypi
   - provider: script
@@ -60,4 +60,4 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-      condition: $BUILD_PYPI = true && $TRAVIS_TAG != "latest" && $TRAVIS_TAG != "nightly"
+      condition: $BUILD_PYPI = true && $TRAVIS_TAG != "nightly"

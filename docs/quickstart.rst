@@ -3,10 +3,9 @@
 Quickstart
 ==========
 
-1. `Download <https://github.com/regisb/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path. From the command line::
+1. `Download <https://github.com/regisb/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path. From the command line:
 
-       sudo curl -L "https://github.com/regisb/tutor/releases/download/latest/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
-       sudo chmod +x /usr/local/bin/tutor
+.. include:: cli_download.rst
 
 2. Run ``tutor local quickstart``
 3. You're done!

@@ -20,9 +20,8 @@ dist/tutor:
 nightly: ## Create a "nightly" release
 	$(MAKE) tag TAG=nightly
 
-release: ## Create a release, update the "latest" tag and push them to origin
+release: ## Create a release tag and push it to origin
 	$(MAKE) tag TAG=v$(shell make version)
-	$(MAKE) tag TAG=latest
 
 tag:
 	@echo "=== Creating tag $(TAG)"
