@@ -21,6 +21,7 @@ from . import utils
 def local():
     pass
 
+
 @click.command(help="Configure and run Open edX from scratch")
 @click.option("-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images")
 @opts.root
@@ -39,11 +40,13 @@ def quickstart(pullimages_, root):
     click.echo(fmt.title("Starting the platform in detached mode"))
     start.callback(root, True)
 
+
 @click.command(help="Update docker images")
 @opts.root
 def pullimages(root):
     config = tutor_config.load(root)
     docker_compose(root, config, "pull")
+
 
 @click.command(help="Run all configured Open edX services")
 @opts.root
@@ -97,6 +100,7 @@ def restart(root, service):
         command += [service]
     docker_compose(root, config, *command)
 
+
 @click.command(
     help="Run a command in one of the containers",
     context_settings={"ignore_unknown_options": True},
@@ -118,6 +122,7 @@ def run(root, service, command, args):
     config = tutor_config.load(root)
     docker_compose(root, config, *run_command)
 
+
 @click.command(
     help="Create databases and run database migrations",
 )
@@ -125,6 +130,7 @@ def run(root, service, command, args):
 def databases(root):
     init_mysql(root)
     scripts.migrate(root, run_bash)
+
 
 def init_mysql(root):
     config = tutor_config.load(root)
@@ -139,19 +145,22 @@ def init_mysql(root):
         click.echo(fmt.info("    waiting for mysql initialization"))
         # TODO this is duplicate code with the docker_compose function. We
         # should rely on a dedicated function in utils module.
-        logs = subprocess.check_output([
+        mysql_logs = subprocess.check_output([
             "docker-compose", "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
             "--project-name", config["LOCAL_PROJECT_NAME"], "logs", "mysql",
         ])
-        if b"MySQL init process done. Ready for start up." in logs:
+        # pylint: disable=unsupported-membership-test
+        if b"MySQL init process done. Ready for start up." in mysql_logs:
             click.echo(fmt.info("MySQL database initialized"))
             docker_compose(root, config, "stop", "mysql")
             return
         sleep(4)
 
+
 @click.group(help="Manage https certificates")
 def https():
     pass
+
 
 @click.command(help="Create https certificates", name="create")
 @opts.root
@@ -188,6 +197,7 @@ See the official certbot documentation for your platform: https://certbot.eff.or
         "-e", "-c", script,
     )
 
+
 @click.command(help="Renew https certificates", name="renew")
 @opts.root
 def https_renew(root):
@@ -211,6 +221,7 @@ See the official certbot documentation for your platform: https://certbot.eff.or
     ]
     utils.docker_run(*docker_run)
 
+
 @click.command(help="View output from containers")
 @opts.root
 @click.option("-f", "--follow", is_flag=True, help="Follow log output")
@@ -226,6 +237,7 @@ def logs(root, follow, tail, service):
     config = tutor_config.load(root)
     docker_compose(root, config, *command)
 
+
 @click.command(help="Create an Open edX user and interactively set their password")
 @opts.root
 @click.option("--superuser", is_flag=True, help="Make superuser")
@@ -237,6 +249,7 @@ def createuser(root, superuser, staff, name, email):
     check_service_is_activated(config, "lms")
     scripts.create_user(root, run_bash, superuser, staff, name, email)
 
+
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
@@ -247,12 +260,14 @@ def importdemocourse(root):
     click.echo(fmt.info("Re-indexing courses"))
     indexcourses.callback(root)
 
+
 @click.command(help="Re-index courses for better searching")
 @opts.root
 def indexcourses(root):
     config = tutor_config.load(root)
     check_service_is_activated(config, "cms")
     scripts.index_courses(root, run_bash)
+
 
 @click.command(
     help="Run Portainer (https://portainer.io), a UI for container supervision",
@@ -271,13 +286,16 @@ def portainer(root, port):
     click.echo(fmt.info("View the Portainer UI at http://localhost:{port}".format(port=port)))
     utils.docker_run(*docker_run)
 
+
 def check_service_is_activated(config, service):
     if not config["ACTIVATE_" + service.upper()]:
         raise exceptions.TutorError("This command may only be executed on the server where the {} is running".format(service))
 
+
 def run_bash(root, service, command):
     config = tutor_config.load(root)
     docker_compose(root, config, "run", "--rm", service, "bash", "-e", "-c", command)
+
 
 def docker_compose(root, config, *command):
     return utils.docker_compose(
@@ -285,6 +303,7 @@ def docker_compose(root, config, *command):
         "--project-name", config["LOCAL_PROJECT_NAME"],
         *command
     )
+
 
 https.add_command(https_create)
 https.add_command(https_renew)

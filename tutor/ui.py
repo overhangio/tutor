@@ -1,6 +1,7 @@
 import click
 import click_repl
 
+
 @click.command(
     short_help="Interactive shell",
     help="Launch an interactive shell for launching Tutor commands"
@@ -14,5 +15,5 @@ Type <ctrl-d> to exit.""")
         try:
             click_repl.repl(click.get_current_context())
             return  # this happens on a ctrl+d
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass

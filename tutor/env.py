@@ -63,7 +63,6 @@ def render_dict(config):
             rendered[key] = value
     for k, v in rendered.items():
         config[k] = v
-    pass
 
 
 def render_str(config, text):
@@ -146,9 +145,9 @@ def walk_templates(root, target):
 def is_part_of_env(path):
     basename = os.path.basename(path)
     return not (
-        basename.startswith(".") or
-        basename.endswith(".pyc") or
-        basename == "__pycache__"
+        basename.startswith(".")
+        or basename.endswith(".pyc")
+        or basename == "__pycache__"
     )
 
 

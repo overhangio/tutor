@@ -13,6 +13,7 @@ from . import utils
 def k8s():
     pass
 
+
 @click.command(
     help="Configure and run Open edX from scratch"
 )
@@ -26,6 +27,7 @@ def quickstart(root):
     start.callback(root)
     click.echo(fmt.title("Running migrations. NOTE: this might fail. If it does, please retry 'tutor k8s databases' later"))
     databases.callback(root)
+
 
 @click.command(help="Run all configured Open edX services")
 @opts.root
@@ -45,9 +47,11 @@ def start(root):
     kubectl("create", "-f", tutor_env.pathjoin(root, "k8s", "services.yml"))
     kubectl("create", "-f", tutor_env.pathjoin(root, "k8s", "deployments.yml"))
 
+
 @click.command(help="Stop a running platform")
 def stop():
     kubectl("delete", "deployments,services,ingress,configmaps", "--all")
+
 
 @click.command(help="Completely delete an existing platform")
 @click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
@@ -56,12 +60,14 @@ def delete(yes):
         click.confirm('Are you sure you want to delete the platform? All data will be removed.', abort=True)
     kubectl("delete", "namespace", K8s.NAMESPACE)
 
+
 @click.command(
     help="Create databases and run database migrations",
 )
 @opts.root
 def databases(root):
     scripts.migrate(root, run_bash)
+
 
 @click.command(help="Create an Open edX user and interactively set their password")
 @opts.root
@@ -72,6 +78,7 @@ def databases(root):
 def createuser(root, superuser, staff, name, email):
     scripts.create_user(root, run_bash, superuser, staff, name, email)
 
+
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
@@ -80,6 +87,7 @@ def importdemocourse(root):
     click.echo(fmt.info("Re-indexing courses"))
     indexcourses.callback(root)
 
+
 @click.command(help="Re-index courses for better searching")
 @opts.root
 def indexcourses(root):
@@ -87,23 +95,25 @@ def indexcourses(root):
     # I'm not quite sure the settings are correctly picked up. Which is weird because migrations work very well.
     scripts.index_courses(root, run_bash)
 
+
 @click.command(
     help="Launch a shell in LMS or CMS",
 )
-@opts.root
 @click.argument("service", type=click.Choice(["lms", "cms"]))
-def shell(root, service):
+def shell(service):
     K8s().execute(service, "bash")
+
 
 @click.command(help="Create a Kubernetesadmin user")
 @opts.root
 def adminuser(root):
     utils.kubectl("create", "-f", tutor_env.pathjoin(root, "k8s", "adminuser.yml"))
 
+
 @click.command(help="Print the Kubernetes admin user token")
-@opts.root
-def admintoken(root):
+def admintoken():
     click.echo(K8s().admin_token())
+
 
 def kubectl(*command):
     """
@@ -115,6 +125,7 @@ def kubectl(*command):
         "--namespace", K8s.NAMESPACE
     ]
     kubectl_no_fail(*args)
+
 
 def kubectl_no_fail(*command):
     """
@@ -164,8 +175,10 @@ class K8s:
         podname = self.pod_name(app)
         kubectl_no_fail("exec", "--namespace", self.NAMESPACE, "-it", podname, "--", *command)
 
-def run_bash(root, service, command):
+
+def run_bash(root, service, command):  # pylint: disable=unused-argument
     K8s().execute(service, "bash", "-e", "-c", command)
+
 
 k8s.add_command(quickstart)
 k8s.add_command(start)

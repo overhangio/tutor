@@ -13,6 +13,7 @@ from . import utils
 def dev():
     pass
 
+
 @click.command(
     help="Run a command in one of the containers",
     context_settings={"ignore_unknown_options": True},
@@ -34,6 +35,7 @@ def run(root, edx_platform_path, edx_platform_settings, service, command, args):
         root, edx_platform_path, edx_platform_settings, port, *run_command
     )
 
+
 @click.command(
     help="Run a development server",
 )
@@ -48,10 +50,12 @@ def runserver(root, edx_platform_path, edx_platform_settings, service):
         service, "./manage.py", service, "runserver", "0.0.0.0:{}".format(port),
     )
 
+
 @click.command(help="Stop a running development platform",)
 @opts.root
 def stop(root):
     docker_compose(root, "rm", "--stop", "--force")
+
 
 @click.command(
     help="Watch for changes in your themes and recompile assets when needed"
@@ -65,11 +69,13 @@ def watchthemes(root, edx_platform_path, edx_platform_settings):
         "--no-deps", "lms", "openedx-assets", "watch-themes", "--env", "dev"
     )
 
+
 def docker_compose_run_with_port(root, edx_platform_path, edx_platform_settings, port, *command):
     docker_compose_run(
         root, edx_platform_path, edx_platform_settings,
         "-p", "{port}:{port}".format(port=port), *command
     )
+
 
 def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command):
     run_command = [
@@ -85,6 +91,7 @@ def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command)
     run_command += command
     docker_compose(root, *run_command)
 
+
 def docker_compose(root, *command):
     return utils.docker_compose(
         "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
@@ -92,8 +99,10 @@ def docker_compose(root, *command):
         *command
     )
 
+
 def service_port(service):
     return 8000 if service == "lms" else 8001
+
 
 dev.add_command(run)
 dev.add_command(runserver)

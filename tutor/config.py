@@ -17,7 +17,7 @@ from .__about__ import __version__
     short_help="Configure Open edX",
     help="""Configure Open edX and store configuration values in $TUTOR_ROOT/config.yml"""
 )
-def config():
+def config_command():
     pass
 
 
@@ -33,8 +33,7 @@ def save_command(root, silent1, silent2, set_):
 
 def save(root, silent=False, keyvalues=None):
     keyvalues = keyvalues or []
-    config = {}
-    load_current(config, root)
+    config = load_current(root)
     for k, v in keyvalues:
         config[k] = v
     if not silent:
@@ -57,8 +56,7 @@ def printroot(root):
 @opts.root
 @click.argument("key")
 def printvalue(root, key):
-    config = {}
-    load_current(config, root)
+    config = load_current(root)
     load_defaults(config)
     try:
         print(config[key])
@@ -71,8 +69,7 @@ def load(root):
     Load configuration, and generate it interactively if the file does not
     exist.
     """
-    config = {}
-    load_current(config, root)
+    config = load_current(root)
 
     should_update_env = False
     if not os.path.exists(config_path(root)):
@@ -119,20 +116,22 @@ def pre_upgrade_announcement(root):
         )
 
 
-def load_current(config, root):
+def load_current(root):
     convert_json2yml(root)
-    load_base(config, root)
+    config = {}
+    load_base(config)
     load_user(config, root)
-    load_env(config, root)
+    load_env(config)
+    return config
 
 
-def load_base(config, root):
+def load_base(config):
     base = serialize.load(env.read("config-base.yml"))
     for k, v in base.items():
         config[k] = v
 
 
-def load_env(config, root):
+def load_env(config):
     base_config = serialize.load(env.read("config-base.yml"))
     default_config = serialize.load(env.read("config-defaults.yml"))
     keys = set(list(base_config.keys()) + list(default_config.keys()))
@@ -272,6 +271,6 @@ def config_path(root):
     return os.path.join(root, "config.yml")
 
 
-config.add_command(save_command, name="save")
-config.add_command(printroot)
-config.add_command(printvalue)
+config_command.add_command(save_command, name="save")
+config_command.add_command(printroot)
+config_command.add_command(printvalue)

@@ -6,9 +6,11 @@ from . import fmt
 from . import opts
 from . import utils
 
+
 @click.group(short_help="Manage docker images")
-def images():
+def images_command():
     pass
+
 
 OPENEDX_IMAGES = ["openedx", "forum", "notes", "xqueue", "android"]
 VENDOR_IMAGES = ["elasticsearch", "memcached", "mongodb", "mysql", "nginx", "rabbitmq", "smtp"]
@@ -18,6 +20,7 @@ argument_openedx_image = click.argument(
 argument_image = click.argument(
     "image", type=click.Choice(["all"] + OPENEDX_IMAGES + VENDOR_IMAGES),
 )
+
 
 @click.command(
     short_help="Build docker images",
@@ -31,8 +34,7 @@ argument_image = click.argument(
 )
 def build(root, image, build_arg):
     config = tutor_config.load(root)
-    for image in openedx_image_names(config, image):
-        tag = get_tag(config, image)
+    for tag in openedx_image_tags(config, image):
         click.echo(fmt.info("Building image {}".format(tag)))
         command = [
             "build", "-t", tag,
@@ -44,25 +46,27 @@ def build(root, image, build_arg):
             ]
         utils.docker(*command)
 
+
 @click.command(short_help="Pull images from the Docker registry")
 @opts.root
 @argument_image
 def pull(root, image):
     config = tutor_config.load(root)
-    for image in image_names(config, image):
-        tag = get_tag(config, image)
+    for img in image_names(config, image):
+        tag = get_tag(config, img)
         click.echo(fmt.info("Pulling image {}".format(tag)))
         utils.execute("docker", "pull", tag)
+
 
 @click.command(short_help="Push images to the Docker registry")
 @opts.root
 @argument_openedx_image
 def push(root, image):
     config = tutor_config.load(root)
-    for image in openedx_image_names(config, image):
-        tag = get_tag(config, image)
+    for tag in openedx_image_tags(config, image):
         click.echo(fmt.info("Pushing image {}".format(tag)))
         utils.execute("docker", "push", tag)
+
 
 def get_tag(config, name):
     image = config["DOCKER_IMAGE_" + name.upper()]
@@ -71,8 +75,15 @@ def get_tag(config, name):
         image=image,
     )
 
+
 def image_names(config, image):
     return openedx_image_names(config, image) + vendor_image_names(config, image)
+
+
+def openedx_image_tags(config, image):
+    for img in openedx_image_names(config, image):
+        yield get_tag(config, img)
+
 
 def openedx_image_names(config, image):
     if image == "all":
@@ -83,6 +94,7 @@ def openedx_image_names(config, image):
             images.remove('notes')
         return images
     return [image]
+
 
 def vendor_image_names(config, image):
     if image == "all":
@@ -100,6 +112,7 @@ def vendor_image_names(config, image):
         return images
     return [image]
 
-images.add_command(build)
-images.add_command(pull)
-images.add_command(push)
+
+images_command.add_command(build)
+images_command.add_command(pull)
+images_command.add_command(push)

@@ -6,9 +6,9 @@ import click_repl
 
 from .__about__ import __version__
 from .android import android
-from .config import config
+from .config import config_command
 from .dev import dev
-from .images import images
+from .images import images_command
 from .k8s import k8s
 from .local import local
 from .ui import ui
@@ -24,10 +24,12 @@ def main():
         sys.stderr.write(fmt.error("Error: {}\n".format(e.args[0])))
         sys.exit(1)
 
+
 @click.group(context_settings={'help_option_names': ['-h', '--help', 'help']})
 @click.version_option(version=__version__)
 def cli():
     pass
+
 
 @click.command(
     help="Print this help",
@@ -37,9 +39,10 @@ def print_help():
     with click.Context(cli) as context:
         click.echo(cli.get_help(context))
 
+
 click_repl.register_repl(cli, name="ui")
-cli.add_command(images)
-cli.add_command(config)
+cli.add_command(images_command, name="images")
+cli.add_command(config_command, name="config")
 cli.add_command(local)
 cli.add_command(dev)
 cli.add_command(android)
