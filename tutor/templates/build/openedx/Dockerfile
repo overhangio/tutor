@@ -92,6 +92,10 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 # Copy gunicorn settings file
 COPY gunicorn_conf.py /openedx/gunicorn_conf.py
 
+RUN mkdir /openedx/logs \
+    && ln -s /dev/stdout /openedx/logs/tracking.log \
+    && ln -s /dev/stderr /openedx/logs/edx.log
+
 # Run server
 EXPOSE 8000
 CMD gunicorn -c file:/openedx/gunicorn_conf.py --name ${SERVICE_VARIANT} --bind=0.0.0.0:8000 --max-requests=1000 ${SERVICE_VARIANT}.wsgi:application

@@ -9,10 +9,16 @@ VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location'] = MEDIA_ROOT
 VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['location'] = MEDIA_ROOT
 
 # Change syslog-based loggers which don't work inside docker containers
-LOGGING['handlers']['local'] = {'class': 'logging.NullHandler'}
+LOGGING['handlers']['local'] = {
+    'class': 'logging.handlers.WatchedFileHandler',
+    'filename': '/openedx/logs/edx.log',
+    'formatter': 'standard',
+}
+
 LOGGING['handlers']['tracking'] = {
     'level': 'DEBUG',
-    'class': 'logging.StreamHandler',
+    'class': 'logging.handlers.WatchedFileHandler',
+    'filename': '/openedx/logs/tracking.log',
     'formatter': 'standard',
 }
 
