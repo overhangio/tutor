@@ -1,30 +1,9 @@
 import os
 from cms.envs.devstack import *
 
-# Load module store settings from config files
-update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
 
-# Set uploaded media file path
-MEDIA_ROOT = "/openedx/data/uploads/"
-
-# Video settings
-VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location'] = MEDIA_ROOT
-VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['location'] = MEDIA_ROOT
-
-# Change syslog-based loggers which don't work inside docker containers
-LOGGING['handlers']['local'] = {'class': 'logging.NullHandler'}
-LOGGING['handlers']['tracking'] = {
-    'level': 'DEBUG',
-    'class': 'logging.StreamHandler',
-    'formatter': 'standard',
-}
-
-LOCALE_PATHS.append('/openedx/locale')
+# Execute the contents of common.py in this context
+execfile(os.path.join(os.path.dirname(__file__), 'common.py'), globals())
 
 # Setup correct webpack configuration file for development
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
-
-# Create folders if necessary
-for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
-    if not os.path.exists(folder):
-        os.makedirs(folder)
