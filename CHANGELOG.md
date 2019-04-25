@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.3.5 (2019-04-22)
+## 3.3.5 (2019-04-22)
 
 - [Feature] Pluggable LMS/CMS/forum
 - [Improvement] Safer environment overwrite. Thanks @silviot! 👐
@@ -8,16 +8,16 @@
 - [Improvement] Improve CLI cold start performance
 - [Improvement] Allow uppercase "Y" and "N" as answers to boolean questions
 
-## v3.3.4 (2019-04-09)
+## 3.3.4 (2019-04-09)
 
 - [Improvement] Rename `--silent` option to `-y/--yes`
 - [Bugfix] Fix (again) login from studio when https is activated (#193)
 
-## v3.3.3 (2019-03-29)
+## 3.3.3 (2019-03-29)
 
 - [Bugfix] Fix `pip install tutor-openedx`
 
-## v3.3.2 (2019-03-27)
+## 3.3.2 (2019-03-27)
 
 - [Bugfix] Fix login from localhost
 - [Bugfix] Fix Android app image build
