@@ -34,11 +34,12 @@ argument_image = click.argument(
 )
 def build(root, image, build_arg):
     config = tutor_config.load(root)
-    for tag in openedx_image_tags(config, image):
+    for img in openedx_image_names(config, image):
+        tag = get_tag(config, img)
         click.echo(fmt.info("Building image {}".format(tag)))
         command = [
             "build", "-t", tag,
-            tutor_env.pathjoin(root, "build", image)
+            tutor_env.pathjoin(root, "build", img)
         ]
         for arg in build_arg:
             command += [
