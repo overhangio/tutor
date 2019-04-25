@@ -1,7 +1,7 @@
 .. _quickstart:
 
-Quickstart
-==========
+Quickstart (1-click install)
+============================
 
 1. `Download <https://github.com/regisb/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path. From the command line:
 

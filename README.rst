@@ -1,5 +1,7 @@
-Tutor 🎓 Open edX 1-click install for everyone
-==============================================
+.. _readme_intro_start:
+
+Tutor 🎓 The docker-based Open edX distribution designed for peace of mind
+==========================================================================
 
 .. image:: https://img.shields.io/travis/regisb/tutor.svg
     :alt: Build status
@@ -21,7 +23,9 @@ Tutor 🎓 Open edX 1-click install for everyone
     :alt: AGPL License
     :target: https://www.gnu.org/licenses/agpl-3.0.en.html
 
-**Tutor** is a one-click install of `Open edX <https://openedx.org>`_, both for production and local development, inside docker containers. Tutor is easy to run, fast, full of cool features, and it is already used by dozens of Open edX platforms in the world.
+**Tutor** is a docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is easy to use, fast, full of cool features, and it is already used by dozens of Open edX platforms in the world.
+
+.. _readme_intro_end:
 
 .. image:: ./docs/img/quickstart.gif
     :alt: Tutor local quickstart
@@ -39,12 +43,20 @@ Documentation
 
 Extensive documentation is available online: https://docs.tutor.overhang.io/
 
+.. _readme_support_start:
+
 Support
 -------
 
 To get community support, go to the official discussion forums: https://discuss.overhang.io.
 
+.. _readme_support_end:
+
+.. _readme_contributing_start:
+
 Contributing
 ------------
 
-We go to great lengths to make it as easy as possible for people to run Open edX inside Docker containers. If you have an improvement idea, feel free to first discuss it on the `Tutor forum <https://discuss.overhang.io>`_. Did you find an issue with Tutor? Please first make sure that it's related to Tutor, and not an issue with Open edX. Then, `open an issue on Github <https://github.com/regisb/tutor/issues/new>`_. `Pull requests <https://github.com/regisb/tutor/pulls>`_ will be happily examined, too!
+We are very much open to new ideas, features for Tutor. If you have an improvement idea, feel free to first discuss it on the `Tutor forums <https://discuss.overhang.io>`_. If you are not quite familiar with Open edX or if you need technical advice, the forums are a great place to start, too. Did you find an issue with Tutor? Please first make sure that it's related to Tutor, and not an upstream issue with Open edX. Then, `open an issue on Github <https://github.com/regisb/tutor/issues/new>`_. `Pull requests <https://github.com/regisb/tutor/pulls>`_ will be happily examined, too!
+
+.. _readme_contributing_end:
