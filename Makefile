@@ -48,6 +48,7 @@ ci-bundle: ## Create bundle and run basic tests
 	mkdir -p releases/
 	./dist/tutor --version
 	./dist/tutor config printroot
+	yes "" | ./dist/tutor config save
 	./dist/tutor config save --yes --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
 
 ./releases/github-release: ## Download github-release binary
