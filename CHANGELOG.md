@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.3.6 (2019-04-27)
+
+- [Bugfix] Fix KeyError on first quickstart
+- [Improvement] De-duplication of prod/dev settings. Thanks @silviot! 😺
+
 ## 3.3.5 (2019-04-22)
 
 - [Feature] Pluggable LMS/CMS/forum
