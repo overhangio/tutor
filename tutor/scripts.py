@@ -8,7 +8,8 @@ def migrate(root, run_func):
     config = tutor_config.load(root)
 
     click.echo(fmt.info("Creating all databases..."))
-    run_template(root, config, "openedx-assets", "create_databases.sh", run_func)
+    # Note: run this only when lms is activated?
+    run_template(root, config, "lms", "create_databases.sh", run_func)
 
     if config["ACTIVATE_LMS"]:
         click.echo(fmt.info("Running lms migrations..."))
