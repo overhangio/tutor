@@ -1,5 +1,4 @@
 import multiprocessing
 
-# The recommended number of workers is twice the
-# CPU count plus one
-workers = (multiprocessing.cpu_count() * 2) + 1
+# Set the number of gunicorn workers to the number of CPU
+workers = multiprocessing.cpu_count()

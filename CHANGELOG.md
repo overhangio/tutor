@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.8 (2019-04-28)
+
+- [Bugfix] Reduce the number of gunicorn workers to address RAM usage (#207)
+
 ## 3.3.7 (2019-04-28)
 
 - [Bugfix] Fix "Timeout after 20s" on running migrations
