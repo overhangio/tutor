@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.7 (2019-04-28)
+
+- [Bugfix] Fix "Timeout after 20s" on running migrations
+
 ## 3.3.6 (2019-04-27)
 
 - [Bugfix] Fix KeyError on first quickstart
