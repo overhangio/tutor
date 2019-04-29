@@ -19,12 +19,16 @@ RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releas
     && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
     && rm /tmp/dockerize.tar.gz
 
-## Checkout edx-platform code
+# Checkout edx-platform code
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
 ARG EDX_PLATFORM_VERSION=open-release/ironwood.1
 RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
+
+# Apply patches
+# https://github.com/edx/edx-platform/pull/20325/
+RUN curl https://github.com/edx/edx-platform/commit/14fdc28daa00d07d9176c9dbd85b6a2d7ca3e473.patch | git apply -
 
 # Download extra locales to /openedx/locale
 # TODO upgrade this to ironwood

@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Bugfix] Fix triple display of courses in LMS search (upstream patch, #189)
+
 ## 3.3.8 (2019-04-28)
 
 - [Bugfix] Reduce the number of gunicorn workers to address RAM usage (#207)
