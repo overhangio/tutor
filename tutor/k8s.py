@@ -66,7 +66,7 @@ def delete(yes):
 )
 @opts.root
 def databases(root):
-    scripts.migrate(root, run_bash)
+    scripts.migrate(root, run_sh)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -76,14 +76,14 @@ def databases(root):
 @click.argument("name")
 @click.argument("email")
 def createuser(root, superuser, staff, name, email):
-    scripts.create_user(root, run_bash, superuser, staff, name, email)
+    scripts.create_user(root, run_sh, superuser, staff, name, email)
 
 
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
     click.echo(fmt.info("Importing demo course"))
-    scripts.import_demo_course(root, run_bash)
+    scripts.import_demo_course(root, run_sh)
     click.echo(fmt.info("Re-indexing courses"))
     indexcourses.callback(root)
 
@@ -93,7 +93,7 @@ def importdemocourse(root):
 def indexcourses(root):
     # Note: this is currently broken with "pymongo.errors.ConnectionFailure: [Errno 111] Connection refused"
     # I'm not quite sure the settings are correctly picked up. Which is weird because migrations work very well.
-    scripts.index_courses(root, run_bash)
+    scripts.index_courses(root, run_sh)
 
 
 @click.command(
@@ -176,8 +176,8 @@ class K8s:
         kubectl_no_fail("exec", "--namespace", self.NAMESPACE, "-it", podname, "--", *command)
 
 
-def run_bash(root, service, command):  # pylint: disable=unused-argument
-    K8s().execute(service, "bash", "-e", "-c", command)
+def run_sh(root, service, command):  # pylint: disable=unused-argument
+    K8s().execute(service, "sh", "-e", "-c", command)
 
 
 k8s.add_command(quickstart)

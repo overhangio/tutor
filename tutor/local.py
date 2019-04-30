@@ -129,7 +129,7 @@ def run(root, service, command, args):
 @opts.root
 def databases(root):
     init_mysql(root)
-    scripts.migrate(root, run_bash)
+    scripts.migrate(root, run_sh)
 
 
 def init_mysql(root):
@@ -247,7 +247,7 @@ def logs(root, follow, tail, service):
 def createuser(root, superuser, staff, name, email):
     config = tutor_config.load(root)
     check_service_is_activated(config, "lms")
-    scripts.create_user(root, run_bash, superuser, staff, name, email)
+    scripts.create_user(root, run_sh, superuser, staff, name, email)
 
 
 @click.command(help="Import the demo course")
@@ -256,7 +256,7 @@ def importdemocourse(root):
     config = tutor_config.load(root)
     check_service_is_activated(config, "cms")
     click.echo(fmt.info("Importing demo course"))
-    scripts.import_demo_course(root, run_bash)
+    scripts.import_demo_course(root, run_sh)
     click.echo(fmt.info("Re-indexing courses"))
     indexcourses.callback(root)
 
@@ -266,7 +266,7 @@ def importdemocourse(root):
 def indexcourses(root):
     config = tutor_config.load(root)
     check_service_is_activated(config, "cms")
-    scripts.index_courses(root, run_bash)
+    scripts.index_courses(root, run_sh)
 
 
 @click.command(
@@ -292,9 +292,9 @@ def check_service_is_activated(config, service):
         raise exceptions.TutorError("This command may only be executed on the server where the {} is running".format(service))
 
 
-def run_bash(root, service, command):
+def run_sh(root, service, command):
     config = tutor_config.load(root)
-    docker_compose(root, config, "run", "--rm", service, "bash", "-e", "-c", command)
+    docker_compose(root, config, "run", "--rm", service, "sh", "-e", "-c", command)
 
 
 def docker_compose(root, config, *command):
