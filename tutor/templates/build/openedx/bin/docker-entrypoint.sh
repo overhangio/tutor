@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
 USERID=${USERID:=0}
 
@@ -13,7 +13,7 @@ if [ "$USERID" -ne 0 ]
 
         # Run CMD as different user
         exec chroot --userspec="$USERID" --skip-chdir / env HOME=/openedx "$@"
-else 
+else
         # Run CMD as root (business as usual)
         exec "$@"
 fi

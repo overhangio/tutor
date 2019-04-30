@@ -49,7 +49,7 @@ services:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     volumes:
       - ../../data/openedx:/var/www/openedx
-    command: bash -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
+    command: sh -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
 
   nginx:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NGINX }}
