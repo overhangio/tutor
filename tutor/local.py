@@ -152,7 +152,6 @@ def init_mysql(root):
         # pylint: disable=unsupported-membership-test
         if b"MySQL init process done. Ready for start up." in mysql_logs:
             click.echo(fmt.info("MySQL database initialized"))
-            docker_compose(root, config, "stop", "mysql")
             return
         sleep(4)
 
