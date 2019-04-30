@@ -1,4 +1,4 @@
-dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
+while ! (tail /var/log/mysql/error.log |grep "ready for connections.">/dev/null); do sleep 1; done
 mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'CREATE DATABASE IF NOT EXISTS {{ OPENEDX_MYSQL_DATABASE }};'
 mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" -e 'GRANT ALL ON {{ OPENEDX_MYSQL_DATABASE }}.* TO "{{ OPENEDX_MYSQL_USERNAME }}"@"%" IDENTIFIED BY "{{ OPENEDX_MYSQL_PASSWORD }}";'
 
