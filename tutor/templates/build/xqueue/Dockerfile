@@ -12,4 +12,4 @@ WORKDIR /openedx/xqueue
 RUN pip install -r requirements.txt
 
 EXPOSE 8040
-CMD gunicorn --workers=3 --name xqueue --bind=0.0.0.0:8040 --max-requests=1000 xqueue.wsgi:application
+CMD gunicorn --workers=2 --name xqueue --bind=0.0.0.0:8040 --max-requests=1000 xqueue.wsgi:application

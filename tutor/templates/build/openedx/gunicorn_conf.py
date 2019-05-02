@@ -1,4 +1,4 @@
-import multiprocessing
+import os
 
-# Set the number of gunicorn workers to the number of CPU
-workers = multiprocessing.cpu_count()
+# Set the number of gunicorn workers
+workers = int(os.environ.get("GUNICORN_WORKERS", "2"))
