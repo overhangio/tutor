@@ -53,3 +53,18 @@ Installing from a local clone of the repository::
     git clone https://github.com/regisb/tutor
     cd tutor
     pip install -e .
+    
+Autocomplete
+------------
+
+Tutor is built on top of `Click <https://click.palletsprojects.com>`_, which is a great library for building command line interface (CLI) tools. As such, Tutor benefits from all Click features, including `auto-completion <https://click.palletsprojects.com/en/7.x/bashcomplete/>`_. After installing Tutor, auto-completion can be enabled by running::
+
+    _TUTOR_COMPLETE=source tutor >> ~/.bashrc
+
+If you are running zsh, run instead::
+
+    _TUTOR_COMPLETE=source_zsh tutor >> ~/.zshrc
+
+After opening a new shell, you can test auto-completion by typing::
+
+    tutor <tab><tab>
