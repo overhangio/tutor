@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Add `local exec` command for running commands inside existing containers
 - [Bugfix] Fix triple display of courses in LMS search (upstream patch, #189)
 
 ## 3.3.8 (2019-04-28)
