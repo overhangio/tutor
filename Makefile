@@ -16,7 +16,7 @@ test-lint: ## Run code linting tests
 	pylint --errors-only tutor
 
 test-unit: ## Run unit tests
-	nosetests --nocapture tests/
+	python3 -m unittest discover tests
 
 format: ## Format code automatically
 	black ./tutor
@@ -48,13 +48,10 @@ ci-info: ## Print info about environment
 	python3 --version
 	pip3 --version
 
-ci-test: test-format test-lint ## Run unit tests but without nosetests, which is not available on Mac OS in travis-ci
-	python3 -m unittest discover tests
-
 ci-bundle: ## Create bundle and run basic tests
 	pip3 install -U setuptools
 	pip3 install -r requirements/dev.txt
-	$(MAKE) ci-test
+	$(MAKE) test
 	$(MAKE) bundle
 	mkdir -p releases/
 	./dist/tutor --version
