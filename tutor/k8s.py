@@ -14,9 +14,7 @@ def k8s():
     pass
 
 
-@click.command(
-    help="Configure and run Open edX from scratch"
-)
+@click.command(help="Configure and run Open edX from scratch")
 @opts.root
 def quickstart(root):
     click.echo(fmt.title("Interactive platform configuration"))
@@ -25,7 +23,11 @@ def quickstart(root):
     stop.callback()
     click.echo(fmt.title("Starting the platform"))
     start.callback(root)
-    click.echo(fmt.title("Running migrations. NOTE: this might fail. If it does, please retry 'tutor k8s databases' later"))
+    click.echo(
+        fmt.title(
+            "Running migrations. NOTE: this might fail. If it does, please retry 'tutor k8s databases' later"
+        )
+    )
     databases.callback(root)
 
 
@@ -35,12 +37,42 @@ def start(root):
     config = tutor_config.load(root)
     kubectl_no_fail("create", "-f", tutor_env.pathjoin(root, "k8s", "namespace.yml"))
 
-    kubectl("create", "configmap", "nginx-config", "--from-file", tutor_env.pathjoin(root, "apps", "nginx"))
-    if config['ACTIVATE_MYSQL']:
-        kubectl("create", "configmap", "mysql-config", "--from-env-file", tutor_env.pathjoin(root, "apps", "mysql", "auth.env"))
-    kubectl("create", "configmap", "openedx-settings-lms", "--from-file", tutor_env.pathjoin(root, "apps", "openedx", "settings", "lms"))
-    kubectl("create", "configmap", "openedx-settings-cms", "--from-file", tutor_env.pathjoin(root, "apps", "openedx", "settings", "cms"))
-    kubectl("create", "configmap", "openedx-config", "--from-file", tutor_env.pathjoin(root, "apps", "openedx", "config"))
+    kubectl(
+        "create",
+        "configmap",
+        "nginx-config",
+        "--from-file",
+        tutor_env.pathjoin(root, "apps", "nginx"),
+    )
+    if config["ACTIVATE_MYSQL"]:
+        kubectl(
+            "create",
+            "configmap",
+            "mysql-config",
+            "--from-env-file",
+            tutor_env.pathjoin(root, "apps", "mysql", "auth.env"),
+        )
+    kubectl(
+        "create",
+        "configmap",
+        "openedx-settings-lms",
+        "--from-file",
+        tutor_env.pathjoin(root, "apps", "openedx", "settings", "lms"),
+    )
+    kubectl(
+        "create",
+        "configmap",
+        "openedx-settings-cms",
+        "--from-file",
+        tutor_env.pathjoin(root, "apps", "openedx", "settings", "cms"),
+    )
+    kubectl(
+        "create",
+        "configmap",
+        "openedx-config",
+        "--from-file",
+        tutor_env.pathjoin(root, "apps", "openedx", "config"),
+    )
 
     kubectl("create", "-f", tutor_env.pathjoin(root, "k8s", "volumes.yml"))
     kubectl("create", "-f", tutor_env.pathjoin(root, "k8s", "ingress.yml"))
@@ -57,13 +89,14 @@ def stop():
 @click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
 def delete(yes):
     if not yes:
-        click.confirm('Are you sure you want to delete the platform? All data will be removed.', abort=True)
+        click.confirm(
+            "Are you sure you want to delete the platform? All data will be removed.",
+            abort=True,
+        )
     kubectl("delete", "namespace", K8s.NAMESPACE)
 
 
-@click.command(
-    help="Create databases and run database migrations",
-)
+@click.command(help="Create databases and run database migrations")
 @opts.root
 def databases(root):
     scripts.migrate(root, run_sh)
@@ -96,9 +129,7 @@ def indexcourses(root):
     scripts.index_courses(root, run_sh)
 
 
-@click.command(
-    help="Launch a shell in LMS or CMS",
-)
+@click.command(help="Launch a shell in LMS or CMS")
 @click.argument("service", type=click.Choice(["lms", "cms"]))
 def shell(service):
     K8s().execute(service, "bash")
@@ -121,9 +152,7 @@ def kubectl(*command):
     ignored, to avoid stopping on "AlreadyExists" errors.
     """
     args = list(command)
-    args += [
-        "--namespace", K8s.NAMESPACE
-    ]
+    args += ["--namespace", K8s.NAMESPACE]
     kubectl_no_fail(*args)
 
 
@@ -150,6 +179,7 @@ class K8s:
         if self.CLIENT is None:
             # Import moved here for performance reasons
             import kubernetes
+
             kubernetes.config.load_kube_config()
             self.CLIENT = kubernetes.client.CoreV1Api()
         return self.CLIENT
@@ -157,23 +187,37 @@ class K8s:
     def pod_name(self, app):
         selector = "app=" + app
         try:
-            return self.client.list_namespaced_pod("openedx", label_selector=selector).items[0].metadata.name
+            return (
+                self.client.list_namespaced_pod("openedx", label_selector=selector)
+                .items[0]
+                .metadata.name
+            )
         except IndexError:
-            raise exceptions.TutorError("Pod with app {} does not exist. Make sure that the pod is running.")
+            raise exceptions.TutorError(
+                "Pod with app {} does not exist. Make sure that the pod is running."
+            )
 
     def admin_token(self):
         # Note: this is a HORRIBLE way of looking for a secret
         try:
             secret = [
-                s for s in self.client.list_namespaced_secret("kube-system").items if s.metadata.name.startswith("admin-user-token")
+                s
+                for s in self.client.list_namespaced_secret("kube-system").items
+                if s.metadata.name.startswith("admin-user-token")
             ][0]
         except IndexError:
-            raise exceptions.TutorError("Secret 'admin-user-token'. Make sure that admin user was created.")
-        return self.client.read_namespaced_secret(secret.metadata.name, "kube-system").data["token"]
+            raise exceptions.TutorError(
+                "Secret 'admin-user-token'. Make sure that admin user was created."
+            )
+        return self.client.read_namespaced_secret(
+            secret.metadata.name, "kube-system"
+        ).data["token"]
 
     def execute(self, app, *command):
         podname = self.pod_name(app)
-        kubectl_no_fail("exec", "--namespace", self.NAMESPACE, "-it", podname, "--", *command)
+        kubectl_no_fail(
+            "exec", "--namespace", self.NAMESPACE, "-it", podname, "--", *command
+        )
 
 
 def run_sh(root, service, command):  # pylint: disable=unused-argument

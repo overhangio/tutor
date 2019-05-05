@@ -25,16 +25,13 @@ def main():
         sys.exit(1)
 
 
-@click.group(context_settings={'help_option_names': ['-h', '--help', 'help']})
+@click.group(context_settings={"help_option_names": ["-h", "--help", "help"]})
 @click.version_option(version=__version__)
 def cli():
     pass
 
 
-@click.command(
-    help="Print this help",
-    name="help",
-)
+@click.command(help="Print this help", name="help")
 def print_help():
     with click.Context(cli) as context:
         click.echo(cli.get_help(context))

@@ -20,7 +20,7 @@ def render_full(root, config):
     for target in ["android", "apps", "k8s", "local", "webui"]:
         render_target(root, config, target)
     copy_target(root, "build")
-    with open(pathjoin(root, VERSION_FILENAME), 'w') as f:
+    with open(pathjoin(root, VERSION_FILENAME), "w") as f:
         f.write(__version__)
 
 
@@ -36,7 +36,7 @@ def render_target(root, config, target):
 
 
 def render_file(config, path):
-    with codecs.open(path, encoding='utf-8') as fi:
+    with codecs.open(path, encoding="utf-8") as fi:
         try:
             return render_str(config, fi.read())
         except jinja2.exceptions.TemplateError:
@@ -77,9 +77,7 @@ def render_str(config, text):
     template = jinja2.Template(text, undefined=jinja2.StrictUndefined)
     try:
         return template.render(
-            RAND8=utils.random_string(8),
-            RAND24=utils.random_string(24),
-            **config
+            RAND8=utils.random_string(8), RAND24=utils.random_string(24), **config
         )
     except jinja2.exceptions.UndefinedError as e:
         raise exceptions.TutorError("Missing configuration value: {}".format(e.args[0]))
@@ -113,7 +111,7 @@ def read(*path):
     Read template content located at `path`.
     """
     src = template_path(*path)
-    with codecs.open(src, encoding='utf-8') as fi:
+    with codecs.open(src, encoding="utf-8") as fi:
         return fi.read()
 
 
@@ -129,10 +127,7 @@ def walk_templates(root, target):
     for dirpath, _, filenames in os.walk(target_root):
         if not is_part_of_env(dirpath):
             continue
-        dst_dir = pathjoin(
-            root, target,
-            os.path.relpath(dirpath, target_root)
-        )
+        dst_dir = pathjoin(root, target, os.path.relpath(dirpath, target_root))
         if not os.path.exists(dst_dir):
             os.makedirs(dst_dir)
         for filename in filenames:

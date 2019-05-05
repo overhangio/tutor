@@ -23,7 +23,9 @@ def local():
 
 
 @click.command(help="Configure and run Open edX from scratch")
-@click.option("-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images")
+@click.option(
+    "-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images"
+)
 @opts.root
 def quickstart(pullimages_, root):
     click.echo(fmt.title("Interactive platform configuration"))
@@ -64,30 +66,38 @@ def start(root, detach):
         http = "https" if config["ACTIVATE_HTTPS"] else "http"
         urls = []
         if not config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
-            urls += [
-                "http://localhost",
-                "http://studio.localhost",
-            ]
-        urls.append("{http}://{lms_host}".format(http=http, lms_host=config["LMS_HOST"]))
-        urls.append("{http}://{cms_host}".format(http=http, cms_host=config["CMS_HOST"]))
-        click.echo(fmt.info("""Your Open edX platform is ready and can be accessed at the following urls:
+            urls += ["http://localhost", "http://studio.localhost"]
+        urls.append(
+            "{http}://{lms_host}".format(http=http, lms_host=config["LMS_HOST"])
+        )
+        urls.append(
+            "{http}://{cms_host}".format(http=http, cms_host=config["CMS_HOST"])
+        )
+        click.echo(
+            fmt.info(
+                """Your Open edX platform is ready and can be accessed at the following urls:
 
-    {}""".format("\n    ".join(urls))))
+    {}""".format(
+                    "\n    ".join(urls)
+                )
+            )
+        )
 
 
-@click.command(help="Stop a running platform",)
+@click.command(help="Stop a running platform")
 @opts.root
 def stop(root):
     config = tutor_config.load(root)
     docker_compose(root, config, "rm", "--stop", "--force")
 
+
 @click.command(
     help="""Restart some components from a running platform.
 You may specify 'openedx' to restart the lms, cms and workers, or 'all' to
-restart all services.""",
+restart all services."""
 )
 @opts.root
-@click.argument('service')
+@click.argument("service")
 def restart(root, service):
     config = tutor_config.load(root)
     command = ["restart"]
@@ -110,11 +120,7 @@ def restart(root, service):
 @click.argument("command", default=None, required=False)
 @click.argument("args", nargs=-1, required=False)
 def run(root, service, command, args):
-    run_command = [
-        "run",
-        "--rm",
-        service
-    ]
+    run_command = ["run", "--rm", service]
     if command:
         run_command.append(command)
     if args:
@@ -123,9 +129,7 @@ def run(root, service, command, args):
     docker_compose(root, config, *run_command)
 
 
-@click.command(
-    help="Create databases and run database migrations",
-)
+@click.command(help="Create databases and run database migrations")
 @opts.root
 def databases(root):
     init_mysql(root)
@@ -134,7 +138,7 @@ def databases(root):
 
 def init_mysql(root):
     config = tutor_config.load(root)
-    if not config['ACTIVATE_MYSQL']:
+    if not config["ACTIVATE_MYSQL"]:
         return
     mysql_data_path = tutor_env.data_path(root, "mysql", "mysql")
     if os.path.exists(mysql_data_path):
@@ -145,10 +149,17 @@ def init_mysql(root):
         click.echo(fmt.info("    waiting for mysql initialization"))
         # TODO this is duplicate code with the docker_compose function. We
         # should rely on a dedicated function in utils module.
-        mysql_logs = subprocess.check_output([
-            "docker-compose", "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-            "--project-name", config["LOCAL_PROJECT_NAME"], "logs", "mysql",
-        ])
+        mysql_logs = subprocess.check_output(
+            [
+                "docker-compose",
+                "-f",
+                tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+                "--project-name",
+                config["LOCAL_PROJECT_NAME"],
+                "logs",
+                "mysql",
+            ]
+        )
         # pylint: disable=unsupported-membership-test
         if b"MySQL init process done. Ready for start up." in mysql_logs:
             click.echo(fmt.info("MySQL database initialized"))
@@ -173,28 +184,38 @@ def https_create(root):
     2. On certificate renewal, nginx is not reloaded
     """
     config = tutor_config.load(root)
-    if not config['ACTIVATE_HTTPS']:
+    if not config["ACTIVATE_HTTPS"]:
         click.echo(fmt.info("HTTPS is not activated: certificate generation skipped"))
         return
 
-    script = scripts.render_template(config, 'https_create.sh')
+    script = scripts.render_template(config, "https_create.sh")
 
-    if config['WEB_PROXY']:
-        click.echo(fmt.info("""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+    if config["WEB_PROXY"]:
+        click.echo(
+            fmt.info(
+                """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
 certificates must be generated on the host. For instance, to generate
 certificates with Let's Encrypt, run:
 
 {}
 
-See the official certbot documentation for your platform: https://certbot.eff.org/""".format(indent(script, "    "))))
+See the official certbot documentation for your platform: https://certbot.eff.org/""".format(
+                    indent(script, "    ")
+                )
+            )
+        )
         return
 
     utils.docker_run(
-        "--volume", "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
-        "-p", "80:80",
+        "--volume",
+        "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
+        "-p",
+        "80:80",
         "--entrypoint=sh",
         "certbot/certbot:latest",
-        "-e", "-c", script,
+        "-e",
+        "-c",
+        script,
     )
 
 
@@ -202,22 +223,29 @@ See the official certbot documentation for your platform: https://certbot.eff.or
 @opts.root
 def https_renew(root):
     config = tutor_config.load(root)
-    if not config['ACTIVATE_HTTPS']:
+    if not config["ACTIVATE_HTTPS"]:
         click.echo(fmt.info("HTTPS is not activated: certificate renewal skipped"))
         return
-    if config['WEB_PROXY']:
-        click.echo(fmt.info("""You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+    if config["WEB_PROXY"]:
+        click.echo(
+            fmt.info(
+                """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
 certificates must be renewed on the host. For instance, to renew Let's Encrypt
 certificates, run:
 
     certbot renew
 
-See the official certbot documentation for your platform: https://certbot.eff.org/"""))
+See the official certbot documentation for your platform: https://certbot.eff.org/"""
+            )
+        )
         return
     docker_run = [
-        "--volume", "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
-        "-p", "80:80",
-        "certbot/certbot:latest", "renew"
+        "--volume",
+        "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
+        "-p",
+        "80:80",
+        "certbot/certbot:latest",
+        "renew",
     ]
     utils.docker_run(*docker_run)
 
@@ -274,22 +302,31 @@ def indexcourses(root):
     short_help="Run Portainer, a UI for container supervision",
 )
 @opts.root
-@click.option("-p", "--port", type=int, default=9000, show_default=True, help="Bind port")
+@click.option(
+    "-p", "--port", type=int, default=9000, show_default=True, help="Bind port"
+)
 def portainer(root, port):
     docker_run = [
         "--volume=/var/run/docker.sock:/var/run/docker.sock",
         "--volume={}:/data".format(tutor_env.data_path(root, "portainer")),
-        "-p", "{port}:{port}".format(port=port),
+        "-p",
+        "{port}:{port}".format(port=port),
         "portainer/portainer:latest",
         "--bind=:{}".format(port),
     ]
-    click.echo(fmt.info("View the Portainer UI at http://localhost:{port}".format(port=port)))
+    click.echo(
+        fmt.info("View the Portainer UI at http://localhost:{port}".format(port=port))
+    )
     utils.docker_run(*docker_run)
 
 
 def check_service_is_activated(config, service):
     if not config["ACTIVATE_" + service.upper()]:
-        raise exceptions.TutorError("This command may only be executed on the server where the {} is running".format(service))
+        raise exceptions.TutorError(
+            "This command may only be executed on the server where the {} is running".format(
+                service
+            )
+        )
 
 
 def run_sh(root, service, command):
@@ -299,8 +336,10 @@ def run_sh(root, service, command):
 
 def docker_compose(root, config, *command):
     return utils.docker_compose(
-        "-f", tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-        "--project-name", config["LOCAL_PROJECT_NAME"],
+        "-f",
+        tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+        "--project-name",
+        config["LOCAL_PROJECT_NAME"],
         *command
     )
 
