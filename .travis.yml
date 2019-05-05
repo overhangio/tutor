@@ -31,6 +31,8 @@ matrix:
 
 script:
   - make ci-info
+  - make ci-install
+  - make test
   - make ci-bundle
 
 deploy:
