@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Persist LMS/CMS logs to disk by default (with collaboration from @silviot 💪)
 - [Bugfix] Fix installing a locally cloned requirement repository
 - [Improvement] Add `--no-cache` option to `images build`
 - [Improvement] Make it possible to configure the notes service hostname
@@ -11,7 +12,6 @@
 - [Bugfix] Fix boolean configuration choices
 
 ## 3.3.9 (2019-05-13)
-
 - [Improvement] Add `local exec` command for running commands inside existing containers
 - [Bugfix] Fix triple display of courses in LMS search (upstream patch, #189)
 

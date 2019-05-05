@@ -93,11 +93,6 @@ ENV SETTINGS tutor.production
 # Entrypoint will fix permissions of all files and run commands as openedx
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# Configure logging
-RUN mkdir -p /openedx/logs \
-    && ln -s /dev/stdout /openedx/logs/tracking.log \
-    && ln -s /dev/stderr /openedx/logs/edx.log
-
 # Run server
 COPY gunicorn_conf.py /openedx/gunicorn_conf.py
 EXPOSE 8000
