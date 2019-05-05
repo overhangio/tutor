@@ -1,4 +1,6 @@
 -r base.txt
+black
 nose
 pip-tools
+pylint
 pyinstaller
