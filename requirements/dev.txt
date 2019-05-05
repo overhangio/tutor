@@ -24,7 +24,6 @@ lazy-object-proxy==1.3.1  # via astroid
 macholib==1.11            # via pyinstaller
 markupsafe==1.1.1
 mccabe==0.6.1             # via pylint
-nose==1.3.7
 oauthlib==3.0.1
 pefile==2018.8.8          # via pyinstaller
 pip-tools==3.2.0
