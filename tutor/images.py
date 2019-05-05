@@ -13,38 +13,43 @@ def images_command():
 
 
 OPENEDX_IMAGES = ["openedx", "forum", "notes", "xqueue", "android"]
-VENDOR_IMAGES = ["elasticsearch", "memcached", "mongodb", "mysql", "nginx", "rabbitmq", "smtp"]
+VENDOR_IMAGES = [
+    "elasticsearch",
+    "memcached",
+    "mongodb",
+    "mysql",
+    "nginx",
+    "rabbitmq",
+    "smtp",
+]
 argument_openedx_image = click.argument(
-    "image", type=click.Choice(["all"] + OPENEDX_IMAGES),
+    "image", type=click.Choice(["all"] + OPENEDX_IMAGES)
 )
 argument_image = click.argument(
-    "image", type=click.Choice(["all"] + OPENEDX_IMAGES + VENDOR_IMAGES),
+    "image", type=click.Choice(["all"] + OPENEDX_IMAGES + VENDOR_IMAGES)
 )
 
 
 @click.command(
     short_help="Build docker images",
-    help="Build the docker images necessary for an Open edX platform."
+    help="Build the docker images necessary for an Open edX platform.",
 )
 @opts.root
 @argument_openedx_image
 @click.option(
-    "-a", "--build-arg", multiple=True,
-    help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times."
+    "-a",
+    "--build-arg",
+    multiple=True,
+    help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times.",
 )
 def build(root, image, build_arg):
     config = tutor_config.load(root)
     for img in openedx_image_names(config, image):
         tag = get_tag(config, img)
         click.echo(fmt.info("Building image {}".format(tag)))
-        command = [
-            "build", "-t", tag,
-            tutor_env.pathjoin(root, "build", img)
-        ]
+        command = ["build", "-t", tag, tutor_env.pathjoin(root, "build", img)]
         for arg in build_arg:
-            command += [
-                "--build-arg", arg
-            ]
+            command += ["--build-arg", arg]
         utils.docker(*command)
 
 
@@ -71,10 +76,7 @@ def push(root, image):
 
 def get_tag(config, name):
     image = config["DOCKER_IMAGE_" + name.upper()]
-    return "{registry}{image}".format(
-        registry=config["DOCKER_REGISTRY"],
-        image=image,
-    )
+    return "{registry}{image}".format(registry=config["DOCKER_REGISTRY"], image=image)
 
 
 def image_names(config, image):
@@ -89,10 +91,10 @@ def openedx_image_tags(config, image):
 def openedx_image_names(config, image):
     if image == "all":
         images = OPENEDX_IMAGES[:]
-        if not config['ACTIVATE_XQUEUE']:
-            images.remove('xqueue')
-        if not config['ACTIVATE_NOTES']:
-            images.remove('notes')
+        if not config["ACTIVATE_XQUEUE"]:
+            images.remove("xqueue")
+        if not config["ACTIVATE_NOTES"]:
+            images.remove("notes")
         return images
     return [image]
 
@@ -100,16 +102,16 @@ def openedx_image_names(config, image):
 def vendor_image_names(config, image):
     if image == "all":
         images = VENDOR_IMAGES[:]
-        if not config['ACTIVATE_ELASTICSEARCH']:
-            images.remove('elasticsearch')
-        if not config['ACTIVATE_MEMCACHED']:
-            images.remove('memcached')
-        if not config['ACTIVATE_MONGODB']:
-            images.remove('mongodb')
-        if not config['ACTIVATE_MYSQL']:
-            images.remove('mysql')
-        if not config['ACTIVATE_RABBITMQ']:
-            images.remove('rabbitmq')
+        if not config["ACTIVATE_ELASTICSEARCH"]:
+            images.remove("elasticsearch")
+        if not config["ACTIVATE_MEMCACHED"]:
+            images.remove("memcached")
+        if not config["ACTIVATE_MONGODB"]:
+            images.remove("mongodb")
+        if not config["ACTIVATE_MYSQL"]:
+            images.remove("mysql")
+        if not config["ACTIVATE_RABBITMQ"]:
+            images.remove("rabbitmq")
         return images
     return [image]
 

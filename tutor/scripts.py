@@ -4,6 +4,7 @@ from . import config as tutor_config
 from . import env
 from . import fmt
 
+
 def migrate(root, run_func):
     config = tutor_config.load(root)
 
@@ -31,28 +32,29 @@ def migrate(root, run_func):
         run_template(root, config, "lms", "oauth2.sh", run_func)
     click.echo(fmt.info("Databases ready."))
 
+
 def create_user(root, run_func, superuser, staff, name, email):
-    config = {
-        "OPTS": "",
-        "USERNAME": name,
-        "EMAIL": email,
-    }
+    config = {"OPTS": "", "USERNAME": name, "EMAIL": email}
     if superuser:
         config["OPTS"] += " --superuser"
     if staff:
         config["OPTS"] += " --staff"
     run_template(root, config, "lms", "create_user.sh", run_func)
 
+
 def import_demo_course(root, run_func):
     run_template(root, {}, "cms", "import_demo_course.sh", run_func)
 
+
 def index_courses(root, run_func):
     run_template(root, {}, "cms", "index_courses.sh", run_func)
+
 
 def run_template(root, config, service, template, run_func):
     command = render_template(config, template)
     if command:
         run_func(root, service, command)
+
 
 def render_template(config, template):
     path = env.template_path("scripts", template)

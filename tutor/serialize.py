@@ -1,10 +1,13 @@
 import yaml
 
+
 def load(stream):
     return yaml.load(stream, Loader=yaml.SafeLoader)
 
+
 def dump(content, fileobj):
     yaml.dump(content, fileobj, default_flow_style=False)
+
 
 def parse_value(v):
     """
@@ -16,5 +19,5 @@ def parse_value(v):
     elif v == "null":
         v = None
     elif v in ["true", "false"]:
-        v = (v == "true")
+        v = v == "true"
     return v

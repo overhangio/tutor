@@ -15,7 +15,7 @@ from .__about__ import __version__
 
 @click.group(
     short_help="Configure Open edX",
-    help="""Configure Open edX and store configuration values in $TUTOR_ROOT/config.yml"""
+    help="""Configure Open edX and store configuration values in $TUTOR_ROOT/config.yml""",
 )
 def config_command():
     pass
@@ -44,9 +44,7 @@ def save(root, silent=False, keyvalues=None):
     save_env(root, config)
 
 
-@click.command(
-    help="Print the project root",
-)
+@click.command(help="Print the project root")
 @opts.root
 def printroot(root):
     click.echo(root)
@@ -93,19 +91,25 @@ def pre_upgrade_announcement(root):
     Inform the user that the current environment is not up-to-date. Crash if running in
     non-interactive mode.
     """
-    click.echo(fmt.alert(
-        "The current environment stored at {} is not up-to-date: it is at "
-        "v{} while the 'tutor' binary is at v{}.".format(
-            env.base_dir(root), env.version(root), __version__
+    click.echo(
+        fmt.alert(
+            "The current environment stored at {} is not up-to-date: it is at "
+            "v{} while the 'tutor' binary is at v{}.".format(
+                env.base_dir(root), env.version(root), __version__
+            )
         )
-    ))
+    )
     if os.isatty(sys.stdin.fileno()):
         # Interactive mode: ask the user permission to proceed
-        click.confirm(fmt.question(
-            # every patch you take, every change you make, I'll be watching you
-            "Would you like to upgrade the environment? If you do, any change you"
-            " might have made will be overwritten."
-        ), default=True, abort=True)
+        click.confirm(
+            fmt.question(
+                # every patch you take, every change you make, I'll be watching you
+                "Would you like to upgrade the environment? If you do, any change you"
+                " might have made will be overwritten."
+            ),
+            default=True,
+            abort=True,
+        )
     else:
         # Non-interactive mode with no authorization: abort
         raise exceptions.TutorError(
@@ -171,29 +175,105 @@ def load_interactive(config):
     ask("Your public contact email address", "CONTACT_EMAIL", config)
     ask_choice(
         "The default language code for the platform",
-        "LANGUAGE_CODE", config,
-        ['en', 'am', 'ar', 'az', 'bg-bg', 'bn-bd', 'bn-in', 'bs', 'ca',
-         'ca@valencia', 'cs', 'cy', 'da', 'de-de', 'el', 'en-uk', 'en@lolcat',
-         'en@pirate', 'es-419', 'es-ar', 'es-ec', 'es-es', 'es-mx', 'es-pe',
-         'et-ee', 'eu-es', 'fa', 'fa-ir', 'fi-fi', 'fil', 'fr', 'gl', 'gu',
-         'he', 'hi', 'hr', 'hu', 'hy-am', 'id', 'it-it', 'ja-jp', 'kk-kz',
-         'km-kh', 'kn', 'ko-kr', 'lt-lt', 'ml', 'mn', 'mr', 'ms', 'nb', 'ne',
-         'nl-nl', 'or', 'pl', 'pt-br', 'pt-pt', 'ro', 'ru', 'si', 'sk', 'sl',
-         'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'th', 'tr-tr', 'uk', 'ur', 'vi',
-         'uz', 'zh-cn', 'zh-hk', 'zh-tw'],
+        "LANGUAGE_CODE",
+        config,
+        [
+            "en",
+            "am",
+            "ar",
+            "az",
+            "bg-bg",
+            "bn-bd",
+            "bn-in",
+            "bs",
+            "ca",
+            "ca@valencia",
+            "cs",
+            "cy",
+            "da",
+            "de-de",
+            "el",
+            "en-uk",
+            "en@lolcat",
+            "en@pirate",
+            "es-419",
+            "es-ar",
+            "es-ec",
+            "es-es",
+            "es-mx",
+            "es-pe",
+            "et-ee",
+            "eu-es",
+            "fa",
+            "fa-ir",
+            "fi-fi",
+            "fil",
+            "fr",
+            "gl",
+            "gu",
+            "he",
+            "hi",
+            "hr",
+            "hu",
+            "hy-am",
+            "id",
+            "it-it",
+            "ja-jp",
+            "kk-kz",
+            "km-kh",
+            "kn",
+            "ko-kr",
+            "lt-lt",
+            "ml",
+            "mn",
+            "mr",
+            "ms",
+            "nb",
+            "ne",
+            "nl-nl",
+            "or",
+            "pl",
+            "pt-br",
+            "pt-pt",
+            "ro",
+            "ru",
+            "si",
+            "sk",
+            "sl",
+            "sq",
+            "sr",
+            "sv",
+            "sw",
+            "ta",
+            "te",
+            "th",
+            "tr-tr",
+            "uk",
+            "ur",
+            "vi",
+            "uz",
+            "zh-cn",
+            "zh-hk",
+            "zh-tw",
+        ],
     )
     ask_bool(
-        ("Activate SSL/TLS certificates for HTTPS access? Important note:"
-         "this will NOT work in a development environment."),
-        "ACTIVATE_HTTPS", config
+        (
+            "Activate SSL/TLS certificates for HTTPS access? Important note:"
+            "this will NOT work in a development environment."
+        ),
+        "ACTIVATE_HTTPS",
+        config,
     )
     ask_bool(
         "Activate Student Notes service (https://open.edx.org/features/student-notes)?",
-        "ACTIVATE_NOTES", config
+        "ACTIVATE_NOTES",
+        config,
     )
     ask_bool(
         "Activate Xqueue for external grader services (https://github.com/edx/xqueue)?",
-        "ACTIVATE_XQUEUE", config
+        "ACTIVATE_XQUEUE",
+        config,
     )
 
 
@@ -204,24 +284,21 @@ def load_defaults(config):
             config[k] = v
 
     # Add extra configuration parameters that need to be computed separately
-    config["lms_cms_common_domain"] = utils.common_domain(config["LMS_HOST"], config["CMS_HOST"])
+    config["lms_cms_common_domain"] = utils.common_domain(
+        config["LMS_HOST"], config["CMS_HOST"]
+    )
     config["lms_host_reverse"] = ".".join(config["LMS_HOST"].split(".")[::-1])
 
 
 def ask(question, key, config):
     default = env.render_str(config, config[key])
     config[key] = click.prompt(
-        fmt.question(question),
-        prompt_suffix=" ", default=default, show_default=True,
+        fmt.question(question), prompt_suffix=" ", default=default, show_default=True
     )
 
 
 def ask_bool(question, key, config):
-    return click.confirm(
-        fmt.question(question),
-        prompt_suffix=' ',
-        default=config[key],
-    )
+    return click.confirm(fmt.question(question), prompt_suffix=" ", default=config[key])
 
 
 def ask_choice(question, key, config, choices):
@@ -242,13 +319,19 @@ def convert_json2yml(root):
         return
     if os.path.exists(config_path(root)):
         raise exceptions.TutorError(
-            "Both config.json and config.yml exist in {}: only one of these files must exist to continue".format(root)
+            "Both config.json and config.yml exist in {}: only one of these files must exist to continue".format(
+                root
+            )
         )
     with open(json_path) as fi:
         config = json.load(fi)
         save_config(root, config)
     os.remove(json_path)
-    click.echo(fmt.info("File config.json detected in {} and converted to config.yml".format(root)))
+    click.echo(
+        fmt.info(
+            "File config.json detected in {} and converted to config.yml".format(root)
+        )
+    )
 
 
 def save_config(root, config):

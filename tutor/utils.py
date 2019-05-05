@@ -10,7 +10,9 @@ from . import fmt
 
 
 def random_string(length):
-    return "".join([random.choice(string.ascii_letters + string.digits) for _ in range(length)])
+    return "".join(
+        [random.choice(string.ascii_letters + string.digits) for _ in range(length)]
+    )
 
 
 def common_domain(d1, d2):
@@ -36,13 +38,17 @@ def docker_run(*command):
 
 def docker(*command):
     if shutil.which("docker") is None:
-        raise exceptions.TutorError("docker is not installed. Please follow instructions from https://docs.docker.com/install/")
+        raise exceptions.TutorError(
+            "docker is not installed. Please follow instructions from https://docs.docker.com/install/"
+        )
     return execute("docker", *command)
 
 
 def docker_compose(*command):
     if shutil.which("docker-compose") is None:
-        raise exceptions.TutorError("docker-compose is not installed. Please follow instructions from https://docs.docker.com/compose/install/")
+        raise exceptions.TutorError(
+            "docker-compose is not installed. Please follow instructions from https://docs.docker.com/compose/install/"
+        )
     return execute("docker-compose", *command)
 
 
@@ -66,11 +72,8 @@ def execute(*command):
         except Exception:
             p.kill()
             p.wait()
-            raise exceptions.TutorError("Command failed: {}".format(
-                " ".join(command)
-            ))
+            raise exceptions.TutorError("Command failed: {}".format(" ".join(command)))
         if result > 0:
-            raise exceptions.TutorError("Command failed with status {}: {}".format(
-                result,
-                " ".join(command)
-            ))
+            raise exceptions.TutorError(
+                "Command failed with status {}: {}".format(result, " ".join(command))
+            )
