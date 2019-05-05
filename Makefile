@@ -48,10 +48,11 @@ ci-info: ## Print info about environment
 	python3 --version
 	pip3 --version
 
-ci-bundle: ## Create bundle and run basic tests
+ci-install: ## Install requirements
 	pip3 install -U setuptools
 	pip3 install -r requirements/dev.txt
-	$(MAKE) test
+
+ci-bundle: ## Create bundle and run basic tests
 	$(MAKE) bundle
 	mkdir -p releases/
 	./dist/tutor --version
