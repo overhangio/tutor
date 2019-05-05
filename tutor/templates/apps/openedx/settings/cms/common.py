@@ -11,16 +11,16 @@ VIDEO_TRANSCRIPTS_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
 # Change syslog-based loggers which don't work inside docker containers
 LOGGING["handlers"]["local"] = {
     "class": "logging.handlers.WatchedFileHandler",
-    "filename": "/openedx/logs/edx.log",
+    "filename": os.path.join(LOG_DIR, "all.log"),
     "formatter": "standard",
 }
-
 LOGGING["handlers"]["tracking"] = {
     "level": "DEBUG",
     "class": "logging.handlers.WatchedFileHandler",
-    "filename": "/openedx/logs/tracking.log",
+    "filename": os.path.join(LOG_DIR, "tracking.log"),
     "formatter": "standard",
 }
+LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
 
 LOCALE_PATHS.append("/openedx/locale")
 
