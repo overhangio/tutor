@@ -129,6 +129,22 @@ def run(root, service, command, args):
     docker_compose(root, config, *run_command)
 
 
+@click.command(
+    help="Exec a command in a running container",
+    context_settings={"ignore_unknown_options": True},
+)
+@opts.root
+@click.argument("service")
+@click.argument("command")
+@click.argument("args", nargs=-1, required=False)
+def execute(root, service, command, args):
+    exec_command = ["exec", service, command]
+    if args:
+        exec_command += args
+    config = tutor_config.load(root)
+    docker_compose(root, config, *exec_command)
+
+
 @click.command(help="Create databases and run database migrations")
 @opts.root
 def databases(root):
@@ -353,6 +369,7 @@ local.add_command(start)
 local.add_command(stop)
 local.add_command(restart)
 local.add_command(run)
+local.add_command(execute, name="exec")
 local.add_command(databases)
 local.add_command(https)
 local.add_command(logs)
