@@ -3,21 +3,26 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: cms-data
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: cms-data
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 2Gi
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: lms-data
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: lms-data
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 2Gi
@@ -27,6 +32,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: elasticsearch
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: elasticearch
 spec:
   accessModes:
     - ReadWriteOnce
@@ -40,6 +48,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: mysql
 spec:
   accessModes:
     - ReadWriteOnce
@@ -47,23 +58,31 @@ spec:
     requests:
       storage: 5Gi
 {% endif %}
+{% if ACTIVATE_NOTES %}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: openedx-staticfiles
+  name: notes-data
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: notes-data
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
+{% endif %}
 {% if ACTIVATE_RABBITMQ %}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rabbitmq
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: rabbitmq
 spec:
   accessModes:
     - ReadWriteOnce

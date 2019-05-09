@@ -5,9 +5,7 @@ metadata:
   name: web
 spec:
   rules:
-  {% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}
-  {% if ACTIVATE_NOTES %}{% set hosts = hosts + [NOTES_HOST] %}{% endif %}
-  {% for host in hosts %}
+  {% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}{% if ACTIVATE_NOTES %}{% set hosts = hosts + [NOTES_HOST] %}{% endif %}{% for host in hosts %}
   - host: {{ host }}
     http:
       paths:

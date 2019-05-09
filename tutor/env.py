@@ -28,6 +28,7 @@ class Renderer:
             environment.filters["random_string"] = utils.random_string
             environment.filters["common_domain"] = utils.common_domain
             environment.filters["reverse_host"] = utils.reverse_host
+            environment.filters["walk_templates"] = walk_templates
             environment.globals["TUTOR_VERSION"] = __version__
             cls.ENVIRONMENT = environment
 
@@ -97,6 +98,7 @@ def render_full(root, config):
         save_subdir(subdir, root, config)
     copy_subdir("build", root)
     save_file(VERSION_FILENAME, root, config)
+    save_file("kustomization.yml", root, config)
 
 
 def save_subdir(subdir, root, config):
