@@ -9,7 +9,7 @@ spec:
     - port: 8000
       protocol: TCP
   selector:
-    app: cms
+    app.kubernetes.io/name: cms
 {% if ACTIVATE_FORUM %}
 ---
 apiVersion: v1
@@ -22,7 +22,7 @@ spec:
     - port: 4567
       protocol: TCP
   selector:
-    app: forum
+    app.kubernetes.io/name: forum
 {% endif %}
 ---
 apiVersion: v1
@@ -35,7 +35,7 @@ spec:
     - port: 8000
       protocol: TCP
   selector:
-    app: lms
+    app.kubernetes.io/name: lms
 {% if ACTIVATE_ELASTICSEARCH %}
 ---
 apiVersion: v1
@@ -48,7 +48,7 @@ spec:
     - port: 9200
       protocol: TCP
   selector:
-    app: elasticsearch
+    app.kubernetes.io/name: elasticsearch
 {% endif %}
 {% if ACTIVATE_MEMCACHED %}
 ---
@@ -62,7 +62,7 @@ spec:
     - port: 11211
       protocol: TCP
   selector:
-    app: memcached
+    app.kubernetes.io/name: memcached
 {% endif %}
 {% if ACTIVATE_MONGODB %}
 ---
@@ -76,7 +76,7 @@ spec:
     - port: 27017
       protocol: TCP
   selector:
-    app: mongodb
+    app.kubernetes.io/name: mongodb
 {% endif %}
 {% if ACTIVATE_MYSQL %}
 ---
@@ -90,7 +90,7 @@ spec:
     - port: 3306
       protocol: TCP
   selector:
-    app: mysql
+    app.kubernetes.io/name: mysql
 {% endif %}
 ---
 apiVersion: v1
@@ -101,15 +101,25 @@ spec:
   type: NodePort
   ports:
     - port: 80
-      protocol: TCP
       name: http
-      targetPort: http-port
     - port: 443
-      protocol: TCP
       name: https
-      targetPort: https-port
   selector:
-    app: nginx
+    app.kubernetes.io/name: nginx
+{% if ACTIVATE_FORUM %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notes
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: notes
+{% endif %}
 {% if ACTIVATE_RABBITMQ %}
 ---
 apiVersion: v1
@@ -122,7 +132,7 @@ spec:
     - port: 5672
       protocol: TCP
   selector:
-    app: rabbitmq
+    app.kubernetes.io/name: rabbitmq
 {% endif %}
 {% if ACTIVATE_SMTP %}
 ---
@@ -136,5 +146,5 @@ spec:
     - port: 25
       protocol: TCP
   selector:
-    app: smtp
+    app.kubernetes.io/name: smtp
 {% endif %}

@@ -1,0 +1,274 @@
+{% macro include_script(script) %}{% include script %}{% endmacro %}---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: createdatabases
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: create_databases.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: create_databases.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mysql-client
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/create_databases.sh")|indent(12) }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migratecms
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: migrate_cms.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: migrate_cms.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: cms
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/migrate_cms.sh")|indent(12) }}
+        volumeMounts:
+          - mountPath: /openedx/edx-platform/lms/envs/tutor/
+            name: settings-lms
+          - mountPath: /openedx/edx-platform/cms/envs/tutor/
+            name: settings-cms
+          - mountPath: /openedx/config
+            name: config
+      volumes:
+      - name: settings-lms
+        configMap:
+          name: openedx-settings-lms
+      - name: settings-cms
+        configMap:
+          name: openedx-settings-cms
+      - name: config
+        configMap:
+          name: openedx-config
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migratelms
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: migrate_lms.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: migrate_lms.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: lms
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/migrate_lms.sh")|indent(12) }}
+        volumeMounts:
+          - mountPath: /openedx/edx-platform/lms/envs/tutor/
+            name: settings-lms
+          - mountPath: /openedx/edx-platform/cms/envs/tutor/
+            name: settings-cms
+          - mountPath: /openedx/config
+            name: config
+      volumes:
+      - name: settings-lms
+        configMap:
+          name: openedx-settings-lms
+      - name: settings-cms
+        configMap:
+          name: openedx-settings-cms
+      - name: config
+        configMap:
+          name: openedx-config
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: oauth2
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: oauth2.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: oauth2.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: lms
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/oauth2.sh")|indent(12) }}
+        volumeMounts:
+          - mountPath: /openedx/edx-platform/lms/envs/tutor/
+            name: settings-lms
+          - mountPath: /openedx/edx-platform/cms/envs/tutor/
+            name: settings-cms
+          - mountPath: /openedx/config
+            name: config
+      volumes:
+      - name: settings-lms
+        configMap:
+          name: openedx-settings-lms
+      - name: settings-cms
+        configMap:
+          name: openedx-settings-cms
+      - name: config
+        configMap:
+          name: openedx-config
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: importdemocourse
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: import_demo_course.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: import_demo_course.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: lms
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/import_demo_course.sh")|indent(12) }}
+        volumeMounts:
+          - mountPath: /openedx/edx-platform/lms/envs/tutor/
+            name: settings-lms
+          - mountPath: /openedx/edx-platform/cms/envs/tutor/
+            name: settings-cms
+          - mountPath: /openedx/config
+            name: config
+          - mountPath: /openedx/data
+            name: data
+      volumes:
+      - name: settings-lms
+        configMap:
+          name: openedx-settings-lms
+      - name: settings-cms
+        configMap:
+          name: openedx-settings-cms
+      - name: config
+        configMap:
+          name: openedx-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: lms-data
+{% if ACTIVATE_FORUM %}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrateforum
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: migrate_forum.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: migrate_forum.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: forum
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/migrate_forum.sh")|indent(12) }}
+        env:
+          - name: SEARCH_SERVER
+            value: "http://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
+          - name: MONGOHQ_URL
+            value: "mongodb://{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}{{ MONGODB_HOST }}:{{ MONGODB_PORT }}/cs_comments_service"
+{% endif %}
+{% if ACTIVATE_NOTES %}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migratenotes
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: migrate_notes.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: migrate_notes.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: notes
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NOTES }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/migrate_notes.sh")|indent(12) }}
+        volumeMounts:
+          - mountPath: /openedx/edx-notes-api/notesserver/settings/tutor.py
+            name: settings
+      volumes:
+        - name: settings
+          configMap:
+            name: notes-settings
+{% endif %}
+{% if ACTIVATE_XQUEUE %}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migratexqueue
+  labels:
+    app.kubernetes.io/component: script
+    app.kubernetes.io/name: migrate_xqueue.sh
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: migrate_xqueue.sh
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: xqueue
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NOTES }}
+        command:  ["/bin/sh", "-e", "-c"]
+        args: 
+          - |
+            {{ include_script("scripts/migrate_xqueue.sh")|indent(12) }}
+        volumeMounts:
+          - mountPath: /openedx/xqueue/xqueue/tutor.py
+            name: settings
+      volumes:
+        - name: settings
+          configMap:
+            name: notes-settings
+{% endif %}

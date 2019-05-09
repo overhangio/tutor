@@ -46,10 +46,10 @@ def migrate(runner):
         runner.run("forum", "migrate_forum.sh")
     if runner.is_activated("notes"):
         fmt.echo_info("Running notes migrations...")
-        runner.run("notes", "migrate_django.sh")
+        runner.run("notes", "migrate_notes.sh")
     if runner.is_activated("xqueue"):
         fmt.echo_info("Running xqueue migrations...")
-        runner.run("xqueue", "migrate_django.sh")
+        runner.run("xqueue", "migrate_xqueue.sh")
     if runner.is_activated("lms"):
         fmt.echo_info("Creating oauth2 users...")
         runner.run("lms", "oauth2.sh")
