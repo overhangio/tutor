@@ -1,7 +1,4 @@
-import os
-import subprocess
 from textwrap import indent
-from time import sleep
 
 import click
 
@@ -148,40 +145,7 @@ def execute(root, service, command, args):
 @click.command(help="Create databases and run database migrations")
 @opts.root
 def databases(root):
-    init_mysql(root)
     scripts.migrate(root, run_sh)
-
-
-def init_mysql(root):
-    config = tutor_config.load(root)
-    if not config["ACTIVATE_MYSQL"]:
-        return
-    mysql_data_path = tutor_env.data_path(root, "mysql", "mysql")
-    if os.path.exists(mysql_data_path):
-        return
-    click.echo(fmt.info("Initializing MySQL database..."))
-    docker_compose(root, config, "up", "-d", "mysql")
-    while True:
-        click.echo(fmt.info("    waiting for mysql initialization"))
-        # TODO this is duplicate code with the docker_compose function. We
-        # should rely on a dedicated function in utils module.
-        mysql_logs = subprocess.check_output(
-            [
-                "docker-compose",
-                "-f",
-                tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-                "--project-name",
-                config["LOCAL_PROJECT_NAME"],
-                "logs",
-                "mysql",
-            ]
-        )
-        # pylint: disable=unsupported-membership-test
-        if b"MySQL init process done. Ready for start up." in mysql_logs:
-            click.echo(fmt.info("MySQL database initialized"))
-            docker_compose(root, config, "stop", "mysql")
-            return
-        sleep(4)
 
 
 @click.group(help="Manage https certificates")

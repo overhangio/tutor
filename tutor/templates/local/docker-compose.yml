@@ -28,6 +28,12 @@ services:
       - ../../data/mysql:/var/lib/mysql
     env_file: ../apps/mysql/auth.env
   {% endif %}
+  mysql-client:
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+    command: echo "mysql client ready"
+    restart: "no"
+    {% if ACTIVATE_MYSQL %}depends_on:
+      - mysql{% endif %}
 
   {% if ACTIVATE_ELASTICSEARCH %}
   elasticsearch:
