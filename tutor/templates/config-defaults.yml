@@ -1,13 +1,33 @@
 ---
+# These configuration values must be stored in the user's config.yml.
+LMS_HOST: "www.myopenedx.com"
+CMS_HOST: "studio.{{ LMS_HOST }}"
+CONTACT_EMAIL: "contact@{{ LMS_HOST }}"
+SECRET_KEY: "{{ 24|random_string }}"
+MYSQL_ROOT_PASSWORD: "{{ 8|random_string }}"
+OPENEDX_MYSQL_PASSWORD: "{{ 8|random_string }}"
+NOTES_MYSQL_PASSWORD: "{{ 8|random_string }}"
+NOTES_SECRET_KEY: "{{ 24|random_string }}"
+NOTES_OAUTH2_SECRET: "{{ 24|random_string }}"
+XQUEUE_AUTH_PASSWORD: "{{ 8|random_string }}"
+XQUEUE_MYSQL_PASSWORD: "{{ 8|random_string }}"
+XQUEUE_SECRET_KEY: "{{ 24|random_string }}"
+ANDROID_OAUTH2_SECRET: "{{ 24|random_string }}"
+ID: "{{ 24|random_string }}"
+
+# The following are default values
 ACTIVATE_LMS: true
 ACTIVATE_CMS: true
 ACTIVATE_FORUM: true
 ACTIVATE_ELASTICSEARCH: true
+ACTIVATE_HTTPS: false
 ACTIVATE_MEMCACHED: true
 ACTIVATE_MONGODB: true
 ACTIVATE_MYSQL: true
+ACTIVATE_NOTES: false
 ACTIVATE_RABBITMQ: true
 ACTIVATE_SMTP: true
+ACTIVATE_XQUEUE: false
 ANDROID_RELEASE_STORE_PASSWORD: "android store password"
 ANDROID_RELEASE_KEY_PASSWORD: "android release key password"
 ANDROID_RELEASE_KEY_ALIAS: "android release key alias"
@@ -28,6 +48,7 @@ LOCAL_PROJECT_NAME: "tutor_local"
 ELASTICSEARCH_HOST: "elasticsearch"
 ELASTICSEARCH_PORT: 9200
 FORUM_HOST: "forum"
+LANGUAGE_CODE: "en"
 MEMCACHED_HOST: "memcached"
 MEMCACHED_PORT: 11211
 MONGODB_HOST: "mongodb"
@@ -44,6 +65,7 @@ NGINX_HTTPS_PORT: 443
 NOTES_HOST: "notes.{{ LMS_HOST }}"
 NOTES_MYSQL_DATABASE: "notes"
 NOTES_MYSQL_USERNAME: "notes"
+PLATFORM_NAME: "My Open edX"
 RABBITMQ_HOST: "rabbitmq"
 RABBITMQ_USERNAME: ""
 RABBITMQ_PASSWORD: ""

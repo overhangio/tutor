@@ -19,20 +19,42 @@ class Renderer:
     @classmethod
     def environment(cls):
         if not cls.ENVIRONMENT:
-            cls.ENVIRONMENT = jinja2.Environment(
+            environment = jinja2.Environment(
                 loader=jinja2.FileSystemLoader(TEMPLATES_ROOT),
                 undefined=jinja2.StrictUndefined,
             )
+            environment.filters["random_string"] = utils.random_string
+            environment.filters["common_domain"] = utils.random_string
+            environment.filters["reverse_host"] = utils.reverse_host
+            cls.ENVIRONMENT = environment
+
         return cls.ENVIRONMENT
 
     @classmethod
+    def reset(cls):
+        cls.ENVIRONMENT = None
+
+    @classmethod
     def render_str(cls, config, text):
-        template_globals = dict(
-            RAND8=utils.random_string(8), RAND24=utils.random_string(24), **config
-        )
-        template = cls.environment().from_string(text, globals=template_globals)
+        template = cls.environment().from_string(text)
+        return cls.__render(template, config)
+
+    @classmethod
+    def render_file(cls, config, path):
+        template = cls.environment().get_template(path)
         try:
-            return template.render()
+            return cls.__render(template, config)
+        except (jinja2.exceptions.TemplateError, exceptions.TutorError):
+            print("Error rendering template", path)
+            raise
+        except Exception:
+            print("Unknown error rendering template", path)
+            raise
+
+    @classmethod
+    def __render(cls, template, config):
+        try:
+            return template.render(**config)
         except jinja2.exceptions.UndefinedError as e:
             raise exceptions.TutorError(
                 "Missing configuration value: {}".format(e.args[0])
@@ -58,36 +80,16 @@ def render_subdir(subdir, root, config):
     for path in walk_templates(subdir):
         dst = pathjoin(root, path)
         rendered = render_file(config, path)
-        ensure_file_directory_exists(dst)
+        utils.ensure_file_directory_exists(dst)
         with open(dst, "w") as of:
             of.write(rendered)
-
-
-def ensure_file_directory_exists(path):
-    """
-    Create file's base directory if it does not exist.
-    """
-    directory = os.path.dirname(path)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
 
 
 def render_file(config, *path):
     """
     Return the rendered contents of a template.
-    TODO refactor this and move it to Renderer
     """
-    with codecs.open(template_path(*path), encoding="utf-8") as fi:
-        try:
-            return render_str(config, fi.read())
-        except jinja2.exceptions.UndefinedError:
-            raise
-        except jinja2.exceptions.TemplateError:
-            print("Error rendering template", path)
-            raise
-        except Exception:
-            print("Unknown error rendering template", path)
-            raise
+    return Renderer.render_file(config, os.path.join(*path))
 
 
 def render_dict(config):
@@ -128,7 +130,7 @@ def copy_subdir(subdir, root):
     for path in walk_templates(subdir):
         src = os.path.join(TEMPLATES_ROOT, path)
         dst = pathjoin(root, path)
-        ensure_file_directory_exists(dst)
+        utils.ensure_file_directory_exists(dst)
         shutil.copy(src, dst)
 
 

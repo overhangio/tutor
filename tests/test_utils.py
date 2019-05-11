@@ -18,6 +18,9 @@ class UtilsTests(unittest.TestCase):
             "domain.com", utils.common_domain("sub.domain.com", "ub.domain.com")
         )
 
+    def test_reverse_host(self):
+        self.assertEqual("com.google.www", utils.reverse_host("www.google.com"))
+
 
 class SerializeTests(unittest.TestCase):
     def test_parse_value(self):

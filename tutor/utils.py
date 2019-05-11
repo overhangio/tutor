@@ -1,3 +1,4 @@
+import os
 import random
 import shutil
 import string
@@ -7,6 +8,15 @@ import click
 
 from . import exceptions
 from . import fmt
+
+
+def ensure_file_directory_exists(path):
+    """
+    Create file's base directory if it does not exist.
+    """
+    directory = os.path.dirname(path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
 def random_string(length):
@@ -30,6 +40,15 @@ def common_domain(d1, d2):
         else:
             break
     return ".".join(common[::-1])
+
+
+def reverse_host(domain):
+    """
+    Return the reverse domain name, java-style.
+
+    Ex: "www.google.com" -> "com.google.www"
+    """
+    return ".".join(domain.split(".")[::-1])
 
 
 def docker_run(*command):

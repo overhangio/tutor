@@ -33,14 +33,14 @@ def save_command(root, silent1, silent2, set_):
 
 def save(root, silent=False, keyvalues=None):
     keyvalues = keyvalues or []
-    config = load_current(root)
+    defaults = load_defaults()
+    config = load_current(root, defaults)
     for k, v in keyvalues:
         config[k] = v
     if not silent:
-        load_interactive(config)
+        load_interactive(config, defaults)
     save_config(root, config)
-
-    load_defaults(config)
+    merge(config, defaults)
     save_env(root, config)
 
 
@@ -54,8 +54,9 @@ def printroot(root):
 @opts.root
 @click.argument("key")
 def printvalue(root, key):
-    config = load_current(root)
-    load_defaults(config)
+    defaults = load_defaults()
+    config = load_current(root, defaults)
+    merge(config, defaults)
     try:
         print(config[key])
     except KeyError:
@@ -67,15 +68,15 @@ def load(root):
     Load configuration, and generate it interactively if the file does not
     exist.
     """
-    config = load_current(root)
+    defaults = load_defaults()
+    config = load_current(root, defaults)
 
     should_update_env = False
     if not os.path.exists(config_path(root)):
-        load_interactive(config)
+        load_interactive(config, defaults)
         should_update_env = True
         save_config(root, config)
 
-    load_defaults(config)
     if not env.is_up_to_date(root):
         should_update_env = True
         pre_upgrade_announcement(root)
@@ -120,40 +121,55 @@ def pre_upgrade_announcement(root):
         )
 
 
-def load_current(root):
+def load_current(root, defaults):
     convert_json2yml(root)
-    config = {}
-    load_base(config)
-    load_user(config, root)
-    load_env(config)
+    config = load_user(root)
+    load_env(config, defaults)
+    load_required(config, defaults)
     return config
 
 
-def load_base(config):
-    base = serialize.load(env.read("config-base.yml"))
-    for k, v in base.items():
-        config[k] = v
+def load_user(root):
+    path = config_path(root)
+    if not os.path.exists(path):
+        return {}
+
+    with open(path) as fi:
+        config = serialize.load(fi.read())
+    upgrade_obsolete(config)
+    return config
 
 
-def load_env(config):
-    base_config = serialize.load(env.read("config-base.yml"))
-    default_config = serialize.load(env.read("config-defaults.yml"))
-    keys = set(list(base_config.keys()) + list(default_config.keys()))
-
-    for k in keys:
+def load_env(config, defaults):
+    for k in defaults.keys():
         env_var = "TUTOR_" + k
         if env_var in os.environ:
             config[k] = serialize.parse_value(os.environ[env_var])
 
 
-def load_user(config, root):
-    path = config_path(root)
-    if os.path.exists(path):
-        with open(path) as fi:
-            loaded = serialize.load(fi.read())
-        for key, value in loaded.items():
-            config[key] = value
-    upgrade_obsolete(config)
+def load_required(config, defaults):
+    """
+    All these keys must be present in the user's config.yml. This includes all important
+    values, such as LMS_HOST, and randomly-generated values, such as passwords.
+    """
+    for key in [
+        "LMS_HOST",
+        "CMS_HOST",
+        "CONTACT_EMAIL",
+        "SECRET_KEY",
+        "MYSQL_ROOT_PASSWORD",
+        "OPENEDX_MYSQL_PASSWORD",
+        "NOTES_MYSQL_PASSWORD",
+        "NOTES_SECRET_KEY",
+        "NOTES_OAUTH2_SECRET",
+        "XQUEUE_AUTH_PASSWORD",
+        "XQUEUE_MYSQL_PASSWORD",
+        "XQUEUE_SECRET_KEY",
+        "ANDROID_OAUTH2_SECRET",
+        "ID",
+    ]:
+        if key not in config:
+            config[key] = env.render_str(config, defaults[key])
 
 
 def upgrade_obsolete(config):
@@ -168,15 +184,16 @@ def upgrade_obsolete(config):
         config["OPENEDX_MYSQL_USERNAME"] = config.pop("MYSQL_USERNAME")
 
 
-def load_interactive(config):
-    ask("Your website domain name for students (LMS)", "LMS_HOST", config)
-    ask("Your website domain name for teachers (CMS)", "CMS_HOST", config)
-    ask("Your platform name/title", "PLATFORM_NAME", config)
-    ask("Your public contact email address", "CONTACT_EMAIL", config)
+def load_interactive(config, defaults):
+    ask("Your website domain name for students (LMS)", "LMS_HOST", config, defaults)
+    ask("Your website domain name for teachers (CMS)", "CMS_HOST", config, defaults)
+    ask("Your platform name/title", "PLATFORM_NAME", config, defaults)
+    ask("Your public contact email address", "CONTACT_EMAIL", config, defaults)
     ask_choice(
         "The default language code for the platform",
         "LANGUAGE_CODE",
         config,
+        defaults,
         [
             "en",
             "am",
@@ -264,47 +281,40 @@ def load_interactive(config):
         ),
         "ACTIVATE_HTTPS",
         config,
+        defaults,
     )
     ask_bool(
         "Activate Student Notes service (https://open.edx.org/features/student-notes)?",
         "ACTIVATE_NOTES",
         config,
+        defaults,
     )
     ask_bool(
         "Activate Xqueue for external grader services (https://github.com/edx/xqueue)?",
         "ACTIVATE_XQUEUE",
         config,
+        defaults,
     )
 
 
-def load_defaults(config):
-    defaults = serialize.load(env.read("config-defaults.yml"))
-    for k, v in defaults.items():
-        if k not in config:
-            config[k] = v
-
-    # Add extra configuration parameters that need to be computed separately
-    config["lms_cms_common_domain"] = utils.common_domain(
-        config["LMS_HOST"], config["CMS_HOST"]
-    )
-    config["lms_host_reverse"] = ".".join(config["LMS_HOST"].split(".")[::-1])
+def load_defaults():
+    return serialize.load(env.read("config.yml"))
 
 
-def ask(question, key, config):
-    default = env.render_str(config, config[key])
+def ask(question, key, config, defaults):
+    default = env.render_str(config, config.get(key, defaults[key]))
     config[key] = click.prompt(
         fmt.question(question), prompt_suffix=" ", default=default, show_default=True
     )
 
 
-def ask_bool(question, key, config):
-    config[key] = click.confirm(
-        fmt.question(question), prompt_suffix=" ", default=config[key]
-    )
+def ask_bool(question, key, config, defaults):
+    default = config.get(key, defaults[key])
+    config[key] = click.confirm(fmt.question(question), prompt_suffix=" ", default=default)
 
 
-def ask_choice(question, key, config, choices):
-    default = config[key]
+def ask_choice(question, key, config, defaults, choices):
+    default = config.get(key, defaults[key])
     answer = click.prompt(
         fmt.question(question),
         type=click.Choice(choices),
@@ -337,11 +347,8 @@ def convert_json2yml(root):
 
 
 def save_config(root, config):
-    env.render_dict(config)
     path = config_path(root)
-    directory = os.path.dirname(path)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    utils.ensure_file_directory_exists(path)
     with open(path, "w") as of:
         serialize.dump(config, of)
     click.echo(fmt.info("Configuration saved to {}".format(path)))
