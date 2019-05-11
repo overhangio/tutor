@@ -4,13 +4,13 @@ import sys
 
 import click
 
-from . import exceptions
-from . import env
-from . import fmt
-from . import opts
-from . import serialize
-from . import utils
-from .__about__ import __version__
+from .. import exceptions
+from .. import env
+from .. import fmt
+from .. import opts
+from .. import serialize
+from .. import utils
+from ..__about__ import __version__
 
 
 @click.group(

@@ -39,7 +39,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'tutor=tutor.cli:main',
+            'tutor=tutor.commands.cli:main',
         ],
     },
     classifiers=[

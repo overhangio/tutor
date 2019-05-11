@@ -1,12 +1,12 @@
 import click
 
 from . import config as tutor_config
-from . import env as tutor_env
-from . import exceptions
-from . import fmt
-from . import opts
-from . import scripts
-from . import utils
+from .. import env as tutor_env
+from .. import exceptions
+from .. import fmt
+from .. import opts
+from .. import scripts
+from .. import utils
 
 
 @click.group(help="Run Open edX on Kubernetes [BETA FEATURE]")
@@ -99,7 +99,8 @@ def delete(yes):
 @click.command(help="Create databases and run database migrations")
 @opts.root
 def databases(root):
-    scripts.migrate(root, run_sh)
+    config = tutor_config.load(root)
+    scripts.migrate(root, config, run_sh)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")

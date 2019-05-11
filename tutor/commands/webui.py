@@ -10,10 +10,10 @@ import click
 
 # Note: it is important that this module does not depend on config, such that
 # the web ui can be launched even where there is no configuration.
-from . import fmt
-from . import opts
-from . import env as tutor_env
-from . import serialize
+from .. import fmt
+from .. import opts
+from .. import env as tutor_env
+from .. import serialize
 
 
 @click.group(

@@ -72,11 +72,12 @@ def ensure_file_directory_exists(path):
         os.makedirs(directory)
 
 
-def render_file(config, path):
+def render_file(config, *path):
     """
     Return the rendered contents of a template.
+    TODO refactor this and move it to Renderer
     """
-    with codecs.open(path, encoding="utf-8") as fi:
+    with codecs.open(template_path(*path), encoding="utf-8") as fi:
         try:
             return render_str(config, fi.read())
         except jinja2.exceptions.UndefinedError:

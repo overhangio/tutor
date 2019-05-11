@@ -1,13 +1,10 @@
 import click
 
-from . import config as tutor_config
 from . import env
 from . import fmt
 
 
-def migrate(root, run_func):
-    config = tutor_config.load(root)
-
+def migrate(root, config, run_func):
     click.echo(fmt.info("Creating all databases..."))
     run_script(root, config, "mysql-client", "create_databases.sh", run_func)
 
@@ -50,6 +47,10 @@ def index_courses(root, run_func):
 
 
 def run_script(root, config, service, template, run_func):
-    command = env.render_file(config, "script", template).strip()
+    command = render_template(config, template)
     if command:
         run_func(root, service, command)
+
+
+def render_template(config, template):
+    return env.render_file(config, "scripts", template).strip()

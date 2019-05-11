@@ -1,7 +1,7 @@
 import unittest
 import unittest.mock
 
-from tutor.config import load_defaults
+from tutor.commands.config import load_defaults
 from tutor import env
 from tutor import scripts
 
@@ -9,8 +9,8 @@ from tutor import scripts
 class ScriptsTests(unittest.TestCase):
     def test_run_script(self):
         config = {}
-        load_defaults({})
-        rendered_script = env.render_file("scripts", "create_databases.sh")
+        load_defaults(config)
+        rendered_script = env.render_file(config, "scripts", "create_databases.sh")
         with unittest.mock.Mock() as run_func:
             scripts.run_script(
                 "/tmp", config, "someservice", "create_databases.sh", run_func

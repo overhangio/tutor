@@ -4,7 +4,6 @@ import sys
 import click
 import click_repl
 
-from .__about__ import __version__
 from .android import android
 from .config import config_command
 from .dev import dev
@@ -13,8 +12,9 @@ from .k8s import k8s
 from .local import local
 from .ui import ui
 from .webui import webui
-from . import exceptions
-from . import fmt
+from ..__about__ import __version__
+from .. import exceptions
+from .. import fmt
 
 
 def main():

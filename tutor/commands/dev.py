@@ -2,9 +2,9 @@ import subprocess
 
 import click
 
-from . import env as tutor_env
-from . import opts
-from . import utils
+from .. import env as tutor_env
+from .. import opts
+from .. import utils
 
 
 @click.group(help="Run Open edX platform with development settings")
