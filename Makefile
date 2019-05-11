@@ -10,7 +10,7 @@ compile-requirements: ## Compile requirements files
 test: test-lint test-unit test-format ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
-	black --check --diff tutor
+	black --check --diff ./tutor ./tests
 
 test-lint: ## Run code linting tests
 	pylint --errors-only tutor
@@ -19,7 +19,7 @@ test-unit: ## Run unit tests
 	python3 -m unittest discover tests
 
 format: ## Format code automatically
-	black ./tutor
+	black ./tutor ./tests
 
 ###### Deployment
 
