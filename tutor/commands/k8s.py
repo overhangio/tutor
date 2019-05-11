@@ -116,9 +116,9 @@ def createuser(root, superuser, staff, name, email):
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
-    click.echo(fmt.info("Importing demo course"))
+    fmt.echo_info("Importing demo course")
     scripts.import_demo_course(root, run_sh)
-    click.echo(fmt.info("Re-indexing courses"))
+    fmt.echo_info("Re-indexing courses")
     indexcourses.callback(root)
 
 

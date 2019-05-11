@@ -5,28 +5,28 @@ from . import fmt
 
 
 def migrate(root, config, run_func):
-    click.echo(fmt.info("Creating all databases..."))
+    fmt.echo_info("Creating all databases...")
     run_script(root, config, "mysql-client", "create_databases.sh", run_func)
 
     if config["ACTIVATE_LMS"]:
-        click.echo(fmt.info("Running lms migrations..."))
+        fmt.echo_info("Running lms migrations...")
         run_script(root, config, "lms", "migrate_lms.sh", run_func)
     if config["ACTIVATE_CMS"]:
-        click.echo(fmt.info("Running cms migrations..."))
+        fmt.echo_info("Running cms migrations...")
         run_script(root, config, "cms", "migrate_cms.sh", run_func)
     if config["ACTIVATE_FORUM"]:
-        click.echo(fmt.info("Running forum migrations..."))
+        fmt.echo_info("Running forum migrations...")
         run_script(root, config, "forum", "migrate_forum.sh", run_func)
     if config["ACTIVATE_NOTES"]:
-        click.echo(fmt.info("Running notes migrations..."))
+        fmt.echo_info("Running notes migrations...")
         run_script(root, config, "notes", "migrate_django.sh", run_func)
     if config["ACTIVATE_XQUEUE"]:
-        click.echo(fmt.info("Running xqueue migrations..."))
+        fmt.echo_info("Running xqueue migrations...")
         run_script(root, config, "xqueue", "migrate_django.sh", run_func)
     if config["ACTIVATE_LMS"]:
-        click.echo(fmt.info("Creating oauth2 users..."))
+        fmt.echo_info("Creating oauth2 users...")
         run_script(root, config, "lms", "oauth2.sh", run_func)
-    click.echo(fmt.info("Databases ready."))
+    fmt.echo_info("Databases ready.")
 
 
 def create_user(root, run_func, superuser, staff, name, email):

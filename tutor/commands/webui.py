@@ -38,7 +38,7 @@ def webui():
 )
 def start(root, port, host):
     check_gotty_binary(root)
-    click.echo(fmt.info("Access the Tutor web UI at http://{}:{}".format(host, port)))
+    fmt.echo_info("Access the Tutor web UI at http://{}:{}".format(host, port))
     while True:
         config = load_config(root)
         user = config["user"]
@@ -57,10 +57,8 @@ def start(root, port, host):
             credential = "{}:{}".format(user, password)
             command += ["--credential", credential]
         else:
-            click.echo(
-                fmt.alert(
-                    "Running web UI without user authentication. Run 'tutor webui configure' to setup authentication"
-                )
+            fmt.echo_alert(
+                "Running web UI without user authentication. Run 'tutor webui configure' to setup authentication"
             )
         command += [sys.argv[0], "ui"]
         p = subprocess.Popen(command)
@@ -91,12 +89,10 @@ def start(root, port, host):
 )
 def configure(root, user, password):
     save_config(root, {"user": user, "password": password})
-    click.echo(
-        fmt.info(
-            "The web UI configuration has been updated. "
-            "If at any point you wish to reset your username and password, "
-            "just delete the following file:\n\n    {}".format(config_path(root))
-        )
+    fmt.echo_info(
+        "The web UI configuration has been updated. "
+        "If at any point you wish to reset your username and password, "
+        "just delete the following file:\n\n    {}".format(config_path(root))
     )
 
 
@@ -104,7 +100,7 @@ def check_gotty_binary(root):
     path = gotty_path(root)
     if os.path.exists(path):
         return
-    click.echo(fmt.info("Downloading gotty to {}...".format(path)))
+    fmt.echo_info("Downloading gotty to {}...".format(path))
 
     # Generate release url
     # Note: I don't know how to handle arm

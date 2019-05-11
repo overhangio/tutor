@@ -49,7 +49,7 @@ def build(root, image, no_cache, build_arg):
     config = tutor_config.load(root)
     for img in openedx_image_names(config, image):
         tag = get_tag(config, img)
-        click.echo(fmt.info("Building image {}".format(tag)))
+        fmt.echo_info("Building image {}".format(tag))
         command = ["build", "-t", tag, tutor_env.pathjoin(root, "build", img)]
         if no_cache:
             command.append("--no-cache")
@@ -65,7 +65,7 @@ def pull(root, image):
     config = tutor_config.load(root)
     for img in image_names(config, image):
         tag = get_tag(config, img)
-        click.echo(fmt.info("Pulling image {}".format(tag)))
+        fmt.echo_info("Pulling image {}".format(tag))
         utils.execute("docker", "pull", tag)
 
 
@@ -75,7 +75,7 @@ def pull(root, image):
 def push(root, image):
     config = tutor_config.load(root)
     for tag in openedx_image_tags(config, image):
-        click.echo(fmt.info("Pushing image {}".format(tag)))
+        fmt.echo_info("Pushing image {}".format(tag))
         utils.execute("docker", "push", tag)
 
 

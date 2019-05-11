@@ -20,8 +20,9 @@ class ConfigTests(unittest.TestCase):
             tutor_config.merge(config, defaults)
 
         self.assertEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
-
-    def test_save_twice(self):
+    
+    @unittest.mock.patch.object(tutor_config.fmt, "echo")
+    def test_save_twice(self, mock_echo):
         with tempfile.TemporaryDirectory() as root:
             tutor_config.save(root, silent=True)
             config1 = tutor_config.load_user(root)
@@ -31,7 +32,8 @@ class ConfigTests(unittest.TestCase):
 
         self.assertEqual(config1, config2)
 
-    def test_removed_entry_is_added_on_save(self):
+    @unittest.mock.patch.object(tutor_config.fmt, "echo")
+    def test_removed_entry_is_added_on_save(self, mock_echo):
         with tempfile.TemporaryDirectory() as root:
             with unittest.mock.patch.object(
                 tutor_config.utils, "random_string"

@@ -21,11 +21,9 @@ def build():
 @opts.root
 def debug(root):
     docker_run(root)
-    click.echo(
-        fmt.info(
-            "The debuggable APK file is available in {}".format(
-                tutor_env.data_path(root, "android")
-            )
+    fmt.echo_info(
+        "The debuggable APK file is available in {}".format(
+            tutor_env.data_path(root, "android")
         )
     )
 
@@ -34,11 +32,9 @@ def debug(root):
 @opts.root
 def release(root):
     docker_run(root, "./gradlew", "assembleProdRelease")
-    click.echo(
-        fmt.info(
-            "The production APK file is available in {}".format(
-                tutor_env.data_path(root, "android")
-            )
+    fmt.echo_info(
+        "The production APK file is available in {}".format(
+            tutor_env.data_path(root, "android")
         )
     )
 

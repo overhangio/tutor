@@ -10,12 +10,20 @@ def title(text):
     return click.style(message, fg="green")
 
 
+def echo_info(text):
+    echo(info(text))
+
+
 def info(text):
     return click.style(text, fg="blue")
 
 
 def error(text):
     return click.style(text, fg="red")
+
+
+def echo_error(text):
+    echo(error(text), err=True)
 
 
 def command(text):
@@ -26,5 +34,13 @@ def question(text):
     return click.style(text, fg="yellow")
 
 
+def echo_alert(text):
+    echo(alert(text))
+
+
 def alert(text):
     return click.style("⚠️  " + text, fg="yellow", bold=True)
+
+
+def echo(text, err=False):
+    click.echo(text, err=err)

@@ -58,7 +58,7 @@ def printvalue(root, key):
     config = load_current(root, defaults)
     merge(config, defaults)
     try:
-        print(config[key])
+        fmt.echo(config[key])
     except KeyError:
         raise exceptions.TutorError("Missing configuration value: {}".format(key))
 
@@ -84,7 +84,20 @@ def load(root):
     if should_update_env:
         save_env(root, config)
 
+    merge(config, defaults)
     return config
+
+
+def merge(config, defaults):
+    """
+    Merge default values with user configuration.
+    """
+    for key, value in defaults.items():
+        if key not in config:
+            if isinstance(value, str):
+                config[key] = env.render_str(config, value)
+            else:
+                config[key] = value
 
 
 def pre_upgrade_announcement(root):
@@ -92,12 +105,10 @@ def pre_upgrade_announcement(root):
     Inform the user that the current environment is not up-to-date. Crash if running in
     non-interactive mode.
     """
-    click.echo(
-        fmt.alert(
-            "The current environment stored at {} is not up-to-date: it is at "
-            "v{} while the 'tutor' binary is at v{}.".format(
-                env.base_dir(root), env.version(root), __version__
-            )
+    fmt.echo_alert(
+        "The current environment stored at {} is not up-to-date: it is at "
+        "v{} while the 'tutor' binary is at v{}.".format(
+            env.base_dir(root), env.version(root), __version__
         )
     )
     if os.isatty(sys.stdin.fileno()):
@@ -339,10 +350,8 @@ def convert_json2yml(root):
         config = json.load(fi)
         save_config(root, config)
     os.remove(json_path)
-    click.echo(
-        fmt.info(
-            "File config.json detected in {} and converted to config.yml".format(root)
-        )
+    fmt.echo_info(
+        "File config.json detected in {} and converted to config.yml".format(root)
     )
 
 
@@ -351,12 +360,12 @@ def save_config(root, config):
     utils.ensure_file_directory_exists(path)
     with open(path, "w") as of:
         serialize.dump(config, of)
-    click.echo(fmt.info("Configuration saved to {}".format(path)))
+    fmt.echo_info("Configuration saved to {}".format(path))
 
 
 def save_env(root, config):
     env.render_full(root, config)
-    click.echo(fmt.info("Environment generated in {}".format(env.base_dir(root))))
+    fmt.echo_info("Environment generated in {}".format(env.base_dir(root)))
 
 
 def config_path(root):

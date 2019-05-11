@@ -21,7 +21,7 @@ def main():
     try:
         cli()
     except exceptions.TutorError as e:
-        sys.stderr.write(fmt.error("Error: {}\n".format(e.args[0])))
+        fmt.echo_error("Error: {}".format(e.args[0]))
         sys.exit(1)
 
 

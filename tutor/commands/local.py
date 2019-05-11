@@ -59,7 +59,7 @@ def start(root, detach):
     docker_compose(root, config, *command)
 
     if detach:
-        click.echo(fmt.info("The Open edX platform is now running in detached mode"))
+        fmt.echo_info("The Open edX platform is now running in detached mode")
         http = "https" if config["ACTIVATE_HTTPS"] else "http"
         urls = []
         if not config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
@@ -70,13 +70,11 @@ def start(root, detach):
         urls.append(
             "{http}://{cms_host}".format(http=http, cms_host=config["CMS_HOST"])
         )
-        click.echo(
-            fmt.info(
-                """Your Open edX platform is ready and can be accessed at the following urls:
+        fmt.echo_info(
+            """Your Open edX platform is ready and can be accessed at the following urls:
 
     {}""".format(
-                    "\n    ".join(urls)
-                )
+                "\n    ".join(urls)
             )
         )
 
@@ -166,23 +164,21 @@ def https_create(root):
     """
     config = tutor_config.load(root)
     if not config["ACTIVATE_HTTPS"]:
-        click.echo(fmt.info("HTTPS is not activated: certificate generation skipped"))
+        fmt.echo_info("HTTPS is not activated: certificate generation skipped")
         return
 
     script = scripts.render_template(config, "https_create.sh")
 
     if config["WEB_PROXY"]:
-        click.echo(
-            fmt.info(
-                """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+        fmt.echo_info(
+            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
 certificates must be generated on the host. For instance, to generate
 certificates with Let's Encrypt, run:
 
 {}
 
 See the official certbot documentation for your platform: https://certbot.eff.org/""".format(
-                    indent(script, "    ")
-                )
+                indent(script, "    ")
             )
         )
         return
@@ -205,19 +201,17 @@ See the official certbot documentation for your platform: https://certbot.eff.or
 def https_renew(root):
     config = tutor_config.load(root)
     if not config["ACTIVATE_HTTPS"]:
-        click.echo(fmt.info("HTTPS is not activated: certificate renewal skipped"))
+        fmt.echo_info("HTTPS is not activated: certificate renewal skipped")
         return
     if config["WEB_PROXY"]:
-        click.echo(
-            fmt.info(
-                """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
+        fmt.echo_info(
+            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
 certificates must be renewed on the host. For instance, to renew Let's Encrypt
 certificates, run:
 
     certbot renew
 
 See the official certbot documentation for your platform: https://certbot.eff.org/"""
-            )
         )
         return
     docker_run = [
@@ -264,9 +258,9 @@ def createuser(root, superuser, staff, name, email):
 def importdemocourse(root):
     config = tutor_config.load(root)
     check_service_is_activated(config, "cms")
-    click.echo(fmt.info("Importing demo course"))
+    fmt.echo_info("Importing demo course")
     scripts.import_demo_course(root, run_sh)
-    click.echo(fmt.info("Re-indexing courses"))
+    fmt.echo_info("Re-indexing courses")
     indexcourses.callback(root)
 
 
@@ -295,9 +289,7 @@ def portainer(root, port):
         "portainer/portainer:latest",
         "--bind=:{}".format(port),
     ]
-    click.echo(
-        fmt.info("View the Portainer UI at http://localhost:{port}".format(port=port))
-    )
+    fmt.echo_info("View the Portainer UI at http://localhost:{port}".format(port=port))
     utils.docker_run(*docker_run)
 
 

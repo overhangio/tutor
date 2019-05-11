@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import unittest.mock
 
 from tutor.commands import config as tutor_config
 from tutor import env
@@ -7,6 +8,7 @@ from tutor import exceptions
 
 
 class EnvTests(unittest.TestCase):
+        
     def test_walk_templates(self):
         templates = list(env.walk_templates("local"))
         self.assertIn("local/docker-compose.yml", templates)
@@ -32,7 +34,8 @@ class EnvTests(unittest.TestCase):
         rendered = env.render_file(config, "scripts", "create_databases.sh")
         self.assertIn("testpassword", rendered)
 
-    def test_render_file_missing_configuration(self):
+    @unittest.mock.patch.object(tutor_config.fmt, "echo")
+    def test_render_file_missing_configuration(self, _):
         self.assertRaises(
             exceptions.TutorError, env.render_file, {}, "local", "docker-compose.yml"
         )

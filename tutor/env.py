@@ -5,6 +5,7 @@ import shutil
 import jinja2
 
 from . import exceptions
+from . import fmt
 from . import utils
 from .__about__ import __version__
 
@@ -45,10 +46,10 @@ class Renderer:
         try:
             return cls.__render(template, config)
         except (jinja2.exceptions.TemplateError, exceptions.TutorError):
-            print("Error rendering template", path)
+            fmt.echo_error("Error rendering template " + path)
             raise
         except Exception:
-            print("Unknown error rendering template", path)
+            fmt.echo_error("Unknown error rendering template " + path)
             raise
 
     @classmethod
