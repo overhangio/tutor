@@ -46,12 +46,12 @@ Bundle ``tutor`` executable
 
     make bundle
 
-Generate the documentation
---------------------------
+Generating the documentation
+----------------------------
 
 ::
 
-    pip install sphinx sphinx_rtd_theme
+    pip install -r requirements/docs.txt
     cd docs/
     make html
 

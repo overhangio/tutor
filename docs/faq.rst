@@ -6,7 +6,16 @@ FAQ
 What is Tutor?
 --------------
 
-Tutor is a distribution of `Open edX <https://open.edx.org>`_. It uses the original code from the various Open edX repositories, such as `edx-platform <https://github.com/edx/edx-platform/>`_, `cs_comments_service <https://github.com/edx/cs_comments_service>`_, etc. and packages everything in a way that makes it very easy to install, administer and upgrade Open edX. In particular, all services are run inside Docker containers.
+Tutor is an open source distribution of `Open edX <https://open.edx.org>`_. It uses the original code from the various Open edX repositories, such as `edx-platform <https://github.com/edx/edx-platform/>`_, `cs_comments_service <https://github.com/edx/cs_comments_service>`_, etc. and packages everything in a way that makes it very easy to install, administer and upgrade Open edX. In particular, all services are run inside Docker containers.
+
+Tutor makes it possible to deploy Open edX locally, with `docker-compose <https://docs.docker.com/compose/overview/>`_ or on an existing `Kubernetes cluster <http://kubernetes.io/>`_.
+
+What is the purpose of Tutor?
+-----------------------------
+
+To make it possible to deploy, administer and upgrade Open edX anywhere, easily.
+
+.. _native:
 
 What's the difference with the official "native" install?
 ---------------------------------------------------------
@@ -42,11 +51,16 @@ Those features are currently not available in Tutor:
 
 Those extra services were considered low priority while developing this project, but we are planning on adding them to Tutor, eventually. If you need one or more of these services, feel free to let me know by opening a `Github issue <https://github.com/regisb/tutor/issues/>`_. In particular, support for the Analytics stack is going to require a lot of work and I am looking forward to financial sponsorship. Please get in touch if you're interested.
 
+Are there people already running this in production?
+----------------------------------------------------
+
+Yes, many of them. There is no way to count precisely how many running Open edX platforms were deployed with Tutor, but from feedback collected directly from real users, there must be dozens, if not hundreds. Tutor is also used by some Open edX providers who are hosting platforms for their customers.
+
 Why should I trust software written by some random guy on the Internet?
 -----------------------------------------------------------------------
 
 You shouldn't :) I'm `Régis Behmo <https://github.com/regisb/>`_ and I have been working on Tutor since early 2018. I have been a contributor of the Open edX project since 2015. In particular, I have worked for 2 years on `FUN-MOOC <https://www.fun-mooc.fr/>`_, one of the top 5 largest Open edX platforms in the world. Here are the talks I have presented at the Open edX conferences:
 
-- *FUN: Life in the Avant-Garde*, Oct. 2015 (`video <https://www.youtube.com/watch?v=V1EBo1l8BgY>`__, `slides <http://regisb.github.io/openedx-conference-2015/>`__)
-- *Open edX 101: A Source Code Review*, June 2016 (`video <https://www.youtube.com/watch?v=DVku7Y7XQII>`__, `slides <http://regisb.github.io/openedx-conference-2016/>`__)
 - *Videofront: a Self-Hosted YouTube*, June 2017 (`video <https://www.youtube.com/watch?v=e7bJchJrmP8&t=5m53s>`__, `slides <http://regisb.github.io/openedx-conference-2017/>`__)
+- *Open edX 101: A Source Code Review*, June 2016 (`video <https://www.youtube.com/watch?v=DVku7Y7XQII>`__, `slides <http://regisb.github.io/openedx-conference-2016/>`__)
+- *FUN: Life in the Avant-Garde*, Oct. 2015 (`video <https://www.youtube.com/watch?v=V1EBo1l8BgY>`__, `slides <http://regisb.github.io/openedx-conference-2015/>`__)

@@ -11,21 +11,18 @@
 .. include:: quickstart.rst
     :start-line: 1
 
-But there's a lot more to Tutor than that! For more advanced usage, please refer to the following sections.
-
 .. toctree::
    :maxdepth: 2
    :caption: User guide
 
+   intro
    install
    quickstart
    configuration
    local
-   customise
-   dev
    k8s
-   webui
-   mobile
+   dev
+   extra
    troubleshooting
    tutor
    faq

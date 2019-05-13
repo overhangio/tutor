@@ -21,3 +21,5 @@ Yes :) This is what happens when you run ``tutor local quickstart``:
 5. A full, production-ready platform is run with docker-compose.
 
 The whole procedure should require less than 10 minutes, on a server with a good bandwidth. Note that your host environment will not be affected in any way, since everything runs inside docker containers. Root access is not even necessary.
+
+There's a lot more to Tutor than that! To understand what Tutor does and how it works, take a look at the :ref:`introduction <intro>`.

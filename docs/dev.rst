@@ -1,15 +1,15 @@
 .. _development:
 
-Using Tutor for Open edX development
-====================================
+Open edX development
+====================
 
-In addition to running Open edX in production, you can use the docker containers for local development. This means you can hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
+In addition to running Open edX in production, Tutor can be used for local development of Open edX. This means it is possible to hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
-The following commands assume you have previously launched a local Open edX platform. If you have not done so already, you should run::
+The following commands assume you have previously launched a :ref:`local <local>` Open edX platform. If you have not done so already, you should run::
 
     tutor local quickstart
 
-You should setup real host names for the LMS and the CMS (i.e: not "localhost"). It is not necessary to configure the DNS records for local development. You should *not* activate HTTPS certificates, which will not work locally.
+You should setup real host names for the LMS and the CMS (i.e: not "localhost"). It is not necessary to configure the DNS records for local development: in other words, it doesn't matter that the chosen domain names exist or not for your platform, as the LMS and the CMS will be accessed on ``localhost``. You should *not* activate HTTPS certificates, which will not work locally.
 
 Once the local platform has been configured, you should stop it so that it does not interfere with the development environment::
 
