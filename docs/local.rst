@@ -177,7 +177,6 @@ As an example, here is how to launch two different platforms, with nginx running
 
 You should then have two different platforms, completely isolated from one another, running on the same server.
 
-
 Loading different production settings for ``edx-platform``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -205,3 +204,27 @@ Then, create the Tutor project root and move your data::
 Finally, start your platform again::
 
     tutor local quickstart
+
+Backups/Migrating to a different server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With Tutor, all data are stored in a single folder. This means that it's extremely easy to migrate an existing platform to a different server. For instance, it's possible to configure a platform locally on a laptop, and then move this platform to a production server.
+
+1. Make sure `tutor` is installed on both servers with the same version.
+2. Stop any running platform on server 1::
+    
+    tutor local stop
+
+3. Transfer the configuration, environment and platform data from server 1 to server 2::
+
+    rsync -avr "$(tutor config printroot)"/ username@server2:/tmp/tutor/ 
+
+4. On server 2, move the data to the right location::
+    
+    mv /tmp/tutor "$(tutor config printroot)"
+
+5. Start the instance with::
+    
+    tutor local start -d
+    
+    
