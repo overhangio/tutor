@@ -260,7 +260,7 @@ def load_interactive(config):
     ask_bool(
         (
             "Activate SSL/TLS certificates for HTTPS access? Important note:"
-            "this will NOT work in a development environment."
+            " this will NOT work in a development environment."
         ),
         "ACTIVATE_HTTPS",
         config,
@@ -298,7 +298,9 @@ def ask(question, key, config):
 
 
 def ask_bool(question, key, config):
-    return click.confirm(fmt.question(question), prompt_suffix=" ", default=config[key])
+    config[key] = click.confirm(
+        fmt.question(question), prompt_suffix=" ", default=config[key]
+    )
 
 
 def ask_choice(question, key, config, choices):

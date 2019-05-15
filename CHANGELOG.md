@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Bugfix] Fix boolean configuration choices
+
 ## 3.3.9 (2019-05-13)
 
 - [Improvement] Add `local exec` command for running commands inside existing containers
