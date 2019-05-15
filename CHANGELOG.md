@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## 3.3.10 (2019-05-15)
 
 - [Bugfix] Fix boolean configuration choices
 
