@@ -168,6 +168,7 @@ Student notes
 *************
 
 - ``ACTIVATE_NOTES`` (default: ``false``)
+- ``NOTES_HOST`` (default: ``notes.{{ LMS_HOST }}``)
 
 With `notes <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-ironwood.master/exercises_tools/notes.html?highlight=notes>`_, students can annotate portions of the courseware. 
 
@@ -175,6 +176,8 @@ With `notes <https://edx.readthedocs.io/projects/open-edx-building-and-running-a
     :alt: Notes in action
 
 You should beware that the ``notes.<LMS_HOST>`` domain name should be activated and point to your server. For instance, if your LMS is hosted at http://myopenedx.com, the notes service should be found at http://notes.myopenedx.com.
+
+If you would like to host the notes service at a different domain name, you can set the ``NOTES_HOST`` configuration variable. In particular, in development you should set this configuration variable to ``notes.localhost`` in order to be able to access the notes service from the LMS. Otherwise you will get a "Sorry, we could not search the store for annotations" error.
 
 Xqueue
 ******

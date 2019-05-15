@@ -6,7 +6,7 @@ ALLOWED_HOSTS = [
     "notes",
     "notes.openedx",
     "notes.localhost",
-    "notes.{{ LMS_HOST }}",
+    "{{ NOTES_HOST }}",
 ]
 
 DATABASES = {

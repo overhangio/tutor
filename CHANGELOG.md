@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+
+- [Improvement] Make it possible to configure the notes service hostname
+
 ## 3.3.10 (2019-05-15)
 
 - [Bugfix] Fix boolean configuration choices
