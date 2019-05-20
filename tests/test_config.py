@@ -11,6 +11,10 @@ class ConfigTests(unittest.TestCase):
         # This is necessary to avoid cached mocks
         env.Renderer.reset()
 
+    def test_version(self):
+        defaults = tutor_config.load_defaults()
+        self.assertNotIn("TUTOR_VERSION", defaults)
+
     def test_merge(self):
         config = {}
         defaults = tutor_config.load_defaults()
@@ -39,16 +43,14 @@ class ConfigTests(unittest.TestCase):
                 tutor_config.utils, "random_string"
             ) as mock_random_string:
                 mock_random_string.return_value = "abcd"
-                defaults = tutor_config.load_defaults()
-                config1 = tutor_config.load_current(root, defaults)
+                config1, defaults = tutor_config.load_all(root)
                 password1 = config1["MYSQL_ROOT_PASSWORD"]
 
                 config1.pop("MYSQL_ROOT_PASSWORD")
                 tutor_config.save_config(root, config1)
 
                 mock_random_string.return_value = "efgh"
-                defaults = tutor_config.load_defaults()
-                config2 = tutor_config.load_current(root, defaults)
+                config2, defaults = tutor_config.load_all(root)
                 password2 = config2["MYSQL_ROOT_PASSWORD"]
 
         self.assertEqual("abcd", password1)

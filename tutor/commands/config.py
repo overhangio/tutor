@@ -33,8 +33,7 @@ def save_command(root, silent1, silent2, set_):
 
 def save(root, silent=False, keyvalues=None):
     keyvalues = keyvalues or []
-    defaults = load_defaults()
-    config = load_current(root, defaults)
+    config, defaults = load_all(root)
     for k, v in keyvalues:
         config[k] = v
     if not silent:
@@ -54,8 +53,7 @@ def printroot(root):
 @opts.root
 @click.argument("key")
 def printvalue(root, key):
-    defaults = load_defaults()
-    config = load_current(root, defaults)
+    config, defaults = load_all(root)
     merge(config, defaults)
     try:
         fmt.echo(config[key])
@@ -130,6 +128,16 @@ def pre_upgrade_announcement(root):
             "\n"
             "    tutor config save -y"
         )
+
+
+def load_all(root):
+    defaults = load_defaults()
+    current = load_current(root, defaults)
+    return current, defaults
+
+
+def load_defaults():
+    return serialize.load(env.read("config.yml"))
 
 
 def load_current(root, defaults):
@@ -306,10 +314,6 @@ def load_interactive(config, defaults):
         config,
         defaults,
     )
-
-
-def load_defaults():
-    return serialize.load(env.read("config.yml"))
 
 
 def ask(question, key, config, defaults):

@@ -27,6 +27,7 @@ class Renderer:
             environment.filters["random_string"] = utils.random_string
             environment.filters["common_domain"] = utils.random_string
             environment.filters["reverse_host"] = utils.reverse_host
+            environment.globals["TUTOR_VERSION"] = __version__
             cls.ENVIRONMENT = environment
 
         return cls.ENVIRONMENT
@@ -69,8 +70,7 @@ def render_full(root, config):
     for subdir in ["android", "apps", "k8s", "local", "webui"]:
         render_subdir(subdir, root, config)
     copy_subdir("build", root)
-    with open(pathjoin(root, VERSION_FILENAME), "w") as f:
-        f.write(__version__)
+    render_file(config, VERSION_FILENAME)
 
 
 def render_subdir(subdir, root, config):

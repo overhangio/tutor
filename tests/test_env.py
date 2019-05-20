@@ -39,3 +39,8 @@ class EnvTests(unittest.TestCase):
         self.assertRaises(
             exceptions.TutorError, env.render_file, {}, "local", "docker-compose.yml"
         )
+
+    def test_render_full(self):
+        with tempfile.TemporaryDirectory() as root:
+            defaults = tutor_config.load_defaults()
+            env.render_full(root, defaults)
