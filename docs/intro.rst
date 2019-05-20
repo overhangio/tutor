@@ -12,6 +12,10 @@ Tutor simplifies the deployment of Open edX by:
 
 Because Docker containers are becoming an industry-wide standard, that means that with Tutor it becomes possible to run Open edX anywhere: for now, Tutor supports deploying on a local server, with `docker-compose <https://docs.docker.com/compose/overview/>`_, and in a large cluster, with `Kubernetes <http://kubernetes.io/>`_. But in the future, Tutor may support other deployment platforms.
 
+.. include:: ../README.rst
+    :start-after: _whats_tutor_start:
+    :end-before: _whats_tutor_end:
+
 How does Tutor work?
 --------------------
 

@@ -52,6 +52,19 @@ To get community support, go to the official discussion forums: https://discuss.
 
 .. _readme_support_end:
 
+.. _whats_tutor_start:
+
+What is Tutor?
+--------------
+
+Tutor was presented at the 2019 Open edX conference in San Diego, CA. Here's the 7-minute talk (`slides <https://regisb.github.io/openedx2019/>`_):
+
+.. raw:: html
+    
+    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Oqc7c-3qFc4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+.. _whats_tutor_end:
+
 .. _readme_contributing_start:
 
 Contributing
