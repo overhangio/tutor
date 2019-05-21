@@ -4,7 +4,6 @@ import click
 
 from . import config as tutor_config
 from .. import env as tutor_env
-from .. import exceptions
 from .. import fmt
 from .. import opts
 from .. import scripts
@@ -144,7 +143,8 @@ def execute(root, service, command, args):
 @opts.root
 def databases(root):
     config = tutor_config.load(root)
-    scripts.migrate(root, config, run_sh)
+    runner = ScriptRunner(root, config)
+    scripts.migrate(runner)
 
 
 @click.group(help="Manage https certificates")
@@ -163,11 +163,12 @@ def https_create(root):
     2. On certificate renewal, nginx is not reloaded
     """
     config = tutor_config.load(root)
+    runner = ScriptRunner(root, config)
     if not config["ACTIVATE_HTTPS"]:
         fmt.echo_info("HTTPS is not activated: certificate generation skipped")
         return
 
-    script = scripts.render_template(config, "https_create.sh")
+    script = runner.render("https_create.sh")
 
     if config["WEB_PROXY"]:
         fmt.echo_info(
@@ -249,17 +250,17 @@ def logs(root, follow, tail, service):
 @click.argument("email")
 def createuser(root, superuser, staff, name, email):
     config = tutor_config.load(root)
-    check_service_is_activated(config, "lms")
-    scripts.create_user(root, run_sh, superuser, staff, name, email)
+    runner = ScriptRunner(root, config)
+    scripts.create_user(runner, superuser, staff, name, email)
 
 
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
     config = tutor_config.load(root)
-    check_service_is_activated(config, "cms")
+    runner = ScriptRunner(root, config)
     fmt.echo_info("Importing demo course")
-    scripts.import_demo_course(root, run_sh)
+    scripts.import_demo_course(runner)
     fmt.echo_info("Re-indexing courses")
     indexcourses.callback(root)
 
@@ -268,8 +269,8 @@ def importdemocourse(root):
 @opts.root
 def indexcourses(root):
     config = tutor_config.load(root)
-    check_service_is_activated(config, "cms")
-    scripts.index_courses(root, run_sh)
+    runner = ScriptRunner(root, config)
+    scripts.index_courses(runner)
 
 
 @click.command(
@@ -293,18 +294,11 @@ def portainer(root, port):
     utils.docker_run(*docker_run)
 
 
-def check_service_is_activated(config, service):
-    if not config["ACTIVATE_" + service.upper()]:
-        raise exceptions.TutorError(
-            "This command may only be executed on the server where the {} is running".format(
-                service
-            )
+class ScriptRunner(scripts.BaseRunner):
+    def exec(self, service, command):
+        docker_compose(
+            self.root, self.config, "run", "--rm", service, "sh", "-e", "-c", command
         )
-
-
-def run_sh(root, service, command):
-    config = tutor_config.load(root)
-    docker_compose(root, config, "run", "--rm", service, "sh", "-e", "-c", command)
 
 
 def docker_compose(root, config, *command):
