@@ -24,6 +24,15 @@ class EnvTests(unittest.TestCase):
             "hello world", env.render_str({"name": "world"}, "hello {{ name }}")
         )
 
+    def test_common_domain(self):
+        self.assertEqual(
+            "mydomain.com",
+            env.render_str(
+                {"d1": "d1.mydomain.com", "d2": "d2.mydomain.com"},
+                "{{ d1|common_domain(d2) }}",
+            ),
+        )
+
     def test_render_str_missing_configuration(self):
         self.assertRaises(exceptions.TutorError, env.render_str, {}, "hello {{ name }}")
 
@@ -41,6 +50,12 @@ class EnvTests(unittest.TestCase):
         )
 
     def test_render_full(self):
+        defaults = tutor_config.load_defaults()
         with tempfile.TemporaryDirectory() as root:
-            defaults = tutor_config.load_defaults()
+            env.render_full(root, defaults)
+
+    def test_render_full_with_https(self):
+        defaults = tutor_config.load_defaults()
+        defaults["ACTIVATE_HTTPS"] = True
+        with tempfile.TemporaryDirectory() as root:
             env.render_full(root, defaults)

@@ -25,7 +25,7 @@ class Renderer:
                 undefined=jinja2.StrictUndefined,
             )
             environment.filters["random_string"] = utils.random_string
-            environment.filters["common_domain"] = utils.random_string
+            environment.filters["common_domain"] = utils.common_domain
             environment.filters["reverse_host"] = utils.reverse_host
             environment.globals["TUTOR_VERSION"] = __version__
             cls.ENVIRONMENT = environment
@@ -68,22 +68,29 @@ def render_full(root, config):
     Render the full environment, including version information.
     """
     for subdir in ["android", "apps", "k8s", "local", "webui"]:
-        render_subdir(subdir, root, config)
+        save_subdir(subdir, root, config)
     copy_subdir("build", root)
-    render_file(config, VERSION_FILENAME)
+    save_file(VERSION_FILENAME, root, config)
 
 
-def render_subdir(subdir, root, config):
+def save_subdir(subdir, root, config):
     """
     Render the templates located in `subdir` and store them with the same
     hierarchy at `root`.
     """
     for path in walk_templates(subdir):
-        dst = pathjoin(root, path)
-        rendered = render_file(config, path)
-        utils.ensure_file_directory_exists(dst)
-        with open(dst, "w") as of:
-            of.write(rendered)
+        save_file(path, root, config)
+
+
+def save_file(path, root, config):
+    """
+    Render the template located in `path` and store it with the same hierarchy at `root`.
+    """
+    dst = pathjoin(root, path)
+    rendered = render_file(config, path)
+    utils.ensure_file_directory_exists(dst)
+    with open(dst, "w") as of:
+        of.write(rendered)
 
 
 def render_file(config, *path):
