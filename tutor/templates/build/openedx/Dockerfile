@@ -58,7 +58,7 @@ ENV PATH ./node_modules/.bin:${PATH}
 
 # Install private requirements: this is useful for installing custom xblocks.
 COPY ./requirements/ /openedx/requirements
-RUN pip install -r /openedx/requirements/private.txt
+RUN cd /openedx/requirements/ && pip install -r ./private.txt
 
 # Create folder that will store *.env.json and *.auth.json files, as well as
 # the tutor-specific settings files.

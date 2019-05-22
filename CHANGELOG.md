@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Bugfix] Fix installing a locally cloned requirement repository
 - [Improvement] Add `--no-cache` option to `images build`
 - [Improvement] Make it possible to configure the notes service hostname
 
