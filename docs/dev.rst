@@ -80,7 +80,7 @@ Customised themes
 
 With Tutor, it's pretty easy to develop your own themes. Start by placing your files inside the ``env/build/openedx/themes`` directory. For instance, you could start from the ``edx.org`` theme present inside the ``edx-platform`` repository::
 
-    cp -r /path/to/edx-platform/themes/edx.org $(tutor config printroot)/env/build/openedx/themes/
+    cp -r /path/to/edx-platform/themes/edx.org "$(tutor config printroot)/env/build/openedx/themes/"
 
 Then, run a local webserver::
 

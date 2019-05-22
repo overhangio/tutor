@@ -208,7 +208,7 @@ Adding custom themes
 
 Comprehensive theming is enabled by default, but only the default theme is compiled. To compile your own theme, add it to the ``env/build/openedx/themes/`` folder::
 
-    git clone https://github.com/me/myopenedxtheme.git $(tutor config printroot)/env/build/openedx/themes/
+    git clone https://github.com/me/myopenedxtheme.git "$(tutor config printroot)/env/build/openedx/themes/"
 
 The ``themes`` folder should have the following structure::
 
@@ -232,7 +232,7 @@ Installing extra xblocks and requirements
 
 Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``env/build/openedx/requirements/private.txt`` file. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_::
 
-    echo "git+https://github.com/open-craft/xblock-poll.git" >> $(tutor config printroot)/env/build/openedx/requirements/private.txt
+    echo "git+https://github.com/open-craft/xblock-poll.git" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
 
 Then, the ``openedx`` docker image must be rebuilt::
 
@@ -240,11 +240,11 @@ Then, the ``openedx`` docker image must be rebuilt::
 
 To install xblocks from a private repository that requires authentication, you must first clone the repository inside the ``openedx/requirements`` folder on the host::
 
-    git clone git@github.com:me/myprivaterepo.git ./openedx/requirements/myprivaterepo
+    git clone git@github.com:me/myprivaterepo.git "$(tutor config printroot)/env/build/openedx/requirements/myprivaterepo"
 
 Then, declare your extra requirements with the ``-e`` flag in ``openedx/requirements/private.txt``::
 
-    echo "-e ./myprivaterepo" >> $(tutor config printroot)/env/build/openedx/requirements/private.txt
+    echo "-e ./myprivaterepo" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
 
 .. _edx_platform_fork:
 

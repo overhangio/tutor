@@ -133,14 +133,14 @@ In this example, the nginx container ports would be mapped to 81 and 444, instea
 
 For nginx::
 
-    sudo ln -s $(tutor config printroot)/env/local/proxy/nginx/openedx.conf /etc/nginx/sites-enabled/
+    sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/
     sudo systemctl reload nginx
 
 For apache::
 
     sudo a2enmod proxy
     sudo a2enmod proxy_http
-    sudo ln -s $(tutor config printroot)/env/local/proxy/apache2/openedx.conf /etc/apache2/sites-enabled/
+    sudo ln -s "$(tutor config printroot)/env/local/proxy/apache2/openedx.conf" /etc/apache2/sites-enabled/
     sudo systemctl reload apache2
 
 If you have configured your platform to use SSL/TLS certificates for HTTPS access, the generation and renewal of certificates will not be managed by Tutor: you are supposed to take care of it yourself. Suggestions for generating and renewing these certificates with `Let's Encrypt <https://letsencrypt.org/>`_ are given by::
@@ -166,14 +166,14 @@ As an example, here is how to launch two different platforms, with nginx running
     export TUTOR_ROOT=~/openedx/site1
     tutor config save --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site1 --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=481
     tutor local quickstart
-    sudo ln -s $(tutor config printroot)/env/local/proxy/nginx/openedx.conf /etc/nginx/sites-enabled/site1.conf
+    sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/site1.conf
 
 
     # platform 2
     export TUTOR_ROOT=~/openedx/site2
     tutor config save --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site2 --set NGINX_HTTP_PORT=82 --set NGINX_HTTPS_PORT=482
     tutor local quickstart
-    sudo ln -s $(tutor config printroot)/env/local/proxy/nginx/openedx.conf /etc/nginx/sites-enabled/site2.conf
+    sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/site2.conf
 
 You should then have two different platforms, completely isolated from one another, running on the same server.
 
@@ -196,8 +196,8 @@ Versions 1 and 2 of Tutor were organized differently: they relied on many differ
 
 Then, create the Tutor project root and move your data::
 
-    mkdir -p $(tutor config printroot)
-    mv config.json data/ $(tutor config printroot)
+    mkdir -p "$(tutor config printroot)"
+    mv config.json data/ "$(tutor config printroot)"
 
 `Download <https://github.com/regisb/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path.
 
@@ -217,7 +217,7 @@ With Tutor, all data are stored in a single folder. This means that it's extreme
 
 3. Transfer the configuration, environment and platform data from server 1 to server 2::
 
-    rsync -avr "$(tutor config printroot)"/ username@server2:/tmp/tutor/ 
+    rsync -avr "$(tutor config printroot)/" username@server2:/tmp/tutor/ 
 
 4. On server 2, move the data to the right location::
     
