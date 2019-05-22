@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Add `--no-cache` option to `images build`
 - [Improvement] Make it possible to configure the notes service hostname
 
 ## 3.3.10 (2019-05-15)

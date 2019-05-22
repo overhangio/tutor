@@ -37,17 +37,22 @@ argument_image = click.argument(
 @opts.root
 @argument_openedx_image
 @click.option(
+    "--no-cache", is_flag=True, help="Do not use cache when building the image"
+)
+@click.option(
     "-a",
     "--build-arg",
     multiple=True,
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times.",
 )
-def build(root, image, build_arg):
+def build(root, image, no_cache, build_arg):
     config = tutor_config.load(root)
     for img in openedx_image_names(config, image):
         tag = get_tag(config, img)
         click.echo(fmt.info("Building image {}".format(tag)))
         command = ["build", "-t", tag, tutor_env.pathjoin(root, "build", img)]
+        if no_cache:
+            command.append("--no-cache")
         for arg in build_arg:
             command += ["--build-arg", arg]
         utils.docker(*command)
