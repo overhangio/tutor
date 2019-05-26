@@ -19,13 +19,14 @@ def local():
 
 
 @click.command(help="Configure and run Open edX from scratch")
+@click.option("-y", "--yes", "silent", is_flag=True, help="Run non-interactively")
 @click.option(
     "-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images"
 )
 @opts.root
-def quickstart(pullimages_, root):
+def quickstart(silent, pullimages_, root):
     click.echo(fmt.title("Interactive platform configuration"))
-    tutor_config.save(root)
+    tutor_config.save(root, silent=silent)
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback(root)
     if pullimages_:
