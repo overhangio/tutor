@@ -120,3 +120,9 @@ You should then specify the settings to use on the host::
 From then on, all ``dev`` commands will use the ``mysettings`` module. For instance::
 
     tutor dev runserver lms --edx-platform-path=/path/to/edx-platform
+
+
+Using Tutor for frontend development
+------------------------------------
+
+I'm sure we can make life easier for frontend devs, right?
