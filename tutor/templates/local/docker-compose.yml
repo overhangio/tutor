@@ -64,7 +64,7 @@ services:
       - "{{ NGINX_HTTP_PORT }}:80"
       - "{{ NGINX_HTTPS_PORT }}:443"
     volumes:
-      - ../apps/nginx:/etc/nginx/conf.d/
+      - ../apps/nginx:/etc/nginx/conf.d/:ro
       - ../../data/openedx:/var/www/openedx:ro
       {% if ACTIVATE_CMS %}- ../../data/cms:/openedx/data/cms/:ro{% endif %}
       {% if ACTIVATE_LMS %}- ../../data/lms:/openedx/data/lms/:ro{% endif %}
@@ -164,7 +164,7 @@ services:
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
     depends_on:
-      {% if ACTIVATE_LMS %}- lms {% endif %}
+      - lms
   {% endif %}
 
   {% if ACTIVATE_CMS %}
@@ -182,7 +182,7 @@ services:
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
     depends_on:
-      {% if ACTIVATE_CMS %}- cms {% endif %}
+      - cms
   {% endif %}
 
   {% if ACTIVATE_NOTES %}
