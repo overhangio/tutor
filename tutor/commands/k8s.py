@@ -100,7 +100,8 @@ def delete(yes):
 @opts.root
 def databases(root):
     config = tutor_config.load(root)
-    scripts.migrate(root, config, run_sh)
+    runner = K8sScriptRunner(root, config)
+    scripts.migrate(runner)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -110,14 +111,18 @@ def databases(root):
 @click.argument("name")
 @click.argument("email")
 def createuser(root, superuser, staff, name, email):
-    scripts.create_user(root, run_sh, superuser, staff, name, email)
+    config = tutor_config.load(root)
+    runner = K8sScriptRunner(root, config)
+    scripts.create_user(runner, superuser, staff, name, email)
 
 
 @click.command(help="Import the demo course")
 @opts.root
 def importdemocourse(root):
     fmt.echo_info("Importing demo course")
-    scripts.import_demo_course(root, run_sh)
+    config = tutor_config.load(root)
+    runner = K8sScriptRunner(root, config)
+    scripts.import_demo_course(runner)
     fmt.echo_info("Re-indexing courses")
     indexcourses.callback(root)
 
@@ -127,7 +132,9 @@ def importdemocourse(root):
 def indexcourses(root):
     # Note: this is currently broken with "pymongo.errors.ConnectionFailure: [Errno 111] Connection refused"
     # I'm not quite sure the settings are correctly picked up. Which is weird because migrations work very well.
-    scripts.index_courses(root, run_sh)
+    config = tutor_config.load(root)
+    runner = K8sScriptRunner(root, config)
+    scripts.index_courses(runner)
 
 
 @click.command(help="Launch a shell in LMS or CMS")
@@ -221,8 +228,9 @@ class K8s:
         )
 
 
-def run_sh(root, service, command):  # pylint: disable=unused-argument
-    K8s().execute(service, "sh", "-e", "-c", command)
+class K8sScriptRunner(scripts.BaseRunner):
+    def exec(self, service, command):
+        K8s().execute(service, "sh", "-e", "-c", command)
 
 
 k8s.add_command(quickstart)
