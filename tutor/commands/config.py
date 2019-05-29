@@ -14,6 +14,7 @@ from ..__about__ import __version__
 
 
 @click.group(
+    name="config",
     short_help="Configure Open edX",
     help="""Configure Open edX and store configuration values in $TUTOR_ROOT/config.yml""",
 )
@@ -21,7 +22,7 @@ def config_command():
     pass
 
 
-@click.command(help="Create and save configuration interactively")
+@click.command(name="save", help="Create and save configuration interactively")
 @opts.root
 @click.option("-y", "--yes", "silent1", is_flag=True, help="Run non-interactively")
 @click.option("--silent", "silent2", is_flag=True, hidden=True)
@@ -376,6 +377,6 @@ def config_path(root):
     return os.path.join(root, "config.yml")
 
 
-config_command.add_command(save_command, name="save")
+config_command.add_command(save_command)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)

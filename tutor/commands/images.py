@@ -7,7 +7,7 @@ from .. import opts
 from .. import utils
 
 
-@click.group(short_help="Manage docker images")
+@click.group(name="images", short_help="Manage docker images")
 def images_command():
     pass
 

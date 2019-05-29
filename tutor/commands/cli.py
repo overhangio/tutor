@@ -38,8 +38,8 @@ def print_help():
 
 
 click_repl.register_repl(cli, name="ui")
-cli.add_command(images_command, name="images")
-cli.add_command(config_command, name="config")
+cli.add_command(images_command)
+cli.add_command(config_command)
 cli.add_command(local)
 cli.add_command(dev)
 cli.add_command(android)
