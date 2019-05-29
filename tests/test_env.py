@@ -8,7 +8,6 @@ from tutor import exceptions
 
 
 class EnvTests(unittest.TestCase):
-        
     def test_walk_templates(self):
         templates = list(env.walk_templates("local"))
         self.assertIn("local/docker-compose.yml", templates)

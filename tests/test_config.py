@@ -24,7 +24,7 @@ class ConfigTests(unittest.TestCase):
             tutor_config.merge(config, defaults)
 
         self.assertEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
-    
+
     @unittest.mock.patch.object(tutor_config.fmt, "echo")
     def test_save_twice(self, mock_echo):
         with tempfile.TemporaryDirectory() as root:

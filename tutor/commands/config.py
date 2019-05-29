@@ -326,7 +326,9 @@ def ask(question, key, config, defaults):
 
 def ask_bool(question, key, config, defaults):
     default = config.get(key, defaults[key])
-    config[key] = click.confirm(fmt.question(question), prompt_suffix=" ", default=default)
+    config[key] = click.confirm(
+        fmt.question(question), prompt_suffix=" ", default=default
+    )
 
 
 def ask_choice(question, key, config, defaults, choices):
