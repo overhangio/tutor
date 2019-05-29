@@ -1,4 +1,4 @@
--r base.txt
+-r plugins.txt
 black
 pip-tools
 pylint

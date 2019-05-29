@@ -1,0 +1,10 @@
+minio:
+  image: minio/minio:RELEASE.2019-05-23T00-29-34Z
+  volumes:
+    - ../../data/minio:/data
+  ports:
+    - "9000:9000"
+  environment:
+    MINIO_ACCESS_KEY: "{{ OPENEDX_AWS_ACCESS_KEY }}"
+    MINIO_SECRET_KEY: "{{ OPENEDX_AWS_SECRET_ACCESS_KEY }}"
+  command: server /data

@@ -58,3 +58,22 @@ class EnvTests(unittest.TestCase):
         defaults["ACTIVATE_HTTPS"] = True
         with tempfile.TemporaryDirectory() as root:
             env.render_full(root, defaults)
+
+    def test_patch(self):
+        patches = {"plugin1": "abcd", "plugin2": "efgh"}
+        with unittest.mock.patch.object(
+            env.plugins, "iter_patches", return_value=patches.items()
+        ) as mock_iter_patches:
+            rendered = env.render_str({}, '{{ patch("location") }}')
+            mock_iter_patches.assert_called_once_with({}, "location")
+        self.assertEqual("abcd\nefgh", rendered)
+
+    def test_patch_separator_suffix(self):
+        patches = {"plugin1": "abcd", "plugin2": "efgh"}
+        with unittest.mock.patch.object(
+            env.plugins, "iter_patches", return_value=patches.items()
+        ) as mock_iter_patches:
+            rendered = env.render_str(
+                {}, '{{ patch("location", separator=",\n", suffix=",") }}'
+            )
+        self.assertEqual("abcd,\nefgh,", rendered)

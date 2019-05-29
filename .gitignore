@@ -2,9 +2,9 @@
 !.gitignore
 TODO
 __pycache__
+*.egg-info/
 
 /tutor.spec
 /build/tutor
 /dist/
 /releases/
-/tutor_openedx.egg-info/

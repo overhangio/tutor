@@ -5,25 +5,32 @@
 compile-requirements: ## Compile requirements files
 	pip-compile -o requirements/base.txt requirements/base.in
 	pip-compile -o requirements/dev.txt requirements/dev.in
+	pip-compile -o requirements/plugins.txt requirements/plugins.in
 	pip-compile -o requirements/docs.txt requirements/docs.in
 
 test: test-lint test-unit test-format ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
-	black --check --diff ./tutor ./tests
+	black --check --diff ./tutor ./tests ./plugins
 
 test-lint: ## Run code linting tests
 	pylint --errors-only tutor
 
-test-unit: ## Run unit tests
+test-unit: test-unit-core test-unit-plugins ## Run unit tests
+
+test-unit-core:
 	python3 -m unittest discover tests
 
+test-unit-plugins:
+	python3 -m unittest discover plugins/minio/tests
+
 format: ## Format code automatically
-	black ./tutor ./tests
+	black ./tutor ./tests ./plugins
 
 ###### Deployment
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
+	# TODO bundle plugins
 	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main
 dist/tutor:
 	$(MAKE) bundle

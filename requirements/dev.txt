@@ -4,6 +4,7 @@
 #
 #    pip-compile --output-file requirements/dev.txt requirements/dev.in
 #
+-e file:///home/data/regis/projets/openedx/repos/tutor/plugins/minio
 altgraph==0.16.1          # via macholib, pyinstaller
 appdirs==1.4.3
 astroid==2.2.5            # via pylint

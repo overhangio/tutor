@@ -10,6 +10,7 @@ from .dev import dev
 from .images import images_command
 from .k8s import k8s
 from .local import local
+from .plugins import plugins_command
 from .ui import ui
 from .webui import webui
 from ..__about__ import __version__
@@ -47,6 +48,7 @@ cli.add_command(k8s)
 cli.add_command(ui)
 cli.add_command(webui)
 cli.add_command(print_help)
+cli.add_command(plugins_command)
 
 if __name__ == "__main__":
     main()

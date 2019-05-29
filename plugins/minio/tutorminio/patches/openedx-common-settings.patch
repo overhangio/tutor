@@ -1,0 +1,1 @@
+AWS_S3_USE_SSL = {{ "True" if ACTIVATE_HTTPS else "False" }}

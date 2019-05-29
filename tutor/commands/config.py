@@ -8,6 +8,7 @@ from .. import exceptions
 from .. import env
 from .. import fmt
 from .. import opts
+from .. import plugins
 from .. import serialize
 from .. import utils
 from ..__about__ import __version__
@@ -87,12 +88,12 @@ def load(root):
     return config
 
 
-def merge(config, defaults):
+def merge(config, defaults, force=False):
     """
     Merge default values with user configuration.
     """
     for key, value in defaults.items():
-        if key not in config:
+        if force or key not in config:
             if isinstance(value, str):
                 config[key] = env.render_str(config, value)
             else:
@@ -142,10 +143,14 @@ def load_defaults():
 
 
 def load_current(root, defaults):
+    """
+    Note: this modifies the defaults. TODO this is not that great.
+    """
     convert_json2yml(root)
     config = load_user(root)
     load_env(config, defaults)
     load_required(config, defaults)
+    load_plugins(config, defaults)
     return config
 
 
@@ -190,6 +195,13 @@ def load_required(config, defaults):
     ]:
         if key not in config:
             config[key] = env.render_str(config, defaults[key])
+
+
+def load_plugins(config, defaults):
+    add_config, set_config, defaults_config = plugins.load_config(config)
+    merge(config, add_config)
+    merge(config, set_config, force=True)
+    merge(defaults, defaults_config)
 
 
 def upgrade_obsolete(config):
