@@ -13,6 +13,6 @@ class ScriptsTests(unittest.TestCase):
     def test_run(self):
         config = tutor_config.load_defaults()
         runner = DummyRunner("/tmp", config)
-        rendered_script = runner.render("create_databases.sh")
-        runner.run("someservice", "create_databases.sh")
-        runner.exec.assert_called_once_with("someservice", rendered_script)
+        rendered_script = runner.render("mysql-client", "createdatabases")
+        runner.run("mysql-client", "createdatabases")
+        runner.exec.assert_called_once_with("mysql-client", rendered_script)

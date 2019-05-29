@@ -230,3 +230,5 @@ services:
     depends_on:
       {% if ACTIVATE_MYSQL %}- mysql{% endif %}
   {% endif %}
+  
+  {{ patch("local-docker-compose-services")|indent(2) }}

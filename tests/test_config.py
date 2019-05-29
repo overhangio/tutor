@@ -16,6 +16,12 @@ class ConfigTests(unittest.TestCase):
         self.assertNotIn("TUTOR_VERSION", defaults)
 
     def test_merge(self):
+        config1 = {"x": "y"}
+        config2 = {"x": "z"}
+        tutor_config.merge(config1, config2)
+        self.assertEqual({"x": "y"}, config1)
+
+    def test_merge_render(self):
         config = {}
         defaults = tutor_config.load_defaults()
         with unittest.mock.patch.object(

@@ -41,6 +41,11 @@ def run(root, edx_platform_path, edx_platform_settings, service, command, args):
 @click.argument("service", type=click.Choice(["lms", "cms"]))
 def runserver(root, edx_platform_path, edx_platform_settings, service):
     port = service_port(service)
+    from .. import fmt
+
+    fmt.echo_info(
+        "The {} service will be available at http://localhost:{}".format(service, port)
+    )
     docker_compose_run_with_port(
         root,
         edx_platform_path,

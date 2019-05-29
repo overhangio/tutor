@@ -6,6 +6,7 @@ import jinja2
 
 from . import exceptions
 from . import fmt
+from . import plugins
 from . import utils
 from .__about__ import __version__
 
@@ -39,13 +40,17 @@ class Renderer:
     @classmethod
     def render_str(cls, config, text):
         template = cls.environment().from_string(text)
-        return cls.__render(template, config)
+        return cls.__render(config, template)
 
     @classmethod
     def render_file(cls, config, path):
-        template = cls.environment().get_template(path)
         try:
-            return cls.__render(template, config)
+            template = cls.environment().get_template(path)
+        except:
+            fmt.echo_error("Error loading template " + path)
+            raise
+        try:
+            return cls.__render(config, template)
         except (jinja2.exceptions.TemplateError, exceptions.TutorError):
             fmt.echo_error("Error rendering template " + path)
             raise
@@ -54,13 +59,34 @@ class Renderer:
             raise
 
     @classmethod
-    def __render(cls, template, config):
+    def __render(cls, config, template):
+        def patch(name, separator="\n", suffix=""):
+            return cls.__render_patch(config, name, separator=separator, suffix=suffix)
+
         try:
-            return template.render(**config)
+            return template.render(patch=patch, **config)
         except jinja2.exceptions.UndefinedError as e:
             raise exceptions.TutorError(
                 "Missing configuration value: {}".format(e.args[0])
             )
+
+    @classmethod
+    def __render_patch(cls, config, name, separator="\n", suffix=""):
+        patches = []
+        for plugin, patch in plugins.iter_patches(config, name):
+            patch_template = cls.environment().from_string(patch)
+            try:
+                patches.append(patch_template.render(**config))
+            except jinja2.exceptions.UndefinedError as e:
+                raise exceptions.TutorError(
+                    "Missing configuration value: {} in patch '{}' from plugin {}".format(
+                        e.args[0], name, plugin
+                    )
+                )
+        rendered = separator.join(patches)
+        if rendered:
+            rendered += suffix
+        return rendered
 
 
 def render_full(root, config):
@@ -194,6 +220,7 @@ def is_part_of_env(path):
         basename.startswith(".")
         or basename.endswith(".pyc")
         or basename == "__pycache__"
+        or basename == "partials"
     )
 
 

@@ -1,6 +1,7 @@
 from . import env
 from . import exceptions
 from . import fmt
+from . import plugins
 
 
 class BaseRunner:
@@ -8,12 +9,12 @@ class BaseRunner:
         self.root = root
         self.config = config
 
-    def render(self, script, config=None):
+    def render(self, service, script, config=None):
         config = config or self.config
-        return env.render_file(config, "scripts", script).strip()
+        return env.render_file(config, "scripts", service, script).strip()
 
     def run(self, service, script, config=None):
-        command = self.render(script, config=config)
+        command = self.render(service, script, config=config)
         self.exec(service, command)
 
     def exec(self, service, command):
@@ -33,26 +34,18 @@ class BaseRunner:
 
 def migrate(runner):
     fmt.echo_info("Creating all databases...")
-    runner.run("mysql-client", "create_databases.sh")
+    runner.run("mysql-client", "createdatabases")
 
-    if runner.is_activated("lms"):
-        fmt.echo_info("Running lms migrations...")
-        runner.run("lms", "migrate_lms.sh")
-    if runner.is_activated("cms"):
-        fmt.echo_info("Running cms migrations...")
-        runner.run("cms", "migrate_cms.sh")
-    if runner.is_activated("forum"):
-        fmt.echo_info("Running forum migrations...")
-        runner.run("forum", "migrate_forum.sh")
-    if runner.is_activated("notes"):
-        fmt.echo_info("Running notes migrations...")
-        runner.run("notes", "migrate_django.sh")
-    if runner.is_activated("xqueue"):
-        fmt.echo_info("Running xqueue migrations...")
-        runner.run("xqueue", "migrate_django.sh")
-    if runner.is_activated("lms"):
-        fmt.echo_info("Creating oauth2 users...")
-        runner.run("lms", "oauth2.sh")
+    for service in ["lms", "cms", "forum", "notes", "xqueue"]:
+        if runner.is_activated(service):
+            fmt.echo_info("Running {} migrations...".format(service))
+            runner.run(service, "init")
+    # TODO it's really ugly to load the config from the runner
+    for plugin_name, service, command in plugins.iter_scripts(runner.config, "init"):
+        fmt.echo_info(
+            "Plugin {}: running init for service {}...".format(plugin_name, service)
+        )
+        runner.run(service, "init")
     fmt.echo_info("Databases ready.")
 
 
@@ -63,14 +56,14 @@ def create_user(runner, superuser, staff, name, email):
         config["OPTS"] += " --superuser"
     if staff:
         config["OPTS"] += " --staff"
-    runner.run("lms", "create_user.sh", config=config)
+    runner.run("lms", "createuser", config=config)
 
 
 def import_demo_course(runner):
     runner.check_service_is_activated("cms")
-    runner.run("cms", "import_demo_course.sh")
+    runner.run("cms", "importdemocourse")
 
 
 def index_courses(runner):
     runner.check_service_is_activated("cms")
-    runner.run("cms", "index_courses.sh")
+    runner.run("cms", "indexcourses")

@@ -8,6 +8,7 @@ from .. import exceptions
 from .. import env
 from .. import fmt
 from .. import opts
+from .. import plugins
 from .. import serialize
 from .. import utils
 from ..__about__ import __version__
@@ -142,10 +143,14 @@ def load_defaults():
 
 
 def load_current(root, defaults):
+    """
+    Note: this modifies the defaults. TODO this is not that great.
+    """
     convert_json2yml(root)
     config = load_user(root)
     load_env(config, defaults)
     load_required(config, defaults)
+    load_plugins(config, defaults)
     return config
 
 
@@ -190,6 +195,15 @@ def load_required(config, defaults):
     ]:
         if key not in config:
             config[key] = env.render_str(config, defaults[key])
+
+
+def load_plugins(config, defaults):
+    add_config, set_config, defaults_config = plugins.load_config(config)
+    merge(config, add_config)
+    # TODO this might have unexpected consequences if plugins have conflicting configurations. Maybe we should print warning messages.
+    merge(config, set_config)
+    # TODO this modifies defaults, which is ugly.
+    merge(defaults, defaults_config)
 
 
 def upgrade_obsolete(config):

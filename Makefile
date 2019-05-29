@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-BLACK_OPTS = --exclude templates ./tutor ./tests
+BLACK_OPTS = --exclude templates ./tutor ./tests ./plugins
 
 ###### Development
 
@@ -16,8 +16,13 @@ test-format: ## Run code formatting tests
 test-lint: ## Run code linting tests
 	pylint --errors-only tutor tests plugins
 
-test-unit: ## Run unit tests
+test-unit: test-unit-core test-unit-plugins ## Run unit tests
+
+test-unit-core:
 	python3 -m unittest discover tests
+
+test-unit-plugins:
+	python3 -m unittest discover plugins/minio/tests
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)
@@ -25,6 +30,7 @@ format: ## Format code automatically
 ###### Deployment
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
+	# TODO bundle plugins
 	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main
 dist/tutor:
 	$(MAKE) bundle
@@ -52,6 +58,7 @@ ci-info: ## Print info about environment
 ci-install: ## Install requirements
 	pip3 install -U setuptools
 	pip3 install -r requirements/dev.txt
+	pip3 install -r requirements/plugins.txt
 
 ci-bundle: ## Create bundle and run basic tests
 	$(MAKE) bundle

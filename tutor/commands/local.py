@@ -169,7 +169,7 @@ def https_create(root):
         fmt.echo_info("HTTPS is not activated: certificate generation skipped")
         return
 
-    script = runner.render("https_create.sh")
+    script = runner.render("certbot", "create")
 
     if config["WEB_PROXY"]:
         fmt.echo_info(
