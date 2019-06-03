@@ -3,7 +3,8 @@ import pkg_resources
 from . import exceptions
 
 """
-Tutor plugins are regular python packages that have a 'tutor.plugin.v1' entrypoint. This entrypoint must point to a module or a class that implements I don't know what (yet).
+Tutor plugins are regular python packages that have a 'tutor.plugin.v1' entrypoint. This
+entrypoint must point to a module or a class that implements I don't know what (yet).
 TODO
 """
 
@@ -102,7 +103,7 @@ def iter_patches(config, name):
 def load_config(config):
     """
     TODO Return:
-    
+
     add_config (dict): config key/values to add, if they are not already present
     set_config (dict): config key/values to set and override existing values
     """

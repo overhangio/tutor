@@ -1,6 +1,6 @@
 import click
 
-from . import config as tutor_config
+from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
 from .. import opts

@@ -1,6 +1,6 @@
 import click
 
-from . import config as tutor_config
+from .. import config as tutor_config
 from .. import env as tutor_env
 
 # from .. import exceptions
@@ -81,7 +81,6 @@ def delete(root, yes):
             "Are you sure you want to delete the platform? All data will be removed.",
             abort=True,
         )
-    config = tutor_config.load(root)
     utils.kubectl(
         "delete", "-k", tutor_env.pathjoin(root), "--ignore-not-found=true", "--wait"
     )

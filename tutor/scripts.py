@@ -41,7 +41,7 @@ def migrate(runner):
             fmt.echo_info("Running {} migrations...".format(service))
             runner.run(service, "init")
     # TODO it's really ugly to load the config from the runner
-    for plugin_name, service, command in plugins.iter_scripts(runner.config, "init"):
+    for plugin_name, service, _command in plugins.iter_scripts(runner.config, "init"):
         fmt.echo_info(
             "Plugin {}: running init for service {}...".format(plugin_name, service)
         )

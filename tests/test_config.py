@@ -2,7 +2,7 @@ import unittest
 import unittest.mock
 import tempfile
 
-from tutor.commands import config as tutor_config
+from tutor import config as tutor_config
 from tutor import env
 
 

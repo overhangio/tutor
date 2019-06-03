@@ -1,6 +1,6 @@
 import click
 
-from . import config as tutor_config
+from .. import config as tutor_config
 from .. import opts
 from .. import plugins
 

@@ -2,7 +2,7 @@ import tempfile
 import unittest
 import unittest.mock
 
-from tutor.commands import config as tutor_config
+from tutor import config as tutor_config
 from tutor import env
 from tutor import exceptions
 
@@ -72,7 +72,7 @@ class EnvTests(unittest.TestCase):
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
         with unittest.mock.patch.object(
             env.plugins, "iter_patches", return_value=patches.items()
-        ) as mock_iter_patches:
+        ):
             rendered = env.render_str(
                 {}, '{{ patch("location", separator=",\n", suffix=",") }}'
             )
