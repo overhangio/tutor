@@ -1,4 +1,5 @@
 .DEFAULT_GOAL := help
+BLACK_OPTS = --exclude templates ./tutor ./tests
 
 ###### Development
 
@@ -10,7 +11,7 @@ compile-requirements: ## Compile requirements files
 test: test-lint test-unit test-format ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
-	black --check --diff ./tutor ./tests
+	black --check --diff $(BLACK_OPTS)
 
 test-lint: ## Run code linting tests
 	pylint --errors-only tutor
@@ -19,7 +20,7 @@ test-unit: ## Run unit tests
 	python3 -m unittest discover tests
 
 format: ## Format code automatically
-	black ./tutor ./tests
+	black $(BLACK_OPTS)
 
 ###### Deployment
 
