@@ -50,17 +50,16 @@ class Patches:
     @classmethod
     def fill_cache(cls, config):
         for plugin_name, plugin in iter_enabled(config):
-            patches = get_callable_attr(plugin, "patches")
+            patches = get_callable_attr(plugin, "patches", {})
             for patch_name, content in patches.items():
                 if patch_name not in cls.CACHE:
                     cls.CACHE[patch_name] = {}
                 cls.CACHE[patch_name][plugin_name] = content
 
 
-def get_callable_attr(plugin, attr_name):
-    attr = getattr(plugin, attr_name, {})
+def get_callable_attr(plugin, attr_name, default=None):
+    attr = getattr(plugin, attr_name, default)
     if callable(attr):
-        # TODO pass config here for initialisation
         attr = attr()
     return attr
 
@@ -120,6 +119,12 @@ def iter_scripts(config, script_name):
     }
     """
     for plugin_name, plugin in iter_enabled(config):
-        scripts = get_callable_attr(plugin, "scripts")
+        scripts = get_callable_attr(plugin, "scripts", {})
         for service in scripts.get(script_name, []):
             yield plugin_name, service
+
+def iter_templates(config):
+    for plugin_name, plugin in iter_enabled(config):
+        templates = get_callable_attr(plugin, "templates")
+        if templates:
+            yield plugin_name, templates

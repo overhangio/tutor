@@ -22,9 +22,8 @@ class Renderer:
     def environment(cls, config):
         if not cls.ENVIRONMENT:
             template_roots = [TEMPLATES_ROOT]
-            for plugin_name, plugin in plugins.iter_enabled(config):
-                # TODO move this to plugins.iter_templates and add tests
-                template_roots.append(plugin.templates)
+            for _, plugin_templates in plugins.iter_templates(config):
+                template_roots.append(plugin_templates)
             environment = jinja2.Environment(
                 loader=jinja2.FileSystemLoader(template_roots),
                 undefined=jinja2.StrictUndefined,

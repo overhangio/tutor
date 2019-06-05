@@ -193,7 +193,6 @@ class K8sScriptRunner(scripts.BaseRunner):
         #     selector,
         #     "job",
         # )
-        # TODO check failure?
 
 
 k8s.add_command(quickstart)

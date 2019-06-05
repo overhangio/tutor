@@ -118,7 +118,7 @@ def load_plugins(config, defaults):
     """
     for plugin_name, plugin in plugins.iter_enabled(config):
         plugin_prefix = plugin_name.upper() + "_"
-        plugin_config = plugins.get_callable_attr(plugin, "config")
+        plugin_config = plugins.get_callable_attr(plugin, "config", {})
 
         # Add new config key/values
         for key, value in plugin_config.get("add", {}).items():

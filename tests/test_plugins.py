@@ -138,3 +138,13 @@ class PluginsTests(unittest.TestCase):
             self.assertEqual(
                 [("plugin1", "myclient")], list(plugins.iter_scripts({}, "init"))
             )
+    
+    def test_iter_templates(self):
+        class plugin1:
+            templates = "/tmp/templates"
+        with unittest.mock.patch.object(
+            plugins, "iter_enabled", return_value=[("plugin1", plugin1)]
+        ):
+            self.assertEqual(
+                [("plugin1", "/tmp/templates")], list(plugins.iter_templates({}))
+            )
