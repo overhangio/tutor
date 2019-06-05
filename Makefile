@@ -14,7 +14,7 @@ test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
 
 test-lint: ## Run code linting tests
-	pylint --errors-only tutor
+	pylint --errors-only tutor tests plugins
 
 test-unit: ## Run unit tests
 	python3 -m unittest discover tests
