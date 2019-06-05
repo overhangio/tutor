@@ -95,7 +95,9 @@ services:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
     environment:
       SEARCH_SERVER: "http://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
-      MONGOHQ_URL: "mongodb://{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}{{ MONGODB_HOST }}:{{ MONGODB_PORT }}/cs_comments_service"
+      MONGODB_AUTH: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
+      MONGODB_HOST: "{{ MONGODB_HOST }}"
+      MONGODB_PORT: "{{ MONGODB_PORT }}"
     restart: unless-stopped
     depends_on:
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}

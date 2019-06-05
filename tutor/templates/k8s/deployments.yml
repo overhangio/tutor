@@ -69,8 +69,12 @@ spec:
           env:
             - name: SEARCH_SERVER
               value: "http://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
-            - name: MONGOHQ_URL
-              value: "mongodb://{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}{{ MONGODB_HOST }}:{{ MONGODB_PORT }}/cs_comments_service"
+            - name: MONGODB_AUTH
+              value: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
+            - name: MONGODB_HOST
+              value: "{{ MONGODB_HOST }}"
+            - name: MONGODB_PORT
+              value: "{{ MONGODB_PORT }}"
 {% endif %}
 ---
 apiVersion: apps/v1
