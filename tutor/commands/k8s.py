@@ -25,7 +25,7 @@ def quickstart(root, silent):
     click.echo(fmt.title("Starting the platform"))
     start.callback(root)
     click.echo(fmt.title("Database creation and migrations"))
-    databases.callback(root)
+    init.callback(root)
     # TODO https certificates
 
 
@@ -81,13 +81,13 @@ def delete(root, yes):
     )
 
 
-@click.command(help="Create databases and run database migrations")
+@click.command(help="Initialise all applications")
 @opts.root
-def databases(root):
+def init(root):
     # TODO this requires a running mysql/mongodb/elasticsearch. Maybe we should wait until they are up?
     config = tutor_config.load(root)
     runner = K8sScriptRunner(root, config)
-    scripts.migrate(runner)
+    scripts.initialise(runner)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -200,7 +200,7 @@ k8s.add_command(quickstart)
 k8s.add_command(start)
 k8s.add_command(stop)
 k8s.add_command(delete)
-k8s.add_command(databases)
+k8s.add_command(init)
 k8s.add_command(createuser)
 k8s.add_command(importdemocourse)
 k8s.add_command(indexcourses)

@@ -60,7 +60,7 @@ class Patches:
 def get_callable_attr(plugin, attr_name):
     attr = getattr(plugin, attr_name, {})
     if callable(attr):
-        # TODO pass config here for initialization
+        # TODO pass config here for initialisation
         attr = attr()
     return attr
 

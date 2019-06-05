@@ -43,16 +43,16 @@ Update docker images
 
 This downloads the latest version of the docker images from `Docker Hub <https://hub.docker.com/r/regis/openedx/>`_. Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
 
-Database management
-~~~~~~~~~~~~~~~~~~~
+Service initialisation
+~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-    tutor local databases
+    tutor local init
 
-This command should be run just once. It will create the required databases tables and apply database migrations for all applications.
+This command should be run just once. It will initialise all applications: in particular, this will create the required databases tables and apply database migrations for all applications.
 
-If migrations are stopped with a ``Killed`` message, this certainly means the docker containers don't have enough RAM. See the :ref:`troubleshooting` section.
+If initialisation is stopped with a ``Killed`` message, this certainly means the docker containers don't have enough RAM. See the :ref:`troubleshooting` section.
 
 Running Open edX
 ~~~~~~~~~~~~~~~~

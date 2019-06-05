@@ -31,19 +31,19 @@ class BaseRunner:
         yield from plugins.iter_scripts(self.config, script)
 
 
-def migrate(runner):
-    fmt.echo_info("Creating all databases...")
+def initialise(runner):
+    fmt.echo_info("Initialising all services...")
     runner.run("mysql-client", "scripts", "mysql-client", "init")
     for service in ["lms", "cms", "forum", "notes", "xqueue"]:
         if runner.is_activated(service):
-            fmt.echo_info("Running {} migrations...".format(service))
+            fmt.echo_info("Initialising {}...".format(service))
             runner.run(service, "scripts", service, "init")
     for plugin_name, service in runner.iter_plugin_scripts("init"):
         fmt.echo_info(
             "Plugin {}: running init for service {}...".format(plugin_name, service)
         )
         runner.run(service, plugin_name, "scripts", service, "init")
-    fmt.echo_info("Databases ready.")
+    fmt.echo_info("All services initialised.")
 
 
 def create_user(runner, superuser, staff, username, email):

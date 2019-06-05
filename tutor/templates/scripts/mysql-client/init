@@ -1,4 +1,4 @@
-echo "Initializing MySQL..."
+echo "Initialising MySQL..."
 mysql_connection_max_attempts=10
 mysql_connection_attempt=0
 until mysql -u root --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" --port {{ MYSQL_PORT }} -e 'exit'
@@ -7,7 +7,7 @@ do
     echo "    [$mysql_connection_attempt/$mysql_connection_max_attempts] Waiting for MySQL service (this may take a while)..."
     if [ $mysql_connection_attempt -eq $mysql_connection_max_attempts ]
     then
-      echo "MySQL initialization error" 1>&2
+      echo "MySQL initialisation error" 1>&2
       exit 1
     fi
     sleep 10

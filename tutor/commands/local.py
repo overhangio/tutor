@@ -36,7 +36,7 @@ def quickstart(root, silent, pullimages_):
         click.echo(fmt.title("Docker image updates"))
         pullimages.callback(root)
     click.echo(fmt.title("Database creation and migrations"))
-    databases.callback(root)
+    init.callback(root)
     click.echo(fmt.title("HTTPS certificates generation"))
     https_create.callback(root)
     click.echo(fmt.title("Starting the platform in detached mode"))
@@ -147,12 +147,12 @@ def execute(root, service, command, args):
     docker_compose(root, config, *exec_command)
 
 
-@click.command(help="Create databases and run database migrations")
+@click.command(help="Initialise all applications")
 @opts.root
-def databases(root):
+def init(root):
     config = tutor_config.load(root)
     runner = ScriptRunner(root, config)
-    scripts.migrate(runner)
+    scripts.initialise(runner)
 
 
 @click.group(help="Manage https certificates")
@@ -328,7 +328,7 @@ local.add_command(stop)
 local.add_command(restart)
 local.add_command(run)
 local.add_command(execute, name="exec")
-local.add_command(databases)
+local.add_command(init)
 local.add_command(https)
 local.add_command(logs)
 local.add_command(createuser)

@@ -95,7 +95,7 @@ ci-github: ./releases/github-release ## Upload assets to github
 ci-images: ## Build and push docker images to hub.docker.com
 	python setup.py develop
 	tutor images build all
-	tutor local databases
+	tutor local init
 	docker login -u "$$DOCKER_USERNAME" -p "$$DOCKER_PASSWORD"
 	tutor images push all
 
