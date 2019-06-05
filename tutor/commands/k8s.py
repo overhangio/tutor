@@ -59,12 +59,18 @@ def start(root):
 def stop(root):
     config = tutor_config.load(root)
     utils.kubectl(
-        "delete",
-        "--namespace",
-        config["K8S_NAMESPACE"],
-        "--selector=app.kubernetes.io/instance=openedx-" + config["ID"],
-        "deployments,services,ingress,configmaps",
+        "delete", *resource_selector(config), "deployments,services,ingress,configmaps"
     )
+
+
+def resource_selector(config, *selectors):
+    """
+    Convenient utility for filtering only the resources that belong to this project.
+    """
+    selector = ",".join(
+        ["app.kubernetes.io/instance=openedx-" + config["ID"]] + list(selectors)
+    )
+    return ["--namespace", config["K8S_NAMESPACE"], "--selector=" + selector]
 
 
 @click.command(help="Completely delete an existing platform")
@@ -84,9 +90,11 @@ def delete(root, yes):
 @click.command(help="Initialise all applications")
 @opts.root
 def init(root):
-    # TODO this requires a running mysql/mongodb/elasticsearch. Maybe we should wait until they are up?
     config = tutor_config.load(root)
     runner = K8sScriptRunner(root, config)
+    for service in ["mysql", "elasticsearch", "mongodb"]:
+        if runner.is_activated(service):
+            wait_for_pod_ready(config, service)
     scripts.initialise(runner)
 
 
@@ -136,32 +144,29 @@ def logs(root, follow, tail, service):
     config = tutor_config.load(root)
 
     command = ["logs"]
-    command += ["--namespace", config["K8S_NAMESPACE"]]
+    selectors = ["app.kubernetes.io/name=" + service] if service else []
+    command += resource_selector(config, *selectors)
 
     if follow:
         command += ["--follow"]
     if tail is not None:
         command += ["--tail", str(tail)]
 
-    selector = "--selector=app.kubernetes.io/instance=openedx-" + config["ID"]
-    if service:
-        selector += ",app.kubernetes.io/name=" + service
-    command.append(selector)
-
     utils.kubectl(*command)
 
 
 class K8sScriptRunner(scripts.BaseRunner):
     def exec(self, service, command):
+        selector = "app.kubernetes.io/name={}".format(service)
+
         # Find pod in runner deployment
+        wait_for_pod_ready(self.config, service)
         fmt.echo_info("Finding pod name for {} deployment...".format(service))
         pod = utils.check_output(
             "kubectl",
             "get",
-            "-n",
-            "openedx",
+            *resource_selector(self.config, selector),
             "pods",
-            "--selector=app.kubernetes.io/name={}".format(service),
             "-o=jsonpath={.items[0].metadata.name}",
         )
         # Delete any previously run jobs (completed job objects still exist)
@@ -193,6 +198,16 @@ class K8sScriptRunner(scripts.BaseRunner):
         #     selector,
         #     "job",
         # )
+
+def wait_for_pod_ready(config, service):
+    fmt.echo_info("Waiting for a {} pod to be ready...".format(service))
+    utils.kubectl(
+        "wait",
+        *resource_selector(config, "app.kubernetes.io/name={}".format(service)),
+        "--for=condition=Ready",
+        "--timeout=600s",
+        "pod",
+    )
 
 
 k8s.add_command(quickstart)
