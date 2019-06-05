@@ -23,7 +23,7 @@ By default, this file contains only the required configuration parameters for ru
 
 Alternatively, you can set each parameter from the command line::
 
-    tutor config save -y --set PARAM1=VALUE1 --set PARAM2=VALUE2
+    tutor config save --set PARAM1=VALUE1 --set PARAM2=VALUE2
 
 Or from the system environment::
 
@@ -139,7 +139,7 @@ SMTP
 Optional features
 ~~~~~~~~~~~~~~~~~
 
-Some optional features may be activated or deactivated during the interactive configuration step (``tutor config save``).
+Some optional features may be activated or deactivated during the interactive configuration step (``tutor config save -i``).
 
 SSL/TLS certificates for HTTPS access
 *************************************
@@ -264,7 +264,7 @@ Running a different ``openedx`` Docker image
 
 By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry with::
 
-    tutor config save -y --set DOCKER_IMAGE_OPENEDX=myusername/openedx:mytag
+    tutor config save --set DOCKER_IMAGE_OPENEDX=myusername/openedx:mytag
     tutor images build openedx
     tutor images push openedx
 

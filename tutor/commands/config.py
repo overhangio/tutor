@@ -4,7 +4,7 @@ from .. import config as tutor_config
 from .. import env
 from .. import exceptions
 from .. import fmt
-from .. import interactive
+from .. import interactive as interactive_config
 from .. import opts
 
 
@@ -19,12 +19,10 @@ def config_command():
 
 @click.command(help="Create and save configuration interactively")
 @opts.root
-@click.option("-y", "--yes", "silent1", is_flag=True, help="Run non-interactively")
-@click.option("--silent", "silent2", is_flag=True, hidden=True)
+@click.option("-i", "--interactive", is_flag=True, help="Run interactively")
 @opts.key_value
-def save(root, silent1, silent2, set_):
-    silent = silent1 or silent2
-    config, defaults = interactive.load_all(root, silent=silent)
+def save(root, interactive, set_):
+    config, defaults = interactive_config.load_all(root, interactive=interactive)
     if set_:
         tutor_config.merge(config, dict(set_), force=True)
     tutor_config.save(root, config)

@@ -28,9 +28,9 @@ Configuration
 
 ::
 
-    tutor config save
+    tutor config save --interactive
 
-This is the only non-automatic step in the install process. You will be asked various questions about your Open edX platform and appropriate configuration files will be generated. If you would like to automate this step then you should run ``tutor config save`` once. After that, there will be a ``config.yml`` file at the root of the project folder: this file contains all the configuration values for your platform, such as randomly generated passwords, domain names, etc.
+This is the only non-automatic step in the install process. You will be asked various questions about your Open edX platform and appropriate configuration files will be generated. If you would like to automate this step then you should run ``tutor config save --interactive`` once. After that, there will be a ``config.yml`` file at the root of the project folder: this file contains all the configuration values for your platform, such as randomly generated passwords, domain names, etc.
 
 If you want to run a fully automated install, upload the ``config.yml`` file to wherever you want to run Open edX. You can then entirely skip the configuration step.
 
@@ -143,7 +143,7 @@ Running Open edX behind a web proxy
 
 The containerized web server (nginx) needs to listen to ports 80 and 443 on the host. If there is already a webserver running on the host, such as Apache or Nginx, the nginx container will not be able to start. Tutor supports running behind a web proxy. To do so, add the following configuration::
 
-       tutor config save -y --set WEB_PROXY=true --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
+       tutor config save --set WEB_PROXY=true --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
 
 In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. You must then configure the web proxy on the host. Basic configuration files are provided by Tutor which can be used directly by your web proxy.
 
@@ -180,14 +180,14 @@ As an example, here is how to launch two different platforms, with nginx running
 
     # platform 1
     export TUTOR_ROOT=~/openedx/site1
-    tutor config save --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site1 --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=481
+    tutor config save --interactive --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site1 --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=481
     tutor local quickstart
     sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/site1.conf
 
 
     # platform 2
     export TUTOR_ROOT=~/openedx/site2
-    tutor config save --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site2 --set NGINX_HTTP_PORT=82 --set NGINX_HTTPS_PORT=482
+    tutor config save --interactive --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site2 --set NGINX_HTTP_PORT=82 --set NGINX_HTTPS_PORT=482
     tutor local quickstart
     sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/site2.conf
 

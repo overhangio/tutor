@@ -191,7 +191,7 @@ def check_is_up_to_date(root):
             "v{} while the 'tutor' binary is at v{}. You should upgrade "
             "the environment by running:\n"
             "\n"
-            "    tutor config save -y"
+            "    tutor config save"
         )
         fmt.echo_alert(message.format(base_dir(root), version(root), __version__))
 

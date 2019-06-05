@@ -37,7 +37,7 @@ sudo curl -L "https://github.com/regisb/tutor/releases/download/$TUTOR_VERSION/t
 sudo chmod +x /usr/local/bin/tutor
 
 echo "=============== Pulling vendor docker images"
-tutor config save --yes
+tutor config save
 tutor images pull elasticsearch
 tutor images pull memcached
 tutor images pull mongodb
@@ -65,7 +65,7 @@ docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NGINX)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_RABBITMQ)
 
 echo "=============== Building openedx docker images"
-tutor config save --yes --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true --set DOCKER_REGISTRY=localhost:5000/
+tutor config save --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true --set DOCKER_REGISTRY=localhost:5000/
 tutor images build all
 
 echo "=============== Create Web UI script"

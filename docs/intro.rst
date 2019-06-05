@@ -21,7 +21,7 @@ How does Tutor work?
 
 You can experiment with Tutor very quickly: start by `installing <install>`_ Tutor. Then run::
   
-    tutor config save
+    tutor config save --interactive
 
 This command does two things:
 
@@ -32,7 +32,7 @@ All these files are stored in a single folder, called the Tutor project root. On
 
 The values from ``config.yml`` are used to generate the environment files in ``env/``. As a consequence, **every time the values from** ``config.yml`` **are modified, the environment must be regenerated**. This can be done with::
     
-    tutor config save -y
+    tutor config save
     
 Another consequence is that **any manual change made to a file in** ``env/`` **will be overwritten by** ``tutor config save`` **commands**. Consider yourself warned ;-)
 

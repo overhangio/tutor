@@ -181,7 +181,7 @@ def check_existing_config(root):
     """
     if not os.path.exists(config_path(root)):
         raise exceptions.TutorError(
-            "Project root does not exist. Make sure to generate the initial configuration with `tutor config save` or `tutor config quickstart` prior to running other commands."
+            "Project root does not exist. Make sure to generate the initial configuration with `tutor config save --interactive` or `tutor config quickstart` prior to running other commands."
         )
     env.check_is_up_to_date(root)
 

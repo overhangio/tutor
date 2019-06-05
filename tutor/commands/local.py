@@ -5,7 +5,7 @@ import click
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
-from .. import interactive
+from .. import interactive as interactive_config
 from .. import opts
 from .. import scripts
 from .. import utils
@@ -21,13 +21,13 @@ def local():
 
 @click.command(help="Configure and run Open edX from scratch")
 @opts.root
-@click.option("-y", "--yes", "silent", is_flag=True, help="Run non-interactively")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option(
     "-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images"
 )
-def quickstart(root, silent, pullimages_):
+def quickstart(root, non_interactive, pullimages_):
     click.echo(fmt.title("Interactive platform configuration"))
-    config = interactive.update(root, silent=silent)
+    config = interactive_config.update(root, interactive=(not non_interactive))
     click.echo(fmt.title("Updating the current environment"))
     tutor_env.save(root, config)
     click.echo(fmt.title("Stopping any existing platform"))

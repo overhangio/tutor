@@ -8,17 +8,17 @@ from . import fmt
 from .__about__ import __version__
 
 
-def update(root, silent=False):
+def update(root, interactive=True):
     """
     Load and save the configuration.
     """
-    config, defaults = load_all(root, silent=silent)
+    config, defaults = load_all(root, interactive=interactive)
     tutor_config.save(root, config)
     tutor_config.merge(config, defaults)
     return config
 
 
-def load_all(root, silent=False):
+def load_all(root, interactive=True):
     """
     Load configuration and interactively ask questions to collect param values from the user.
     """
@@ -27,7 +27,7 @@ def load_all(root, silent=False):
     if os.path.exists(tutor_config.config_path(root)):
         config = tutor_config.load_current(root, defaults)
 
-    if not silent:
+    if interactive:
         ask_questions(config, defaults)
 
     return config, defaults
