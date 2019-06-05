@@ -160,6 +160,7 @@ def render_unknown(config, value):
         return render_str(config, value)
     return value
 
+
 def render_str(config, text):
     """
     Args:

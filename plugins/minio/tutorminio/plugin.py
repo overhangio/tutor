@@ -21,9 +21,8 @@ config = {
 
 templates = os.path.join(HERE, "templates")
 
-scripts = {
-    "init": ["minio-client"]
-}
+scripts = {"init": ["minio-client"]}
+
 
 def patches():
     all_patches = {}

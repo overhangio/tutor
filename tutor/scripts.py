@@ -10,8 +10,11 @@ class BaseRunner:
         self.config = config
 
     def run(self, service, *path):
-        command = env.render_file(self.config, *path).strip()
+        command = self.render(*path)
         self.exec(service, command)
+
+    def render(self, *path):
+        return env.render_file(self.config, *path).strip()
 
     def exec(self, service, command):
         raise NotImplementedError

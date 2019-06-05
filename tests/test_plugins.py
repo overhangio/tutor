@@ -66,6 +66,7 @@ class PluginsTests(unittest.TestCase):
     def test_configure(self):
         config = {"ID": "id"}
         defaults = {}
+
         class plugin1:
             config = {
                 "add": {"PARAM1": "value1", "PARAM2": "value2"},
@@ -104,6 +105,7 @@ class PluginsTests(unittest.TestCase):
 
     def test_configure_set_random_string(self):
         config = {}
+
         class plugin1:
             config = {"set": {"PARAM1": "{{ 128|random_string }}"}}
 
@@ -116,8 +118,10 @@ class PluginsTests(unittest.TestCase):
     def test_configure_default_value_with_previous_definition(self):
         config = {}
         defaults = {"PARAM1": "value"}
+
         class plugin1:
             config = {"defaults": {"PARAM2": "{{ PARAM1 }}"}}
+
         with unittest.mock.patch.object(
             plugins, "iter_enabled", return_value=[("plugin1", plugin1)]
         ):
@@ -127,6 +131,7 @@ class PluginsTests(unittest.TestCase):
     def test_scripts(self):
         class plugin1:
             scripts = {"init": ["myclient"]}
+
         with unittest.mock.patch.object(
             plugins, "iter_enabled", return_value=[("plugin1", plugin1)]
         ):

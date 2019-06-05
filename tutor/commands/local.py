@@ -122,7 +122,7 @@ def run(root, entrypoint, service, command, args):
     run_command = ["run", "--rm"]
     if entrypoint:
         run_command += ["--entrypoint", entrypoint]
-    run_command.append(service)    
+    run_command.append(service)
     if command:
         run_command.append(command)
     if args:
@@ -176,8 +176,7 @@ def https_create(root):
         fmt.echo_info("HTTPS is not activated: certificate generation skipped")
         return
 
-    # TODO this is not going to work anymore
-    script = runner.render("certbot", "create")
+    script = runner.render("scripts", "certbot", "create")
 
     if config["WEB_PROXY"]:
         fmt.echo_info(
@@ -305,7 +304,16 @@ def portainer(root, port):
 
 class ScriptRunner(scripts.BaseRunner):
     def exec(self, service, command):
-        docker_compose(self.root, self.config, "run", "--rm", "--entrypoint", "sh -e -c", service, command)
+        docker_compose(
+            self.root,
+            self.config,
+            "run",
+            "--rm",
+            "--entrypoint",
+            "sh -e -c",
+            service,
+            command,
+        )
 
 
 def docker_compose(root, config, *command):

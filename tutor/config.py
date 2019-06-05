@@ -111,6 +111,7 @@ def load_required(config, defaults):
         if key not in config:
             config[key] = env.render_unknown(config, defaults[key])
 
+
 def load_plugins(config, defaults):
     """
     Add, override and set new defaults from plugins.
