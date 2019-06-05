@@ -2,6 +2,4 @@ appdirs
 click>=7.0
 click_repl
 jinja2
-# TODO get rid of kubernetes?
-kubernetes
 pyyaml>=4.2b1
