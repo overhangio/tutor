@@ -1,6 +1,7 @@
 import pkg_resources
 
 from . import exceptions
+from . import fmt
 
 """
 Tutor plugins are regular python packages that have a 'tutor.plugin.v1' entrypoint. This
@@ -85,6 +86,11 @@ def enable(config, name):
     config[CONFIG_KEY].sort()
 
 
+def disable(config, name):
+    while name in config[CONFIG_KEY]:
+        config[CONFIG_KEY].remove(name)
+
+
 def iter_enabled(config):
     for name, plugin in iter_installed():
         if is_enabled(config, name):
@@ -100,46 +106,14 @@ def iter_patches(config, name):
         yield plugin, patch
 
 
-def load_config(config):
-    """
-    TODO Return:
-
-    add_config (dict): config key/values to add, if they are not already present
-    set_config (dict): config key/values to set and override existing values
-    """
-    add_config = {}
-    set_config = {}
-    defaults_config = {}
-    for plugin_name, plugin in iter_enabled(config):
-        plugin_prefix = plugin_name.upper() + "_"
-        plugin_config = get_callable_attr(plugin, "config")
-
-        # Add new config key/values
-        for key, value in plugin_config.get("add", {}).items():
-            add_config[plugin_prefix + key] = value
-
-        # Set existing config key/values
-        for key, value in plugin_config.get("set", {}).items():
-            # TODO crash in case of conflicting keys between plugins
-            # If key already exists
-            set_config[key] = value
-
-        # Create new defaults
-        for key, value in plugin_config.get("defaults", {}).items():
-            defaults_config[plugin_prefix + key] = value
-    return add_config, set_config, defaults_config
-
-
 def iter_scripts(config, script_name):
     """
     Scripts are of the form:
 
     scripts = {
         "script-name": [
-            {
-                "service": "service-name",
-                "command": "...",
-            },
+            "service-name1",
+            "service-name2",
             ...
         ],
         ...
@@ -147,10 +121,5 @@ def iter_scripts(config, script_name):
     """
     for plugin_name, plugin in iter_enabled(config):
         scripts = get_callable_attr(plugin, "scripts")
-        for script in scripts.get(script_name, []):
-            try:
-                yield plugin_name, script["service"], script["command"]
-            except KeyError as e:
-                raise exceptions.TutorError(
-                    "plugin script configuration requires key '{}'".format(e.args[0])
-                )
+        for service in scripts.get(script_name, []):
+            yield plugin_name, service

@@ -39,7 +39,7 @@ class EnvTests(unittest.TestCase):
         config = {}
         tutor_config.merge(config, tutor_config.load_defaults())
         config["MYSQL_ROOT_PASSWORD"] = "testpassword"
-        rendered = env.render_file(config, "scripts", "mysql-client", "createdatabases")
+        rendered = env.render_file(config, "scripts", "mysql-client", "init")
         self.assertIn("testpassword", rendered)
 
     @unittest.mock.patch.object(tutor_config.fmt, "echo")

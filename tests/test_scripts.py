@@ -5,14 +5,10 @@ from tutor import config as tutor_config
 from tutor import scripts
 
 
-class DummyRunner(scripts.BaseRunner):
-    exec = unittest.mock.Mock()
-
-
 class ScriptsTests(unittest.TestCase):
-    def test_run(self):
-        config = tutor_config.load_defaults()
-        runner = DummyRunner("/tmp", config)
-        rendered_script = runner.render("mysql-client", "createdatabases")
-        runner.run("mysql-client", "createdatabases")
-        runner.exec.assert_called_once_with("mysql-client", rendered_script)
+    def test_is_activated(self):
+        config = {"ACTIVATE_SERVICE1": True, "ACTIVATE_SERVICE2": False}
+        runner = scripts.BaseRunner("/tmp", config)
+
+        self.assertTrue(runner.is_activated("service1"))
+        self.assertFalse(runner.is_activated("service2"))

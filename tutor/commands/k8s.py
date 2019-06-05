@@ -2,9 +2,8 @@ import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
-
-# from .. import exceptions
 from .. import fmt
+from .. import interactive
 from .. import opts
 from .. import scripts
 from .. import utils
@@ -20,7 +19,9 @@ def k8s():
 @click.option("-y", "--yes", "silent", is_flag=True, help="Run non-interactively")
 def quickstart(root, silent):
     click.echo(fmt.title("Interactive platform configuration"))
-    tutor_config.save(root, silent=silent)
+    config = interactive.update(root, silent=silent)
+    click.echo(fmt.title("Updating the current environment"))
+    tutor_env.save(root, config)
     click.echo(fmt.title("Starting the platform"))
     start.callback(root)
     click.echo(fmt.title("Database creation and migrations"))
@@ -49,14 +50,8 @@ def start(root):
         "--selector",
         "app.kubernetes.io/component=volume",
     )
-    # Create everything else (except Job objects)
-    utils.kubectl(
-        "apply",
-        "--selector",
-        "app.kubernetes.io/component!=script",
-        "--kustomize",
-        tutor_env.pathjoin(root),
-    )
+    # Create everything else
+    utils.kubectl("apply", "--kustomize", tutor_env.pathjoin(root))
 
 
 @click.command(help="Stop a running platform")
@@ -68,7 +63,7 @@ def stop(root):
         "--namespace",
         config["K8S_NAMESPACE"],
         "--selector=app.kubernetes.io/instance=openedx-" + config["ID"],
-        "deployments,services,ingress,configmaps,jobs",
+        "deployments,services,ingress,configmaps",
     )
 
 
@@ -104,7 +99,6 @@ def databases(root):
 def createuser(root, superuser, staff, name, email):
     config = tutor_config.load(root)
     runner = K8sScriptRunner(root, config)
-    # TODO this is not going to work
     scripts.create_user(runner, superuser, staff, name, email)
 
 
@@ -124,7 +118,6 @@ def importdemocourse(root):
 def indexcourses(root):
     config = tutor_config.load(root)
     runner = K8sScriptRunner(root, config)
-    # TODO this is not going to work
     scripts.index_courses(runner)
 
 
@@ -159,32 +152,47 @@ def logs(root, follow, tail, service):
 
 
 class K8sScriptRunner(scripts.BaseRunner):
-    def run(self, service, script, config=None):
-        job_name = "{}/{}".format(service, script)
-        selector = (
-            "--selector=app.kubernetes.io/component=script,app.kubernetes.io/name="
-            + job_name
+    def exec(self, service, command):
+        # Find pod in runner deployment
+        fmt.echo_info("Finding pod name for {} deployment...".format(service))
+        pod = utils.check_output(
+            "kubectl",
+            "get",
+            "-n",
+            "openedx",
+            "pods",
+            "--selector=app.kubernetes.io/name={}".format(service),
+            "-o=jsonpath={.items[0].metadata.name}",
         )
-        kustomization = tutor_env.pathjoin(self.root)
         # Delete any previously run jobs (completed job objects still exist)
-        utils.kubectl("delete", "-k", kustomization, "--wait", selector)
+        # utils.kubectl("delete", "-k", kustomization, "--wait", selector)
         # Run job
-        utils.kubectl("apply", "-k", kustomization, selector)
-        # Wait until complete
-        fmt.echo_info(
-            "Waiting for job to complete. To view logs, run: \n\n    kubectl logs -n {} -l app.kubernetes.io/name={} --follow\n".format(
-                self.config["K8S_NAMESPACE"], job_name
-            )
-        )
         utils.kubectl(
-            "wait",
+            "exec",
             "--namespace",
             self.config["K8S_NAMESPACE"],
-            "--for=condition=complete",
-            "--timeout=-1s",
-            selector,
-            "job",
+            pod.decode(),
+            "--",
+            "sh",
+            "-e",
+            "-c",
+            command,
         )
+        # # Wait until complete
+        # fmt.echo_info(
+        #     "Waiting for job to complete. To view logs, run: \n\n    kubectl logs -n {} -l app.kubernetes.io/name={} --follow\n".format(
+        #         self.config["K8S_NAMESPACE"], job_name
+        #     )
+        # )
+        # utils.kubectl(
+        #     "wait",
+        #     "--namespace",
+        #     self.config["K8S_NAMESPACE"],
+        #     "--for=condition=complete",
+        #     "--timeout=-1s",
+        #     selector,
+        #     "job",
+        # )
         # TODO check failure?
 
 

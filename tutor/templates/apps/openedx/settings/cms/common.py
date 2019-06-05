@@ -24,9 +24,10 @@ LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
 
 LOCALE_PATHS.append("/openedx/locale")
 
-{{ patch("openedx-common-settings") }}
-
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
     if not os.path.exists(folder):
         os.makedirs(folder)
+
+{{ patch("openedx-common-settings") }}
+{{ patch("openedx-cms-common-settings") }}

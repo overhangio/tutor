@@ -105,3 +105,12 @@ def execute(*command):
             raise exceptions.TutorError(
                 "Command failed with status {}: {}".format(result, " ".join(command))
             )
+
+
+def check_output(*command):
+    click.echo(fmt.command(" ".join(command)))
+    try:
+        return subprocess.check_output(command)
+    except:
+        fmt.echo_error("Command failed: {}".format(" ".join(command)))
+        raise

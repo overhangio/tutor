@@ -247,6 +247,27 @@ spec:
           persistentVolumeClaim:
             claimName: mysql
 {% endif %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-client
+  labels:
+    app.kubernetes.io/name: mysql-client
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mysql-client
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mysql-client
+    spec:
+      containers:
+        - name: mysql
+          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+          command: ["sh", "-e", "-c"]
+          args: ["while true; do echo 'ready'; sleep 10; done"]
 {% if ACTIVATE_NOTES %}
 ---
 apiVersion: apps/v1
@@ -399,3 +420,5 @@ spec:
           persistentVolumeClaim:
             claimName: rabbitmq
 {% endif %}
+
+{{ patch("k8s-deployments") }}

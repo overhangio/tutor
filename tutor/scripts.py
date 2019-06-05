@@ -9,12 +9,8 @@ class BaseRunner:
         self.root = root
         self.config = config
 
-    def render(self, service, script, config=None):
-        config = config or self.config
-        return env.render_file(config, "scripts", service, script).strip()
-
-    def run(self, service, script, config=None):
-        command = self.render(service, script, config=config)
+    def run(self, service, *path):
+        command = env.render_file(self.config, *path).strip()
         self.exec(service, command)
 
     def exec(self, service, command):
@@ -31,32 +27,37 @@ class BaseRunner:
     def is_activated(self, service):
         return self.config["ACTIVATE_" + service.upper()]
 
+    def iter_plugin_scripts(self, script):
+        yield from plugins.iter_scripts(self.config, script)
+
 
 def migrate(runner):
     fmt.echo_info("Creating all databases...")
-    runner.run("mysql-client", "createdatabases")
-
+    runner.run("mysql-client", "scripts", "mysql-client", "init")
     for service in ["lms", "cms", "forum", "notes", "xqueue"]:
         if runner.is_activated(service):
             fmt.echo_info("Running {} migrations...".format(service))
-            runner.run(service, "init")
-    # TODO it's really ugly to load the config from the runner
-    for plugin_name, service, _command in plugins.iter_scripts(runner.config, "init"):
+            runner.run(service, "scripts", service, "init")
+    for plugin_name, service in runner.iter_plugin_scripts("init"):
         fmt.echo_info(
             "Plugin {}: running init for service {}...".format(plugin_name, service)
         )
-        runner.run(service, "init")
+        runner.run(service, plugin_name, "scripts", service, "init")
     fmt.echo_info("Databases ready.")
 
 
-def create_user(runner, superuser, staff, name, email):
+def create_user(runner, superuser, staff, username, email):
     runner.check_service_is_activated("lms")
-    config = {"OPTS": "", "USERNAME": name, "EMAIL": email}
+    opts = ""
     if superuser:
-        config["OPTS"] += " --superuser"
+        opts += " --superuser"
     if staff:
-        config["OPTS"] += " --staff"
-    runner.run("lms", "createuser", config=config)
+        opts += " --staff"
+    command = (
+        "./manage.py lms --settings=tutor.production manage_user {opts} {username} {email}\n"
+        "./manage.py lms --settings=tutor.production changepassword {username}"
+    ).format(opts=opts, username=username, email=email)
+    runner.exec("lms", command)
 
 
 def import_demo_course(runner):

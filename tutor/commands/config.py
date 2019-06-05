@@ -1,8 +1,10 @@
 import click
 
-from .. import config
+from .. import config as tutor_config
+from .. import env
 from .. import exceptions
 from .. import fmt
+from .. import interactive
 from .. import opts
 
 
@@ -15,14 +17,19 @@ def config_command():
     pass
 
 
-@click.command(name="save", help="Create and save configuration interactively")
+@click.command(help="Create and save configuration interactively")
 @opts.root
 @click.option("-y", "--yes", "silent1", is_flag=True, help="Run non-interactively")
 @click.option("--silent", "silent2", is_flag=True, hidden=True)
 @opts.key_value
-def save_command(root, silent1, silent2, set_):
+def save(root, silent1, silent2, set_):
     silent = silent1 or silent2
-    config.save(root, silent=silent, keyvalues=set_)
+    config, defaults = interactive.load_all(root, silent=silent)
+    if set_:
+        tutor_config.merge(config, dict(set_), force=True)
+    tutor_config.save(root, config)
+    tutor_config.merge(config, defaults)
+    env.save(root, config)
 
 
 @click.command(help="Print the project root")
@@ -35,13 +42,13 @@ def printroot(root):
 @opts.root
 @click.argument("key")
 def printvalue(root, key):
-    local = config.load(root)
+    config = tutor_config.load(root)
     try:
-        fmt.echo(local[key])
+        fmt.echo(config[key])
     except KeyError:
         raise exceptions.TutorError("Missing configuration value: {}".format(key))
 
 
-config_command.add_command(save_command)
+config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)

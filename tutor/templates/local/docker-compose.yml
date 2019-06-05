@@ -30,9 +30,9 @@ services:
   {% endif %}
   mysql-client:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
-    command: echo "mysql client ready"
+    command: sh
     restart: "no"
-    {% if ACTIVATE_MYSQL %}depends_on:
+    {% if ACTIVATE_MYSQL%}depends_on:
       - mysql{% endif %}
 
   {% if ACTIVATE_ELASTICSEARCH %}
@@ -63,6 +63,9 @@ services:
     ports:
       - "{{ NGINX_HTTP_PORT }}:80"
       - "{{ NGINX_HTTPS_PORT }}:443"
+    networks:
+      default:
+        aliases: [{{ patch("local-docker-compose-nginx-aliases", separator=", ") }}]
     volumes:
       - ../apps/nginx:/etc/nginx/conf.d/:ro
       - ../../data/openedx:/var/www/openedx:ro
@@ -201,8 +204,8 @@ services:
       - ../apps/notes/settings/tutor.py:/openedx/edx-notes-api/notesserver/settings/tutor.py
       - ../../data/notes:/openedx/data
     restart: unless-stopped
-    depends_on:
-      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
+    {% if ACTIVATE_MYSQL %}depends_on:
+      - mysql{% endif %}
   {% endif %}
 
   {% if ACTIVATE_XQUEUE %}
@@ -215,8 +218,8 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: xqueue.tutor
     restart: unless-stopped
-    depends_on:
-      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
+    {% if ACTIVATE_MYSQL %}depends_on:
+      - mysql{% endif %}
 
   xqueue_consumer:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_XQUEUE }}
@@ -227,8 +230,8 @@ services:
       DJANGO_SETTINGS_MODULE: xqueue.tutor
     restart: unless-stopped
     command: ./manage.py run_consumer
-    depends_on:
-      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
+    {% if ACTIVATE_MYSQL %}depends_on:
+      - mysql{% endif %}
   {% endif %}
   
   {{ patch("local-docker-compose-services")|indent(2) }}

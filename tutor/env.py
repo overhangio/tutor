@@ -19,10 +19,14 @@ class Renderer:
     ENVIRONMENT = None
 
     @classmethod
-    def environment(cls):
+    def environment(cls, config):
         if not cls.ENVIRONMENT:
+            template_roots = [TEMPLATES_ROOT]
+            for plugin_name, plugin in plugins.iter_enabled(config):
+                # TODO move this to plugins.iter_templates and add tests
+                template_roots.append(plugin.templates)
             environment = jinja2.Environment(
-                loader=jinja2.FileSystemLoader(TEMPLATES_ROOT),
+                loader=jinja2.FileSystemLoader(template_roots),
                 undefined=jinja2.StrictUndefined,
             )
             environment.filters["random_string"] = utils.random_string
@@ -40,13 +44,13 @@ class Renderer:
 
     @classmethod
     def render_str(cls, config, text):
-        template = cls.environment().from_string(text)
+        template = cls.environment(config).from_string(text)
         return cls.__render(config, template)
 
     @classmethod
     def render_file(cls, config, path):
         try:
-            template = cls.environment().get_template(path)
+            template = cls.environment(config).get_template(path)
         except:
             fmt.echo_error("Error loading template " + path)
             raise
@@ -75,7 +79,7 @@ class Renderer:
     def __render_patch(cls, config, name, separator="\n", suffix=""):
         patches = []
         for plugin, patch in plugins.iter_patches(config, name):
-            patch_template = cls.environment().from_string(patch)
+            patch_template = cls.environment(config).from_string(patch)
             try:
                 patches.append(patch_template.render(**config))
             except jinja2.exceptions.UndefinedError as e:
@@ -88,6 +92,11 @@ class Renderer:
         if rendered:
             rendered += suffix
         return rendered
+
+
+def save(root, config):
+    render_full(root, config)
+    fmt.echo_info("Environment generated in {}".format(base_dir(root)))
 
 
 def render_full(root, config):
@@ -146,6 +155,11 @@ def render_dict(config):
         config[k] = v
 
 
+def render_unknown(config, value):
+    if isinstance(value, str):
+        return render_str(config, value)
+    return value
+
 def render_str(config, text):
     """
     Args:
@@ -168,6 +182,18 @@ def copy_subdir(subdir, root):
         dst = pathjoin(root, path)
         utils.ensure_file_directory_exists(dst)
         shutil.copy(src, dst)
+
+
+def check_is_up_to_date(root):
+    if not is_up_to_date(root):
+        message = (
+            "The current environment stored at {} is not up-to-date: it is at "
+            "v{} while the 'tutor' binary is at v{}. You should upgrade "
+            "the environment by running:\n"
+            "\n"
+            "    tutor config save -y"
+        )
+        fmt.echo_alert(message.format(base_dir(root), version(root), __version__))
 
 
 def is_up_to_date(root):

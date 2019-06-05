@@ -32,12 +32,12 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
 
     @unittest.mock.patch.object(tutor_config.fmt, "echo")
-    def test_save_twice(self, _):
+    def test_update_twice(self, _):
         with tempfile.TemporaryDirectory() as root:
-            tutor_config.save(root, silent=True)
+            tutor_config.update(root)
             config1 = tutor_config.load_user(root)
 
-            tutor_config.save(root, silent=True)
+            tutor_config.update(root)
             config2 = tutor_config.load_user(root)
 
         self.assertEqual(config1, config2)
@@ -53,7 +53,7 @@ class ConfigTests(unittest.TestCase):
                 password1 = config1["MYSQL_ROOT_PASSWORD"]
 
                 config1.pop("MYSQL_ROOT_PASSWORD")
-                tutor_config.save_config(root, config1)
+                tutor_config.save(root, config1)
 
                 mock_random_string.return_value = "efgh"
                 config2, _ = tutor_config.load_all(root)

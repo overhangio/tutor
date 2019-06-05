@@ -19,22 +19,17 @@ config = {
     },
 }
 
+templates = os.path.join(HERE, "templates")
+
 scripts = {
-    "init": [
-        {
-            "service": "mysql-client",
-            "command": """mc config host add minio http://minio:9000 {{ OPENEDX_AWS_ACCESS_KEY }} {{ OPENEDX_AWS_SECRET_ACCESS_KEY }} --api s3v4
-            mc mb minio {{ FILE_UPLOAD_BUCKET_NAME }} {{ COURSE_IMPORT_EXPORT_BUCKET }}""",
-        }
-    ]
+    "init": ["minio-client"]
 }
 
-
-def patches(*_args):
+def patches():
     all_patches = {}
-    for path in glob(os.path.join(HERE, "patches", "*.patch")):
+    for path in glob(os.path.join(HERE, "patches", "*")):
         with open(path) as patch_file:
-            name = os.path.basename(path)[:-6]
+            name = os.path.basename(path)
             content = patch_file.read()
             all_patches[name] = content
     return all_patches

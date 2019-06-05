@@ -1,4 +1,5 @@
-dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s && ./manage.py lms migrate
+dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
+./manage.py lms migrate
 
 ./manage.py lms create_oauth2_client \
     "http://androidapp.com" "http://androidapp.com/redirect" public \
