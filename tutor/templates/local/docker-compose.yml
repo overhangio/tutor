@@ -229,7 +229,8 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: xqueue.tutor
     restart: unless-stopped
-    command: ./manage.py run_consumer
+    entrypoint: ["sh", "-e", "-c"]
+    command: ["while true; do echo 'running consumers'; ./manage.py run_consumer; sleep 10; done"]
     {% if ACTIVATE_MYSQL %}depends_on:
       - mysql{% endif %}
   {% endif %}

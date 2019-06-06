@@ -1,18 +1,87 @@
----
+---{% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}{% if ACTIVATE_NOTES %}{% set hosts = hosts + [NOTES_HOST] %}{% endif %}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: web
+  labels:
+    app.kubernetes.io/name: web
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+    {% if ACTIVATE_HTTPS%}certmanager.k8s.io/issuer: letsencrypt
+    certmanager.k8s.io/acme-challenge-type: http01{% endif %}
 spec:
   rules:
-  {% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}{% if ACTIVATE_NOTES %}{% set hosts = hosts + [NOTES_HOST] %}{% endif %}{% for host in hosts %}
+  {% for host in hosts %}
   - host: {{ host }}
     http:
       paths:
       - backend:
           serviceName: nginx
-          servicePort: 80
-      - backend:
-          serviceName: nginx
-          servicePort: 443
-  {% endfor %}
+          servicePort: {% if ACTIVATE_HTTPS %}443{% else %}80{% endif %}{% endfor %}
+  {{ patch("k8s-ingress-rules")|indent(2) }}
+  {% if ACTIVATE_HTTPS %}
+  tls:
+  - hosts:
+    {% for host in hosts %}
+    - {{ host }}
+    {{ patch("k8s-ingress-tls-hosts")|indent(6) }}
+    {% endfor %}
+    secretName: letsencrypt
+  {%endif%}
+{% if ACTIVATE_HTTPS %}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: letsencrypt
+  labels:
+    app.kubernetes.io/name: letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: {{ CONTACT_EMAIL }}
+    privateKeySecretRef:
+      name: letsencrypt-privatekey
+    http01: {}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ LMS_HOST|replace(".", "-") }}
+spec:
+  secretName: {{ LMS_HOST }}-tls
+  issuerRef:
+    name: letsencrypt
+  commonName: {{ LMS_HOST }}
+  dnsNames:
+  - {{ LMS_HOST }}
+  - {{ CMS_HOST }}
+  acme:
+    config:
+    - http01:
+        ingress: web
+      domains:
+      - {{ LMS_HOST }}
+      - {{ CMS_HOST }}
+{% if ACTIVATE_NOTES %}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ NOTES_HOST|replace(".", "-") }}
+spec:
+  secretName: {{ NOTES_HOST }}-tls
+  issuerRef:
+    name: letsencrypt
+  commonName: {{ NOTES_HOST }}
+  dnsNames:
+  - {{ NOTES_HOST }}
+  acme:
+    config:
+    - http01:
+        ingress: web
+      domains:
+      - {{ NOTES_HOST }}
+{% endif %}
+{{ patch("k8s-ingress-certificates") }}
+{% endif %}

@@ -1,0 +1,18 @@
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ MINIO_HOST|replace(".", "-") }}
+spec:
+  secretName: {{ MINIO_HOST }}-tls
+  issuerRef:
+    name: letsencrypt
+  commonName: {{ MINIO_HOST }}
+  dnsNames:
+  - {{ MINIO_HOST }}
+  acme:
+    config:
+    - http01:
+        ingress: web
+      domains:
+      - {{ MINIO_HOST }}

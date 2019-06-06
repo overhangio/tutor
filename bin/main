@@ -1,4 +1,0 @@
-#!/usr/bin/env python3
-
-from tutor.commands.cli import main
-main()

@@ -30,27 +30,26 @@ class BaseRunner:
     def is_activated(self, service):
         return self.config["ACTIVATE_" + service.upper()]
 
-    def iter_plugin_scripts(self, script):
-        yield from plugins.iter_scripts(self.config, script)
+    def iter_plugin_hooks(self, hook):
+        yield from plugins.iter_hooks(self.config, hook)
 
 
 def initialise(runner):
     fmt.echo_info("Initialising all services...")
-    runner.run("mysql-client", "scripts", "mysql-client", "init")
+    runner.run("mysql-client", "hooks", "mysql-client", "init")
     for service in ["lms", "cms", "forum", "notes", "xqueue"]:
         if runner.is_activated(service):
             fmt.echo_info("Initialising {}...".format(service))
-            runner.run(service, "scripts", service, "init")
-    for plugin_name, service in runner.iter_plugin_scripts("init"):
+            runner.run(service, "hooks", service, "init")
+    for plugin_name, service in runner.iter_plugin_hooks("init"):
         fmt.echo_info(
             "Plugin {}: running init for service {}...".format(plugin_name, service)
         )
-        runner.run(service, plugin_name, "scripts", service, "init")
+        runner.run(service, plugin_name, "hooks", service, "init")
     fmt.echo_info("All services initialised.")
 
 
-def create_user(runner, superuser, staff, username, email):
-    runner.check_service_is_activated("lms")
+def create_user_command(superuser, staff, username, email):
     opts = ""
     if superuser:
         opts += " --superuser"
@@ -60,14 +59,14 @@ def create_user(runner, superuser, staff, username, email):
         "./manage.py lms --settings=tutor.production manage_user {opts} {username} {email}\n"
         "./manage.py lms --settings=tutor.production changepassword {username}"
     ).format(opts=opts, username=username, email=email)
-    runner.exec("lms", command)
+    return command
 
 
 def import_demo_course(runner):
     runner.check_service_is_activated("cms")
-    runner.run("cms", "importdemocourse")
+    runner.run("cms", "hooks", "cms", "importdemocourse")
 
 
 def index_courses(runner):
     runner.check_service_is_activated("cms")
-    runner.run("cms", "indexcourses")
+    runner.run("cms", "hooks", "cms", "indexcourses")

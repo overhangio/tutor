@@ -15,8 +15,8 @@ Memory
 
 In the following, we assume you have access to a working Kubernetes cluster. `kubectl` should use your cluster configuration by default. To launch a cluster locally, you may try out Minikube. Just follow the `official installation instructions <https://kubernetes.io/docs/setup/minikube/>`_.
 
-The Kubernetes cluster should have at least 4Gb of RAM on each node. When running Minikube, the virtual machine should have that much allocated memory. See below for an example with VirtualBox::
-  
+The Kubernetes cluster should have at least 4Gb of RAM on each node. When running Minikube, the virtual machine should have that much allocated memory. See below for an example with VirtualBox:
+
 .. image:: img/virtualbox-minikube-system.png
     :alt: Virtualbox memory settings for Minikube
 
@@ -40,12 +40,31 @@ With Kubernetes, your Open edX platform will *not* be available at localhost or 
 
 where ``MINIKUBEIP`` should be replaced by the result of the command ``minikube ip``.
 
-`ReadWriteMany` storage provider access mode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cert-manager for TLS certificates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some of the data volumes are shared between pods and thus require the `ReadWriteMany` access mode. We assume that a persistent volume provisioner with such capability is already installed on the cluster. For instance, on AWS the `AWS EBS <https://kubernetes.io/docs/concepts/storage/storage-classes/#aws-ebs>`_ provisioner is available. On DigitalOcean, there is `no such provider <https://www.digitalocean.com/docs/kubernetes/how-to/add-volumes/>`_ out of the box and you have to install one yourself.
+Tutor relies on `cert-manager <https://docs.cert-manager.io/>`_ to generate TLS certificates for HTTPS access. In order to activate HTTPS support, you will have to install cert-manager yourself. To do so, follow the `instructions from the official documentation <https://docs.cert-manager.io/en/latest/getting-started/install/kubernetes.html>`_. It might be as simple as running::
 
-On Minikube, the standard storage class uses the `k8s.io/minikube-hostpath <https://kubernetes.io/docs/concepts/storage/volumes/#hostpath>`_ provider, which supports `ReadWriteMany` access mode out of the box, so there is no need to install an extra provider. 
+    kubectl create namespace cert-manager
+    kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
+    kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.8.0/cert-manager.yaml
+
+If you decide to enable HTTPS certificates, you will also have to set ``WEB_PROXY=true`` in the platform configuration, because the SSL/TLS termination will not occur in the Nginx container, but in the Ingress controller. This parameter will automatically be set during quickstart; you can also do it manually with::
+  
+    tutor config save --set WEB_PROXY=true
+
+Note that this configuration might conflict with a local installation.
+
+S3-like object storage with `MinIO <https://www.minio.io/>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Like many web applications, Open edX needs to persist data. In particular, it needs to persist files uploaded by students and course designers. In the local installation, these files are persisted to disk, on the host filesystem. But on Kubernetes, it is difficult to share a single filesystem between different pods. This would require persistent volume claims with `ReadWriteMany` access mode, and these are difficult to setup.
+
+Luckily, there is another solution: at `edx.org <edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on premises. This is achieved thanks to `MinIO <https://www.minio.io/>`_. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
+  
+    tutor plugin enable minio
+
+The "minio.LMS_HOST" domain name will have to point to your Kubernetes cluster. This will not be necessary if you have a CNAME from "\*.LMS_HOST" to "LMS_HOST", of course.
 
 Kubernetes dashboard
 ~~~~~~~~~~~~~~~~~~~~
@@ -71,7 +90,7 @@ The other benefit of ``kubectl apply`` is that it allows you to customise the Ku
     - ../env/
     ...
 
-To learn more about "kustomizations", refer to the `official documentation <https://kubectl.docs.kubernetes.io/pages/app_customization/introduction.html>`_.
+To learn more about "kustomizations", refer to the `official documentation <https://kubectl.docs.kubernetes.io/pages/app_customization/introduction.html>`__.
 
 Quickstart
 ----------
@@ -93,13 +112,22 @@ Other commands
 As with the :ref:`local installation <local>`, there are multiple commands to run operations on your Open edX platform. To view those commands, run::
   
     tutor k8s -h
+    
+In particular, the `tutor k8s start` command restarts and reconfigures all services by running ``kubectl apply``. That means that you can delete containers, deployments or just any other kind of resources, and Tutor will re-create them automatically. You should just beware of not deleting any persistent data stored in persistent volume claims. For instance, to restart from a "blank slate", run::
+  
+    tutor k8s stop
+    tutor k8s start
 
-Missing features
-----------------
+All non-persisting data will be deleted, and then re-created.
 
-For now, the following features from the local deployment are not supported:
+Recipes
+-------
 
-- HTTPS certificates
-- Xqueue
+Updating docker images
+~~~~~~~~~~~~~~~~~~~~~~
 
-Kubernetes deployment is under intense development, and these features should be implemented pretty soon. Stay tuned 🤓
+Kubernetes does not provide a single command for updating docker images out of the box. A `commonly used trick <https://github.com/kubernetes/kubernetes/issues/33664>`_ is to modify an innocuous label on all resources::
+  
+    kubectl patch -k "$(tutor config printroot)/env" --patch "{\"spec\": {\"template\": {\"metadata\": {\"labels\": {\"date\": \"`date +'%Y%m%d-%H%M%S'`\"}}}}}"
+
+

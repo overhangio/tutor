@@ -83,6 +83,15 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Vendor services
 ~~~~~~~~~~~~~~~
 
+Nginx
+*****
+
+- ``NGINX_HTTP_PORT`` (default: ``80``)
+- ``NGINX_HTTPS_PORT`` (default: ``443``)
+- ``WEB_PROXY`` (default: ``true``)
+
+Nginx is used to route web traffic to the various applications and to serve static assets. In case there is another web server in front of the Nginx container (for instance, a web server running on the host or an Ingress controller on Kubernetes), the container exposed ports can be modified. If ``WEB_PROXY`` is set to ``true`` then we assume that SSL termination does not occur in the Nginx container.
+
 MySQL
 *****
 

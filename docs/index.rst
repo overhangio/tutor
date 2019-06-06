@@ -22,6 +22,7 @@
    local
    k8s
    dev
+   plugins
    extra
    troubleshooting
    tutor

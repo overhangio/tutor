@@ -37,3 +37,6 @@ configMapGenerator:
 {% if ACTIVATE_NOTES %}- name: notes-settings
   files:
     - apps/notes/settings/tutor.py{% endif %}
+{% if ACTIVATE_XQUEUE %}- name: xqueue-settings
+  files:
+    - apps/xqueue/settings/tutor.py{% endif %}

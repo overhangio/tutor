@@ -1,60 +1,110 @@
 import pkg_resources
 
 from . import exceptions
-from . import fmt
 
-"""
-Tutor plugins are regular python packages that have a 'tutor.plugin.v1' entrypoint. This
-entrypoint must point to a module or a class that implements I don't know what (yet).
-TODO
-"""
 
-# TODO switch to v1
-ENTRYPOINT = "tutor.plugin.v0"
 CONFIG_KEY = "PLUGINS"
 
 
-class Patches:
+class Plugins:
     """
-    Provide a patch cache on which we can conveniently iterate without having to parse again all plugin patches for every environment file.
+    Tutor plugins are regular python packages that have a 'tutor.plugin.v0' entrypoint.
 
-    The CACHE static attribute is a dict of the form:
+    The API for Tutor plugins is currently in development. The entrypoint will switch to
+    'tutor.plugin.v1' once it is stabilised.
 
-        {
-            "patchname": {
-                "pluginname": "patch content",
-                ...
-            },
-            ...
-        }
+    This entrypoint must point to a module or a class that implements one or more of the
+    following properties:
+
+    `patches` (dict str->str): entries in this dict will be used to patch the rendered
+    Tutor templates. For instance, to add "somecontent" to a template that includes '{{
+    patch("mypatch") }}', set: `patches["mypatch"] = "somecontent"`. It is recommended
+    to store all patches in separate files, and to dynamically list patches by listing
+    the contents of a "patches"  subdirectory.
+
+    `templates` (str): path to a directory that includes new template files for the
+    plugin. It is recommended that all files in the template directory are stored in a
+    `myplugin` folder to avoid conflicts with other plugins. Plugin templates are useful
+    for content re-use, e.g: "{% include 'myplugin/mytemplate.html'}".
+
+    `hooks` (dict str->list[str]): hooks are commands that will be run at various points
+    during the lifetime of the platform. For instance, to run `service1` and `service2`
+    in sequence during initialization, you should define:
+
+        hooks["init"] = ["service1", "service2"]
+
+    It is then assumed that there are `myplugin/hooks/service1/init` and
+    `myplugin/hooks/service2/init` templates in the plugin `templates` directory.
     """
 
-    CACHE = {}
+    ENTRYPOINT = "tutor.plugin.v0"
+    INSTANCE = None
+    EXTRA_INSTALLED = {}
 
-    def __init__(self, config, name):
-        self.name = name
-        if not self.CACHE:
-            self.fill_cache(config)
+    def __init__(self, config):
+        self.config = config
+        self.patches = {}
+        self.hooks = {}
+        self.templates = {}
 
-    def __iter__(self):
-        """
-        Yields:
-            plugin name (str)
-            patch content (str)
-        """
-        plugin_patches = self.CACHE.get(self.name, {})
+        for plugin_name, plugin in self.iter_enabled():
+            patches = get_callable_attr(plugin, "patches", {})
+            for patch_name, content in patches.items():
+                if patch_name not in self.patches:
+                    self.patches[patch_name] = {}
+                self.patches[patch_name][plugin_name] = content
+
+            hooks = get_callable_attr(plugin, "hooks", {})
+            for hook_name, services in hooks.items():
+                if hook_name not in self.hooks:
+                    self.hooks[hook_name] = {}
+                self.hooks[hook_name][plugin_name] = services
+
+            templates = get_callable_attr(plugin, "templates")
+            if templates:
+                self.templates[plugin_name] = templates
+
+    @classmethod
+    def clear(cls):
+        cls.INSTANCE = None
+        cls.EXTRA_INSTALLED.clear()
+
+    @classmethod
+    def instance(cls, config):
+        if cls.INSTANCE is None or cls.INSTANCE.config != config:
+            cls.INSTANCE = cls(config)
+        return cls.INSTANCE
+
+    @classmethod
+    def iter_installed(cls):
+        yield from cls.EXTRA_INSTALLED.items()
+        for name, module in cls.iter_installed_entrypoints():
+            if name not in cls.EXTRA_INSTALLED:
+                yield name, module
+
+    @classmethod
+    def iter_installed_entrypoints(cls):
+        for entrypoint in pkg_resources.iter_entry_points(cls.ENTRYPOINT):
+            yield (entrypoint.name, entrypoint.load())
+
+    def iter_enabled(self):
+        for name, plugin in self.iter_installed():
+            if is_enabled(self.config, name):
+                yield name, plugin
+
+    def iter_patches(self, name):
+        plugin_patches = self.patches.get(name, {})
         plugins = sorted(plugin_patches.keys())
         for plugin in plugins:
             yield plugin, plugin_patches[plugin]
 
-    @classmethod
-    def fill_cache(cls, config):
-        for plugin_name, plugin in iter_enabled(config):
-            patches = get_callable_attr(plugin, "patches", {})
-            for patch_name, content in patches.items():
-                if patch_name not in cls.CACHE:
-                    cls.CACHE[patch_name] = {}
-                cls.CACHE[patch_name][plugin_name] = content
+    def iter_hooks(self, hook_name):
+        for plugin_name, services in self.hooks.get(hook_name, {}).items():
+            for service in services:
+                yield plugin_name, service
+
+    def iter_templates(self):
+        yield from self.templates.items()
 
 
 def get_callable_attr(plugin, attr_name, default=None):
@@ -70,8 +120,7 @@ def is_installed(name):
 
 
 def iter_installed():
-    for entrypoint in pkg_resources.iter_entry_points(ENTRYPOINT):
-        yield entrypoint.name, entrypoint.load()
+    yield from Plugins.iter_installed()
 
 
 def enable(config, name):
@@ -91,9 +140,7 @@ def disable(config, name):
 
 
 def iter_enabled(config):
-    for name, plugin in iter_installed():
-        if is_enabled(config, name):
-            yield name, plugin
+    yield from Plugins.instance(config).iter_enabled()
 
 
 def is_enabled(config, name):
@@ -101,30 +148,12 @@ def is_enabled(config, name):
 
 
 def iter_patches(config, name):
-    for plugin, patch in Patches(config, name):
-        yield plugin, patch
+    yield from Plugins.instance(config).iter_patches(name)
 
 
-def iter_scripts(config, script_name):
-    """
-    Scripts are of the form:
+def iter_hooks(config, hook_name):
+    yield from Plugins.instance(config).iter_hooks(hook_name)
 
-    scripts = {
-        "script-name": [
-            "service-name1",
-            "service-name2",
-            ...
-        ],
-        ...
-    }
-    """
-    for plugin_name, plugin in iter_enabled(config):
-        scripts = get_callable_attr(plugin, "scripts", {})
-        for service in scripts.get(script_name, []):
-            yield plugin_name, service
 
 def iter_templates(config):
-    for plugin_name, plugin in iter_enabled(config):
-        templates = get_callable_attr(plugin, "templates")
-        if templates:
-            yield plugin_name, templates
+    yield from Plugins.instance(config).iter_templates()
