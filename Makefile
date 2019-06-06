@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
-BLACK_OPTS = --exclude templates ./tutor ./tests ./plugins
+SRC_DIRS = ./tutor ./tests ./plugins ./bin
+BLACK_OPTS = --exclude templates ${SRC_DIRS}
 
 ###### Development
 
@@ -14,7 +15,7 @@ test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
 
 test-lint: ## Run code linting tests
-	pylint --errors-only tutor tests plugins
+	pylint --errors-only ${SRC_DIRS}
 
 test-unit: test-unit-core test-unit-plugins ## Run unit tests
 
@@ -30,8 +31,7 @@ format: ## Format code automatically
 ###### Deployment
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
-	# TODO bundle plugins
-	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main
+	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main.py
 dist/tutor:
 	$(MAKE) bundle
 

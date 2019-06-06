@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import click
 
 from .. import config as tutor_config
@@ -20,13 +22,19 @@ def k8s():
 def quickstart(root, non_interactive):
     click.echo(fmt.title("Interactive platform configuration"))
     config = interactive_config.update(root, interactive=(not non_interactive))
+    if config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
+        fmt.echo_alert(
+            "Potentially invalid configuration: ACTIVATE_HTTPS=true WEB_PROXY=false\n"
+            "You should either disable HTTPS support or configure your platform to use"
+            " a web proxy. See the Kubernetes section in the Tutor documentation for"
+            " more information."
+        )
     click.echo(fmt.title("Updating the current environment"))
     tutor_env.save(root, config)
     click.echo(fmt.title("Starting the platform"))
     start.callback(root)
     click.echo(fmt.title("Database creation and migrations"))
     init.callback(root)
-    # TODO https certificates
 
 
 @click.command(help="Run all configured Open edX services")
@@ -107,7 +115,9 @@ def init(root):
 def createuser(root, superuser, staff, name, email):
     config = tutor_config.load(root)
     runner = K8sScriptRunner(root, config)
-    scripts.create_user(runner, superuser, staff, name, email)
+    runner.check_service_is_activated("lms")
+    command = scripts.create_user_command(superuser, staff, name, email)
+    kubectl_exec(config, "lms", command, attach=True)
 
 
 @click.command(help="Import the demo course")
@@ -129,24 +139,30 @@ def indexcourses(root):
     scripts.index_courses(runner)
 
 
-# @click.command(help="Launch a shell in LMS or CMS")
-# @click.argument("service", type=click.Choice(["lms", "cms"]))
-# def shell(service):
-#     K8s().execute(service, "bash")
+@click.command(name="exec", help="Execute a command in a pod of the given application")
+@opts.root
+@click.argument("service")
+@click.argument("command")
+def exec_command(root, service, command):
+    config = tutor_config.load(root)
+    kubectl_exec(config, service, command, attach=True)
 
 
 @click.command(help="View output from containers")
 @opts.root
+@click.option("-c", "--container", help="Print the logs of this specific container")
 @click.option("-f", "--follow", is_flag=True, help="Follow log output")
 @click.option("--tail", type=int, help="Number of lines to show from each container")
 @click.argument("service")
-def logs(root, follow, tail, service):
+def logs(root, container, follow, tail, service):
     config = tutor_config.load(root)
 
     command = ["logs"]
     selectors = ["app.kubernetes.io/name=" + service] if service else []
     command += resource_selector(config, *selectors)
 
+    if container:
+        command += ["-c", container]
     if follow:
         command += ["--follow"]
     if tail is not None:
@@ -157,54 +173,45 @@ def logs(root, follow, tail, service):
 
 class K8sScriptRunner(scripts.BaseRunner):
     def exec(self, service, command):
-        selector = "app.kubernetes.io/name={}".format(service)
+        kubectl_exec(self.config, service, command, attach=False)
 
-        # Find pod in runner deployment
-        wait_for_pod_ready(self.config, service)
-        fmt.echo_info("Finding pod name for {} deployment...".format(service))
-        pod = utils.check_output(
-            "kubectl",
-            "get",
-            *resource_selector(self.config, selector),
-            "pods",
-            "-o=jsonpath={.items[0].metadata.name}",
-        )
-        # Delete any previously run jobs (completed job objects still exist)
-        # utils.kubectl("delete", "-k", kustomization, "--wait", selector)
-        # Run job
-        utils.kubectl(
-            "exec",
-            "--namespace",
-            self.config["K8S_NAMESPACE"],
-            pod.decode(),
-            "--",
-            "sh",
-            "-e",
-            "-c",
-            command,
-        )
-        # # Wait until complete
-        # fmt.echo_info(
-        #     "Waiting for job to complete. To view logs, run: \n\n    kubectl logs -n {} -l app.kubernetes.io/name={} --follow\n".format(
-        #         self.config["K8S_NAMESPACE"], job_name
-        #     )
-        # )
-        # utils.kubectl(
-        #     "wait",
-        #     "--namespace",
-        #     self.config["K8S_NAMESPACE"],
-        #     "--for=condition=complete",
-        #     "--timeout=-1s",
-        #     selector,
-        #     "job",
-        # )
+
+def kubectl_exec(config, service, command, attach=False):
+    selector = "app.kubernetes.io/name={}".format(service)
+
+    # Find pod in runner deployment
+    wait_for_pod_ready(config, service)
+    fmt.echo_info("Finding pod name for {} deployment...".format(service))
+    pod = utils.check_output(
+        "kubectl",
+        "get",
+        *resource_selector(config, selector),
+        "pods",
+        "-o=jsonpath={.items[0].metadata.name}",
+    )
+
+    # Run command
+    attach_opts = ["-i", "-t"] if attach else []
+    utils.kubectl(
+        "exec",
+        *attach_opts,
+        "--namespace",
+        config["K8S_NAMESPACE"],
+        pod.decode(),
+        "--",
+        "sh",
+        "-e",
+        "-c",
+        command,
+    )
+
 
 def wait_for_pod_ready(config, service):
     fmt.echo_info("Waiting for a {} pod to be ready...".format(service))
     utils.kubectl(
         "wait",
         *resource_selector(config, "app.kubernetes.io/name={}".format(service)),
-        "--for=condition=Ready",
+        "--for=condition=ContainersReady",
         "--timeout=600s",
         "pod",
     )
@@ -218,5 +225,5 @@ k8s.add_command(init)
 k8s.add_command(createuser)
 k8s.add_command(importdemocourse)
 k8s.add_command(indexcourses)
-# k8s.add_command(shell)
+k8s.add_command(exec_command)
 k8s.add_command(logs)

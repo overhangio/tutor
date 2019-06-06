@@ -1,31 +1,3 @@
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: cms-data
-  labels:
-    app.kubernetes.io/component: volume
-    app.kubernetes.io/name: cms-data
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 2Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: lms-data
-  labels:
-    app.kubernetes.io/component: volume
-    app.kubernetes.io/name: lms-data
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 2Gi
 {% if ACTIVATE_ELASTICSEARCH %}
 ---
 apiVersion: v1
@@ -41,6 +13,22 @@ spec:
   resources:
     requests:
       storage: 2Gi
+{% endif %}
+{% if ACTIVATE_MONGODB %}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: mongodb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
 {% endif %}
 {% if ACTIVATE_MYSQL %}
 ---
@@ -58,22 +46,6 @@ spec:
     requests:
       storage: 5Gi
 {% endif %}
-{% if ACTIVATE_NOTES %}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: notes-data
-  labels:
-    app.kubernetes.io/component: volume
-    app.kubernetes.io/name: notes-data
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-{% endif %}
 {% if ACTIVATE_RABBITMQ %}
 ---
 apiVersion: v1
@@ -90,3 +62,4 @@ spec:
     requests:
       storage: 1Gi
 {% endif %}
+{{ patch("k8s-volumes") }}

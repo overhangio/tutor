@@ -49,8 +49,7 @@ def initialise(runner):
     fmt.echo_info("All services initialised.")
 
 
-def create_user(runner, superuser, staff, username, email):
-    runner.check_service_is_activated("lms")
+def create_user_command(superuser, staff, username, email):
     opts = ""
     if superuser:
         opts += " --superuser"
@@ -60,14 +59,14 @@ def create_user(runner, superuser, staff, username, email):
         "./manage.py lms --settings=tutor.production manage_user {opts} {username} {email}\n"
         "./manage.py lms --settings=tutor.production changepassword {username}"
     ).format(opts=opts, username=username, email=email)
-    runner.exec("lms", command)
+    return command
 
 
 def import_demo_course(runner):
     runner.check_service_is_activated("cms")
-    runner.run("cms", "importdemocourse")
+    runner.run("cms", "scripts", "cms", "importdemocourse")
 
 
 def index_courses(runner):
     runner.check_service_is_activated("cms")
-    runner.run("cms", "indexcourses")
+    runner.run("cms", "scripts", "cms", "indexcourses")

@@ -148,3 +148,18 @@ spec:
   selector:
     app.kubernetes.io/name: smtp
 {% endif %}
+{% if ACTIVATE_XQUEUE %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xqueue
+spec:
+  type: NodePort
+  ports:
+    - port: 8040
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: xqueue
+{% endif %}
+{{ patch("k8s-services") }}

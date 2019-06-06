@@ -2,6 +2,13 @@
 upstream minio-backend {
     server minio:9000 fail_timeout=0;
 }
+{% if ACTIVATE_HTTPS %}
+server {
+    server_name {{ MINIO_HOST }};
+    listen 80;
+    return 301 https://$server_name$request_uri;
+}
+{% endif %}
 server {
   {% if ACTIVATE_HTTPS %}listen 443 {{ "" if WEB_PROXY else "ssl" }};{% else %}listen 80;{% endif %}
   server_name minio.localhost {{ MINIO_HOST }};

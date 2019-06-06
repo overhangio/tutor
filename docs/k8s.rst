@@ -40,8 +40,25 @@ With Kubernetes, your Open edX platform will *not* be available at localhost or 
 
 where ``MINIKUBEIP`` should be replaced by the result of the command ``minikube ip``.
 
+cert-manager for TLS certificates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tutor relies on `cert-manager <https://docs.cert-manager.io/>`_ to generate TLS certificates for HTTPS access. In order to activate HTTPS support, you will have to install cert-manager yourself. To do so, follow the `instructions from the official documentation <https://docs.cert-manager.io/en/latest/getting-started/install/kubernetes.html>`_. It might be as simple as running::
+
+    kubectl create namespace cert-manager
+    kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
+    kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.8.0/cert-manager.yaml
+
+If you decide to enable HTTPS certificates, you will also have to set ``WEB_PROXY=true`` in the platform configuration, because the SSL/TLS termination will not occur in the Nginx container, but in the Ingress controller. This parameter will automatically be set during quickstart; you can also do it manually with::
+  
+    tutor config save --set WEB_PROXY=true
+
+Note that this configuration might conflict with a local installation.
+
 `ReadWriteMany` storage provider access mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO remove this section and give instruction on MinIO.
 
 Some of the data volumes are shared between pods and thus require the `ReadWriteMany` access mode. We assume that a persistent volume provisioner with such capability is already installed on the cluster. For instance, on AWS the `AWS EBS <https://kubernetes.io/docs/concepts/storage/storage-classes/#aws-ebs>`_ provisioner is available. On DigitalOcean, there is `no such provider <https://www.digitalocean.com/docs/kubernetes/how-to/add-volumes/>`_ out of the box and you have to install one yourself.
 
@@ -93,13 +110,22 @@ Other commands
 As with the :ref:`local installation <local>`, there are multiple commands to run operations on your Open edX platform. To view those commands, run::
   
     tutor k8s -h
+    
+In particular, the `tutor k8s start` command restarts and reconfigures all services by running ``kubectl apply``. That means that you can delete containers, deployments or just any other kind of resources, and Tutor will re-create them automatically. You should just beware of not deleting any persistent data stored in persistent volume claims. For instance, to restart from a "blank slate", run::
+  
+    tutor k8s stop
+    tutor k8s start
 
-Missing features
-----------------
+All non-persisting data will be deleted, and then re-created.
 
-For now, the following features from the local deployment are not supported:
+Recipes
+-------
 
-- HTTPS certificates
-- Xqueue
+Updating docker images
+~~~~~~~~~~~~~~~~~~~~~~
 
-Kubernetes deployment is under intense development, and these features should be implemented pretty soon. Stay tuned 🤓
+Kubernetes does not provide a single command for updating docker images out of the box. A `commonly used trick <https://github.com/kubernetes/kubernetes/issues/33664>`_ is to modify an innocuous label on all resources::
+  
+    kubectl patch -k "$(tutor config printroot)/env" --patch "{\"spec\": {\"template\": {\"metadata\": {\"labels\": {\"date\": \"`date +'%Y%m%d-%H%M%S'`\"}}}}}"
+
+

@@ -259,7 +259,9 @@ def logs(root, follow, tail, service):
 def createuser(root, superuser, staff, name, email):
     config = tutor_config.load(root)
     runner = ScriptRunner(root, config)
-    scripts.create_user(runner, superuser, staff, name, email)
+    runner.check_service_is_activated("lms")
+    command = scripts.create_user_command(superuser, staff, name, email)
+    runner.exec("lms", command)
 
 
 @click.command(help="Import the demo course")
