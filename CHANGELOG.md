@@ -2,6 +2,7 @@
 
 ## Latest
 
+- [Improvement] Upgrade to ironwood.2
 - [Improvement] Add `-y/--yes` option to `local quickstart` for non-interactive quickstart
 - [Improvement] Persist LMS/CMS logs to disk by default (with collaboration from @silviot 💪)
 - [Bugfix] Fix installing a locally cloned requirement repository
