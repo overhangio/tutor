@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## 3.3.11 (2019-06-07)
 
 - [Improvement] Upgrade to ironwood.2
 - [Improvement] Add `-y/--yes` option to `local quickstart` for non-interactive quickstart
