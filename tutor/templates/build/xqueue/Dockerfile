@@ -5,7 +5,7 @@ RUN apt update && \
   apt upgrade -y && \
   apt install -y language-pack-en git python-pip libmysqlclient-dev
 
-RUN mkdir /openedx
+RUN mkdir /openedx /openedx/data
 RUN git clone https://github.com/edx/xqueue --branch open-release/ironwood.2 --depth 1 /openedx/xqueue
 WORKDIR /openedx/xqueue
 

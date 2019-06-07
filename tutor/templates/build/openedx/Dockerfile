@@ -80,6 +80,9 @@ COPY ./themes/ /openedx/themes/
 RUN openedx-assets themes \
     && openedx-assets collect --settings=tutor.assets
 
+# Create a data directory, which might be used (or not)
+RUN mkdir /openedx/data
+
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
 ENV SETTINGS tutor.production
