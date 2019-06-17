@@ -2,14 +2,13 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.4.0 (2019-06-17)
 
+- [Feature] Creation of a plugin system
+- [Feature] Kubernetes support out of beta
 - [Improvement] Switch to pinned image tags for easier upgrades
 - 💥[Improvement] Remove the `-y/--yes` option: `tutor config save` is now non-interactive by default. Use `-i/--interactive` to force interactive mode.
 - 💥[Improvement] Replace the `databases` command by `init`.
-
-## 3.3.11 (2019-06-07)
-
 - [Improvement] Upgrade to ironwood.2
 - [Improvement] Add `-y/--yes` option to `local quickstart` for non-interactive quickstart
 - [Improvement] Persist LMS/CMS logs to disk by default (with collaboration from @silviot 💪)
