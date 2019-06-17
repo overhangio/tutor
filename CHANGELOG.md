@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Improvement] Switch to pinned image tags for easier upgrades
 - 💥[Improvement] Remove the `-y/--yes` option: `tutor config save` is now non-interactive by default. Use `-i/--interactive` to force interactive mode.
 - 💥[Improvement] Replace the `databases` command by `init`.
 
