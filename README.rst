@@ -59,10 +59,6 @@ What is Tutor?
 
 Tutor was presented at the 2019 Open edX conference in San Diego, CA. Here's the 7-minute talk: `video <https://www.youtube.com/watch?v=Oqc7c-3qFc4>`_, `slides <https://regisb.github.io/openedx2019/>`_.
 
-.. raw:: html
-    
-    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Oqc7c-3qFc4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 .. _whats_tutor_end:
 
 .. _readme_contributing_start:
