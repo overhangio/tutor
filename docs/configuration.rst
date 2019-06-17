@@ -61,13 +61,13 @@ Docker
 Custom images
 *************
 
-- ``DOCKER_IMAGE_OPENEDX`` (default: ``"regis/openedx:ironwood"``)
-- ``DOCKER_IMAGE_ANDROID`` (default: ``"regis/openedx-android:ironwood"``)
-- ``DOCKER_IMAGE_FORUM`` (default: ``"regis/openedx-forum:ironwood"``)
-- ``DOCKER_IMAGE_NOTES`` (default: ``"regis/openedx-notes:ironwood"``)
-- ``DOCKER_IMAGE_XQUEUE`` (default: ``"regis/openedx-xqueue:ironwood"``)
+- ``DOCKER_IMAGE_OPENEDX`` (default: ``"regis/openedx:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_ANDROID`` (default: ``"regis/openedx-android:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_FORUM`` (default: ``"regis/openedx-forum:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_NOTES`` (default: ``"regis/openedx-notes:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_XQUEUE`` (default: ``"regis/openedx-xqueue:{{ TUTOR_VERSION }}"``)
 
-These configuration parameters define which image to run for each service.
+These configuration parameters define which image to run for each service. By default, the docker image tag matches the Tutor version it was built with.
 
 Custom registry
 ***************
