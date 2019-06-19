@@ -10,6 +10,11 @@ A word of warning: managing a Kubernetes platform is a fairly advanced endeavour
 Requirements
 ------------
 
+Version
+~~~~~~~
+
+Tutor was tested with server version 1.14.1 and client 1.14.3.
+
 Memory
 ~~~~~~
 
