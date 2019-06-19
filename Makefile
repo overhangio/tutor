@@ -11,7 +11,7 @@ compile-requirements: ## Compile requirements files
 	
 package: ## Build a package ready to upload to pypi
 	pip install twine
-	python setup.py sdist
+	python3 setup.py sdist
 
 test: test-lint test-unit test-format test-package ## Run all tests by decreasing order or priority
 
