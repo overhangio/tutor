@@ -9,7 +9,7 @@ compile-requirements: ## Compile requirements files
 	pip-compile -o requirements/dev.txt requirements/dev.in
 	pip-compile -o requirements/docs.txt requirements/docs.in
 
-test: test-lint test-unit test-format ## Run all tests by decreasing order or priority
+test: test-lint test-unit test-format test-package ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
@@ -19,11 +19,15 @@ test-lint: ## Run code linting tests
 
 test-unit: test-unit-core test-unit-plugins ## Run unit tests
 
-test-unit-core:
+test-unit-core: ## Run unit tests on core
 	python3 -m unittest discover tests
 
-test-unit-plugins:
+test-unit-plugins: ## Run unit tests on plugins
 	python3 -m unittest discover plugins/minio/tests
+
+test-package: ## Test that package can be uploaded to pypi
+	python setup.py sdist
+	twine check dist/tutor-openedx*.tar.gz
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)
