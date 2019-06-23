@@ -165,7 +165,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - 2019-01-04 [Bugfix] Fix xqueue consumer command
 - 2018-12-26 [Improvement] Upgrade nodejs to 5.5.1
 - 2018-12-07 [Improvement] Bundle theme and production static assets in the openedx docker image
-- 2018-12-02 [Feature] Download extra locales from [openedx-i18n](https://github.com/regisb/openedx-i18n/) to the Open edX Docker image
+- 2018-12-02 [Feature] Download extra locales from [openedx-i18n](https://github.com/openedx/openedx-i18n/) to the Open edX Docker image
 - 2018-11-28 [Feature] Easily change openedx docker image
 - 2018-11-28 [Feature] Enable comprehensive theming!
 - 2018-11-28 [Improvement] Get rid of datadog

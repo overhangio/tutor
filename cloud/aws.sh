@@ -1,6 +1,6 @@
 #! /bin/bash -e
 # Provision an AWS cloud instance with tutor.
-# Run with: curl -sSL https://raw.githubusercontent.com/regisb/tutor/master/cloud/aws.sh | bash -e
+# Run with: curl -sSL https://raw.githubusercontent.com/overhangio/tutor/master/cloud/aws.sh | bash -e
 
 export DEBIAN_FRONTEND=noninteractive 
 
@@ -32,8 +32,8 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 
 echo "=============== Installing tutor"
-export TUTOR_VERSION="$(curl -sSL https://api.github.com/repos/regisb/tutor/releases/latest | grep tag_name | sed "s/.*tag_name\": \"\(.*\)\",/\1/g")"
-sudo curl -L "https://github.com/regisb/tutor/releases/download/$TUTOR_VERSION/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
+export TUTOR_VERSION="$(curl -sSL https://api.github.com/repos/overhangio/tutor/releases/latest | grep tag_name | sed "s/.*tag_name\": \"\(.*\)\",/\1/g")"
+sudo curl -L "https://github.com/overhangio/tutor/releases/download/$TUTOR_VERSION/tutor-$(uname -s)_$(uname -m)" -o /usr/local/bin/tutor
 sudo chmod +x /usr/local/bin/tutor
 
 echo "=============== Pulling vendor docker images"

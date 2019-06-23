@@ -123,4 +123,4 @@ MinIO
   
     tutor plugins enable minio
 
-See the `plugin documentation <https://github.com/regisb/tutor/tree/master/plugins/minio>`_.
+See the `plugin documentation <https://github.com/overhangio/tutor/tree/master/plugins/minio>`_.

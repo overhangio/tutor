@@ -7,8 +7,8 @@ What should you do if you have a problem?
 
 1. Read the error logs that appear in the console. When running a single server platform as daemon, you can view the logs with the ``docker-compose logs`` command. (see :ref:`logging` below)
 2. Check if your problem already has a solution right here in the :ref:`troubleshooting` section.
-3. Search for your problem in the `open and closed Github issues <https://github.com/regisb/tutor/issues?utf8=%E2%9C%93&q=is%3Aissue>`_.
-4. If, despite all your efforts, you can't solve the problem, decide if the issue is related to Open edX or if it's specific to Tutor. In the latter case, you are most welcome to open an `issue on Github <https://github.com/regisb/tutor/issues/new>`_. **Please follow the instructions from the issue template!!!** Your issue will be examined in all cases, but you can make my life much easier by giving me as much background information as possible.
+3. Search for your problem in the `open and closed Github issues <https://github.com/overhangio/tutor/issues?utf8=%E2%9C%93&q=is%3Aissue>`_.
+4. If, despite all your efforts, you can't solve the problem, decide if the issue is related to Open edX or if it's specific to Tutor. In the latter case, you are most welcome to open an `issue on Github <https://github.com/overhangio/tutor/issues/new>`_. **Please follow the instructions from the issue template!!!** Your issue will be examined in all cases, but you can make my life much easier by giving me as much background information as possible.
 
 .. _logging:
 

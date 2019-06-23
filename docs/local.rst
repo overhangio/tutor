@@ -216,7 +216,7 @@ Then, create the Tutor project root and move your data::
     mkdir -p "$(tutor config printroot)"
     mv config.json data/ "$(tutor config printroot)"
 
-`Download <https://github.com/regisb/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path.
+`Download <https://github.com/overhangio/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path.
 
 Finally, start your platform again::
 
