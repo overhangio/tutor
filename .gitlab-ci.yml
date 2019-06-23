@@ -1,0 +1,70 @@
+stages:
+  - build
+  - deploy:docs # TODO move this to the end
+  - deploy:images
+  - deploy:pypi
+
+
+build:images:
+  script:
+    - apk add --no-cache docker make
+    - python setup.py install
+    - make ci-build-images
+  tags:
+    - private
+  stage: build
+
+build:docs:
+  script:
+    - apk add --no-cache make
+    - pip install -r requirements/docs.txt
+    - cd docs && make
+  artifacts:
+    paths:
+      - docs/_build/html
+  stage: build
+
+build:pypi:
+  script:
+    - apk add --no-cache make
+    - pip install -r requirements/base.txt
+    - pip install -r requirements/plugins.txt
+    - make package
+  artifacts:
+    paths:
+      - dist/
+  stage: build
+
+deploy:images:
+  script:
+    - apk add --no-cache docker make
+    - python setup.py install
+    - make ci-push-images
+  only:
+    - tags
+  tags:
+    - private
+  stage: deploy:images
+
+deploy:pypi:
+  script:
+    - apk add --no-cache make
+    - make ci-pypi
+  dependencies:
+    - build:pypi
+  only:
+    - tags
+  tags:
+    - private
+  stage: deploy:pypi
+
+deploy:docs:
+  dependencies:
+    - build:docs
+  script:
+    - cp -r docs/_build/html/ /var/www/docs.tutor.overhang.io
+  only:
+    - tags
+  tags:
+    - private
+  stage: deploy:docs

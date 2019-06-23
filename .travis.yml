@@ -8,26 +8,8 @@ matrix:
       python: 3.6
       services:
         - docker
-      env:
-        BUILD_BINARY: "true"
-    - os: linux
-      dist: xenial
-      python: 3.6
-      services:
-        - docker
-      env:
-        BUILD_DOCKER: "true"
-    - os: linux
-      dist: xenial
-      python: 3.6
-      services:
-        - docker
-      env:
-        BUILD_PYPI: "true"
     - os: osx
       language: generic
-      env:
-        BUILD_BINARY: "true"
 
 script:
   - make ci-info
@@ -42,20 +24,3 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-      condition: $BUILD_BINARY = true
-
-  # Push docker images to docker hub
-  - provider: script
-    script: make ci-images
-    skip_cleanup: true
-    on:
-      tags: true
-      condition: $BUILD_DOCKER = true && $TRAVIS_TAG != "nightly"
-
-  # Push to pypi
-  - provider: script
-    script: make ci-pypi
-    skip_cleanup: true
-    on:
-      tags: true
-      condition: $BUILD_PYPI = true && $TRAVIS_TAG != "nightly"
