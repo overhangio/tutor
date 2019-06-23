@@ -61,11 +61,11 @@ Docker
 Custom images
 *************
 
-- ``DOCKER_IMAGE_OPENEDX`` (default: ``"regis/openedx:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_ANDROID`` (default: ``"regis/openedx-android:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_FORUM`` (default: ``"regis/openedx-forum:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_NOTES`` (default: ``"regis/openedx-notes:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_XQUEUE`` (default: ``"regis/openedx-xqueue:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_OPENEDX`` (default: ``"overhangio/openedx:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_ANDROID`` (default: ``"overhangio/openedx-android:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_FORUM`` (default: ``"overhangio/openedx-forum:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_NOTES`` (default: ``"overhangio/openedx-notes:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_XQUEUE`` (default: ``"overhangio/openedx-xqueue:{{ TUTOR_VERSION }}"``)
 
 These configuration parameters define which image to run for each service. By default, the docker image tag matches the Tutor version it was built with.
 
@@ -202,7 +202,7 @@ Custom Open edX docker image
 
 There are different ways you can customise your Open edX platform. For instance, optional features can be activated during configuration. But if you want to add unique features to your Open edX platform, you are going to have to modify and re-build the ``openedx`` docker image. This is the image that contains the ``edx-platform`` repository: it is in charge of running the web application for the Open edX "core". Both the LMS and the CMS run from the ``openedx`` docker image. 
 
-On a vanilla platform deployed by Tutor, the image that is run is downloaded from the `regis/openedx repository on Docker Hub <https://hub.docker.com/r/regis/openedx/>`_. This is also the image that is downloaded whenever we run ``tutor local pullimages``. But you can decide to build the image locally instead of downloading it. To do so, build and tag the ``openedx`` image::
+On a vanilla platform deployed by Tutor, the image that is run is downloaded from the `overhangio/openedx repository on Docker Hub <https://hub.docker.com/r/overhangio/openedx/>`_. This is also the image that is downloaded whenever we run ``tutor local pullimages``. But you can decide to build the image locally instead of downloading it. To do so, build and tag the ``openedx`` image::
 
     tutor images build openedx
 
@@ -271,7 +271,7 @@ Note that your release must be a fork of Ironwood in order to work. Otherwise, y
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, Tutor runs the `regis/openedx <https://hub.docker.com/r/regis/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry with::
+By default, Tutor runs the `overhangio/openedx <https://hub.docker.com/r/overhangio/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry with::
 
     tutor config save --set DOCKER_IMAGE_OPENEDX=myusername/openedx:mytag
     tutor images build openedx

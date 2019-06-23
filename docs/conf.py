@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Tutor'
-copyright = '2018, Régis Behmo'
-author = 'Régis Behmo'
+copyright = '2018, Overhang.io'
+author = 'Overhang.io'
 
 # The short X.Y version
 version = ''
@@ -128,7 +128,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'tutor.tex', 'Tutor Documentation', 'Régis Behmo', 'manual'),
+    (master_doc, 'tutor.tex', 'Tutor Documentation', 'Overhang.io', 'manual'),
 ]
 
 

@@ -41,7 +41,7 @@ Update docker images
 
     tutor local pullimages
 
-This downloads the latest version of the docker images from `Docker Hub <https://hub.docker.com/r/regis/openedx/>`_. Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
+This downloads the latest version of the docker images from `Docker Hub <https://hub.docker.com/r/overhangio/openedx/>`_. Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
 
 Service initialisation
 ~~~~~~~~~~~~~~~~~~~~~~
