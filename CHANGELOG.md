@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Bugfix] Fix incorrect settings during lms/cms init (#224)
+
 ## 3.4.1 (2019-06-23)
 
 - [Bugfix] Fix install from pypi
