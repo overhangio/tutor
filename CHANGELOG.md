@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.4.2 (2019-06-23)
 
 - [Bugfix] Fix incorrect settings during lms/cms init (#224)
 
