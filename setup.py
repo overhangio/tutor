@@ -1,6 +1,6 @@
 import io
 import os
-from setuptools import setup
+from setuptools import find_packages, setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -26,7 +26,7 @@ setup(
     author_email="regis@behmo.com",
     description="The Open edX distribution for the busy system administrator",
     long_description=readme,
-    packages=["tutor"],
+    packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
     python_requires=">=3.5",
     install_requires=[

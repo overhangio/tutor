@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Bugfix] Fix install from pypi
 - [Improvement] Get rid of kubernetes python package dependency
 
 ## 3.4.0 (2019-06-17)
