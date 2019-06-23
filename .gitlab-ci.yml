@@ -26,9 +26,9 @@ build:docs:
 build:pypi:
   script:
     - apk add --no-cache make
-    - pip install -r requirements/base.txt
-    - pip install -r requirements/plugins.txt
+    - make ci-install
     - make package
+    - make package-plugins
   artifacts:
     paths:
       - dist/
@@ -48,6 +48,7 @@ deploy:images:
 deploy:pypi:
   script:
     - apk add --no-cache make
+    - make ci-install
     - make ci-pypi
   dependencies:
     - build:pypi

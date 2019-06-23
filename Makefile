@@ -12,7 +12,10 @@ compile-requirements: ## Compile requirements files
 package: ## Build a package ready to upload to pypi
 	python3 setup.py sdist
 
-test: test-lint test-unit test-format test-package ## Run all tests by decreasing order or priority
+package-plugins: ## Build packages for each plugin
+	cd plugins/minio && python3 setup.py sdist --dist-dir=../../dist/
+
+test: test-lint test-unit test-format test-packages ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
@@ -28,8 +31,8 @@ test-unit-core: ## Run unit tests on core
 test-unit-plugins: ## Run unit tests on plugins
 	python3 -m unittest discover plugins/minio/tests
 
-test-package: package ## Test that package can be uploaded to pypi
-	twine check dist/tutor-openedx-$(shell make version).tar.gz
+test-packages: package package-plugins ## Test that packages can be uploaded to pypi
+	twine check dist/tutor-*.tar.gz
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)
@@ -64,9 +67,14 @@ ci-info: ## Print info about environment
 	python3 --version
 	pip3 --version
 
-ci-install: ## Install requirements
+ci-install-dev: ## Install requirements
 	pip3 install -U setuptools twine
 	pip3 install -r requirements/dev.txt
+	pip3 install -r requirements/plugins.txt
+
+ci-install:
+	pip3 install -U setuptools twine
+	pip3 install -r requirements/base.txt
 	pip3 install -r requirements/plugins.txt
 
 ci-bundle: ## Create bundle and run basic tests
@@ -111,9 +119,8 @@ ci-push-images: ci-config-images ## Push docker images to hub.docker.com
 		docker login -u "$$DOCKER_USERNAME" -p "$$DOCKER_PASSWORD"
 		tutor images push all
 
-ci-pypi: ## Push release to pypi
-	pip install twine
-	twine upload dist/*.tar.gz
+ci-pypi: ## Push packages to pypi
+	twine upload --skip-existing dist/tutor-*.tar.gz
 
 ###### Additional commands
 
