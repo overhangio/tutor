@@ -54,7 +54,7 @@ Tutor relies on `cert-manager <https://docs.cert-manager.io/>`_ to generate TLS 
     kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
     kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.8.0/cert-manager.yaml
 
-If you decide to enable HTTPS certificates, you will also have to set ``WEB_PROXY=true`` in the platform configuration, because the SSL/TLS termination will not occur in the Nginx container, but in the Ingress controller. This parameter will automatically be set during quickstart; you can also do it manually with::
+If you decide to enable HTTPS certificates, you will also have to set ``WEB_PROXY=true`` in the platform configuration, because the SSL/TLS termination will not occur in the Nginx container, but in the Ingress controller. To do so, run::
   
     tutor config save --set WEB_PROXY=true
 
