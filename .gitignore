@@ -5,6 +5,6 @@ __pycache__
 *.egg-info/
 
 /tutor.spec
-/build/tutor
+/build/
 /dist/
 /releases/
