@@ -10,7 +10,6 @@ compile-requirements: ## Compile requirements files
 	pip-compile -o requirements/docs.txt requirements/docs.in
 	
 package: ## Build a package ready to upload to pypi
-	pip install twine
 	python3 setup.py sdist
 
 test: test-lint test-unit test-format test-package ## Run all tests by decreasing order or priority
@@ -52,9 +51,12 @@ tag:
 	@echo "=== Creating tag $(TAG)"
 	git tag -d $(TAG) || true
 	git tag $(TAG)
-	@echo "=== Pushing tag $(TAG)"
+	@echo "=== Pushing tag $(TAG) to origin"
 	git push origin :$(TAG) || true
 	git push origin $(TAG)
+	@echo "=== Pushing tag $(TAG) to overhangio"
+	git push overhangio :$(TAG) || true
+	git push overhangio $(TAG)
 
 ###### Continuous integration tasks
 
@@ -63,7 +65,7 @@ ci-info: ## Print info about environment
 	pip3 --version
 
 ci-install: ## Install requirements
-	pip3 install -U setuptools
+	pip3 install -U setuptools twine
 	pip3 install -r requirements/dev.txt
 	pip3 install -r requirements/plugins.txt
 
@@ -97,16 +99,20 @@ ci-github: ./releases/github-release ## Upload assets to github
 	    --tag "v$(shell make version)" \
 	    --name "tutor-$$(uname -s)_$$(uname -m)" \
 	    --file ./dist/tutor \
-		--replace
+			--replace
 
-ci-images: ## Build and push docker images to hub.docker.com
-	python setup.py develop
+ci-config-images:
+	tutor config save --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
+
+ci-build-images: ci-config-images ## Build docker images
 	tutor images build all
-	tutor local init
-	docker login -u "$$DOCKER_USERNAME" -p "$$DOCKER_PASSWORD"
-	tutor images push all
 
-ci-pypi: package ## Push release to pypi
+ci-push-images: ci-config-images ## Push docker images to hub.docker.com
+		docker login -u "$$DOCKER_USERNAME" -p "$$DOCKER_PASSWORD"
+		tutor images push all
+
+ci-pypi: ## Push release to pypi
+	pip install twine
 	twine upload dist/*.tar.gz
 
 ###### Additional commands
