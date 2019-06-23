@@ -1,5 +1,5 @@
 FROM ubuntu:18.04
-MAINTAINER Régis Behmo <regis@behmo.com>
+MAINTAINER Overhang.io <contact@overhang.io>
 
 RUN apt update && \
   apt upgrade -y && \
