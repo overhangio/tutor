@@ -34,7 +34,6 @@ setup(
         "click>=7.0",
         "click_repl",
         "jinja2",
-        "kubernetes",
         "pyyaml>=4.2b1",
     ],
     entry_points={

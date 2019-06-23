@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Improvement] Get rid of kubernetes python package dependency
+
 ## 3.4.0 (2019-06-17)
 
 - [Feature] Creation of a plugin system
