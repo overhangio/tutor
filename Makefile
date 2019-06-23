@@ -88,13 +88,13 @@ ci-github: ./releases/github-release ## Upload assets to github
 	sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md > releases/description.md
 	git log -1 --pretty=format:%b >> releases/description.md
 	./releases/github-release release \
-		--user regisb \
+		--user overhangio \
 		--repo tutor \
 		--tag "v$(shell make version)" \
 		--name "v$(shell make version)" \
 		--description "$$(cat releases/description.md)" || true
 	./releases/github-release upload \
-	    --user regisb \
+	    --user overhangio \
 	    --repo tutor \
 	    --tag "v$(shell make version)" \
 	    --name "tutor-$$(uname -s)_$$(uname -m)" \

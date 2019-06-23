@@ -8,9 +8,9 @@ In particular, this plugin is essential for `Kubernetes deployment <https://docs
 Installation
 ------------
 
-The plugin is currently bundled with the `binary releases of Tutor <https://github.com/regisb/tutor/releases>`_. If you have installed Tutor from source, you will have to install this plugin from source, too::
+The plugin is currently bundled with the `binary releases of Tutor <https://github.com/overhangio/tutor/releases>`_. If you have installed Tutor from source, you will have to install this plugin from source, too::
   
-    git clone https://github.com/regisb/tutor/
+    git clone https://github.com/overhangio/tutor/
     pip install -e tutor/plugins/minio
 
 Then, to enable this plugin, run::

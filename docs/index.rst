@@ -31,7 +31,7 @@
 Source code
 -----------
 
-The complete source code for Tutor is available on Github: https://github.com/regisb/tutor
+The complete source code for Tutor is available on Github: https://github.com/overhangio/tutor
 
 .. include:: ../README.rst
     :start-after: _readme_support_start:
@@ -44,7 +44,7 @@ The complete source code for Tutor is available on Github: https://github.com/re
 License
 -------
 
-This work is licensed under the terms of the `GNU Affero General Public License (AGPL) <https://github.com/regisb/tutor/blob/master/LICENSE.txt>`_.
+This work is licensed under the terms of the `GNU Affero General Public License (AGPL) <https://github.com/overhangio/tutor/blob/master/LICENSE.txt>`_.
 
 The AGPL license covers the Tutor code, including the Dockerfiles, but not the content of the Docker images which can be downloaded from https://hub.docker.com. Software other than Tutor provided with the docker images retain their original license.
 

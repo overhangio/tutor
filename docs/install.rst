@@ -26,7 +26,7 @@ Also, the host running the containers should be a 64 bit platform. (images are n
 Direct binary downloads
 -----------------------
 
-The latest binaries can be downloaded from https://github.com/regisb/tutor/releases. From the command line:
+The latest binaries can be downloaded from https://github.com/overhangio/tutor/releases. From the command line:
 
 .. include:: cli_download.rst
 
@@ -40,7 +40,7 @@ Tutor can be launched on Amazon Web Services very quickly with the `official Tut
 Installing from source
 ----------------------
 
-If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/regisb/tutor>`_. You will need python >= 3.5 and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
+If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.5 and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
 
     sudo apt install python3 libyaml-dev
 
@@ -50,7 +50,7 @@ Installing from pypi::
 
 Installing from a local clone of the repository::
 
-    git clone https://github.com/regisb/tutor
+    git clone https://github.com/overhangio/tutor
     cd tutor
     pip install -e .
     

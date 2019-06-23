@@ -5,7 +5,7 @@ Tutor development
 
 Start by cloning the Tutor repository::
 
-    git clone https://github.com/regisb/tutor.git
+    git clone https://github.com/overhangio/tutor.git
     cd tutor/
 
 Install requirements

@@ -1,9 +1,8 @@
 stages:
   - build
-  - deploy:docs # TODO move this to the end
   - deploy:images
   - deploy:pypi
-
+  - deploy:docs
 
 build:images:
   script:

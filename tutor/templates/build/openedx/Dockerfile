@@ -27,7 +27,7 @@ WORKDIR /openedx/edx-platform
 # Download extra locales to /openedx/locale
 # TODO upgrade this to ironwood
 RUN cd /tmp \
-    && curl -L -o openedx-i18n.tar.gz https://github.com/regisb/openedx-i18n/archive/hawthorn.tar.gz \
+    && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/hawthorn.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
     && mv openedx-i18n-hawthorn/edx-platform/locale/ /openedx/locale/ \
     && rm -rf openedx-i18n*
@@ -43,7 +43,7 @@ RUN pip install -r requirements/edx/development.txt
 
 # Install patched version of ora2
 RUN pip uninstall -y ora2 && \
-    pip install git+https://github.com/regisb/edx-ora2.git@2.2.0-patched#egg=ora2==2.2.0
+    pip install git+https://github.com/overhangio/edx-ora2.git@2.2.0-patched#egg=ora2==2.2.0
 
 # Install a recent version of nodejs
 RUN nodeenv /openedx/nodeenv --node=8.9.3 --prebuilt
