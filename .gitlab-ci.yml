@@ -62,7 +62,8 @@ deploy:docs:
   dependencies:
     - build:docs
   script:
-    - cp -r docs/_build/html/ /var/www/docs.tutor.overhang.io
+    - rm -rf /var/www/docs.tutor.overhang.io
+    - mv docs/_build/html/ /var/www/docs.tutor.overhang.io
   only:
     - tags
   tags:
