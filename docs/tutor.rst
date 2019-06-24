@@ -65,8 +65,6 @@ Releasing a new version
 - Bump the ``__version__`` value in ``tutor/__about__.py``.
 - Replace "Latest" by the version name in CHANGELOG.md.
 - Create a commit with the version changelog.
-- Push changes to github: ``git push origin``
-- Push changes to git.overhang.io: ``git push overhangio``
-- ``make release``
+- ``make release`` (this assumes that there are two remotes named "origin" and "overhangio")
 
 After a regular push to ``master``, run ``make nightly`` to update the "nightly" tag.
