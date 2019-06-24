@@ -37,7 +37,7 @@ sudo curl -L "https://github.com/overhangio/tutor/releases/download/$TUTOR_VERSI
 sudo chmod +x /usr/local/bin/tutor
 
 echo "=============== Pulling vendor docker images"
-tutor config save
+tutor config save --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
 tutor images pull elasticsearch
 tutor images pull memcached
 tutor images pull mongodb
@@ -45,6 +45,9 @@ tutor images pull mysql
 tutor images pull nginx
 tutor images pull rabbitmq
 tutor images pull smtp
+
+echo "=============== Pulling openedx docker images"
+tutor images pull all
 
 echo "=============== Tagging vendor docker images"
 docker tag $(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH) localhost:5000/$(tutor config printvalue DOCKER_IMAGE_ELASTICSEARCH)
@@ -64,9 +67,9 @@ docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_SMTP)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_NGINX)
 docker push localhost:5000/$(tutor config printvalue DOCKER_IMAGE_RABBITMQ)
 
-echo "=============== Building openedx docker images"
-tutor config save --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true --set DOCKER_REGISTRY=localhost:5000/
-tutor images build all
+echo "=============== Pushing openedx docker images to the local registry"
+tutor config save --set DOCKER_REGISTRY=localhost:5000/
+tutor images push all
 
 echo "=============== Create Web UI script"
 echo '#! /bin/bash
