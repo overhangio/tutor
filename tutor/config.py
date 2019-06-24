@@ -89,13 +89,9 @@ def load_env(config, defaults):
 
 def load_required(config, defaults):
     """
-    All these keys must be present in the user's config.yml. This includes all important
-    values, such as LMS_HOST, and randomly-generated values, such as passwords.
+    All these keys must be present in the user's config.yml. This includes all values that are generated once and must be kept after that, such as passwords.
     """
     for key in [
-        "LMS_HOST",
-        "CMS_HOST",
-        "CONTACT_EMAIL",
         "SECRET_KEY",
         "MYSQL_ROOT_PASSWORD",
         "OPENEDX_MYSQL_PASSWORD",

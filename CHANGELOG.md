@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Bugfix] Fix missing password values from generated configuration
+
 ## 3.4.2 (2019-06-23)
 
 - [Bugfix] Fix incorrect settings during lms/cms init (#224)

@@ -4,6 +4,7 @@ import tempfile
 
 from tutor import config as tutor_config
 from tutor import env
+from tutor import interactive
 
 
 class ConfigTests(unittest.TestCase):
@@ -61,3 +62,13 @@ class ConfigTests(unittest.TestCase):
 
         self.assertEqual("abcd", password1)
         self.assertEqual("efgh", password2)
+
+    def test_interactive_load_all(self):
+        with tempfile.TemporaryDirectory() as rootdir:
+            config, defaults = interactive.load_all(rootdir, interactive=False)
+
+        self.assertIn("MYSQL_ROOT_PASSWORD", config)
+        self.assertEqual(8, len(config["MYSQL_ROOT_PASSWORD"]))
+        self.assertNotIn("LMS_HOST", config)
+        self.assertEqual("www.myopenedx.com", defaults["LMS_HOST"])
+        self.assertEqual("studio.{{ LMS_HOST }}", defaults["CMS_HOST"])

@@ -23,13 +23,9 @@ def load_all(root, interactive=True):
     Load configuration and interactively ask questions to collect param values from the user.
     """
     defaults = tutor_config.load_defaults()
-    config = {}
-    if os.path.exists(tutor_config.config_path(root)):
-        config = tutor_config.load_current(root, defaults)
-
+    config = tutor_config.load_current(root, defaults)
     if interactive:
         ask_questions(config, defaults)
-
     return config, defaults
 
 

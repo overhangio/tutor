@@ -1,8 +1,5 @@
 ---
 # These configuration values must be stored in the user's config.yml.
-LMS_HOST: "www.myopenedx.com"
-CMS_HOST: "studio.{{ LMS_HOST }}"
-CONTACT_EMAIL: "contact@{{ LMS_HOST }}"
 SECRET_KEY: "{{ 24|random_string }}"
 MYSQL_ROOT_PASSWORD: "{{ 8|random_string }}"
 OPENEDX_MYSQL_PASSWORD: "{{ 8|random_string }}"
@@ -14,6 +11,9 @@ XQUEUE_MYSQL_PASSWORD: "{{ 8|random_string }}"
 XQUEUE_SECRET_KEY: "{{ 24|random_string }}"
 ANDROID_OAUTH2_SECRET: "{{ 24|random_string }}"
 ID: "{{ 24|random_string }}"
+
+# This must be defined early
+LMS_HOST: "www.myopenedx.com"
 
 # The following are default values
 ACTIVATE_LMS: true
@@ -28,6 +28,8 @@ ACTIVATE_NOTES: false
 ACTIVATE_RABBITMQ: true
 ACTIVATE_SMTP: true
 ACTIVATE_XQUEUE: false
+CMS_HOST: "studio.{{ LMS_HOST }}"
+CONTACT_EMAIL: "contact@{{ LMS_HOST }}"
 OPENEDX_AWS_ACCESS_KEY: ""
 OPENEDX_AWS_SECRET_ACCESS_KEY: ""
 ANDROID_RELEASE_STORE_PASSWORD: "android store password"
