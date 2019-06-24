@@ -3,11 +3,15 @@
 Tutor 🎓 The docker-based Open edX distribution designed for peace of mind
 ==========================================================================
 
-.. image:: https://img.shields.io/travis/overhangio/tutor.svg
-    :alt: Build status
+.. image:: https://img.shields.io/travis/overhangio/tutor.svg?label=Release%20build
+    :alt: Release build status
     :target: https://travis-ci.org/overhangio/tutor
 
-.. image:: https://img.shields.io/badge/docs-current-brightgreen.svg
+.. image:: https://git.overhang.io/community/tutor/badges/master/pipeline.svg
+    :alt: Release build status
+    :target: https://git.overhang.io/community/tutor/commits/master
+
+.. image:: https://img.shields.io/badge/docs-current-blue.svg
     :alt: Documentation
     :target: https://docs.tutor.overhang.io
 
@@ -23,7 +27,7 @@ Tutor 🎓 The docker-based Open edX distribution designed for peace of mind
     :alt: AGPL License
     :target: https://www.gnu.org/licenses/agpl-3.0.en.html
 
-**Tutor** is a docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is easy to use, fast, full of cool features, and it is already used by dozens of Open edX platforms in the world.
+**Tutor** is a docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is fast, full of cool features, extendable, and it is already used by dozens of Open edX platforms in the world.
 
 .. _readme_intro_end:
 
