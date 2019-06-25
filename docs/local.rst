@@ -184,7 +184,6 @@ As an example, here is how to launch two different platforms, with nginx running
     tutor local quickstart
     sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/site1.conf
 
-
     # platform 2
     export TUTOR_ROOT=~/openedx/site2
     tutor config save --interactive --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site2 --set NGINX_HTTP_PORT=82 --set NGINX_HTTPS_PORT=482
