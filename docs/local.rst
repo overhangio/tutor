@@ -176,7 +176,7 @@ With Tutor, it is easy to run multiple Open edX instances on a single server. To
 
 In addition, a web proxy must be setup on the host, as described :ref:`above <web_proxy>`.
 
-As an example, here is how to launch two different platforms, with nginx running as a web proxy:
+As an example, here is how to launch two different platforms, with nginx running as a web proxy::
 
     # platform 1
     export TUTOR_ROOT=~/openedx/site1
