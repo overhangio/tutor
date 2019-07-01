@@ -59,7 +59,7 @@ Yes, many of them. There is no way to count precisely how many running Open edX 
 Why should I trust software written by some random guy on the Internet?
 -----------------------------------------------------------------------
 
-You shouldn't :) Tutor is actively maintained by `Overhang.io <https://overhang.io>`_, a France-based company founded by `Régis Behmo <https://github.com/regisb/>`_. Régis has been working on Tutor since early 2018; he has been a contributor of the Open edX project since 2015. In particular, I have worked for 2 years on `FUN-MOOC <https://www.fun-mooc.fr/>`_, one of the top 5 largest Open edX platforms in the world. He presented several talks at the Open edX conferences:
+You shouldn't :) Tutor is actively maintained by `Overhang.io <https://overhang.io>`_, a France-based company founded by `Régis Behmo <https://github.com/regisb/>`_. Régis has been working on Tutor since early 2018; he has been a contributor of the Open edX project since 2015. In particular, he has worked for 2 years on `FUN-MOOC <https://www.fun-mooc.fr/>`_, one of the top 5 largest Open edX platforms in the world. He presented several talks at the Open edX conferences:
 
 - *Deploying a robust, scalable Open edX platform in 1 click (or less) with Tutor*, March 2019 (`video <https://www.youtube.com/watch?v=Oqc7c-3qFc4>`_, `slides <https://regisb.github.io/openedx2019/>`_)
 - *Videofront: a Self-Hosted YouTube*, June 2017 (`video <https://www.youtube.com/watch?v=e7bJchJrmP8&t=5m53s>`__, `slides <http://regisb.github.io/openedx-conference-2017/>`__)
