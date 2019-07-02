@@ -2,9 +2,9 @@ import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
-from .. import fmt
+from .. import images
 from .. import opts
-from .. import utils
+from .. import plugins
 
 
 @click.group(name="images", short_help="Manage docker images")
@@ -12,30 +12,12 @@ def images_command():
     pass
 
 
-OPENEDX_IMAGES = ["openedx", "forum", "notes", "xqueue", "android"]
-VENDOR_IMAGES = [
-    "elasticsearch",
-    "memcached",
-    "mongodb",
-    "mysql",
-    "nginx",
-    "rabbitmq",
-    "smtp",
-]
-argument_openedx_image = click.argument(
-    "image", type=click.Choice(["all"] + OPENEDX_IMAGES)
-)
-argument_image = click.argument(
-    "image", type=click.Choice(["all"] + OPENEDX_IMAGES + VENDOR_IMAGES)
-)
-
-
 @click.command(
     short_help="Build docker images",
     help="Build the docker images necessary for an Open edX platform.",
 )
 @opts.root
-@argument_openedx_image
+@click.argument("image")
 @click.option(
     "--no-cache", is_flag=True, help="Do not use cache when building the image"
 )
@@ -47,36 +29,67 @@ argument_image = click.argument(
 )
 def build(root, image, no_cache, build_arg):
     config = tutor_config.load(root)
-    for img in openedx_image_names(config, image):
-        tag = get_tag(config, img)
-        fmt.echo_info("Building image {}".format(tag))
-        command = ["build", "-t", tag, tutor_env.pathjoin(root, "build", img)]
-        if no_cache:
-            command.append("--no-cache")
-        for arg in build_arg:
-            command += ["--build-arg", arg]
-        utils.docker(*command)
+
+    # Build base images
+    for img in openedx_image_names(config):
+        if image in [img, "all"]:
+            tag = get_tag(config, img)
+            images.build(
+                tutor_env.pathjoin(root, "build", img),
+                tag,
+                no_cache=no_cache,
+                build_args=build_arg,
+            )
+
+    # Build plugin images
+    for plugin, hook in plugins.iter_hooks(config, "build-image"):
+        for img, tag in hook.items():
+            if image in [img, "all"]:
+                tag = tutor_env.render_str(config, tag)
+                images.build(
+                    tutor_env.pathjoin(root, "plugins", plugin, "build", img),
+                    tag,
+                    no_cache=no_cache,
+                    build_args=build_arg,
+                )
 
 
 @click.command(short_help="Pull images from the Docker registry")
 @opts.root
-@argument_image
+@click.argument("image")
 def pull(root, image):
     config = tutor_config.load(root)
-    for img in image_names(config, image):
-        tag = get_tag(config, img)
-        fmt.echo_info("Pulling image {}".format(tag))
-        utils.execute("docker", "pull", tag)
+    # Pull base images
+    for img in image_names(config):
+        if image in [img, "all"]:
+            tag = get_tag(config, img)
+            images.pull(tag)
+
+    # Pull plugin images
+    for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
+        for img, tag in hook.items():
+            if image in [img, "all"]:
+                tag = config["DOCKER_REGISTRY"] + tutor_env.render_str(config, tag)
+                images.pull(tag)
 
 
 @click.command(short_help="Push images to the Docker registry")
 @opts.root
-@argument_openedx_image
+@click.argument("image")
 def push(root, image):
     config = tutor_config.load(root)
-    for tag in openedx_image_tags(config, image):
-        fmt.echo_info("Pushing image {}".format(tag))
-        utils.execute("docker", "push", tag)
+    # Push base images
+    for img in openedx_image_names(config):
+        if image in [img, "all"]:
+            tag = get_tag(config, img)
+            images.push(tag)
+
+    # Push plugin images
+    for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
+        for img, tag in hook.items():
+            if image in [img, "all"]:
+                tag = config["DOCKER_REGISTRY"] + tutor_env.render_str(config, tag)
+                images.push(tag)
 
 
 def get_tag(config, name):
@@ -84,41 +97,38 @@ def get_tag(config, name):
     return "{registry}{image}".format(registry=config["DOCKER_REGISTRY"], image=image)
 
 
-def image_names(config, image):
-    return openedx_image_names(config, image) + vendor_image_names(config, image)
+def image_names(config):
+    return openedx_image_names(config) + vendor_image_names(config)
 
 
-def openedx_image_tags(config, image):
-    for img in openedx_image_names(config, image):
-        yield get_tag(config, img)
+def openedx_image_names(config):
+    openedx_images = ["openedx", "forum", "notes", "android"]
+    if not config["ACTIVATE_NOTES"]:
+        openedx_images.remove("notes")
+    return openedx_images
 
 
-def openedx_image_names(config, image):
-    if image == "all":
-        images = OPENEDX_IMAGES[:]
-        if not config["ACTIVATE_XQUEUE"]:
-            images.remove("xqueue")
-        if not config["ACTIVATE_NOTES"]:
-            images.remove("notes")
-        return images
-    return [image]
-
-
-def vendor_image_names(config, image):
-    if image == "all":
-        images = VENDOR_IMAGES[:]
-        if not config["ACTIVATE_ELASTICSEARCH"]:
-            images.remove("elasticsearch")
-        if not config["ACTIVATE_MEMCACHED"]:
-            images.remove("memcached")
-        if not config["ACTIVATE_MONGODB"]:
-            images.remove("mongodb")
-        if not config["ACTIVATE_MYSQL"]:
-            images.remove("mysql")
-        if not config["ACTIVATE_RABBITMQ"]:
-            images.remove("rabbitmq")
-        return images
-    return [image]
+def vendor_image_names(config):
+    vendor_images = [
+        "elasticsearch",
+        "memcached",
+        "mongodb",
+        "mysql",
+        "nginx",
+        "rabbitmq",
+        "smtp",
+    ]
+    if not config["ACTIVATE_ELASTICSEARCH"]:
+        vendor_images.remove("elasticsearch")
+    if not config["ACTIVATE_MEMCACHED"]:
+        vendor_images.remove("memcached")
+    if not config["ACTIVATE_MONGODB"]:
+        vendor_images.remove("mongodb")
+    if not config["ACTIVATE_MYSQL"]:
+        vendor_images.remove("mysql")
+    if not config["ACTIVATE_RABBITMQ"]:
+        vendor_images.remove("rabbitmq")
+    return vendor_images
 
 
 images_command.add_command(build)

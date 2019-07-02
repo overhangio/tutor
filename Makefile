@@ -14,6 +14,7 @@ package: ## Build a package ready to upload to pypi
 
 package-plugins: ## Build packages for each plugin
 	cd plugins/minio && python3 setup.py sdist --dist-dir=../../dist/
+	cd plugins/xqueue && python3 setup.py sdist --dist-dir=../../dist/
 
 test: test-lint test-unit test-format test-packages ## Run all tests by decreasing order or priority
 
@@ -21,7 +22,7 @@ test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
 
 test-lint: ## Run code linting tests
-	pylint --errors-only ${SRC_DIRS}
+	pylint --errors-only --ignore=templates ${SRC_DIRS}
 
 test-unit: test-unit-core test-unit-plugins ## Run unit tests
 
@@ -30,6 +31,7 @@ test-unit-core: ## Run unit tests on core
 
 test-unit-plugins: ## Run unit tests on plugins
 	python3 -m unittest discover plugins/minio/tests
+	python3 -m unittest discover plugins/xqueue/tests
 
 test-packages: package package-plugins ## Test that packages can be uploaded to pypi
 	twine check dist/tutor-*.tar.gz
@@ -110,7 +112,8 @@ ci-github: ./releases/github-release ## Upload assets to github
 			--replace
 
 ci-config-images:
-	tutor config save --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
+	tutor plugin enable xqueue
+	tutor config save --set ACTIVATE_NOTES=true
 
 ci-build-images: ci-config-images ## Build docker images
 	tutor images build all

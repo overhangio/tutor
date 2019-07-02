@@ -155,7 +155,7 @@ class PluginsTests(unittest.TestCase):
             plugins.Plugins, "iter_enabled", return_value=[("plugin1", plugin1)]
         ):
             self.assertEqual(
-                [("plugin1", "myclient")], list(plugins.iter_hooks({}, "init"))
+                [("plugin1", ["myclient"])], list(plugins.iter_hooks({}, "init"))
             )
 
     def test_iter_templates(self):

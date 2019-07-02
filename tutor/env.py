@@ -104,9 +104,25 @@ def render_full(root, config):
     """
     for subdir in ["android", "apps", "k8s", "local", "webui"]:
         save_subdir(subdir, root, config)
+    for plugin, path in plugins.iter_templates(config):
+        save_plugin_templates(plugin, path, root, config)
     copy_subdir("build", root)
     save_file(VERSION_FILENAME, root, config)
     save_file("kustomization.yml", root, config)
+
+
+def save_plugin_templates(plugin, plugin_path, root, config):
+    """
+    Save plugin templates to plugins/<plugin name>/*.
+    Only the "apps" and "build" subfolders are rendered.
+    TODO we should delete this folder when the plugin is disabled.
+    """
+    for subdir in ["apps", "build"]:
+        path = os.path.join(plugin_path, plugin, subdir)
+        for src in walk_templates(path, root=plugin_path):
+            dst = pathjoin(root, "plugins", src)
+            rendered = render_file(config, src)
+            write_to(rendered, dst)
 
 
 def save_subdir(subdir, root, config):
@@ -124,9 +140,13 @@ def save_file(path, root, config):
     """
     dst = pathjoin(root, path)
     rendered = render_file(config, path)
-    utils.ensure_file_directory_exists(dst)
-    with open(dst, "w") as of:
-        of.write(rendered)
+    write_to(rendered, dst)
+
+
+def write_to(content, path):
+    utils.ensure_file_directory_exists(path)
+    with open(path, "w") as of:
+        of.write(content)
 
 
 def render_file(config, *path):
@@ -223,7 +243,7 @@ def read(*path):
         return fi.read()
 
 
-def walk_templates(subdir):
+def walk_templates(subdir, root=TEMPLATES_ROOT):
     """
     Iterate on the template files from `templates/<subdir>`.
 
@@ -234,7 +254,7 @@ def walk_templates(subdir):
         if not is_part_of_env(dirpath):
             continue
         for filename in filenames:
-            path = os.path.join(os.path.relpath(dirpath, TEMPLATES_ROOT), filename)
+            path = os.path.join(os.path.relpath(dirpath, root), filename)
             if is_part_of_env(path):
                 yield path
 
