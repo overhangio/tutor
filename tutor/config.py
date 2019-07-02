@@ -98,9 +98,6 @@ def load_required(config, defaults):
         "NOTES_MYSQL_PASSWORD",
         "NOTES_SECRET_KEY",
         "NOTES_OAUTH2_SECRET",
-        "XQUEUE_AUTH_PASSWORD",
-        "XQUEUE_MYSQL_PASSWORD",
-        "XQUEUE_SECRET_KEY",
         "ANDROID_OAUTH2_SECRET",
         "ID",
     ]:
@@ -140,6 +137,10 @@ def upgrade_obsolete(config):
         config["OPENEDX_MYSQL_DATABASE"] = config.pop("MYSQL_DATABASE")
     if "MYSQL_USERNAME" in config:
         config["OPENEDX_MYSQL_USERNAME"] = config.pop("MYSQL_USERNAME")
+    if "ACTIVATE_XQUEUE" in config:
+        if config["ACTIVATE_XQUEUE"]:
+            plugins.enable(config, "xqueue")
+        config.pop("ACTIVATE_XQUEUE")
 
 
 def convert_json2yml(root):

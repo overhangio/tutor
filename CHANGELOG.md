@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Improvement] Move Xqueue to a dedicated plugin
+
 ## 3.4.3 (2019-06-24)
 
 - [Bugfix] Fix missing password values from generated configuration

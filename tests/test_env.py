@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 import unittest.mock
@@ -8,6 +9,9 @@ from tutor import exceptions
 
 
 class EnvTests(unittest.TestCase):
+    def setUp(self):
+        env.Renderer.reset()
+
     def test_walk_templates(self):
         templates = list(env.walk_templates("local"))
         self.assertIn("local/docker-compose.yml", templates)
@@ -52,6 +56,10 @@ class EnvTests(unittest.TestCase):
         defaults = tutor_config.load_defaults()
         with tempfile.TemporaryDirectory() as root:
             env.render_full(root, defaults)
+            self.assertTrue(os.path.exists(os.path.join(root, "env", "version")))
+            self.assertTrue(
+                os.path.exists(os.path.join(root, "env", "local", "docker-compose.yml"))
+            )
 
     def test_render_full_with_https(self):
         defaults = tutor_config.load_defaults()
@@ -77,3 +85,41 @@ class EnvTests(unittest.TestCase):
                 {}, '{{ patch("location", separator=",\n", suffix=",") }}'
             )
         self.assertEqual("abcd,\nefgh,", rendered)
+
+    def test_plugin_templates(self):
+        with tempfile.TemporaryDirectory() as plugin_templates:
+            # Create two templates
+            os.makedirs(os.path.join(plugin_templates, "plugin1", "apps"))
+            with open(
+                os.path.join(plugin_templates, "plugin1", "unrendered.txt"), "w"
+            ) as f:
+                f.write("This file should not be rendered")
+            with open(
+                os.path.join(plugin_templates, "plugin1", "apps", "rendered.txt"), "w"
+            ) as f:
+                f.write("Hello my ID is {{ ID }}")
+
+            # Create configuration
+            config = {"ID": "abcd"}
+
+            # Create a single plugin
+            with unittest.mock.patch.object(
+                env.plugins,
+                "iter_templates",
+                return_value=[("plugin1", plugin_templates)],
+            ):
+                with tempfile.TemporaryDirectory() as root:
+                    # Render plugin templates
+                    env.save_plugin_templates("plugin1", plugin_templates, root, config)
+
+                    # Check that plugin template was rendered
+                    dst_unrendered = os.path.join(
+                        root, "env", "plugins", "plugin1", "unrendered.txt"
+                    )
+                    dst_rendered = os.path.join(
+                        root, "env", "plugins", "plugin1", "apps", "rendered.txt"
+                    )
+                    self.assertFalse(os.path.exists(dst_unrendered))
+                    self.assertTrue(os.path.exists(dst_rendered))
+                    with open(dst_rendered) as f:
+                        self.assertEqual("Hello my ID is abcd", f.read())

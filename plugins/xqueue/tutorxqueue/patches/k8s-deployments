@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xqueue
+  labels:
+    app.kubernetes.io/name: xqueue
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: xqueue
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: xqueue
+    spec:
+      containers:
+        - name: xqueue
+          image: {{ DOCKER_REGISTRY }}{{ XQUEUE_DOCKER_IMAGE }}
+          ports:
+            - containerPort: 8040
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: xqueue.tutor
+          volumeMounts:
+            - mountPath: /openedx/xqueue/xqueue/tutor.py
+              name: settings
+              subPath: tutor.py
+        - name: xqueue-consumer
+          image: {{ DOCKER_REGISTRY }}{{ XQUEUE_DOCKER_IMAGE }}
+          command: ["sh", "-e", "-c"]
+          args: ["while true; do echo 'running consumers'; ./manage.py run_consumer; sleep 10; done"]
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: xqueue.tutor
+          volumeMounts:
+            - mountPath: /openedx/xqueue/xqueue/tutor.py
+              name: settings
+              subPath: tutor.py
+      volumes:
+        - name: settings
+          configMap:
+            name: xqueue-settings

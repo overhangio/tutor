@@ -99,9 +99,7 @@ class Plugins:
             yield plugin, plugin_patches[plugin]
 
     def iter_hooks(self, hook_name):
-        for plugin_name, services in self.hooks.get(hook_name, {}).items():
-            for service in services:
-                yield plugin_name, service
+        yield from self.hooks.get(hook_name, {}).items()
 
     def iter_templates(self):
         yield from self.templates.items()

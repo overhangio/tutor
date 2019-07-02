@@ -33,7 +33,7 @@ API (v0)
 
 Note: The API for developing Tutor plugins is still considered unstable: profound changes should be expected for some time.
 
-There are two mechanisms by which a plugin can integrate with Tutor: patches and hooks. Patches affect the rendered environment templates, while hooks are actions that are run during the lifetime of an Open edX platform. A plugin indicates which templates it patches, and which hooks it needs to run.
+There are two mechanisms by which a plugin can integrate with Tutor: patches and hooks. Patches affect the rendered environment templates, while hooks are actions that are run during the lifetime of an Open edX platform. A plugin indicates which templates it patches, and which hooks it needs to run. A plugin can also affect the project configuration by adding new values and modifying existing values.
 
 Entrypoint
 ~~~~~~~~~~
@@ -90,13 +90,62 @@ This will add a Redis instance to the services run with ``tutor local`` commands
 ``hooks``
 ~~~~~~~~~
 
-Hooks are services that are run during the lifetime of the platform. Currently, there is just one ``init`` hook. You should add there the services that will be run during initialisation, for instance for database creation and migrations.
+Hooks are actions that are run during the lifetime of the platform. Each hook has a different specification.
+
+``init``
+++++++++
+
+The services that will be run during initialisation should be added to the ``init`` hook, for instance for database creation and migrations.
 
 Example::
   
-    hooks = {"init": ["myservice1", "myservice2"]}
+    hooks = {
+      "init": ["myservice1", "myservice2"]
+    }
     
 During initialisation, "myservice1" and "myservice2" will be run in sequence with the commands defined in the templates ``myplugin/hooks/myservice1/init`` and ``myplugin/hooks/myservice2/init``.
+
+``build-image``
++++++++++++++++
+
+This is a hook that will be run to build a docker image for the requested service.
+
+Example::
+
+    hooks = {
+        "build-image": {"myimage": "myimage:latest"}
+    }
+    
+With this hook, users will be able to build the ``myimage:latest`` docker image by running::
+  
+    tutor images build myimage
+
+or::
+  
+    tutor images build all
+
+This assumes that there is a ``Dockerfile`` file in the ``myplugin/build/myimage`` subfolder of the plugin templates directory.
+
+``remote-image``
+++++++++++++++++
+
+This hook allows pulling/pushing images from/to a docker registry.
+
+Example::
+  
+    hooks = {
+        "remote-image": {"myimage": "myimage:latest"},
+    }
+
+With this hook, users will be able to pull and push the ``myimage:latest`` docker image by running::
+      
+        tutor images pull myimage
+        tutor images push myimage
+
+    or::
+      
+        tutor images pull all
+        tutor images push all
 
 ``templates``
 ~~~~~~~~~~~~~
@@ -114,13 +163,22 @@ With the above declaration, you can store plugin-specific templates in the ``tem
 Existing plugins
 ----------------
 
-There exists just one Tutor plugin, for now. In the future, Xqueue and Student Notes will be moved outside of the main configuration and will have their own plugin.
-
 MinIO
 ~~~~~
 
 ::
+
     pip install tutor-minio
     tutor plugins enable minio
 
 See the `plugin documentation <https://github.com/overhangio/tutor/tree/master/plugins/minio>`_.
+
+Xqueue
+~~~~~~
+
+::
+  
+  pip install tutor-xqueue
+  tutor plugins enable xqueue
+  
+See the `plugin documentation <https://github.com/overhangio/tutor/tree/master/plugins/xqueue>`_.

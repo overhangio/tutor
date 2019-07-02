@@ -37,15 +37,16 @@ class BaseRunner:
 def initialise(runner):
     fmt.echo_info("Initialising all services...")
     runner.run("mysql-client", "hooks", "mysql-client", "init")
-    for service in ["lms", "cms", "forum", "notes", "xqueue"]:
+    for service in ["lms", "cms", "forum", "notes"]:
         if runner.is_activated(service):
             fmt.echo_info("Initialising {}...".format(service))
             runner.run(service, "hooks", service, "init")
-    for plugin_name, service in runner.iter_plugin_hooks("init"):
-        fmt.echo_info(
-            "Plugin {}: running init for service {}...".format(plugin_name, service)
-        )
-        runner.run(service, plugin_name, "hooks", service, "init")
+    for plugin_name, hook in runner.iter_plugin_hooks("init"):
+        for service in hook:
+            fmt.echo_info(
+                "Plugin {}: running init for service {}...".format(plugin_name, service)
+            )
+            runner.run(service, plugin_name, "hooks", service, "init")
     fmt.echo_info("All services initialised.")
 
 

@@ -9,7 +9,7 @@ with io.open(os.path.join(here, "README.rst"), "rt", encoding="utf8") as f:
 
 
 setup(
-    name="tutor-minio",
+    name="tutor-xqueue",
     version="0.0.1",
     url="https://docs.tutor.overhang.io/",
     project_urls={
@@ -21,12 +21,12 @@ setup(
     license="AGPLv3",
     author="Overhang.io",
     author_email="contact@overhang.io",
-    description="A Tutor plugin for object storage in MinIO",
+    description="A Tutor plugin for Xqueue (external grading system)",
     long_description=readme,
-    packages=["tutorminio"],
+    packages=["tutorxqueue"],
     include_package_data=True,
     python_requires=">=3.5",
-    entry_points={"tutor.plugin.v0": ["minio = tutorminio.plugin"]},
+    entry_points={"tutor.plugin.v0": ["xqueue = tutorxqueue.plugin"]},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

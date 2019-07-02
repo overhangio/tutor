@@ -134,12 +134,6 @@ def ask_questions(config, defaults):
         config,
         defaults,
     )
-    ask_bool(
-        "Activate Xqueue for external grader services (https://github.com/edx/xqueue)?",
-        "ACTIVATE_XQUEUE",
-        config,
-        defaults,
-    )
 
 
 def ask(question, key, config, defaults):

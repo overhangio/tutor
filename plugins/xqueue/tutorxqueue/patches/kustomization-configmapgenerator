@@ -1,0 +1,3 @@
+- name: xqueue-settings
+  files:
+    - apps/xqueue/settings/tutor.py

@@ -1,1 +1,2 @@
 -e ./plugins/minio
+-e ./plugins/xqueue

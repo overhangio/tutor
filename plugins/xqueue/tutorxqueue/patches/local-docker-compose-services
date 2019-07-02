@@ -1,0 +1,24 @@
+############# Xqueue: external grading of Open edX problems
+xqueue:
+  image: {{ DOCKER_REGISTRY }}{{ XQUEUE_DOCKER_IMAGE }}
+  volumes:
+    - ../plugins/xqueue/apps/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
+    - ../../data/xqueue:/openedx/data
+  environment:
+    DJANGO_SETTINGS_MODULE: xqueue.tutor
+  restart: unless-stopped
+  {% if ACTIVATE_MYSQL %}depends_on:
+    - mysql{% endif %}
+
+xqueue_consumer:
+  image: {{ DOCKER_REGISTRY }}{{ XQUEUE_DOCKER_IMAGE }}
+  volumes:
+    - ../plugins/xqueue/apps/settings/tutor.py:/openedx/xqueue/xqueue/tutor.py
+    - ../../data/xqueue:/openedx/data
+  environment:
+    DJANGO_SETTINGS_MODULE: xqueue.tutor
+  restart: unless-stopped
+  entrypoint: ["sh", "-e", "-c"]
+  command: ["while true; do echo 'running consumers'; ./manage.py run_consumer; sleep 10; done"]
+  {% if ACTIVATE_MYSQL %}depends_on:
+    - mysql{% endif %}
