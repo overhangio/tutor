@@ -1,0 +1,2 @@
+"EDXNOTES_PUBLIC_API": "{{ "https" if ACTIVATE_HTTPS else "http" }}://{{ NOTES_HOST }}/api/v1",
+"EDXNOTES_INTERNAL_API": "http://notes.openedx:8000/api/v1"

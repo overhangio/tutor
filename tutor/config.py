@@ -89,15 +89,13 @@ def load_env(config, defaults):
 
 def load_required(config, defaults):
     """
-    All these keys must be present in the user's config.yml. This includes all values that are generated once and must be kept after that, such as passwords.
+    All these keys must be present in the user's config.yml. This includes all values
+    that are generated once and must be kept after that, such as passwords.
     """
     for key in [
         "SECRET_KEY",
         "MYSQL_ROOT_PASSWORD",
         "OPENEDX_MYSQL_PASSWORD",
-        "NOTES_MYSQL_PASSWORD",
-        "NOTES_SECRET_KEY",
-        "NOTES_OAUTH2_SECRET",
         "ANDROID_OAUTH2_SECRET",
         "ID",
     ]:
@@ -115,7 +113,9 @@ def load_plugins(config, defaults):
 
         # Add new config key/values
         for key, value in plugin_config.get("add", {}).items():
-            config[plugin_prefix + key] = env.render_unknown(config, value)
+            new_key = plugin_prefix + key
+            if new_key not in config:
+                config[new_key] = env.render_unknown(config, value)
 
         # Set existing config key/values: here, we do not override existing values
         for key, value in plugin_config.get("set", {}).items():
@@ -137,6 +137,10 @@ def upgrade_obsolete(config):
         config["OPENEDX_MYSQL_DATABASE"] = config.pop("MYSQL_DATABASE")
     if "MYSQL_USERNAME" in config:
         config["OPENEDX_MYSQL_USERNAME"] = config.pop("MYSQL_USERNAME")
+    if "ACTIVATE_NOTES" in config:
+        if config["ACTIVATE_NOTES"]:
+            plugins.enable(config, "notes")
+        config.pop("ACTIVATE_NOTES")
     if "ACTIVATE_XQUEUE" in config:
         if config["ACTIVATE_XQUEUE"]:
             plugins.enable(config, "xqueue")

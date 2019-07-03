@@ -75,7 +75,6 @@ services:
     depends_on:
       {% if ACTIVATE_LMS %}- lms{% endif %}
       {% if ACTIVATE_CMS %}- cms {% endif %}
-      {% if ACTIVATE_NOTES %}- notes{% endif %}
 
   {% if ACTIVATE_RABBITMQ %}
   rabbitmq:
@@ -190,22 +189,4 @@ services:
       - cms
   {% endif %}
 
-  {% if ACTIVATE_NOTES %}
-  ############# Notes: backend store for edX Student Notes
-  notes:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NOTES }}
-    networks:
-      default:
-        aliases:
-          - notes.openedx
-    environment:
-      DJANGO_SETTINGS_MODULE: notesserver.settings.tutor
-    volumes:
-      - ../apps/notes/settings/tutor.py:/openedx/edx-notes-api/notesserver/settings/tutor.py
-      - ../../data/notes:/openedx/data
-    restart: unless-stopped
-    {% if ACTIVATE_MYSQL %}depends_on:
-      - mysql{% endif %}
-  {% endif %}
-  
   {{ patch("local-docker-compose-services")|indent(2) }}

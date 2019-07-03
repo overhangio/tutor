@@ -128,12 +128,6 @@ def ask_questions(config, defaults):
         config,
         defaults,
     )
-    ask_bool(
-        "Activate Student Notes service (https://open.edx.org/features/student-notes)?",
-        "ACTIVATE_NOTES",
-        config,
-        defaults,
-    )
 
 
 def ask(question, key, config, defaults):

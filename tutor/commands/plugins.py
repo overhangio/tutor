@@ -1,6 +1,9 @@
+import os
+import shutil
 import click
 
 from .. import config as tutor_config
+from .. import env as tutor_env
 from .. import fmt
 from .. import opts
 from .. import plugins
@@ -46,6 +49,11 @@ def disable(root, plugin):
     config = tutor_config.load_user(root)
     plugins.disable(config, plugin)
     tutor_config.save(root, config)
+
+    plugin_dir = tutor_env.pathjoin(root, "plugins", plugin)
+    if os.path.exists(plugin_dir):
+        shutil.rmtree(plugin_dir)
+
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
     )

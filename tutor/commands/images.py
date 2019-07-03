@@ -6,6 +6,8 @@ from .. import images
 from .. import opts
 from .. import plugins
 
+OPENEDX_IMAGE_NAMES = ["openedx", "forum", "android"]
+
 
 @click.group(name="images", short_help="Manage docker images")
 def images_command():
@@ -31,7 +33,7 @@ def build(root, image, no_cache, build_arg):
     config = tutor_config.load(root)
 
     # Build base images
-    for img in openedx_image_names(config):
+    for img in OPENEDX_IMAGE_NAMES:
         if image in [img, "all"]:
             tag = get_tag(config, img)
             images.build(
@@ -79,7 +81,7 @@ def pull(root, image):
 def push(root, image):
     config = tutor_config.load(root)
     # Push base images
-    for img in openedx_image_names(config):
+    for img in OPENEDX_IMAGE_NAMES:
         if image in [img, "all"]:
             tag = get_tag(config, img)
             images.push(tag)
@@ -98,14 +100,7 @@ def get_tag(config, name):
 
 
 def image_names(config):
-    return openedx_image_names(config) + vendor_image_names(config)
-
-
-def openedx_image_names(config):
-    openedx_images = ["openedx", "forum", "notes", "android"]
-    if not config["ACTIVATE_NOTES"]:
-        openedx_images.remove("notes")
-    return openedx_images
+    return OPENEDX_IMAGE_NAMES + vendor_image_names(config)
 
 
 def vendor_image_names(config):
@@ -118,16 +113,9 @@ def vendor_image_names(config):
         "rabbitmq",
         "smtp",
     ]
-    if not config["ACTIVATE_ELASTICSEARCH"]:
-        vendor_images.remove("elasticsearch")
-    if not config["ACTIVATE_MEMCACHED"]:
-        vendor_images.remove("memcached")
-    if not config["ACTIVATE_MONGODB"]:
-        vendor_images.remove("mongodb")
-    if not config["ACTIVATE_MYSQL"]:
-        vendor_images.remove("mysql")
-    if not config["ACTIVATE_RABBITMQ"]:
-        vendor_images.remove("rabbitmq")
+    for image in vendor_images[:]:
+        if not config.get("ACTIVATE_" + image.upper(), True):
+            vendor_images.remove(image)
     return vendor_images
 
 

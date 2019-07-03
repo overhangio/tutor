@@ -147,6 +147,27 @@ class PluginsTests(unittest.TestCase):
             tutor_config.load_plugins(config, defaults)
         self.assertEqual("{{ PARAM1 }}", defaults["PLUGIN1_PARAM2"])
 
+    def test_configure_add_twice(self):
+        config = {}
+
+        class plugin1:
+            config = {"add": {"PARAM1": "{{ 10|random_string }}"}}
+
+        with unittest.mock.patch.object(
+            plugins.Plugins, "iter_enabled", return_value=[("plugin1", plugin1)]
+        ):
+            tutor_config.load_plugins(config, {})
+        value1 = config["PLUGIN1_PARAM1"]
+        with unittest.mock.patch.object(
+            plugins.Plugins, "iter_enabled", return_value=[("plugin1", plugin1)]
+        ):
+            tutor_config.load_plugins(config, {})
+        value2 = config["PLUGIN1_PARAM1"]
+
+        self.assertEqual(10, len(value1))
+        self.assertEqual(10, len(value2))
+        self.assertEqual(value1, value2)
+
     def test_hooks(self):
         class plugin1:
             hooks = {"init": ["myclient"]}

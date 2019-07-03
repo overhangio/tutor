@@ -48,7 +48,6 @@ Individual service activation
 - ``ACTIVATE_RABBITMQ`` (default: ``true``)
 - ``ACTIVATE_SMTP`` (default: ``true``)
 - ``ACTIVATE_HTTPS`` (default: ``false``)
-- ``ACTIVATE_NOTES`` (default: ``false``)
 
 Every single Open edX service may be (de)activated at will by these configuration parameters. This is useful if you want, for instance, to distribute the various Open edX services on different servers.
 
@@ -63,7 +62,6 @@ Custom images
 - ``DOCKER_IMAGE_OPENEDX`` (default: ``"overhangio/openedx:{{ TUTOR_VERSION }}"``)
 - ``DOCKER_IMAGE_ANDROID`` (default: ``"overhangio/openedx-android:{{ TUTOR_VERSION }}"``)
 - ``DOCKER_IMAGE_FORUM`` (default: ``"overhangio/openedx-forum:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_NOTES`` (default: ``"overhangio/openedx-notes:{{ TUTOR_VERSION }}"``)
 
 These configuration parameters define which image to run for each service. By default, the docker image tag matches the Tutor version it was built with.
 
@@ -143,13 +141,8 @@ SMTP
 - ``SMTP_USERNAME`` (default: ``""``)
 - ``SMTP_PASSWORD`` (default: ``""``)
 
-Optional features
-~~~~~~~~~~~~~~~~~
-
-Some optional features may be activated or deactivated during the interactive configuration step (``tutor config save -i``).
-
 SSL/TLS certificates for HTTPS access
-*************************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - ``ACTIVATE_HTTPS`` (default: ``false``)
 
@@ -170,21 +163,6 @@ To create the certificate manually, run::
 To renew the certificate, run this command once per month::
 
     tutor local https renew
-
-Student notes
-*************
-
-- ``ACTIVATE_NOTES`` (default: ``false``)
-- ``NOTES_HOST`` (default: ``notes.{{ LMS_HOST }}``)
-
-With `notes <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-ironwood.master/exercises_tools/notes.html?highlight=notes>`_, students can annotate portions of the courseware. 
-
-.. image:: https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-ironwood.master/_images/SFD_SN_bodyexample.png
-    :alt: Notes in action
-
-You should beware that the ``notes.<LMS_HOST>`` domain name should be activated and point to your server. For instance, if your LMS is hosted at http://myopenedx.com, the notes service should be found at http://notes.myopenedx.com.
-
-If you would like to host the notes service at a different domain name, you can set the ``NOTES_HOST`` configuration variable. In particular, in development you should set this configuration variable to ``notes.localhost`` in order to be able to access the notes service from the LMS. Otherwise you will get a "Sorry, we could not search the store for annotations" error.
 
 .. _customise:
 

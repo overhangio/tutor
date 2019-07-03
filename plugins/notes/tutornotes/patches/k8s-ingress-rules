@@ -1,0 +1,6 @@
+- host: {{ NOTES_HOST }}
+  http:
+    paths:
+    - backend:
+        serviceName: nginx
+        servicePort: {% if ACTIVATE_HTTPS %}443{% else %}80{% endif %}

@@ -115,7 +115,6 @@ def save_plugin_templates(plugin, plugin_path, root, config):
     """
     Save plugin templates to plugins/<plugin name>/*.
     Only the "apps" and "build" subfolders are rendered.
-    TODO we should delete this folder when the plugin is disabled.
     """
     for subdir in ["apps", "build"]:
         path = os.path.join(plugin_path, plugin, subdir)

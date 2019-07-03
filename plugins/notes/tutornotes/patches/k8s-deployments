@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes
+  labels:
+    app.kubernetes.io/name: notes
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: notes
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: notes
+    spec:
+      containers:
+        - name: notes
+          image: {{ DOCKER_REGISTRY }}{{ NOTES_DOCKER_IMAGE }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: notesserver.settings.tutor
+          volumeMounts:
+            - mountPath: /openedx/edx-notes-api/notesserver/settings/tutor.py
+              name: settings
+              subPath: tutor.py
+      volumes:
+        - name: settings
+          configMap:
+            name: notes-settings
