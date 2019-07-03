@@ -1,0 +1,27 @@
+{% if ACTIVATE_HTTPS %}
+<VirtualHost *:80>
+   ServerName {{ NOTES_HOST }}
+   Redirect / https://notes.{{ LMS_HOST }}/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName {{ NOTES_HOST }}
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/{{ NOTES_HOST }}/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/{{ NOTES_HOST }}/privkey.pem
+
+    ProxyPreserveHost On
+    ProxyRequests On
+    ProxyPass / http://localhost:{{ NGINX_HTTP_PORT }}/
+    ProxyPassReverse / http://localhost:{{ NGINX_HTTP_PORT }}/
+</VirtualHost>
+{% else %}
+<VirtualHost *:80>
+    ServerName {{ NOTES_HOST }}
+
+    ProxyPreserveHost On
+    ProxyRequests On
+    ProxyPass / http://localhost:{{ NGINX_HTTP_PORT }}/
+    ProxyPassReverse / http://localhost:{{ NGINX_HTTP_PORT }}/
+</VirtualHost>
+{% endif %}

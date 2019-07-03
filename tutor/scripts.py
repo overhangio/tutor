@@ -37,7 +37,7 @@ class BaseRunner:
 def initialise(runner):
     fmt.echo_info("Initialising all services...")
     runner.run("mysql-client", "hooks", "mysql-client", "init")
-    for service in ["lms", "cms", "forum", "notes"]:
+    for service in ["lms", "cms", "forum"]:
         if runner.is_activated(service):
             fmt.echo_info("Initialising {}...".format(service))
             runner.run(service, "hooks", service, "init")

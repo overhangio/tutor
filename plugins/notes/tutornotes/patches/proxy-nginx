@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name {{ LMS_HOST }} preview.{{ LMS_HOST }} {{ CMS_HOST }};
+    server_name {{ NOTES_HOST }};
 
     server_tokens off;
     location / {
@@ -12,14 +12,13 @@ server {
         proxy_pass http://localhost:{{ NGINX_HTTP_PORT }};
     }
 }
-
 {% if ACTIVATE_HTTPS %}
 server {
     listen 443 ssl;
-    server_name {{ LMS_HOST }} preview.{{ LMS_HOST }} {{ CMS_HOST }};
+    server_name {{ NOTES_HOST }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ LMS_HOST }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ LMS_HOST }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ NOTES_HOST }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ NOTES_HOST }}/privkey.pem;
 
     server_tokens off;
     location / {
@@ -32,5 +31,3 @@ server {
     }
 }
 {% endif %}
-
-{{ patch("proxy-nginx") }}

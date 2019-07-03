@@ -3,9 +3,6 @@
 SECRET_KEY: "{{ 24|random_string }}"
 MYSQL_ROOT_PASSWORD: "{{ 8|random_string }}"
 OPENEDX_MYSQL_PASSWORD: "{{ 8|random_string }}"
-NOTES_MYSQL_PASSWORD: "{{ 8|random_string }}"
-NOTES_SECRET_KEY: "{{ 24|random_string }}"
-NOTES_OAUTH2_SECRET: "{{ 24|random_string }}"
 ANDROID_OAUTH2_SECRET: "{{ 24|random_string }}"
 ID: "{{ 24|random_string }}"
 
@@ -21,7 +18,6 @@ ACTIVATE_HTTPS: false
 ACTIVATE_MEMCACHED: true
 ACTIVATE_MONGODB: true
 ACTIVATE_MYSQL: true
-ACTIVATE_NOTES: false
 ACTIVATE_RABBITMQ: true
 ACTIVATE_SMTP: true
 CMS_HOST: "studio.{{ LMS_HOST }}"
@@ -34,7 +30,6 @@ ANDROID_RELEASE_KEY_ALIAS: "android release key alias"
 DOCKER_IMAGE_OPENEDX: "overhangio/openedx:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_ANDROID: "overhangio/openedx-android:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_FORUM: "overhangio/openedx-forum:{{ TUTOR_VERSION }}"
-DOCKER_IMAGE_NOTES: "overhangio/openedx-notes:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_MEMCACHED: "memcached:1.4.38"
 DOCKER_IMAGE_MONGODB: "mongo:3.2.16"
 DOCKER_IMAGE_MYSQL: "mysql:5.6.36"
@@ -62,9 +57,6 @@ MYSQL_HOST: "mysql"
 MYSQL_PORT: 3306
 NGINX_HTTP_PORT: 80
 NGINX_HTTPS_PORT: 443
-NOTES_HOST: "notes.{{ LMS_HOST }}"
-NOTES_MYSQL_DATABASE: "notes"
-NOTES_MYSQL_USERNAME: "notes"
 PLATFORM_NAME: "My Open edX"
 PLUGINS: []
 RABBITMQ_HOST: "rabbitmq"

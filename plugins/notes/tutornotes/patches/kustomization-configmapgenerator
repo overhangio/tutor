@@ -1,0 +1,3 @@
+- name: notes-settings
+  files:
+    - plugins/notes/apps/notes/settings/tutor.py

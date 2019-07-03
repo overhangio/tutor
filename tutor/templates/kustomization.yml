@@ -34,7 +34,4 @@ configMapGenerator:
   - {{ file }}{% endfor %}
 {% if ACTIVATE_MYSQL %}- name: mysql-config
   env: apps/mysql/auth.env{% endif %}
-{% if ACTIVATE_NOTES %}- name: notes-settings
-  files:
-    - apps/notes/settings/tutor.py{% endif %}
 {{ patch("kustomization-configmapgenerator") }}

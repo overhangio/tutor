@@ -14,6 +14,7 @@ package: ## Build a package ready to upload to pypi
 
 package-plugins: ## Build packages for each plugin
 	cd plugins/minio && python3 setup.py sdist --dist-dir=../../dist/
+	cd plugins/notes && python3 setup.py sdist --dist-dir=../../dist/
 	cd plugins/xqueue && python3 setup.py sdist --dist-dir=../../dist/
 
 test: test-lint test-unit test-format test-packages ## Run all tests by decreasing order or priority
@@ -85,7 +86,10 @@ ci-bundle: ## Create bundle and run basic tests
 	./dist/tutor --version
 	./dist/tutor config printroot
 	yes "" | ./dist/tutor config save --interactive
-	./dist/tutor config save --set ACTIVATE_NOTES=true --set ACTIVATE_XQUEUE=true
+	./dist/tutor config save
+	./dist/tutor plugins enable notes
+	./dist/tutor plugins enable xqueue
+	
 
 ./releases/github-release: ## Download github-release binary
 	cd releases/ \
@@ -112,8 +116,8 @@ ci-github: ./releases/github-release ## Upload assets to github
 			--replace
 
 ci-config-images:
+	tutor plugin enable notes
 	tutor plugin enable xqueue
-	tutor config save --set ACTIVATE_NOTES=true
 
 ci-build-images: ci-config-images ## Build docker images
 	tutor images build all
