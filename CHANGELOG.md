@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Security] Apply certificate XSS security patch
+
 ## 3.5.1 (2019-07-04)
 
 - [Feature] Make it possible for plugins to patch the build templates

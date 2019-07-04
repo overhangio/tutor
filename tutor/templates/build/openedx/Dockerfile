@@ -24,6 +24,10 @@ RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
+# Apply patches
+# Certificates XSS vulnerability https://github.com/edx/edx-platform/pull/20904
+RUN curl https://github.com/edx/edx-platform/commit/b33db2c548a1a530510d785f7659c78783a187fa.patch | git apply -
+
 # Download extra locales to /openedx/locale
 # TODO upgrade this to ironwood
 RUN cd /tmp \
