@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.5.2 (2019-07-05)
 
 - [Security] Apply certificate XSS security patch
 
