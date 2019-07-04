@@ -1,4 +1,4 @@
-"XQUEUE_INTERFACE": {
+XQUEUE_INTERFACE = {
   "django_auth": {
     "username": "{{ XQUEUE_AUTH_USERNAME }}",
     "password": "{{ XQUEUE_AUTH_PASSWORD }}"
