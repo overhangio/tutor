@@ -35,6 +35,7 @@ WORKDIR /openedx/cs_comments_service
 RUN bundle install --deployment
 
 COPY ./bin /openedx/bin
+RUN chmod a+x /openedx/bin/*
 ENV PATH /openedx/bin:${PATH}
 ENTRYPOINT ["docker-entrypoint.sh"]
 
