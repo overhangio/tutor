@@ -51,15 +51,17 @@ nightly: ## Create a "nightly" release
 	$(MAKE) tag TAG=nightly
 
 release: ## Create a release tag and push it to origin
-	$(MAKE) tag TAG=v$(shell make version)
+	$(MAKE) retag release-origin release-overhangio TAG=v$(shell make version)
 
-tag:
+retag:
 	@echo "=== Creating tag $(TAG)"
 	git tag -d $(TAG) || true
 	git tag $(TAG)
+release-origin:
 	@echo "=== Pushing tag $(TAG) to origin"
 	git push origin :$(TAG) || true
 	git push origin $(TAG)
+release-overhangio:
 	@echo "=== Pushing tag $(TAG) to overhangio"
 	git push overhangio :$(TAG) || true
 	git push overhangio $(TAG)
