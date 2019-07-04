@@ -67,6 +67,7 @@ COPY settings/cms/*.py ./cms/envs/tutor/
 
 # Copy scripts
 COPY ./bin /openedx/bin
+RUN chmod a+x /openedx/bin/*
 ENV PATH /openedx/bin:${PATH}
 
 {{ patch("openedx-dockerfile-pre-assets") }}
