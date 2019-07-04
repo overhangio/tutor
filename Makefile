@@ -116,8 +116,7 @@ ci-github: ./releases/github-release ## Upload assets to github
 			--replace
 
 ci-config-images:
-	tutor plugin enable notes
-	tutor plugin enable xqueue
+	tutor config save
 
 ci-build-images: ci-config-images ## Build docker images
 	tutor images build all

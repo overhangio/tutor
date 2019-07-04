@@ -67,7 +67,7 @@ Like many web applications, Open edX needs to persist data. In particular, it ne
 
 Luckily, there is another solution: at `edx.org <edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on premises. This is achieved thanks to `MinIO <https://www.minio.io/>`_. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
   
-    tutor plugin enable minio
+    tutor plugins enable minio
 
 The "minio.LMS_HOST" domain name will have to point to your Kubernetes cluster. This will not be necessary if you have a CNAME from "\*.LMS_HOST" to "LMS_HOST", of course.
 
