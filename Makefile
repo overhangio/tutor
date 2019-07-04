@@ -117,13 +117,16 @@ ci-github: ./releases/github-release ## Upload assets to github
 	    --file ./dist/tutor \
 			--replace
 
-ci-config-images:
+ci-bootstrap-images:
+	pip install -r requirements/plugins.txt
+	tutor plugins enable notes
+	tutor plugins enable xqueue
 	tutor config save
 
-ci-build-images: ci-config-images ## Build docker images
+ci-build-images: ci-bootstrap-images ## Build docker images
 	tutor images build all
 
-ci-push-images: ci-config-images ## Push docker images to hub.docker.com
+ci-push-images: ci-bootstrap-images ## Push docker images to hub.docker.com
 		docker login -u "$$DOCKER_USERNAME" -p "$$DOCKER_PASSWORD"
 		tutor images push all
 
