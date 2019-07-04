@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Feature] Make it possible for plugins to patch the build templates
 - [Improvement] Move Xqueue and Student notes to a dedicated plugin
 
 ## 3.4.3 (2019-06-24)

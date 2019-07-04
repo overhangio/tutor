@@ -69,6 +69,8 @@ COPY settings/cms/*.py ./cms/envs/tutor/
 COPY ./bin /openedx/bin
 ENV PATH /openedx/bin:${PATH}
 
+{{ patch("openedx-dockerfile-pre-assets") }}
+
 # Collect production assets. By default, only assets from the default theme
 # will be processed. This makes the docker image lighter and faster to build.
 # Only the custom themes added to /openedx/themes will be compiled.
@@ -90,6 +92,8 @@ RUN mkdir /openedx/data
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
 ENV SETTINGS tutor.production
+
+{{ patch("openedx-dockerfile") }}
 
 # Entrypoint will fix permissions of all files and run commands as openedx
 ENTRYPOINT ["docker-entrypoint.sh"]

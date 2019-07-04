@@ -102,11 +102,10 @@ def render_full(root, config):
     """
     Render the full environment, including version information.
     """
-    for subdir in ["android", "apps", "k8s", "local", "webui"]:
+    for subdir in ["android", "apps", "build", "k8s", "local", "webui"]:
         save_subdir(subdir, root, config)
     for plugin, path in plugins.iter_templates(config):
         save_plugin_templates(plugin, path, root, config)
-    copy_subdir("build", root)
     save_file(VERSION_FILENAME, root, config)
     save_file("kustomization.yml", root, config)
 
