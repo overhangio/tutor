@@ -40,7 +40,9 @@ def initialise(runner):
     for plugin_name, hook in runner.iter_plugin_hooks("pre-init"):
         for service in hook:
             fmt.echo_info(
-                "Plugin {}: running pre-init for service {}...".format(plugin_name, service)
+                "Plugin {}: running pre-init for service {}...".format(
+                    plugin_name, service
+                )
             )
             runner.run(service, plugin_name, "hooks", service, "pre-init")
     for service in ["lms", "cms", "forum"]:
