@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.5.3 (2019-07-05)
 
 - [Bugfix] Add pre-init hook for correct initialisation of minio
 
