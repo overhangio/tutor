@@ -22,7 +22,7 @@ config = {
 templates = os.path.join(HERE, "templates")
 
 hooks = {
-    "init": ["minio-client"],
+    "pre-init": ["minio-client"],
     "remote-image": {
         "minio-server": "{{ MINIO_DOCKER_IMAGE_SERVER }}",
         "minio-client": "{{ MINIO_DOCKER_IMAGE_CLIENT }}",

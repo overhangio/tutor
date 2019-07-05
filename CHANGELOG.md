@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Bugfix] Add pre-init hook for correct initialisation of minio
+
 ## 3.5.2 (2019-07-05)
 
 - [Security] Apply certificate XSS security patch

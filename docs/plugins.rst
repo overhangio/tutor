@@ -105,6 +105,12 @@ Example::
     
 During initialisation, "myservice1" and "myservice2" will be run in sequence with the commands defined in the templates ``myplugin/hooks/myservice1/init`` and ``myplugin/hooks/myservice2/init``.
 
+``pre-init``
+++++++++++++
+
+This hook will be executed just before the ``init`` hooks. Otherwise, the specs are identical. This is useful for creating databases or other resources that will be required during initialisation, for instance.
+
+
 ``build-image``
 +++++++++++++++
 

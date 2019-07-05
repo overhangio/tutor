@@ -37,6 +37,12 @@ class BaseRunner:
 def initialise(runner):
     fmt.echo_info("Initialising all services...")
     runner.run("mysql-client", "hooks", "mysql-client", "init")
+    for plugin_name, hook in runner.iter_plugin_hooks("pre-init"):
+        for service in hook:
+            fmt.echo_info(
+                "Plugin {}: running pre-init for service {}...".format(plugin_name, service)
+            )
+            runner.run(service, plugin_name, "hooks", service, "pre-init")
     for service in ["lms", "cms", "forum"]:
         if runner.is_activated(service):
             fmt.echo_info("Initialising {}...".format(service))
