@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Improvement] Add 'local-docker-compose-nginx-volumes' patch
+
 ## 3.5.3 (2019-07-05)
 
 - [Bugfix] Add pre-init hook for correct initialisation of minio

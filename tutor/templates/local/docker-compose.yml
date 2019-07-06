@@ -72,6 +72,7 @@ services:
       {% if ACTIVATE_CMS %}- ../../data/cms:/openedx/data/cms/:ro{% endif %}
       {% if ACTIVATE_LMS %}- ../../data/lms:/openedx/data/lms/:ro{% endif %}
       {% if ACTIVATE_HTTPS %}- ../../data/letsencrypt:/etc/letsencrypt/:ro{% endif %}
+      {{ patch("local-docker-compose-nginx-volumes")|indent(6) }}
     depends_on:
       {% if ACTIVATE_LMS %}- lms{% endif %}
       {% if ACTIVATE_CMS %}- cms {% endif %}
