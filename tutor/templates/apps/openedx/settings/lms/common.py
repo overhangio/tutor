@@ -45,6 +45,11 @@ GRADES_DOWNLOAD = {
 
 LOCALE_PATHS.append("/openedx/locale")
 
+# JWT is authentication for other openedx services
+JWT_AUTH["ISSUER"] = "{% if ACTIVATE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"
+JWT_AUTH["JWT_AUDIENCE"] = "openedx"
+JWT_AUTH["SECRET_KEY"] = "{{ OPENEDX_SECRET_KEY }}"
+
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):
