@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Improvement] Make it possible to enable/disable multiple plugins at once
 - [Improvement] Add 'local-docker-compose-nginx-volumes' patch
 
 ## 3.5.3 (2019-07-05)

@@ -32,10 +32,12 @@ def list_command(root):
 
 @click.command(help="Enable a plugin")
 @opts.root
-@click.argument("plugin")
-def enable(root, plugin):
+@click.argument("plugin_names", metavar="plugin", nargs=-1)
+def enable(root, plugin_names):
     config = tutor_config.load_user(root)
-    plugins.enable(config, plugin)
+    for plugin in plugin_names:
+        plugins.enable(config, plugin)
+        fmt.echo_info("Plugin {} enabled".format(plugin))
     tutor_config.save(root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
@@ -44,16 +46,18 @@ def enable(root, plugin):
 
 @click.command(help="Disable a plugin")
 @opts.root
-@click.argument("plugin")
-def disable(root, plugin):
+@click.argument("plugin_names", metavar="plugin", nargs=-1)
+def disable(root, plugin_names):
     config = tutor_config.load_user(root)
-    plugins.disable(config, plugin)
+    for plugin in plugin_names:
+        plugins.disable(config, plugin)
+
+        plugin_dir = tutor_env.pathjoin(root, "plugins", plugin)
+        if os.path.exists(plugin_dir):
+            shutil.rmtree(plugin_dir)
+        fmt.echo_info("Plugin {} disabled".format(plugin))
+
     tutor_config.save(root, config)
-
-    plugin_dir = tutor_env.pathjoin(root, "plugins", plugin)
-    if os.path.exists(plugin_dir):
-        shutil.rmtree(plugin_dir)
-
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
     )
