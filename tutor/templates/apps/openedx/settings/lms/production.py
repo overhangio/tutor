@@ -8,12 +8,10 @@ execfile(os.path.join(os.path.dirname(__file__), "common.py"), globals())
 ALLOWED_HOSTS = [
     ENV_TOKENS.get("LMS_BASE"),
     FEATURES["PREVIEW_LMS_BASE"],
+    "lms",
     "127.0.0.1",
     "localhost",
     "preview.localhost",
-    "127.0.0.1:8000",
-    "localhost:8000",
-    "preview.localhost:8000",
 ]
 
 # Required to display all courses on start page
