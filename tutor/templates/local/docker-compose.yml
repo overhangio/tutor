@@ -69,8 +69,7 @@ services:
     volumes:
       - ../apps/nginx:/etc/nginx/conf.d/:ro
       - ../../data/openedx:/var/www/openedx:ro
-      {% if ACTIVATE_CMS %}- ../../data/cms:/openedx/data/cms/:ro{% endif %}
-      {% if ACTIVATE_LMS %}- ../../data/lms:/openedx/data/lms/:ro{% endif %}
+      - ../../data/openedx-media:/var/www/openedx-media:ro
       {% if ACTIVATE_HTTPS %}- ../../data/letsencrypt:/etc/letsencrypt/:ro{% endif %}
       {{ patch("local-docker-compose-nginx-volumes")|indent(6) }}
     depends_on:
@@ -121,6 +120,7 @@ services:
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
     depends_on:
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_FORUM %}- forum{% endif %}
@@ -143,6 +143,7 @@ services:
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
     depends_on:
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
@@ -168,6 +169,7 @@ services:
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/lms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
     depends_on:
       - lms
   {% endif %}
@@ -186,6 +188,7 @@ services:
       - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
       - ../apps/openedx/config/:/openedx/config/
       - ../../data/cms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
     depends_on:
       - cms
   {% endif %}
