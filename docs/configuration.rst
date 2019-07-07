@@ -140,6 +140,9 @@ SMTP
 - ``SMTP_PORT`` (default: ``25``)
 - ``SMTP_USERNAME`` (default: ``""``)
 - ``SMTP_PASSWORD`` (default: ``""``)
+- ``SMTP_USE_TLS`` (default: ``false``)
+
+Note that the SMTP server shipped with Tutor by default does not implement TLS.
 
 SSL/TLS certificates for HTTPS access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
