@@ -22,6 +22,8 @@ LOGGING["handlers"]["tracking"] = {
 }
 LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
 
+EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
+
 LOCALE_PATHS.append("/openedx/locale")
 
 # Create folders if necessary

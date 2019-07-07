@@ -24,6 +24,8 @@ LOGGING["handlers"]["tracking"] = {
 }
 LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
 
+EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
+
 # Fix media files paths
 VIDEO_IMAGE_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
 VIDEO_TRANSCRIPTS_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT

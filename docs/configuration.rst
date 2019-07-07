@@ -141,8 +141,9 @@ SMTP
 - ``SMTP_USERNAME`` (default: ``""``)
 - ``SMTP_PASSWORD`` (default: ``""``)
 - ``SMTP_USE_TLS`` (default: ``false``)
+- ``SMTP_USE_SSL`` (default: ``false``)
 
-Note that the SMTP server shipped with Tutor by default does not implement TLS.
+Note that the SMTP server shipped with Tutor by default does not implement TLS. With external servers, only one of SSL or TLS should be enabled, at most.
 
 SSL/TLS certificates for HTTPS access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
