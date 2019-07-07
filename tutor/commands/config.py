@@ -20,11 +20,27 @@ def config_command():
 @click.command(help="Create and save configuration interactively")
 @opts.root
 @click.option("-i", "--interactive", is_flag=True, help="Run interactively")
-@opts.key_value
-def save(root, interactive, set_):
+@click.option(
+    "-s",
+    "--set",
+    "set_",
+    type=opts.YamlParamType(),
+    multiple=True,
+    metavar="KEY=VAL",
+    help="Set a configuration value (can be used multiple times)",
+)
+@click.option(
+    "-U",
+    "--unset",
+    multiple=True,
+    help="Remove a configuration value (can be used multiple times)",
+)
+def save(root, interactive, set_, unset):
     config, defaults = interactive_config.load_all(root, interactive=interactive)
     if set_:
         tutor_config.merge(config, dict(set_), force=True)
+    for key in unset:
+        config.pop(key, None)
     tutor_config.save(root, config)
     tutor_config.merge(config, defaults)
     env.save(root, config)

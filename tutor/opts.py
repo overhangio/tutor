@@ -40,14 +40,3 @@ class YamlParamType(click.ParamType):
         except ValueError:
             self.fail("'{}' is not of the form 'key=value'.".format(value), param, ctx)
         return k, serialize.parse_value(v)
-
-
-key_value = click.option(
-    "-s",
-    "--set",
-    "set_",
-    type=YamlParamType(),
-    multiple=True,
-    metavar="KEY=VAL",
-    help="Set a configuration value (can be used multiple times)",
-)
