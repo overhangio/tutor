@@ -1,8 +1,8 @@
 ---
 # These configuration values must be stored in the user's config.yml.
-SECRET_KEY: "{{ 24|random_string }}"
 MYSQL_ROOT_PASSWORD: "{{ 8|random_string }}"
 OPENEDX_MYSQL_PASSWORD: "{{ 8|random_string }}"
+OPENEDX_SECRET_KEY: "{{ 24|random_string }}"
 ANDROID_OAUTH2_SECRET: "{{ 24|random_string }}"
 ID: "{{ 24|random_string }}"
 

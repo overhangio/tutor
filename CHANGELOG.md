@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Improvement] Rename ``SECRET_KEY`` configuration parameter to ``OPENEDX_SECRET_KEY``
 - [Improvement] Add support for TLS in external SMTP server (#231)
 - [Bugfix] Fix missing video transcripts in LMS (#229)
 - [Improvement] Make it possible to enable/disable multiple plugins at once

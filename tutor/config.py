@@ -93,7 +93,7 @@ def load_required(config, defaults):
     that are generated once and must be kept after that, such as passwords.
     """
     for key in [
-        "SECRET_KEY",
+        "OPENEDX_SECRET_KEY",
         "MYSQL_ROOT_PASSWORD",
         "OPENEDX_MYSQL_PASSWORD",
         "ANDROID_OAUTH2_SECRET",
@@ -145,6 +145,8 @@ def upgrade_obsolete(config):
         if config["ACTIVATE_XQUEUE"]:
             plugins.enable(config, "xqueue")
         config.pop("ACTIVATE_XQUEUE")
+    if "SECRET_KEY" in config:
+        config["OPENEDX_SECRET_KEY"] = config.pop("SECRET_KEY")
 
 
 def convert_json2yml(root):
