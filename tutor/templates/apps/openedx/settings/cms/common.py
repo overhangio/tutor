@@ -2,7 +2,7 @@
 update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
 
 # Set uploaded media file path
-MEDIA_ROOT = "/openedx/data/uploads/"
+MEDIA_ROOT = "/openedx/media/"
 
 # Video settings
 VIDEO_IMAGE_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
