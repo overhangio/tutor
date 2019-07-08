@@ -90,9 +90,20 @@ def stop(root):
 
 
 @click.command(
-    help="""Restart some components from a running platform.
-You may specify 'openedx' to restart the lms, cms and workers, or 'all' to
-restart all services."""
+    short_help="Reboot an existing platform",
+    help="This is more than just a restart: with reboot, the platform is fully stopped before being restarted again",
+)
+@opts.root
+@click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
+def reboot(root, detach):
+    stop.callback(root)
+    start.callback(root, detach)
+
+
+@click.command(
+    short_help="Restart some components from a running platform.",
+    help="""Specify 'openedx' to restart the lms, cms and workers, or 'all' to
+restart all services. Note that this performs a 'docker-compose restart', so new images may not be taken into account. To fully stop the platform, use the 'reboot' command.""",
 )
 @opts.root
 @click.argument("service")
@@ -336,6 +347,7 @@ local.add_command(pullimages)
 local.add_command(start)
 local.add_command(stop)
 local.add_command(restart)
+local.add_command(reboot)
 local.add_command(run)
 local.add_command(execute, name="exec")
 local.add_command(init)

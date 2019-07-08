@@ -69,6 +69,13 @@ def stop(root):
     )
 
 
+@click.command(help="Reboot an existing platform")
+@opts.root
+def reboot(root):
+    stop.callback(root)
+    start.callback(root)
+
+
 def resource_selector(config, *selectors):
     """
     Convenient utility for filtering only the resources that belong to this project.
@@ -218,6 +225,7 @@ def wait_for_pod_ready(config, service):
 k8s.add_command(quickstart)
 k8s.add_command(start)
 k8s.add_command(stop)
+k8s.add_command(reboot)
 k8s.add_command(delete)
 k8s.add_command(init)
 k8s.add_command(createuser)

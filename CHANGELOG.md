@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Improvement] Add ``local/k8s reboot`` commands
 - [Improvement] Add ``-U/--unset`` option to ``config save``
 - [Bugfix] Fix insecure static asset loading when web proxy is enabled
 - [Improvement] Rename ``SECRET_KEY`` configuration parameter to ``OPENEDX_SECRET_KEY``
