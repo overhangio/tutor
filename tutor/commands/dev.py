@@ -21,7 +21,7 @@ def dev():
 @opts.edx_platform_settings
 @click.argument("service")
 @click.argument("command", default=None, required=False)
-@click.argument("args", nargs=-1, required=False)
+@click.argument("args", nargs=-1)
 def run(root, edx_platform_path, edx_platform_settings, service, command, args):
     run_command = [service]
     if command:
