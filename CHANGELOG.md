@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Bugfix] Fix incorrect notes settings definition
 - [Improvement] Make it possible to start/stop/reboot a selection of services
 - [Improvement] Add ``local/k8s reboot`` commands
 - [Improvement] Add ``-U/--unset`` option to ``config save``

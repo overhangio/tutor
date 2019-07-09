@@ -8,7 +8,7 @@ notes:
   environment:
     DJANGO_SETTINGS_MODULE: notesserver.settings.tutor
   volumes:
-    - ../apps/notes/settings/tutor.py:/openedx/edx-notes-api/notesserver/settings/tutor.py
+    - ../plugins/notes/apps/settings/tutor.py:/openedx/edx-notes-api/notesserver/settings/tutor.py
     - ../../data/notes:/openedx/data
   restart: unless-stopped
   {% if ACTIVATE_MYSQL %}depends_on:
