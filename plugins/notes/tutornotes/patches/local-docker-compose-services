@@ -1,10 +1,6 @@
 ############# Notes: backend store for edX Student Notes
 notes:
   image: {{ DOCKER_REGISTRY }}{{ NOTES_DOCKER_IMAGE }}
-  networks:
-    default:
-      aliases:
-        - notes.openedx
   environment:
     DJANGO_SETTINGS_MODULE: notesserver.settings.tutor
   volumes:

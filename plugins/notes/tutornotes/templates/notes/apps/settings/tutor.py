@@ -4,7 +4,6 @@ SECRET_KEY = "{{ NOTES_SECRET_KEY }}"
 ALLOWED_HOSTS = [
     "localhost",
     "notes",
-    "notes.openedx",
     "notes.localhost",
     "{{ NOTES_HOST }}",
 ]

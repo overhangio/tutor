@@ -1,5 +1,18 @@
-./manage.py lms --settings=tutor.production manage_user notes notes@{{ LMS_HOST }} --staff --superuser
-./manage.py lms --settings=tutor.production create_oauth2_client \
-    "http://notes.openedx:8000" "http://notes.openedx:8000/complete/edx-oidc/" confidential \
-    --client_name edx-notes --client_id notes --client_secret {{ NOTES_OAUTH2_SECRET }} \
-    --trusted --logout_uri "http://notes.openedx:8000/logout/" --username notes
+export DJANGO_SETTINGS_MODULE=lms.envs.tutor.production
+
+# Modify users created an incorrect email and that might clash with the newly created users
+./manage.py lms shell -c \
+  "from django.contrib.auth import get_user_model;\
+  get_user_model().objects.filter(username='notes').exclude(email='notes@openedx').update(email='notes@openedx')"
+
+./manage.py lms manage_user notes notes@openedx --staff --superuser
+./manage.py lms create_oauth2_client \
+    "http://notes:8000" \
+    "http://notes:8000/complete/edx-oidc/" \
+    confidential \
+    --client_name notes \
+    --client_id notes \
+    --client_secret {{ NOTES_OAUTH2_SECRET }} \
+    --trusted \
+    --logout_uri "http://notes:8000/logout/" \
+    --username notes
