@@ -33,6 +33,19 @@ def run(root, edx_platform_path, edx_platform_settings, service, command, args):
         root, edx_platform_path, edx_platform_settings, port, *run_command
     )
 
+@click.command(
+    help="Exec a command in a running container",
+    context_settings={"ignore_unknown_options": True},
+)
+@opts.root
+@click.argument("service")
+@click.argument("command")
+@click.argument("args", nargs=-1)
+def execute(root, service, command, args):
+    exec_command = ["exec", service, command]
+    if args:
+        exec_command += args
+    docker_compose(root, *exec_command)
 
 @click.command(help="Run a development server")
 @opts.root
@@ -131,6 +144,7 @@ def service_port(service):
 
 
 dev.add_command(run)
+dev.add_command(execute, name="exec")
 dev.add_command(runserver)
 dev.add_command(stop)
 dev.add_command(watchthemes)
