@@ -7,10 +7,10 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Feature] Add `dev exec` command
 - [Bugfix] Fix incorrect notes settings definition
 - [Improvement] Make it possible to start/stop/reboot a selection of services
-- [Improvement] Add ``local/k8s reboot`` commands
-- [Improvement] Add ``-U/--unset`` option to ``config save``
+- [Improvement] Add `local/k8s reboot` commands
+- [Improvement] Add `-U/--unset` option to `config save`
 - [Bugfix] Fix insecure static asset loading when web proxy is enabled
-- [Improvement] Rename ``SECRET_KEY`` configuration parameter to ``OPENEDX_SECRET_KEY``
+- [Improvement] Rename `SECRET_KEY` configuration parameter to `OPENEDX_SECRET_KEY`
 - [Improvement] Add support for SSL and TLS in external SMTP server (#231)
 - [Bugfix] Fix missing video transcripts in LMS (#229)
 - [Improvement] Make it possible to enable/disable multiple plugins at once
