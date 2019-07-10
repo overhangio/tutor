@@ -17,10 +17,12 @@ VERSION_FILENAME = "version"
 
 class Renderer:
     ENVIRONMENT = None
+    ENVIRONMENT_CONFIG = None
 
     @classmethod
     def environment(cls, config):
-        if not cls.ENVIRONMENT:
+        if cls.ENVIRONMENT_CONFIG != config:
+            cls.ENVIRONMENT_CONFIG = config
             template_roots = [TEMPLATES_ROOT]
             for _, plugin_templates in plugins.iter_templates(config):
                 template_roots.append(plugin_templates)
