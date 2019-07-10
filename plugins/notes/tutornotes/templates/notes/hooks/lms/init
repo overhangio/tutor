@@ -10,7 +10,7 @@ export DJANGO_SETTINGS_MODULE=lms.envs.tutor.production
     "http://notes:8000" \
     "http://notes:8000/complete/edx-oidc/" \
     confidential \
-    --client_name notes \
+    --client_name edx-notes \
     --client_id notes \
     --client_secret {{ NOTES_OAUTH2_SECRET }} \
     --trusted \
