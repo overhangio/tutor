@@ -407,6 +407,7 @@ spec:
           volumeMounts:
             - mountPath: /var/www/openedx/
               name: openedx-staticfiles
+        {{ patch("k8s-deployments-nginx-init-containers")|indent(8) }}
       containers:
         - name: nginx
           image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NGINX }}
