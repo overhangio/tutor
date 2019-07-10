@@ -436,6 +436,7 @@ spec:
           emptyDir: {}
         - name: data-lms
           emptyDir: {}
+        {{ patch("k8s-deployments-nginx-volumes")|indent(8) }}
 {% if ACTIVATE_RABBITMQ %}
 ---
 apiVersion: apps/v1

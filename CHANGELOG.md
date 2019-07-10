@@ -15,7 +15,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Improvement] Add support for SSL and TLS in external SMTP server (#231)
 - [Bugfix] Fix missing video transcripts in LMS (#229)
 - [Improvement] Make it possible to enable/disable multiple plugins at once
-- [Improvement] Add 'local-docker-compose-nginx-volumes' and 'k8s-deployments-nginx-init-containers' patches
+- [Improvement] Add a few local and k8s patches for plugins
 
 ## 3.5.3 (2019-07-05)
 
