@@ -189,3 +189,11 @@ class PluginsTests(unittest.TestCase):
             self.assertEqual(
                 [("plugin1", "/tmp/templates")], list(plugins.iter_templates({}))
             )
+
+    def test_plugins_are_updated_on_config_change(self):
+        config = {"PLUGINS": []}
+        instance1 = plugins.Plugins(config)
+        self.assertEqual(0, len(list(instance1.iter_enabled())))
+        config["PLUGINS"].append("minio")
+        instance2 = plugins.Plugins(config)
+        self.assertEqual(1, len(list(instance2.iter_enabled())))

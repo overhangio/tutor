@@ -123,3 +123,14 @@ class EnvTests(unittest.TestCase):
                     self.assertTrue(os.path.exists(dst_rendered))
                     with open(dst_rendered) as f:
                         self.assertEqual("Hello my ID is abcd", f.read())
+
+    def test_renderer_is_reset_on_config_change(self):
+        config = {"PLUGINS": []}
+        env1 = env.Renderer.environment(config)
+        config["PLUGINS"].append("minio")
+        env2 = env.Renderer.environment(config)
+
+        self.assertNotIn(
+            "minio/hooks/mino-client/pre-init", env1.loader.list_templates()
+        )
+        self.assertIn("minio/hooks/minio-client/pre-init", env2.loader.list_templates())

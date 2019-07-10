@@ -1,3 +1,4 @@
+from copy import deepcopy
 import pkg_resources
 
 from . import exceptions
@@ -42,7 +43,7 @@ class Plugins:
     EXTRA_INSTALLED = {}
 
     def __init__(self, config):
-        self.config = config
+        self.config = deepcopy(config)
         self.patches = {}
         self.hooks = {}
         self.templates = {}
