@@ -84,7 +84,7 @@ def load_env(config, defaults):
     for k in defaults.keys():
         env_var = "TUTOR_" + k
         if env_var in os.environ:
-            config[k] = serialize.parse_value(os.environ[env_var])
+            config[k] = serialize.parse(os.environ[env_var])
 
 
 def load_required(config, defaults):

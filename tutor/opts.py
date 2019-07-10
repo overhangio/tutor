@@ -39,4 +39,4 @@ class YamlParamType(click.ParamType):
             k, v = value.split("=")
         except ValueError:
             self.fail("'{}' is not of the form 'key=value'.".format(value), param, ctx)
-        return k, serialize.parse_value(v)
+        return k, serialize.parse(v)

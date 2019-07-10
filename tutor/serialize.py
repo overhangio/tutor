@@ -1,4 +1,5 @@
 import yaml
+from yaml.parser import ParserError
 
 
 def load(stream):
@@ -9,15 +10,12 @@ def dump(content, fileobj):
     yaml.dump(content, fileobj, default_flow_style=False)
 
 
-def parse_value(v):
+def parse(v):
     """
-    Parse a yaml-formatted string. This is fairly basic and should only be used
-    for parsing of elementary values.
+    Parse a yaml-formatted string.
     """
-    if v.isdigit():
-        v = int(v)
-    elif v == "null":
-        v = None
-    elif v in ["true", "false"]:
-        v = v == "true"
+    try:
+        return load(v)
+    except ParserError:
+        pass
     return v

@@ -20,10 +20,3 @@ class UtilsTests(unittest.TestCase):
 
     def test_reverse_host(self):
         self.assertEqual("com.google.www", utils.reverse_host("www.google.com"))
-
-
-class SerializeTests(unittest.TestCase):
-    def test_parse_value(self):
-        self.assertEqual(True, serialize.parse_value("true"))
-        self.assertEqual(False, serialize.parse_value("false"))
-        self.assertEqual(None, serialize.parse_value("null"))

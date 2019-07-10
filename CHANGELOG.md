@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Improvement] Better yaml value parsing from command line
 - [Feature] Add `dev exec` command
 - [Bugfix] Fix incorrect notes settings definition
 - [Improvement] Make it possible to start/stop/reboot a selection of services
