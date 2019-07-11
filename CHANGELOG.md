@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.6.0 (2019-07-11)
 
 - [Feature] Modify ``createuser`` commands to define a password from the command line
 - [Improvement] Better yaml value parsing from command line
