@@ -7,6 +7,7 @@ resources:
 - k8s/ingress.yml
 - k8s/services.yml
 - k8s/volumes.yml
+{{ patch("kustomization-resources") }}
 
 # namespace to deploy all Resources to
 namespace: {{ K8S_NAMESPACE }}
@@ -18,6 +19,7 @@ commonLabels:
   app.kubernetes.io/version: {{ TUTOR_VERSION }}
   app.kubernetes.io/part-of: openedx
   app.kubernetes.io/managed-by: tutor
+  {{ patch("kustomization-commonlabels")|indent(2) }}
 
 configMapGenerator:
 - name: openedx-settings-lms
@@ -35,3 +37,5 @@ configMapGenerator:
 {% if ACTIVATE_MYSQL %}- name: mysql-config
   env: apps/mysql/auth.env{% endif %}
 {{ patch("kustomization-configmapgenerator") }}
+
+{{ patch("kustomization") }}
