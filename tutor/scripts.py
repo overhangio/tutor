@@ -58,17 +58,20 @@ def initialise(runner):
     fmt.echo_info("All services initialised.")
 
 
-def create_user_command(superuser, staff, username, email):
+def create_user_command(superuser, staff, username, email, password=None):
     opts = ""
     if superuser:
         opts += " --superuser"
     if staff:
         opts += " --staff"
-    command = (
-        "./manage.py lms --settings=tutor.production manage_user {opts} {username} {email}\n"
-        "./manage.py lms --settings=tutor.production changepassword {username}"
-    ).format(opts=opts, username=username, email=email)
-    return command
+    command = "./manage.py lms --settings=tutor.production manage_user {opts} {username} {email}\n"
+    if password:
+        command += "./manage.py lms --settings=tutor.production shell -c \"from django.contrib.auth import get_user_model; u = get_user_model().objects.get(username='{username}'); u.set_password('{password}'); u.save()\""
+    else:
+        command += (
+            "./manage.py lms --settings=tutor.production changepassword {username}"
+        )
+    return command.format(opts=opts, username=username, email=email, password=password)
 
 
 def import_demo_course(runner):

@@ -270,13 +270,20 @@ def logs(root, follow, tail, service):
 @opts.root
 @click.option("--superuser", is_flag=True, help="Make superuser")
 @click.option("--staff", is_flag=True, help="Make staff user")
+@click.option(
+    "-p",
+    "--password",
+    help="Specify password from the command line. If undefined, you will be prompted to input a password",
+)
 @click.argument("name")
 @click.argument("email")
-def createuser(root, superuser, staff, name, email):
+def createuser(root, superuser, staff, password, name, email):
     config = tutor_config.load(root)
     runner = ScriptRunner(root, config)
     runner.check_service_is_activated("lms")
-    command = scripts.create_user_command(superuser, staff, name, email)
+    command = scripts.create_user_command(
+        superuser, staff, name, email, password=password
+    )
     runner.exec("lms", command)
 
 

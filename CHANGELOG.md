@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Feature] Modify ``createuser`` commands to define a password from the command line
 - [Improvement] Better yaml value parsing from command line
 - [Feature] Add `dev exec` command
 - [Bugfix] Fix incorrect notes settings definition
