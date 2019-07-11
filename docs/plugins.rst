@@ -179,22 +179,8 @@ With the above declaration, you can store plugin-specific templates in the ``tem
 Existing plugins
 ----------------
 
-MinIO
-~~~~~
-
-::
-
-    pip install tutor-minio
-    tutor plugins enable minio
-
-See the `plugin documentation <https://github.com/overhangio/tutor/tree/master/plugins/minio>`_.
-
-Xqueue
-~~~~~~
-
-::
-  
-  pip install tutor-xqueue
-  tutor plugins enable xqueue
-  
-See the `plugin documentation <https://github.com/overhangio/tutor/tree/master/plugins/xqueue>`_.
+- `Course discovery <https://pypi.org/project/tutor-discovery>`__: Deploy an API for interacting with your course catalog
+- `Ecommerce <https://pypi.org/project/tutor-minio>`__: Sell courses and products on your Open edX platform
+- `Figures <https://pypi.org/project/tutor-figures>`__: Visualize daily stats about course engagement
+- `MinIO <https://github.com/overhangio/tutor/tree/master/plugins/minio>`__: S3 emulator for object storage and scalable Open edX deployment.
+- `Xqueue <https://github.com/overhangio/tutor/tree/master/plugins/xqueue>`__: for external grading
