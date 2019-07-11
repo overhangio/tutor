@@ -22,3 +22,6 @@ class SerializeTests(unittest.TestCase):
 
     def test_parse_list(self):
         self.assertEqual(["abcd"], serialize.parse('["abcd"]'))
+
+    def test_parse_weird_chars(self):
+        self.assertEqual("*@google.com", serialize.parse("*@google.com"))

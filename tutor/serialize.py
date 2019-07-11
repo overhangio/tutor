@@ -1,5 +1,6 @@
 import yaml
 from yaml.parser import ParserError
+from yaml.scanner import ScannerError
 
 
 def load(stream):
@@ -16,6 +17,6 @@ def parse(v):
     """
     try:
         return load(v)
-    except ParserError:
+    except (ParserError, ScannerError):
         pass
     return v
