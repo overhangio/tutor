@@ -55,21 +55,32 @@ The ``myplugin.plugin`` python module should then declare a few attributes that 
 
 The ``config`` attribute is used to modify existing and add new configuration parameters:
 
-* ``config["set"]`` are key/values that should be modified.
-* ``config["defaults"]`` are default key/values for this plugin. Key names will automatically be prefixed with the plugin name (as declared in the entrypoint), in upper case.
+* ``config["add"]`` are key/values that should be added to the user-specific ``config.yml`` configuration. Add there passwords, secret keys and other values that do not have a default value.
+* ``config["defaults"]`` are default key/values for this plugin. These values will not be added to the ``config.yml`` user file unless users override them manually with ``tutor config save --set ...``.
+* ``config["set"]`` are existing key/values that should be modified. Be very careful what you add there! Plugins may define conflicting values for some parameters.
+
+ "set" and "default" key names will be automatically prefixed with the plugin name, in upper case.
 
 Example::
   
     config = {
-        "set": {
-            "DOCKER_IMAGE_OPENEDX": "openedx:mytag",
-        },
+        "add": {
+            "SECRET_KEY": "{{ 8|random_string }}"
+        }
         "defaults": {
-            "PARAM": "somevalue",
+            "DOCKER_IMAGE": "username/imagename:latest",
+        },
+        "set": {
+            "MASTER_PASSWORD": "h4cked",
         },
     }
 
-This will override the ``DOCKER_IMAGE_OPENEDX`` configuration parameter and will add a new parameter ``MYPLUGIN_PARAM`` that will be equal to "somevalue".
+This configuration from the "myplugin" plugin will set the following values:
+
+- ``MYPLUGIN_SECRET_KEY``: an 8-character random string will be generated and stored in the user configuration.
+- ``MYPLUGIN_DOCKER_IMAGE``: this value will by default not be stored in ``config.yml``, but ``tutor config printvalue MYPLUGIN_DOCKER_IMAGE`` will print ``username/imagename:latest``.
+- ``MASTER_PASSWORD`` will be set to ``h4cked``. Needless to say, plugin developers should avoid doing this.
+
 
 ``patches``
 ~~~~~~~~~~~
@@ -109,7 +120,6 @@ During initialisation, "myservice1" and "myservice2" will be run in sequence wit
 ++++++++++++
 
 This hook will be executed just before the ``init`` hooks. Otherwise, the specs are identical. This is useful for creating databases or other resources that will be required during initialisation, for instance.
-
 
 ``build-image``
 +++++++++++++++
