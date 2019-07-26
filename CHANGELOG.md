@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.6.1
 
 - [Bugfix] Fix missing patches from minio plugin (thanks @Wejie!)
 
