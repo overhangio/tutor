@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Bugfix] Fix missing patches from minio plugin (thanks @Wejie!)
+
 ## 3.6.0 (2019-07-11)
 
 - [Feature] Modify ``createuser`` commands to define a password from the command line
