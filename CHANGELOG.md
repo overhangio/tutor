@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Bugfix] Enable html certificate view
+
 ## 3.6.1 (2019-07-27)
 
 - [Bugfix] Fix missing patches from minio plugin (thanks @Wejie!)
