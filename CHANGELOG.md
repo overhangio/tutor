@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Bugfix] Fix missing templates in bundled plugins
 - [Bugfix] Enable html certificate view
 
 ## 3.6.1 (2019-07-27)

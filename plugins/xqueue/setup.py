@@ -1,6 +1,6 @@
 import io
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -10,7 +10,7 @@ with io.open(os.path.join(here, "README.rst"), "rt", encoding="utf8") as f:
 
 setup(
     name="tutor-xqueue",
-    version="0.0.1",
+    version="0.1.0",
     url="https://docs.tutor.overhang.io/",
     project_urls={
         "Documentation": "https://docs.tutor.overhang.io/",
@@ -23,7 +23,7 @@ setup(
     author_email="contact@overhang.io",
     description="A Tutor plugin for Xqueue (external grading system)",
     long_description=readme,
-    packages=["tutorxqueue"],
+    packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
     python_requires=">=3.5",
     entry_points={"tutor.plugin.v0": ["xqueue = tutorxqueue.plugin"]},
