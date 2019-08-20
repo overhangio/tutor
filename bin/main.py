@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
+import importlib
 
 from tutor.commands.cli import main
-
-# Manually adding plugins to bundle
 from tutor.plugins import Plugins
-import tutorminio.plugin
-import tutornotes.plugin
-import tutorxqueue.plugin
 
-Plugins.EXTRA_INSTALLED["minio"] = tutorminio.plugin
-Plugins.EXTRA_INSTALLED["notes"] = tutornotes.plugin
-Plugins.EXTRA_INSTALLED["xqueue"] = tutorxqueue.plugin
+# Manually install plugins (this is for creating the bundle)
+for plugin in ["discovery", "ecommerce", "figures", "minio", "notes", "xqueue"]:
+    try:
+        module = importlib.import_module("tutor{}.plugin".format(plugin))
+    except ImportError:
+        pass
+    else:
+        Plugins.EXTRA_INSTALLED[plugin] = module
+
 main()

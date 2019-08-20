@@ -43,7 +43,7 @@ format: ## Format code automatically
 ###### Deployment
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
-	pyinstaller --onefile --name=tutor --add-data=./tutor/templates:./tutor/templates ./bin/main.py
+	pyinstaller tutor.spec
 dist/tutor:
 	$(MAKE) bundle
 

@@ -27,20 +27,10 @@ setup(
     description="The Open edX distribution for the busy system administrator",
     long_description=readme,
     packages=find_packages(exclude=["tests*"]),
-    include_package_data=True,
+    package_data={"tutor": ["templates/**"]},
     python_requires=">=3.5",
-    install_requires=[
-        "appdirs",
-        "click>=7.0",
-        "click_repl",
-        "jinja2",
-        "pyyaml>=4.2b1",
-    ],
-    entry_points={
-        'console_scripts': [
-            'tutor=tutor.commands.cli:main',
-        ],
-    },
+    install_requires=["appdirs", "click>=7.0", "click_repl", "jinja2", "pyyaml>=4.2b1"],
+    entry_points={"console_scripts": ["tutor=tutor.commands.cli:main"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",

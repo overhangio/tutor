@@ -32,13 +32,8 @@ The latest binaries can be downloaded from https://github.com/overhangio/tutor/r
 
 This is the recommended installation method for most people.
 
-Cloud deployment
-----------------
-
-Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. This is a commercial offer priced at $50/month ($500/year) that was created to support the development of Tutor.
-
-Installing from source
-----------------------
+From source
+-----------
 
 If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.5 and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
 
@@ -54,6 +49,11 @@ Installing from a local clone of the repository::
     cd tutor
     pip install -e .
     
+Cloud deployment
+----------------
+
+    Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. This is a commercial offer priced at $50/month ($500/year) that was created to support the development of Tutor.
+
 Autocomplete
 ------------
 

@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Bugfix/Improvement] Add all plugins (with data) into binary bundle (#242)
+
 ## 3.6.2 (2019-08-07)
 
 - [Bugfix] Fix missing templates in bundled plugins
