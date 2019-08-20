@@ -4,6 +4,7 @@ import os
 import shutil
 
 import jinja2
+import pkg_resources
 
 from . import exceptions
 from . import fmt
@@ -12,7 +13,7 @@ from . import utils
 from .__about__ import __version__
 
 
-TEMPLATES_ROOT = os.path.join(os.path.dirname(__file__), "templates")
+TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
 
 
