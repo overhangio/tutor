@@ -1,2 +1,0 @@
-# MinIO
-certbot certonly --standalone -n --agree-tos -m admin@{{ LMS_HOST }} -d {{ MINIO_HOST }}

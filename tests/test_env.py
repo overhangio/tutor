@@ -125,12 +125,21 @@ class EnvTests(unittest.TestCase):
                         self.assertEqual("Hello my ID is abcd", f.read())
 
     def test_renderer_is_reset_on_config_change(self):
-        config = {"PLUGINS": []}
-        env1 = env.Renderer.environment(config)
-        config["PLUGINS"].append("minio")
-        env2 = env.Renderer.environment(config)
+        with tempfile.TemporaryDirectory() as plugin_templates:
+            # Create one template
+            with open(os.path.join(plugin_templates, "myplugin.txt"), "w") as f:
+                f.write("some content")
 
-        self.assertNotIn(
-            "minio/hooks/mino-client/pre-init", env1.loader.list_templates()
-        )
-        self.assertIn("minio/hooks/minio-client/pre-init", env2.loader.list_templates())
+                # Load env once
+                config = {"PLUGINS": []}
+                env1 = env.Renderer.environment(config)
+
+                with unittest.mock.patch.object(
+                    env.plugins, "iter_templates", return_value=[("myplugin", plugin_templates)]
+                ):
+                    # Load env a second time
+                    config["PLUGINS"].append("myplugin")
+                    env2 = env.Renderer.environment(config)
+
+                self.assertNotIn("myplugin.txt", env1.loader.list_templates())
+                self.assertIn("myplugin.txt", env2.loader.list_templates())

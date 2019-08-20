@@ -194,6 +194,9 @@ class PluginsTests(unittest.TestCase):
         config = {"PLUGINS": []}
         instance1 = plugins.Plugins(config)
         self.assertEqual(0, len(list(instance1.iter_enabled())))
-        config["PLUGINS"].append("minio")
-        instance2 = plugins.Plugins(config)
-        self.assertEqual(1, len(list(instance2.iter_enabled())))
+        config["PLUGINS"].append("plugin1")
+        with unittest.mock.patch.object(
+            plugins.Plugins, "iter_installed", return_value=[("plugin1", None)]
+        ):
+            instance2 = plugins.Plugins(config)
+            self.assertEqual(1, len(list(instance2.iter_enabled())))

@@ -14,7 +14,7 @@ setup(
     url="https://docs.tutor.overhang.io/",
     project_urls={
         "Documentation": "https://docs.tutor.overhang.io/",
-        "Code": "https://github.com/overhangio/tutor/tree/master/plugins/minio",
+        "Code": "https://github.com/overhangio/tutor/tree/master/plugins/notes",
         "Issue tracker": "https://github.com/overhangio/tutor/issues",
         "Community": "https://discuss.overhang.io",
     },

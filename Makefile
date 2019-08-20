@@ -13,7 +13,6 @@ package: ## Build a package ready to upload to pypi
 	python3 setup.py sdist
 
 package-plugins: ## Build packages for each plugin
-	cd plugins/minio && python3 setup.py sdist --dist-dir=../../dist/
 	cd plugins/notes && python3 setup.py sdist --dist-dir=../../dist/
 	cd plugins/xqueue && python3 setup.py sdist --dist-dir=../../dist/
 
@@ -31,7 +30,6 @@ test-unit-core: ## Run unit tests on core
 	python3 -m unittest discover tests
 
 test-unit-plugins: ## Run unit tests on plugins
-	python3 -m unittest discover plugins/minio/tests
 	python3 -m unittest discover plugins/xqueue/tests
 
 test-packages: package package-plugins ## Test that packages can be uploaded to pypi
