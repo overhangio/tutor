@@ -135,7 +135,9 @@ class EnvTests(unittest.TestCase):
                 env1 = env.Renderer.environment(config)
 
                 with unittest.mock.patch.object(
-                    env.plugins, "iter_templates", return_value=[("myplugin", plugin_templates)]
+                    env.plugins,
+                    "iter_templates",
+                    return_value=[("myplugin", plugin_templates)],
                 ):
                     # Load env a second time
                     config["PLUGINS"].append("myplugin")
