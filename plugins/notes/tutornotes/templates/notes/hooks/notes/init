@@ -1,1 +1,0 @@
-./manage.py migrate --settings=notesserver.settings.tutor

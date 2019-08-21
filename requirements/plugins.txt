@@ -1,6 +1,6 @@
--e ./plugins/notes
--e ./plugins/xqueue
 tutor-discovery
 tutor-ecommerce
 tutor-figures
 tutor-minio
+tutor-notes
+tutor-xqueue

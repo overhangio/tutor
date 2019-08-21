@@ -4,7 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
-- [Improvement] Move minio plugin outside of the tutor repo
+- [Improvement] Move all plugins outside of the tutor repo
 - [Bugfix/Improvement] Add all plugins (with data) into binary bundle (#242)
 
 ## 3.6.2 (2019-08-07)

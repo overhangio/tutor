@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-SRC_DIRS = ./tutor ./tests ./plugins ./bin
+SRC_DIRS = ./tutor ./tests ./bin
 BLACK_OPTS = --exclude templates ${SRC_DIRS}
 
 ###### Development
@@ -12,10 +12,6 @@ compile-requirements: ## Compile requirements files
 package: ## Build a package ready to upload to pypi
 	python3 setup.py sdist
 
-package-plugins: ## Build packages for each plugin
-	cd plugins/notes && python3 setup.py sdist --dist-dir=../../dist/
-	cd plugins/xqueue && python3 setup.py sdist --dist-dir=../../dist/
-
 test: test-lint test-unit test-format test-packages ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
@@ -24,15 +20,10 @@ test-format: ## Run code formatting tests
 test-lint: ## Run code linting tests
 	pylint --errors-only --ignore=templates ${SRC_DIRS}
 
-test-unit: test-unit-core test-unit-plugins ## Run unit tests
-
-test-unit-core: ## Run unit tests on core
+test-unit: ## Run unit tests
 	python3 -m unittest discover tests
 
-test-unit-plugins: ## Run unit tests on plugins
-	python3 -m unittest discover plugins/xqueue/tests
-
-test-packages: package package-plugins ## Test that packages can be uploaded to pypi
+test-packages: package ## Test that package can be uploaded to pypi
 	twine check dist/tutor-*.tar.gz
 
 format: ## Format code automatically
@@ -87,9 +78,7 @@ ci-bundle: ## Create bundle and run basic tests
 	./dist/tutor config printroot
 	yes "" | ./dist/tutor config save --interactive
 	./dist/tutor config save
-	./dist/tutor plugins enable notes
-	./dist/tutor plugins enable xqueue
-	
+	./dist/tutor plugins enable discovery ecommerce minio notes xqueue
 
 ./releases/github-release: ## Download github-release binary
 	cd releases/ \
@@ -117,8 +106,6 @@ ci-github: ./releases/github-release ## Upload assets to github
 
 ci-bootstrap-images:
 	pip install -r requirements/plugins.txt
-	tutor plugins enable notes
-	tutor plugins enable xqueue
 	tutor config save
 
 ci-build-images: ci-bootstrap-images ## Build docker images

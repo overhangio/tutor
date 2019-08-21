@@ -1,3 +1,0 @@
-- name: xqueue-settings
-  files:
-    - plugins/xqueue/apps/xqueue/settings/tutor.py
