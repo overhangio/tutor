@@ -28,7 +28,6 @@ build:pypi:
     - apk add --no-cache make
     - make ci-install
     - make package
-    - make package-plugins
   artifacts:
     paths:
       - dist/
