@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- [Security] Fix CustomTagModule mako template injection
 - [Improvement] Move all plugins outside of the tutor repo
 - [Bugfix/Improvement] Add all plugins (with data) into binary bundle (#242)
 

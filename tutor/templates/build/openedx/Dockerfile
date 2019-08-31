@@ -27,6 +27,8 @@ WORKDIR /openedx/edx-platform
 # Apply patches
 # Certificates XSS vulnerability https://github.com/edx/edx-platform/pull/20904
 RUN curl https://github.com/edx/edx-platform/commit/b33db2c548a1a530510d785f7659c78783a187fa.patch | git apply -
+# CustomTagModule mako template injection https://groups.google.com/forum/#!topic/openedx-ops/aVHomKimstU
+RUN curl https://github.com/edx/edx-platform/commit/f9689aadb0f8a41570a4bb76654f980b4e31ad96.patch | git apply -
 
 # Download extra locales to /openedx/locale
 # TODO upgrade this to ironwood
