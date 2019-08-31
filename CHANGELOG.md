@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.6.3 (2019-08-31)
 
 - [Security] Fix CustomTagModule mako template injection
 - [Improvement] Move all plugins outside of the tutor repo
