@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Latest
+## 3.7.0 (2019-09-03)
 
 - 💥[Improvement] Get rid of mysql-client container
 - [Improvement] Add "local-docker-compose-lms/cms-dependencies" plugin patches
