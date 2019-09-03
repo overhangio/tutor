@@ -30,8 +30,9 @@ services:
   {% endif %}
   mysql-client:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
-    command: sh
-    restart: "no"
+    entrypoint: ["sh", "-e", "-c"]
+    command: ["echo 'ready'; while true; do sleep 60; done"]
+    restart: unless-stopped
     {% if ACTIVATE_MYSQL%}depends_on:
       - mysql{% endif %}
 
