@@ -130,6 +130,7 @@ services:
       {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       {% if ACTIVATE_SMTP %}- smtp{% endif %}
+      {{ patch("local-docker-compose-lms-dependencies")|indent(6) }}
   {% endif %}
 
   {% if ACTIVATE_CMS %}
@@ -152,6 +153,7 @@ services:
       {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       {% if ACTIVATE_SMTP %}- smtp{% endif %}
+      {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}
   {% endif %}
 
   ############# LMS and CMS workers
