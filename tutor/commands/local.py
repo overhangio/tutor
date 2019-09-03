@@ -32,15 +32,15 @@ def quickstart(root, non_interactive, pullimages_):
     tutor_env.save(root, config)
     click.echo(fmt.title("Stopping any existing platform"))
     stop.callback(root, [])
+    click.echo(fmt.title("HTTPS certificates generation"))
+    https_create.callback(root)
     if pullimages_:
         click.echo(fmt.title("Docker image updates"))
         pullimages.callback(root)
-    click.echo(fmt.title("Database creation and migrations"))
-    init.callback(root)
-    click.echo(fmt.title("HTTPS certificates generation"))
-    https_create.callback(root)
     click.echo(fmt.title("Starting the platform in detached mode"))
     start.callback(root, True, [])
+    click.echo(fmt.title("Database creation and migrations"))
+    init.callback(root)
 
 
 @click.command(help="Update docker images")
@@ -330,14 +330,7 @@ def portainer(root, port):
 class ScriptRunner(scripts.BaseRunner):
     def exec(self, service, command):
         docker_compose(
-            self.root,
-            self.config,
-            "run",
-            "--rm",
-            "--entrypoint",
-            "sh -e -c",
-            service,
-            command,
+            self.root, self.config, "exec", service, "sh", "-e", "-c", command
         )
 
 

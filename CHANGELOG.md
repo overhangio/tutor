@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Latest
+
+- [Improvement] Use "exec" instead of "run" to initialise local platform
+
 ## 3.6.3 (2019-08-31)
 
 - [Security] Fix CustomTagModule mako template injection
