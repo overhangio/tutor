@@ -41,6 +41,7 @@ def quickstart(root, non_interactive, pullimages_):
     start.callback(root, True, [])
     click.echo(fmt.title("Database creation and migrations"))
     init.callback(root)
+    echo_platform_info(config)
 
 
 @click.command(help="Update docker images")
@@ -62,25 +63,22 @@ def start(root, detach, services):
     config = tutor_config.load(root)
     docker_compose(root, config, *command, *services)
 
-    if detach:
-        fmt.echo_info("The Open edX platform is now running in detached mode")
-        http = "https" if config["ACTIVATE_HTTPS"] else "http"
-        urls = []
-        if not config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
-            urls += ["http://localhost", "http://studio.localhost"]
-        urls.append(
-            "{http}://{lms_host}".format(http=http, lms_host=config["LMS_HOST"])
-        )
-        urls.append(
-            "{http}://{cms_host}".format(http=http, cms_host=config["CMS_HOST"])
-        )
-        fmt.echo_info(
-            """Your Open edX platform is ready and can be accessed at the following urls:
+
+def echo_platform_info(config):
+    fmt.echo_info("The Open edX platform is now running in detached mode")
+    http = "https" if config["ACTIVATE_HTTPS"] else "http"
+    urls = []
+    if not config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
+        urls += ["http://localhost", "http://studio.localhost"]
+    urls.append("{http}://{lms_host}".format(http=http, lms_host=config["LMS_HOST"]))
+    urls.append("{http}://{cms_host}".format(http=http, cms_host=config["CMS_HOST"]))
+    fmt.echo_info(
+        """Your Open edX platform is ready and can be accessed at the following urls:
 
     {}""".format(
-                "\n    ".join(urls)
-            )
+            "\n    ".join(urls)
         )
+    )
 
 
 @click.command(help="Stop a running platform")

@@ -19,22 +19,18 @@ services:
       - ../../data/mongodb:/data/db
   {% endif %}
 
-  {% if ACTIVATE_MYSQL %}
   mysql:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+    {% if ACTIVATE_MYSQL %}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
+    {% else %}
+    entrypoint: ["sh", "-e", "-c"]
+    command: ["echo 'ready'; while true; do sleep 60; done"]
+    {% endif %}
     restart: unless-stopped
     volumes:
       - ../../data/mysql:/var/lib/mysql
     env_file: ../apps/mysql/auth.env
-  {% endif %}
-  mysql-client:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
-    entrypoint: ["sh", "-e", "-c"]
-    command: ["echo 'ready'; while true; do sleep 60; done"]
-    restart: unless-stopped
-    {% if ACTIVATE_MYSQL%}depends_on:
-      - mysql{% endif %}
 
   {% if ACTIVATE_ELASTICSEARCH %}
   elasticsearch:
@@ -123,11 +119,11 @@ services:
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
+      - mysql
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_FORUM %}- forum{% endif %}
       {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
-      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       {% if ACTIVATE_SMTP %}- smtp{% endif %}
       {{ patch("local-docker-compose-lms-dependencies")|indent(6) }}
@@ -147,10 +143,10 @@ services:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
+      - mysql
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
-      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       {% if ACTIVATE_SMTP %}- smtp{% endif %}
       {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}

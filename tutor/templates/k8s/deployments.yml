@@ -295,7 +295,6 @@ spec:
           persistentVolumeClaim:
             claimName: mongodb
 {% endif %}
-{% if ACTIVATE_MYSQL %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -317,7 +316,12 @@ spec:
       containers:
         - name: mysql
           image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+          {% if ACTIVATE_MYSQL %}
           args: ["mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci"]
+          {% else %}
+          command: ["sh", "-e", "-c"]
+          args: ["echo 'ready'; while true; do sleep 60; done"]
+          {% endif %}
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -326,6 +330,7 @@ spec:
                   key: MYSQL_ROOT_PASSWORD
           ports:
             - containerPort: 3306
+          {% if ACTIVATE_MYSQL %}
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: data
@@ -333,28 +338,7 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mysql
-{% endif %}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mysql-client
-  labels:
-    app.kubernetes.io/name: mysql-client
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: mysql-client
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: mysql-client
-    spec:
-      containers:
-        - name: mysql
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
-          command: ["sh", "-e", "-c"]
-          args: ["echo 'ready'; while true; do sleep 60; done"]
+            {% endif %}
 {% if ACTIVATE_SMTP %}
 ---
 apiVersion: apps/v1

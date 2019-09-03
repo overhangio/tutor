@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Latest
 
+- 💥[Improvement] Get rid of mysql-client container
 - [Improvement] Add "local-docker-compose-lms/cms-dependencies" plugin patches
 - [Improvement] Use "exec" instead of "run" to initialise local platform
 

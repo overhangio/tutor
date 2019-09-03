@@ -34,8 +34,8 @@ configMapGenerator:
 - name: nginx-config
   files:{% for file in "apps/nginx"|walk_templates %}
   - {{ file }}{% endfor %}
-{% if ACTIVATE_MYSQL %}- name: mysql-config
-  env: apps/mysql/auth.env{% endif %}
+- name: mysql-config
+  env: apps/mysql/auth.env
 {{ patch("kustomization-configmapgenerator") }}
 
 {{ patch("kustomization") }}
