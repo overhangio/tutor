@@ -76,6 +76,14 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 
 (the trailing ``/`` is important)
 
+Open edX customisation
+~~~~~~~~~~~~~~~~~~~~~~
+
+- ``OPENEDX_CMS_GUNICORN_WORKERS`` (default: ``2``)
+- ``OPENEDX_LMS_GUNICORN_WORKERS`` (default: ``2``)
+
+By default there are 2 `gunicorn worker processes <https://docs.gunicorn.org/en/stable/settings.html#worker-processes>`__ to serve requests for the LMS and the CMS. However, each workers requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
+
 Vendor services
 ~~~~~~~~~~~~~~~
 

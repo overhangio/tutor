@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Added configuration values to limit the number of gunicorn workers for the LMS and CMS.
+
 ## 3.7.0 (2019-09-03)
 
 - 💥[Improvement] Get rid of mysql-client container

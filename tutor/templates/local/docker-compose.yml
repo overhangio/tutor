@@ -110,6 +110,7 @@ services:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
+      GUNICORN_WORKERS: {{ OPENEDX_LMS_GUNICORN_WORKERS }}
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:
@@ -134,6 +135,7 @@ services:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
+      GUNICORN_WORKERS: {{ OPENEDX_CMS_GUNICORN_WORKERS }}
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:

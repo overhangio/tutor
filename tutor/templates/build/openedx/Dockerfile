@@ -38,9 +38,7 @@ RUN cd /tmp \
     && mv openedx-i18n-hawthorn/edx-platform/locale/ /openedx/locale/ \
     && rm -rf openedx-i18n*
 
-# Install python requirements (clone source repos in a separate dir, otherwise
-# they will be overwritten when we mount edx-platform)
-ENV NO_PYTHON_UNINSTALL 1
+# Install python requirements in a virtualenv
 RUN virtualenv /openedx/venv
 ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
@@ -65,7 +63,9 @@ ENV PATH ./node_modules/.bin:${PATH}
 
 # Install private requirements: this is useful for installing custom xblocks.
 COPY ./requirements/ /openedx/requirements
-RUN cd /openedx/requirements/ && pip install -r ./private.txt
+RUN cd /openedx/requirements/ \
+  && touch ./private.txt \
+  && pip install -r ./private.txt
 
 # Create folder that will store *.env.json and *.auth.json files, as well as
 # the tutor-specific settings files.
@@ -88,6 +88,7 @@ ENV PATH /openedx/bin:${PATH}
 # and requires a complex settings file. Instead, we decompose the commands
 # and run each one individually to collect the production static assets to
 # /openedx/staticfiles.
+ENV NO_PYTHON_UNINSTALL 1
 RUN openedx-assets xmodule \
     && openedx-assets npm \
     && openedx-assets webpack --env=prod \
