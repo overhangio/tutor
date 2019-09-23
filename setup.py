@@ -26,6 +26,7 @@ setup(
     author_email="contact@overhang.io",
     description="The Open edX distribution for the busy system administrator",
     long_description=readme,
+    long_description_content_type="text/x-rst",
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
     python_requires=">=3.5",
