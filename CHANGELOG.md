@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Persist `private.txt` file between two runs of `config save`. (#247)
 - [Improvement] Added configuration values to limit the number of gunicorn workers for the LMS and CMS.
 
 ## 3.7.0 (2019-09-03)
