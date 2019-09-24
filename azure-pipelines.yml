@@ -23,6 +23,7 @@ steps:
     echo Injecting kubeconfig...
     mkdir -p $HOME/.kube/
     cp -r $(kubeconfig.secureFilePath) $HOME/.kube/config
+    rm $(kubeconfig.secureFilePath)
 
 - script: |
     export LC_ALL=C.UTF-8
