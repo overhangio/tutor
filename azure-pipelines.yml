@@ -17,7 +17,7 @@ steps:
 - task: DownloadSecureFile@1
   name: kubeconfig
   inputs:
-    secureFile: 'kubeconfig-dev'
+    secureFile: 'dev-kubeconfig'
 
 - script: |
     echo Injecting kubeconfig...
