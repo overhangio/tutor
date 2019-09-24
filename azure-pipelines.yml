@@ -10,14 +10,19 @@ pool: k8s
 
 steps:
 
-- script: |
-    mkdir -p $HOME/.kube/
-    echo $KUBECONFIG > $HOME/.kube/config
-  displayName: 'Create directory for tutor config file and kube config'
-
 - task: KubectlInstaller@0
   inputs:
     kubectlVersion: 'latest'
+
+- task: DownloadSecureFile@1
+  name: kubeconfig
+  inputs:
+    secureFile: 'kubeconfig-dev'
+
+- script: |
+    echo Injecting kubeconfig...
+    mkdir -p $HOME/.kube/
+    mv -n $(kubeconfig.secureFilePath) $HOME/.kube/config
 
 - script: |
     export LC_ALL=C.UTF-8
