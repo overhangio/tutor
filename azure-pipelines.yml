@@ -15,15 +15,16 @@ steps:
     echo $KUBECONFIG > $HOME/.kube/config
   displayName: 'Create directory for tutor config file and kube config'
 
+- task: KubectlInstaller@0
+  inputs:
+    kubectlVersion: 'latest'
+
 - script: |
     export LC_ALL=C.UTF-8
     export LANG=C.UTF-8
     apt install python3 libyaml-dev python3-pip
     pip3 install --ignore-installed wheel
     pip3 install -e .
-    curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-    chmod +x ./kubectl
-    mv -n ./kubectl /usr/local/bin/kubectl
     
   displayName: 'Install tutor'
 
@@ -31,6 +32,8 @@ steps:
   continueOnError: true
   inputs:
     script: |
+      export LC_ALL=C.UTF-8
+      export LANG=C.UTF-8
       printf 'kh.academy\nstudio.kh.academy\nKH Academy\nacademy@arfront.com\n\nn\n' | tutor k8s quickstart
       
 
