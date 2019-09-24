@@ -22,7 +22,7 @@ steps:
 - script: |
     echo Injecting kubeconfig...
     mkdir -p $HOME/.kube/
-    mv -n $(kubeconfig.secureFilePath) $HOME/.kube/config
+    cp -r $(kubeconfig.secureFilePath) $HOME/.kube/config
 
 - script: |
     export LC_ALL=C.UTF-8
