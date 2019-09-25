@@ -31,6 +31,7 @@ steps:
     apt install python3 libyaml-dev python3-pip
     pip3 install --ignore-installed wheel
     pip3 install -e .
+    tutor k8s stop
     
   displayName: 'Install tutor'
 
