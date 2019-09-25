@@ -2,26 +2,10 @@
 
 Tutor 🎓 The docker-based Open edX distribution designed for peace of mind
 ==========================================================================
-
-.. image:: https://img.shields.io/travis/overhangio/tutor.svg?label=Release%20build
-    :alt: Release build status
-    :target: https://travis-ci.org/overhangio/tutor
-
-.. image:: https://git.overhang.io/community/tutor/badges/master/pipeline.svg
-    :alt: Release build status
-    :target: https://git.overhang.io/community/tutor/commits/master
-
-.. image:: https://img.shields.io/badge/docs-current-blue.svg
-    :alt: Documentation
-    :target: https://docs.tutor.overhang.io
-
-.. image:: https://img.shields.io/github/issues/overhangio/tutor.svg
-    :alt: GitHub issues
-    :target: https://github.com/overhangio/tutor/issues
-
-.. image:: https://img.shields.io/github/issues-closed/overhangio/tutor.svg?colorB=brightgreen
-    :alt: GitHub closed issues
-    :target: https://github.com/overhangio/tutor/issues?q=is%3Aclosed
+    
+.. image:: https://arfront.visualstudio.com/kh-academy/_apis/build/status/arfront.tutor?branchName=master
+    :alt: Dev build status
+    :target: https://arfront.visualstudio.com/kh-academy/_build?definitionId=45&_a=summary
 
 .. image:: https://img.shields.io/github/license/overhangio/tutor.svg
     :alt: AGPL License
