@@ -73,4 +73,4 @@ SMTP_USERNAME: ""
 SMTP_PASSWORD: ""
 SMTP_USE_TLS: false
 SMTP_USE_SSL: false
-WEB_PROXY: false
+WEB_PROXY: true
