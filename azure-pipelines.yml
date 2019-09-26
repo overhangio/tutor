@@ -42,7 +42,7 @@ steps:
       export LC_ALL=C.UTF-8
       export LANG=C.UTF-8
       tutor config save --set MYSQL_ROOT_PASSWORD=$(MYSQL_ROOT_PASSWORD) --set OPENEDX_MYSQL_PASSWORD=$(OPENEDX_MYSQL_PASSWORD) --set OPENEDX_SECRET_KEY=$(OPENEDX_SECRET_KEY)
-      printf 'kh.academy\nstudio.kh.academy\nKH Academy\nacademy@arfront.com\n\nn\n' | tutor k8s quickstart
+      printf 'kh.academy\nstudio.kh.academy\nKH Academy\nacademy@arfront.com\n\ny\nletsencrypt-prod\ncertmanager.k8s.io/cluster-issuer\n' | tutor k8s quickstart
       
 
 - task: CmdLine@2
