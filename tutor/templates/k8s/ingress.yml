@@ -7,8 +7,10 @@ metadata:
     app.kubernetes.io/name: web
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 1000m
-    {% if ACTIVATE_HTTPS%}certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-    certmanager.k8s.io/acme-challenge-type: http01{% endif %}
+    #{% if ACTIVATE_HTTPS%}certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    certmanager.k8s.io/acme-challenge-type: http01
+    #{% endif %}
 spec:
   rules:
   {% for host in hosts %}
@@ -17,17 +19,18 @@ spec:
       paths:
       - backend:
           serviceName: nginx
-          servicePort: {% if ACTIVATE_HTTPS %}443{% else %}80{% endif %}{% endfor %}
+          #servicePort: {% if ACTIVATE_HTTPS %}443{% else %}80{% endif %}{% endfor %}
+          servicePort: 443{% endfor %}
   {{ patch("k8s-ingress-rules")|indent(2) }}
-  {% if ACTIVATE_HTTPS %}
+  #{% if ACTIVATE_HTTPS %}
   tls:
   - hosts:
     {% for host in hosts %}
     - {{ host }}{% endfor %}
     {{ patch("k8s-ingress-tls-hosts")|indent(6) }}
     secretName: letsencrypt
-  {%endif%}
-{% if ACTIVATE_HTTPS %}
+  #{%endif%}
+#{% if ACTIVATE_HTTPS %}
 ---
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Issuer
@@ -63,4 +66,4 @@ spec:
       - {{ LMS_HOST }}
       - {{ CMS_HOST }}
 {{ patch("k8s-ingress-certificates") }}
-{% endif %}
+#{% endif %}
