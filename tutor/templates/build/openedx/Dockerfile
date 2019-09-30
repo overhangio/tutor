@@ -102,7 +102,7 @@ RUN mkdir /openedx/data
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
-ENV SETTINGS tutor.production
+ENV EDX_PLATFORM_SETTINGS tutor.production
 
 {{ patch("openedx-dockerfile") }}
 
