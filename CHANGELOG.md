@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Introduce `local hook` command for plugin development.
 - [Bugfix] Persist `private.txt` file between two runs of `config save`. (#247)
 - [Improvement] Added configuration values to limit the number of gunicorn workers for the LMS and CMS.
 

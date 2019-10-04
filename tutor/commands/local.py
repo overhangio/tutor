@@ -169,6 +169,28 @@ def init(root):
     scripts.initialise(runner)
 
 
+@click.command(
+    short_help="Manually trigger hook (advanced users only)",
+    help="""
+Manually trigger a hook for a given plugin/service. This is a low-level command
+that is convenient when developing new plugins. Ex:
+
+    tutor local hook mysql hooks mysql init
+    tutor local hook discovery discovery hooks discovery init""",
+    name="hook",
+)
+@opts.root
+@click.argument("service")
+@click.argument("path", nargs=-1)
+def run_hook(root, service, path):
+    config = tutor_config.load(root)
+    runner = ScriptRunner(root, config)
+    fmt.echo_info(
+        "Running '{}' hook in '{}' container...".format(".".join(path), service)
+    )
+    runner.run(service, *path)
+
+
 @click.group(help="Manage https certificates")
 def https():
     pass
@@ -354,6 +376,7 @@ local.add_command(reboot)
 local.add_command(run)
 local.add_command(execute, name="exec")
 local.add_command(init)
+local.add_command(run_hook)
 local.add_command(https)
 local.add_command(logs)
 local.add_command(createuser)
