@@ -35,6 +35,7 @@ class Renderer:
             environment.filters["common_domain"] = utils.common_domain
             environment.filters["reverse_host"] = utils.reverse_host
             environment.filters["walk_templates"] = walk_templates
+            environment.filters["to_json"] = utils.to_json
             environment.globals["TUTOR_VERSION"] = __version__
 
             cls.ENVIRONMENT_CONFIG = deepcopy(config)

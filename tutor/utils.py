@@ -1,4 +1,5 @@
 import os
+import json
 import random
 import shutil
 import string
@@ -58,6 +59,10 @@ def walk_files(path):
     for dirpath, _, filenames in os.walk(path):
         for filename in filenames:
             yield os.path.join(dirpath, filename)
+
+
+def to_json(value):
+    return json.dumps(value, indent=2)
 
 
 def docker_run(*command):
