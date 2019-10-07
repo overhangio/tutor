@@ -59,7 +59,7 @@ Tutor can be launched on Amazon Web Services very quickly with the `official Tut
 .. _upgrade:
 
 Upgrading
-=========
+---------
 
 To upgrade a running Open edX platform, just install the latest ``tutor`` version (using either methods above) and run the ``quickstart`` command again. If you have :ref:`customised <configuration_customisation>` your docker images, you will have to re-build them prior to running ``quickstart``.
 
