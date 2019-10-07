@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.7.1 (2019-10-06)
 
 - [Feature] Introduce tutor docker image
 - [Feature] Introduce `local hook` command for plugin development.
