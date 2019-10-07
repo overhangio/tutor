@@ -41,9 +41,9 @@ Running Open edX
 
 Now that you have generated a configuration and environment, you probably want to run Open edX.
 
-- The most simple and popular use case is to `run Open edX locally, on a single server <local>`_, with docker-compose.
-- If you have a running cluster, you can use Tutor to `deploy Open edX on Kubernetes <k8s>`_.
-- Are you an Open edX developer? You can use Tutor for `hacking into the internals of edx-platform <development>`_.
+- The most simple and popular use case is to :ref:`run Open edX locally, on a single server <local>`, with docker-compose.
+- If you have a running cluster, you can use Tutor to :ref:`deploy Open edX on Kubernetes <k8s>`.
+- Are you an Open edX developer? You can use Tutor for :ref:`hacking into the internals of edx-platform <development>`.
 
 Bells and whistles
 ------------------

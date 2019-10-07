@@ -34,10 +34,10 @@ Features
 
 * 100% `open source <https://github.com/overhangio/tutor>`__
 * Runs entirely on Docker
-* World-famous 1-click :ref:`installation <install>` and :ref:`upgrades <upgrade>`
-* Extensible architecture with :ref:`plugins <plugins>`
-* Works with :ref:`Kubernetes <k8s>`
-* No technical skill required with the :ref:`1-click Tutor AWS image <install_cloud>`
+* World-famous 1-click `installation and upgrades <https://docs.tutor.overhang.io/install.html>`_
+* Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins.html>`_
+* Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`_
+* No technical skill required with the `1-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#cloud_install>`_
 * Try it out!
 
 .. _readme_intro_end:
