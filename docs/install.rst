@@ -48,11 +48,20 @@ Installing from a local clone of the repository::
     git clone https://github.com/overhangio/tutor
     cd tutor
     pip install -e .
-    
+
+.. _install_cloud:
+  
 Cloud deployment
 ----------------
 
-    Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. This is a commercial offer priced at $50/month ($500/year) that was created to support the development of Tutor.
+Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. This is a commercial offer priced at $50/month ($500/year) that was created to support the development of Tutor.
+
+.. _upgrade:
+
+Upgrading
+=========
+
+To upgrade a running Open edX platform, just install the latest ``tutor`` version (using either methods above) and run the ``quickstart`` command again. If you have :ref:`customised <configuration_customisation>` your docker images, you will have to re-build them prior to running ``quickstart``.
 
 Autocomplete
 ------------
