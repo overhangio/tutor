@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Enable Mysql strict mode
+
 ## 3.7.1 (2019-10-06)
 
 - [Feature] Introduce tutor docker image
