@@ -8,6 +8,10 @@
 
 ----------------------------------
 
+.. include:: testimonials.rst
+
+----------------------------------
+
 .. include:: quickstart.rst
     :start-line: 1
 
