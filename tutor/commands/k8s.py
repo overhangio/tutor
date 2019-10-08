@@ -9,7 +9,7 @@ from .. import scripts
 from .. import utils
 
 
-@click.group(help="Run Open edX on Kubernetes [BETA FEATURE]")
+@click.group(help="Run Open edX on Kubernetes")
 def k8s():
     pass
 
