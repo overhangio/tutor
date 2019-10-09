@@ -61,14 +61,11 @@ ci-info: ## Print info about environment
 	python3 --version
 	pip3 --version
 
-ci-install-dev: ## Install requirements
-	pip3 install -U setuptools twine
+ci-install-python-requirements: ## Install requirements
+	pip3 install -U setuptools pip
 	pip3 install -r requirements/dev.txt
-	pip3 install -r requirements/plugins.txt
 
-ci-install:
-	pip3 install -U setuptools twine
-	pip3 install -r requirements/base.txt
+ci-install-plugins: ci-install-python-requirements ## Install alll supported plugins
 	pip3 install -r requirements/plugins.txt
 
 ci-bundle: ## Create bundle and run basic tests

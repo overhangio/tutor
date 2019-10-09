@@ -3,3 +3,4 @@ black
 pip-tools
 pylint
 pyinstaller
+twine

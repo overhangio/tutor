@@ -13,7 +13,7 @@ matrix:
 
 script:
   - make ci-info
-  - make ci-install-dev
+  - make ci-install-plugins
   - make test
   - make ci-bundle
 
