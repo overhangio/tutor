@@ -128,6 +128,9 @@ def ask_questions(config, defaults):
         config,
         defaults,
     )
+    if(config["ACTIVATE_HTTPS"]):
+        ask("Default issuer", "DEFAULT_ISSUER", config, defaults)
+        ask("Issuer class", "ISSUER_CLASS", config, defaults)
 
 
 def ask(question, key, config, defaults):
