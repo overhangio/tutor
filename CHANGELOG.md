@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Properly set studio title (#246)
 - [Improvement] Enable Mysql strict mode
 
 ## 3.7.1 (2019-10-06)

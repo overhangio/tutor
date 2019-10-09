@@ -26,6 +26,8 @@ EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
 
 LOCALE_PATHS.append("/openedx/locale")
 
+STUDIO_NAME = "{{ PLATFORM_NAME }} - Studio"
+
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
     if not os.path.exists(folder):
