@@ -24,7 +24,7 @@ setup(
     license="AGPLv3",
     author="Overhang.io",
     author_email="contact@overhang.io",
-    description="The Open edX distribution for the busy system administrator",
+    description="The docker-based Open edX distribution designed for peace of mind",
     long_description=readme,
     long_description_content_type="text/x-rst",
     packages=find_packages(exclude=["tests*"]),
