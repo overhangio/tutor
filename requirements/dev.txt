@@ -30,7 +30,7 @@ prompt-toolkit==2.0.9
 pygments==2.4.2           # via readme-renderer
 pyinstaller==3.4
 pylint==2.3.1
-pyyaml==5.1
+pyyaml==5.1.2
 readme-renderer==24.0     # via twine
 requests-toolbelt==0.9.1  # via twine
 requests==2.22.0          # via requests-toolbelt, twine

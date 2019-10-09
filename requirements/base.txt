@@ -10,6 +10,6 @@ click==7.0
 jinja2==2.10.1
 markupsafe==1.1.1         # via jinja2
 prompt-toolkit==2.0.9     # via click-repl
-pyyaml==5.1
+pyyaml==5.1.2
 six==1.12.0               # via click-repl, prompt-toolkit
 wcwidth==0.1.7            # via prompt-toolkit
