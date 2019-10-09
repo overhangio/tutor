@@ -61,6 +61,9 @@ ci-info: ## Print info about environment
 	python3 --version
 	pip3 --version
 
+ci-install-alpine-requirements: ## Install requirements for a python:alpine image
+	apk add --no-cache docker gcc musl-dev yaml-dev
+
 ci-install-python-requirements: ## Install requirements
 	pip3 install -U setuptools pip
 	pip3 install -r requirements/dev.txt
