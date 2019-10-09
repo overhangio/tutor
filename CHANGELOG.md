@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Upgrade openedx locales to Ironwood
+
 ## 3.7.2 (2019-10-09)
 
 - [Improvement] Properly set studio title (#246)
