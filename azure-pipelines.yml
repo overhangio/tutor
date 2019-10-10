@@ -43,6 +43,10 @@ steps:
     echo ===============================================
     pip3 install -e .
     echo ===============================================
+    echo Creating tutor config
+    echo ===============================================
+    tutor config save --set MYSQL_ROOT_PASSWORD=$(MYSQL_ROOT_PASSWORD) --set OPENEDX_MYSQL_PASSWORD=$(OPENEDX_MYSQL_PASSWORD) --set OPENEDX_SECRET_KEY=$(OPENEDX_SECRET_KEY)
+    echo ===============================================
     echo Removing old containers
     echo ===============================================
     tutor k8s stop 
