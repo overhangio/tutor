@@ -20,7 +20,9 @@ steps:
     secureFile: 'dev-kubeconfig'
 
 - script: |
+    echo ===============================================
     echo Injecting kubeconfig...
+    echo ===============================================
     mkdir -p $HOME/.kube/
     cp -r $(kubeconfig.secureFilePath) $HOME/.kube/config
     rm $(kubeconfig.secureFilePath)
@@ -28,10 +30,21 @@ steps:
 - script: |
     export LC_ALL=C.UTF-8
     export LANG=C.UTF-8
+    echo ===============================================
+    echo Installing python3, pip
+    echo ===============================================
     apt install python3 libyaml-dev python3-pip
+    echo ===============================================
+    echo Installing wheel
+    echo ===============================================
     pip3 install --ignore-installed wheel
+    echo ===============================================
+    echo Installing tutor
+    echo ===============================================
     pip3 install -e .
-    echo removing old containers
+    echo ===============================================
+    echo Removing old containers
+    echo ===============================================
     tutor k8s stop 
     
   displayName: 'Install tutor, destroy cluster'
@@ -42,7 +55,13 @@ steps:
     script: |
       export LC_ALL=C.UTF-8
       export LANG=C.UTF-8
+      echo ===============================================
+      echo Creating tutor config
+      echo ===============================================
       tutor config save --set MYSQL_ROOT_PASSWORD=$(MYSQL_ROOT_PASSWORD) --set OPENEDX_MYSQL_PASSWORD=$(OPENEDX_MYSQL_PASSWORD) --set OPENEDX_SECRET_KEY=$(OPENEDX_SECRET_KEY)
+      echo ===============================================
+      echo Running Tutor
+      echo ===============================================
       printf 'kh.academy\nstudio.kh.academy\nKH Academy\nacademy@arfront.com\n\ny\nletsencrypt-prod\ncertmanager.k8s.io/cluster-issuer\n' | tutor k8s quickstart
       
   displayName: 'Install new custer'
