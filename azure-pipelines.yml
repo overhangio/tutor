@@ -34,18 +34,26 @@ steps:
     echo Installing python3, pip
     echo ===============================================
     apt install python3 libyaml-dev python3-pip
+
+
     echo ===============================================
     echo Installing wheel
     echo ===============================================
     pip3 install --ignore-installed wheel
+
+
     echo ===============================================
     echo Installing tutor
     echo ===============================================
     pip3 install -e .
+
+
     echo ===============================================
     echo Creating tutor config
     echo ===============================================
     printf 'kh.academy\nstudio.kh.academy\nKH Academy\nacademy@arfront.com\n\ny\nletsencrypt-prod\ncertmanager.k8s.io/cluster-issuer\n' | tutor k8s quickstart
+    
+    
     echo ===============================================
     echo Removing old containers
     echo ===============================================
@@ -63,6 +71,8 @@ steps:
       echo Creating tutor config
       echo ===============================================
       tutor config save --set MYSQL_ROOT_PASSWORD=$(MYSQL_ROOT_PASSWORD) --set OPENEDX_MYSQL_PASSWORD=$(OPENEDX_MYSQL_PASSWORD) --set OPENEDX_SECRET_KEY=$(OPENEDX_SECRET_KEY)
+      
+      
       echo ===============================================
       echo Running Tutor
       echo ===============================================
