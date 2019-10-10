@@ -43,13 +43,9 @@ No. Tutor is developed independently from edX. That means that the folks at edX.
 What features are missing from Tutor?
 -------------------------------------
 
-Those features are currently not available in Tutor:
+Tutor tries very hard to support all major Open edX features, notably in the form of :ref:`plugins <existing_plugins>`. In particular, the discovery and ecommerce services, once unavailable in Tutor, can now be easily installed via plugins. If you are interested in sponsoring the development of a new plugin, please `get in touch <mailto:worktogether@overhang.io>`__!
 
-- `discovery service <https://github.com/edx/course-discovery/>`_
-- `ecommerce <https://github.com/edx/ecommerce>`_
-- `analytics <https://github.com/edx/edx-analytics-pipeline>`_
-
-Those extra services were considered low priority while developing this project, but we are planning on adding them to Tutor, eventually. If you need one or more of these services, feel free to let me know by opening a `Github issue <https://github.com/overhangio/tutor/issues/>`_. In particular, support for the Analytics stack is going to require a lot of work and I am looking forward to financial sponsorship. Please get in touch if you're interested.
+It should be noted that the `Analytics <https://github.com/edx/edx-analytics-pipeline>`__ stack is currently unsupported, and will likely stay so in the future, as it would require a tremendous amount of work to containerize all the components. For generating great-looking analytics reports, we recommend the `Figures plugin <https://github.com/overhangio/tutor-figures>`__.
 
 Are there people already running this in production?
 ----------------------------------------------------

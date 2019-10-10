@@ -174,7 +174,8 @@ Example::
     templates = templates = os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates")
 
 With the above declaration, you can store plugin-specific templates in the ``templates/myplugin`` folder next to the ``plugin.py`` file.
-    
+
+.. _existing_plugins:
 
 Existing plugins
 ----------------
