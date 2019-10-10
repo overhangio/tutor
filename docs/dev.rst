@@ -64,6 +64,8 @@ Prepare the edx-platform repo
 In order to run a fork of edx-platform, dependencies need to be properly installed and assets compiled in that repo. To do so, run::
 
     export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
+    cd /path/to/edx-platform
+    npm install
     tutor dev run lms pip install --requirement requirements/edx/development.txt
     tutor dev run lms python setup.py install
     tutor dev run lms paver update_assets --settings=tutor.development
