@@ -1,81 +1,23 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- dev/*
-
-pool: k8s
 
 steps:
 
-- task: KubectlInstaller@0
-  inputs:
-    kubectlVersion: 'latest'
 
-- task: DownloadSecureFile@1
-  name: kubeconfig
+# build tutor
+- task: UsePythonVersion@0
   inputs:
-    secureFile: 'dev-kubeconfig'
+    versionSpec: '3.6.9'
+    addToPath: true
+    architecture: 'x64'
 
-- script: |
-    echo ===============================================
-    echo Injecting kubeconfig...
-    echo ===============================================
-    mkdir -p $HOME/.kube/
-    cp -r $(kubeconfig.secureFilePath) $HOME/.kube/config
-    rm $(kubeconfig.secureFilePath)
 
 - script: |
     export LC_ALL=C.UTF-8
     export LANG=C.UTF-8
-    echo ===============================================
-    echo Installing python3, pip
-    echo ===============================================
-    apt install python3 libyaml-dev python3-pip
-
-
-    echo ===============================================
-    echo Installing wheel
-    echo ===============================================
-    pip3 install --ignore-installed wheel
-
-
-    echo ===============================================
-    echo Installing tutor
-    echo ===============================================
     pip3 install -e .
 
+  displayName: 'pip tutor'
 
-    echo ===============================================
-    echo Creating tutor config
-    echo ===============================================
-    printf 'kh.academy\nstudio.kh.academy\nKH Academy\nacademy@arfront.com\n\ny\nletsencrypt-prod\ncertmanager.k8s.io/cluster-issuer\n' | tutor k8s quickstart
-    
-    
-    echo ===============================================
-    echo Removing old containers
-    echo ===============================================
-    tutor k8s stop 
-    
-  displayName: 'Install tutor, destroy cluster'
-
-- task: CmdLine@2
-  continueOnError: true
+- task: PublishPipelineArtifact@1
   inputs:
-    script: |
-      export LC_ALL=C.UTF-8
-      export LANG=C.UTF-8
-      echo ===============================================
-      echo Creating tutor config
-      echo ===============================================
-      tutor config save --set MYSQL_ROOT_PASSWORD=$(MYSQL_ROOT_PASSWORD) --set OPENEDX_MYSQL_PASSWORD=$(OPENEDX_MYSQL_PASSWORD) --set OPENEDX_SECRET_KEY=$(OPENEDX_SECRET_KEY)
-      
-      
-      echo ===============================================
-      echo Running Tutor
-      echo ===============================================
-      printf 'kh.academy\nstudio.kh.academy\nKH Academy\nacademy@arfront.com\n\ny\nletsencrypt-prod\ncertmanager.k8s.io/cluster-issuer\n' | tutor k8s quickstart
-      
-  displayName: 'Install new custer'
+    path: $(Build.SourcesDirectory)
+    artifact: tutor
