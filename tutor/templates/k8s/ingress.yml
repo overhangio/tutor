@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/name: web
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+    rancher.io/globalDNS.hostname: {{LMS_HOST}}
     {% if ACTIVATE_HTTPS%}{{ISSUER_CLASS}}: {{DEFAULT_ISSUER}}
     certmanager.k8s.io/acme-challenge-type: http01{% endif %}
 spec:
