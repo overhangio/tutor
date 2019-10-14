@@ -1,5 +1,5 @@
 appdirs
 click>=7.0
 click_repl
-jinja2
+jinja2>=2.9
 pyyaml>=4.2b1
