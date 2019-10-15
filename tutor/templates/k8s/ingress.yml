@@ -26,7 +26,7 @@ spec:
     {% for host in hosts %}
     - {{ host }}{% endfor %}
     {{ patch("k8s-ingress-tls-hosts")|indent(6) }}
-    secretName: letsencrypt
+    secretName: kh-academy
   {%endif%}
 {% if ACTIVATE_HTTPS %}
 ---
