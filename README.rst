@@ -1,9 +1,18 @@
 .. _readme_intro_start:
 
-Tutor 🎓 The docker-based Open edX distribution designed for peace of mind
-==========================================================================
+Tutor: the docker-based Open edX distribution designed for peace of mind
+========================================================================
 
-.. image:: https://img.shields.io/travis/overhangio/tutor.svg?label=Release%20build
+|
+
+.. image:: https://overhang.io/images/tutor-logo.svg
+  :alt: Tutor logo
+  :width: 500px
+  :align: center
+
+|
+
+.. image:: https://img.shields.io/travis/overhangio/tutor.svg?label=Release%20build&style=flat-square
     :alt: Release build status
     :target: https://travis-ci.org/overhangio/tutor
 
@@ -11,21 +20,22 @@ Tutor 🎓 The docker-based Open edX distribution designed for peace of mind
     :alt: Release build status
     :target: https://git.overhang.io/community/tutor/commits/master
 
-.. image:: https://img.shields.io/badge/docs-current-blue.svg
+.. image:: https://img.shields.io/badge/docs-current-blue.svg?style=flat-square
     :alt: Documentation
     :target: https://docs.tutor.overhang.io
 
-.. image:: https://img.shields.io/github/issues/overhangio/tutor.svg
+.. image:: https://img.shields.io/github/issues/overhangio/tutor.svg?style=flat-square
     :alt: GitHub issues
     :target: https://github.com/overhangio/tutor/issues
 
-.. image:: https://img.shields.io/github/issues-closed/overhangio/tutor.svg?colorB=brightgreen
+.. image:: https://img.shields.io/github/issues-closed/overhangio/tutor.svg?colorB=brightgreen&style=flat-square
     :alt: GitHub closed issues
     :target: https://github.com/overhangio/tutor/issues?q=is%3Aclosed
 
-.. image:: https://img.shields.io/github/license/overhangio/tutor.svg
+.. image:: https://img.shields.io/github/license/overhangio/tutor.svg?style=flat-square
     :alt: AGPL License
     :target: https://www.gnu.org/licenses/agpl-3.0.en.html
+
 
 **Tutor** is a docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used by dozens of Open edX platforms in the world.
 

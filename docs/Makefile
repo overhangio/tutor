@@ -8,4 +8,4 @@ browse:
 	sensible-browser _build/html/index.html
 
 watch: html browse
-	while true; do inotifywait -e modify *.rst ../*.rst; $(MAKE) html; done
+	while true; do inotifywait -e modify *.rst ../*.rst conf.py; $(MAKE) html; done

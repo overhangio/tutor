@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Tutor'
-copyright = '2018, Overhang.io'
+copyright = ""
 author = 'Overhang.io'
 
 # The short X.Y version
@@ -80,7 +80,18 @@ html_theme = 'sphinx_rtd_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'logo_only': True,
+    "style_nav_header_background": "#EFEFEF",
+}
+
+html_context = {
+  'display_github': True,
+  'github_user': 'overhangio',
+  'github_repo': 'tutor',
+  'github_version': 'master',
+  "conf_py_path": "/docs/"
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -97,6 +108,16 @@ html_static_path = ['img']
 #
 # html_sidebars = {}
 
+# Custom settings
+html_logo = "./img/tutor-logo.png"
+html_show_sourcelink = False
+html_display_github = True
+html_show_sphinx = False
+html_github_user = "overhangio"
+html_github_repo = "tutor"
+# Images do not link to themselves
+html_scaled_image_link = False
+html_show_copyright = False
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
