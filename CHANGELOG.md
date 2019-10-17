@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.7.3 (2019-10-09)
 
 - [Improvement] Upgrade openedx locales to Ironwood
 
