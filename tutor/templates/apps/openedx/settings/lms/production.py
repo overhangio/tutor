@@ -1,9 +1,7 @@
 import os
 from lms.envs.production import *
 
-
-# Execute the contents of common.py in this context
-execfile(os.path.join(os.path.dirname(__file__), "common.py"), globals())
+{% include "apps/openedx/settings/partials/common/lms.py" %}
 
 ALLOWED_HOSTS = [
     ENV_TOKENS.get("LMS_BASE"),
@@ -19,16 +17,3 @@ SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 # Allow insecure oauth2 for local interaction with local containers
 OAUTH_ENFORCE_SECURE = False
-
-DEFAULT_FROM_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-SERVER_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-TECH_SUPPORT_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-CONTACT_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-BUGS_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-UNIVERSITY_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-PRESS_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-PAYMENT_SUPPORT_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-BULK_EMAIL_DEFAULT_FROM_EMAIL = "no-reply@" + ENV_TOKENS["LMS_BASE"]
-API_ACCESS_MANAGER_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
-API_ACCESS_FROM_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
