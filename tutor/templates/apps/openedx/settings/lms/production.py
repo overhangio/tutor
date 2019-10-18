@@ -17,3 +17,5 @@ SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 # Allow insecure oauth2 for local interaction with local containers
 OAUTH_ENFORCE_SECURE = False
+
+{{ patch("openedx-lms-production-settings") }}

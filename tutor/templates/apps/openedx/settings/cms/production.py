@@ -10,3 +10,5 @@ ALLOWED_HOSTS = [
     "localhost",
     "studio.localhost",
 ]
+
+{{ patch("openedx-cms-production-settings") }}

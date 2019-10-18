@@ -60,7 +60,6 @@ for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-{{ patch("openedx-common-settings") }}
 {{ patch("openedx-lms-common-settings") }}
 
 ######## End of common LMS settings
