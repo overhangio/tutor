@@ -2,7 +2,12 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## 3.7.3 (2019-10-09)
+## Unreleased
+
+- [Improvement] Allow SigV4 authentication for video upload to S3
+- [Bugfix] Fix cms development settings
+
+## 3.7.3 (2019-10-17)
 
 - [Improvement] Upgrade openedx locales to Ironwood
 
