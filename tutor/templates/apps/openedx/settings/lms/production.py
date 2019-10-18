@@ -1,7 +1,7 @@
 import os
 from lms.envs.production import *
 
-{% include "apps/openedx/settings/partials/common/lms.py" %}
+{% include "apps/openedx/settings/partials/common_lms.py" %}
 
 ALLOWED_HOSTS = [
     ENV_TOKENS.get("LMS_BASE"),

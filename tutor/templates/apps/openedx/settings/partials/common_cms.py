@@ -1,4 +1,4 @@
-{% include "apps/openedx/settings/partials/common/all.py" %}
+{% include "apps/openedx/settings/partials/common_all.py" %}
 
 ######## Common CMS settings
 
