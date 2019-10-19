@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.7.4 (2019-10-19)
 
 - [Bugfix] Fix missing requirements file in pypi package (#261)
 - [Improvement] Add missing cms/lms production/development setting patches
