@@ -1,1 +1,2 @@
+include requirements/base.in
 recursive-include tutor/templates *

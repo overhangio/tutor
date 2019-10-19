@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix missing requirements file in pypi package (#261)
 - [Improvement] Add missing cms/lms production/development setting patches
 - [Improvement] Allow SigV4 authentication for video upload to S3
 - [Bugfix] Fix cms development settings
