@@ -66,6 +66,7 @@ ci-install-alpine-requirements: ## Install requirements for a python:alpine imag
 
 ci-install-python-requirements: ## Install requirements
 	pip3 install -U setuptools pip
+	python3 setup.py install
 	pip3 install -r requirements/dev.txt
 
 ci-install-plugins: ci-install-python-requirements ## Install alll supported plugins
