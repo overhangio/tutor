@@ -44,7 +44,7 @@ RUN virtualenv /openedx/venv
 ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 RUN pip install setuptools==39.0.1 pip==9.0.3
-RUN pip install -r requirements/edx/development.txt
+RUN pip install -r requirements/edx/base.txt
 
 # Install patched version of ora2
 RUN pip uninstall -y ora2 && \
@@ -107,7 +107,7 @@ ENV SETTINGS tutor.production
 
 {{ patch("openedx-dockerfile") }}
 
-# Entrypoint will fix permissions of all files and run commands as openedx
+# Entrypoint will set right environment variables
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Run server

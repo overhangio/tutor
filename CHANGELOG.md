@@ -2,6 +2,11 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- 💥[Improvement] Better `dev` commands, with dedicated development docker image. One of the consequences is that the `dev watchthemes` command is replaced by `dev run lms watchthemes`.
+- [Improvement] `images` commands now accept multiple `image` arguments
+
 ## 3.7.4 (2019-10-19)
 
 - [Bugfix] Fix missing requirements file in pypi package (#261)

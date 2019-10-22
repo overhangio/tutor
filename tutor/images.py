@@ -2,6 +2,11 @@ from . import fmt
 from . import utils
 
 
+def get_tag(config, name):
+    image = config["DOCKER_IMAGE_" + name.upper().replace("-", "_")]
+    return "{registry}{image}".format(registry=config["DOCKER_REGISTRY"], image=image)
+
+
 def build(path, tag, no_cache=False, build_args=None):
     fmt.echo_info("Building image {}".format(tag))
     command = ["build", "-t", tag, path]

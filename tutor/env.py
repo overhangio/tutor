@@ -108,7 +108,7 @@ def render_full(root, config):
     """
     Render the full environment, including version information.
     """
-    for subdir in ["android", "apps", "build", "k8s", "local", "webui"]:
+    for subdir in ["android", "apps", "build", "dev", "k8s", "local", "webui"]:
         save_subdir(subdir, root, config)
     for plugin, path in plugins.iter_templates(config):
         save_plugin_templates(plugin, path, root, config)

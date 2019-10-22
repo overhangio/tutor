@@ -1,8 +1,7 @@
-import subprocess
-
 import click
 
 from .. import env as tutor_env
+from .. import fmt
 from .. import opts
 from .. import utils
 
@@ -28,10 +27,7 @@ def run(root, edx_platform_path, edx_platform_settings, service, command, args):
         run_command.append(command)
     if args:
         run_command += args
-    port = service_port(service)
-    docker_compose_run_with_port(
-        root, edx_platform_path, edx_platform_settings, port, *run_command
-    )
+    docker_compose_run(root, edx_platform_path, edx_platform_settings, *run_command)
 
 
 @click.command(
@@ -56,16 +52,16 @@ def execute(root, service, command, args):
 @click.argument("service", type=click.Choice(["lms", "cms"]))
 def runserver(root, edx_platform_path, edx_platform_settings, service):
     port = service_port(service)
-    from .. import fmt
 
     fmt.echo_info(
         "The {} service will be available at http://localhost:{}".format(service, port)
     )
-    docker_compose_run_with_port(
+    docker_compose_run(
         root,
         edx_platform_path,
         edx_platform_settings,
-        port,
+        "-p",
+        "{port}:{port}".format(port=port),
         service,
         "./manage.py",
         service,
@@ -80,53 +76,15 @@ def stop(root):
     docker_compose(root, "rm", "--stop", "--force")
 
 
-@click.command(help="Watch for changes in your themes and recompile assets when needed")
-@opts.root
-@opts.edx_platform_path
-@opts.edx_platform_settings
-def watchthemes(root, edx_platform_path, edx_platform_settings):
-    docker_compose_run(
-        root,
-        edx_platform_path,
-        edx_platform_settings,
-        "--no-deps",
-        "lms",
-        "openedx-assets",
-        "watch-themes",
-        "--env",
-        "dev",
-    )
-
-
-def docker_compose_run_with_port(
-    root, edx_platform_path, edx_platform_settings, port, *command
-):
-    docker_compose_run(
-        root,
-        edx_platform_path,
-        edx_platform_settings,
-        "-p",
-        "{port}:{port}".format(port=port),
-        *command
-    )
-
-
 def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command):
     run_command = [
         "run",
         "--rm",
         "-e",
         "SETTINGS={}".format(edx_platform_settings),
-        "--volume={}:/openedx/themes".format(
-            tutor_env.pathjoin(root, "build", "openedx", "themes")
-        ),
     ]
     if edx_platform_path:
-        run_command += [
-            "--volume={}:/openedx/edx-platform".format(edx_platform_path),
-            "-e",
-            "USERID={}".format(subprocess.check_output(["id", "-u"]).strip().decode()),
-        ]
+        run_command += ["--volume={}:/openedx/edx-platform".format(edx_platform_path)]
     run_command += command
     docker_compose(root, *run_command)
 
@@ -135,6 +93,8 @@ def docker_compose(root, *command):
     return utils.docker_compose(
         "-f",
         tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+        "-f",
+        tutor_env.pathjoin(root, "dev", "docker-compose.yml"),
         "--project-name",
         "tutor_dev",
         *command
@@ -149,4 +109,3 @@ dev.add_command(run)
 dev.add_command(execute, name="exec")
 dev.add_command(runserver)
 dev.add_command(stop)
-dev.add_command(watchthemes)

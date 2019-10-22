@@ -15,6 +15,18 @@ Once the local platform has been configured, you should stop it so that it does 
 
     tutor local stop
 
+Finally, you should build the ``openedx-dev`` docker image::
+
+    tutor images build openedx-dev
+
+This ``openedx-dev`` development image differs from the ``openedx`` production image:
+
+- The user that runs inside the container has the same UID as the user on the host, in order to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
+- Additional python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
+- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/ironwood.2/requirements/edx/development.in>`__ are installed.
+
+Since the ``openedx-dev`` is based upon the ``openedx`` docker image, it should be re-built every time the ``openedx`` docker image is modified.
+
 Run a local development webserver
 ---------------------------------
 
@@ -71,7 +83,7 @@ In order to run a fork of edx-platform, dependencies need to be properly install
 Debug edx-platform
 ~~~~~~~~~~~~~~~~~~
 
-To debug a local edx-platform repository, add a ``import pdb; pdb.set_trace()`` breakpoint anywhere in your code and run::
+To debug a local edx-platform repository, add a ``import ipdb; ipdb.set_trace()`` breakpoint anywhere in your code and run::
 
     tutor dev runserver lms --edx-platform-path=/path/to/edx-platform
 
@@ -92,7 +104,7 @@ Then, follow the `Open edX documentation to apply your themes <https://edx.readt
 
 Watch the themes folders for changes (in a different terminal)::
 
-    tutor dev watchthemes
+    tutor dev run watchthemes
 
 Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://localhost:8000.
 

@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  x-openedx-service:
+    &openedx-service
+    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX_DEV }}
+    volumes:
+      # static assets
+      - ../../data/openedx/staticfiles:/openedx/staticfiles
+      # theme files
+      - ../build/openedx/themes:/openedx/themes
+      # editable requirements
+      - ../build/openedx/requirements:/openedx/requirements
+
+  lms:
+    <<: *openedx-service
+  cms:
+    <<: *openedx-service
+  lms_worker:
+    <<: *openedx-service
+  cms_worker:
+    <<: *openedx-service
+  
+  # Additional service for watching theme changes
+  watchthemes:
+    <<: *openedx-service
+    command: openedx-assets watch-themes --env dev
+  
+  {{ patch("local-docker-compose-dev-services")|indent(2) }}

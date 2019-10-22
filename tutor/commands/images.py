@@ -1,3 +1,5 @@
+import subprocess
+
 import click
 
 from .. import config as tutor_config
@@ -6,7 +8,8 @@ from .. import images
 from .. import opts
 from .. import plugins
 
-OPENEDX_IMAGE_NAMES = ["openedx", "forum", "android"]
+BASE_IMAGE_NAMES = ["openedx", "forum", "android"]
+DEV_IMAGE_NAMES = ["openedx-dev"]
 
 
 @click.group(name="images", short_help="Manage docker images")
@@ -19,7 +22,7 @@ def images_command():
     help="Build the docker images necessary for an Open edX platform.",
 )
 @opts.root
-@click.argument("image")
+@click.argument("image", nargs=-1)
 @click.option(
     "--no-cache", is_flag=True, help="Do not use cache when building the image"
 )
@@ -31,11 +34,15 @@ def images_command():
 )
 def build(root, image, no_cache, build_arg):
     config = tutor_config.load(root)
+    for i in image:
+        build_image(root, config, i, no_cache, build_arg)
 
+
+def build_image(root, config, image, no_cache, build_arg):
     # Build base images
-    for img in OPENEDX_IMAGE_NAMES:
+    for img in BASE_IMAGE_NAMES:
         if image in [img, "all"]:
-            tag = get_tag(config, img)
+            tag = images.get_tag(config, img)
             images.build(
                 tutor_env.pathjoin(root, "build", img),
                 tag,
@@ -55,16 +62,34 @@ def build(root, image, no_cache, build_arg):
                     build_args=build_arg,
                 )
 
+    # Build dev images
+    user_id = subprocess.check_output(["id", "-u"]).strip().decode()
+    dev_build_args = list(build_arg) + ["USERID={}".format(user_id)]
+    for img in DEV_IMAGE_NAMES:
+        if image in [img, "all"]:
+            tag = images.get_tag(config, img)
+            images.build(
+                tutor_env.pathjoin(root, "build", img),
+                tag,
+                no_cache=no_cache,
+                build_args=dev_build_args,
+            )
+
 
 @click.command(short_help="Pull images from the Docker registry")
 @opts.root
-@click.argument("image")
+@click.argument("image", nargs=-1)
 def pull(root, image):
     config = tutor_config.load(root)
+    for i in image:
+        pull_image(config, i)
+
+
+def pull_image(config, image):
     # Pull base images
     for img in image_names(config):
         if image in [img, "all"]:
-            tag = get_tag(config, img)
+            tag = images.get_tag(config, img)
             images.pull(tag)
 
     # Pull plugin images
@@ -77,13 +102,17 @@ def pull(root, image):
 
 @click.command(short_help="Push images to the Docker registry")
 @opts.root
-@click.argument("image")
+@click.argument("image", nargs=-1)
 def push(root, image):
     config = tutor_config.load(root)
+    for i in image:
+        push_image(root, config, i)
+    
+def push_image(root, config, image):
     # Push base images
-    for img in OPENEDX_IMAGE_NAMES:
+    for img in BASE_IMAGE_NAMES:
         if image in [img, "all"]:
-            tag = get_tag(config, img)
+            tag = images.get_tag(config, img)
             images.push(tag)
 
     # Push plugin images
@@ -94,13 +123,8 @@ def push(root, image):
                 images.push(tag)
 
 
-def get_tag(config, name):
-    image = config["DOCKER_IMAGE_" + name.upper()]
-    return "{registry}{image}".format(registry=config["DOCKER_REGISTRY"], image=image)
-
-
 def image_names(config):
-    return OPENEDX_IMAGE_NAMES + vendor_image_names(config)
+    return BASE_IMAGE_NAMES + vendor_image_names(config)
 
 
 def vendor_image_names(config):
