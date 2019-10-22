@@ -29,6 +29,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+            - mountPath: /openedx/media
+              name: media
           resources:
             requests:
               memory: 2Gi
@@ -42,6 +44,8 @@ spec:
         - name: config
           configMap:
             name: openedx-config
+        - name: media
+          emptyDir: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -74,6 +78,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+            - mountPath: /openedx/media
+              name: media
       volumes:
         - name: settings-lms
           configMap:
@@ -84,6 +90,8 @@ spec:
         - name: config
           configMap:
             name: openedx-config
+        - name: media
+          emptyDir: {}
 {% if ACTIVATE_FORUM %}
 ---
 apiVersion: apps/v1
@@ -144,6 +152,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+            - mountPath: /openedx/media
+              name: media
           resources:
             requests:
               memory: 2Gi
@@ -157,6 +167,8 @@ spec:
         - name: config
           configMap:
             name: openedx-config
+        - name: media
+          emptyDir: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -189,6 +201,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+            - mountPath: /openedx/media
+              name: media
       volumes:
         - name: settings-lms
           configMap:
@@ -199,6 +213,8 @@ spec:
         - name: config
           configMap:
             name: openedx-config
+        - name: media
+          emptyDir: {}
 {% if ACTIVATE_ELASTICSEARCH %}
 ---
 apiVersion: apps/v1
@@ -407,10 +423,15 @@ spec:
             - mountPath: /openedx/data/lms
               name: data-lms
               readOnly: true
+            - mountPath: /var/www/openedx-media
+              name: media
+              readOnly: true
           ports:
             - containerPort: 80
             - containerPort: 443
       volumes:
+        - name: media
+          emptyDir: {}
         - name: config
           configMap:
             name: nginx-config
