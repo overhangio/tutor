@@ -45,7 +45,8 @@ spec:
           configMap:
             name: openedx-config
         - name: media
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: media
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -91,7 +92,8 @@ spec:
           configMap:
             name: openedx-config
         - name: media
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: media
 {% if ACTIVATE_FORUM %}
 ---
 apiVersion: apps/v1
@@ -168,7 +170,8 @@ spec:
           configMap:
             name: openedx-config
         - name: media
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: media
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -214,7 +217,8 @@ spec:
           configMap:
             name: openedx-config
         - name: media
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: media
 {% if ACTIVATE_ELASTICSEARCH %}
 ---
 apiVersion: apps/v1
@@ -431,7 +435,8 @@ spec:
             - containerPort: 443
       volumes:
         - name: media
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: media
         - name: config
           configMap:
             name: nginx-config
