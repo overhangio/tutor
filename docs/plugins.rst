@@ -175,6 +175,15 @@ Example::
 
 With the above declaration, you can store plugin-specific templates in the ``templates/myplugin`` folder next to the ``plugin.py`` file.
 
+Creating a new plugin
+---------------------
+
+Creating a new plugin for Tutor is not so hard! You can get started with the `tutor plugin cookiecutter <https://github.com/overhangio/cookiecutter-tutor-plugin>`__::
+
+    pip install cookiecutter
+    cookiecutter https://github.com/overhangio/cookiecutter-tutor-plugin.git
+
+
 .. _existing_plugins:
 
 Existing plugins
