@@ -107,7 +107,8 @@ def push(root, image):
     config = tutor_config.load(root)
     for i in image:
         push_image(root, config, i)
-    
+
+
 def push_image(root, config, image):
     # Push base images
     for img in BASE_IMAGE_NAMES:

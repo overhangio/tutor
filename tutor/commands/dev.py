@@ -77,12 +77,7 @@ def stop(root):
 
 
 def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command):
-    run_command = [
-        "run",
-        "--rm",
-        "-e",
-        "SETTINGS={}".format(edx_platform_settings),
-    ]
+    run_command = ["run", "--rm", "-e", "SETTINGS={}".format(edx_platform_settings)]
     if edx_platform_path:
         run_command += ["--volume={}:/openedx/edx-platform".format(edx_platform_path)]
     run_command += command
