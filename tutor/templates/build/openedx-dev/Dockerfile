@@ -10,14 +10,13 @@ RUN apt update && \
 RUN pip install -r requirements/edx/development.txt
 RUN pip install ipdb==0.12.2 ipython==5.8.0
 
-# Configure new user
-ARG USERID=1000
-RUN useradd --home-dir /openedx --uid $USERID openedx
-RUN chown -R openedx:openedx /openedx
-
 # Copy new entrypoint (to take care of permission issues at runtime)
 COPY ./bin /openedx/bin
 RUN chmod a+x /openedx/bin/*
+
+# Configure new user
+ARG USERID=1000
+RUN create-user.sh $USERID
 
 # Default django settings
 ENV SETTINGS tutor.development
