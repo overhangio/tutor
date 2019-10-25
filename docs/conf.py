@@ -110,6 +110,7 @@ html_static_path = ['img']
 
 # Custom settings
 html_logo = "./img/tutor-logo.png"
+html_favicon = "./img/favicon.png"
 html_show_sourcelink = False
 html_display_github = True
 html_show_sphinx = False
