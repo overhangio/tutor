@@ -72,7 +72,7 @@ metadata:
     app.kubernetes.io/name: media
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 64Gi
