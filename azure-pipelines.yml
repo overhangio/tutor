@@ -1,7 +1,5 @@
 
 steps:
-
-
 # build tutor
 - task: UsePythonVersion@0
   inputs:
