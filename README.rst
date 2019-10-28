@@ -3,7 +3,7 @@
 Tutor 🎓 The docker-based Open edX distribution designed for peace of mind
 ==========================================================================
     
-.. image:: https://arfront.visualstudio.com/kh-academy/_apis/build/status/arfront.tutor?branchName=master
+.. image:: https://arfront.visualstudio.com/kh-academy/_apis/build/status/arfront.tutor?branchName=develop
     :alt: Dev build status
     :target: https://arfront.visualstudio.com/kh-academy/_build?definitionId=45&_a=summary
 
