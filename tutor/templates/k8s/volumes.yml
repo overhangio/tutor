@@ -71,6 +71,8 @@ metadata:
     app.kubernetes.io/component: volume
     app.kubernetes.io/name: media
 spec:
+  mountOptions: 
+    - "vers=4.1"
   accessModes:
     - ReadWriteMany
   resources:
