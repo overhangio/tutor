@@ -76,4 +76,5 @@ spec:
   resources:
     requests:
       storage: 64Gi
+  storageClassName: {{ NFS_PROVISIONER }}
 {{ patch("k8s-volumes") }}
