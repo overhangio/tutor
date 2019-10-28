@@ -3,7 +3,7 @@ steps:
 - task: TriggerBuild@3
   inputs:
     definitionIsInCurrentTeamProject: true
-    buildDefinition: 'develop'
+    buildDefinition: 'dev/*'
     queueBuildForUserThatTriggeredBuild: true
     ignoreSslCertificateErrors: false
     useSameSourceVersion: true
