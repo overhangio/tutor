@@ -22,7 +22,7 @@ edx_platform_path = click.option(
     help="Mount a local edx-platform from the host (environment variable: TUTOR_EDX_PLATFORM_PATH)",
 )
 
-edx_platform_settings = click.option(
+edx_platform_development_settings = click.option(
     "-S",
     "--edx-platform-settings",
     envvar="TUTOR_EDX_PLATFORM_SETTINGS",

@@ -17,7 +17,7 @@ def dev():
 )
 @opts.root
 @opts.edx_platform_path
-@opts.edx_platform_settings
+@opts.edx_platform_development_settings
 @click.argument("service")
 @click.argument("command", default=None, required=False)
 @click.argument("args", nargs=-1)
@@ -48,7 +48,7 @@ def execute(root, service, command, args):
 @click.command(help="Run a development server")
 @opts.root
 @opts.edx_platform_path
-@opts.edx_platform_settings
+@opts.edx_platform_development_settings
 @click.argument("service", type=click.Choice(["lms", "cms"]))
 def runserver(root, edx_platform_path, edx_platform_settings, service):
     port = service_port(service)
