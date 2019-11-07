@@ -15,8 +15,8 @@ ACTIVATE_CMS: true
 ACTIVATE_FORUM: true
 ACTIVATE_ELASTICSEARCH: true
 ACTIVATE_HTTPS: false
-DEFAULT_ISSUER: "letsencrypt"
-ISSUER_CLASS: "certmanager.k8s.io/issuer"
+DEFAULT_ISSUER: "letsencrypt-prod"
+ISSUER_CLASS: "cert-manager.io/cluster-issuer"
 ACTIVATE_MEMCACHED: true
 ACTIVATE_MONGODB: true
 ACTIVATE_MYSQL: true
