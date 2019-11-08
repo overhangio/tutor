@@ -30,12 +30,12 @@ The latest binaries can be downloaded from https://github.com/overhangio/tutor/r
 
 .. include:: cli_download.rst
 
-This is the recommended installation method for most people.
+This is the simplest and recommended installation method for most people. Note however that you will not be able to use custom plugins with this pre-compiled binary. The only plugins you can use with this approach are those thare are already bundled with the binary: `discovery <https://github.com/overhangio/tutor-discovery>`__, `ecommerce <https://github.com/overhangio/tutor-ecommerce>`__, `figures <https://github.com/overhangio/tutor-figures>`__, `minio <https://github.com/overhangio/tutor-minio>`__, `notes <https://github.com/overhangio/tutor-notes>`__, `xqueue <https://github.com/overhangio/tutor-xqueue>`__.
 
 From source
 -----------
 
-If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.5 and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
+If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.6 and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
 
     sudo apt install python3 libyaml-dev
 
