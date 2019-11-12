@@ -359,7 +359,6 @@ spec:
           persistentVolumeClaim:
             claimName: mysql
             {% endif %}
-{% if ACTIVATE_SMTP %}
 ---
 apiVersion: apps/v1
 kind: Deployment

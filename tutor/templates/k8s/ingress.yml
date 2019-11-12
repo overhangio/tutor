@@ -9,7 +9,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 1000m
     rancher.io/globalDNS.hostname: {{LMS_HOST}}
     {% if ACTIVATE_HTTPS%}{{ISSUER_CLASS}}: {{DEFAULT_ISSUER}}
-    certmanager.k8s.io/acme-challenge-type: http01{% endif %}
+    {% endif %}
 spec:
   rules:
   {% for host in hosts %}
@@ -26,42 +26,5 @@ spec:
     {% for host in hosts %}
     - {{ host }}{% endfor %}
     {{ patch("k8s-ingress-tls-hosts")|indent(6) }}
-    secretName: letsencrypt
+    secretName: academy-tls
   {%endif%}
-{% if ACTIVATE_HTTPS %}
----
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Issuer
-metadata:
-  name: letsencrypt
-  labels:
-    app.kubernetes.io/name: letsencrypt
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: {{ CONTACT_EMAIL }}
-    privateKeySecretRef:
-      name: letsencrypt-privatekey
-    http01: {}
----
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: {{ LMS_HOST|replace(".", "-") }}
-spec:
-  secretName: {{ LMS_HOST }}-tls
-  issuerRef:
-    name: letsencrypt
-  commonName: {{ LMS_HOST }}
-  dnsNames:
-  - {{ LMS_HOST }}
-  - {{ CMS_HOST }}
-  acme:
-    config:
-    - http01:
-        ingress: web
-      domains:
-      - {{ LMS_HOST }}
-      - {{ CMS_HOST }}
-{{ patch("k8s-ingress-certificates") }}
-{% endif %}
