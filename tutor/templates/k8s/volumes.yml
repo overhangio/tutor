@@ -62,4 +62,19 @@ spec:
     requests:
       storage: 1Gi
 {% endif %}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media
+  labels:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 64Gi
+  storageClassName: {{ NFS_PROVISIONER }}
 {{ patch("k8s-volumes") }}
