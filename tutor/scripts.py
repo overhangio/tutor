@@ -59,18 +59,28 @@ def initialise(runner):
 
 
 def create_user_command(superuser, staff, username, email, password=None):
+    command = """
+export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
+echo "Loading settings $DJANGO_SETTINGS_MODULE"
+"""
+
     opts = ""
     if superuser:
         opts += " --superuser"
     if staff:
         opts += " --staff"
-    command = "./manage.py lms --settings=tutor.production manage_user {opts} {username} {email}\n"
+    command += """
+./manage.py lms manage_user {opts} {username} {email}
+"""
     if password:
-        command += "./manage.py lms --settings=tutor.production shell -c \"from django.contrib.auth import get_user_model; u = get_user_model().objects.get(username='{username}'); u.set_password('{password}'); u.save()\""
+        command += """
+./manage.py lms shell -c "from django.contrib.auth import get_user_model; u = get_user_model().objects.get(username='{username}'); u.set_password('{password}'); u.save()"
+"""
     else:
-        command += (
-            "./manage.py lms --settings=tutor.production changepassword {username}"
-        )
+        command += """
+./manage.py lms changepassword {username}
+"""
+
     return command.format(opts=opts, username=username, email=email, password=password)
 
 
