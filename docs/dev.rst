@@ -94,6 +94,8 @@ With Tutor, it's pretty easy to develop your own themes. Start by placing your f
 
     cp -r /path/to/edx-platform/themes/edx.org "$(tutor config printroot)/env/build/openedx/themes/"
 
+**Note:** Soft link doen't work here, may cause a theme not found error
+
 Then, run a local webserver::
 
     tutor dev runserver lms
