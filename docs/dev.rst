@@ -94,7 +94,7 @@ With Tutor, it's pretty easy to develop your own themes. Start by placing your f
 
     cp -r /path/to/edx-platform/themes/edx.org "$(tutor config printroot)/env/build/openedx/themes/"
 
-**Note:** Soft link doen't work here, may cause a theme not found error
+**Note:** You should not create a soft link here. If you do, it will trigger a ``Theme not found in any of the themes dirs`` error. This is because soft links are not properly resolved from inside docker containers.
 
 Then, run a local webserver::
 
