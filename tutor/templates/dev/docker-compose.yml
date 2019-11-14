@@ -5,8 +5,6 @@ services:
     &openedx-service
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX_DEV }}
     volumes:
-      # static assets
-      - ../../data/openedx/staticfiles:/openedx/staticfiles
       # theme files
       - ../build/openedx/themes:/openedx/themes
       # editable requirements
@@ -25,5 +23,6 @@ services:
   watchthemes:
     <<: *openedx-service
     command: openedx-assets watch-themes --env dev
+    restart: unless-stopped
   
   {{ patch("local-docker-compose-dev-services")|indent(2) }}
