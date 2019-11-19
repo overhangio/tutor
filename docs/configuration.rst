@@ -5,8 +5,8 @@ Configuration and customisation
 
 Tutor offers plenty of possibilities for platform customisation out of the box. There are two main ways in which the base Open edX install can be customized:
 
-a. Modifying the Tutor :ref:`configuration parameters <configuration>`: 
-b. Modifying the:ref:`Open edX docker image <customise>` that runs the Open edX platform.
+a. Modifying the Tutor :ref:`configuration parameters <configuration>`.
+b. Modifying the :ref:`Open edX docker image <customise>` that runs the Open edX platform.
 
 .. _configuration:
 
