@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.8.0 (2019-11-22)
 
 - [Improvement] Add `k8s-deployments-nginx-volume-mounts` patch
 - [Bugfix] Fix running forum locally when both elasticsearch and mongodb are not activated (#266)
