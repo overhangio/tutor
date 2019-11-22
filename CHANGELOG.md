@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add `k8s-deployments-nginx-volume-mounts` patch
 - [Bugfix] Fix running forum locally when both elasticsearch and mongodb are not activated (#266)
 - [Bugfix] Fix MongoDb url in forum when running separate service (#267)
 - 💥[Improvement] Better `dev` commands, with dedicated development docker image. One of the consequences is that the `dev watchthemes` command is replaced by `dev run lms watchthemes`.

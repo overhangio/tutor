@@ -407,6 +407,7 @@ spec:
             - mountPath: /openedx/data/lms
               name: data-lms
               readOnly: true
+            {{ patch("k8s-deployments-nginx-volume-mounts")|indent(12) }}
           ports:
             - containerPort: 80
             - containerPort: 443
