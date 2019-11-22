@@ -1,4 +1,9 @@
-dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s && ./manage.py cms migrate
+dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
+
+export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
+echo "Loading settings $DJANGO_SETTINGS_MODULE"
+
+./manage.py cms migrate
 
 # Fix incorrect uploaded file path
 if [ -d /openedx/data/uploads/ ]; then
