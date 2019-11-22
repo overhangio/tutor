@@ -6,7 +6,7 @@ Installation
 Requirements
 ------------
 
-The only prerequisite for running this is a working docker install. Both docker and docker-compose are required. Follow the instructions from the official documentation:
+The only prerequisite for running this is a working docker installation. Both docker and docker-compose are required. Follow the instructions from the official documentation:
 
 - `Docker <https://docs.docker.com/engine/installation/>`_
 - `Docker compose <https://docs.docker.com/compose/install/>`_

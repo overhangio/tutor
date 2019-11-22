@@ -17,8 +17,8 @@ To make it possible to deploy, administer and upgrade Open edX anywhere, easily.
 
 .. _native:
 
-What's the difference with the official "native" install?
----------------------------------------------------------
+What's the difference with the official "native" installation?
+--------------------------------------------------------------
 
 The `native installation <https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/146440579/Native+Open+edX+Ubuntu+16.04+64+bit+Installation>`_ maintained by edX relies on `Ansible scripts <https://github.com/edx/configuration/>`_ to deploy Open edX on one or multiple servers. These scripts suffer from a couple issues that Tutor tries to address:
 
@@ -28,7 +28,7 @@ The `native installation <https://openedx.atlassian.net/wiki/spaces/OpenOPS/page
 4. Security: because you are no longer bound to a single OS, with Tutor you are now free to install security-related upgrades as soon as they become available.
 5. Portability: Tutor makes it easy to move your platform from one server to another. Just zip-compress your Tutor project root, send it to another server and you're done.
 
-There are also many features that are not included in the native install, such as a :ref:`web user interface <webui>` for remotely installing the platform, :ref:`Kubernetes deployment <k8s>`, additional languages, etc. You'll discover these differences as you explore Tutor :)
+There are also many features that are not included in the native installation, such as a :ref:`web user interface <webui>` for remotely installing the platform, :ref:`Kubernetes deployment <k8s>`, additional languages, etc. You'll discover these differences as you explore Tutor :)
 
 What's the difference with the official devstack?
 -------------------------------------------------
