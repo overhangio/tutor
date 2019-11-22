@@ -46,6 +46,5 @@ ENV SEARCH_SERVER "http://elasticsearch:9200"
 ENV MONGODB_AUTH ""
 ENV MONGODB_HOST "mongodb"
 ENV MONGODB_PORT "27017"
-ENV MONGOHQ_URL "mongodb://$MONGODB_AUTH$MONGODB_HOST:$MONGODB_PORT/cs_comments_service"
 EXPOSE 4567
 CMD ./bin/unicorn -c config/unicorn_tcp.rb -I '.'

@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix MongoDb url in forum when running separate service (#267)
 - 💥[Improvement] Better `dev` commands, with dedicated development docker image. One of the consequences is that the `dev watchthemes` command is replaced by `dev run lms watchthemes`.
 - [Improvement] `images` commands now accept multiple `image` arguments
 

@@ -1,2 +1,4 @@
+export MONGOHQ_URL="mongodb://$MONGODB_AUTH$MONGODB_HOST:$MONGODB_PORT/cs_comments_service"
+
 bundle exec rake search:initialize
 bundle exec rake search:rebuild_index
