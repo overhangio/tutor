@@ -1,7 +1,6 @@
 import unittest
 
 from tutor import utils
-from tutor import serialize
 
 
 class UtilsTests(unittest.TestCase):
@@ -20,3 +19,6 @@ class UtilsTests(unittest.TestCase):
 
     def test_reverse_host(self):
         self.assertEqual("com.google.www", utils.reverse_host("www.google.com"))
+
+    def test_list_if(self):
+        self.assertEqual('["cms"]', utils.list_if([("lms", False), ("cms", True)]))

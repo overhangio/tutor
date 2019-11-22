@@ -69,9 +69,7 @@ services:
       - ../../data/openedx-media:/var/www/openedx-media:ro
       {% if ACTIVATE_HTTPS %}- ../../data/letsencrypt:/etc/letsencrypt/:ro{% endif %}
       {{ patch("local-docker-compose-nginx-volumes")|indent(6) }}
-    depends_on:
-      {% if ACTIVATE_LMS %}- lms{% endif %}
-      {% if ACTIVATE_CMS %}- cms {% endif %}
+    depends_on: {{ [("lms", ACTIVATE_LMS), ("cms", ACTIVATE_CMS)]|list_if }}
 
   {% if ACTIVATE_RABBITMQ %}
   rabbitmq:
@@ -98,9 +96,7 @@ services:
       MONGODB_HOST: "{{ MONGODB_HOST }}"
       MONGODB_PORT: "{{ MONGODB_PORT }}"
     restart: unless-stopped
-    depends_on:
-      {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
-      {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
+    depends_on: {{ [("elasticsearch", ACTIVATE_ELASTICSEARCH), ("mongodb", ACTIVATE_MONGODB)]|list_if }}
   {% endif %}
 
   ############# LMS and CMS

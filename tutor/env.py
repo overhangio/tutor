@@ -33,6 +33,7 @@ class Renderer:
             )
             environment.filters["random_string"] = utils.random_string
             environment.filters["common_domain"] = utils.common_domain
+            environment.filters["list_if"] = utils.list_if
             environment.filters["reverse_host"] = utils.reverse_host
             environment.filters["walk_templates"] = walk_templates
             environment.globals["TUTOR_VERSION"] = __version__

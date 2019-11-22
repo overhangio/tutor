@@ -1,3 +1,4 @@
+import json
 import os
 import random
 import shutil
@@ -24,6 +25,8 @@ def random_string(length):
         [random.choice(string.ascii_letters + string.digits) for _ in range(length)]
     )
 
+def list_if(services):
+    return json.dumps([service[0] for service in services if service[1]])
 
 def common_domain(d1, d2):
     """
