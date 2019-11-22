@@ -12,7 +12,7 @@ compile-requirements: ## Compile requirements files
 package: ## Build a package ready to upload to pypi
 	python3 setup.py sdist
 
-test: test-lint test-unit test-format test-packages ## Run all tests by decreasing order or priority
+test: test-lint test-unit test-format test-package ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
@@ -23,8 +23,8 @@ test-lint: ## Run code linting tests
 test-unit: ## Run unit tests
 	python3 -m unittest discover tests
 
-test-packages: package ## Test that package can be uploaded to pypi
-	twine check dist/tutor-*.tar.gz
+test-package: package ## Test that package can be uploaded to pypi
+	twine check dist/tutor-openedx-$(shell make version).tar.gz
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)
