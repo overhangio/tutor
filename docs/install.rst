@@ -6,7 +6,7 @@ Installation
 Requirements
 ------------
 
-The only prerequisite for running this is a working docker installation. Both docker and docker-compose are required. Follow the instructions from the official documentation:
+The only prerequisite for running this is a working Docker installation. You'll need both the ``docker`` and ``docker-compose`` commands in your system ``$PATH``. Follow the instructions from the official documentation:
 
 - `Docker <https://docs.docker.com/engine/installation/>`_
 - `Docker compose <https://docs.docker.com/compose/install/>`_
@@ -77,3 +77,5 @@ If you are running zsh, run instead::
 After opening a new shell, you can test auto-completion by typing::
 
     tutor <tab><tab>
+
+.. include:: podman.rst
