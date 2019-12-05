@@ -88,6 +88,16 @@ Finally, tracking logs that store `user events <https://edx.readthedocs.io/proje
     $(tutor config printroot)/data/lms/logs/tracking.log
     $(tutor config printroot)/data/cms/logs/tracking.log
 
+Docker command verbosity
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The verbosity of ``docker`` and ``docker-compose`` commands can be adjusted by setting the values of the ``DOCKER_LOG_LEVEL`` and ``COMPOSE_LOG_LEVEL`` environment variables. For instance, to silence all output::
+
+    export DOCKER_LOG_LEVEL=fatal     # one of "debug", "info", "warn", "error", "fatal"
+    export COMPOSE_LOG_LEVEL=critical # one of "debug", "info", "warn", "error", "critical"
+    
+Note that the "fatal" error level is called "critical in docker-compose.
+
 
 Extra commands
 --------------

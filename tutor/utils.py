@@ -11,6 +11,9 @@ from . import exceptions
 from . import fmt
 
 
+DOCKER_LOG_LEVEL = os.environ.get("TUTOR_DOCKER_LOG_LEVEL")
+COMPOSE_LOG_LEVEL = os.environ.get("TUTOR_COMPOSE_LOG_LEVEL")
+
 def ensure_file_directory_exists(path):
     """
     Create file's base directory if it does not exist.
@@ -74,7 +77,10 @@ def docker(*command):
         raise exceptions.TutorError(
             "docker is not installed. Please follow instructions from https://docs.docker.com/install/"
         )
-    return execute("docker", *command)
+    docker_command = ["docker"]
+    if DOCKER_LOG_LEVEL:
+        docker_command.append("--log-level=" + DOCKER_LOG_LEVEL.lower())
+    return execute(*docker_command, *command)
 
 
 def docker_compose(*command):
@@ -82,7 +88,10 @@ def docker_compose(*command):
         raise exceptions.TutorError(
             "docker-compose is not installed. Please follow instructions from https://docs.docker.com/compose/install/"
         )
-    return execute("docker-compose", *command)
+    docker_compose_command = ["docker-compose"]
+    if COMPOSE_LOG_LEVEL:
+        docker_compose_command.append("--log-level=" + COMPOSE_LOG_LEVEL.upper())
+    return execute(*docker_compose_command, *command)
 
 
 def kubectl(*command):

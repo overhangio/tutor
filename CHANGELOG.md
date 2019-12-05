@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Add environment variables to silence ``docker`` and ``docker-compose`` commands. (#268)
+
 ## 3.8.0 (2019-11-22)
 
 - [Improvement] Add `k8s-deployments-nginx-volume-mounts` patch
