@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Print gunicorn access logs in the console
 - 💥[Improvement] Get rid of the `indexcourses` and `portainer` command (#269)
 
 ## 3.8.0 (2019-11-22)
