@@ -3,7 +3,7 @@
 ######## Common CMS settings
 
 
-STUDIO_NAME = "{{ PLATFORM_NAME }} - Studio"
+STUDIO_NAME = u"{{ PLATFORM_NAME }} - Studio"
 
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
