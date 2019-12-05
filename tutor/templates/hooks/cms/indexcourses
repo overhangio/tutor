@@ -1,4 +1,0 @@
-export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
-echo "Loading settings $DJANGO_SETTINGS_MODULE"
-
-./manage.py cms reindex_course --all --setup

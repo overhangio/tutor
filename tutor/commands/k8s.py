@@ -139,16 +139,6 @@ def importdemocourse(root):
     config = tutor_config.load(root)
     runner = K8sScriptRunner(root, config)
     scripts.import_demo_course(runner)
-    fmt.echo_info("Re-indexing courses")
-    indexcourses.callback(root)
-
-
-@click.command(help="Re-index courses for better searching")
-@opts.root
-def indexcourses(root):
-    config = tutor_config.load(root)
-    runner = K8sScriptRunner(root, config)
-    scripts.index_courses(runner)
 
 
 @click.command(name="exec", help="Execute a command in a pod of the given application")
@@ -237,6 +227,5 @@ k8s.add_command(delete)
 k8s.add_command(init)
 k8s.add_command(createuser)
 k8s.add_command(importdemocourse)
-k8s.add_command(indexcourses)
 k8s.add_command(exec_command)
 k8s.add_command(logs)

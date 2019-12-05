@@ -314,16 +314,6 @@ def importdemocourse(root):
     runner = ScriptRunner(root, config)
     fmt.echo_info("Importing demo course")
     scripts.import_demo_course(runner)
-    fmt.echo_info("Re-indexing courses")
-    indexcourses.callback(root)
-
-
-@click.command(help="Re-index courses for better searching")
-@opts.root
-def indexcourses(root):
-    config = tutor_config.load(root)
-    runner = ScriptRunner(root, config)
-    scripts.index_courses(runner)
 
 
 @click.command(
@@ -381,5 +371,4 @@ local.add_command(https)
 local.add_command(logs)
 local.add_command(createuser)
 local.add_command(importdemocourse)
-local.add_command(indexcourses)
 local.add_command(portainer)

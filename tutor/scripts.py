@@ -88,7 +88,3 @@ def import_demo_course(runner):
     runner.check_service_is_activated("cms")
     runner.run("cms", "hooks", "cms", "importdemocourse")
 
-
-def index_courses(runner):
-    runner.check_service_is_activated("cms")
-    runner.run("cms", "hooks", "cms", "indexcourses")

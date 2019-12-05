@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- 💥[Improvement] Get rid of the `indexcourses` command (#269)
+
 ## 3.8.0 (2019-11-22)
 
 - [Improvement] Add `k8s-deployments-nginx-volume-mounts` patch

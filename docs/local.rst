@@ -108,14 +108,17 @@ After a fresh installation, your platform will not have a single course. To impo
 
     tutor local importdemocourse
 
-Updating the course search index
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running arbitrary ``manage.py`` commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The course search index can be updated with::
+Any ``./manage.py`` command provided by Open edX can be run in a local platform deployed with Tutor. For instance, to delete a course, run::
+    
+    tutor local run cms ./manage.py cms delete_course <your_course_id>
 
-    tutor local indexcourses
+To update the course search index, run::
 
-Run this command periodically to ensure that course search results are always up-to-date.
+    # Run this command periodically to ensure that course search results are always up-to-date.
+    tutor local run cms ./manage.py cms reindex_course --all --setup
 
 .. _portainer:
 
