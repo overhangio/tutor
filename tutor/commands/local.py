@@ -316,27 +316,6 @@ def importdemocourse(root):
     scripts.import_demo_course(runner)
 
 
-@click.command(
-    help="Run Portainer (https://portainer.io), a UI for container supervision",
-    short_help="Run Portainer, a UI for container supervision",
-)
-@opts.root
-@click.option(
-    "-p", "--port", type=int, default=9000, show_default=True, help="Bind port"
-)
-def portainer(root, port):
-    docker_run = [
-        "--volume=/var/run/docker.sock:/var/run/docker.sock",
-        "--volume={}:/data".format(tutor_env.data_path(root, "portainer")),
-        "-p",
-        "{port}:{port}".format(port=port),
-        "portainer/portainer:latest",
-        "--bind=:{}".format(port),
-    ]
-    fmt.echo_info("View the Portainer UI at http://localhost:{port}".format(port=port))
-    utils.docker_run(*docker_run)
-
-
 class ScriptRunner(scripts.BaseRunner):
     def exec(self, service, command):
         docker_compose(
@@ -371,4 +350,3 @@ local.add_command(https)
 local.add_command(logs)
 local.add_command(createuser)
 local.add_command(importdemocourse)
-local.add_command(portainer)

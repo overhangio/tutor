@@ -127,12 +127,16 @@ Docker container web UI with `Portainer <https://portainer.io/>`__
 
 Portainer is a web UI for managing docker containers. It lets you view your entire Open edX platform at a glace. Try it! It's really cool::
 
-    tutor local portainer
+    docker run --rm \
+        --volume=/var/run/docker.sock:/var/run/docker.sock \
+        --volume=/tmp/portainer:/data \
+        -p 9000:9000 \
+        portainer/portainer:latest --bind=:9000
 
 .. .. image:: https://portainer.io/images/screenshots/portainer.gif
     ..:alt: Portainer demo
 
-After launching your platfom, the web UI will be available at `http://localhost:9000 <http://localhost:9000>`_. You will be asked to define a password for the admin user. Then, select a "Local environment" to work on; hit "Connect" and select the "local" group to view all running containers.
+You can then view the portainer UI at `http://localhost:9000 <http://localhost:9000>`_. You will be asked to define a password for the admin user. Then, select a "Local environment" to work on; hit "Connect" and select the "local" group to view all running containers.
 
 Among many other things, you'll be able to view the logs for each container, which is really useful.
 
