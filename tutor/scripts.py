@@ -87,4 +87,3 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 def import_demo_course(runner):
     runner.check_service_is_activated("cms")
     runner.run("cms", "hooks", "cms", "importdemocourse")
-
