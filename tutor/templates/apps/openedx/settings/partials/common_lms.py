@@ -21,6 +21,8 @@ GRADES_DOWNLOAD = {
     },
 }
 
+COURSE_CATALOG_VISIBILITY_PERMISSION = "see_in_catalog"
+COURSE_ABOUT_VISIBILITY_PERMISSION = "see_about_page"
 
 # JWT is authentication for other openedx services
 JWT_AUTH["JWT_ISSUER"] = "{{ JWT_COMMON_ISSUER }}"

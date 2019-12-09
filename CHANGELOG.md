@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix course about page visibility
 - [Improvement] Print gunicorn access logs in the console
 - 💥[Improvement] Get rid of the `indexcourses` and `portainer` command (#269)
 
