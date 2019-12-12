@@ -2,7 +2,6 @@ import click
 
 from .. import env as tutor_env
 from .. import fmt
-from .. import opts
 from .. import utils
 
 
@@ -11,53 +10,72 @@ def dev():
     pass
 
 
+edx_platform_path_option = click.option(
+    "-P",
+    "--edx-platform-path",
+    envvar="TUTOR_EDX_PLATFORM_PATH",
+    type=click.Path(exists=True, dir_okay=True, resolve_path=True),
+    help="Mount a local edx-platform from the host (environment variable: TUTOR_EDX_PLATFORM_PATH)",
+)
+
+edx_platform_development_settings_option = click.option(
+    "-S",
+    "--edx-platform-settings",
+    envvar="TUTOR_EDX_PLATFORM_SETTINGS",
+    default="tutor.development",
+    help="Mount a local edx-platform from the host (environment variable: TUTOR_EDX_PLATFORM_PATH)",
+)
+
+
 @click.command(
     help="Run a command in one of the containers",
     context_settings={"ignore_unknown_options": True},
 )
-@opts.root
-@opts.edx_platform_path
-@opts.edx_platform_development_settings
+@edx_platform_path_option
+@edx_platform_development_settings_option
 @click.argument("service")
 @click.argument("command", default=None, required=False)
 @click.argument("args", nargs=-1)
-def run(root, edx_platform_path, edx_platform_settings, service, command, args):
+@click.pass_obj
+def run(context, edx_platform_path, edx_platform_settings, service, command, args):
     run_command = [service]
     if command:
         run_command.append(command)
     if args:
         run_command += args
-    docker_compose_run(root, edx_platform_path, edx_platform_settings, *run_command)
+    docker_compose_run(
+        context.root, edx_platform_path, edx_platform_settings, *run_command
+    )
 
 
 @click.command(
     help="Exec a command in a running container",
     context_settings={"ignore_unknown_options": True},
 )
-@opts.root
 @click.argument("service")
 @click.argument("command")
 @click.argument("args", nargs=-1)
-def execute(root, service, command, args):
+@click.pass_obj
+def execute(context, service, command, args):
     exec_command = ["exec", service, command]
     if args:
         exec_command += args
-    docker_compose(root, *exec_command)
+    docker_compose(context.root, *exec_command)
 
 
 @click.command(help="Run a development server")
-@opts.root
-@opts.edx_platform_path
-@opts.edx_platform_development_settings
+@edx_platform_path_option
+@edx_platform_development_settings_option
 @click.argument("service", type=click.Choice(["lms", "cms"]))
-def runserver(root, edx_platform_path, edx_platform_settings, service):
+@click.pass_obj
+def runserver(context, edx_platform_path, edx_platform_settings, service):
     port = service_port(service)
 
     fmt.echo_info(
         "The {} service will be available at http://localhost:{}".format(service, port)
     )
     docker_compose_run(
-        root,
+        context.root,
         edx_platform_path,
         edx_platform_settings,
         "-p",
@@ -71,9 +89,9 @@ def runserver(root, edx_platform_path, edx_platform_settings, service):
 
 
 @click.command(help="Stop a running development platform")
-@opts.root
-def stop(root):
-    docker_compose(root, "rm", "--stop", "--force")
+@click.pass_obj
+def stop(context):
+    docker_compose(context.root, "rm", "--stop", "--force")
 
 
 def docker_compose_run(root, edx_platform_path, edx_platform_settings, *command):

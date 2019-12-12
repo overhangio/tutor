@@ -6,7 +6,6 @@ from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
 from .. import interactive as interactive_config
-from .. import opts
 from .. import scripts
 from .. import utils
 
@@ -20,48 +19,48 @@ def local():
 
 
 @click.command(help="Configure and run Open edX from scratch")
-@opts.root
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option(
     "-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images"
 )
-def quickstart(root, non_interactive, pullimages_):
+@click.pass_obj
+def quickstart(context, non_interactive, pullimages_):
     click.echo(fmt.title("Interactive platform configuration"))
-    config = interactive_config.update(root, interactive=(not non_interactive))
+    config = interactive_config.update(context.root, interactive=(not non_interactive))
     click.echo(fmt.title("Updating the current environment"))
-    tutor_env.save(root, config)
+    tutor_env.save(context.root, config)
     click.echo(fmt.title("Stopping any existing platform"))
-    stop.callback(root, [])
+    stop.callback([])
     click.echo(fmt.title("HTTPS certificates generation"))
-    https_create.callback(root)
+    https_create.callback()
     if pullimages_:
         click.echo(fmt.title("Docker image updates"))
-        pullimages.callback(root)
+        pullimages.callback()
     click.echo(fmt.title("Starting the platform in detached mode"))
-    start.callback(root, True, [])
+    start.callback(True, [])
     click.echo(fmt.title("Database creation and migrations"))
-    init.callback(root)
+    init.callback()
     echo_platform_info(config)
 
 
 @click.command(help="Update docker images")
-@opts.root
-def pullimages(root):
-    config = tutor_config.load(root)
-    docker_compose(root, config, "pull")
+@click.pass_obj
+def pullimages(context):
+    config = tutor_config.load(context.root)
+    docker_compose(context.root, config, "pull")
 
 
 @click.command(help="Run all or a selection of configured Open edX services")
-@opts.root
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
-def start(root, detach, services):
+@click.pass_obj
+def start(context, detach, services):
     command = ["up", "--remove-orphans"]
     if detach:
         command.append("-d")
 
-    config = tutor_config.load(root)
-    docker_compose(root, config, *command, *services)
+    config = tutor_config.load(context.root)
+    docker_compose(context.root, config, *command, *services)
 
 
 def echo_platform_info(config):
@@ -82,23 +81,22 @@ def echo_platform_info(config):
 
 
 @click.command(help="Stop a running platform")
-@opts.root
 @click.argument("services", metavar="service", nargs=-1)
-def stop(root, services):
-    config = tutor_config.load(root)
-    docker_compose(root, config, "rm", "--stop", "--force", *services)
+@click.pass_obj
+def stop(context, services):
+    config = tutor_config.load(context.root)
+    docker_compose(context.root, config, "rm", "--stop", "--force", *services)
 
 
 @click.command(
     short_help="Reboot an existing platform",
     help="This is more than just a restart: with reboot, the platform is fully stopped before being restarted again",
 )
-@opts.root
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
-def reboot(root, detach, services):
-    stop.callback(root, services)
-    start.callback(root, detach, services)
+def reboot(detach, services):
+    stop.callback(services)
+    start.callback(detach, services)
 
 
 @click.command(
@@ -108,10 +106,10 @@ restart all services. Note that this performs a 'docker-compose restart', so new
 may not be taken into account. It is useful for reloading settings, for instance. To
 fully stop the platform, use the 'reboot' command.""",
 )
-@opts.root
 @click.argument("service")
-def restart(root, service):
-    config = tutor_config.load(root)
+@click.pass_obj
+def restart(context, service):
+    config = tutor_config.load(context.root)
     command = ["restart"]
     if service == "openedx":
         if config["ACTIVATE_LMS"]:
@@ -120,19 +118,19 @@ def restart(root, service):
             command += ["cms", "cms_worker"]
     elif service != "all":
         command += [service]
-    docker_compose(root, config, *command)
+    docker_compose(context.root, config, *command)
 
 
 @click.command(
     help="Run a command in one of the containers",
     context_settings={"ignore_unknown_options": True},
 )
-@opts.root
 @click.option("--entrypoint", help="Override the entrypoint of the image")
 @click.argument("service")
 @click.argument("command", default=None, required=False)
 @click.argument("args", nargs=-1)
-def run(root, entrypoint, service, command, args):
+@click.pass_obj
+def run(context, entrypoint, service, command, args):
     run_command = ["run", "--rm"]
     if entrypoint:
         run_command += ["--entrypoint", entrypoint]
@@ -141,31 +139,31 @@ def run(root, entrypoint, service, command, args):
         run_command.append(command)
     if args:
         run_command += args
-    config = tutor_config.load(root)
-    docker_compose(root, config, *run_command)
+    config = tutor_config.load(context.root)
+    docker_compose(context.root, config, *run_command)
 
 
 @click.command(
     help="Exec a command in a running container",
     context_settings={"ignore_unknown_options": True},
 )
-@opts.root
 @click.argument("service")
 @click.argument("command")
 @click.argument("args", nargs=-1)
-def execute(root, service, command, args):
+@click.pass_obj
+def execute(context, service, command, args):
     exec_command = ["exec", service, command]
     if args:
         exec_command += args
-    config = tutor_config.load(root)
-    docker_compose(root, config, *exec_command)
+    config = tutor_config.load(context.root)
+    docker_compose(context.root, config, *exec_command)
 
 
 @click.command(help="Initialise all applications")
-@opts.root
-def init(root):
-    config = tutor_config.load(root)
-    runner = ScriptRunner(root, config)
+@click.pass_obj
+def init(context):
+    config = tutor_config.load(context.root)
+    runner = ScriptRunner(context.root, config)
     scripts.initialise(runner)
 
 
@@ -179,12 +177,12 @@ that is convenient when developing new plugins. Ex:
     tutor local hook discovery discovery hooks discovery init""",
     name="hook",
 )
-@opts.root
 @click.argument("service")
 @click.argument("path", nargs=-1)
-def run_hook(root, service, path):
-    config = tutor_config.load(root)
-    runner = ScriptRunner(root, config)
+@click.pass_obj
+def run_hook(context, service, path):
+    config = tutor_config.load(context.root)
+    runner = ScriptRunner(context.root, config)
     fmt.echo_info(
         "Running '{}' hook in '{}' container...".format(".".join(path), service)
     )
@@ -197,8 +195,8 @@ def https():
 
 
 @click.command(help="Create https certificates", name="create")
-@opts.root
-def https_create(root):
+@click.pass_obj
+def https_create(context):
     """
     Note: there are a couple issues with https certificate generation.
     1. Certificates are generated and renewed by using port 80, which is not necessarily open.
@@ -206,8 +204,8 @@ def https_create(root):
         b. It may be occupied by an external web server
     2. On certificate renewal, nginx is not reloaded
     """
-    config = tutor_config.load(root)
-    runner = ScriptRunner(root, config)
+    config = tutor_config.load(context.root)
+    runner = ScriptRunner(context.root, config)
     if not config["ACTIVATE_HTTPS"]:
         fmt.echo_info("HTTPS is not activated: certificate generation skipped")
         return
@@ -230,7 +228,7 @@ See the official certbot documentation for your platform: https://certbot.eff.or
 
     utils.docker_run(
         "--volume",
-        "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
+        "{}:/etc/letsencrypt/".format(tutor_env.data_path(context.root, "letsencrypt")),
         "-p",
         "80:80",
         "--entrypoint=sh",
@@ -242,9 +240,9 @@ See the official certbot documentation for your platform: https://certbot.eff.or
 
 
 @click.command(help="Renew https certificates", name="renew")
-@opts.root
-def https_renew(root):
-    config = tutor_config.load(root)
+@click.pass_obj
+def https_renew(context):
+    config = tutor_config.load(context.root)
     if not config["ACTIVATE_HTTPS"]:
         fmt.echo_info("HTTPS is not activated: certificate renewal skipped")
         return
@@ -261,7 +259,7 @@ See the official certbot documentation for your platform: https://certbot.eff.or
         return
     docker_run = [
         "--volume",
-        "{}:/etc/letsencrypt/".format(tutor_env.data_path(root, "letsencrypt")),
+        "{}:/etc/letsencrypt/".format(tutor_env.data_path(context.root, "letsencrypt")),
         "-p",
         "80:80",
         "certbot/certbot:latest",
@@ -271,23 +269,22 @@ See the official certbot documentation for your platform: https://certbot.eff.or
 
 
 @click.command(help="View output from containers")
-@opts.root
 @click.option("-f", "--follow", is_flag=True, help="Follow log output")
 @click.option("--tail", type=int, help="Number of lines to show from each container")
 @click.argument("service", nargs=-1)
-def logs(root, follow, tail, service):
+@click.pass_obj
+def logs(context, follow, tail, service):
     command = ["logs"]
     if follow:
         command += ["--follow"]
     if tail is not None:
         command += ["--tail", str(tail)]
     command += service
-    config = tutor_config.load(root)
-    docker_compose(root, config, *command)
+    config = tutor_config.load(context.root)
+    docker_compose(context.root, config, *command)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
-@opts.root
 @click.option("--superuser", is_flag=True, help="Make superuser")
 @click.option("--staff", is_flag=True, help="Make staff user")
 @click.option(
@@ -297,9 +294,10 @@ def logs(root, follow, tail, service):
 )
 @click.argument("name")
 @click.argument("email")
-def createuser(root, superuser, staff, password, name, email):
-    config = tutor_config.load(root)
-    runner = ScriptRunner(root, config)
+@click.pass_obj
+def createuser(context, superuser, staff, password, name, email):
+    config = tutor_config.load(context.root)
+    runner = ScriptRunner(context.root, config)
     runner.check_service_is_activated("lms")
     command = scripts.create_user_command(
         superuser, staff, name, email, password=password
@@ -308,10 +306,10 @@ def createuser(root, superuser, staff, password, name, email):
 
 
 @click.command(help="Import the demo course")
-@opts.root
-def importdemocourse(root):
-    config = tutor_config.load(root)
-    runner = ScriptRunner(root, config)
+@click.pass_obj
+def importdemocourse(context):
+    config = tutor_config.load(context.root)
+    runner = ScriptRunner(context.root, config)
     fmt.echo_info("Importing demo course")
     scripts.import_demo_course(runner)
 

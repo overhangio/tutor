@@ -3,7 +3,6 @@ import click
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
-from .. import opts
 from .. import utils
 
 
@@ -18,31 +17,31 @@ def build():
 
 
 @click.command(help="Build the application in debug mode")
-@opts.root
-def debug(root):
-    docker_run(root)
+@click.pass_obj
+def debug(context):
+    docker_run(context.root)
     fmt.echo_info(
         "The debuggable APK file is available in {}".format(
-            tutor_env.data_path(root, "android")
+            tutor_env.data_path(context.root, "android")
         )
     )
 
 
 @click.command(help="Build the application in release mode")
-@opts.root
-def release(root):
-    docker_run(root, "./gradlew", "assembleProdRelease")
+@click.pass_obj
+def release(context):
+    docker_run(context.root, "./gradlew", "assembleProdRelease")
     fmt.echo_info(
         "The production APK file is available in {}".format(
-            tutor_env.data_path(root, "android")
+            tutor_env.data_path(context.root, "android")
         )
     )
 
 
 @click.command(help="Pull the docker image")
-@opts.root
-def pullimage(root):
-    config = tutor_config.load(root)
+@click.pass_obj
+def pullimage(context):
+    config = tutor_config.load(context.root)
     utils.execute("docker", "pull", config["DOCKER_IMAGE_ANDROID"])
 
 

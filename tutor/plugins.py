@@ -156,3 +156,15 @@ def iter_hooks(config, hook_name):
 
 def iter_templates(config):
     yield from Plugins.instance(config).iter_templates()
+
+
+def iter_commands():
+    """
+    TODO doesn't this slow down the cli? (we need to import all plugins)
+    Also, do we really need the `config` argument? Do we want to make it possible for disabled plugins to be loaded?
+    TODO document this
+    """
+    for plugin_name, plugin in iter_installed():
+        command = getattr(plugin, "command", None)
+        if command:
+            yield plugin_name, command

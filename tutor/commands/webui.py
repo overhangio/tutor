@@ -11,7 +11,6 @@ import click
 # Note: it is important that this module does not depend on config, such that
 # the web ui can be launched even where there is no configuration.
 from .. import fmt
-from .. import opts
 from .. import env as tutor_env
 from .. import serialize
 
@@ -24,7 +23,6 @@ def webui():
 
 
 @click.command(help="Start the web UI")
-@opts.root
 @click.option(
     "-p",
     "--port",
@@ -36,15 +34,16 @@ def webui():
 @click.option(
     "-h", "--host", default="0.0.0.0", show_default=True, help="Host address to listen"
 )
-def start(root, port, host):
-    check_gotty_binary(root)
+@click.pass_obj
+def start(context, port, host):
+    check_gotty_binary(context.root)
     fmt.echo_info("Access the Tutor web UI at http://{}:{}".format(host, port))
     while True:
-        config = load_config(root)
+        config = load_config(context.root)
         user = config["user"]
         password = config["password"]
         command = [
-            gotty_path(root),
+            gotty_path(context.root),
             "--permit-write",
             "--address",
             host,
@@ -66,7 +65,7 @@ def start(root, port, host):
             try:
                 p.wait(timeout=2)
             except subprocess.TimeoutExpired:
-                new_config = load_config(root)
+                new_config = load_config(context.root)
                 if new_config != config:
                     click.echo(
                         "WARNING configuration changed. Tutor web UI is now going to restart. Reload this page to continue."
@@ -77,7 +76,6 @@ def start(root, port, host):
 
 
 @click.command(help="Configure authentication")
-@opts.root
 @click.option("-u", "--user", prompt="User name", help="Authentication user name")
 @click.option(
     "-p",
@@ -87,12 +85,13 @@ def start(root, port, host):
     confirmation_prompt=True,
     help="Authentication password",
 )
-def configure(root, user, password):
-    save_config(root, {"user": user, "password": password})
+@click.pass_obj
+def configure(context, user, password):
+    save_config(context.root, {"user": user, "password": password})
     fmt.echo_info(
         "The web UI configuration has been updated. "
         "If at any point you wish to reset your username and password, "
-        "just delete the following file:\n\n    {}".format(config_path(root))
+        "just delete the following file:\n\n    {}".format(config_path(context.root))
     )
 
 

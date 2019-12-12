@@ -5,7 +5,6 @@ import click
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
-from .. import opts
 from .. import plugins
 
 
@@ -22,45 +21,55 @@ def plugins_command():
 
 
 @click.command(name="list", help="List installed plugins")
-@opts.root
-def list_command(root):
-    config = tutor_config.load_user(root)
+@click.pass_obj
+def list_command(context):
+    config = tutor_config.load_user(context.root)
     for name, _ in plugins.iter_installed():
         status = "" if plugins.is_enabled(config, name) else " (disabled)"
         print("{plugin}{status}".format(plugin=name, status=status))
 
 
 @click.command(help="Enable a plugin")
-@opts.root
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
-def enable(root, plugin_names):
-    config = tutor_config.load_user(root)
+@click.pass_obj
+def enable(context, plugin_names):
+    config = tutor_config.load_user(context.root)
     for plugin in plugin_names:
         plugins.enable(config, plugin)
         fmt.echo_info("Plugin {} enabled".format(plugin))
-    tutor_config.save(root, config)
+    tutor_config.save(context.root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
     )
 
 
 @click.command(help="Disable a plugin")
-@opts.root
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
-def disable(root, plugin_names):
-    config = tutor_config.load_user(root)
+@click.pass_obj
+def disable(context, plugin_names):
+    config = tutor_config.load_user(context.root)
     for plugin in plugin_names:
         plugins.disable(config, plugin)
 
-        plugin_dir = tutor_env.pathjoin(root, "plugins", plugin)
+        plugin_dir = tutor_env.pathjoin(context.root, "plugins", plugin)
         if os.path.exists(plugin_dir):
             shutil.rmtree(plugin_dir)
         fmt.echo_info("Plugin {} disabled".format(plugin))
 
-    tutor_config.save(root, config)
+    tutor_config.save(context.root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
     )
+
+
+def iter_extra_plugin_commands():
+    """
+    TODO document this. Merge with plugins.iter_commands? It's good to keepo
+    click-related stuff outside of the plugins module.
+    """
+    for plugin_name, command in plugins.iter_commands():
+        command.name = plugin_name
+        yield command
 
 
 plugins_command.add_command(list_command)

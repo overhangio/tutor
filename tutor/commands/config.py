@@ -5,7 +5,7 @@ from .. import env
 from .. import exceptions
 from .. import fmt
 from .. import interactive as interactive_config
-from .. import opts
+from .. import serialize
 
 
 @click.group(
@@ -17,14 +17,24 @@ def config_command():
     pass
 
 
+class YamlParamType(click.ParamType):
+    name = "yaml"
+
+    def convert(self, value, param, ctx):
+        try:
+            k, v = value.split("=")
+        except ValueError:
+            self.fail("'{}' is not of the form 'key=value'.".format(value), param, ctx)
+        return k, serialize.parse(v)
+
+
 @click.command(help="Create and save configuration interactively")
-@opts.root
 @click.option("-i", "--interactive", is_flag=True, help="Run interactively")
 @click.option(
     "-s",
     "--set",
     "set_",
-    type=opts.YamlParamType(),
+    type=YamlParamType(),
     multiple=True,
     metavar="KEY=VAL",
     help="Set a configuration value (can be used multiple times)",
@@ -35,28 +45,31 @@ def config_command():
     multiple=True,
     help="Remove a configuration value (can be used multiple times)",
 )
-def save(root, interactive, set_, unset):
-    config, defaults = interactive_config.load_all(root, interactive=interactive)
+@click.pass_obj
+def save(context, interactive, set_, unset):
+    config, defaults = interactive_config.load_all(
+        context.root, interactive=interactive
+    )
     if set_:
         tutor_config.merge(config, dict(set_), force=True)
     for key in unset:
         config.pop(key, None)
-    tutor_config.save(root, config)
+    tutor_config.save(context.root, config)
     tutor_config.merge(config, defaults)
-    env.save(root, config)
+    env.save(context.root, config)
 
 
 @click.command(help="Print the project root")
-@opts.root
-def printroot(root):
-    click.echo(root)
+@click.pass_obj
+def printroot(context):
+    click.echo(context.root)
 
 
 @click.command(help="Print a configuration value")
-@opts.root
 @click.argument("key")
-def printvalue(root, key):
-    config = tutor_config.load(root)
+@click.pass_obj
+def printvalue(context, key):
+    config = tutor_config.load(context.root)
     try:
         fmt.echo(config[key])
     except KeyError:

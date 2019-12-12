@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import sys
 
+import appdirs
 import click
 import click_repl
 
@@ -18,9 +19,15 @@ from .. import exceptions
 from .. import fmt
 
 
+# pylint: disable=too-few-public-methods
+class Context:
+    def __init__(self, root):
+        self.root = root
+
+
 def main():
     try:
-        cli()
+        cli()  # pylint: disable=no-value-for-parameter
     except exceptions.TutorError as e:
         fmt.echo_error("Error: {}".format(e.args[0]))
         sys.exit(1)
@@ -28,8 +35,18 @@ def main():
 
 @click.group(context_settings={"help_option_names": ["-h", "--help", "help"]})
 @click.version_option(version=__version__)
-def cli():
-    pass
+@click.option(
+    "-r",
+    "--root",
+    envvar="TUTOR_ROOT",
+    default=appdirs.user_data_dir(appname="tutor"),
+    show_default=True,
+    type=click.Path(resolve_path=True),
+    help="Root project directory (environment variable: TUTOR_ROOT)",
+)
+@click.pass_context
+def cli(context, root):
+    context.obj = Context(root)
 
 
 @click.command(help="Print this help", name="help")

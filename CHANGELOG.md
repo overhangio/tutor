@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Move ``-r/--root`` option to parent command level
 - [Bugfix] Fix course about page visibility
 - [Improvement] Print gunicorn access logs in the console
 - 💥[Improvement] Get rid of the `indexcourses` and `portainer` command (#269)

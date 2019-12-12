@@ -4,7 +4,6 @@ from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
 from .. import interactive as interactive_config
-from .. import opts
 from .. import scripts
 from .. import utils
 
@@ -15,11 +14,11 @@ def k8s():
 
 
 @click.command(help="Configure and run Open edX from scratch")
-@opts.root
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
-def quickstart(root, non_interactive):
+@click.pass_obj
+def quickstart(context, non_interactive):
     click.echo(fmt.title("Interactive platform configuration"))
-    config = interactive_config.update(root, interactive=(not non_interactive))
+    config = interactive_config.update(context.root, interactive=(not non_interactive))
     if config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
         fmt.echo_alert(
             "Potentially invalid configuration: ACTIVATE_HTTPS=true WEB_PROXY=false\n"
@@ -28,21 +27,21 @@ def quickstart(root, non_interactive):
             " more information."
         )
     click.echo(fmt.title("Updating the current environment"))
-    tutor_env.save(root, config)
+    tutor_env.save(context, config)
     click.echo(fmt.title("Starting the platform"))
-    start.callback(root)
+    start.callback()
     click.echo(fmt.title("Database creation and migrations"))
-    init.callback(root)
+    init.callback()
 
 
 @click.command(help="Run all configured Open edX services")
-@opts.root
-def start(root):
+@click.pass_obj
+def start(context):
     # Create namespace
     utils.kubectl(
         "apply",
         "--kustomize",
-        tutor_env.pathjoin(root),
+        tutor_env.pathjoin(context.root),
         "--wait",
         "--selector",
         "app.kubernetes.io/component=namespace",
@@ -51,29 +50,29 @@ def start(root):
     utils.kubectl(
         "apply",
         "--kustomize",
-        tutor_env.pathjoin(root),
+        tutor_env.pathjoin(context.root),
         "--wait",
         "--selector",
         "app.kubernetes.io/component=volume",
     )
     # Create everything else
-    utils.kubectl("apply", "--kustomize", tutor_env.pathjoin(root))
+    utils.kubectl("apply", "--kustomize", tutor_env.pathjoin(context.root))
 
 
 @click.command(help="Stop a running platform")
-@opts.root
-def stop(root):
-    config = tutor_config.load(root)
+@click.pass_obj
+def stop(context):
+    config = tutor_config.load(context.root)
     utils.kubectl(
         "delete", *resource_selector(config), "deployments,services,ingress,configmaps"
     )
 
 
 @click.command(help="Reboot an existing platform")
-@opts.root
-def reboot(root):
-    stop.callback(root)
-    start.callback(root)
+@click.pass_obj
+def reboot(context):
+    stop.callback()
+    start.callback()
 
 
 def resource_selector(config, *selectors):
@@ -87,24 +86,28 @@ def resource_selector(config, *selectors):
 
 
 @click.command(help="Completely delete an existing platform")
-@opts.root
 @click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
-def delete(root, yes):
+@click.pass_obj
+def delete(context, yes):
     if not yes:
         click.confirm(
             "Are you sure you want to delete the platform? All data will be removed.",
             abort=True,
         )
     utils.kubectl(
-        "delete", "-k", tutor_env.pathjoin(root), "--ignore-not-found=true", "--wait"
+        "delete",
+        "-k",
+        tutor_env.pathjoin(context.root),
+        "--ignore-not-found=true",
+        "--wait",
     )
 
 
 @click.command(help="Initialise all applications")
-@opts.root
-def init(root):
-    config = tutor_config.load(root)
-    runner = K8sScriptRunner(root, config)
+@click.pass_obj
+def init(context):
+    config = tutor_config.load(context.root)
+    runner = K8sScriptRunner(context.root, config)
     for service in ["mysql", "elasticsearch", "mongodb"]:
         if runner.is_activated(service):
             wait_for_pod_ready(config, service)
@@ -112,7 +115,6 @@ def init(root):
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
-@opts.root
 @click.option("--superuser", is_flag=True, help="Make superuser")
 @click.option("--staff", is_flag=True, help="Make staff user")
 @click.option(
@@ -122,9 +124,10 @@ def init(root):
 )
 @click.argument("name")
 @click.argument("email")
-def createuser(root, superuser, staff, password, name, email):
-    config = tutor_config.load(root)
-    runner = K8sScriptRunner(root, config)
+@click.pass_obj
+def createuser(context, superuser, staff, password, name, email):
+    config = tutor_config.load(context.root)
+    runner = K8sScriptRunner(context.root, config)
     runner.check_service_is_activated("lms")
     command = scripts.create_user_command(
         superuser, staff, name, email, password=password
@@ -133,31 +136,31 @@ def createuser(root, superuser, staff, password, name, email):
 
 
 @click.command(help="Import the demo course")
-@opts.root
-def importdemocourse(root):
+@click.pass_obj
+def importdemocourse(context):
     fmt.echo_info("Importing demo course")
-    config = tutor_config.load(root)
-    runner = K8sScriptRunner(root, config)
+    config = tutor_config.load(context.root)
+    runner = K8sScriptRunner(context.root, config)
     scripts.import_demo_course(runner)
 
 
 @click.command(name="exec", help="Execute a command in a pod of the given application")
-@opts.root
 @click.argument("service")
 @click.argument("command")
-def exec_command(root, service, command):
-    config = tutor_config.load(root)
+@click.pass_obj
+def exec_command(context, service, command):
+    config = tutor_config.load(context.root)
     kubectl_exec(config, service, command, attach=True)
 
 
 @click.command(help="View output from containers")
-@opts.root
 @click.option("-c", "--container", help="Print the logs of this specific container")
 @click.option("-f", "--follow", is_flag=True, help="Follow log output")
 @click.option("--tail", type=int, help="Number of lines to show from each container")
 @click.argument("service")
-def logs(root, container, follow, tail, service):
-    config = tutor_config.load(root)
+@click.pass_obj
+def logs(context, container, follow, tail, service):
+    config = tutor_config.load(context.root)
 
     command = ["logs"]
     selectors = ["app.kubernetes.io/name=" + service] if service else []

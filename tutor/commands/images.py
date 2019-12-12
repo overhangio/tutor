@@ -5,7 +5,6 @@ import click
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import images
-from .. import opts
 from .. import plugins
 
 BASE_IMAGE_NAMES = ["openedx", "forum", "android"]
@@ -21,7 +20,6 @@ def images_command():
     short_help="Build docker images",
     help="Build the docker images necessary for an Open edX platform.",
 )
-@opts.root
 @click.argument("image", nargs=-1)
 @click.option(
     "--no-cache", is_flag=True, help="Do not use cache when building the image"
@@ -32,10 +30,11 @@ def images_command():
     multiple=True,
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times.",
 )
-def build(root, image, no_cache, build_arg):
-    config = tutor_config.load(root)
+@click.pass_obj
+def build(context, image, no_cache, build_arg):
+    config = tutor_config.load(context.root)
     for i in image:
-        build_image(root, config, i, no_cache, build_arg)
+        build_image(context.root, config, i, no_cache, build_arg)
 
 
 def build_image(root, config, image, no_cache, build_arg):
@@ -77,10 +76,10 @@ def build_image(root, config, image, no_cache, build_arg):
 
 
 @click.command(short_help="Pull images from the Docker registry")
-@opts.root
 @click.argument("image", nargs=-1)
-def pull(root, image):
-    config = tutor_config.load(root)
+@click.pass_obj
+def pull(context, image):
+    config = tutor_config.load(context.root)
     for i in image:
         pull_image(config, i)
 
@@ -101,15 +100,15 @@ def pull_image(config, image):
 
 
 @click.command(short_help="Push images to the Docker registry")
-@opts.root
 @click.argument("image", nargs=-1)
-def push(root, image):
-    config = tutor_config.load(root)
+@click.pass_obj
+def push(context, image):
+    config = tutor_config.load(context.root)
     for i in image:
-        push_image(root, config, i)
+        push_image(config, i)
 
 
-def push_image(root, config, image):
+def push_image(config, image):
     # Push base images
     for img in BASE_IMAGE_NAMES:
         if image in [img, "all"]:

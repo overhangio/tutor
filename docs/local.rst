@@ -5,7 +5,12 @@ Local deployment
 
 This method is for deploying Open edX locally on a single server, where docker images are orchestrated with `docker-compose <https://docs.docker.com/compose/overview/>`_.
 
-In the following, environment and data files will be generated in a user-specific project folder which will be referred to as the "**project root**". On Linux, the default project root is ``~/.local/share/tutor``. An alternative project root can be defined by passing the ``--root=...`` option to most commands, or define the ``TUTOR_ROOT=...`` environment variable.
+In the following, environment and data files will be generated in a user-specific project folder which will be referred to as the "**project root**". On Linux, the default project root is ``~/.local/share/tutor``. An alternative project root can be defined by passing the ``--root=...`` option to the ``tutor`` command, or define the ``TUTOR_ROOT=...`` environment variable::
+    
+    tutor --root=/path/to/tutorroot run ...
+    # Or equivalently:
+    export TUTOR_ROOT=/path/to/tutorroot
+    tutor run ...
 
 Main commands
 -------------
