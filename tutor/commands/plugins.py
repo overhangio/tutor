@@ -62,14 +62,15 @@ def disable(context, plugin_names):
     )
 
 
-def iter_extra_plugin_commands():
+def add_plugin_commands(command_group):
     """
-    TODO document this. Merge with plugins.iter_commands? It's good to keepo
-    click-related stuff outside of the plugins module.
+    Add commands provided by all plugins to the given command group. Each command is
+    added with a name that is equal to the plugin name.
     """
     for plugin_name, command in plugins.iter_commands():
-        command.name = plugin_name
-        yield command
+        if isinstance(command, click.Command):
+            command.name = plugin_name
+            command_group.add_command(command)
 
 
 plugins_command.add_command(list_command)

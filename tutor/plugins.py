@@ -160,9 +160,7 @@ def iter_templates(config):
 
 def iter_commands():
     """
-    TODO doesn't this slow down the cli? (we need to import all plugins)
-    Also, do we really need the `config` argument? Do we want to make it possible for disabled plugins to be loaded?
-    TODO document this
+    Iterate over all plugins that provide a `command` attribute.
     """
     for plugin_name, plugin in iter_installed():
         command = getattr(plugin, "command", None)

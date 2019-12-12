@@ -175,6 +175,43 @@ Example::
 
 With the above declaration, you can store plugin-specific templates in the ``templates/myplugin`` folder next to the ``plugin.py`` file.
 
+``command``
+~~~~~~~~~~~
+
+A plugin can provide custom command line commands. Commands are assumed to be `click.Command <https://click.palletsprojects.com/en/7.x/api/#commands>`__ objects.
+
+Example::
+    
+    import click
+    
+    @click.command(help="I'm a plugin command")
+    def command():
+        click.echo("Hello from myplugin!")
+
+Any user who installs the ``myplugin`` plugin can then run::
+    
+    $ tutor myplugin
+    Hello from myplugin!
+
+You can even define subcommands by creating `command groups <https://click.palletsprojects.com/en/7.x/api/#click.Group>`__::
+    
+    import click
+    
+    @click.group(help="I'm a plugin command group")
+    def command():
+        pass
+    
+    @click.command(help="I'm a plugin subcommand")
+    def dosomething():
+        click.echo("This subcommand is awesome")
+
+This would allow any user to run::
+
+    $ tutor myplugin dosomething
+    This subcommand is awesome
+    
+See the official `click documentation <https://click.palletsprojects.com/en/7.x/>`__ for more information.
+
 Creating a new plugin
 ---------------------
 
