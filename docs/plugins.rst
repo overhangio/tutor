@@ -193,4 +193,5 @@ Existing plugins
 - `Ecommerce <https://pypi.org/project/tutor-ecommerce>`__: Sell courses and products on your Open edX platform
 - `Figures <https://pypi.org/project/tutor-figures>`__: Visualize daily stats about course engagement
 - `MinIO <https://pypi.org/project/tutor-minio>`__: S3 emulator for object storage and scalable Open edX deployment.
+- `Notes <https://pypi.org/project/tutor-notes>`__:  Allows students to annotate portions of the courseware.
 - `Xqueue <https://pypi.org/project/tutor-xqueue>`__: for external grading
