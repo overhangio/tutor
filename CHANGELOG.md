@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add `cms/lms-env-features` patches (#276)
 - [Feature] Add plugin subcommands
 - 💥[Improvement] Move ``-r/--root`` option to parent command level
 - [Bugfix] Fix course about page visibility
