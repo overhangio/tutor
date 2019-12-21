@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.9.0 (2019-12-21)
 
 - [Security] Apply django 1.11.21 -> 1.11.27 security patches
 - [Bugfix] Fix running dev image with `sudo`
