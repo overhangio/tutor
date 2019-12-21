@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply django 1.11.21 -> 1.11.27 security patches
 - [Bugfix] Fix running dev image with `sudo`
 - [Improvement] Add `cms/lms-env-features` patches (#276)
 - [Feature] Add plugin subcommands
