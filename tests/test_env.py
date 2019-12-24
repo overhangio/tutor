@@ -72,19 +72,22 @@ class EnvTests(unittest.TestCase):
     def test_save_full(self):
         defaults = tutor_config.load_defaults()
         with tempfile.TemporaryDirectory() as root:
+            config = tutor_config.load_current(root, defaults)
+            tutor_config.merge(config, defaults)
             with unittest.mock.patch.object(fmt, "STDOUT"):
-                env.save(root, defaults)
-            self.assertTrue(os.path.exists(os.path.join(root, "env", "version")))
+                env.save(root, config)
             self.assertTrue(
                 os.path.exists(os.path.join(root, "env", "local", "docker-compose.yml"))
             )
 
     def test_save_full_with_https(self):
         defaults = tutor_config.load_defaults()
-        defaults["ACTIVATE_HTTPS"] = True
         with tempfile.TemporaryDirectory() as root:
+            config = tutor_config.load_current(root, defaults)
+            tutor_config.merge(config, defaults)
+            config["ACTIVATE_HTTPS"] = True
             with unittest.mock.patch.object(fmt, "STDOUT"):
-                env.save(root, defaults)
+                env.save(root, config)
                 with open(os.path.join(root, "env", "apps", "nginx", "lms.conf")) as f:
                     self.assertIn("ssl", f.read())
 

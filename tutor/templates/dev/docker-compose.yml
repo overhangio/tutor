@@ -6,6 +6,10 @@ x-openedx-service:
   environment:
     SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.development}
   volumes:
+    # Settings & config
+    - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
+    - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
+    - ../apps/openedx/config/:/openedx/config/
     # theme files
     - ../build/openedx/themes:/openedx/themes
     # editable requirements
@@ -17,13 +21,20 @@ services:
     command: ./manage.py lms runserver 0.0.0.0:8000
     ports:
         - "8000:8000"
+    networks:
+      default:
+        aliases:
+          - "{{ LMS_HOST }}"
+
   cms:
     <<: *openedx-service
     command: ./manage.py cms runserver 0.0.0.0:8000
     ports:
         - "8001:8000"
+
   lms-worker:
     <<: *openedx-service
+
   cms-worker:
     <<: *openedx-service
   
@@ -32,5 +43,5 @@ services:
     <<: *openedx-service
     command: openedx-assets watch-themes --env dev
     restart: unless-stopped
-  
+
   {{ patch("local-docker-compose-dev-services")|indent(2) }}

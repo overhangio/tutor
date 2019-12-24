@@ -23,6 +23,8 @@ class LocalContext(Context):
         return utils.docker_compose(
             "-f",
             tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+            "-f",
+            tutor_env.pathjoin(root, "local", "docker-compose.prod.yml"),
             *args,
             "--project-name",
             config["LOCAL_PROJECT_NAME"],
@@ -43,6 +45,13 @@ def local(context):
 )
 @click.pass_obj
 def quickstart(context, non_interactive, pullimages_):
+    if tutor_env.needs_major_upgrade(context.root):
+        click.echo(fmt.title("Upgrading from an older release"))
+        upgrade.callback(
+            from_version=tutor_env.current_release(context.root),
+            non_interactive=non_interactive,
+        )
+
     click.echo(fmt.title("Interactive platform configuration"))
     config = interactive_config.update(context.root, interactive=(not non_interactive))
     click.echo(fmt.title("Updating the current environment"))
@@ -58,22 +67,17 @@ def quickstart(context, non_interactive, pullimages_):
     compose.start.callback(True, [])
     click.echo(fmt.title("Database creation and migrations"))
     compose.init.callback(limit=None)
-    echo_platform_info(config)
 
-
-def echo_platform_info(config):
-    fmt.echo_info("The Open edX platform is now running in detached mode")
-    http = "https" if config["ACTIVATE_HTTPS"] else "http"
-    urls = []
-    if not config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
-        urls += ["http://localhost", "http://studio.localhost"]
-    urls.append("{http}://{lms_host}".format(http=http, lms_host=config["LMS_HOST"]))
-    urls.append("{http}://{cms_host}".format(http=http, cms_host=config["CMS_HOST"]))
     fmt.echo_info(
-        """Your Open edX platform is ready and can be accessed at the following urls:
+        """The Open edX platform is now running in detached mode
+Your Open edX platform is ready and can be accessed at the following urls:
 
-    {}""".format(
-            "\n    ".join(urls)
+    {http}://{lms_host}
+    {http}://{cms_host}
+    """.format(
+            http="https" if config["ACTIVATE_HTTPS"] else "http",
+            lms_host=config["LMS_HOST"],
+            cms_host=config["CMS_HOST"],
         )
     )
 
@@ -157,8 +161,81 @@ See the official certbot documentation for your platform: https://certbot.eff.or
     utils.docker_run(*docker_run)
 
 
+@click.command(help="Upgrade from a previous Open edX named release")
+@click.option(
+    "--from", "from_version", default="ironwood", type=click.Choice(["ironwood"])
+)
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.pass_obj
+def upgrade(context, from_version, non_interactive):
+    config = tutor_config.load_no_check(context.root)
+
+    if not non_interactive:
+        question = """You are about to upgrade your Open edX platform. It is strongly recommended to make a backup before upgrading. To do so, run:
+
+    tutor local stop
+    sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/
+
+In case of problem, to restore your backup you will then have to run: sudo rsync -avr /tmp/tutor-backup/ "$(tutor config printroot)"/
+
+Are you sure you want to continue?"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
+        )
+
+    if from_version == "ironwood":
+        upgrade_from_ironwood(context, config)
+
+
+def upgrade_from_ironwood(context, config):
+    click.echo(fmt.title("Upgrading from Ironwood"))
+    tutor_env.save(context.root, config)
+
+    click.echo(fmt.title("Stopping any existing platform"))
+    compose.stop.callback([])
+
+    if not config["ACTIVATE_MONGODB"]:
+        fmt.echo_info(
+            "You are not running MongDB (ACTIVATE_MONGODB=false). It is your "
+            "responsibility to upgrade your MongoDb instance to v3.6. There is "
+            "nothing left to do."
+        )
+        return
+
+    # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
+    # environment, not the configuration.
+    click.echo(fmt.title("Upgrading MongoDb from v3.2 to v3.4"))
+    config["DOCKER_IMAGE_MONGODB"] = "mongo:3.4.24"
+    tutor_env.save(context.root, config)
+    compose.start.callback(detach=True, services=["mongodb"])
+    compose.execute.callback(
+        [
+            "mongodb",
+            "mongo",
+            "--eval",
+            'db.adminCommand({ setFeatureCompatibilityVersion: "3.4" })',
+        ]
+    )
+    compose.stop.callback([])
+
+    click.echo(fmt.title("Upgrading MongoDb from v3.4 to v3.6"))
+    config["DOCKER_IMAGE_MONGODB"] = "mongo:3.6.18"
+    tutor_env.save(context.root, config)
+    compose.start.callback(detach=True, services=["mongodb"])
+    compose.execute.callback(
+        [
+            "mongodb",
+            "mongo",
+            "--eval",
+            'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })',
+        ]
+    )
+    compose.stop.callback([])
+
+
 https.add_command(https_create)
 https.add_command(https_renew)
 local.add_command(https)
 local.add_command(quickstart)
+local.add_command(upgrade)
 compose.add_commands(local)

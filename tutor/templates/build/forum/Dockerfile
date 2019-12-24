@@ -15,22 +15,22 @@ RUN wget -O /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/
 
 # Install ruby-build for building specific version of ruby
 # The ruby-build version should be periodically updated to reflect the latest release
-ARG RUBY_BUILD_VERSION=v20200224
+ARG RUBY_BUILD_VERSION=v20200401
 RUN git clone https://github.com/rbenv/ruby-build.git --branch $RUBY_BUILD_VERSION /openedx/ruby-build
 WORKDIR /openedx/ruby-build
 RUN PREFIX=/usr/local ./install.sh
 
 # Install ruby and some specific dependencies
-ARG RUBY_VERSION=2.4.1
-ARG BUNDLER_VERSION=1.11.2
-ARG RAKE_VERSION=10.4.2
+ARG RUBY_VERSION=2.5.7
+ARG BUNDLER_VERSION=1.17.3
+ARG RAKE_VERSION=13.0.1
 RUN ruby-build $RUBY_VERSION /openedx/ruby
 ENV PATH "/openedx/ruby/bin:$PATH"
 RUN gem install bundler -v $BUNDLER_VERSION
 RUN gem install rake -v $RAKE_VERSION
 
 # Install forum
-RUN git clone https://github.com/edx/cs_comments_service.git --branch open-release/ironwood.2 --depth 1 /openedx/cs_comments_service
+RUN git clone https://github.com/edx/cs_comments_service.git --branch open-release/juniper.1 --depth 1 /openedx/cs_comments_service
 WORKDIR /openedx/cs_comments_service
 RUN bundle install --deployment
 
@@ -44,6 +44,7 @@ ENV NEW_RELIC_ENABLE false
 ENV API_KEY forumapikey
 ENV SEARCH_SERVER "http://elasticsearch:9200"
 ENV MONGODB_AUTH ""
+ENV MONGOID_AUTH_MECH ""
 ENV MONGODB_HOST "mongodb"
 ENV MONGODB_PORT "27017"
 EXPOSE 4567

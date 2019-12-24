@@ -9,7 +9,9 @@ The following commands assume you have previously launched a :ref:`local <local>
 
     tutor local quickstart
 
-You should setup real host names for the LMS and the CMS (i.e: not "localhost"). It is not necessary to configure the DNS records for local development: in other words, it doesn't matter that the chosen domain names exist or not for your platform, as the LMS and the CMS will be accessed on ``localhost``. You should *not* activate HTTPS certificates, which will not work locally.
+In order to run the platform in development mode, you **must** answer no ("n") to the question "Are you configuring a production platform". 
+
+Note that the local.overhang.io `domain <https://dnschecker.org/#A/local.overhang.io>`__ and its `subdomains <https://dnschecker.org/#CNAME/studio.local.overhang.io>`__ all point to 127.0.0.1. This is just a domain name that was setup to conveniently access a locally running Open edX platform.
 
 Once the local platform has been configured, you should stop it so that it does not interfere with the development environment::
 
@@ -23,7 +25,7 @@ This ``openedx-dev`` development image differs from the ``openedx`` production i
 
 - The user that runs inside the container has the same UID as the user on the host, in order to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
 - Additional python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
-- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/ironwood.master/requirements/edx/development.in>`__ are installed.
+- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/juniper.1/requirements/edx/development.in>`__ are installed.
 
 Since the ``openedx-dev`` is based upon the ``openedx`` docker image, it should be re-built every time the ``openedx`` docker image is modified.
 
@@ -32,8 +34,8 @@ Run a local development webserver
 
 ::
 
-    tutor dev runserver lms # Access the lms at http://localhost:8000
-    tutor dev runserver cms # Access the cms at http://localhost:8001
+    tutor dev runserver lms # Access the lms at http://local.overhang.io:8000
+    tutor dev runserver cms # Access the cms at http://studio.local.overhang.io:8001
 
 Running arbitrary commands
 --------------------------
@@ -50,10 +52,9 @@ To open a python shell in the LMS or CMS, run::
 
 You can then import edx-platform and django modules and execute python code.
 
-To collect assets, you can use the standard ``update_assets`` Open edX command with the right settings::
+To collect assets, you can use the ``openedx-assets`` command that ships with Tutor::
 
-    tutor dev run lms paver update_assets --settings=tutor.development
-    tutor dev run cms paver update_assets --settings=tutor.development
+    tutor dev run openedx-assets --env=dev
 
 Point to a local edx-platform
 -----------------------------
@@ -89,7 +90,7 @@ Then, add the following content::
 
 This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automaticall mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-v`` option from the command line with the ``run`` or ``runserver`` commands.
 
-**Note:** containers are built on the Ironwood release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the :ref:`fork edx-platform section <edx_platform_fork>`.
+**Note:** containers are built on the Juniper release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the :ref:`fork edx-platform section <edx_platform_fork>`.
 
 Prepare the edx-platform repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,9 +146,9 @@ Then, run a local webserver::
 
     tutor dev runserver lms
 
-The LMS can then be accessed at http://localhost:8000. You will then have to :ref:`enable that theme <settheme>` for the development domain names::
+The LMS can then be accessed at http://local.overhang.io:8000. You will then have to :ref:`enable that theme <settheme>` for the development domain names::
     
-    tutor dev settheme mythemename localhost:8000 localhost:8001
+    tutor dev settheme mythemename local.overhang.io:8000 studio.local.overhang.io:8001
 
 Re-build development docker image (and compile assets)::
     
@@ -157,7 +158,7 @@ Watch the themes folders for changes (in a different terminal)::
 
     tutor dev run watchthemes
 
-Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://localhost:8000.
+Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://local.overhang.io:8000.
 
 Custom edx-platform settings
 ----------------------------

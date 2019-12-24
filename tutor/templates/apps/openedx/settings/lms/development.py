@@ -7,5 +7,18 @@ from lms.envs.devstack import *
 # Setup correct webpack configuration file for development
 WEBPACK_CONFIG_PATH = "webpack.dev.config.js"
 
+SESSION_COOKIE_DOMAIN = ".{{ LMS_HOST|common_domain(CMS_HOST) }}"
+
+CMS_BASE = "{{ CMS_HOST}}:8001"
+CMS_ROOT_URL = "http://{}".format(CMS_BASE)
+LOGIN_REDIRECT_WHITELIST.append(CMS_BASE)
+
+FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] = False
+
+LOGGING["loggers"]["oauth2_provider"] = {
+    "handlers": ["console"],
+    "level": "DEBUG"
+}
+
 {{ patch("openedx-development-settings") }}
 {{ patch("openedx-lms-development-settings") }}

@@ -51,10 +51,13 @@ class Renderer:
         environment.filters["common_domain"] = utils.common_domain
         environment.filters["encrypt"] = utils.encrypt
         environment.filters["list_if"] = utils.list_if
+        environment.filters["long_to_base64"] = utils.long_to_base64
         environment.filters["random_string"] = utils.random_string
         environment.filters["reverse_host"] = utils.reverse_host
+        environment.filters["rsa_private_key"] = utils.rsa_private_key
         environment.filters["walk_templates"] = self.walk_templates
         environment.globals["patch"] = self.patch
+        environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
 
@@ -293,14 +296,30 @@ def is_up_to_date(root):
     return current_version(root) == __version__
 
 
+def needs_major_upgrade(root):
+    """
+    Return the current version as a tuple of int. E.g: (1, 0, 2).
+    """
+    current = int(current_version(root).split(".")[0])
+    required = int(__version__.split(".")[0])
+    return current < required
+
+
+def current_release(root):
+    """
+    Return the name of the current Open edX release.
+    """
+    return {"3": "ironwood", "10": "juniper"}[current_version(root).split(".")[0]]
+
+
 def current_version(root):
     """
     Return the current environment version. If the current environment has no version,
-    return "0".
+    return "0.0.0".
     """
     path = pathjoin(root, VERSION_FILENAME)
     if not os.path.exists(path):
-        return "0"
+        return "0.0.0"
     return open(path).read().strip()
 
 

@@ -18,7 +18,7 @@ Yes :) This is what happens when you run ``tutor local quickstart``:
 2. Configuration files are generated from templates.
 3. Docker images are downloaded.
 4. Docker containers are provisioned.
-5. A full, production-ready Open edX platform (`Ironwood <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-ironwood.master/platform_releases/ironwood.html#open-edx-ironwood-release>`__ release) is run with docker-compose.
+5. A full, production-ready Open edX platform (`Juniper <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-juniper.master/platform_releases/juniper.html>`__ release) is run with docker-compose.
 
 The whole procedure should require less than 10 minutes, on a server with a good bandwidth. Note that your host environment will not be affected in any way, since everything runs inside docker containers. Root access is not even necessary.
 

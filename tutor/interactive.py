@@ -1,9 +1,8 @@
-import os
-
 import click
 
 from . import config as tutor_config
 from . import env
+from . import exceptions
 from . import fmt
 from .__about__ import __version__
 
@@ -22,16 +21,41 @@ def load_all(root, interactive=True):
     """
     Load configuration and interactively ask questions to collect param values from the user.
     """
-    defaults = tutor_config.load_defaults()
-    config = tutor_config.load_current(root, defaults)
+    config, defaults = tutor_config.load_all(root)
     if interactive:
         ask_questions(config, defaults)
     return config, defaults
 
 
 def ask_questions(config, defaults):
-    ask("Your website domain name for students (LMS)", "LMS_HOST", config, defaults)
-    ask("Your website domain name for teachers (CMS)", "CMS_HOST", config, defaults)
+    run_for_prod = click.confirm(
+        fmt.question(
+            "Are you configuring a production platform? Type 'n' if you are just testing Tutor on your local computer"
+        ),
+        prompt_suffix=" ",
+        default=True,
+    )
+    if not run_for_prod:
+        dev_values = {
+            "LMS_HOST": "local.overhang.io",
+            "CMS_HOST": "studio.local.overhang.io",
+            "ACTIVATE_HTTPS": False,
+        }
+        fmt.echo_info(
+            """As you are not running this platform in production, we automatically set the following configuration values:"""
+        )
+        for k, v in dev_values.items():
+            config[k] = v
+            fmt.echo_info("    {} = {}".format(k, v))
+
+    if run_for_prod:
+        ask("Your website domain name for students (LMS)", "LMS_HOST", config, defaults)
+        if "localhost" in config["LMS_HOST"]:
+            raise exceptions.TutorError(
+                "You may not use 'localhost' as the LMS domain name. To run a local platform for testing purposes you should answer 'n' to the previous question."
+            )
+        ask("Your website domain name for teachers (CMS)", "CMS_HOST", config, defaults)
+
     ask("Your platform name/title", "PLATFORM_NAME", config, defaults)
     ask("Your public contact email address", "CONTACT_EMAIL", config, defaults)
     ask_choice(
@@ -119,15 +143,16 @@ def ask_questions(config, defaults):
             "zh-tw",
         ],
     )
-    ask_bool(
-        (
-            "Activate SSL/TLS certificates for HTTPS access? Important note:"
-            " this will NOT work in a development environment."
-        ),
-        "ACTIVATE_HTTPS",
-        config,
-        defaults,
-    )
+    if run_for_prod:
+        ask_bool(
+            (
+                "Activate SSL/TLS certificates for HTTPS access? Important note:"
+                " this will NOT work in a development environment."
+            ),
+            "ACTIVATE_HTTPS",
+            config,
+            defaults,
+        )
 
 
 def ask(question, key, config, defaults):

@@ -5,7 +5,7 @@ from tutor.plugins import OfficialPlugin
 for plugin_name in [
     "discovery",
     "ecommerce",
-    "figures",
+    # "figures",
     "lts",
     "minio",
     "notes",

@@ -12,6 +12,9 @@ In the following, environment and data files will be generated in a user-specifi
     export TUTOR_ROOT=/path/to/tutorroot
     tutor run ...
 
+.. note::
+    As of v10.0.0, a locally-running Open edX platform can no longer be accessed from http://localhost or http://studio.localhost. Instead, when running ``tutor local quickstart``, you must now decide whether you are running a platform that will be used in production. If not, the platform will be automatically be bound to http://local.overhang.io and http://studio.local.overhang.io, which are domain names that point to 127.0.0.1 (localhost). This change was made to facilitate internal communication between Docker containers.
+
 Main commands
 -------------
 
@@ -55,7 +58,7 @@ Running Open edX
 
     tutor local start
 
-This will launch the various docker containers required for your Open edX platform. The LMS and the Studio will then be reachable at the domain name you specified during the configuration step. You can also access them at http://localhost and http://studio.localhost.
+This will launch the various docker containers required for your Open edX platform. The LMS and the Studio will then be reachable at the domain name you specified during the configuration step.
 
 To stop the running containers, just hit Ctrl+C.
 
@@ -124,12 +127,9 @@ Setting a new theme
 
 The default Open edX theme is rather bland, so Tutor makes it easy to switch to a different theme::
     
-    tutor local settheme mytheme localhost
+    tutor local settheme mytheme $(tutor config printvalue LMS_HOST) $(tutor config printvalue CMS_HOST)
 
-Notice the "localhost" argument: in Open edX, themes are assigned per domain name. That means that your custom theme will only be visible if you access your platform at http://localhost. So you might want to run this command with all possible domain names. For instance, to assign your custom theme both to the LMS and the studio, locally and in production, run::
-    
-    tutor local settheme mytheme localhost studio.localhost \
-        $(tutor config printvalue LMS_HOST) $(tutor config printvalue CMS_HOST)
+Notice that we pass the hostnames of the LMS and the CMS to the ``settheme`` command: this is because in Open edX, themes are assigned per domain name.
 
 Out of the box, only the default "open-edx" theme is available. We also developed `Indigo, a beautiful, customizable theme <https://github.com/overhangio/indigo>`__ which is easy to install with Tutor.
 

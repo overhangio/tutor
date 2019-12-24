@@ -10,7 +10,7 @@ The ``podman`` CLI aims to be fully compatible with the ``docker`` CLI, and ``po
 
 
 Enabling Podman
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 Podman is supported on a variety of development platforms, see the `installation instructions <https://podman.io/getting-started/installation>`_ for details.
 
@@ -26,7 +26,7 @@ Once you have installed Podman and its dependencies on the platform of your choi
 
 
 Enabling podman-compose
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ``podman-compose`` is available as a package from PyPI, and can thus be installed with ``pip``. See `its README <https://github.com/containers/podman-compose/blob/devel/README.md>`_ for installation instructions. Note that if you have installed Tutor in its own virtualenv, you'll need to run ``pip install podman-compose`` in that same virtualenv.
 
@@ -42,7 +42,7 @@ Once installed, you'll again need to create a symbolic link that aliases ``docke
 
 
 Verifying your environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you have configured your symbolic links as described, you should be able to run ``docker version`` and ``docker-compose --help`` and their output should agree, respectively, with ``podman version`` and ``podman-compose --help``.
 

@@ -8,9 +8,6 @@ ALLOWED_HOSTS = [
     ENV_TOKENS.get("LMS_BASE"),
     FEATURES["PREVIEW_LMS_BASE"],
     "lms",
-    "127.0.0.1",
-    "localhost",
-    "preview.localhost",
 ]
 
 # Required to display all courses on start page

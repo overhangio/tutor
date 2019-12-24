@@ -9,7 +9,6 @@ import traceback
 from path import Path
 
 from pavelib import assets
-from xmodule import static_content as xmodule_static_content
 
 
 DEFAULT_STATIC_ROOT = "/openedx/staticfiles"
@@ -99,8 +98,18 @@ def run_build(args):
 
 
 def run_xmodule(_args):
+    # Collecting xmodule assets is incompatible with setting the django path, because
+    # of an unfortunate call to settings.configure()
+    django_settings_module = os.environ.get("DJANGO_SETTINGS_MODULE")
+    if django_settings_module:
+        os.environ.pop("DJANGO_SETTINGS_MODULE")
+
     sys.argv[1:] = ["common/static/xmodule"]
-    xmodule_static_content.main()
+    import xmodule.static_content
+    xmodule.static_content.main()
+
+    if django_settings_module:
+        os.environ["DJANGO_SETTINGS_MODULE"] = django_settings_module
 
 
 def run_npm(_args):

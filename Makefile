@@ -88,7 +88,8 @@ ci-bundle: bundle ## Create bundle and run basic tests
 	yes "" | ./dist/tutor config save --interactive
 	./dist/tutor config save
 	./dist/tutor plugins list
-	./dist/tutor plugins enable discovery ecommerce figures lts minio notes xqueue
+	# ./dist/tutor plugins enable discovery ecommerce figures lts minio notes xqueue
+	./dist/tutor plugins enable discovery ecommerce lts minio notes xqueue
 	./dist/tutor plugins list
 	./dist/tutor lts --help
 

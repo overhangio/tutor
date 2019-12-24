@@ -101,11 +101,6 @@ The error produced should help you better understand what is happening.
 
 This will occur if you try to run a development environment without patching the LOGGING configuration, as indicated in the `development_` section. Maybe you correctly patched the development settings, but they are not taken into account? For instance, you might have correctly defined the ``EDX_PLATFORM_SETTINGS`` environment variable, but ``paver`` uses the ``devstack`` settings (which does not patch the ``LOGGING`` variable). This is because calling ``paver lms --settings=development`` or ``paver cms --settings=development`` ignores the ``--settings`` argument. Yes, it might be considered an edx-platform bug... Instead, you should run the ``update_assets`` and ``runserver`` commands, as explained above.
 
-"TypeError: get_logger_config() got an unexpected keyword argument 'debug'"
--------------------------------------------------------------------------------
-
-This might occur when you try to run the latest version of ``edx-platform``, and not a version close to ``ironwood.master``. It is no longer necessary to patch the ``LOGGING`` configuration in the latest ``edx-platform`` releases, as indicated in the `development_` section, so you should remove the call to ``get_logger_config`` altogether from your development settings.
-
 The chosen default language does not display properly
 -----------------------------------------------------
 

@@ -24,6 +24,10 @@ def load(root):
     configuration in the project root.
     """
     check_existing_config(root)
+    return load_no_check(root)
+
+
+def load_no_check(root):
     config, defaults = load_all(root)
     merge(config, defaults)
     return config
@@ -101,6 +105,7 @@ def load_required(config, defaults):
         "OPENEDX_MYSQL_PASSWORD",
         "ANDROID_OAUTH2_SECRET",
         "ID",
+        "JWT_RSA_PRIVATE_KEY",
     ]:
         if key not in config:
             config[key] = env.render_unknown(config, defaults[key])

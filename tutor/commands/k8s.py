@@ -201,6 +201,40 @@ def logs(context, container, follow, tail, service):
     utils.kubectl(*command)
 
 
+@click.command(help="Upgrade from a previous Open edX named release")
+@click.option(
+    "--from", "from_version", default="ironwood", type=click.Choice(["ironwood"])
+)
+@click.pass_obj
+def upgrade(context, from_version):
+    config = tutor_config.load(context.root)
+
+    if from_version == "ironwood":
+        if not config["ACTIVATE_MONGODB"]:
+            fmt.echo_info(
+                "You are not running MongDB (ACTIVATE_MONGODB=false). It is your "
+                "responsibility to upgrade your MongoDb instance to v3.6. There is "
+                "nothing left to do."
+            )
+            return
+        message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Ironwood, you should upgrade your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
+
+    # Upgrade from v3.2 to v3.4
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.4.24
+    tutor k8s start
+    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.4" })'
+
+    # Upgrade from v3.4 to v3.6
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.6.18
+    tutor k8s start
+    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })'
+
+    tutor config save --unset DOCKER_IMAGE_MONGODB"""
+        fmt.echo_info(message)
+
+
 class K8sClients:
     _instance = None
 
@@ -392,3 +426,4 @@ k8s.add_command(importdemocourse)
 k8s.add_command(settheme)
 k8s.add_command(exec_command)
 k8s.add_command(logs)
+k8s.add_command(upgrade)

@@ -43,29 +43,6 @@ services:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
   {% endif %}
 
-  openedx-assets:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
-    volumes:
-      - ../../data/openedx:/var/www/openedx
-    command: sh -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
-
-  nginx:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NGINX }}
-    restart: unless-stopped
-    ports:
-      - "{{ NGINX_HTTP_PORT }}:80"
-      - "{{ NGINX_HTTPS_PORT }}:443"
-    networks:
-      default:
-        aliases: [{{ patch("local-docker-compose-nginx-aliases", separator=", ") }}]
-    volumes:
-      - ../apps/nginx:/etc/nginx/conf.d/:ro
-      - ../../data/openedx:/var/www/openedx:ro
-      - ../../data/openedx-media:/var/www/openedx-media:ro
-      {% if ACTIVATE_HTTPS %}- ../../data/letsencrypt:/etc/letsencrypt/:ro{% endif %}
-      {{ patch("local-docker-compose-nginx-volumes")|indent(6) }}
-    depends_on: {{ [("lms", ACTIVATE_LMS), ("cms", ACTIVATE_CMS)]|list_if }}
-
   {% if ACTIVATE_RABBITMQ %}
   rabbitmq:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_RABBITMQ }}
@@ -142,6 +119,7 @@ services:
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
       {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
       {% if ACTIVATE_SMTP %}- smtp{% endif %}
+      {% if ACTIVATE_LMS %}- lms{% endif %}
       {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}
   {% endif %}
 

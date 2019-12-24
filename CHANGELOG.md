@@ -2,10 +2,11 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.0.0 (2020-06-15)
 
+- 💥[Improvement] Upgrade to Juniper 🍾
 - [Bugfix] Fix nginx resolver address to address container restarts
-- [Feature] Add `--limit=myplugin` option to `init` commands for limit execution of initialisation to certain services and plugins
+- [Feature] Add `--limit=myplugin` option to `init` commands to limit execution of initialisation to certain services and plugins
 
 ## v3.12.6 (2020-06-01)
 

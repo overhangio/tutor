@@ -1,6 +1,7 @@
 appdirs
 click>=7.0
 click_repl
+pycryptodome
 jinja2>=2.9
 kubernetes
 pyyaml>=4.2b1

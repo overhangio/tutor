@@ -47,7 +47,7 @@ On Minikube, run::
   
     minikube addons enable ingress
 
-With Kubernetes, your Open edX platform will *not* be available at localhost or studio.localhost. Instead, you will have to access your platform with the domain names you specified for the LMS and the CMS. To do so on a local computer, you will need to add the following line to /etc/hosts::
+With Kubernetes, your Open edX platform will *not* be available at localhost. Instead, you will have to access your platform with the domain names you specified for the LMS and the CMS. To do so on a local computer, you will need to add the following line to /etc/hosts::
 
     MINIKUBEIP yourdomain.com studio.yourdomain.com preview.yourdomain.com notes.yourdomain.com
 

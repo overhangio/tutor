@@ -4,6 +4,7 @@ import click
 
 from . import compose
 from .context import Context
+from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
 from .. import utils
@@ -15,7 +16,7 @@ class DevContext(Context):
         args = []
         for folder in ["local", "dev"]:
             # Add docker-compose.yml and docker-compose.override.yml (if it exists)
-            # from "local" and "dev" folders
+            # from "local" and "dev" folders (but not docker-compose.prod.yml)
             args += [
                 "-f",
                 tutor_env.pathjoin(root, folder, "docker-compose.yml"),
@@ -41,12 +42,15 @@ def dev(context):
 )
 @click.argument("options", nargs=-1, required=False)
 @click.argument("service")
-def runserver(options, service):
+@click.pass_obj
+def runserver(context, options, service):
+    config = tutor_config.load(context.root)
     if service in ["lms", "cms"]:
         port = 8000 if service == "lms" else 8001
+        host = config["LMS_HOST"] if service == "lms" else config["CMS_HOST"]
         fmt.echo_info(
-            "The {} service will be available at http://localhost:{}".format(
-                service, port
+            "The {} service will be available at http://{}:{}".format(
+                service, host, port
             )
         )
     args = ["--service-ports", *options, service]
