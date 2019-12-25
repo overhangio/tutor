@@ -23,7 +23,7 @@ for entrypoint in pkg_resources.iter_entry_points("tutor.plugin.v0"):
 hidden_imports.append("tutorlts.__about__")
 hidden_imports.append("Crypto.Cipher.AES")
 hidden_imports.append("Crypto.Cipher.PKCS1_OAEP")
-hidden_imports.append("Crypto.Hash")
+hidden_imports.append("Crypto.Hash.SHA256")
 hidden_imports.append("Crypto.PublicKey.RSA")
 hidden_imports.append("Crypto.Random")
 hidden_imports.append("Crypto.Signature.PKCS1_v1_5")
