@@ -13,4 +13,5 @@ for plugin in ["discovery", "ecommerce", "figures", "lts", "minio", "notes", "xq
         Plugins.EXTRA_INSTALLED[plugin] = module
 
 from tutor.commands.cli import main
+
 main()
