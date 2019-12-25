@@ -72,16 +72,16 @@ ci-install-python-requirements: ## Install requirements
 ci-install-plugins: ci-install-python-requirements ## Install alll supported plugins
 	pip3 install -r requirements/plugins.txt
 
-ci-bundle: ## Create bundle and run basic tests
-	$(MAKE) bundle
-	mkdir -p releases/
+ci-bundle: bundle ## Create bundle and run basic tests
 	./dist/tutor --version
 	./dist/tutor config printroot
 	yes "" | ./dist/tutor config save --interactive
 	./dist/tutor config save
-	./dist/tutor plugins enable discovery ecommerce minio notes xqueue
+	./dist/tutor plugins enable discovery ecommerce figures lts minio notes xqueue
+	./dist/tutor lts --help
 
 ./releases/github-release: ## Download github-release binary
+	mkdir -p releases/
 	cd releases/ \
 		&& curl -sSL -o ./github-release.tar.bz2 "https://github.com/aktau/github-release/releases/download/v0.7.2/$(shell uname -s | tr "[:upper:]" "[:lower:]")-amd64-github-release.tar.bz2" \
 		&& bzip2 -d -f ./github-release.tar.bz2 \

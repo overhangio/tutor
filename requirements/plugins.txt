@@ -1,6 +1,7 @@
 tutor-discovery
 tutor-ecommerce
 tutor-figures
+tutor-lts
 tutor-minio
 tutor-notes
 tutor-xqueue
