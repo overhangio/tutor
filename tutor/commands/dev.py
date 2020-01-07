@@ -51,6 +51,7 @@ def run(context, edx_platform_path, edx_platform_settings, service, command, arg
 @click.command(
     help="Exec a command in a running container",
     context_settings={"ignore_unknown_options": True},
+    name="exec",
 )
 @click.argument("service")
 @click.argument("command")
@@ -119,6 +120,6 @@ def service_port(service):
 
 
 dev.add_command(run)
-dev.add_command(execute, name="exec")
+dev.add_command(execute)
 dev.add_command(runserver)
 dev.add_command(stop)
