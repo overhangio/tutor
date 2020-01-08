@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Make it possible to override the project name in development mode
+- [Bugfix] Fix user switching in development mode
 - [Bugfix] Fix "k8s quickstart" crash
 
 ## 3.9.0 (2019-12-21)
