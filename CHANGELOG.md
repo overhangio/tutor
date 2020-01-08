@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- 💥[Feature] `dev run/exec` commands now support generic options which are passed to docker-compose. Consequently, defining the `TUTOR_EDX_PLATFORM_PATH` environment variable no longer works. Instead, users are encouraged to explicitely pass the `-v` option or define a command alias.
+
 ## 3.9.1 (2020-01-08)
 
 - [Improvement] Make it possible to override the project name in development mode

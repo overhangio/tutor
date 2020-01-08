@@ -3,7 +3,7 @@
 Open edX development
 ====================
 
-In addition to running Open edX in production, Tutor can be used for local development of Open edX. This means it is possible to hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
+In addition to running Open edX in production, Tutor can be used for local development of Open edX. This means that it is possible to hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
 The following commands assume you have previously launched a :ref:`local <local>` Open edX platform. If you have not done so already, you should run::
 
@@ -58,15 +58,36 @@ To collect assets, you can use the standard ``update_assets`` Open edX command w
 Point to a local edx-platform
 -----------------------------
 
-If you have one, you can point to a local version of `edx-platform <https://github.com/edx/edx-platform/>`_ on your host machine. To do so, pass a ``-P/--edx-platform-path`` option to the commands. For instance::
+If you have one, you can point to a local version of `edx-platform <https://github.com/edx/edx-platform/>`_ on your host machine. To do so, pass a ``-v/--volume`` option to the ``run`` and runserver commands. For instance::
 
-    tutor dev run --edx-platform-path=/path/to/edx-platform lms bash
+    tutor dev run -v /path/to/edx-platform:/openedx/edx-platform lms bash
 
-If you don't want to rewrite this option every time, you can instead define the environment variable::
+If you don't want to rewrite this option every time, you can define a command alias::
 
-    export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
+    alias tutor-dev-run-lms="tutor dev run -v /path/to/edx-platform:/openedx/edx-platform lms"
 
-All development commands will then automatically mount your local repo.
+For technical reasons, the ``-v`` option is only supported for the ``run`` and ``runserver`` commands. With these commands, only one service is started. But there are cases where you may want to launch and debug a complete Open edX platform with ``tutor dev start`` and mount a custom edx-platform fork. For instance, this might be needed when testing the interaction between multiple services. To do so, you should create a ``docker-compose.override.yml`` file that will specify a custom volume to be used with all ``dev`` commands::
+    
+    vim "$(tutor config printroot)/env/dev/docker-compose.override.yml"
+
+Then, add the following content::
+    
+    version: "3.7"
+    services:
+        lms:
+            volumes:
+                - /path/to/edx-platform/:/openedx/edx-platform
+        cms:
+            volumes:
+                - /path/to/edx-platform/:/openedx/edx-platform
+        lms_worker:
+            volumes:
+                - /path/to/edx-platform/:/openedx/edx-platform
+        cms_worker:
+            volumes:
+                - /path/to/edx-platform/:/openedx/edx-platform
+
+This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automaticall mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-v`` option from the command line with the ``run`` or ``runserver`` commands.
 
 **Note:** containers are built on the Ironwood release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the :ref:`fork edx-platform section <edx_platform_fork>`.
 
@@ -75,17 +96,17 @@ Prepare the edx-platform repo
 
 In order to run a fork of edx-platform, dependencies need to be properly installed and assets compiled in that repo. To do so, run::
 
-    export TUTOR_EDX_PLATFORM_PATH=/path/to/edx-platform
-    tutor dev run lms pip install --requirement requirements/edx/development.txt
-    tutor dev run lms python setup.py install
-    tutor dev run lms paver update_assets --settings=tutor.development
+    tutor dev run -v /path/to/edx-platform:/openedx/edx-platform lms bash
+    pip install --requirement requirements/edx/development.txt
+    python setup.py install
+    paver update_assets --settings=tutor.development
 
 Debug edx-platform
 ~~~~~~~~~~~~~~~~~~
 
 To debug a local edx-platform repository, add a ``import ipdb; ipdb.set_trace()`` breakpoint anywhere in your code and run::
 
-    tutor dev runserver lms --edx-platform-path=/path/to/edx-platform
+    tutor dev runserver -v /path/to/edx-platform:/openedx/edx-platform lms
 
 Customised themes
 -----------------
@@ -115,7 +136,7 @@ Custom edx-platform settings
 
 By default, tutor settings files are mounted inside the docker images at ``/openedx/edx-platform/lms/envs/tutor/`` and ``/openedx/edx-platform/cms/envs/tutor/``. In the various ``dev`` commands, the default ``edx-platform`` settings module is set to ``tutor.development`` and you don't have to do anything to set up these settings.
 
-If, for some reason, you want to use different settings, you will need to pass the ``-S/--edx-platform-settings`` option to each command. Alternatively, you can define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
+If, for some reason, you want to use different settings, you will need to pass the ``-e SETTINGS=mycustomsettings`` option to each command. Alternatively, you can define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
 
 For instance, let's assume you have created the ``/path/to/edx-platform/lms/envs/mysettings.py`` and ``/path/to/edx-platform/cms/envs/mysettings.py`` modules. These settings should be pretty similar to the following files::
 
@@ -133,4 +154,4 @@ You should then specify the settings to use on the host::
 
 From then on, all ``dev`` commands will use the ``mysettings`` module. For instance::
 
-    tutor dev runserver lms --edx-platform-path=/path/to/edx-platform
+    tutor dev runserver -v /path/to/edx-platform:/openedx/edx-platform lms

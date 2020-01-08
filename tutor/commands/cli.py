@@ -7,6 +7,7 @@ import click_repl
 
 from .android import android
 from .config import config_command
+from .context import Context
 from .dev import dev
 from .images import images_command
 from .k8s import k8s
@@ -17,12 +18,6 @@ from .webui import webui
 from ..__about__ import __version__
 from .. import exceptions
 from .. import fmt
-
-
-# pylint: disable=too-few-public-methods
-class Context:
-    def __init__(self, root):
-        self.root = root
 
 
 def main():
