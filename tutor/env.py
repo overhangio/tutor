@@ -23,10 +23,16 @@ class Renderer:
 
     @classmethod
     def environment(cls, config):
+        def patch(name, separator="\n", suffix=""):
+            return cls.__render_patch(config, name, separator=separator, suffix=suffix)
+
         if cls.ENVIRONMENT_CONFIG != config:
+            # Load template roots
             template_roots = [TEMPLATES_ROOT]
             for _, plugin_templates in plugins.iter_templates(config):
                 template_roots.append(plugin_templates)
+
+            # Create environment
             environment = jinja2.Environment(
                 loader=jinja2.FileSystemLoader(template_roots),
                 undefined=jinja2.StrictUndefined,
@@ -36,8 +42,10 @@ class Renderer:
             environment.filters["list_if"] = utils.list_if
             environment.filters["reverse_host"] = utils.reverse_host
             environment.filters["walk_templates"] = walk_templates
+            environment.globals["patch"] = patch
             environment.globals["TUTOR_VERSION"] = __version__
 
+            # Update environment singleton
             cls.ENVIRONMENT_CONFIG = deepcopy(config)
             cls.ENVIRONMENT = environment
 
@@ -57,7 +65,7 @@ class Renderer:
     def render_file(cls, config, path):
         try:
             template = cls.environment(config).get_template(path)
-        except:
+        except Exception:
             fmt.echo_error("Error loading template " + path)
             raise
         try:
@@ -71,11 +79,8 @@ class Renderer:
 
     @classmethod
     def __render(cls, config, template):
-        def patch(name, separator="\n", suffix=""):
-            return cls.__render_patch(config, name, separator=separator, suffix=suffix)
-
         try:
-            return template.render(patch=patch, **config)
+            return template.render(**config)
         except jinja2.exceptions.UndefinedError as e:
             raise exceptions.TutorError(
                 "Missing configuration value: {}".format(e.args[0])
@@ -83,6 +88,9 @@ class Renderer:
 
     @classmethod
     def __render_patch(cls, config, name, separator="\n", suffix=""):
+        """
+        Render calls to {{ patch("...") }} in environment templates from plugin patches.
+        """
         patches = []
         for plugin, patch in plugins.iter_patches(config, name):
             patch_template = cls.environment(config).from_string(patch)
