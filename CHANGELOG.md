@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.9.1 (2020-01-08)
 
 - [Improvement] Make it possible to override the project name in development mode
 - [Bugfix] Fix user switching in development mode
