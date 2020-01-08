@@ -8,7 +8,7 @@ if id -u openedx > /dev/null 2>&1; then
     echo "File permissions set."
     
     # Run CMD as user openedx
-    exec chroot --userspec="$openedx:openedx" --skip-chdir / env HOME=/openedx "$@"
+    exec chroot --userspec="openedx:openedx" --skip-chdir / env HOME=/openedx "$@"
 else
     echo "Running openedx-dev as root user"
     exec "$@"
