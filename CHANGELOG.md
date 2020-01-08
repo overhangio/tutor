@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix "k8s quickstart" crash
+
 ## 3.9.0 (2019-12-21)
 
 - [Security] Apply django 1.11.21 -> 1.11.27 security patches

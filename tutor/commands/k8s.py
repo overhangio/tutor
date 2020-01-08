@@ -27,7 +27,7 @@ def quickstart(context, non_interactive):
             " more information."
         )
     click.echo(fmt.title("Updating the current environment"))
-    tutor_env.save(context, config)
+    tutor_env.save(context.root, config)
     click.echo(fmt.title("Starting the platform"))
     start.callback()
     click.echo(fmt.title("Database creation and migrations"))
@@ -69,8 +69,7 @@ def stop(context):
 
 
 @click.command(help="Reboot an existing platform")
-@click.pass_obj
-def reboot(context):
+def reboot():
     stop.callback()
     start.callback()
 
