@@ -14,8 +14,14 @@ services:
 
   lms:
     <<: *openedx-service
+    command: ./manage.py lms runserver 0.0.0.0:8000
+    ports:
+        - "8000:8000"
   cms:
     <<: *openedx-service
+    command: ./manage.py cms runserver 0.0.0.0:8000
+    ports:
+        - "8001:8000"
   lms_worker:
     <<: *openedx-service
   cms_worker:

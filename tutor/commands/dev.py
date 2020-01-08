@@ -31,23 +31,16 @@ def dev(context):
     help="Run a development server", context_settings={"ignore_unknown_options": True},
 )
 @click.argument("options", nargs=-1, required=False)
-@click.argument("service", type=click.Choice(["lms", "cms"]))
+@click.argument("service")
 def runserver(options, service):
-    port = 8000 if service == "lms" else 8001
-
-    fmt.echo_info(
-        "The {} service will be available at http://localhost:{}".format(service, port)
-    )
-    args = [
-        "-p",
-        "{port}:{port}".format(port=port),
-        *options,
-        service,
-        "./manage.py",
-        service,
-        "runserver",
-        "0.0.0.0:{}".format(port),
-    ]
+    if service in ["lms", "cms"]:
+        port = 8000 if service == "lms" else 8001
+        fmt.echo_info(
+            "The {} service will be available at http://localhost:{}".format(
+                service, port
+            )
+        )
+    args = ["--service-ports", *options, service]
     compose.run.callback(args)
 
 
