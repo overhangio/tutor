@@ -23,7 +23,7 @@ edx_platform_development_settings_option = click.option(
     "--edx-platform-settings",
     envvar="TUTOR_EDX_PLATFORM_SETTINGS",
     default="tutor.development",
-    help="Mount a local edx-platform from the host (environment variable: TUTOR_EDX_PLATFORM_PATH)",
+    help="Load custom development settings (environment variable: TUTOR_EDX_PLATFORM_SETTINGS)",
 )
 
 
