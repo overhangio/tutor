@@ -30,6 +30,9 @@ JWT_AUTH["JWT_AUDIENCE"] = "{{ JWT_COMMON_AUDIENCE }}"
 JWT_AUTH["JWT_SECRET_KEY"] = "{{ JWT_COMMON_SECRET_KEY }}"
 JWT_AUTH["JWT_PRIVATE_SIGNING_JWK"] = None
 
+# Allow insecure oauth2 for local interaction with local containers
+OAUTH_ENFORCE_SECURE = False
+
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):
