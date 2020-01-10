@@ -7,9 +7,9 @@
 appdirs==1.4.3
 click-repl==0.1.6
 click==7.0
-jinja2==2.10.1
+jinja2==2.10.3
 markupsafe==1.1.1         # via jinja2
-prompt-toolkit==2.0.9     # via click-repl
-pyyaml==5.1.2
-six==1.12.0               # via click-repl, prompt-toolkit
-wcwidth==0.1.7            # via prompt-toolkit
+prompt-toolkit==3.0.2     # via click-repl
+pyyaml==5.3
+six==1.13.0               # via click-repl
+wcwidth==0.1.8            # via prompt-toolkit

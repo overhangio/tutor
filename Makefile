@@ -9,9 +9,14 @@ docs: ## Build html documentation
 	$(MAKE) -C docs
 
 compile-requirements: ## Compile requirements files
-	pip-compile -o requirements/base.txt requirements/base.in
-	pip-compile -o requirements/dev.txt requirements/dev.in
-	pip-compile -o requirements/docs.txt requirements/docs.in
+	pip-compile requirements/base.in
+	pip-compile requirements/dev.in
+	pip-compile requirements/docs.in
+
+upgrade-requirements: ## Upgrade requirements files
+	pip-compile --upgrade requirements/base.in
+	pip-compile --upgrade requirements/dev.in
+	pip-compile --upgrade requirements/docs.in
 	
 package: ## Build a package ready to upload to pypi
 	python3 setup.py sdist
