@@ -12,6 +12,8 @@ What should you do if you have a problem?
 5. If, despite all your efforts, you can't solve the problem, you may want to first discuss it in the `community forums <https://discuss.overhang.io>`__. Please give as much details about your problem as possible! As a rule of thumb, people will not dedicate more time to solving your problem than you took to write your question. 
 6. If you have a technical background, you may try to decide if the issue is related to Open edX or if it's specific to Tutor. In the latter case, you are most welcome to open an `issue on Github <https://github.com/overhangio/tutor/issues/new>`_. **Please follow the instructions from the issue template!!!** Your issue will be examined in all cases, but you can make our life much easier by giving us as much background information as possible.
 
+Do you need professional assistance with your tutor-managed Open edX platform? Overhang.IO offers online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/lts>`__.
+
 .. _logging:
 
 Logging

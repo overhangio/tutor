@@ -35,6 +35,8 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
 
 **Tutor** is a docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used by dozens of Open edX platforms around the world.
 
+Do you need professional assistance setting up or managing your Open edX platform? Overhang.IO offers online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/lts>`__.
+
 Features
 --------
 
