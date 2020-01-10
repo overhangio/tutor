@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.10.0 (2020-01-10)
 
 - [Bugfix] Fix oauth authentication in dev mode
 - [Improvement] Upgrade to the 3.7 docker-compose syntax
