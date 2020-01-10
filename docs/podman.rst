@@ -1,5 +1,3 @@
-.. _podman:
-
 Running Tutor with Podman
 -------------------------
 

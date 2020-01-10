@@ -11,7 +11,8 @@ The only prerequisite for running this is a working Docker installation. You'll 
 - `Docker <https://docs.docker.com/engine/installation/>`_: minimum supported version is 18.06.0.
 - `Docker compose <https://docs.docker.com/compose/install/>`_
 
-⚠️ Warning: do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
+.. warning::
+    Do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
 
 Note that the production web server container will bind to port 80 and 443, so if there a web server is running on the same server (Apache or Nginx, for instance), it should be stopped prior to running tutor. Check the section on :ref:`how to setup a web proxy <web_proxy>` for a workaround.
 
@@ -62,6 +63,8 @@ Upgrading
 ---------
 
 To upgrade a running Open edX platform, just install the latest ``tutor`` version (using either methods above) and run the ``quickstart`` command again. If you have :ref:`customised <configuration_customisation>` your docker images, you will have to re-build them prior to running ``quickstart``.
+
+.. _autocomplete:
 
 Autocomplete
 ------------
