@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM docker.io/ubuntu:16.04
 MAINTAINER Overhang.io <contact@overhang.io>
 
 ############ common to lms & cms

@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM docker.io/ubuntu:18.04
 MAINTAINER Overhang.io <contact@overhang.io>
 
 RUN mkdir /openedx
