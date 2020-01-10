@@ -7,7 +7,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Bugfix] Fix oauth authentication in dev mode
 - [Improvement] Upgrade to the 3.7 docker-compose syntax
 - [Improvement] The `dev runserver` command can now be run for just any service
-- 💥[Feature] `dev run/exec` commands now support generic options which are passed to docker-compose. Consequently, defining the `TUTOR_EDX_PLATFORM_PATH` environment variable no longer works. Instead, users are encouraged to explicitely pass the `-v` option or define a command alias
+- 💥[Feature] `dev run/exec` commands now support generic options which are passed to docker-compose. Consequently, defining the `TUTOR_EDX_PLATFORM_PATH` environment variable no longer works. Instead, users are encouraged to explicitely pass the `-v` option, define a command alias or create a `docker-compose.override.yml` file.
 
 ## 3.9.1 (2020-01-08)
 
