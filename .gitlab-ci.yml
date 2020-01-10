@@ -28,7 +28,7 @@ build:docs:
     - apk add --no-cache make
     - make ci-install-alpine-requirements
     - pip install -r requirements/docs.txt
-    - cd docs && make
+    - make docs
   artifacts:
     paths:
       - docs/_build/html

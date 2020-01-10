@@ -1,8 +1,12 @@
 .DEFAULT_GOAL := help
+.PHONY: docs
 SRC_DIRS = ./tutor ./tests ./bin
 BLACK_OPTS = --exclude templates ${SRC_DIRS}
 
 ###### Development
+
+docs: ## Build html documentation
+	$(MAKE) -C docs
 
 compile-requirements: ## Compile requirements files
 	pip-compile -o requirements/base.txt requirements/base.in
