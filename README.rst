@@ -5,7 +5,7 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
 
 |
 
-.. image:: https://overhang.io/images/tutor-logo.svg
+.. image:: https://overhang.io/static/img/tutor-logo.svg
   :alt: Tutor logo
   :width: 500px
   :align: center
