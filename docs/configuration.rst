@@ -68,7 +68,7 @@ These configuration parameters define which image to run for each service. By de
 Custom registry
 ***************
 
-- ``DOCKER_REGISTRY`` (default: ``""``)
+- ``DOCKER_REGISTRY`` (default: ``"docker.io/"``)
 
 You may want to pull/push images from/to a custom docker registry. For instance, for a registry running on ``localhost:5000``, define::
 
