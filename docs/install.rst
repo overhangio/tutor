@@ -8,7 +8,7 @@ Requirements
 
 The only prerequisite for running this is a working docker installation. Both docker and docker-compose are required. Follow the instructions from the official documentation:
 
-- `Docker <https://docs.docker.com/engine/installation/>`_
+- `Docker <https://docs.docker.com/engine/installation/>`_: minimum supported version is 18.06.0.
 - `Docker compose <https://docs.docker.com/compose/install/>`_
 
 ⚠️ Warning: do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.

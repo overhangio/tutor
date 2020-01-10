@@ -1,17 +1,17 @@
-version: "3"
+version: "3.7"
+
+x-openedx-service:
+  &openedx-service
+  image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX_DEV }}
+  environment:
+    SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.development}
+  volumes:
+    # theme files
+    - ../build/openedx/themes:/openedx/themes
+    # editable requirements
+    - ../build/openedx/requirements:/openedx/requirements
 
 services:
-  x-openedx-service:
-    &openedx-service
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX_DEV }}
-    environment:
-      SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.development}
-    volumes:
-      # theme files
-      - ../build/openedx/themes:/openedx/themes
-      # editable requirements
-      - ../build/openedx/requirements:/openedx/requirements
-
   lms:
     <<: *openedx-service
     command: ./manage.py lms runserver 0.0.0.0:8000
