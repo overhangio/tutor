@@ -50,7 +50,7 @@ Installing from a local clone of the repository::
     cd tutor
     pip install -e .
 
-.. _install_cloud:
+.. _cloud_install:
   
 Cloud deployment
 ----------------
