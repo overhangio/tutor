@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## 3.10.1 (2020-01-13)
+
+- [Improvement] Explicitely point to docker.io images, when necessary, for [podman](https://podman.io/) compatibility.
+
 ## 3.10.0 (2020-01-10)
 
 - [Bugfix] Fix oauth authentication in dev mode
