@@ -4,11 +4,12 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
-- 💥[Improvement] The output of `plugins list` now includes plugin version numbers.
+- [Feature] Add support for simple, YAML-based plugins
+- 💥[Improvement] The output of `plugins list` now includes plugin version numbers
 
 ## 3.10.1 (2020-01-13)
 
-- [Improvement] Explicitely point to docker.io images, when necessary, for [podman](https://podman.io/) compatibility.
+- [Improvement] Explicitely point to docker.io images, when necessary, for [podman](https://podman.io/) compatibility
 
 ## 3.10.0 (2020-01-10)
 

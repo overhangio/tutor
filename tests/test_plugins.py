@@ -213,3 +213,10 @@ class PluginsTests(unittest.TestCase):
         ):
             plugins2 = plugins.Plugins(config)
             self.assertEqual(1, len(list(plugins2.iter_enabled())))
+
+    def test_dict_plugin(self):
+        plugin = plugins.DictPlugin(
+            {"name": "myplugin", "config": {"set": {"KEY": "value"}}, "version": "0.1"}
+        )
+        self.assertEqual("myplugin", plugin.name)
+        self.assertEqual({"KEY": "value"}, plugin.config_set)

@@ -3,14 +3,16 @@
 Plugins
 =======
 
-Since v3.4.0, Tutor comes with a plugin system that allows anyone to customise the deployment of an Open edX platform very easily. The vision behind this plugin system is that users should not have to fork the Tutor repository to customise their deployments. For instance, if you have created a new application that integrates with Open edX, you should not have to describe how to manually patch the platform settings, ``urls.py`` or ``*.env.json`` files. Instead, you can create a "tutor-myapp" plugin for Tutor. Then, users will start using your application in three simple steps::
+Tutor comes with a plugin system that allows anyone to customise the deployment of an Open edX platform very easily. The vision behind this plugin system is that users should not have to fork the Tutor repository to customise their deployments. For instance, if you have created a new application that integrates with Open edX, you should not have to describe how to manually patch the platform settings, ``urls.py`` or ``*.env.json`` files. Instead, you can create a "tutor-myapp" plugin for Tutor. Then, users will start using your application in three simple steps::
 
     # 1) Install the plugin
     pip install tutor-myapp
     # 2) Enable the plugin
     tutor plugins enable myapp
-    # 3) Restart the platform
+    # 3) Reconfigure and restart the platform
     tutor local quickstart
+
+In the following we see how to use and create Tutor plugins.
 
 Commands
 --------
@@ -28,30 +30,15 @@ After enabling or disabling a plugin, the environment should be re-generated wit
   
     tutor config save
 
-API (v0)
---------
+API
+---
 
-Note: The API for developing Tutor plugins is still considered unstable: profound changes should be expected for some time.
+Plugins can affect the behaviour of Tutor at multiple levels. First, plugins can define new services with their Docker images, settings and the right initialisation commands. To do so you will have to define custom :ref:`config <plugin_config>`, :ref:`patches <plugin_patches>`, :ref:`hooks <plugin_hooks>` and :ref:`templates <plugin_templates>`. Then, plugins can also extend the CLI by defining their own :ref:`commands <plugin_command>`.
 
-There are two mechanisms by which a plugin can integrate with Tutor: patches and hooks. Patches affect the rendered environment templates, while hooks are actions that are run during the lifetime of an Open edX platform. A plugin indicates which templates it patches, and which hooks it needs to run. A plugin can also affect the project configuration by adding new values and modifying existing values.
+.. _plugin_config:
 
-Entrypoint
-~~~~~~~~~~
-
-A plugin is a regular python package with a specific entrypoint: ``tutor.plugin.v0``.
-
-Example::
-  
-    from setuptools import setup
-    setup(
-        ...
-        entry_points={"tutor.plugin.v0": ["myplugin = myplugin.plugin"]},
-    )
-
-The ``myplugin.plugin`` python module should then declare a few attributes that will define its behaviour.
-
-``config``
-~~~~~~~~~~
+config
+~~~~~~
 
 The ``config`` attribute is used to modify existing and add new configuration parameters:
 
@@ -81,14 +68,20 @@ This configuration from the "myplugin" plugin will set the following values:
 - ``MYPLUGIN_DOCKER_IMAGE``: this value will by default not be stored in ``config.yml``, but ``tutor config printvalue MYPLUGIN_DOCKER_IMAGE`` will print ``username/imagename:latest``.
 - ``MASTER_PASSWORD`` will be set to ``h4cked``. Needless to say, plugin developers should avoid doing this.
 
+.. _plugin_patches:
 
-``patches``
-~~~~~~~~~~~
+patches
+~~~~~~~
 
-The Tutor templates include calls to ``{{ patch("patchname") }}`` in many different places. Plugins can add content in these places by adding values to the ``patches`` attribute.
+Plugin patches affect the rendered environment templates. In many places the Tutor templates include calls to ``{{ patch("patchname") }}``. This grants plugin developers the possibility to modify the content of rendered templates. Plugins can add content in these places by adding values to the ``patches`` attribute.
 
-The ``patches`` attribute can be a callable function instead of a static attribute.
-
+.. note::
+    The list of existing patches can be found by searching for `{{ patch(` strings in the Tutor source code::
+    
+        git grep "{{ patch"
+    
+    The list of patches can also be browsed online `on Github <https://github.com/search?utf8=✓&q={{+patch+repo%3Aoverhangio%2Ftutor+path%3A%2Ftutor%2Ftemplates&type=Code&ref=advsearch&l=&l= 8>`__.
+    
 Example::
   
     patches = {
@@ -98,10 +91,16 @@ Example::
 
 This will add a Redis instance to the services run with ``tutor local`` commands.
 
-``hooks``
-~~~~~~~~~
+.. note::
+    The ``patches`` attribute can be a callable function instead of a static dict value.
 
-Hooks are actions that are run during the lifetime of the platform. Each hook has a different specification.
+
+.. _plugin_hooks:
+
+hooks
+~~~~~
+
+Hooks are actions that are run during the lifetime of the platform. For instance, hooks are used to trigger database initialisation and migrations. Each hook has a different specification.
 
 ``init``
 ++++++++
@@ -155,28 +154,32 @@ Example::
 
 With this hook, users will be able to pull and push the ``myimage:latest`` docker image by running::
       
-        tutor images pull myimage
-        tutor images push myimage
+    tutor images pull myimage
+    tutor images push myimage
 
-    or::
-      
-        tutor images pull all
-        tutor images push all
+or::
+  
+    tutor images pull all
+    tutor images push all
 
-``templates``
-~~~~~~~~~~~~~
+.. _plugin_templates:
+
+templates
+~~~~~~~~~
 
 In order to define plugin-specific hooks, a plugin should also have a template directory that includes the plugin hooks. The ``templates`` attribute should point to that directory.
 
 Example::
   
     import os
-    templates = templates = os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates")
+    templates = os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates")
 
 With the above declaration, you can store plugin-specific templates in the ``templates/myplugin`` folder next to the ``plugin.py`` file.
 
-``command``
-~~~~~~~~~~~
+.. _plugin_command:
+
+command
+~~~~~~~
 
 A plugin can provide custom command line commands. Commands are assumed to be `click.Command <https://click.palletsprojects.com/en/7.x/api/#commands>`__ objects.
 
@@ -212,14 +215,84 @@ This would allow any user to run::
     
 See the official `click documentation <https://click.palletsprojects.com/en/7.x/>`__ for more information.
 
+
 Creating a new plugin
 ---------------------
 
-Creating a new plugin for Tutor is not so hard! You can get started with the `tutor plugin cookiecutter <https://github.com/overhangio/cookiecutter-tutor-plugin>`__::
+Plugins can be created in two different ways: either as plain YAML files or installable Python packages. YAML files are great when you need to make minor changes to the default platform, such as modifying settings. For creating more complex applications, it is recommended to create python packages.
+
+YAML file
+~~~~~~~~~
+
+YAML files that are stored in the tutor plugins root folder will be automatically considered as plugins. The location of the plugin root can be found by running::
+    
+    tutor plugins printroot
+
+On Linux, this points to ``~/.local/share/tutor-plugins``. The location of the plugin root folder can be modified by setting the ``TUTOR_PLUGINS_ROOT`` environment variable.
+
+YAML plugins need to define two extra keys: "name" and "version". Custom CLI commands are not supported by YAML plugins.
+
+Let's create a simple plugin that adds your own `Google Analytics <https://analytics.google.com/>`__ tracking code to your Open edX platform. We need to add the ``GOOGLE_ANALYTICS_ACCOUNT`` and ``GOOGLE_ANALYTICS_TRACKING_ID`` settings to both the LMS and the CMS settings. To do so, we will only have to create the ``openedx-common-settings`` patch, which is shared by the development and the production settings both for the LMS and the CMS. First, create the plugin directory::
+    
+    mkdir "$(tutor plugins printroot)"
+
+Then add the following content to the plugin file located at ``$(tutor plugins printroot)/myplugin.yml``::
+
+    name: myplugin
+    version: 0.1.0
+    patches:
+      openedx-common-settings: |
+        # myplugin special settings
+        GOOGLE_ANALYTICS_ACCOUNT = "UA-654321-1"
+        GOOGLE_ANALYTICS_TRACKING_ID = "UA-654321-1"
+
+Of course, you should replace your Google Analytics tracking code with your own. You can verify that your plugin is correctly installed, but not enabled yet::
+    
+    $ tutor plugins list
+    myplugin@0.1.0 (disabled)
+    
+You can then enable your newly-created plugin::
+    
+    tutor plugins enable myplugin
+
+Update your environment to apply changes from your plugin::
+    
+    tutor config save
+
+You should be able to view your changes in every LMS and CMS settings file::
+
+    grep -r myplugin "$(tutor config printroot)/env/apps/openedx/settings/"
+
+Now just restart your platform to start sending tracking events to Google Analytics::
+    
+    tutor local quickstart
+
+That's it! And it's very easy to share your plugins. Just upload them to your Github repo and share the url with other users. They will be able to install your plugin by running::
+    
+    tutor plugins install https://raw.githubusercontent.com/username/yourrepo/master/myplugin.yml
+
+Python package
+~~~~~~~~~~~~~~
+
+Creating a plugin as a Python package allows you to define more complex logic and to store your patches in a more structured way. Python Tutor plugins are regular Python packages that define a specific entrypoint: ``tutor.plugin.v0``.
+
+Example::
+  
+    from setuptools import setup
+    setup(
+        ...
+        entry_points={"tutor.plugin.v0": ["myplugin = myplugin.plugin"]},
+    )
+
+The ``myplugin.plugin`` python module should then declare the ``config``, ``hooks``, etc. attributes that will define its behaviour.
+
+To get started on the right foot, it is strongly recommended to create your first plugin with the `tutor plugin cookiecutter <https://github.com/overhangio/cookiecutter-tutor-plugin>`__::
 
     pip install cookiecutter
     cookiecutter https://github.com/overhangio/cookiecutter-tutor-plugin.git
-
+    pip install -e ./tutor-myplugin
+    tutor plugins list # your plugin should appear here
+    tutor plugins enable myplugin # hack at it!
 
 .. _existing_plugins:
 

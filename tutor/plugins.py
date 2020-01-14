@@ -1,8 +1,14 @@
+from collections import namedtuple
 from copy import deepcopy
+from glob import glob
 import importlib
+import os
 import pkg_resources
 
+import appdirs
+
 from . import exceptions
+from . import serialize
 
 
 CONFIG_KEY = "PLUGINS"
@@ -121,6 +127,39 @@ class OfficialPlugin(BasePlugin):
         yield from cls.INSTALLED
 
 
+class DictPlugin(BasePlugin):
+    ROOT_ENV_VAR_NAME = "TUTOR_PLUGINS_ROOT"
+    ROOT = os.path.expanduser(
+        os.environ.get(ROOT_ENV_VAR_NAME, "")
+    ) or appdirs.user_data_dir(appname="tutor-plugins")
+
+    def __init__(self, data):
+        Module = namedtuple("Module", data.keys())
+        obj = Module(**data)
+        super().__init__(data["name"], obj)
+        self._version = data["version"]
+
+    @property
+    def version(self):
+        return self._version
+
+    @classmethod
+    def iter_installed(cls):
+        for path in glob(os.path.join(cls.ROOT, "*.yml")):
+            with open(path) as f:
+                data = serialize.load(f)
+                if not isinstance(data, dict):
+                    raise exceptions.TutorError(
+                        "Invalid plugin: {}. Expected dict.".format(path)
+                    )
+                try:
+                    yield cls(data)
+                except KeyError as e:
+                    raise exceptions.TutorError(
+                        "Invalid plugin: {}. Missing key: {}".format(path, e.args[0])
+                    )
+
+
 class Plugins:
 
     INSTANCE = None
@@ -161,7 +200,7 @@ class Plugins:
         """
         Iterate on all installed plugins. Plugins are deduplicated by name.
         """
-        classes = [OfficialPlugin, EntrypointPlugin]
+        classes = [OfficialPlugin, EntrypointPlugin, DictPlugin]
         installed_plugin_names = set()
         for PluginClass in classes:
             for plugin in PluginClass.iter_installed():

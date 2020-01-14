@@ -22,6 +22,18 @@ from .. import fmt
 
 def main():
     try:
+        click_repl.register_repl(cli, name="ui")
+        cli.add_command(images_command)
+        cli.add_command(config_command)
+        cli.add_command(local)
+        cli.add_command(dev)
+        cli.add_command(android)
+        cli.add_command(k8s)
+        cli.add_command(ui)
+        cli.add_command(webui)
+        cli.add_command(print_help)
+        cli.add_command(plugins_command)
+        add_plugin_commands(cli)
         cli()  # pylint: disable=no-value-for-parameter
     except exceptions.TutorError as e:
         fmt.echo_error("Error: {}".format(e.args[0]))
@@ -49,19 +61,6 @@ def print_help():
     with click.Context(cli) as context:
         click.echo(cli.get_help(context))
 
-
-click_repl.register_repl(cli, name="ui")
-cli.add_command(images_command)
-cli.add_command(config_command)
-cli.add_command(local)
-cli.add_command(dev)
-cli.add_command(android)
-cli.add_command(k8s)
-cli.add_command(ui)
-cli.add_command(webui)
-cli.add_command(print_help)
-cli.add_command(plugins_command)
-add_plugin_commands(cli)
 
 if __name__ == "__main__":
     main()

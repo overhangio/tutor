@@ -1,9 +1,12 @@
 import os
 import shutil
+import urllib.request
+
 import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
+from .. import exceptions
 from .. import fmt
 from .. import plugins
 
@@ -66,6 +69,50 @@ def disable(context, plugin_names):
     )
 
 
+@click.command(
+    short_help="Print the location of yaml-based plugins",
+    help="""Print the location of yaml-based plugins. This location can be manually
+defined by setting the {} environment variable""".format(
+        plugins.DictPlugin.ROOT_ENV_VAR_NAME
+    ),
+)
+def printroot():
+    fmt.echo(plugins.DictPlugin.ROOT)
+
+
+@click.command(
+    short_help="Install a plugin",
+    help="""Install a plugin, either from a local YAML file or a remote, web-hosted
+location. The plugin will be installed to {}.""".format(
+        plugins.DictPlugin.ROOT_ENV_VAR_NAME
+    ),
+)
+@click.argument("location")
+def install(location):
+    basename = os.path.basename(location)
+    if not basename.endswith(".yml"):
+        basename += ".yml"
+    plugin_path = os.path.join(plugins.DictPlugin.ROOT, basename)
+
+    if location.startswith("http"):
+        # Download file
+        response = urllib.request.urlopen(location)
+        content = response.read().decode()
+    elif os.path.isfile(location):
+        # Read file
+        with open(location) as f:
+            content = f.read()
+    else:
+        raise exceptions.TutorError("No plugin found at {}".format(location))
+
+    # Save file
+    if not os.path.exists(plugins.DictPlugin.ROOT):
+        os.makedirs(plugins.DictPlugin.ROOT)
+    with open(plugin_path, "w") as f:
+        f.write(content)
+    fmt.echo_info("Plugin installed at {}".format(plugin_path))
+
+
 def add_plugin_commands(command_group):
     """
     Add commands provided by all plugins to the given command group. Each command is
@@ -80,3 +127,5 @@ def add_plugin_commands(command_group):
 plugins_command.add_command(list_command)
 plugins_command.add_command(enable)
 plugins_command.add_command(disable)
+plugins_command.add_command(printroot)
+plugins_command.add_command(install)
