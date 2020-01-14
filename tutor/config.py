@@ -107,24 +107,21 @@ def load_plugins(config, defaults):
     """
     Add, override and set new defaults from plugins.
     """
-    for plugin_name, plugin in plugins.iter_enabled(config):
-        plugin_prefix = plugin_name.upper() + "_"
-        plugin_config = plugins.get_callable_attr(plugin, "config", {})
-
+    for plugin in plugins.iter_enabled(config):
         # Add new config key/values
-        for key, value in plugin_config.get("add", {}).items():
-            new_key = plugin_prefix + key
+        for key, value in plugin.config_add.items():
+            new_key = plugin.config_key(key)
             if new_key not in config:
                 config[new_key] = env.render_unknown(config, value)
 
         # Set existing config key/values: here, we do not override existing values
-        for key, value in plugin_config.get("set", {}).items():
+        for key, value in plugin.config_set.items():
             if key not in config:
                 config[key] = env.render_unknown(config, value)
 
         # Create new defaults
-        for key, value in plugin_config.get("defaults", {}).items():
-            defaults[plugin_prefix + key] = value
+        for key, value in plugin.config_defaults.items():
+            defaults[plugin.config_key(key)] = value
 
 
 def upgrade_obsolete(config):

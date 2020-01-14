@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-import importlib
-
-from tutor.plugins import Plugins
+from tutor.plugins import OfficialPlugin
 
 # Manually install plugins (this is for creating the bundle)
-for plugin in ["discovery", "ecommerce", "figures", "lts", "minio", "notes", "xqueue"]:
+for plugin_name in [
+    "discovery",
+    "ecommerce",
+    "figures",
+    "lts",
+    "minio",
+    "notes",
+    "xqueue",
+]:
     try:
-        module = importlib.import_module("tutor{}.plugin".format(plugin))
+        OfficialPlugin.INSTALLED.append(OfficialPlugin(plugin_name))
     except ImportError:
         pass
-    else:
-        Plugins.EXTRA_INSTALLED[plugin] = module
 
 from tutor.commands.cli import main
 

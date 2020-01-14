@@ -24,9 +24,13 @@ def plugins_command():
 @click.pass_obj
 def list_command(context):
     config = tutor_config.load_user(context.root)
-    for name, _ in plugins.iter_installed():
-        status = "" if plugins.is_enabled(config, name) else " (disabled)"
-        print("{plugin}{status}".format(plugin=name, status=status))
+    for plugin in plugins.iter_installed():
+        status = "" if plugins.is_enabled(config, plugin.name) else " (disabled)"
+        print(
+            "{plugin}@{version}{status}".format(
+                plugin=plugin.name, status=status, version=plugin.version
+            )
+        )
 
 
 @click.command(help="Enable a plugin")
@@ -67,10 +71,10 @@ def add_plugin_commands(command_group):
     Add commands provided by all plugins to the given command group. Each command is
     added with a name that is equal to the plugin name.
     """
-    for plugin_name, command in plugins.iter_commands():
-        if isinstance(command, click.Command):
-            command.name = plugin_name
-            command_group.add_command(command)
+    for plugin in plugins.iter_installed():
+        if isinstance(plugin.command, click.Command):
+            plugin.command.name = plugin.name
+            command_group.add_command(plugin.command)
 
 
 plugins_command.add_command(list_command)
