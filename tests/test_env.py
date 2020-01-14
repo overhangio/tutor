@@ -105,7 +105,7 @@ class EnvTests(unittest.TestCase):
             # Create a single plugin
             with unittest.mock.patch.object(
                 env.plugins,
-                "iter_templates",
+                "iter_template_roots",
                 return_value=[("plugin1", plugin_templates)],
             ):
                 with tempfile.TemporaryDirectory() as root:
@@ -136,7 +136,7 @@ class EnvTests(unittest.TestCase):
 
                 with unittest.mock.patch.object(
                     env.plugins,
-                    "iter_templates",
+                    "iter_template_roots",
                     return_value=[("myplugin", plugin_templates)],
                 ):
                     # Load env a second time

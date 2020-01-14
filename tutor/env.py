@@ -29,8 +29,8 @@ class Renderer:
         if cls.ENVIRONMENT_CONFIG != config:
             # Load template roots
             template_roots = [TEMPLATES_ROOT]
-            for _, plugin_templates in plugins.iter_templates(config):
-                template_roots.append(plugin_templates)
+            for _, plugin_template_root in plugins.iter_template_roots(config):
+                template_roots.append(plugin_template_root)
 
             # Create environment
             environment = jinja2.Environment(
@@ -119,7 +119,7 @@ def render_full(root, config):
     """
     for subdir in ["android", "apps", "build", "dev", "k8s", "local", "webui"]:
         save_subdir(subdir, root, config)
-    for plugin, path in plugins.iter_templates(config):
+    for plugin, path in plugins.iter_template_roots(config):
         save_plugin_templates(plugin, path, root, config)
     save_file(VERSION_FILENAME, root, config)
     save_file("kustomization.yml", root, config)
@@ -277,12 +277,10 @@ def is_part_of_env(path):
     Determines whether a file should be rendered or not.
     """
     basename = os.path.basename(path)
-    return not (
-        basename.startswith(".")
-        or basename.endswith(".pyc")
-        or basename == "__pycache__"
-        or basename == "partials"
-    )
+    is_excluded = False
+    is_excluded = is_excluded or basename.startswith(".") or basename.endswith(".pyc")
+    is_excluded = is_excluded or basename == "__pycache__" or basename == "partials"
+    return not is_excluded
 
 
 def template_path(*path):

@@ -46,7 +46,7 @@ class Plugins:
         self.config = deepcopy(config)
         self.patches = {}
         self.hooks = {}
-        self.templates = {}
+        self.template_roots = {}
 
         for plugin_name, plugin in self.iter_enabled():
             patches = get_callable_attr(plugin, "patches", {})
@@ -61,9 +61,9 @@ class Plugins:
                     self.hooks[hook_name] = {}
                 self.hooks[hook_name][plugin_name] = services
 
-            templates = get_callable_attr(plugin, "templates")
-            if templates:
-                self.templates[plugin_name] = templates
+            templates_root = get_callable_attr(plugin, "templates")
+            if templates_root:
+                self.template_roots[plugin_name] = templates_root
 
     @classmethod
     def clear(cls):
@@ -102,8 +102,8 @@ class Plugins:
     def iter_hooks(self, hook_name):
         yield from self.hooks.get(hook_name, {}).items()
 
-    def iter_templates(self):
-        yield from self.templates.items()
+    def iter_template_roots(self):
+        yield from self.template_roots.items()
 
 
 def get_callable_attr(plugin, attr_name, default=None):
@@ -154,8 +154,8 @@ def iter_hooks(config, hook_name):
     yield from Plugins.instance(config).iter_hooks(hook_name)
 
 
-def iter_templates(config):
-    yield from Plugins.instance(config).iter_templates()
+def iter_template_roots(config):
+    yield from Plugins.instance(config).iter_template_roots()
 
 
 def iter_commands():

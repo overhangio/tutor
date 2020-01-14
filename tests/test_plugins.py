@@ -179,7 +179,7 @@ class PluginsTests(unittest.TestCase):
                 [("plugin1", ["myclient"])], list(plugins.iter_hooks({}, "init"))
             )
 
-    def test_iter_templates(self):
+    def test_iter_template_roots(self):
         class plugin1:
             templates = "/tmp/templates"
 
@@ -187,7 +187,7 @@ class PluginsTests(unittest.TestCase):
             plugins.Plugins, "iter_enabled", return_value=[("plugin1", plugin1)]
         ):
             self.assertEqual(
-                [("plugin1", "/tmp/templates")], list(plugins.iter_templates({}))
+                [("plugin1", "/tmp/templates")], list(plugins.iter_template_roots({}))
             )
 
     def test_plugins_are_updated_on_config_change(self):
