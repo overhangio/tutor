@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.11.0 (2020-01-14)
 
 - [Feature] Add support for simple, YAML-based plugins
 - 💥[Improvement] The output of `plugins list` now includes plugin version numbers
