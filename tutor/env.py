@@ -30,16 +30,18 @@ class Renderer:
                 if plugin.templates_root:
                     template_roots.append(plugin.templates_root)
 
-            cls.INSTANCE = cls(config, template_roots)
+            cls.INSTANCE = cls(config, template_roots, ignore_folders=["partials"])
         return cls.INSTANCE
 
     @classmethod
     def reset(cls):
         cls.INSTANCE = None
 
-    def __init__(self, config, template_roots):
+    def __init__(self, config, template_roots, ignore_folders=None):
         self.config = deepcopy(config)
         self.template_roots = template_roots
+        self.ignore_folders = ignore_folders or []
+        self.ignore_folders.append(".git")
 
         # Create environment
         environment = jinja2.Environment(
@@ -58,7 +60,7 @@ class Renderer:
     def iter_templates_in(self, *path):
         prefix = "/".join(path)
         for template in self.environment.loader.list_templates():
-            if template.startswith(prefix) and is_part_of_env(template):
+            if template.startswith(prefix) and self.is_part_of_env(template):
                 yield template
 
     def walk_templates(self, subdir):
@@ -69,6 +71,22 @@ class Renderer:
             path: template path relative to the template root
         """
         yield from self.iter_templates_in(subdir + "/")
+
+    def is_part_of_env(self, path):
+        """
+        Determines whether a template should be rendered or not. Note that here we don't
+        rely on the OS separator, as we are handling templates
+        """
+        parts = path.split("/")
+        basename = parts[-1]
+        is_excluded = False
+        is_excluded = (
+            is_excluded or basename.startswith(".") or basename.endswith(".pyc")
+        )
+        is_excluded = is_excluded or basename == "__pycache__"
+        for ignore_folder in self.ignore_folders:
+            is_excluded = is_excluded or ignore_folder in parts
+        return not is_excluded
 
     def find_path(self, path):
         for templates_root in self.template_roots:
@@ -277,20 +295,6 @@ def read(*path):
     src = template_path(*path)
     with codecs.open(src, encoding="utf-8") as fi:
         return fi.read()
-
-
-def is_part_of_env(path):
-    """
-    Determines whether a template should be rendered or not. Note that here we don't
-    rely on the OS separator, as we are handling templates
-    """
-    parts = path.split("/")
-    basename = parts[-1]
-    is_excluded = False
-    is_excluded = is_excluded or basename.startswith(".") or basename.endswith(".pyc")
-    is_excluded = is_excluded or basename == "__pycache__"
-    is_excluded = is_excluded or "partials" in parts or ".git" in parts
-    return not is_excluded
 
 
 def is_binary_file(path):

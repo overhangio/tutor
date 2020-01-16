@@ -20,7 +20,7 @@ class EnvTests(unittest.TestCase):
 
     def test_walk_templates_partials_are_ignored(self):
         template_name = "apps/openedx/settings/partials/common_all.py"
-        renderer = env.Renderer({}, [env.TEMPLATES_ROOT])
+        renderer = env.Renderer({}, [env.TEMPLATES_ROOT], ignore_folders=["partials"])
         templates = list(renderer.walk_templates("apps"))
         self.assertIn(template_name, renderer.environment.loader.list_templates())
         self.assertNotIn(template_name, templates)
