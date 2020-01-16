@@ -56,6 +56,11 @@ def load_defaults():
     return serialize.load(env.read("config.yml"))
 
 
+def load_file(path):
+    with open(path) as f:
+        return serialize.load(f.read())
+
+
 def load_current(root, defaults):
     """
     Load the configuration currently stored on disk.

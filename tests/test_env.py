@@ -25,6 +25,14 @@ class EnvTests(unittest.TestCase):
         self.assertIn(template_name, renderer.environment.loader.list_templates())
         self.assertNotIn(template_name, templates)
 
+    def test_is_binary_file(self):
+        self.assertTrue(env.is_binary_file("/home/somefile.ico"))
+
+    def test_find_path(self):
+        renderer = env.Renderer({}, [env.TEMPLATES_ROOT])
+        path = renderer.find_path("local/docker-compose.yml")
+        self.assertTrue(os.path.exists(path))
+
     def test_pathjoin(self):
         self.assertEqual(
             "/tmp/env/target/dummy", env.pathjoin("/tmp", "target", "dummy")

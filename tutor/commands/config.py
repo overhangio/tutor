@@ -59,6 +59,28 @@ def save(context, interactive, set_, unset):
     env.save(context.root, config)
 
 
+@click.command(help="Render a template folder with eventual extra configuration files")
+@click.option(
+    "-x",
+    "--extra-config",
+    "extra_configs",
+    multiple=True,
+    type=click.Path(exists=True, resolve_path=True, dir_okay=False),
+    help="Load extra configuration file (can be used multiple times)",
+)
+@click.argument("src", type=click.Path(exists=True, resolve_path=True))
+@click.argument("dst")
+@click.pass_obj
+def render(context, extra_configs, src, dst):
+    config = tutor_config.load(context.root)
+    for extra_config in extra_configs:
+        tutor_config.merge(config, tutor_config.load_file(extra_config), force=True)
+
+    renderer = env.Renderer(config, [src])
+    renderer.render_all_to(dst)
+    fmt.echo_info("Templates rendered to {}".format(dst))
+
+
 @click.command(help="Print the project root")
 @click.pass_obj
 def printroot(context):
@@ -77,5 +99,6 @@ def printvalue(context, key):
 
 
 config_command.add_command(save)
+config_command.add_command(render)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)

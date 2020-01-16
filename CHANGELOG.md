@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Feature] Add `config render` command
+
 ## 3.11.0 (2020-01-14)
 
 - [Feature] Add support for simple, YAML-based plugins

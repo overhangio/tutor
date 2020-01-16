@@ -14,6 +14,7 @@ from .__about__ import __version__
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
+BIN_FILE_EXTENSIONS = [".ico", ".ttf", ".png", ".jpg"]
 
 
 class Renderer:
@@ -38,6 +39,7 @@ class Renderer:
 
     def __init__(self, config, template_roots):
         self.config = deepcopy(config)
+        self.template_roots = template_roots
 
         # Create environment
         environment = jinja2.Environment(
@@ -68,6 +70,13 @@ class Renderer:
         """
         yield from self.iter_templates_in(subdir + "/")
 
+    def find_path(self, path):
+        for templates_root in self.template_roots:
+            full_path = os.path.join(templates_root, path)
+            if os.path.exists(full_path):
+                return full_path
+        raise ValueError("Template path does not exist")
+
     def patch(self, name, separator="\n", suffix=""):
         """
         Render calls to {{ patch("...") }} in environment templates from plugin patches.
@@ -93,11 +102,17 @@ class Renderer:
         return self.__render(template)
 
     def render_file(self, path):
+        if is_binary_file(path):
+            # Don't try to render binary files
+            with open(self.find_path(path), "rb") as f:
+                return f.read()
+
         try:
             template = self.environment.get_template(path)
         except Exception:
             fmt.echo_error("Error loading template " + path)
             raise
+
         try:
             return self.__render(template)
         except (jinja2.exceptions.TemplateError, exceptions.TutorError):
@@ -106,6 +121,12 @@ class Renderer:
         except Exception:
             fmt.echo_error("Unknown error rendering template " + path)
             raise
+
+    def render_all_to(self, root):
+        for template in self.iter_templates_in():
+            rendered = self.render_file(template)
+            dst = os.path.join(root, template)
+            write_to(rendered, dst)
 
     def __render(self, template):
         try:
@@ -165,8 +186,14 @@ def save_all_from(prefix, root, config):
 
 
 def write_to(content, path):
+    """
+    Content can be either str or bytes.
+    """
+    open_mode = "w"
+    if isinstance(content, bytes):
+        open_mode += "b"
     utils.ensure_file_directory_exists(path)
-    with open(path, "w") as of:
+    with open(path, open_mode) as of:
         of.write(content)
 
 
@@ -262,8 +289,13 @@ def is_part_of_env(path):
     is_excluded = False
     is_excluded = is_excluded or basename.startswith(".") or basename.endswith(".pyc")
     is_excluded = is_excluded or basename == "__pycache__"
-    is_excluded = is_excluded or "partials" in parts
+    is_excluded = is_excluded or "partials" in parts or ".git" in parts
     return not is_excluded
+
+
+def is_binary_file(path):
+    ext = os.path.splitext(path)[1]
+    return ext in BIN_FILE_EXTENSIONS
 
 
 def template_path(*path, templates_root=TEMPLATES_ROOT):
