@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.11.1 (2020-01-16)
 
 - [Feature] Add `config render` command
 
