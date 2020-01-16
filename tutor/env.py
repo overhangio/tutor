@@ -1,7 +1,6 @@
 import codecs
 from copy import deepcopy
 import os
-import shutil
 
 import jinja2
 import pkg_resources
@@ -18,84 +17,66 @@ VERSION_FILENAME = "version"
 
 
 class Renderer:
-    ENVIRONMENT = None
-    ENVIRONMENT_CONFIG = None
+    INSTANCE = None
 
     @classmethod
-    def environment(cls, config):
-        def patch(name, separator="\n", suffix=""):
-            return cls.__render_patch(config, name, separator=separator, suffix=suffix)
-
-        if cls.ENVIRONMENT_CONFIG != config:
-            # Load template roots
+    def instance(cls, config):
+        if cls.INSTANCE is None or cls.INSTANCE.config != config:
+            # Load template roots: these are required to be able to use
+            # {% include .. %} directives
             template_roots = [TEMPLATES_ROOT]
-            for _, plugin_template_root in plugins.iter_template_roots(config):
-                template_roots.append(plugin_template_root)
+            for plugin in plugins.iter_enabled(config):
+                if plugin.templates_root:
+                    template_roots.append(plugin.templates_root)
 
-            # Create environment
-            environment = jinja2.Environment(
-                loader=jinja2.FileSystemLoader(template_roots),
-                undefined=jinja2.StrictUndefined,
-            )
-            environment.filters["random_string"] = utils.random_string
-            environment.filters["common_domain"] = utils.common_domain
-            environment.filters["list_if"] = utils.list_if
-            environment.filters["reverse_host"] = utils.reverse_host
-            environment.filters["walk_templates"] = walk_templates
-            environment.globals["patch"] = patch
-            environment.globals["TUTOR_VERSION"] = __version__
-
-            # Update environment singleton
-            cls.ENVIRONMENT_CONFIG = deepcopy(config)
-            cls.ENVIRONMENT = environment
-
-        return cls.ENVIRONMENT
+            cls.INSTANCE = cls(config, template_roots)
+        return cls.INSTANCE
 
     @classmethod
     def reset(cls):
-        cls.ENVIRONMENT = None
-        cls.ENVIRONMENT_CONFIG = None
+        cls.INSTANCE = None
 
-    @classmethod
-    def render_str(cls, config, text):
-        template = cls.environment(config).from_string(text)
-        return cls.__render(config, template)
+    def __init__(self, config, template_roots):
+        self.config = deepcopy(config)
 
-    @classmethod
-    def render_file(cls, config, path):
-        try:
-            template = cls.environment(config).get_template(path)
-        except Exception:
-            fmt.echo_error("Error loading template " + path)
-            raise
-        try:
-            return cls.__render(config, template)
-        except (jinja2.exceptions.TemplateError, exceptions.TutorError):
-            fmt.echo_error("Error rendering template " + path)
-            raise
-        except Exception:
-            fmt.echo_error("Unknown error rendering template " + path)
-            raise
+        # Create environment
+        environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(template_roots),
+            undefined=jinja2.StrictUndefined,
+        )
+        environment.filters["random_string"] = utils.random_string
+        environment.filters["common_domain"] = utils.common_domain
+        environment.filters["list_if"] = utils.list_if
+        environment.filters["reverse_host"] = utils.reverse_host
+        environment.filters["walk_templates"] = self.walk_templates
+        environment.globals["patch"] = self.patch
+        environment.globals["TUTOR_VERSION"] = __version__
+        self.environment = environment
 
-    @classmethod
-    def __render(cls, config, template):
-        try:
-            return template.render(**config)
-        except jinja2.exceptions.UndefinedError as e:
-            raise exceptions.TutorError(
-                "Missing configuration value: {}".format(e.args[0])
-            )
+    def iter_templates_in(self, *path):
+        prefix = "/".join(path)
+        for template in self.environment.loader.list_templates():
+            if template.startswith(prefix) and is_part_of_env(template):
+                yield template
 
-    @classmethod
-    def __render_patch(cls, config, name, separator="\n", suffix=""):
+    def walk_templates(self, subdir):
+        """
+        Iterate on the template files from `templates/<subdir>`.
+
+        Yield:
+            path: template path relative to the template root
+        """
+        yield from self.iter_templates_in(subdir + "/")
+
+    def patch(self, name, separator="\n", suffix=""):
         """
         Render calls to {{ patch("...") }} in environment templates from plugin patches.
         """
         patches = []
-        for plugin, patch in plugins.iter_patches(config, name):
-            patch_template = cls.environment(config).from_string(patch)
+        for plugin, patch in plugins.iter_patches(self.config, name):
+            patch_template = self.environment.from_string(patch)
             try:
-                patches.append(patch_template.render(**config))
+                patches.append(patch_template.render(**self.config))
             except jinja2.exceptions.UndefinedError as e:
                 raise exceptions.TutorError(
                     "Missing configuration value: {} in patch '{}' from plugin {}".format(
@@ -107,53 +88,80 @@ class Renderer:
             rendered += suffix
         return rendered
 
+    def render_str(self, text):
+        template = self.environment.from_string(text)
+        return self.__render(template)
+
+    def render_file(self, path):
+        try:
+            template = self.environment.get_template(path)
+        except Exception:
+            fmt.echo_error("Error loading template " + path)
+            raise
+        try:
+            return self.__render(template)
+        except (jinja2.exceptions.TemplateError, exceptions.TutorError):
+            fmt.echo_error("Error rendering template " + path)
+            raise
+        except Exception:
+            fmt.echo_error("Unknown error rendering template " + path)
+            raise
+
+    def __render(self, template):
+        try:
+            return template.render(**self.config)
+        except jinja2.exceptions.UndefinedError as e:
+            raise exceptions.TutorError(
+                "Missing configuration value: {}".format(e.args[0])
+            )
+
 
 def save(root, config):
-    render_full(root, config)
+    """
+    Save the full environment, including version information.
+    """
+    root_env = pathjoin(root)
+    for prefix in [
+        "android/",
+        "apps/",
+        "build/",
+        "dev/",
+        "k8s/",
+        "local/",
+        "webui/",
+        VERSION_FILENAME,
+        "kustomization.yml",
+    ]:
+        save_all_from(prefix, root_env, config)
+
+    for plugin in plugins.iter_enabled(config):
+        if plugin.templates_root:
+            save_plugin_templates(plugin, root, config)
+
     fmt.echo_info("Environment generated in {}".format(base_dir(root)))
 
 
-def render_full(root, config):
-    """
-    Render the full environment, including version information.
-    """
-    for subdir in ["android", "apps", "build", "dev", "k8s", "local", "webui"]:
-        save_subdir(subdir, root, config)
-    for plugin, path in plugins.iter_template_roots(config):
-        save_plugin_templates(plugin, path, root, config)
-    save_file(VERSION_FILENAME, root, config)
-    save_file("kustomization.yml", root, config)
-
-
-def save_plugin_templates(plugin, plugin_path, root, config):
+def save_plugin_templates(plugin, root, config):
     """
     Save plugin templates to plugins/<plugin name>/*.
     Only the "apps" and "build" subfolders are rendered.
     """
+    plugins_root = pathjoin(root, "plugins")
     for subdir in ["apps", "build"]:
-        path = os.path.join(plugin_path, plugin, subdir)
-        for src in walk_templates(path, root=plugin_path):
-            dst = pathjoin(root, "plugins", src)
-            rendered = render_file(config, src)
-            write_to(rendered, dst)
+        subdir_path = os.path.join(plugin.name, subdir)
+        save_all_from(subdir_path, plugins_root, config)
 
 
-def save_subdir(subdir, root, config):
+def save_all_from(prefix, root, config):
     """
-    Render the templates located in `subdir` and store them with the same
+    Render the templates that start with `prefix` and store them with the same
     hierarchy at `root`.
     """
-    for path in walk_templates(subdir):
-        save_file(path, root, config)
-
-
-def save_file(path, root, config):
-    """
-    Render the template located in `path` and store it with the same hierarchy at `root`.
-    """
-    dst = pathjoin(root, path)
-    rendered = render_file(config, path)
-    write_to(rendered, dst)
+    renderer = Renderer.instance(config)
+    for template in renderer.iter_templates_in(prefix):
+        rendered = renderer.render_file(template)
+        dst = os.path.join(root, template)
+        write_to(rendered, dst)
 
 
 def write_to(content, path):
@@ -166,7 +174,7 @@ def render_file(config, *path):
     """
     Return the rendered contents of a template.
     """
-    return Renderer.render_file(config, os.path.join(*path))
+    return Renderer.instance(config).render_file(os.path.join(*path))
 
 
 def render_dict(config):
@@ -202,19 +210,7 @@ def render_str(config, text):
     Return:
         substituted (str)
     """
-    return Renderer.render_str(config, text)
-
-
-def copy_subdir(subdir, root):
-    """
-    Copy the templates located in `subdir` and store them with the same hierarchy
-    at `root`. No rendering is done here.
-    """
-    for path in walk_templates(subdir):
-        src = os.path.join(TEMPLATES_ROOT, path)
-        dst = pathjoin(root, path)
-        utils.ensure_file_directory_exists(dst)
-        shutil.copy(src, dst)
+    return Renderer.instance(config).render_str(text)
 
 
 def check_is_up_to_date(root):
@@ -256,38 +252,25 @@ def read(*path):
         return fi.read()
 
 
-def walk_templates(subdir, root=TEMPLATES_ROOT):
-    """
-    Iterate on the template files from `templates/<subdir>`.
-
-    Yield:
-        path: template path relative to the template root
-    """
-    for dirpath, _, filenames in os.walk(template_path(subdir)):
-        if not is_part_of_env(dirpath):
-            continue
-        for filename in filenames:
-            path = os.path.join(os.path.relpath(dirpath, root), filename)
-            if is_part_of_env(path):
-                yield path
-
-
 def is_part_of_env(path):
     """
-    Determines whether a file should be rendered or not.
+    Determines whether a template should be rendered or not. Note that here we don't
+    rely on the OS separator, as we are handling templates
     """
-    basename = os.path.basename(path)
+    parts = path.split("/")
+    basename = parts[-1]
     is_excluded = False
     is_excluded = is_excluded or basename.startswith(".") or basename.endswith(".pyc")
-    is_excluded = is_excluded or basename == "__pycache__" or basename == "partials"
+    is_excluded = is_excluded or basename == "__pycache__"
+    is_excluded = is_excluded or "partials" in parts
     return not is_excluded
 
 
-def template_path(*path):
+def template_path(*path, templates_root=TEMPLATES_ROOT):
     """
     Return the template file's absolute path.
     """
-    return os.path.join(TEMPLATES_ROOT, *path)
+    return os.path.join(templates_root, *path)
 
 
 def data_path(root, *path):

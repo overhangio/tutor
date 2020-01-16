@@ -188,19 +188,6 @@ class PluginsTests(unittest.TestCase):
                 [("plugin1", ["myclient"])], list(plugins.iter_hooks({}, "init"))
             )
 
-    def test_iter_template_roots(self):
-        class plugin1:
-            templates = "/tmp/templates"
-
-        with unittest.mock.patch.object(
-            plugins.Plugins,
-            "iter_enabled",
-            return_value=[plugins.BasePlugin("plugin1", plugin1)],
-        ):
-            self.assertEqual(
-                [("plugin1", "/tmp/templates")], list(plugins.iter_template_roots({}))
-            )
-
     def test_plugins_are_updated_on_config_change(self):
         config = {"PLUGINS": []}
         plugins1 = plugins.Plugins(config)

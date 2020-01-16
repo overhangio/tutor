@@ -5,6 +5,7 @@ import unittest.mock
 
 from tutor import config as tutor_config
 from tutor import env
+from tutor import fmt
 from tutor import exceptions
 
 
@@ -13,8 +14,16 @@ class EnvTests(unittest.TestCase):
         env.Renderer.reset()
 
     def test_walk_templates(self):
-        templates = list(env.walk_templates("local"))
+        renderer = env.Renderer({}, [env.TEMPLATES_ROOT])
+        templates = list(renderer.walk_templates("local"))
         self.assertIn("local/docker-compose.yml", templates)
+
+    def test_walk_templates_partials_are_ignored(self):
+        template_name = "apps/openedx/settings/partials/common_all.py"
+        renderer = env.Renderer({}, [env.TEMPLATES_ROOT])
+        templates = list(renderer.walk_templates("apps"))
+        self.assertIn(template_name, renderer.environment.loader.list_templates())
+        self.assertNotIn(template_name, templates)
 
     def test_pathjoin(self):
         self.assertEqual(
@@ -52,20 +61,24 @@ class EnvTests(unittest.TestCase):
             exceptions.TutorError, env.render_file, {}, "local", "docker-compose.yml"
         )
 
-    def test_render_full(self):
+    def test_save_full(self):
         defaults = tutor_config.load_defaults()
         with tempfile.TemporaryDirectory() as root:
-            env.render_full(root, defaults)
+            with unittest.mock.patch.object(fmt, "STDOUT"):
+                env.save(root, defaults)
             self.assertTrue(os.path.exists(os.path.join(root, "env", "version")))
             self.assertTrue(
                 os.path.exists(os.path.join(root, "env", "local", "docker-compose.yml"))
             )
 
-    def test_render_full_with_https(self):
+    def test_save_full_with_https(self):
         defaults = tutor_config.load_defaults()
         defaults["ACTIVATE_HTTPS"] = True
         with tempfile.TemporaryDirectory() as root:
-            env.render_full(root, defaults)
+            with unittest.mock.patch.object(fmt, "STDOUT"):
+                env.save(root, defaults)
+                with open(os.path.join(root, "env", "apps", "nginx", "lms.conf")) as f:
+                    self.assertIn("ssl", f.read())
 
     def test_patch(self):
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
@@ -88,6 +101,11 @@ class EnvTests(unittest.TestCase):
 
     def test_plugin_templates(self):
         with tempfile.TemporaryDirectory() as plugin_templates:
+            # Create plugin
+            plugin1 = env.plugins.DictPlugin(
+                {"name": "plugin1", "version": "0", "templates": plugin_templates}
+            )
+
             # Create two templates
             os.makedirs(os.path.join(plugin_templates, "plugin1", "apps"))
             with open(
@@ -102,15 +120,13 @@ class EnvTests(unittest.TestCase):
             # Create configuration
             config = {"ID": "abcd"}
 
-            # Create a single plugin
+            # Render templates
             with unittest.mock.patch.object(
-                env.plugins,
-                "iter_template_roots",
-                return_value=[("plugin1", plugin_templates)],
+                env.plugins, "iter_enabled", return_value=[plugin1],
             ):
                 with tempfile.TemporaryDirectory() as root:
                     # Render plugin templates
-                    env.save_plugin_templates("plugin1", plugin_templates, root, config)
+                    env.save_plugin_templates(plugin1, root, config)
 
                     # Check that plugin template was rendered
                     dst_unrendered = os.path.join(
@@ -126,22 +142,26 @@ class EnvTests(unittest.TestCase):
 
     def test_renderer_is_reset_on_config_change(self):
         with tempfile.TemporaryDirectory() as plugin_templates:
+            plugin1 = env.plugins.DictPlugin(
+                {"name": "plugin1", "version": "0", "templates": plugin_templates}
+            )
             # Create one template
-            with open(os.path.join(plugin_templates, "myplugin.txt"), "w") as f:
+            os.makedirs(os.path.join(plugin_templates, plugin1.name))
+            with open(
+                os.path.join(plugin_templates, plugin1.name, "myplugin.txt"), "w"
+            ) as f:
                 f.write("some content")
 
-                # Load env once
-                config = {"PLUGINS": []}
-                env1 = env.Renderer.environment(config)
+            # Load env once
+            config = {"PLUGINS": []}
+            env1 = env.Renderer.instance(config).environment
 
-                with unittest.mock.patch.object(
-                    env.plugins,
-                    "iter_template_roots",
-                    return_value=[("myplugin", plugin_templates)],
-                ):
-                    # Load env a second time
-                    config["PLUGINS"].append("myplugin")
-                    env2 = env.Renderer.environment(config)
+            with unittest.mock.patch.object(
+                env.plugins, "iter_enabled", return_value=[plugin1],
+            ):
+                # Load env a second time
+                config["PLUGINS"].append("myplugin")
+                env2 = env.Renderer.instance(config).environment
 
-                self.assertNotIn("myplugin.txt", env1.loader.list_templates())
-                self.assertIn("myplugin.txt", env2.loader.list_templates())
+            self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())
+            self.assertIn("plugin1/myplugin.txt", env2.loader.list_templates())

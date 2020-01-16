@@ -1,5 +1,7 @@
 import click
 
+STDOUT = None
+
 
 def title(text):
     indent = 8
@@ -43,4 +45,4 @@ def alert(text):
 
 
 def echo(text, err=False):
-    click.echo(text, err=err)
+    click.echo(text, file=STDOUT, err=err)

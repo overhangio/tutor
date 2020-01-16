@@ -181,9 +181,6 @@ class Plugins:
                     self.hooks[hook_name] = {}
                 self.hooks[hook_name][plugin.name] = services
 
-            if plugin.templates_root:
-                self.template_roots[plugin.name] = plugin.templates_root
-
     @classmethod
     def clear(cls):
         cls.INSTANCE = None
@@ -221,9 +218,6 @@ class Plugins:
 
     def iter_hooks(self, hook_name):
         yield from self.hooks.get(hook_name, {}).items()
-
-    def iter_template_roots(self):
-        yield from self.template_roots.items()
 
 
 def get_callable_attr(plugin, attr_name, default=None):
@@ -272,7 +266,3 @@ def iter_patches(config, name):
 
 def iter_hooks(config, hook_name):
     yield from Plugins.instance(config).iter_hooks(hook_name)
-
-
-def iter_template_roots(config):
-    yield from Plugins.instance(config).iter_template_roots()
