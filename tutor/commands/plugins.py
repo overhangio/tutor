@@ -30,7 +30,7 @@ def list_command(context):
     for plugin in plugins.iter_installed():
         status = "" if plugins.is_enabled(config, plugin.name) else " (disabled)"
         print(
-            "{plugin}@{version}{status}".format(
+            "{plugin}=={version}{status}".format(
                 plugin=plugin.name, status=status, version=plugin.version
             )
         )
