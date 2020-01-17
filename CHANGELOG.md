@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## 3.11.2 (2020-01-17)
 
 - [Bugfix] Make sure `docker-compose.override.yml` are loaded in dev and local contexts
 
