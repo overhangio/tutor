@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Make sure `docker-compose.override.yml` are loaded in dev and local contexts
+
 ## 3.11.1 (2020-01-16)
 
 - [Feature] Add `config render` command

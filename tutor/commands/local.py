@@ -1,3 +1,4 @@
+import os
 from textwrap import indent
 
 import click
@@ -15,9 +16,14 @@ from .. import utils
 class LocalContext(Context):
     @staticmethod
     def docker_compose(root, config, *command):
+        args = []
+        override_path = tutor_env.pathjoin(root, "local", "docker-compose.override.yml")
+        if os.path.exists(override_path):
+            args += ["-f", override_path]
         return utils.docker_compose(
             "-f",
             tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+            *args,
             "--project-name",
             config["LOCAL_PROJECT_NAME"],
             *command

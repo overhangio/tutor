@@ -1,3 +1,5 @@
+import os
+
 import click
 
 from . import compose
@@ -10,14 +12,22 @@ from .. import utils
 class DevContext(Context):
     @staticmethod
     def docker_compose(root, config, *command):
-        return utils.docker_compose(
+        args = [
             "-f",
             tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+        ]
+        override_path = tutor_env.pathjoin(root, "local", "docker-compose.override.yml")
+        if os.path.exists(override_path):
+            args += ["-f", override_path]
+        args += [
             "-f",
             tutor_env.pathjoin(root, "dev", "docker-compose.yml"),
-            "--project-name",
-            config["DEV_PROJECT_NAME"],
-            *command,
+        ]
+        override_path = tutor_env.pathjoin(root, "dev", "docker-compose.override.yml")
+        if os.path.exists(override_path):
+            args += ["-f", override_path]
+        return utils.docker_compose(
+            *args, "--project-name", config["DEV_PROJECT_NAME"], *command,
         )
 
 
