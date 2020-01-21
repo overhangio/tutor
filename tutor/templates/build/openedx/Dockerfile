@@ -84,6 +84,9 @@ RUN pip install https://github.com/overhangio/edx-ora2/archive/overhangio/boto2t
 # Install scorm xblock
 RUN pip install "openedx-scorm-xblock<11.0.0,>=10.0.0"
 
+# Install whitenoise, for serving static assets
+RUN pip install "whitenoise==5.1.0"
+
 # Install private requirements: this is useful for installing custom xblocks.
 COPY ./requirements/ /openedx/requirements
 RUN cd /openedx/requirements/ \

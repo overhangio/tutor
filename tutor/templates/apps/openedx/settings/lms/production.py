@@ -10,6 +10,8 @@ ALLOWED_HOSTS = [
     "lms",
 ]
 
+MIDDLEWARE.insert(0, "whitenoise.middleware.WhiteNoiseMiddleware")
+
 # Required to display all courses on start page
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 

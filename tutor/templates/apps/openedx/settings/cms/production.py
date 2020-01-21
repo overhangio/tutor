@@ -9,4 +9,6 @@ ALLOWED_HOSTS = [
     "cms",
 ]
 
+MIDDLEWARE.insert(0, "whitenoise.middleware.WhiteNoiseMiddleware")
+
 {{ patch("openedx-cms-production-settings") }}

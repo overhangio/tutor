@@ -370,35 +370,12 @@ spec:
       labels:
         app.kubernetes.io/name: nginx
     spec:
-      initContainers:
-        - name: clean-openedx-staticfiles
-          image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ['rm', '-rf', '/var/www/openedx/staticfiles']
-          volumeMounts:
-            - mountPath: /var/www/openedx/
-              name: openedx-staticfiles
-        - name: init-openedx-staticfiles
-          image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ['cp', '-r', '/openedx/staticfiles', '/var/www/openedx/']
-          volumeMounts:
-            - mountPath: /var/www/openedx/
-              name: openedx-staticfiles
-        {{ patch("k8s-deployments-nginx-init-containers")|indent(8) }}
       containers:
         - name: nginx
           image: {{ DOCKER_IMAGE_NGINX }}
           volumeMounts:
             - mountPath: /etc/nginx/conf.d/
               name: config
-            - mountPath: /var/www/openedx/
-              name: openedx-staticfiles
-              readOnly: true
-            - mountPath: /openedx/data/cms
-              name: data-cms
-              readOnly: true
-            - mountPath: /openedx/data/lms
-              name: data-lms
-              readOnly: true
             {{ patch("k8s-deployments-nginx-volume-mounts")|indent(12) }}
           ports:
             - containerPort: 80
@@ -407,12 +384,6 @@ spec:
         - name: config
           configMap:
             name: nginx-config
-        - name: openedx-staticfiles
-          emptyDir: {}
-        - name: data-cms
-          emptyDir: {}
-        - name: data-lms
-          emptyDir: {}
         {{ patch("k8s-deployments-nginx-volumes")|indent(8) }}
 {% if ACTIVATE_RABBITMQ %}
 ---

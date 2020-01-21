@@ -1,11 +1,5 @@
 version: "3.7"
 services:
-  openedx-assets:
-    image: {{ DOCKER_IMAGE_OPENEDX }}
-    volumes:
-      - ../../data/openedx:/var/www/openedx
-    command: sh -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
-
   nginx:
     image: {{ DOCKER_IMAGE_NGINX }}
     restart: unless-stopped
@@ -21,7 +15,6 @@ services:
     {% endif %}
     volumes:
       - ../apps/nginx:/etc/nginx/conf.d/:ro
-      - ../../data/openedx:/var/www/openedx:ro
       - ../../data/openedx-media:/var/www/openedx-media:ro
       {% if ACTIVATE_HTTPS %}- ../../data/letsencrypt:/etc/letsencrypt/:ro{% endif %}
       {{ patch("local-docker-compose-nginx-volumes")|indent(6) }}
