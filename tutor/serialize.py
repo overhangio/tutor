@@ -8,7 +8,11 @@ def load(stream):
 
 
 def dump(content, fileobj):
-    yaml.dump(content, fileobj, default_flow_style=False)
+    yaml.dump(content, stream=fileobj, default_flow_style=False)
+
+
+def dumps(content):
+    return yaml.dump(content, stream=None, default_flow_style=False)
 
 
 def parse(v):

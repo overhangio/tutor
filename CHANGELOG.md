@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix incorrectly parsed empty strings for `config save --set ...=...` commands
+
 ## 3.11.2 (2020-01-17)
 
 - [Bugfix] Make sure `docker-compose.override.yml` are loaded in dev and local contexts

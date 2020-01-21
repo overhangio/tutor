@@ -25,3 +25,11 @@ class SerializeTests(unittest.TestCase):
 
     def test_parse_weird_chars(self):
         self.assertEqual("*@google.com", serialize.parse("*@google.com"))
+
+    def test_parse_empty_string(self):
+        self.assertEqual("", serialize.parse("''"))
+
+    # def test_dump_null(self):#     # Unfortunately, this fails as the output is "null\n...\n"
+
+
+#     self.assertEqual("null", serialize.dumps(None))

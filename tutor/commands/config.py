@@ -25,6 +25,10 @@ class YamlParamType(click.ParamType):
             k, v = value.split("=")
         except ValueError:
             self.fail("'{}' is not of the form 'key=value'.".format(value), param, ctx)
+        if not v:
+            # Empty strings are incorrectly interpreted as null values, which is
+            # incorrect.
+            v = "''"
         return k, serialize.parse(v)
 
 
@@ -93,6 +97,7 @@ def printroot(context):
 def printvalue(context, key):
     config = tutor_config.load(context.root)
     try:
+        # Note that this will incorrectly print None values
         fmt.echo(config[key])
     except KeyError:
         raise exceptions.TutorError("Missing configuration value: {}".format(key))
