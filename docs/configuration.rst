@@ -174,7 +174,9 @@ To create the certificate manually, run::
 
 To renew the certificate, run this command once per month::
 
+    tutor local stop nginx
     tutor local https renew
+    tutor local start -d
 
 .. _customise:
 
