@@ -254,5 +254,12 @@ With Tutor, all data are stored in a single folder. This means that it's extreme
 5. Start the instance with::
     
     tutor local start -d
-    
-    
+
+Database Dumps
+~~~~~~~~~~~~~~
+To dump all the data from the mysql and mongodb databases used on the platform, run the following command::
+
+    tutor local exec mysql mysqldump --all-databases --password="$(tutor config printvalue MYSQL_ROOT_PASSWORD)" > "$(tutor config printroot)/data/mysql/dump.sql"
+    tutor local exec mongodb mongodump --out=/data/db/dump.mongodb
+
+The dump files will be located in “$(tutor config printroot)/data/mysql” and “$(tutor config printroot)/data/mongodb”.
