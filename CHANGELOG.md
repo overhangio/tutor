@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix auth problem in Android app (#289)
+
 ## 3.11.3 (2020-01-21)
 
 - [Bugfix] Fix incorrectly parsed empty strings for `config save --set ...=...` commands
