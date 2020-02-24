@@ -9,7 +9,7 @@ appdirs==1.4.3
 astroid==2.3.3            # via pylint
 attrs==19.3.0             # via black
 black==19.10b0
-bleach==3.1.0             # via readme-renderer
+bleach==3.1.1             # via readme-renderer
 certifi==2019.11.28       # via requests
 cffi==1.13.2              # via cryptography
 chardet==3.0.4            # via requests
@@ -18,7 +18,6 @@ click==7.0
 cryptography==2.8         # via secretstorage
 docutils==0.16            # via readme-renderer
 idna==2.8                 # via requests
-importlib-metadata==1.4.0  # via keyring, twine
 isort==4.3.21             # via pylint
 jeepney==0.4.2            # via keyring, secretstorage
 jinja2==2.10.3
@@ -26,7 +25,6 @@ keyring==21.1.0           # via twine
 lazy-object-proxy==1.4.3  # via astroid
 markupsafe==1.1.1
 mccabe==0.6.1             # via pylint
-more-itertools==8.1.0     # via zipp
 pathspec==0.7.0           # via black
 pip-tools==4.3.0
 pkginfo==1.5.0.1          # via twine
@@ -45,12 +43,11 @@ six==1.13.0
 toml==0.10.0              # via black
 tqdm==4.41.1              # via twine
 twine==3.1.1
-typed-ast==1.4.1          # via astroid, black
+typed-ast==1.4.1          # via black
 urllib3==1.25.7           # via requests
 wcwidth==0.1.8
 webencodings==0.5.1       # via bleach
 wrapt==1.11.2             # via astroid
-zipp==0.6.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
