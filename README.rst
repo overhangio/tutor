@@ -45,7 +45,7 @@ Features
 * World-famous 1-click `installation and upgrades <https://docs.tutor.overhang.io/install.html>`_
 * Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins.html>`_
 * Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`_
-* No technical skill required with the `1-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#cloud_install>`_
+* No technical skill required with the `1-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#cloud-deployment>`_
 * Professional support and premium plugins available with `Tutor Long Term Support (LTS) <https://overhang.io/tutor/lts>`__
 
 .. _readme_intro_end:
