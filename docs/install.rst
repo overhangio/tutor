@@ -9,7 +9,7 @@ Requirements
 The only prerequisite for running this is a working Docker installation. You'll need both the ``docker`` and ``docker-compose`` commands in your system ``$PATH``. Follow the instructions from the official documentation:
 
 - `Docker <https://docs.docker.com/engine/installation/>`_: minimum supported version is 18.06.0.
-- `Docker compose <https://docs.docker.com/compose/install/>`_
+- `Docker Compose <https://docs.docker.com/compose/install/>`_
 
 .. warning::
     Do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
@@ -31,7 +31,7 @@ The latest binaries can be downloaded from https://github.com/overhangio/tutor/r
 
 .. include:: cli_download.rst
 
-This is the simplest and recommended installation method for most people. Note however that you will not be able to use custom plugins with this pre-compiled binary. The only plugins you can use with this approach are those that are already bundled with the binary: `discovery <https://github.com/overhangio/tutor-discovery>`__, `ecommerce <https://github.com/overhangio/tutor-ecommerce>`__, `figures <https://github.com/overhangio/tutor-figures>`__, `minio <https://github.com/overhangio/tutor-minio>`__, `notes <https://github.com/overhangio/tutor-notes>`__, `xqueue <https://github.com/overhangio/tutor-xqueue>`__.
+This is the simplest and recommended installation method for most people. Note however that you will not be able to use custom plugins with this pre-compiled binary. The only plugins you can use with this approach are those that are already bundled with the binary: see the :ref:`existing plugins <existing_plugins>`.
 
 From source
 -----------
@@ -55,14 +55,16 @@ Installing from a local clone of the repository::
 Cloud deployment
 ----------------
 
-Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface.
+Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. For detailed installation instructions, we recommend watching the following video:
+
+.. youtube:: xtXP52qGphA
 
 .. _upgrade:
 
 Upgrading
 ---------
 
-To upgrade a running Open edX platform, just install the latest ``tutor`` version (using either methods above) and run the ``quickstart`` command again. If you have :ref:`customised <configuration_customisation>` your docker images, you will have to re-build them prior to running ``quickstart``.
+With Tutor, it is very easy to upgrade to a more recent Open edX or Tutor release. Just install the latest ``tutor`` version (using either methods above) and run the ``quickstart`` command again. If you have :ref:`customised <configuration_customisation>` your docker images, you will have to re-build them prior to running ``quickstart``.
 
 .. _autocomplete:
 

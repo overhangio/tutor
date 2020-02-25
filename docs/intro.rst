@@ -36,7 +36,7 @@ This command does two things:
 1. Generate a ``config.yml`` configuration file: this file contains core :ref:`configuration parameters <configuration>` for your Open edX platforms, such as passwords and feature flags.
 2. Generate an ``env/`` folder, which we call the Tutor "environment", and which contains all the files that are necessary to run an Open edX platform: these are mostly Open edX configuration files.
 
-All these files are stored in a single folder, called the Tutor project root. On Linux, this folder is in ``~/.local/share/tutor`` and on Mac OS it is ``~/Library/Application Support/tutor``.
+All these files are stored in a single folder, called the Tutor project root. On Linux, this folder is in ``~/.local/share/tutor``. On Mac OS it is ``~/Library/Application Support/tutor``.
 
 The values from ``config.yml`` are used to generate the environment files in ``env/``. As a consequence, **every time the values from** ``config.yml`` **are modified, the environment must be regenerated**. This can be done with::
     
@@ -56,4 +56,4 @@ Now that you have generated a configuration and environment, you probably want t
 Bells and whistles
 ------------------
 
-For more advanced usage of Tutor, take a look at the :ref:`configuration and customisation <configuration_customisation>` and the :ref:`extra <extra>` sections
+For more advanced usage of Tutor, take a look at the :ref:`configuration and customisation <configuration_customisation>`, the :ref:`existing plugins <existing_plugins>` and the :ref:`extra <extra>` sections
