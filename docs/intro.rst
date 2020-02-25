@@ -10,16 +10,19 @@ Tutor simplifies the deployment of Open edX by:
 1. Separating the configuration logic from the deployment platforms.
 2. Running application processes in cleanly separated `docker containers <https://www.docker.com/resources/what-container>`_.
 
-.. image:: https://overhang.io/images/openedx-plus-docker-is-tutor.png
+.. image:: https://overhang.io/static/img/openedx-plus-docker-is-tutor.png
   :alt: Open edX + Docker = Tutor
   :width: 500px
   :align: center
 
 Because Docker containers are becoming an industry-wide standard, that means that with Tutor it becomes possible to run Open edX anywhere: for now, Tutor supports deploying on a local server, with `docker-compose <https://docs.docker.com/compose/overview/>`_, and in a large cluster, with `Kubernetes <http://kubernetes.io/>`_. But in the future, Tutor may support other deployment platforms.
 
-.. include:: ../README.rst
-    :start-after: _whats_tutor_start:
-    :end-before: _whats_tutor_end:
+What is Tutor?
+--------------
+
+Tutor was presented at the 2019 Open edX conference in San Diego, CA. Here's the 7-minute talk (with `slides <https://regisb.github.io/openedx2019/>`_):
+
+.. youtube:: Oqc7c-3qFc4
 
 How does Tutor work?
 --------------------

@@ -194,14 +194,50 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 # Custom variables
-import io
-import os
 here = os.path.abspath(os.path.dirname(__file__))
 about = {}
-with io.open(os.path.join(here, "..", "tutor", "__about__.py"), "rt", encoding="utf-8") as f:
+with io.open(
+    os.path.join(here, "..", "tutor", "__about__.py"), "rt", encoding="utf-8"
+) as f:
     exec(f.read(), about)
 rst_prolog = """
 .. |tutor_version| replace:: {}
 """.format(
-    about['__version__'],
+    about["__version__"],
 )
+
+
+# Custom directives
+def youtube(
+    _name,
+    _args,
+    _options,
+    content,
+    _lineno,
+    _contentOffset,
+    _blockText,
+    _state,
+    _stateMachine,
+):
+    """ Restructured text extension for inserting youtube embedded videos """
+    if not content:
+        return []
+    video_id = content[0]
+    return [
+        docutils.nodes.raw(
+            "",
+            """
+<iframe width="560" height="315"
+    src="https://www.youtube-nocookie.com/embed/{video_id}"
+    frameborder="0"
+    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+</iframe>""".format(
+                video_id=video_id
+            ),
+            format="html",
+        )
+    ]
+
+
+youtube.content = True
+docutils.parsers.rst.directives.register_directive("youtube", youtube)
