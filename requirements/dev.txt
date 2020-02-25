@@ -4,53 +4,52 @@
 #
 #    pip-compile requirements/dev.in
 #
-altgraph==0.16.1          # via pyinstaller
+altgraph==0.17            # via pyinstaller
 appdirs==1.4.3
 astroid==2.3.3            # via pylint
 attrs==19.3.0             # via black
 black==19.10b0
-bleach==3.1.0             # via readme-renderer
+bleach==3.1.1             # via readme-renderer
 certifi==2019.11.28       # via requests
-cffi==1.13.2              # via cryptography
+cffi==1.14.0              # via cryptography
 chardet==3.0.4            # via requests
 click-repl==0.1.6
 click==7.0
 cryptography==2.8         # via secretstorage
 docutils==0.16            # via readme-renderer
-idna==2.8                 # via requests
-importlib-metadata==1.4.0  # via keyring, twine
+idna==2.9                 # via requests
+importlib-metadata==1.5.0  # via keyring, twine
 isort==4.3.21             # via pylint
 jeepney==0.4.2            # via keyring, secretstorage
-jinja2==2.10.3
+jinja2==2.11.1
 keyring==21.1.0           # via twine
 lazy-object-proxy==1.4.3  # via astroid
 markupsafe==1.1.1
 mccabe==0.6.1             # via pylint
-more-itertools==8.1.0     # via zipp
 pathspec==0.7.0           # via black
-pip-tools==4.3.0
+pip-tools==4.5.0
 pkginfo==1.5.0.1          # via twine
-prompt-toolkit==3.0.2
+prompt-toolkit==3.0.3
 pycparser==2.19           # via cffi
 pygments==2.5.2           # via readme-renderer
 pyinstaller==3.6
 pylint==2.4.4
 pyyaml==5.3
 readme-renderer==24.0     # via twine
-regex==2020.1.8           # via black
+regex==2020.2.20          # via black
 requests-toolbelt==0.9.1  # via twine
-requests==2.22.0          # via requests-toolbelt, twine
+requests==2.23.0          # via requests-toolbelt, twine
 secretstorage==3.1.2      # via keyring
-six==1.13.0
+six==1.14.0
 toml==0.10.0              # via black
-tqdm==4.41.1              # via twine
+tqdm==4.43.0              # via twine
 twine==3.1.1
 typed-ast==1.4.1          # via astroid, black
-urllib3==1.25.7           # via requests
+urllib3==1.25.8           # via requests
 wcwidth==0.1.8
 webencodings==0.5.1       # via bleach
 wrapt==1.11.2             # via astroid
-zipp==0.6.0               # via importlib-metadata
+zipp==3.0.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
