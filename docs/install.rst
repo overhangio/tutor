@@ -31,7 +31,7 @@ The latest binaries can be downloaded from https://github.com/overhangio/tutor/r
 
 .. include:: cli_download.rst
 
-This is the simplest and recommended installation method for most people. Note however that you will not be able to use custom plugins with this pre-compiled binary. The only plugins you can use with this approach are those thare are already bundled with the binary: `discovery <https://github.com/overhangio/tutor-discovery>`__, `ecommerce <https://github.com/overhangio/tutor-ecommerce>`__, `figures <https://github.com/overhangio/tutor-figures>`__, `minio <https://github.com/overhangio/tutor-minio>`__, `notes <https://github.com/overhangio/tutor-notes>`__, `xqueue <https://github.com/overhangio/tutor-xqueue>`__.
+This is the simplest and recommended installation method for most people. Note however that you will not be able to use custom plugins with this pre-compiled binary. The only plugins you can use with this approach are those that are already bundled with the binary: `discovery <https://github.com/overhangio/tutor-discovery>`__, `ecommerce <https://github.com/overhangio/tutor-ecommerce>`__, `figures <https://github.com/overhangio/tutor-figures>`__, `minio <https://github.com/overhangio/tutor-minio>`__, `notes <https://github.com/overhangio/tutor-notes>`__, `xqueue <https://github.com/overhangio/tutor-xqueue>`__.
 
 From source
 -----------
