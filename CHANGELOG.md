@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Restore more recent Android app version (#289).
+
 ## v3.11.4 (2020-02-16)
 
 - [Bugfix] Fix auth problem in Android app (#289)

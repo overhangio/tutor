@@ -23,7 +23,9 @@ RUN wget https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_
 RUN yes | /openedx/android-sdk/tools/bin/sdkmanager "platforms;android-27" 1> /dev/null
 
 # Install android app repo
-RUN git clone https://github.com/edx/edx-app-android --branch open-release/ironwood.1 /openedx/edx-app-android
+ARG ANDROID_APP_REPOSITORY=https://github.com/edx/edx-app-android
+ARG ANDROID_APP_VERSION=release/2.20.2
+RUN git clone $ANDROID_APP_REPOSITORY --branch $ANDROID_APP_VERSION /openedx/edx-app-android
 WORKDIR /openedx/edx-app-android
 
 # Install gradle and all dependencies

@@ -43,7 +43,16 @@ With Tutor, you can build an Android mobile application for your platform. To bu
 
     tutor android build debug
 
-The ``.apk`` file will then be available in ``$TUTOR_ROOT/data/android``. Transfer it to an Android phone to install the application. You should be able to sign in and view available courses.
+The ``.apk`` file will then be available in ``$(tutor config printroot)/data/android``. Transfer it to an Android phone to install the application. You should be able to sign in and view available courses.
+
+Building a custom Android app
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Android app is built from the `official edx-app-android repository <https://github.com/edx/edx-app-android/>`__. To change this repository or the app version, you can simply build a different docker image with::
+
+    tutor images build \
+        --build-arg ANDROID_APP_REPOSITORY=https://github.com/mycustomfork/edx-app-android \
+        --build-arg ANDROID_APP_VERSION=master
 
 Releasing an Android app
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,7 +65,7 @@ Releasing an Android app on the Play Store requires to build the app in release 
     ANDROID_RELEASE_KEY_PASSWORD
     ANDROID_RELEASE_KEY_ALIAS
 
-Then, place your keystore file in ``$TUTOR_ROOT/env/android/app.keystore``. Finally, build the application with::
+Then, place your keystore file in ``$(tutor config printroot)/env/android/app.keystore``. Finally, build the application with::
 
     tutor android build release
 
