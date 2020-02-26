@@ -35,10 +35,7 @@ services:
   {% if ACTIVATE_ELASTICSEARCH %}
   elasticsearch:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_ELASTICSEARCH }}
-    environment:
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - "cluster.name=openedx"
-      - "bootstrap.memory_lock=true"
+    command: ["elasticsearch", "-Xms{{ ELASTICSEARCH_HEAP_SIZE }}", "-Xmx{{ ELASTICSEARCH_HEAP_SIZE }}", "--cluster.name=openedx", "--bootstrap.mlockall=true"]
     ulimits:
       memlock:
         soft: -1

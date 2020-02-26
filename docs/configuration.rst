@@ -115,6 +115,7 @@ Elasticsearch
 
 - ``ELASTICSEARCH_HOST`` (default: ``"elasticsearch"``)
 - ``ELASTICSEARCH_PORT`` (default: ``9200``)
+- ``ELASTICSEARCH_HEAP_SIZE`` (default: ``"1g"``)
 
 Memcached
 *********
