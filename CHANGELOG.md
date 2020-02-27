@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Upgrade django to 1.11.28
 - [Improvement] Make it possible to configure the elasticsearch heap size
 - [Bugfix] Fix broken elasticsearch environment variables
 - [Improvement] Restore more recent Android app version (#289).

@@ -35,6 +35,7 @@ RUN curl https://github.com/overhangio/edx-platform/commit/0d4f6cc3433013960b28e
 RUN curl https://github.com/edx/edx-platform/commit/7731c68b91ba662e6433ab46e434860afc497944.patch | git apply -
 RUN curl https://github.com/edx/edx-platform/commit/86f4902257a431a1a465eec585a116c19d2c4659.patch | git apply -
 RUN curl https://github.com/edx/edx-platform/commit/9490d8e083ccdcf8341694e38bbd9f7200ea2ff3.patch | git apply -
+RUN curl https://github.com/edx/edx-platform/commit/df76bb257a9946271bff8ed2650d158a83a035a8.patch | git apply -
 
 # Download extra locales to /openedx/locale
 RUN cd /tmp \
