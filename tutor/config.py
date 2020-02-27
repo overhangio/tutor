@@ -14,7 +14,7 @@ def update(root):
     Load and save the configuration.
     """
     config, defaults = load_all(root)
-    save(root, config)
+    save_config_file(root, config)
     merge(config, defaults)
     return config
 
@@ -53,10 +53,10 @@ def merge(config, defaults, force=False):
 
 
 def load_defaults():
-    return serialize.load(env.read("config.yml"))
+    return serialize.load(env.read_template_file("config.yml"))
 
 
-def load_file(path):
+def load_config_file(path):
     with open(path) as f:
         return serialize.load(f.read())
 
@@ -79,8 +79,7 @@ def load_user(root):
     if not os.path.exists(path):
         return {}
 
-    with open(path) as fi:
-        config = serialize.load(fi.read())
+    config = load_config_file(path)
     upgrade_obsolete(config)
     return config
 
@@ -164,16 +163,15 @@ def convert_json2yml(root):
                 root
             )
         )
-    with open(json_path) as fi:
-        config = json.load(fi)
-        save(root, config)
+    config = load_config_file(json_path)
+    save_config_file(root, config)
     os.remove(json_path)
     fmt.echo_info(
         "File config.json detected in {} and converted to config.yml".format(root)
     )
 
 
-def save(root, config):
+def save_config_file(root, config):
     path = config_path(root)
     utils.ensure_file_directory_exists(path)
     with open(path, "w") as of:

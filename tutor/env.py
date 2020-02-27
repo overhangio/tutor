@@ -120,6 +120,10 @@ class Renderer:
         return self.__render(template)
 
     def render_file(self, path):
+        """
+        Render a template file. Return the corresponding string. If it's a binary file
+        (as indicated by its path), return bytes.
+        """
         if is_binary_file(path):
             # Don't try to render binary files
             with open(self.find_path(path), "rb") as f:
@@ -205,7 +209,7 @@ def save_all_from(prefix, root, config):
 
 def write_to(content, path):
     """
-    Content can be either str or bytes.
+    Write some content to a path. Content can be either str or bytes.
     """
     open_mode = "w"
     if isinstance(content, bytes):
@@ -267,17 +271,19 @@ def check_is_up_to_date(root):
             "\n"
             "    tutor config save"
         )
-        fmt.echo_alert(message.format(base_dir(root), version(root), __version__))
+        fmt.echo_alert(
+            message.format(base_dir(root), current_version(root), __version__)
+        )
 
 
 def is_up_to_date(root):
     """
     Check if the currently rendered version is equal to the current tutor version.
     """
-    return version(root) == __version__
+    return current_version(root) == __version__
 
 
-def version(root):
+def current_version(root):
     """
     Return the current environment version. If the current environment has no version,
     return "0".
@@ -288,7 +294,7 @@ def version(root):
     return open(path).read().strip()
 
 
-def read(*path):
+def read_template_file(*path):
     """
     Read raw content of template located at `path`.
     """

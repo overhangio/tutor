@@ -87,7 +87,7 @@ def start(context, port, host):
 )
 @click.pass_obj
 def configure(context, user, password):
-    save_config(context.root, {"user": user, "password": password})
+    save_webui_config_file(context.root, {"user": user, "password": password})
     fmt.echo_info(
         "The web UI configuration has been updated. "
         "If at any point you wish to reset your username and password, "
@@ -122,12 +122,12 @@ def check_gotty_binary(root):
 def load_config(root):
     path = config_path(root)
     if not os.path.exists(path):
-        save_config(root, {"user": None, "password": None})
+        save_webui_config_file(root, {"user": None, "password": None})
     with open(config_path(root)) as f:
         return serialize.load(f)
 
 
-def save_config(root, config):
+def save_webui_config_file(root, config):
     path = config_path(root)
     directory = os.path.dirname(path)
     if not os.path.exists(directory):

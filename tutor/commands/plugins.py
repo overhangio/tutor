@@ -44,7 +44,7 @@ def enable(context, plugin_names):
     for plugin in plugin_names:
         plugins.enable(config, plugin)
         fmt.echo_info("Plugin {} enabled".format(plugin))
-    tutor_config.save(context.root, config)
+    tutor_config.save_config_file(context.root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
     )
@@ -63,7 +63,7 @@ def disable(context, plugin_names):
             shutil.rmtree(plugin_dir)
         fmt.echo_info("Plugin {} disabled".format(plugin))
 
-    tutor_config.save(context.root, config)
+    tutor_config.save_config_file(context.root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
     )

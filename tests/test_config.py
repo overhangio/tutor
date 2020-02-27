@@ -54,7 +54,7 @@ class ConfigTests(unittest.TestCase):
                 password1 = config1["MYSQL_ROOT_PASSWORD"]
 
                 config1.pop("MYSQL_ROOT_PASSWORD")
-                tutor_config.save(root, config1)
+                tutor_config.save_config_file(root, config1)
 
                 mock_random_string.return_value = "efgh"
                 config2, _ = tutor_config.load_all(root)

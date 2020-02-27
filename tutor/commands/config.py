@@ -58,7 +58,7 @@ def save(context, interactive, set_, unset):
         tutor_config.merge(config, dict(set_), force=True)
     for key in unset:
         config.pop(key, None)
-    tutor_config.save(context.root, config)
+    tutor_config.save_config_file(context.root, config)
     tutor_config.merge(config, defaults)
     env.save(context.root, config)
 
@@ -78,7 +78,9 @@ def save(context, interactive, set_, unset):
 def render(context, extra_configs, src, dst):
     config = tutor_config.load(context.root)
     for extra_config in extra_configs:
-        tutor_config.merge(config, tutor_config.load_file(extra_config), force=True)
+        tutor_config.merge(
+            config, tutor_config.load_config_file(extra_config), force=True
+        )
 
     renderer = env.Renderer(config, [src])
     renderer.render_all_to(dst)

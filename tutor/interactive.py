@@ -13,7 +13,7 @@ def update(root, interactive=True):
     Load and save the configuration.
     """
     config, defaults = load_all(root, interactive=interactive)
-    tutor_config.save(root, config)
+    tutor_config.save_config_file(root, config)
     tutor_config.merge(config, defaults)
     return config
 
