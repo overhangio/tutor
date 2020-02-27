@@ -17,25 +17,20 @@ RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releas
     && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
     && rm /tmp/dockerize.tar.gz
 
-# Checkout edx-platform code
+# Checkout edx-platform code: https://github.com/edx/edx-platform/commits/open-release/ironwood.master
+# Because we are pulling from a branch, and not a tag, you should manually modify the
+# date hash below to force clearing the docker cache.
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
-ARG EDX_PLATFORM_VERSION=open-release/ironwood.2
+ARG EDX_PLATFORM_VERSION=open-release/ironwood.master
+ARG EDX_PLATFORM_VERSION_DATE=20200227
 RUN mkdir -p /openedx/edx-platform && \
+    echo "Puling $EDX_PLATFORM_VERSION tag from $EDX_PLATFORM_REPOSITORY ($EDX_PLATFORM_VERSION_DATE)" && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
 # Apply patches
-# Certificates XSS vulnerability https://github.com/edx/edx-platform/pull/20904
-RUN curl https://github.com/edx/edx-platform/commit/b33db2c548a1a530510d785f7659c78783a187fa.patch | git apply -
-# CustomTagModule mako template injection https://groups.google.com/forum/#!topic/openedx-ops/aVHomKimstU
-RUN curl https://github.com/edx/edx-platform/commit/f9689aadb0f8a41570a4bb76654f980b4e31ad96.patch | git apply -
 # Allow SigV4 authentication for video uploads to S3 https://github.com/edx/edx-platform/pull/22080
 RUN curl https://github.com/overhangio/edx-platform/commit/0d4f6cc3433013960b28e963c4094ef2a2a92f04.patch | git apply -
-# Django upgrades
-RUN curl https://github.com/edx/edx-platform/commit/7731c68b91ba662e6433ab46e434860afc497944.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/86f4902257a431a1a465eec585a116c19d2c4659.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/9490d8e083ccdcf8341694e38bbd9f7200ea2ff3.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/df76bb257a9946271bff8ed2650d158a83a035a8.patch | git apply -
 
 # Download extra locales to /openedx/locale
 RUN cd /tmp \

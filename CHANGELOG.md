@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Switch edx-platform from open-release/ironwood.2 tag to the open-release/ironwood.master branch
 - [Security] Upgrade django to 1.11.28
 - [Improvement] Make it possible to configure the elasticsearch heap size
 - [Bugfix] Fix broken elasticsearch environment variables
