@@ -24,7 +24,7 @@ ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
 ARG EDX_PLATFORM_VERSION=open-release/ironwood.master
 ARG EDX_PLATFORM_VERSION_DATE=20200227
 RUN mkdir -p /openedx/edx-platform && \
-    echo "Puling $EDX_PLATFORM_VERSION tag from $EDX_PLATFORM_REPOSITORY ($EDX_PLATFORM_VERSION_DATE)" && \
+    echo "Pulling $EDX_PLATFORM_VERSION tag from $EDX_PLATFORM_REPOSITORY ($EDX_PLATFORM_VERSION_DATE)" && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
