@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.11.5 (2020-02-27)
 
 - [Improvement] Switch edx-platform from open-release/ironwood.2 tag to the open-release/ironwood.master branch
 - [Security] Upgrade django to 1.11.28
