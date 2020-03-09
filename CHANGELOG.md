@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add the management plugin to the rabbitmq container
 - [Improvement] Make it possible to run an Elasticsearch service on https
 
 ## v3.11.5 (2020-02-27)
