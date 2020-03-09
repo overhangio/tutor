@@ -113,6 +113,7 @@ By default, a running Open edX platform deployed with Tutor includes all necessa
 Elasticsearch
 *************
 
+- ``ELASTICSEARCH_PROTOCOL`` (default: ``"http"``)
 - ``ELASTICSEARCH_HOST`` (default: ``"elasticsearch"``)
 - ``ELASTICSEARCH_PORT`` (default: ``9200``)
 - ``ELASTICSEARCH_HEAP_SIZE`` (default: ``"1g"``)

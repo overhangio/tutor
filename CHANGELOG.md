@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Make it possible to run an Elasticsearch service on https
+
 ## v3.11.5 (2020-02-27)
 
 - [Improvement] Switch edx-platform from open-release/ironwood.2 tag to the open-release/ironwood.master branch
