@@ -1,0 +1,3 @@
+#! /bin/bash
+echo "Reloading gunicorn process..."
+kill -HUP $(pidof /openedx/venv/bin/python2 /openedx/venv/bin/gunicorn)

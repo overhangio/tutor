@@ -125,6 +125,13 @@ To update the course search index, run::
     # Run this command periodically to ensure that course search results are always up-to-date.
     tutor local run cms ./manage.py cms reindex_course --all --setup
 
+Reloading Open edX settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) but that is overkill. A quicker alternative is to send the HUP signal to the gunicorn processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
+    
+    tutor local exec lms reload-gunicorn
+
 .. _portainer:
 
 Docker container web UI with `Portainer <https://portainer.io/>`__
