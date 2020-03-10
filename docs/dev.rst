@@ -80,10 +80,10 @@ Then, add the following content::
         cms:
             volumes:
                 - /path/to/edx-platform/:/openedx/edx-platform
-        lms_worker:
+        lms-worker:
             volumes:
                 - /path/to/edx-platform/:/openedx/edx-platform
-        cms_worker:
+        cms-worker:
             volumes:
                 - /path/to/edx-platform/:/openedx/edx-platform
 

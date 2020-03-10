@@ -69,9 +69,9 @@ def restart(context, service):
     command = ["restart"]
     if service == "openedx":
         if config["ACTIVATE_LMS"]:
-            command += ["lms", "lms_worker"]
+            command += ["lms", "lms-worker"]
         if config["ACTIVATE_CMS"]:
-            command += ["cms", "cms_worker"]
+            command += ["cms", "cms-worker"]
     elif service != "all":
         command += [service]
     context.docker_compose(context.root, config, *command)

@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Rename lms/cms_worker to lms/cms-worker in local deployment
 - [Improvement] Add the management plugin to the rabbitmq container
 - [Improvement] Make it possible to run an Elasticsearch service on https
 

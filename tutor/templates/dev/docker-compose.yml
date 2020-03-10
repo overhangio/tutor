@@ -22,9 +22,9 @@ services:
     command: ./manage.py cms runserver 0.0.0.0:8000
     ports:
         - "8001:8000"
-  lms_worker:
+  lms-worker:
     <<: *openedx-service
-  cms_worker:
+  cms-worker:
     <<: *openedx-service
   
   # Additional service for watching theme changes

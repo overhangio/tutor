@@ -150,7 +150,7 @@ services:
   ############# LMS and CMS workers
 
   {% if ACTIVATE_LMS %}
-  lms_worker:
+  lms-worker:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
@@ -169,7 +169,7 @@ services:
   {% endif %}
 
   {% if ACTIVATE_CMS %}
-  cms_worker:
+  cms-worker:
     image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
