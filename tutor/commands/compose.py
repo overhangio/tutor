@@ -62,18 +62,22 @@ restart all services. Note that this performs a 'docker-compose restart', so new
 may not be taken into account. It is useful for reloading settings, for instance. To
 fully stop the platform, use the 'reboot' command.""",
 )
-@click.argument("service")
+@click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def restart(context, service):
+def restart(context, services):
     config = tutor_config.load(context.root)
     command = ["restart"]
-    if service == "openedx":
-        if config["ACTIVATE_LMS"]:
-            command += ["lms", "lms-worker"]
-        if config["ACTIVATE_CMS"]:
-            command += ["cms", "cms-worker"]
-    elif service != "all":
-        command += [service]
+    if "all" in services:
+        pass
+    else:
+        for service in services:
+            if "openedx" == service:
+                if config["ACTIVATE_LMS"]:
+                    command += ["lms", "lms-worker"]
+                if config["ACTIVATE_CMS"]:
+                    command += ["cms", "cms-worker"]
+            else:
+                command.append(service)
     context.docker_compose(context.root, config, *command)
 
 
