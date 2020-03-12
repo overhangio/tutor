@@ -108,7 +108,7 @@ spec:
             - containerPort: 4567
           env:
             - name: SEARCH_SERVER
-              value: "{{ ELASTICSEARCH_PROTOCOL }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
+              value: "{{ ELASTICSEARCH_SCHEME }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
             - name: MONGODB_AUTH
               value: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
             - name: MONGODB_HOST
