@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Modify nginx access logs to include request scheme and server name (plugin developers should use the "tutor" log format)
 - [Bugfix] Fix DNS resolution of restarted service
 - [Feature] Restart multiple services with `local restart`
 - [Feature] Make it possible to easily reload openedx gunicorn process with `tutor local exec lms reload-gunicorn``

@@ -181,7 +181,16 @@ def save(root, config):
         if plugin.templates_root:
             save_plugin_templates(plugin, root, config)
 
+    upgrade_obsolete(root)
     fmt.echo_info("Environment generated in {}".format(base_dir(root)))
+
+
+def upgrade_obsolete(root):
+    # tutor.conf was renamed to _tutor.conf in order to be the first config file loaded
+    # by nginx
+    nginx_tutor_conf = pathjoin(root, "apps", "nginx", "tutor.conf")
+    if os.path.exists(nginx_tutor_conf):
+        os.remove(nginx_tutor_conf)
 
 
 def save_plugin_templates(plugin, root, config):
