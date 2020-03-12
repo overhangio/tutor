@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix DNS resolution of restarted service
 - [Feature] Restart multiple services with `local restart`
 - [Feature] Make it possible to easily reload openedx gunicorn process with `tutor local exec lms reload-gunicorn``
 - [Improvement] Rename lms/cms_worker to lms/cms-worker in local deployment
