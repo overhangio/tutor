@@ -131,6 +131,7 @@ def createuser(context, superuser, staff, password, name, email):
     command = scripts.create_user_command(
         superuser, staff, name, email, password=password
     )
+    # This needs to be interactive in case the user needs to type a password
     kubectl_exec(config, "lms", command, attach=True)
 
 
@@ -141,6 +142,19 @@ def importdemocourse(context):
     config = tutor_config.load(context.root)
     runner = K8sScriptRunner(context.root, config)
     scripts.import_demo_course(runner)
+
+
+@click.command(
+    help="Set a theme for a given domain name. To reset to the default theme , use 'default' as the theme name."
+)
+@click.argument("theme_name")
+@click.argument("domain_names", metavar="domain_name", nargs=-1)
+@click.pass_obj
+def settheme(context, theme_name, domain_names):
+    config = tutor_config.load(context.root)
+    runner = K8sScriptRunner(context.root, config)
+    for domain_name in domain_names:
+        scripts.set_theme(theme_name, domain_name, runner)
 
 
 @click.command(name="exec", help="Execute a command in a pod of the given application")
@@ -229,5 +243,6 @@ k8s.add_command(delete)
 k8s.add_command(init)
 k8s.add_command(createuser)
 k8s.add_command(importdemocourse)
+k8s.add_command(settheme)
 k8s.add_command(exec_command)
 k8s.add_command(logs)

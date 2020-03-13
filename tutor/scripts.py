@@ -3,6 +3,11 @@ from . import exceptions
 from . import fmt
 from . import plugins
 
+BASE_OPENEDX_COMMAND = """
+export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
+echo "Loading settings $DJANGO_SETTINGS_MODULE"
+"""
+
 
 class BaseRunner:
     def __init__(self, root, config):
@@ -59,10 +64,7 @@ def initialise(runner):
 
 
 def create_user_command(superuser, staff, username, email, password=None):
-    command = """
-export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
-echo "Loading settings $DJANGO_SETTINGS_MODULE"
-"""
+    command = BASE_OPENEDX_COMMAND
 
     opts = ""
     if superuser:
@@ -74,7 +76,10 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 """
     if password:
         command += """
-./manage.py lms shell -c "from django.contrib.auth import get_user_model; u = get_user_model().objects.get(username='{username}'); u.set_password('{password}'); u.save()"
+./manage.py lms shell -c "from django.contrib.auth import get_user_model
+u = get_user_model().objects.get(username='{username}')
+u.set_password('{password}')
+u.save()"
 """
     else:
         command += """
@@ -87,3 +92,21 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 def import_demo_course(runner):
     runner.check_service_is_activated("cms")
     runner.run("cms", "hooks", "cms", "importdemocourse")
+
+
+def set_theme(theme_name, domain_name, runner):
+    command = BASE_OPENEDX_COMMAND
+    command += """
+echo "Assigning theme {theme_name} to {domain_name}..."
+./manage.py lms shell -c "
+from django.contrib.sites.models import Site
+site, _ = Site.objects.get_or_create(domain='{domain_name}')
+if not site.name:
+    site.name = '{domain_name}'
+    site.save()
+site.themes.all().delete()
+site.themes.create(theme_dir_name='{theme_name}')"
+"""
+    command = command.format(theme_name=theme_name, domain_name=domain_name)
+    runner.check_service_is_activated("lms")
+    runner.exec("lms", command)

@@ -173,6 +173,19 @@ def createuser(context, superuser, staff, password, name, email):
     runner.exec("lms", command)
 
 
+@click.command(
+    help="Set a theme for a given domain name. To reset to the default theme , use 'default' as the theme name."
+)
+@click.argument("theme_name")
+@click.argument("domain_names", metavar="domain_name", nargs=-1)
+@click.pass_obj
+def settheme(context, theme_name, domain_names):
+    config = tutor_config.load(context.root)
+    runner = ScriptRunner(context.root, config, context.docker_compose)
+    for domain_name in domain_names:
+        scripts.set_theme(theme_name, domain_name, runner)
+
+
 @click.command(help="Import the demo course")
 @click.pass_obj
 def importdemocourse(context):
@@ -194,4 +207,5 @@ def add_commands(command_group):
     command_group.add_command(logs)
     command_group.add_command(createuser)
     command_group.add_command(importdemocourse)
+    command_group.add_command(settheme)
     # command_group.add_command(run_hook) # Disabled for now

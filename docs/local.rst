@@ -113,6 +113,22 @@ After a fresh installation, your platform will not have a single course. To impo
 
     tutor local importdemocourse
 
+.. _settheme:
+
+Setting a new theme
+~~~~~~~~~~~~~~~~~~~
+
+The default Open edX theme is rather bland, so Tutor makes it easy to switch to a different theme::
+    
+    tutor local settheme mythemename localhost
+
+Notice the "localhost" argument: in Open edX, themes are assigned per domain name. That means that your custom theme will only be visible if you access your platform at http://localhost. So you might want to run this command with all possible domain names. For instance, to assign the pre-packaged "edx.org" theme to both the LMS and the studio, locally and in production, run::
+    
+    tutor local settheme edx.org localhost studio.localhost \
+        $(tutor config printvalue LMS_HOST) $(tutor config printvalue CMS_HOST)
+
+The following themes are available out of the box: "dark-theme", "edge.edx.org", "edx.org", "open-edx", "red-theme", "stanford-style". We also developed `Indigo, a beautiful, customizable theme which you can check out <https://github.com/overhangio/indigo>`__.
+
 Running arbitrary ``manage.py`` commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
