@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "Unable to resolve dependency" error during forum initialisation
 - [Feature] Add `settheme` command to easily assign a theme to a domain name
 - [Improvement] Modify nginx access logs to include request scheme and server name (plugin developers should use the "tutor" log format)
 - [Bugfix] Fix DNS resolution of restarted service
