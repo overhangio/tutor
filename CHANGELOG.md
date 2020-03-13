@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.11.6 (2020-03-13)
 
 - [Bugfix] Fix "Unable to resolve dependency" error during forum initialisation
 - [Feature] Add `settheme` command to easily assign a theme to a domain name
