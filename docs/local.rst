@@ -120,14 +120,14 @@ Setting a new theme
 
 The default Open edX theme is rather bland, so Tutor makes it easy to switch to a different theme::
     
-    tutor local settheme mythemename localhost
+    tutor local settheme mytheme localhost
 
-Notice the "localhost" argument: in Open edX, themes are assigned per domain name. That means that your custom theme will only be visible if you access your platform at http://localhost. So you might want to run this command with all possible domain names. For instance, to assign the pre-packaged "edx.org" theme to both the LMS and the studio, locally and in production, run::
+Notice the "localhost" argument: in Open edX, themes are assigned per domain name. That means that your custom theme will only be visible if you access your platform at http://localhost. So you might want to run this command with all possible domain names. For instance, to assign your custom theme both to the LMS and the studio, locally and in production, run::
     
-    tutor local settheme edx.org localhost studio.localhost \
+    tutor local settheme mytheme localhost studio.localhost \
         $(tutor config printvalue LMS_HOST) $(tutor config printvalue CMS_HOST)
 
-The following themes are available out of the box: "dark-theme", "edge.edx.org", "edx.org", "open-edx", "red-theme", "stanford-style". We also developed `Indigo, a beautiful, customizable theme which you can check out <https://github.com/overhangio/indigo>`__.
+Out of the box, only the default "open-edx" theme is available. We also developed `Indigo, a beautiful, customizable theme <https://github.com/overhangio/indigo>`__ which is easy to install with Tutor.
 
 Running arbitrary ``manage.py`` commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,7 +143,7 @@ To update the course search index, run::
 
 Reloading Open edX settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+soft
 After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) but that is overkill. A quicker alternative is to send the HUP signal to the gunicorn processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
     
     tutor local exec lms reload-gunicorn
