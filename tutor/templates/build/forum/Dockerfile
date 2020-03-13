@@ -14,7 +14,9 @@ RUN wget -O /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/
     && rm /tmp/dockerize.tar.gz
 
 # Install ruby-build for building specific version of ruby
-RUN git clone https://github.com/rbenv/ruby-build.git /openedx/ruby-build
+# The ruby-build version should be periodically updated to reflect the latest release
+ARG RUBY_BUILD_VERSION=v20200224
+RUN git clone https://github.com/rbenv/ruby-build.git --branch $RUBY_BUILD_VERSION /openedx/ruby-build
 WORKDIR /openedx/ruby-build
 RUN PREFIX=/usr/local ./install.sh
 
