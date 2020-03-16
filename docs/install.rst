@@ -3,38 +3,41 @@
 Install Tutor
 =============
 
+.. _requirements:
+
 Requirements
 ------------
 
-The only prerequisite for running this is a working Docker installation. You'll need both the ``docker`` and ``docker-compose`` commands in your system ``$PATH``. Follow the instructions from the official documentation:
+* Supported OS: Tutor runs on any 64-bit, UNIX-based system. It was also reported to work on Windows.
+* Required software:
 
-- `Docker <https://docs.docker.com/engine/installation/>`__: v18.06.0+
-- `Docker Compose <https://docs.docker.com/compose/install/>`__: v1.22.0+
+    - `Docker <https://docs.docker.com/engine/installation/>`__: v18.06.0+
+    - `Docker Compose <https://docs.docker.com/compose/install/>`__: v1.22.0+
 
 .. warning::
     Do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
 
-Note that the production web server container will bind to port 80 and 443, so if there a web server is running on the same server (Apache or Nginx, for instance), it should be stopped prior to running Tutor. Check the section on :ref:`how to setup a web proxy <web_proxy>` for a workaround.
+* Ports 80 and 443 should be open. If other web services run on these ports, check the section on :ref:`how to setup a web proxy <web_proxy>`.
+* Hardware:
 
-With Tutor, Open edX can run on any platform that supports Docker, including Mac OS and Windows. Tutor was tested under various versions of Ubuntu and Mac OS.
-
-At a minimum, the server running the containers should have 4 Gb of RAM. With less memory, the deployment procedure might crash during migrations (see the :ref:`troubleshooting <migrations_killed>` section) and the platform will be unbearably slow.
+    - Minimum configuration: 4 Gb RAM, 2 CPU, 8 Gb disk space
+    - Recommended configuration: 8 Gb RAM, 4 CPU, 25 Gb disk space
 
 .. note::
-    On Mac OS, by default, containers are allocated 2 GB of RAM, which is not enough. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 Gb to the Docker daemon.
+    On Mac OS, by default, containers are allocated 2 GB of RAM, which is not enough. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 Gb to the Docker daemon. If the deployment fails because of insufficient memory during database migrations, check the :ref:`relevant section in the troubleshooting guide <migrations_killed>`.
 
-At least 9Gb of disk space is required.
+.. _install_binary:
 
-Also, the host running the containers should be a 64 bit platform. (images are not built for i386 systems)
-
-Direct binary downloads
------------------------
+Direct binary download
+----------------------
 
 The latest binaries can be downloaded from https://github.com/overhangio/tutor/releases. From the command line:
 
 .. include:: cli_download.rst
 
 This is the simplest and recommended installation method for most people. Note however that you will not be able to use custom plugins with this pre-compiled binary. The only plugins you can use with this approach are those that are already bundled with the binary: see the :ref:`existing plugins <existing_plugins>`.
+
+.. _install_source:
 
 From source
 -----------
@@ -55,10 +58,10 @@ Installing from a local clone of the repository::
 
 .. _cloud_install:
   
-Cloud deployment
-----------------
+Zero-click AWS installation
+---------------------------
 
-Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`_. Shell access is not even required, as all configuration will happen through the Tutor web user interface. For detailed installation instructions, we recommend watching the following video:
+Tutor can be launched on Amazon Web Services very quickly with the `official Tutor AMI <https://aws.amazon.com/marketplace/pp/B07PV3TB8X>`__. Shell access is not required, as all configuration will happen through the Tutor web user interface. For detailed installation instructions, we recommend watching the following video:
 
 .. youtube:: xtXP52qGphA
 

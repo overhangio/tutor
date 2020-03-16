@@ -5,7 +5,7 @@ Local deployment
 
 This method is for deploying Open edX locally on a single server, where docker images are orchestrated with `docker-compose <https://docs.docker.com/compose/overview/>`_.
 
-In the following, environment and data files will be generated in a user-specific project folder which will be referred to as the "**project root**". On Linux, the default project root is ``~/.local/share/tutor``. An alternative project root can be defined by passing the ``--root=...`` option to the ``tutor`` command, or define the ``TUTOR_ROOT=...`` environment variable::
+In the following, environment and data files will be generated in a user-specific project folder which will be referred to as the "**project root**". On Linux, the default project root is ``~/.local/share/tutor``. An alternative project root can be defined by passing the ``--root=...`` option to the ``tutor`` command, or defining the ``TUTOR_ROOT=...`` environment variable::
     
     tutor --root=/path/to/tutorroot run ...
     # Or equivalently:
@@ -168,8 +168,8 @@ You can then view the portainer UI at `http://localhost:9000 <http://localhost:9
 
 Among many other things, you'll be able to view the logs for each container, which is really useful.
 
-Recipes
--------
+Guides
+------
 
 .. _web_proxy:
 
@@ -240,19 +240,27 @@ Of course, your settings should be compatible with the docker installation. You 
 Upgrading from earlier versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Upgrading from v3+
+******************
+
+Just upgrade Tutor using your :ref:`favorite installation method <install>` and run quickstart again::
+
+    tutor local quickstart
+
+Upgrading from v1 or v2
+***********************
+
 Versions 1 and 2 of Tutor were organized differently: they relied on many different ``Makefile`` and ``make`` commands instead of a single ``tutor`` executable. To migrate from an earlier version, you should first stop your platform::
 
     make stop
 
-Then, create the Tutor project root and move your data::
+Then, install Tutor using one of the :ref:`installation methods <install>`. Then, create the Tutor project root and move your data::
 
     mkdir -p "$(tutor config printroot)"
     mv config.json data/ "$(tutor config printroot)"
 
-`Download <https://github.com/overhangio/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path.
-
-Finally, start your platform again::
-
+Finally, launch your platform with::
+    
     tutor local quickstart
 
 Backups/Migrating to a different server
