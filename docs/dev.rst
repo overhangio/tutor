@@ -111,7 +111,7 @@ To debug a local edx-platform repository, add a ``import ipdb; ipdb.set_trace()`
 XBlock and edx-platform plugin development
 ------------------------------------------
 
-In some cases you will have to develop features for packages that are pip-installed next to edx-platform. This is quite easy with Tutor. Just add your packages to the `$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
+In some cases you will have to develop features for packages that are pip-installed next to edx-platform. This is quite easy with Tutor. Just add your packages to the ``$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
 
     echo "-e ./mypackage" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
 
