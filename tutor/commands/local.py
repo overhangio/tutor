@@ -31,8 +31,7 @@ class LocalContext(Context):
 
 
 @click.group(
-    short_help="Run Open edX locally",
-    help="Run Open edX platform locally, with docker-compose.",
+    help="Run Open edX locally with docker-compose",
 )
 @click.pass_context
 def local(context):

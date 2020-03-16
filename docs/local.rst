@@ -143,8 +143,8 @@ To update the course search index, run::
 
 Reloading Open edX settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-soft
-After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) but that is overkill. A quicker alternative is to send the HUP signal to the gunicorn processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
+
+After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) or just a single service (``tutor local restart lms``) but that is overkill. A quicker alternative is to send the HUP signal to the gunicorn processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
     
     tutor local exec lms reload-gunicorn
 

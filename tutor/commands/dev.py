@@ -31,7 +31,7 @@ class DevContext(Context):
         )
 
 
-@click.group(help="Run Open edX platform with development settings")
+@click.group(help="Run Open edX locally with development settings")
 @click.pass_context
 def dev(context):
     context.obj = DevContext(context.obj.root)
