@@ -19,6 +19,11 @@ Do you need professional assistance with your tutor-managed Open edX platform? O
 Logging
 -------
 
+.. note::
+    Logs are of paramount importance for debugging Tutor. When asking for help on the `Tutor forums <https://discuss.overhang.io>`__, **you should always include the unedited logs of your app**. You can get those with::
+        
+         tutor local logs --tail=100 -f
+
 To view the logs from all containers use the ``tutor local logs`` command, which was modeled on the standard `docker-compose logs <https://docs.docker.com/compose/reference/logs/>`_ command::
 
     tutor local logs --follow
@@ -29,7 +34,7 @@ To view the logs from just one container, for instance the web server::
 
 The last commands produce the logs since the creation of the containers, which can be a lot. Similar to a ``tail -f``, you can run::
 
-    tutor local logs--tail=0 -f
+    tutor local logs --tail=0 -f
 
 If you'd rather use a graphical user interface for viewing logs, you are encouraged to try out :ref:`Portainer <portainer>`.
 
