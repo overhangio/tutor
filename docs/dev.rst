@@ -108,6 +108,27 @@ To debug a local edx-platform repository, add a ``import ipdb; ipdb.set_trace()`
 
     tutor dev runserver -v /path/to/edx-platform:/openedx/edx-platform lms
 
+XBlock and edx-platform plugin development
+------------------------------------------
+
+In some cases you will have to develop features for packages that are pip-installed next to edx-platform. This is quite easy with Tutor. Just add your packages to the `$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
+
+    echo "-e ./mypackage" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
+
+The ``requirements`` folder should have the following content::
+
+    env/build/openedx/requirements/
+        private.txt
+        mypackage/
+            setup.py
+            ...
+
+You will have to re-build the openedx Docker image once::
+    
+    tutor images build openedx
+
+You should then run the development server as usual, with ``runserver``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
+
 .. _theming:
 
 Customised themes

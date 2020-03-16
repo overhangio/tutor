@@ -47,7 +47,7 @@ This is not an error with Tutor, but with your Docker installation. This is freq
     
     docker run --rm hello-world
     
-If the above command does not work, you should fix your Docker installation. Some people will suggest to run Docker as root, or with `sudo`; *do not do this*. Instead, what you should probably do is to add your user to the "docker" group. For more information, check out the `official Docker installation instructions <https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user>`__.
+If the above command does not work, you should fix your Docker installation. Some people will suggest to run Docker as root, or with ``sudo``; **do not do this**. Instead, what you should probably do is to add your user to the "docker" group. For more information, check out the `official Docker installation instructions <https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user>`__.
 
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------
