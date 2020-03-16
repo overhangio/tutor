@@ -149,6 +149,10 @@ The LMS can then be accessed at http://localhost:8000. You will then have to :re
     
     tutor dev settheme mythemename localhost:8000 localhost:8001
 
+Re-build development docker image (and compile assets)::
+    
+    tutor images build openedx-dev
+
 Watch the themes folders for changes (in a different terminal)::
 
     tutor dev run watchthemes
