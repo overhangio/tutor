@@ -63,7 +63,7 @@ Releasing a new version
 -----------------------
 
 - Bump the ``__version__`` value in ``tutor/__about__.py``.
-- Replace "Latest" by the version name in CHANGELOG.md.
+- Replace "Latest" by the version name and date in CHANGELOG.md.
 - Create a commit with the version changelog.
 - ``make release`` (this assumes that there are two remotes named "origin" and "overhangio")
 

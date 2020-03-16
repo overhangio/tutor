@@ -1,15 +1,15 @@
 .. _install:
 
-Installation
-============
+Install Tutor
+=============
 
 Requirements
 ------------
 
 The only prerequisite for running this is a working Docker installation. You'll need both the ``docker`` and ``docker-compose`` commands in your system ``$PATH``. Follow the instructions from the official documentation:
 
-- `Docker <https://docs.docker.com/engine/installation/>`_: minimum supported version is 18.06.0.
-- `Docker Compose <https://docs.docker.com/compose/install/>`_
+- `Docker <https://docs.docker.com/engine/installation/>`__: v18.06.0+
+- `Docker Compose <https://docs.docker.com/compose/install/>`__: v1.22.0+
 
 .. warning::
     Do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.

@@ -1,7 +1,7 @@
 .. _quickstart:
 
 Quickstart (1-click install)
-============================
+----------------------------
 
 1. `Download <https://github.com/overhangio/tutor/releases>`_ the latest stable release of Tutor, uncompress the file and place the ``tutor`` executable in your path. From the command line:
 
@@ -22,4 +22,4 @@ Yes :) This is what happens when you run ``tutor local quickstart``:
 
 The whole procedure should require less than 10 minutes, on a server with a good bandwidth. Note that your host environment will not be affected in any way, since everything runs inside docker containers. Root access is not even necessary.
 
-There's a lot more to Tutor than that! To understand what Tutor does and how it works, take a look at the :ref:`introduction <intro>`.
+There's a lot more to Tutor than that! To understand what Tutor does and how it works, take a look at the :ref:`getting started guide <gettingstarted>`.

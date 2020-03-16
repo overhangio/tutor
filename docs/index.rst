@@ -19,13 +19,9 @@
    :maxdepth: 2
    :caption: User guide
 
-   intro
-   install
-   quickstart
+   gettingstarted
+   run
    configuration
-   local
-   k8s
-   dev
    plugins
    extra
    troubleshooting

@@ -1,5 +1,5 @@
 User testimonials
-=================
+-----------------
 
 *"Tutor is an absolutely fabulous initiative"* -- Lionel Meinertzhagen, Learning engineer - `Université Libre de Bruxelles <https://www.ulb.be/>`__
 
