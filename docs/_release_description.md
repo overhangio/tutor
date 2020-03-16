@@ -5,4 +5,4 @@ Tutor can be installed simply by downloading the compiled binaries:
 
 See the [installation docs](https://docs.tutor.overhang.io/install.html) for more installation options and instructions.
 
-## Features
+## Changes

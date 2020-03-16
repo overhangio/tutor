@@ -49,20 +49,28 @@ This is not an error with Tutor, but with your Docker installation. This is freq
     
 If the above command does not work, you should fix your Docker installation. Some people will suggest to run Docker as root, or with ``sudo``; **do not do this**. Instead, what you should probably do is to add your user to the "docker" group. For more information, check out the `official Docker installation instructions <https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user>`__.
 
+.. _migrations_killed:
+
+"Running migrations... Killed!" / "Command failed with status 137: docker-compose"
+----------------------------------------------------------------------------------
+
+Open edX requires at least 4 GB RAM, in particular to run the SQL migrations. If the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to buy more memory or add swap to your machine. On Docker for Mac OS, by default, containers are allocated at most 2 GB of RAM. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 Gb to the Docker daemon.
+
+If migrations were killed halfway, there is a good chance that the MySQL database is in a state that is hard to recover from. The easiest way to recover is simply to delete all the MySQL data and restart the quickstart process. After you have allocated more memory to the Docker daemon, run::
+    
+    tutor local stop
+    sudo rm -rf "$(tutor config printroot)/data/mysql"
+    tutor local quickstart
+    
+.. warning::
+    THIS WILL ERASE ALL YOUR DATA! Do not run this on a production instance. This solution is only viable for new Open edX installations.
+
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------
 
 You can identify which containers are consuming most resources by running::
 
     docker stats
-
-.. _migrations_killed:
-
-"Running migrations... Killed!"
--------------------------------
-
-Older versions of Open edX required at least 4 GB RAM, in particular to run the Open edX SQL migrations. On Docker for Mac, by default, containers are allocated at most 2 GB of RAM. On Mac OS, if the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to increase the allocated RAM. Follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`_.
-
 
 "Build failed running pavelib.servers.lms: Subprocess return code: 1"
 -----------------------------------------------------------------------
