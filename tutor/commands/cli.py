@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+import os
 import sys
 
 import appdirs
@@ -53,6 +54,10 @@ def main():
 )
 @click.pass_context
 def cli(context, root):
+    if os.getuid() == 0:
+        fmt.echo_alert(
+            "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
+        )
     context.obj = Context(root)
 
 
