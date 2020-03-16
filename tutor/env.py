@@ -14,7 +14,7 @@ from .__about__ import __version__
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
-BIN_FILE_EXTENSIONS = [".ico", ".ttf", ".png", ".jpg"]
+BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf"]
 
 
 class Renderer:

@@ -144,6 +144,24 @@ Example::
 
 With the above declaration, you can store plugin-specific templates in the ``templates/myplugin`` folder next to the ``plugin.py`` file.
 
+In Tutor, templates are `Jinja2 <https://jinja.palletsprojects.com/en/2.11.x/>`__-formatted files that will be rendered in the Tutor environment (the ``$(tutor config printroot)/env`` folder) when running ``tutor config save``. The environment files are overwritten every time the environment is saved. Plugin developers can create templates that make use of the built-in `Jinja2 API <https://jinja.palletsprojects.com/en/2.11.x/api/>`__. In addition, a couple additional filters are added by Tutor::
+    
+* ``common_domain``: Return the longest common name between two domain names. Example: ``{{ "studio.demo.myopenedx.com"|common_domain("lms.demo.myopenedx.com") }}`` is equal to "demo.myopenedx.com".
+* ``list_if``: In a list of ``(value, condition)`` tuples, return the list of ``value`` for which the ``condition`` is true.
+* ``patch``: See :ref:`patches <plugin_patches>`.
+* ``random_string``: Return a random string of the given length composed of ASCII letters and digits. Example: ``{{ 8|random_string }}``.
+* ``reverse_host``: Reverse a domain name (see `reference <https://en.wikipedia.org/wiki/Reverse_domain_name_notation>`__). Example: ``{{ "demo.myopenedx.com"|reverse_host }}`` is equal to "com.myopenedx.demo".
+* ``walk_templates``: Iterate recursively over the templates of the given folder. For instance: 
+
+    {% for file in "apps/myplugin"|walk_templates %}
+    ...
+    {% endfor %}
+
+When saving the environment, template files that are stored in a template root will be rendered to the environment folder. The following files are excluded:
+
+* Binary files with the following extensions: .ico, .jpg, .png, .ttf
+* Files that are stored in a folder named "partials", or one of its subfolders.
+
 .. _plugin_command:
 
 command
