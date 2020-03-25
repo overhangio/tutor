@@ -206,7 +206,7 @@ kind: Deployment
 metadata:
   name: elasticsearch
   labels:
-    app.kubernetes.io/name: elasticearch
+    app.kubernetes.io/name: elasticsearch
 spec:
   selector:
     matchLabels:

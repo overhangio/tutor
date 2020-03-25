@@ -6,7 +6,7 @@ metadata:
   name: elasticsearch
   labels:
     app.kubernetes.io/component: volume
-    app.kubernetes.io/name: elasticearch
+    app.kubernetes.io/name: elasticsearch
 spec:
   accessModes:
     - ReadWriteOnce
