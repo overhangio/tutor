@@ -12,20 +12,19 @@ from .. import utils
 class DevContext(Context):
     @staticmethod
     def docker_compose(root, config, *command):
-        args = [
-            "-f",
-            tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-        ]
-        override_path = tutor_env.pathjoin(root, "local", "docker-compose.override.yml")
-        if os.path.exists(override_path):
-            args += ["-f", override_path]
-        args += [
-            "-f",
-            tutor_env.pathjoin(root, "dev", "docker-compose.yml"),
-        ]
-        override_path = tutor_env.pathjoin(root, "dev", "docker-compose.override.yml")
-        if os.path.exists(override_path):
-            args += ["-f", override_path]
+        args = []
+        for folder in ["local", "dev"]:
+            # Add docker-compose.yml and docker-compose.override.yml (if it exists)
+            # from "local" and "dev" folders
+            args += [
+                "-f",
+                tutor_env.pathjoin(root, folder, "docker-compose.yml"),
+            ]
+            override_path = tutor_env.pathjoin(
+                root, folder, "docker-compose.override.yml"
+            )
+            if os.path.exists(override_path):
+                args += ["-f", override_path]
         return utils.docker_compose(
             *args, "--project-name", config["DEV_PROJECT_NAME"], *command,
         )

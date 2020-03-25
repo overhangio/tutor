@@ -1,8 +1,10 @@
 import click
 
 from .. import config as tutor_config
+from .. import env as tutor_env
 from .. import fmt
 from .. import scripts
+from .. import serialize
 from .. import utils
 
 
@@ -11,11 +13,62 @@ class ScriptRunner(scripts.BaseRunner):
         super().__init__(root, config)
         self.docker_compose_func = docker_compose_func
 
-    def exec(self, service, command):
+    def run_job(self, service, command):
+        """
+        Run the "{{ service }}-job" service from local/docker-compose.jobs.yml with the
+        specified command. For backward-compatibility reasons, if the corresponding
+        service does not exist, run the service from good old regular
+        docker-compose.yml.
+        """
+        jobs_path = tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml")
+        job_service_name = "{}-job".format(service)
         opts = [] if utils.is_a_tty() else ["-T"]
-        self.docker_compose_func(
-            self.root, self.config, "exec", *opts, service, "sh", "-e", "-c", command
-        )
+        if job_service_name in serialize.load(open(jobs_path).read())["services"]:
+            self.docker_compose_func(
+                self.root,
+                self.config,
+                "-f",
+                jobs_path,
+                "run",
+                *opts,
+                "--rm",
+                job_service_name,
+                "sh",
+                "-e",
+                "-c",
+                command,
+            )
+        else:
+            fmt.echo_alert(
+                (
+                    "The '{job_service_name}' service does not exist in {jobs_path}. "
+                    "This might be caused by an older plugin. Tutor switched to a job "
+                    "runner model for running one-time commands, such as database"
+                    " initialisation. For the record, this is the command that we are "
+                    "running:\n"
+                    "\n"
+                    "    {command}\n"
+                    "\n"
+                    "Old-style job running will be deprecated soon. Please inform "
+                    "your plugin maintainer!"
+                ).format(
+                    job_service_name=job_service_name,
+                    jobs_path=jobs_path,
+                    command=command.replace("\n", "\n    "),
+                )
+            )
+            self.docker_compose_func(
+                self.root,
+                self.config,
+                "run",
+                *opts,
+                "--rm",
+                service,
+                "sh",
+                "-e",
+                "-c",
+                command,
+            )
 
 
 @click.command(help="Update docker images")
@@ -73,7 +126,7 @@ def restart(context, services):
         pass
     else:
         for service in services:
-            if "openedx" == service:
+            if service == "openedx":
                 if config["ACTIVATE_LMS"]:
                     command += ["lms", "lms-worker"]
                 if config["ACTIVATE_CMS"]:
@@ -138,7 +191,7 @@ def run_hook(context, service, path):
     fmt.echo_info(
         "Running '{}' hook in '{}' container...".format(".".join(path), service)
     )
-    runner.run(service, *path)
+    runner.run_job_from_template(service, *path)
 
 
 @click.command(help="View output from containers")
@@ -171,11 +224,10 @@ def logs(context, follow, tail, service):
 def createuser(context, superuser, staff, password, name, email):
     config = tutor_config.load(context.root)
     runner = ScriptRunner(context.root, config, context.docker_compose)
-    runner.check_service_is_activated("lms")
     command = scripts.create_user_command(
         superuser, staff, name, email, password=password
     )
-    runner.exec("lms", command)
+    runner.run_job("lms", command)
 
 
 @click.command(

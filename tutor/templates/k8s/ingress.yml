@@ -1,11 +1,12 @@
 ---{% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: web
   labels:
     app.kubernetes.io/name: web
   annotations:
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/proxy-body-size: 1000m
     {% if ACTIVATE_HTTPS%}kubernetes.io/tls-acme: "true"
     cert-manager.io/issuer: letsencrypt{% endif %}
@@ -22,9 +23,11 @@ spec:
   {% if ACTIVATE_HTTPS %}
   tls:
   - hosts:
-    {% for host in hosts %}
-    - {{ host }}{% endfor %}
-    {{ patch("k8s-ingress-tls-hosts")|indent(6) }}
+      {% for host in hosts %}
+      - {{ host }}{% endfor %}
+      {{ patch("k8s-ingress-tls-hosts")|indent(6) }}
+    # TODO maybe we should not take care of generating certificates ourselves
+    # and here just point to a tls secret
     secretName: letsencrypt
   {%endif%}
 {% if ACTIVATE_HTTPS %}

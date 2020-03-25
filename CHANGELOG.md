@@ -5,6 +5,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## Unreleased
 
 - [Improvement] Fix tls certificate generation in k8s
+- [Improvement] Radically change the way jobs are run: we no longer "exec", but instead run a dedicated container.
 - [Improvement] Upgrade k8s certificate issuer to cert-manager.io/v1alpha2
 - [Feature] Add SCORM XBlock to default openedx docker image
 

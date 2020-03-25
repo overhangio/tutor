@@ -1,5 +1,4 @@
 from . import env
-from . import exceptions
 from . import fmt
 from . import plugins
 
@@ -14,26 +13,15 @@ class BaseRunner:
         self.root = root
         self.config = config
 
-    def run(self, service, *path):
+    def run_job_from_template(self, service, *path):
         command = self.render(*path)
-        self.exec(service, command)
+        self.run_job(service, command)
 
     def render(self, *path):
         return env.render_file(self.config, *path).strip()
 
-    def exec(self, service, command):
+    def run_job(self, service, command):
         raise NotImplementedError
-
-    def check_service_is_activated(self, service):
-        if not self.is_activated(service):
-            raise exceptions.TutorError(
-                "This command may only be executed on the server where the {} is running".format(
-                    service
-                )
-            )
-
-    def is_activated(self, service):
-        return self.config["ACTIVATE_" + service.upper()]
 
     def iter_plugin_hooks(self, hook):
         yield from plugins.iter_hooks(self.config, hook)
@@ -41,7 +29,7 @@ class BaseRunner:
 
 def initialise(runner):
     fmt.echo_info("Initialising all services...")
-    runner.run("mysql", "hooks", "mysql", "init")
+    runner.run_job_from_template("mysql", "hooks", "mysql", "init")
     for plugin_name, hook in runner.iter_plugin_hooks("pre-init"):
         for service in hook:
             fmt.echo_info(
@@ -49,17 +37,18 @@ def initialise(runner):
                     plugin_name, service
                 )
             )
-            runner.run(service, plugin_name, "hooks", service, "pre-init")
+            runner.run_job_from_template(
+                service, plugin_name, "hooks", service, "pre-init"
+            )
     for service in ["lms", "cms", "forum"]:
-        if runner.is_activated(service):
-            fmt.echo_info("Initialising {}...".format(service))
-            runner.run(service, "hooks", service, "init")
+        fmt.echo_info("Initialising {}...".format(service))
+        runner.run_job_from_template(service, "hooks", service, "init")
     for plugin_name, hook in runner.iter_plugin_hooks("init"):
         for service in hook:
             fmt.echo_info(
                 "Plugin {}: running init for service {}...".format(plugin_name, service)
             )
-            runner.run(service, plugin_name, "hooks", service, "init")
+            runner.run_job_from_template(service, plugin_name, "hooks", service, "init")
     fmt.echo_info("All services initialised.")
 
 
@@ -90,8 +79,7 @@ u.save()"
 
 
 def import_demo_course(runner):
-    runner.check_service_is_activated("cms")
-    runner.run("cms", "hooks", "cms", "importdemocourse")
+    runner.run_job_from_template("cms", "hooks", "cms", "importdemocourse")
 
 
 def set_theme(theme_name, domain_name, runner):
@@ -108,5 +96,4 @@ site.themes.all().delete()
 site.themes.create(theme_dir_name='{theme_name}')"
 """
     command = command.format(theme_name=theme_name, domain_name=domain_name)
-    runner.check_service_is_activated("lms")
-    runner.exec("lms", command)
+    runner.run_job("lms", command)

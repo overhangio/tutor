@@ -1,4 +1,3 @@
-import json
 import os
 
 from . import exceptions
@@ -126,6 +125,10 @@ def load_plugins(config, defaults):
         # Create new defaults
         for key, value in plugin.config_defaults.items():
             defaults[plugin.config_key(key)] = value
+
+
+def is_service_activated(config, service):
+    return config["ACTIVATE_" + service.upper()]
 
 
 def upgrade_obsolete(config):

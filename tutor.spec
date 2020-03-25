@@ -27,6 +27,7 @@ hidden_imports.append("Crypto.Hash.SHA256")
 hidden_imports.append("Crypto.PublicKey.RSA")
 hidden_imports.append("Crypto.Random")
 hidden_imports.append("Crypto.Signature.PKCS1_v1_5")
+hidden_imports.append("kubernetes")
 hidden_imports.append("uuid")
 
 

@@ -7,6 +7,10 @@ def load(stream):
     return yaml.load(stream, Loader=yaml.SafeLoader)
 
 
+def load_all(stream):
+    return yaml.load_all(stream, Loader=yaml.SafeLoader)
+
+
 def dump(content, fileobj):
     yaml.dump(content, stream=fileobj, default_flow_style=False)
 

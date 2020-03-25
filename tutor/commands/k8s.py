@@ -1,10 +1,15 @@
+from datetime import datetime
+from time import sleep
+
 import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
+from .. import exceptions
 from .. import fmt
 from .. import interactive as interactive_config
 from .. import scripts
+from .. import serialize
 from .. import utils
 
 
@@ -47,6 +52,7 @@ def start(context):
         "app.kubernetes.io/component=namespace",
     )
     # Create volumes
+    # TODO: instead, we should use StatefulSets
     utils.kubectl(
         "apply",
         "--kustomize",
@@ -55,8 +61,14 @@ def start(context):
         "--selector",
         "app.kubernetes.io/component=volume",
     )
-    # Create everything else
-    utils.kubectl("apply", "--kustomize", tutor_env.pathjoin(context.root))
+    # Create everything else except jobs
+    utils.kubectl(
+        "apply",
+        "--kustomize",
+        tutor_env.pathjoin(context.root),
+        "--selector",
+        "app.kubernetes.io/component!=job",
+    )
 
 
 @click.command(help="Stop a running platform")
@@ -64,7 +76,9 @@ def start(context):
 def stop(context):
     config = tutor_config.load(context.root)
     utils.kubectl(
-        "delete", *resource_selector(config), "deployments,services,ingress,configmaps"
+        "delete",
+        *resource_selector(config),
+        "deployments,services,ingress,configmaps,jobs",
     )
 
 
@@ -108,7 +122,7 @@ def init(context):
     config = tutor_config.load(context.root)
     runner = K8sScriptRunner(context.root, config)
     for service in ["mysql", "elasticsearch", "mongodb"]:
-        if runner.is_activated(service):
+        if tutor_config.is_service_activated(config, service):
             wait_for_pod_ready(config, service)
     scripts.initialise(runner)
 
@@ -126,8 +140,6 @@ def init(context):
 @click.pass_obj
 def createuser(context, superuser, staff, password, name, email):
     config = tutor_config.load(context.root)
-    runner = K8sScriptRunner(context.root, config)
-    runner.check_service_is_activated("lms")
     command = scripts.create_user_command(
         superuser, staff, name, email, password=password
     )
@@ -189,24 +201,161 @@ def logs(context, container, follow, tail, service):
     utils.kubectl(*command)
 
 
+class K8sClients:
+    _instance = None
+
+    def __init__(self):
+        # Loading the kubernetes module here to avoid import overhead
+        from kubernetes import client, config  # pylint: disable=import-outside-toplevel
+
+        config.load_kube_config()
+        self._batch_api = None
+        self._core_api = None
+        self._client = client
+
+    @classmethod
+    def instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    @property
+    def batch_api(self):
+        if self._batch_api is None:
+            self._batch_api = self._client.BatchV1Api()
+        return self._batch_api
+
+    @property
+    def core_api(self):
+        if self._core_api is None:
+            self._core_api = self._client.CoreV1Api()
+        return self._core_api
+
+
 class K8sScriptRunner(scripts.BaseRunner):
-    def exec(self, service, command):
-        kubectl_exec(self.config, service, command, attach=False)
+    def load_job(self, name):
+        jobs = self.render("k8s", "jobs.yml")
+        for job in serialize.load_all(jobs):
+            if job["metadata"]["name"] == name:
+                return job
+        raise ValueError("Could not find job '{}'".format(name))
+
+    def active_job_names(self):
+        """
+        Return a list of active job names
+        Docs:
+        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-job-v1-batch
+        """
+        api = K8sClients.instance().batch_api
+        return [
+            job.metadata.name
+            for job in api.list_namespaced_job(self.config["K8S_NAMESPACE"]).items
+            if job.status.active
+        ]
+
+    def run_job(self, service, command):
+        job_name = "{}-job".format(service)
+        try:
+            job = self.load_job(job_name)
+        except ValueError:
+            message = (
+                "The '{job_name}' kubernetes job does not exist in the list of job "
+                "runners. This might be caused by an older plugin. Tutor switched to a"
+                " job runner model for running one-time commands, such as database"
+                " initialisation. For the record, this is the command that we are "
+                "running:\n"
+                "\n"
+                "    {command}\n"
+                "\n"
+                "Old-style job running will be deprecated soon. Please inform "
+                "your plugin maintainer!"
+            ).format(
+                job_name=job_name,
+                command=command.replace("\n", "\n    "),
+            )
+            fmt.echo_alert(message)
+            wait_for_pod_ready(self.config, service)
+            kubectl_exec(self.config, service, command)
+            return
+        # Create a unique job name to make it deduplicate jobs and make it easier to
+        # find later. Logs of older jobs will remain available for some time.
+        job_name += "-" + datetime.now().strftime("%Y%m%d%H%M%S")
+
+        # Wait until all other jobs are completed
+        while True:
+            active_jobs = self.active_job_names()
+            if not active_jobs:
+                break
+            fmt.echo_info(
+                "Waiting for active jobs to terminate: {}".format(" ".join(active_jobs))
+            )
+            sleep(5)
+
+        # Configure job
+        job["metadata"]["name"] = job_name
+        job["metadata"].setdefault("labels", {})
+        job["metadata"]["labels"]["app.kubernetes.io/name"] = job_name
+        job["spec"]["template"]["spec"]["containers"][0]["args"] = [
+            "sh",
+            "-e",
+            "-c",
+            command,
+        ]
+        job["spec"]["backoffLimit"] = 1
+        job["spec"]["ttlSecondsAfterFinished"] = 3600
+        # Save patched job to "jobs.yml" file
+        with open(tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w") as job_file:
+            serialize.dump(job, job_file)
+        # We cannot use the k8s API to create the job: configMap and volume names need
+        # to be found with the right suffixes.
+        utils.kubectl(
+            "apply",
+            "--kustomize",
+            tutor_env.pathjoin(self.root),
+            "--selector",
+            "app.kubernetes.io/name={}".format(job_name),
+        )
+
+        message = (
+            "Job {job_name} is running. To view the logs from this job, run:\n\n"
+            """    kubectl logs --namespace={namespace} --follow $(kubectl get --namespace={namespace} pods """
+            """--selector=job-name={job_name} -o=jsonpath="{{.items[0].metadata.name}}")\n\n"""
+            "Waiting for job completion..."
+        ).format(job_name=job_name, namespace=self.config["K8S_NAMESPACE"])
+        fmt.echo_info(message)
+
+        # Wait for completion
+        field_selector = "metadata.name={}".format(job_name)
+        while True:
+            jobs = K8sClients.instance().batch_api.list_namespaced_job(
+                self.config["K8S_NAMESPACE"], field_selector=field_selector
+            )
+            if not jobs.items:
+                continue
+            job = jobs.items[0]
+            if not job.status.active:
+                if job.status.succeeded:
+                    fmt.echo_info("Job {} successful.".format(job_name))
+                    break
+                if job.status.failed:
+                    raise exceptions.TutorError(
+                        "Job {} failed. View the job logs to debug this issue.".format(
+                            job_name
+                        )
+                    )
+            sleep(5)
 
 
 def kubectl_exec(config, service, command, attach=False):
     selector = "app.kubernetes.io/name={}".format(service)
-
-    # Find pod in runner deployment
-    wait_for_pod_ready(config, service)
-    fmt.echo_info("Finding pod name for {} deployment...".format(service))
-    pod = utils.check_output(
-        "kubectl",
-        "get",
-        *resource_selector(config, selector),
-        "pods",
-        "-o=jsonpath={.items[0].metadata.name}",
+    pods = K8sClients.instance().core_api.list_namespaced_pod(
+        namespace=config["K8S_NAMESPACE"], label_selector=selector
     )
+    if not pods.items:
+        raise exceptions.TutorError(
+            "Could not find an active pod for the {} service".format(service)
+        )
+    pod_name = pods.items[0].metadata.name
 
     # Run command
     attach_opts = ["-i", "-t"] if attach else []
@@ -215,7 +364,7 @@ def kubectl_exec(config, service, command, attach=False):
         *attach_opts,
         "--namespace",
         config["K8S_NAMESPACE"],
-        pod.decode(),
+        pod_name,
         "--",
         "sh",
         "-e",

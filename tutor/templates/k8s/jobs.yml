@@ -1,0 +1,106 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lms-job
+  labels:
+    app.kubernetes.io/component: job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: lms
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        volumeMounts:
+          - mountPath: /openedx/edx-platform/lms/envs/tutor/
+            name: settings-lms
+          - mountPath: /openedx/edx-platform/cms/envs/tutor/
+            name: settings-cms
+          - mountPath: /openedx/config
+            name: config
+      volumes:
+      - name: settings-lms
+        configMap:
+          name: openedx-settings-lms
+      - name: settings-cms
+        configMap:
+          name: openedx-settings-cms
+      - name: config
+        configMap:
+          name: openedx-config
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cms-job
+  labels:
+    app.kubernetes.io/component: job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: cms
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        env:
+        - name: SERVICE_VARIANT
+          value: cms
+        volumeMounts:
+          - mountPath: /openedx/edx-platform/lms/envs/tutor/
+            name: settings-lms
+          - mountPath: /openedx/edx-platform/cms/envs/tutor/
+            name: settings-cms
+          - mountPath: /openedx/config
+            name: config
+      volumes:
+      - name: settings-lms
+        configMap:
+          name: openedx-settings-lms
+      - name: settings-cms
+        configMap:
+          name: openedx-settings-cms
+      - name: config
+        configMap:
+          name: openedx-config
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-job
+  labels:
+    app.kubernetes.io/component: job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mysql
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+        command: []
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: forum-job
+  labels:
+    app.kubernetes.io/component: job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: forum
+        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
+        env:
+          - name: SEARCH_SERVER
+            value: "{{ ELASTICSEARCH_SCHEME }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
+          - name: MONGODB_AUTH
+            value: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
+          - name: MONGODB_HOST
+            value: "{{ MONGODB_HOST }}"
+          - name: MONGODB_PORT
+            value: "{{ MONGODB_PORT }}"
+
+{{ patch("k8s-jobs") }}
+
