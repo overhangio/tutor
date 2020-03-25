@@ -9,7 +9,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Improvement] Modify nginx access logs to include request scheme and server name (plugin developers should use the "tutor" log format)
 - [Bugfix] Fix DNS resolution of restarted service
 - [Feature] Restart multiple services with `local restart`
-- [Feature] Make it possible to easily reload openedx gunicorn process with `tutor local exec lms reload-gunicorn``
+- [Feature] Make it possible to easily reload openedx gunicorn process with `tutor local exec lms reload-gunicorn`
 - [Improvement] Rename lms/cms_worker to lms/cms-worker in local deployment
 - [Improvement] Add the management plugin to the rabbitmq container
 - [Improvement] Make it possible to run an Elasticsearch service on https
