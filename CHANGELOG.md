@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Upgrade k8s certificate issuer to cert-manager.io/v1alpha2
 - [Feature] Add SCORM XBlock to default openedx docker image
 
 ## v3.11.12 (2020-04-16)
