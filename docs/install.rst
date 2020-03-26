@@ -90,3 +90,26 @@ After opening a new shell, you can test auto-completion by typing::
     tutor <tab><tab>
 
 .. include:: podman.rst
+
+Uninstallation
+--------------
+
+It is fairly easy to completely uninstall Tutor and to delete the any Open edX platforms that is running locally.
+
+First of all, stop any locally-running platform::
+    
+    tutor local stop
+    tutor dev stop
+
+Then, delete all data associated to your Open edX platform::
+    
+    # WARNING: this step is irreversible
+    sudo rm -rf "$(tutor config printroot)"
+
+Finally, uninstall Tutor itself::
+    
+    # If you installed tutor from source
+    pip uninstall tutor-openedx
+    
+    # If you downloaded the tutor binary
+    sudo rm /usr/local/bin/tutor
