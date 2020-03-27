@@ -3,6 +3,7 @@ import click
 from .. import config as tutor_config
 from .. import fmt
 from .. import scripts
+from .. import utils
 
 
 class ScriptRunner(scripts.BaseRunner):
@@ -90,7 +91,10 @@ def restart(context, services):
 @click.pass_obj
 def run(context, args):
     config = tutor_config.load(context.root)
-    context.docker_compose(context.root, config, "run", "--rm", *args)
+    command = ["run", "--rm"]
+    if not utils.is_a_tty():
+        command.append("-T")
+    context.docker_compose(context.root, config, *command, *args)
 
 
 @click.command(

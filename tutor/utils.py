@@ -4,6 +4,7 @@ import random
 import shutil
 import string
 import subprocess
+import sys
 
 import click
 
@@ -66,7 +67,10 @@ def walk_files(path):
 
 
 def docker_run(*command):
-    return docker("run", "--rm", "-it", *command)
+    args = ["run", "--rm"]
+    if is_a_tty():
+        args.append("-it")
+    return docker(*args, *command)
 
 
 def docker(*command):
@@ -92,6 +96,12 @@ def kubectl(*command):
         )
     return execute("kubectl", *command)
 
+def is_a_tty():
+    """
+    Return True if stdin is able to allocate a tty. Tty allocation sometimes cannot be
+    enabled, for instance in cron jobs
+    """
+    return os.isatty(sys.stdin.fileno())
 
 def execute(*command):
     click.echo(fmt.command(" ".join(command)))

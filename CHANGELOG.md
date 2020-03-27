@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix tls certificate generation in cron jobs
+
 ## v3.11.6 (2020-03-13)
 
 - [Bugfix] Fix "Unable to resolve dependency" error during forum initialisation
