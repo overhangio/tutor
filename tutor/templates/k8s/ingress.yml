@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/name: web
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 1000m
-    {% if ACTIVATE_HTTPS%}cert-manager.io/issuer: letsencrypt
-    cert-manager.io/acme-challenge-type: http01{% endif %}
+    {% if ACTIVATE_HTTPS%}kubernetes.io/tls-acme: "true"
+    cert-manager.io/issuer: letsencrypt{% endif %}
 spec:
   rules:
   {% for host in hosts %}
@@ -42,21 +42,8 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-privatekey
     solvers:
-      - http01:
+      - selector: {}
+        http01:
           ingress:
             class: nginx
----
-apiVersion: cert-manager.io/v1alpha2
-kind: Certificate
-metadata:
-  name: {{ LMS_HOST|replace(".", "-") }}
-spec:
-  secretName: {{ LMS_HOST }}-tls
-  issuerRef:
-    name: letsencrypt
-  commonName: {{ LMS_HOST }}
-  dnsNames:
-  - {{ LMS_HOST }}
-  - {{ CMS_HOST }}
-{{ patch("k8s-ingress-certificates") }}
 {% endif %}

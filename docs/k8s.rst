@@ -58,6 +58,19 @@ If you decide to enable HTTPS certificates, you will also have to set ``WEB_PROX
 
 Note that this configuration might conflict with a local installation.
 
+.. warning::
+    On DigitalOcean, there is currently a bug that prevents certificate issuers from successfully fetching TLS certificates from Let's Encrypt. A workaround consists in adding a custom annotation to the "ingress-nginx" service::
+        
+        kubectl -n ingress-nginx patch service ingress-nginx -p \
+            '{"metadata": {"annotations": {"service.beta.kubernetes.io/do-loadbalancer-hostname": "YOURLMSHOSTHERE"}}}'
+    
+    Sources:
+    
+    * https://www.digitalocean.com/community/questions/how-do-i-correct-a-connection-timed-out-error-during-http-01-challenge-propagation-with-cert-manager
+    * https://www.digitalocean.com/community/questions/pod-unable-to-curl-loadbalancer
+    * https://github.com/jetstack/cert-manager/issues/863#issuecomment-567062996
+    * https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/examples/README.md#accessing-pods-over-a-managed-load-balancer-from-inside-the-cluster
+
 S3-like object storage with `MinIO <https://www.minio.io/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
