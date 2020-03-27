@@ -96,12 +96,14 @@ def kubectl(*command):
         )
     return execute("kubectl", *command)
 
+
 def is_a_tty():
     """
     Return True if stdin is able to allocate a tty. Tty allocation sometimes cannot be
     enabled, for instance in cron jobs
     """
     return os.isatty(sys.stdin.fileno())
+
 
 def execute(*command):
     click.echo(fmt.command(" ".join(command)))
