@@ -9,7 +9,7 @@ click-repl==0.1.6
 click==7.1.1
 jinja2==2.11.1
 markupsafe==1.1.1         # via jinja2
-prompt-toolkit==3.0.4     # via click-repl
+prompt-toolkit==3.0.5     # via click-repl
 pyyaml==5.3.1
 six==1.14.0               # via click-repl
 wcwidth==0.1.9            # via prompt-toolkit
