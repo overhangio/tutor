@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.11.7 (2020-04-01)
 
 - [Bugfix] Fix missing js translations
 - [Bugfix] Fix tls certificate generation in cron jobs
