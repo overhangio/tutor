@@ -75,6 +75,12 @@ ENV CONFIG_ROOT /openedx/config
 COPY settings/lms/*.py ./lms/envs/tutor/
 COPY settings/cms/*.py ./cms/envs/tutor/
 
+# Compile i18n strings: in Ironwood, js locales are not properly compiled out of the box
+# and we need to do a pass ourselves. Also, we need to compile the djangojs.js files for
+# the downloaded locales.
+RUN ./manage.py lms --settings=tutor.i18n compilejsi18n
+RUN ./manage.py cms --settings=tutor.i18n compilejsi18n
+
 # Copy scripts
 COPY ./bin /openedx/bin
 RUN chmod a+x /openedx/bin/*
