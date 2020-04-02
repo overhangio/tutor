@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix "missing tty" during init in cron jobs
+
 ## v3.11.7 (2020-04-01)
 
 - [Bugfix] Fix missing js translations

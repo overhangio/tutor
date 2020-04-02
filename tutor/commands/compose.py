@@ -12,8 +12,9 @@ class ScriptRunner(scripts.BaseRunner):
         self.docker_compose_func = docker_compose_func
 
     def exec(self, service, command):
+        opts = [] if utils.is_a_tty() else ["-T"]
         self.docker_compose_func(
-            self.root, self.config, "exec", service, "sh", "-e", "-c", command
+            self.root, self.config, "exec", *opts, service, "sh", "-e", "-c", command
         )
 
 
