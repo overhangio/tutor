@@ -147,6 +147,7 @@ With the above declaration, you can store plugin-specific templates in the ``tem
 In Tutor, templates are `Jinja2 <https://jinja.palletsprojects.com/en/2.11.x/>`__-formatted files that will be rendered in the Tutor environment (the ``$(tutor config printroot)/env`` folder) when running ``tutor config save``. The environment files are overwritten every time the environment is saved. Plugin developers can create templates that make use of the built-in `Jinja2 API <https://jinja.palletsprojects.com/en/2.11.x/api/>`__. In addition, a couple additional filters are added by Tutor:
     
 * ``common_domain``: Return the longest common name between two domain names. Example: ``{{ "studio.demo.myopenedx.com"|common_domain("lms.demo.myopenedx.com") }}`` is equal to "demo.myopenedx.com".
+* ``encrypt``: Encrypt an arbitrary string. The encryption process is compatible with `htpasswd <https://httpd.apache.org/docs/2.4/programs/htpasswd.html>`__ verification.
 * ``list_if``: In a list of ``(value, condition)`` tuples, return the list of ``value`` for which the ``condition`` is true.
 * ``patch``: See :ref:`patches <plugin_patches>`.
 * ``random_string``: Return a random string of the given length composed of ASCII letters and digits. Example: ``{{ 8|random_string }}``.

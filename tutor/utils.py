@@ -1,3 +1,5 @@
+from crypt import crypt
+from hmac import compare_digest
 import json
 import os
 import random
@@ -10,6 +12,24 @@ import click
 
 from . import exceptions
 from . import fmt
+
+
+def encrypt(text):
+    """
+    Encrypt some textual content. The method employed is the same as suggested in the
+    `python docs <https://docs.python.org/3/library/crypt.html#examples>`__. The
+    encryption process is compatible with the password verification performed by
+    `htpasswd <https://httpd.apache.org/docs/2.4/programs/htpasswd.html>`__.
+    """
+    hashed = crypt(text)
+    return crypt(text, hashed)
+
+
+def verify_encrypted(encrypted, text):
+    """
+    Return True/False if the encrypted content corresponds to the unencrypted text.
+    """
+    return compare_digest(crypt(text, encrypted), encrypted)
 
 
 def ensure_file_directory_exists(path):

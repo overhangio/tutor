@@ -48,9 +48,10 @@ class Renderer:
             loader=jinja2.FileSystemLoader(template_roots),
             undefined=jinja2.StrictUndefined,
         )
-        environment.filters["random_string"] = utils.random_string
         environment.filters["common_domain"] = utils.common_domain
+        environment.filters["encrypt"] = utils.encrypt
         environment.filters["list_if"] = utils.list_if
+        environment.filters["random_string"] = utils.random_string
         environment.filters["reverse_host"] = utils.reverse_host
         environment.filters["walk_templates"] = self.walk_templates
         environment.globals["patch"] = self.patch
