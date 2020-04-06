@@ -97,6 +97,8 @@ Finally, tracking logs that store `user events <https://edx.readthedocs.io/proje
 Extra commands
 --------------
 
+.. _createuser:
+
 Creating a new user with staff and admin rights
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -105,6 +107,8 @@ You will most certainly need to create a user to administer the platform. Just r
     tutor local createuser --staff --superuser yourusername user@email.com
 
 You will asked to set the user password interactively.
+
+.. _democourse:
 
 Importing the demo course
 ~~~~~~~~~~~~~~~~~~~~~~~~~
