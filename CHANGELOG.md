@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.11.8 (2020-04-06)
 
 - [Feature] Add `encrypt` template filter to conveniently add htpasswd-based authentication to nginx
 - [Bugfix] Fix "missing tty" during init in cron jobs
