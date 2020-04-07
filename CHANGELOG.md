@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix Android app build for domain names that include a dash ("-")
+
 ## v3.11.8 (2020-04-06)
 
 - [Feature] Add `encrypt` template filter to conveniently add htpasswd-based authentication to nginx
