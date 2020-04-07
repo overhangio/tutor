@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.11.9 (2020-04-07)
 
 - [Bugfix] Fix Android app build for domain names that include a dash ("-")
 
