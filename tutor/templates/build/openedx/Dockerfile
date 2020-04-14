@@ -31,6 +31,11 @@ WORKDIR /openedx/edx-platform
 # Apply patches
 # Allow SigV4 authentication for video uploads to S3 https://github.com/edx/edx-platform/pull/22080
 RUN curl https://github.com/overhangio/edx-platform/commit/0d4f6cc3433013960b28e963c4094ef2a2a92f04.patch | git apply -
+# Resolve missing tasks in CMS 
+# https://github.com/edx/edx-platform/pull/21297/
+# https://github.com/edx/edx-platform/pull/21305/
+RUN curl https://github.com/edx/edx-platform/commit/adb2c672e4d17cc1c42bdc206a0051e0fa16b5be.patch | git apply -
+RUN curl https://github.com/edx/edx-platform/commit/b7ecd80a2bef0d845c3bce97818e70fb3ed9e36d.patch | git apply -
 
 # Download extra locales to /openedx/locale
 RUN cd /tmp \

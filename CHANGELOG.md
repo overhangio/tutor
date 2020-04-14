@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix missing celery tasks in the CMS
+
 ## v3.11.10 (2020-04-14)
 
 - [Bugfix] Fix updates to the course structure in the LMS (#302)
