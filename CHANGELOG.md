@@ -2,9 +2,9 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.11.10 (2020-04-14)
 
-- [Bugfix] Fix updates to the course structure in the LMS (#315)
+- [Bugfix] Fix updates to the course structure in the LMS (#302)
 
 ## v3.11.9 (2020-04-07)
 
