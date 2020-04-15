@@ -37,7 +37,13 @@ LOGGING["handlers"]["tracking"] = {
 }
 LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
 
+# Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
+# Forward all emails from edX's Automated Communication Engine (ACE) to django.
+ACE_ENABLED_CHANNELS = ["django_email"]
+ACE_CHANNEL_DEFAULT_EMAIL = "django_email"
+ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
+EMAIL_FILE_PATH = "/tmp/openedx/emails"
 
 LOCALE_PATHS.append("/openedx/locale")
 

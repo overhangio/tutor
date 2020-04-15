@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Make sure all emails (including "password reset") are properly saved to a local file in development mode (#315)
 - [Improvement] Add `openedx-development-settings` patch to patch the LMS and the CMS simultaneously in development 
 - [Bugfix] Fix missing celery tasks in the CMS
 
