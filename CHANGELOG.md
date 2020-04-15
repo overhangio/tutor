@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add `openedx-development-settings` patch to patch the LMS and the CMS simultaneously in development 
 - [Bugfix] Fix missing celery tasks in the CMS
 
 ## v3.11.10 (2020-04-14)

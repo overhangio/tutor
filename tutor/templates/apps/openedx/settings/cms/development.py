@@ -7,4 +7,5 @@ from cms.envs.devstack import *
 # Setup correct webpack configuration file for development
 WEBPACK_CONFIG_PATH = "webpack.dev.config.js"
 
+{{ patch("openedx-development-settings") }}
 {{ patch("openedx-cms-development-settings") }}
