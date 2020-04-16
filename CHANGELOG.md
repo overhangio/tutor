@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Make it possible to rely on a different npm registry for faster image building
+
 ## v3.11.11 (2020-04-15)
 
 - [Bugfix] Make sure all emails (including "password reset") are properly saved to a local file in development mode (#315)

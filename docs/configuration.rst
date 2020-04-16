@@ -197,6 +197,20 @@ The following sections describe how to modify various aspects of the docker imag
 
 The custom image will be used the next time you run ``tutor local quickstart`` or ``tutor local start``. Do not attempt to run ``tutor local restart``! Restarting will not pick up the new image and will continue to use the old image.
 
+openedx Docker Image build arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When building the "openedx" Docker image, it is possible to specify a few `arguments <https://docs.docker.com/engine/reference/builder/#arg>`__:
+
+- ``EDX_PLATFORM_REPOSITORY`` (default: ``"https://github.com/edx/edx-platform.git"``)
+- ``EDX_PLATFORM_VERSION`` (default: ``"open-release/ironwood.master"``)
+- ``EDX_PLATFORM_VERSION_DATE`` (default: ``"20200227"``)
+- ``NPM_REGISTRY`` (default: ``"https://registry.npmjs.org/"``)
+
+These arguments can be specified from the command line, `very much like Docker <https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg>`__. For instance::
+    
+    tutor images build -a EDX_PLATFORM_VERSION=customsha1 openedx
+
 Adding custom themes
 ~~~~~~~~~~~~~~~~~~~~
 

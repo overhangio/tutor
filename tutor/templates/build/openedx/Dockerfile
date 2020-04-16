@@ -63,8 +63,9 @@ RUN nodeenv /openedx/nodeenv --node=8.9.3 --prebuilt
 ENV PATH /openedx/nodeenv/bin:${PATH}
 
 # Install nodejs requirements
+ARG NPM_REGISTRY=https://registry.npmjs.org/
 RUN npm set progress=false \
-    && npm install
+    && npm install --verbose --registry=$NPM_REGISTRY
 ENV PATH ./node_modules/.bin:${PATH}
 
 # Install private requirements: this is useful for installing custom xblocks.
