@@ -116,6 +116,6 @@ When I make changes to a course in the CMS, they are not taken into account by t
 
 This issue should only happen in development mode. Long story short, it can be solved by creating a Waffle switch with the following command::
     
-    tutor dev run lms ./manage.py lms waffle_switch block_structure.invalidate_cache_on_publish --on --create
+    tutor dev run lms ./manage.py lms waffle_switch block_structure.invalidate_cache_on_publish on --create
 
 If you'd like to learn more, please take a look at `this Github issue <https://github.com/overhangio/tutor/issues/302>`__.
