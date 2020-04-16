@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.11.12 (2020-04-16)
 
 - [Feature] Make it easy to add custom translation strings to the openedx Docker image
 - [Improvement] Make it possible to rely on a different npm registry for faster image building
