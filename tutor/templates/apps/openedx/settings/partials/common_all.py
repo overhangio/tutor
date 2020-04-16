@@ -45,7 +45,8 @@ ACE_CHANNEL_DEFAULT_EMAIL = "django_email"
 ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
 EMAIL_FILE_PATH = "/tmp/openedx/emails"
 
-LOCALE_PATHS.append("/openedx/locale")
+LOCALE_PATHS.append("/openedx/locale/contrib/locale")
+LOCALE_PATHS.append("/openedx/locale/user/locale")
 
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS

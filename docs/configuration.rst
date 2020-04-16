@@ -267,6 +267,53 @@ You may want to run your own flavor of edx-platform instead of the `official ver
 
 Note that your release must be a fork of Ironwood in order to work. Otherwise, you may have important compatibility issues with other services. In particular, **don't try to run Tutor with older versions of Open edX**.
 
+Adding custom translations
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/ironwood.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+
+Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
+    
+    mkdir -p "$(tutor config printroot)/env/build/openedx/locale/fr/LC_MESSAGES"
+
+The language code should be similar to those used in edx-platform or openedx-i18n (see links above).
+
+Then, add a "django.po" file there that will contain your custom translations::
+    
+    msgid "String to translate"
+    msgstr "你翻译的东西 la traduction de votre bidule"
+
+The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/ironwood.master/conf/locale/en/LC_MESSAGES/django.po>`__.
+
+If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/ironwood.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same 
+
+To recap, here is an example. To translate a few strings in French, both from django.po and djangojs.po, we would have the following file hierarchy::
+    
+    $(tutor config printroot)/env/build/openedx/locale/
+        fr/
+            LC_MESSAGES/
+                django.po
+                djangojs.po
+
+With django.po containing::
+    
+    msgid "It works! Powered by Open edX{registered_trademark}"
+    msgstr "Ça marche ! Propulsé by Open edX{registered_trademark}"
+
+And djangojs.po::
+    
+    msgid "%(num_points)s point possible (graded, results hidden)"
+    msgid_plural "%(num_points)s points possible (graded, results hidden)"
+    msgstr[0] "%(num_points)s point possible (noté, résultats cachés)"
+    msgstr[1] "%(num_points)s points possibles (notés, résultats cachés)"
+
+Then you will have to re-build the openedx Docker image::
+
+    tutor images build openedx openedx-dev
+
+ Beware that this will take a long time! Unfortunately it's difficult to accelerate this process, as translation files need to be compiled prior to collecting the assets. In development it's possible to accelerate the iteration loop -- but that exercise is left to the reader.
+    
+
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

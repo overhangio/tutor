@@ -14,4 +14,5 @@ DATABASES = {
 
 derive_settings(__name__)
 
-LOCALE_PATHS.append("/openedx/locale")
+LOCALE_PATHS.append("/openedx/locale/contrib/locale")
+LOCALE_PATHS.append("/openedx/locale/user/locale")
