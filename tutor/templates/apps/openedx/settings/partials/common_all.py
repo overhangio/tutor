@@ -48,5 +48,8 @@ EMAIL_FILE_PATH = "/tmp/openedx/emails"
 LOCALE_PATHS.append("/openedx/locale/contrib/locale")
 LOCALE_PATHS.append("/openedx/locale/user/locale")
 
+# Allow the platform to include itself in an iframe
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS

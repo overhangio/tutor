@@ -267,6 +267,8 @@ You may want to run your own flavor of edx-platform instead of the `official ver
 
 Note that your release must be a fork of Ironwood in order to work. Otherwise, you may have important compatibility issues with other services. In particular, **don't try to run Tutor with older versions of Open edX**.
 
+.. _i18n:
+
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

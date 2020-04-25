@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Feature] Add SCORM XBlock to default openedx docker image
+
 ## v3.11.12 (2020-04-16)
 
 - [Feature] Make it easy to add custom translation strings to the openedx Docker image
