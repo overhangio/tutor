@@ -95,10 +95,9 @@ ci-bundle: bundle ## Create bundle and run basic tests
 ./releases/github-release: ## Download github-release binary
 	mkdir -p releases/
 	cd releases/ \
-		&& curl -sSL -o ./github-release.tar.bz2 "https://github.com/meterup/github-release/releases/download/v0.7.5/$(shell uname -s | tr "[:upper:]" "[:lower:]")-amd64-github-release.tar.bz2" \
-		&& bzip2 -d -f ./github-release.tar.bz2 \
-		&& tar xf github-release.tar \
-		&& mv "bin/$(shell uname -s | tr "[:upper:]" "[:lower:]")/amd64/github-release" .
+		&& curl -sSL -o ./github-release.bz2 "https://github.com/meterup/github-release/releases/download/v0.7.5/$(shell uname -s | tr "[:upper:]" "[:lower:]")-amd64-github-release.bz2" \
+		&& bzip2 -d -f ./github-release.bz2 \
+		&& chmod a+x ./github-release
 
 ci-github: ./releases/github-release ## Upload assets to github
 	sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md > releases/description.md
