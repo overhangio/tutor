@@ -52,7 +52,6 @@ def start(context):
         "app.kubernetes.io/component=namespace",
     )
     # Create volumes
-    # TODO: instead, we should use StatefulSets
     utils.kubectl(
         "apply",
         "--kustomize",
@@ -61,13 +60,13 @@ def start(context):
         "--selector",
         "app.kubernetes.io/component=volume",
     )
-    # Create everything else except jobs
+    # Create everything else except jobs, ingress and issuer
     utils.kubectl(
         "apply",
         "--kustomize",
         tutor_env.pathjoin(context.root),
         "--selector",
-        "app.kubernetes.io/component!=job",
+        "app.kubernetes.io/component notin (job, ingress, issuer)",
     )
 
 

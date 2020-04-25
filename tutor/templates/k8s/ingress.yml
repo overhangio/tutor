@@ -1,10 +1,16 @@
 ---{% set hosts = [LMS_HOST, "preview." + LMS_HOST, CMS_HOST] %}
+# This is an nginx-based Ingress object that relies on a letsencrypt Issuer for SSL
+# termination. By default, this ingress and issuer are *not* deployed to the Kubernetes
+# cluster when running "quickstart". This is because there exist many different
+# ingress/issuer combinations and it should not be Tutor's job to choose which one you
+# should use.
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: web
   labels:
     app.kubernetes.io/name: web
+    app.kubernetes.io/component: ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/proxy-body-size: 1000m
@@ -26,8 +32,6 @@ spec:
       {% for host in hosts %}
       - {{ host }}{% endfor %}
       {{ patch("k8s-ingress-tls-hosts")|indent(6) }}
-    # TODO maybe we should not take care of generating certificates ourselves
-    # and here just point to a tls secret
     secretName: letsencrypt
   {%endif%}
 {% if ACTIVATE_HTTPS %}
@@ -38,6 +42,7 @@ metadata:
   name: letsencrypt
   labels:
     app.kubernetes.io/name: letsencrypt
+    app.kubernetes.io/component: issuer
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory

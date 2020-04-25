@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
 - k8s/namespace.yml
 - k8s/deployments.yml
-# TODO maybe we should not take care of ingress stuff and let the administrator do it
 - k8s/ingress.yml
 - k8s/jobs.yml
 - k8s/services.yml

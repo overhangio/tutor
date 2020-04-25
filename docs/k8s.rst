@@ -5,7 +5,9 @@ Kubernetes deployment
 
 With the same docker images we created for :ref:`single server deployment <local>` and :ref:`local development <development>`, we can launch an Open edX platform on Kubernetes. Always in 1 click, of course :)
 
-A word of warning: managing a Kubernetes platform is a fairly advanced endeavour. In this documentation, we assume familiarity with Kubernetes. Running an Open edX platform with Tutor on a single server or in a Kubernetes cluster are two very different things. The local Open edX install was designed such that users with no prior experience with system administration could still launch an Open edX platform. It is *not* the case for the installation method outlined here. You have been warned :)
+A word of warning: managing a Kubernetes platform is a fairly advanced endeavour. In this documentation, we assume familiarity with Kubernetes. Running an Open edX platform with Tutor on a single server or in a Kubernetes cluster are two very different things. The local Open edX install was designed such that users with no prior experience with system administration could still launch an Open edX platform. It is *not* the case for the installation method outlined here.
+
+Consider yourself warned :)
 
 Requirements
 ------------
@@ -34,6 +36,12 @@ In order to access your platform, you will have to setup an Ingress controller. 
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/cloud-generic.yaml
 
 See the `official instructions <https://kubernetes.github.io/ingress-nginx/deploy/>`_ for more details.
+
+
+.. warning::
+    By default, Tutor does *not* launch an Ingress resource or TLS/SSL certificate issuer for you. There are many different ways to create an Ingress resource and issue certificates in a Kubernetes cluster, and it's not the responsibility of Tutor to make this decision. However, Tutor comes with a ready-to-run configuration for an Nginx-based Ingress ressource and a `cert-manager <https://cert-manager.io/docs/>`__ Issuer that delivers `Let's Encrypt <https://letsencrypt.org/>`__ certificates. You may examine the configuration in ``$(tutor config printroot)/env/k8s/ingress.yml``. If you are happy with this configuration, you may apply it with::
+        
+        kubectl apply -k $(tutor config printroot)/env --selector="app.kubernetes.io/component in (ingress, issuer)"
 
 On Minikube, run::
   

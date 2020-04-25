@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- 💥[Improvement] Do not deploy an ingress or SSL/TLS certificate issuer ressource by default in Kubernetes
 - [Improvement] Fix tls certificate generation in k8s
 - [Improvement] Radically change the way jobs are run: we no longer "exec", but instead run a dedicated container.
 - [Improvement] Upgrade k8s certificate issuer to cert-manager.io/v1alpha2
