@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Increase max upload allowed size to 250Mb in CMS
+
 ## v3.12.0 (2020-04-26)
 
 - 💥[Improvement] Do not deploy an ingress or SSL/TLS certificate issuer ressource by default in Kubernetes
