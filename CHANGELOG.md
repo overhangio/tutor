@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Upgrade scorm xblock to solve caching issue
+
 ## v3.12.1 (2020-04-27)
 
 - [Improvement] Increase max upload allowed size to 250Mb in CMS

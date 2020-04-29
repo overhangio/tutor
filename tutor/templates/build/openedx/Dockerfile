@@ -60,7 +60,7 @@ RUN pip uninstall -y ora2 && \
 RUN pip install git+https://github.com/overhangio/edx-oauth2-provider.git@1.2.3#egg=edx-oauth2-provider==1.2.3
 
 # Install ironwood-compatible scorm xblock
-RUN pip install "openedx-scorm-xblock<10.0.0,>=9.0.0"
+RUN pip install "openedx-scorm-xblock<10.0.0,>=9.1.1"
 
 # Install a recent version of nodejs
 RUN nodeenv /openedx/nodeenv --node=8.9.3 --prebuilt
