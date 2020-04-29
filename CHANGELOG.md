@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix oauth2 authentication with 3rd-party services, such as discovery
 - [Bugfix] Upgrade scorm xblock to solve caching issue
 
 ## v3.12.1 (2020-04-27)
