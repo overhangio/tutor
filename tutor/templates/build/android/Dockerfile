@@ -9,22 +9,23 @@ RUN mkdir /openedx
 
 # Install Android SDK
 # Inspired from https://github.com/LiveXP/docker-android-sdk/blob/master/Dockerfile
-ENV ANDROID_SDK_VERSION 4333796
+ENV ANDROID_SDK_VERSION 6200805
 ENV ANDROID_SDK_PATH /openedx/android-sdk
 ENV ANDROID_HOME /openedx/android-sdk
-RUN mkdir /openedx/android-sdk
+RUN mkdir ${ANDROID_HOME}
 WORKDIR /openedx/android-sdk
-RUN wget https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_VERSION}.zip && \
-    unzip sdk-tools-linux-${ANDROID_SDK_VERSION}.zip && \
-    rm sdk-tools-linux-${ANDROID_SDK_VERSION}.zip
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_VERSION}_latest.zip && \
+    unzip commandlinetools-linux-${ANDROID_SDK_VERSION}_latest.zip && \
+    rm commandlinetools-linux-${ANDROID_SDK_VERSION}_latest.zip
 
 # Accept licenses
 # https://developer.android.com/studio/command-line/sdkmanager
-RUN yes | /openedx/android-sdk/tools/bin/sdkmanager "platforms;android-27" 1> /dev/null
+ARG ANDROID_API_LEVEL=28
+RUN yes | /openedx/android-sdk/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} --install "platforms;android-$ANDROID_API_LEVEL" 1> /dev/null
 
 # Install android app repo
 ARG ANDROID_APP_REPOSITORY=https://github.com/edx/edx-app-android
-ARG ANDROID_APP_VERSION=release/2.20.2
+ARG ANDROID_APP_VERSION=release/2.21.1
 RUN git clone $ANDROID_APP_REPOSITORY --branch $ANDROID_APP_VERSION /openedx/edx-app-android
 WORKDIR /openedx/edx-app-android
 
@@ -37,5 +38,4 @@ COPY ./edx.properties ./OpenEdXMobile/edx.properties
 RUN mkdir /openedx/config
 RUN ln -s /openedx/config/gradle.properties ./OpenEdXMobile/gradle.properties
 
-CMD ./gradlew assembleProdDebuggable && \
-  cp OpenEdXMobile/build/outputs/apk/prod/debuggable/*.apk /openedx/data/
+ENTRYPOINT ["sh", "-e", "-c"]

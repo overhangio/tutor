@@ -2,6 +2,11 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Upgrade Android app to v2.21.1 and enable many features, such as downloading videos to SD card. Thanks for the help @ejklock!
+- [Bugfix] Fix Android app crash when accessing course
+
 ## v3.12.4 (2020-05-18)
 
 - [Improvement] Add ability to rescore SCORM units
