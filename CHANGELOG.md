@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Increase maximum uploaded file size in the CMS from 10 to 100 Mb.
+
 ## v3.12.3 (2020-05-05)
 
 - [Security] Apply most recent edx-platform [security patches](https://discuss.openedx.org/t/security-patch-for-edit-chapter-xss-lint-issues/2030)

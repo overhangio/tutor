@@ -4,6 +4,7 @@
 
 
 STUDIO_NAME = u"{{ PLATFORM_NAME }} - Studio"
+MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 100
 
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
