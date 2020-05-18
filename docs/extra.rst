@@ -52,7 +52,8 @@ The Android app is built from the `official edx-app-android repository <https://
 
     tutor images build \
         --build-arg ANDROID_APP_REPOSITORY=https://github.com/mycustomfork/edx-app-android \
-        --build-arg ANDROID_APP_VERSION=master
+        --build-arg ANDROID_APP_VERSION=master \
+        android
 
 Releasing an Android app
 ~~~~~~~~~~~~~~~~~~~~~~~~
