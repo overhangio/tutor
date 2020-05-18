@@ -8,6 +8,8 @@ Tutor offers plenty of possibilities for platform customisation out of the box. 
 a. Modifying the Tutor :ref:`configuration parameters <configuration>`.
 b. Modifying the :ref:`Open edX docker image <customise>` that runs the Open edX platform.
 
+This section does not cover :ref:`plugin development <plugins>`. For simple changes, such as modifying the ``*.env.json`` files or the edx-platform settings, *you should not fork edx-platform or tutor*! Instead, you should create a simple :ref:`plugin for Tutor <plugins_yaml>`.
+
 .. _configuration:
 
 Configuration

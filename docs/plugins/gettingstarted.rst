@@ -3,6 +3,8 @@ Getting started with plugin development
 
 Plugins can be created in two different ways: either as plain YAML files or installable Python packages. YAML files are great when you need to make minor changes to the default platform, such as modifying settings. For creating more complex applications, it is recommended to create python packages.
 
+.. _plugins_yaml:
+
 YAML file
 ~~~~~~~~~
 
@@ -20,22 +22,22 @@ Let's create a simple plugin that adds your own `Google Analytics <https://analy
 
 Then add the following content to the plugin file located at ``$(tutor plugins printroot)/myplugin.yml``::
 
-    name: myplugin
+    name: googleanalytics
     version: 0.1.0
     patches:
       openedx-common-settings: |
-        # myplugin special settings
+        # googleanalytics special settings
         GOOGLE_ANALYTICS_ACCOUNT = "UA-654321-1"
         GOOGLE_ANALYTICS_TRACKING_ID = "UA-654321-1"
 
 Of course, you should replace your Google Analytics tracking code with your own. You can verify that your plugin is correctly installed, but not enabled yet::
     
     $ tutor plugins list
-    myplugin@0.1.0 (disabled)
+    googleanalytics@0.1.0 (disabled)
     
 You can then enable your newly-created plugin::
     
-    tutor plugins enable myplugin
+    tutor plugins enable googleanalytics
 
 Update your environment to apply changes from your plugin::
     
@@ -43,7 +45,7 @@ Update your environment to apply changes from your plugin::
 
 You should be able to view your changes in every LMS and CMS settings file::
 
-    grep -r myplugin "$(tutor config printroot)/env/apps/openedx/settings/"
+    grep -r googleanalytics "$(tutor config printroot)/env/apps/openedx/settings/"
 
 Now just restart your platform to start sending tracking events to Google Analytics::
     
@@ -51,7 +53,7 @@ Now just restart your platform to start sending tracking events to Google Analyt
 
 That's it! And it's very easy to share your plugins. Just upload them to your Github repo and share the url with other users. They will be able to install your plugin by running::
     
-    tutor plugins install https://raw.githubusercontent.com/username/yourrepo/master/myplugin.yml
+    tutor plugins install https://raw.githubusercontent.com/username/yourrepo/master/googleanalytics.yml
 
 Python package
 ~~~~~~~~~~~~~~

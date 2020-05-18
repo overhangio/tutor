@@ -74,18 +74,18 @@ Then, add the following content::
     
     version: "3.7"
     services:
-        lms:
-            volumes:
-                - /path/to/edx-platform/:/openedx/edx-platform
-        cms:
-            volumes:
-                - /path/to/edx-platform/:/openedx/edx-platform
-        lms-worker:
-            volumes:
-                - /path/to/edx-platform/:/openedx/edx-platform
-        cms-worker:
-            volumes:
-                - /path/to/edx-platform/:/openedx/edx-platform
+      lms:
+        volumes:
+          - /path/to/edx-platform/:/openedx/edx-platform
+      cms:
+        volumes:
+          - /path/to/edx-platform/:/openedx/edx-platform
+      lms-worker:
+        volumes:
+          - /path/to/edx-platform/:/openedx/edx-platform
+      cms-worker:
+        volumes:
+          - /path/to/edx-platform/:/openedx/edx-platform
 
 This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automaticall mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-v`` option from the command line with the ``run`` or ``runserver`` commands.
 
