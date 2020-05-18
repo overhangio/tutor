@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add ability to rescore SCORM units
+- [Bugfix] Fix scoring of graded SCORM units
 - [Improvement] Increase maximum uploaded file size in the CMS from 10 to 100 Mb.
 
 ## v3.12.3 (2020-05-05)
