@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.12.5 (2020-05-20)
 
 - [Improvement] Upgrade Android app to v2.21.1 and enable many features, such as downloading videos to SD card. Thanks for the help @ejklock!
 - [Bugfix] Fix Android app crash when accessing course
