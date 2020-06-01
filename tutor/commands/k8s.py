@@ -36,7 +36,7 @@ def quickstart(context, non_interactive):
     click.echo(fmt.title("Starting the platform"))
     start.callback()
     click.echo(fmt.title("Database creation and migrations"))
-    init.callback()
+    init.callback(limit=None)
 
 
 @click.command(help="Run all configured Open edX services")
@@ -116,14 +116,15 @@ def delete(context, yes):
 
 
 @click.command(help="Initialise all applications")
+@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 @click.pass_obj
-def init(context):
+def init(context, limit):
     config = tutor_config.load(context.root)
     runner = K8sScriptRunner(context.root, config)
     for service in ["mysql", "elasticsearch", "mongodb"]:
         if tutor_config.is_service_activated(config, service):
             wait_for_pod_ready(config, service)
-    scripts.initialise(runner)
+    scripts.initialise(runner, limit_to=limit)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")

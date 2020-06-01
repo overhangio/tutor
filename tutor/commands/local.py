@@ -57,7 +57,7 @@ def quickstart(context, non_interactive, pullimages_):
     click.echo(fmt.title("Starting the platform in detached mode"))
     compose.start.callback(True, [])
     click.echo(fmt.title("Database creation and migrations"))
-    compose.init.callback()
+    compose.init.callback(limit=None)
     echo_platform_info(config)
 
 

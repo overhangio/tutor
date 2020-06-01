@@ -165,11 +165,12 @@ def execute(context, args):
 
 
 @click.command(help="Initialise all applications")
+@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 @click.pass_obj
-def init(context):
+def init(context, limit):
     config = tutor_config.load(context.root)
     runner = ScriptRunner(context.root, config, context.docker_compose)
-    scripts.initialise(runner)
+    scripts.initialise(runner, limit_to=limit)
 
 
 @click.command(

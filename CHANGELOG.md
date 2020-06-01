@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Feature] Add `--limit=myplugin` option to `init` commands for limit execution of initialisation to certain services and plugins
+
 ## v3.12.6 (2020-06-01)
 
 - [Improvement] Add `dig`, `ping` utilities to openedx-dev Docker image

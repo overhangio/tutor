@@ -27,28 +27,36 @@ class BaseRunner:
         yield from plugins.iter_hooks(self.config, hook)
 
 
-def initialise(runner):
+def initialise(runner, limit_to=None):
     fmt.echo_info("Initialising all services...")
-    runner.run_job_from_template("mysql", "hooks", "mysql", "init")
+    if limit_to is None or limit_to == "mysql":
+        runner.run_job_from_template("mysql", "hooks", "mysql", "init")
     for plugin_name, hook in runner.iter_plugin_hooks("pre-init"):
-        for service in hook:
-            fmt.echo_info(
-                "Plugin {}: running pre-init for service {}...".format(
-                    plugin_name, service
+        if limit_to is None or limit_to == plugin_name:
+            for service in hook:
+                fmt.echo_info(
+                    "Plugin {}: running pre-init for service {}...".format(
+                        plugin_name, service
+                    )
                 )
-            )
-            runner.run_job_from_template(
-                service, plugin_name, "hooks", service, "pre-init"
-            )
+                runner.run_job_from_template(
+                    service, plugin_name, "hooks", service, "pre-init"
+                )
     for service in ["lms", "cms", "forum"]:
-        fmt.echo_info("Initialising {}...".format(service))
-        runner.run_job_from_template(service, "hooks", service, "init")
+        if limit_to is None or limit_to == service:
+            fmt.echo_info("Initialising {}...".format(service))
+            runner.run_job_from_template(service, "hooks", service, "init")
     for plugin_name, hook in runner.iter_plugin_hooks("init"):
-        for service in hook:
-            fmt.echo_info(
-                "Plugin {}: running init for service {}...".format(plugin_name, service)
-            )
-            runner.run_job_from_template(service, plugin_name, "hooks", service, "init")
+        if limit_to is None or limit_to == plugin_name:
+            for service in hook:
+                fmt.echo_info(
+                    "Plugin {}: running init for service {}...".format(
+                        plugin_name, service
+                    )
+                )
+                runner.run_job_from_template(
+                    service, plugin_name, "hooks", service, "init"
+                )
     fmt.echo_info("All services initialised.")
 
 
