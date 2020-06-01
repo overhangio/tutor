@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Make it possible to customize the MySQL root username, for connecting to external MySQL databases
+
 ## v3.12.5 (2020-05-20)
 
 - [Improvement] Upgrade Android app to v2.21.1 and enable many features, such as downloading videos to SD card. Thanks for the help @ejklock!

@@ -104,12 +104,14 @@ MySQL
 - ``ACTIVATE_MYSQL`` (default: ``true``)
 - ``MYSQL_HOST`` (default: ``"mysql"``)
 - ``MYSQL_PORT`` (default: ``3306``)
+- ``MYSQL_ROOT_USERNAME`` (default: ``"root"``)
 - ``MYSQL_ROOT_PASSWORD`` (default: randomly generated) Note that you are responsible for creating the root user if you are using a managed database.
 
 By default, a running Open edX platform deployed with Tutor includes all necessary 3rd-party services, such as MySQL, MongoDb, etc. But it's also possible to store data on a separate database, such as `Amazon RDS <https://aws.amazon.com/rds/>`_. For instance, to store data on an external MySQL database, set the following configuration::
 
     ACTIVATE_MYSQL: false
     MYSQL_HOST: yourhost
+    MYSQL_ROOT_USERNAME: <root user name>
     MYSQL_ROOT_PASSWORD: <root user password>
 
 Elasticsearch
