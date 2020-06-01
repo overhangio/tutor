@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Resolve "Can't connect to MySQL server" on init
 - [Improvement] Make it possible to customize the MySQL root username, for connecting to external MySQL databases
 
 ## v3.12.5 (2020-05-20)
