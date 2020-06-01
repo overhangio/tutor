@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v3.12.6 (2020-06-01)
 
 - [Improvement] Add `dig`, `ping` utilities to openedx-dev Docker image
 - [Bugfix] Resolve "Can't connect to MySQL server" on init
