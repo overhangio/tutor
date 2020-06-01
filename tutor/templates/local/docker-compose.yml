@@ -26,7 +26,8 @@ services:
     restart: unless-stopped
     volumes:
       - ../../data/mysql:/var/lib/mysql
-    env_file: ../apps/mysql/auth.env
+    environment:
+      MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
   {% endif %}
 
   {% if ACTIVATE_ELASTICSEARCH %}
