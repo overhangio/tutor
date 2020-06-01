@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add `dig`, `ping` utilities to openedx-dev Docker image
 - [Bugfix] Resolve "Can't connect to MySQL server" on init
 - [Improvement] Make it possible to customize the MySQL root username, for connecting to external MySQL databases
 

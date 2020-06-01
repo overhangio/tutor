@@ -3,7 +3,7 @@ MAINTAINER Overhang.io <contact@overhang.io>
 
 # Install useful system requirements
 RUN apt update && \
-    apt install -y vim telnet \
+    apt install -y vim iputils-ping dnsutils telnet \
     && rm -rf /var/lib/apt/lists/*
 
 # Install dev python requirements
