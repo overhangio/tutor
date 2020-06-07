@@ -197,7 +197,7 @@ On a vanilla platform deployed by Tutor, the image that is run is downloaded fro
 
 The following sections describe how to modify various aspects of the docker image. Every time, you will have to re-build your own image with this command. Re-building should take ~20 minutes on a server with good bandwidth. After building a custom image, you should stop the old running containers::
 
-    tutor local stop openedx
+    tutor local stop
 
 The custom image will be used the next time you run ``tutor local quickstart`` or ``tutor local start``. Do not attempt to run ``tutor local restart``! Restarting will not pick up the new image and will continue to use the old image.
 
