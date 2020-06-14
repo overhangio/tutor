@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix nginx resolver address to address container restarts
 - [Feature] Add `--limit=myplugin` option to `init` commands for limit execution of initialisation to certain services and plugins
 
 ## v3.12.6 (2020-06-01)
