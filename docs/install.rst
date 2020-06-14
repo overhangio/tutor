@@ -105,6 +105,7 @@ Then, delete all data associated to your Open edX platform::
     
     # WARNING: this step is irreversible
     sudo rm -rf "$(tutor config printroot)"
+    sudo docker system prune --all
 
 Finally, uninstall Tutor itself::
     
