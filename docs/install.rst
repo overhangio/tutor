@@ -94,7 +94,7 @@ After opening a new shell, you can test auto-completion by typing::
 Uninstallation
 --------------
 
-It is fairly easy to completely uninstall Tutor and to delete the any Open edX platforms that is running locally.
+It is fairly easy to completely uninstall Tutor and to delete the Open edX platforms that is running locally.
 
 First of all, stop any locally-running platform::
     
