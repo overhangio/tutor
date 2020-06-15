@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix KeyError when running ``local quickstart`` for the first time
+
 ## v10.0.0 (2020-06-15)
 
 - 💥[Improvement] Upgrade to Juniper 🍾
