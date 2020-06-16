@@ -120,7 +120,7 @@ def run_webpack(args):
     os.environ["STATIC_ROOT_LMS"] = args.static_root
     os.environ["STATIC_ROOT_CMS"] = os.path.join(args.static_root, "studio")
     os.environ["NODE_ENV"] = {"prod": "production", "dev": "development"}[args.env]
-    subprocess.call(
+    subprocess.check_call(
         ["webpack", "--config=webpack.{env}.config.js".format(env=args.env)]
     )
 
