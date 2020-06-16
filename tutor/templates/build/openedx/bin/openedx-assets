@@ -106,6 +106,7 @@ def run_xmodule(_args):
 
     sys.argv[1:] = ["common/static/xmodule"]
     import xmodule.static_content
+
     xmodule.static_content.main()
 
     if django_settings_module:
@@ -121,7 +122,11 @@ def run_webpack(args):
     os.environ["STATIC_ROOT_CMS"] = os.path.join(args.static_root, "studio")
     os.environ["NODE_ENV"] = {"prod": "production", "dev": "development"}[args.env]
     subprocess.check_call(
-        ["webpack", "--config=webpack.{env}.config.js".format(env=args.env)]
+        [
+            "webpack",
+            "--progress",
+            "--config=webpack.{env}.config.js".format(env=args.env),
+        ]
     )
 
 
