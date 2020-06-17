@@ -218,9 +218,11 @@ These arguments can be specified from the command line, `very much like Docker <
 Adding custom themes
 ~~~~~~~~~~~~~~~~~~~~
 
-Comprehensive theming is enabled by default, but only the default theme is compiled. To compile your own theme, add it to the ``env/build/openedx/themes/`` folder::
+Comprehensive theming is enabled by default, but only the default theme is compiled. `Indigo <https://github.com/overhangio/indigo>`__ is a better, ready-to-run theme which you can start using today.
 
-    git clone https://github.com/me/myopenedxtheme.git "$(tutor config printroot)/env/build/openedx/themes/"
+To compile your own theme, add it to the ``env/build/openedx/themes/`` folder::
+
+    git clone https://github.com/me/myopenedxtheme.git "$(tutor config printroot)/env/build/openedx/themes/myopenedxtheme"
 
 The ``themes`` folder should have the following structure::
 
@@ -237,7 +239,7 @@ Then you must rebuild the openedx Docker image::
 
     tutor images build openedx
 
-Finally, follow the `Open edX documentation to apply your themes <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html#apply-a-theme-to-a-site>`_. You will not have to modify the ``lms.env.json``/``cms.env.json`` files; just follow the instructions to add a site theme in http://localhost/admin (starting from step 3).
+Finally, you should enable your theme with the :ref:`settheme command <settheme>`.
 
 Installing extra xblocks and requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
