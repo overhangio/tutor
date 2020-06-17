@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix crash when viewing problem in LMS
 - [Bugfix] Fix missing webpack-stats.json in openedx Docker image
 
 ## v10.0.1 (2020-06-15)

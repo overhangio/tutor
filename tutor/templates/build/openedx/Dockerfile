@@ -42,6 +42,10 @@ RUN curl https://github.com/overhangio/edx-platform/commit/5f21bbe77056d71ca61b9
 # https://github.com/edx/edx-platform/pull/24055
 # https://github.com/overhangio/edx-platform/tree/regisb/fix-lti-provider-admin
 RUN curl https://github.com/overhangio/edx-platform/commit/089b26eed0302ed1f9a5b24c5f3e563dd44abb04.patch | git apply -
+# Fix problem viewing when CSMH is disabled
+# https://github.com/edx/edx-platform/pull/24237
+# https://github.com/overhangio/edx-platform/tree/overhangio/fix-no-csmh
+RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b51edf5e131106d69e19.patch | git apply -
 
 # Download extra locales to /openedx/locale/contrib/locale
 RUN cd /tmp \
@@ -61,7 +65,7 @@ RUN pip install -r requirements/edx/base.txt
 # Install patched version of ora2
 RUN pip install https://github.com/overhangio/edx-ora2/archive/overhangio/boto2to3.zip
 
-# Install juniper-compatible scorm xblock
+# Install scorm xblock
 RUN pip install "openedx-scorm-xblock<11.0.0,>=10.0.0"
 
 # Install a recent version of nodejs

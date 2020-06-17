@@ -21,6 +21,12 @@ DATA_DIR = "/openedx/data/"
 for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
    store["OPTIONS"]["fs_root"] = DATA_DIR
 
+# Get rid completely of coursewarehistoryextended, as we do not use the CSMH database
+INSTALLED_APPS.remove("coursewarehistoryextended")
+DATABASE_ROUTERS.remove(
+    "openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter"
+)
+
 # Set uploaded media file path
 MEDIA_ROOT = "/openedx/media/"
 
