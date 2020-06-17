@@ -236,7 +236,9 @@ def render_file(config, *path):
     """
     Return the rendered contents of a template.
     """
-    return Renderer.instance(config).render_file(os.path.join(*path))
+    renderer = Renderer.instance(config)
+    file_path = os.path.join(*path)
+    return renderer.render_file(file_path)
 
 
 def render_dict(config):
