@@ -3,7 +3,6 @@ from . import fmt
 from . import plugins
 
 BASE_OPENEDX_COMMAND = """
-export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
 echo "Loading settings $DJANGO_SETTINGS_MODULE"
 """
 

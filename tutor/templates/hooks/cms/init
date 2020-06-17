@@ -1,6 +1,5 @@
 dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
 
-export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
 echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 ./manage.py cms migrate
