@@ -5,13 +5,12 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 ./manage.py lms migrate
 
 # Create oauth credentials for Android application
-./manage.py lms manage_user android android@openedx --staff --superuser
 ./manage.py lms create_dot_application \
     --client-id android \
     --client-secret {{ ANDROID_OAUTH2_SECRET }} \
     --grant-type password \
     android \
-    android
+    login_service_user
 
 # Fix incorrect uploaded file path
 if [ -d /openedx/data/uploads/ ]; then

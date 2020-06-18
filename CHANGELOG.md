@@ -2,7 +2,11 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## v10.0.1 (2020-06-17)
+## Unreleased
+
+- [Bugfix] Fix error on android user creation
+
+## v10.0.2 (2020-06-17)
 
 - [Bugfix] Fix crash when viewing problem in LMS
 - [Bugfix] Fix missing webpack-stats.json in openedx Docker image
