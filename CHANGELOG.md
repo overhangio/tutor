@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix broken `tutor ui` command in binary
+
 ## v10.0.3 (2020-06-19)
 
 - [Bugfix] Fix error on android user creation
