@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.0.3 (2020-06-19)
 
 - [Bugfix] Fix error on android user creation
 
