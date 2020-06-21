@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Security] Apply edx-platform upstream xss security fixes ([pull request](https://github.com/edx/edx-platform/pull/24258))
+
 ## v10.0.4 (2020-06-19)
 
 - [Bugfix] Fix broken `tutor ui` command in binary

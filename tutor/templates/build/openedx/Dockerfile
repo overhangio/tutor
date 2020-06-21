@@ -34,6 +34,8 @@ RUN mkdir -p /openedx/edx-platform && \
 WORKDIR /openedx/edx-platform
 
 # Patch edx-platform
+# Apply xss security fixes https://github.com/edx/edx-platform/pull/24258
+RUN curl https://github.com/overhangio/edx-platform/commit/1ab907b2b019f54450153b08cecb115d668efd25.patch | git apply -
 # Get rid of lepl-related warnings
 # https://github.com/edx/edx-platform/pull/24059 
 # https://github.com/overhangio/edx-platform/tree/overhangio/lepl-rfc6266-warning
