@@ -17,7 +17,7 @@ upgrade-requirements: ## Upgrade requirements files
 	pip-compile --upgrade requirements/base.in
 	pip-compile --upgrade requirements/dev.in
 	pip-compile --upgrade requirements/docs.in
-	
+
 package: ## Build a package ready to upload to pypi
 	python3 setup.py sdist
 
@@ -57,10 +57,12 @@ retag:
 	git tag $(TAG)
 release-origin:
 	@echo "=== Pushing tag $(TAG) to origin"
+	git push origin
 	git push origin :$(TAG) || true
 	git push origin $(TAG)
 release-overhangio:
 	@echo "=== Pushing tag $(TAG) to overhangio"
+	git push overhangio
 	git push overhangio :$(TAG) || true
 	git push overhangio $(TAG)
 
