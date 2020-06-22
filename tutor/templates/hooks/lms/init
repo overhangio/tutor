@@ -9,6 +9,7 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
     --client-id android \
     --client-secret {{ ANDROID_OAUTH2_SECRET }} \
     --grant-type password \
+    --public \
     android \
     login_service_user
 
