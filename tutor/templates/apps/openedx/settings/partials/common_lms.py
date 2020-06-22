@@ -1,9 +1,10 @@
 {% include "apps/openedx/settings/partials/common_all.py" %}
 
 ######## Common LMS settings
-
 LOGIN_REDIRECT_WHITELIST = ["{{ CMS_HOST }}"]
-LEARNING_MICROFRONTEND_URL = None
+
+# This url must not be None and should not be used anywhere
+LEARNING_MICROFRONTEND_URL = "http://learn.openedx.org"
 
 # Fix media files paths
 PROFILE_IMAGE_BACKEND["options"]["location"] = os.path.join(
