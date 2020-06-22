@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.0.7 (2020-06-22)
 
 - [Bugfix] Fix TypeError on viewing xblock
 - [Bugfix] Fix authentication in Android mobile application
