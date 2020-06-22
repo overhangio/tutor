@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.0.6 (2020-06-22)
 
 - [Bugfix] Fix unsent activation emails and other asynchronous tasks
 
