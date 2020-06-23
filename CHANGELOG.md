@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix undefined settings in k8s scripts, such as `createuser`
+
 ## v10.0.7 (2020-06-22)
 
 - [Bugfix] Fix TypeError on viewing xblock
