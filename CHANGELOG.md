@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.0.8 (2020-06-23)
 
 - [Bugfix] Fix android user creation during init
 - [Bugfix] Fix undefined settings in k8s scripts, such as `createuser`
