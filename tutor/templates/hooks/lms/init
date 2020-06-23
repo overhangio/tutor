@@ -4,12 +4,16 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 ./manage.py lms migrate
 
+# Delete obsolete credentials for Android application
+./manage.py lms shell -c 'from oauth2_provider.models import get_application_model
+get_application_model().objects.filter(name="android").exclude(user__username="login_service_user").delete()'
 # Create oauth credentials for Android application
 ./manage.py lms create_dot_application \
     --client-id android \
     --client-secret {{ ANDROID_OAUTH2_SECRET }} \
     --grant-type password \
     --public \
+    --update \
     android \
     login_service_user
 
