@@ -48,6 +48,10 @@ RUN curl https://github.com/overhangio/edx-platform/commit/089b26eed0302ed1f9a5b
 # https://github.com/edx/edx-platform/pull/24237
 # https://github.com/overhangio/edx-platform/tree/overhangio/fix-no-csmh
 RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b51edf5e131106d69e19.patch | git apply -
+# Fix pycontracts version
+# https://github.com/edx/edx-platform/pull/24376
+RUN curl https://github.com/overhangio/edx-platform/commit/226fb100c8f5e1ba66be1e07cf99d3b50ccaf8a4.patch | git apply -
+
 
 # Download extra locales to /openedx/locale/contrib/locale
 RUN cd /tmp \

@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix pycontracts installation error when building openedx Docker image
 - [Bugfix] Fix access to dicussion forum in development mode
 
 ## v10.0.9 (2020-07-07)
