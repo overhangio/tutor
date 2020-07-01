@@ -4,7 +4,7 @@ matrix:
     - os: linux
       # We need an older version of python in order to have compatibility with
       # older versions of libc
-      dist: trusty
+      dist: xenial
       python: 3.6
       services:
         - docker
