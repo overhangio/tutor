@@ -6,8 +6,6 @@ matrix:
       # older versions of libc
       dist: xenial
       python: 3.6
-      services:
-        - docker
     - os: osx
       language: generic
 
