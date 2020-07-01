@@ -85,6 +85,7 @@ ci-install-plugins: ci-install-python-requirements ## Install all supported plug
 	pip3 install -r requirements/plugins.txt
 
 ci-bundle: bundle ## Create bundle and run basic tests
+	ls -lh ./dist/tutor
 	./dist/tutor --version
 	./dist/tutor config printroot
 	yes "" | ./dist/tutor config save --interactive
