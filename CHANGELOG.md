@@ -2,12 +2,12 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.0.10 (2020-07-01)
 
 - [Bugfix] Fix pycontracts installation error when building openedx Docker image
 - [Bugfix] Fix access to dicussion forum in development mode
 
-## v10.0.9 (2020-07-07)
+## v10.0.9 (2020-07-01)
 
 - [Bugfix] Share grade download settings between the LMS and the CMS
 
