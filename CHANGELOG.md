@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Share grade download settings between the LMS and the CMS
+
 ## v10.0.8 (2020-06-23)
 
 - [Bugfix] Fix android user creation during init

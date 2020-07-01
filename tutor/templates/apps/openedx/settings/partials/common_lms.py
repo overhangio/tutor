@@ -11,14 +11,6 @@ PROFILE_IMAGE_BACKEND["options"]["location"] = os.path.join(
     MEDIA_ROOT, "profile-images/"
 )
 
-GRADES_DOWNLOAD = {
-    "STORAGE_TYPE": "",
-    "STORAGE_KWARGS": {
-        "base_url": "/media/grades/",
-        "location": "/openedx/media/grades",
-    },
-}
-
 COURSE_CATALOG_VISIBILITY_PERMISSION = "see_in_catalog"
 COURSE_ABOUT_VISIBILITY_PERMISSION = "see_about_page"
 
