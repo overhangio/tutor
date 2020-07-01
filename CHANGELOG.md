@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix access to dicussion forum in development mode
+
 ## v10.0.9 (2020-07-07)
 
 - [Bugfix] Share grade download settings between the LMS and the CMS

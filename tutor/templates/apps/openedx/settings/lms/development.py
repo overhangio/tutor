@@ -14,6 +14,7 @@ CMS_ROOT_URL = "http://{}".format(CMS_BASE)
 LOGIN_REDIRECT_WHITELIST.append(CMS_BASE)
 
 FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] = False
+COMMENTS_SERVICE_URL = "http://{{ FORUM_HOST }}:4567"
 
 LOGGING["loggers"]["oauth2_provider"] = {
     "handlers": ["console"],
