@@ -186,6 +186,16 @@ To renew the certificate, run this command once per month::
 
 .. _customise:
 
+Disable default course certificates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``DISABLE_CERTIFICATES_HTML_VIEW`` (default: ``false``)
+
+By activating this feature, the system will no longer show certain views related to the default certificates platform.
+
+This feature was developed so that it is retrocompatible, so that it wont break previous versions.
+
+
 Custom Open edX docker image
 ----------------------------
 
