@@ -28,6 +28,7 @@ ANDROID_RELEASE_STORE_PASSWORD: "android store password"
 ANDROID_RELEASE_KEY_PASSWORD: "android release key password"
 ANDROID_RELEASE_KEY_ALIAS: "android release key alias"
 DEV_PROJECT_NAME: "tutor_dev"
+DISABLE_CERTIFICATES_HTML_VIEW: false
 DOCKER_IMAGE_OPENEDX: "overhangio/openedx:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_OPENEDX_DEV: "overhangio/openedx-dev:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_ANDROID: "overhangio/openedx-android:{{ TUTOR_VERSION }}"
