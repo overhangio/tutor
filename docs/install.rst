@@ -42,9 +42,9 @@ This is the simplest and recommended installation method for most people. Note h
 Alternative installation methods
 --------------------------------
 
-If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.6 and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
+If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.6 with pip and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
 
-    sudo apt install python3 libyaml-dev
+    sudo apt install python3 python3-pip libyaml-dev
 
 Installing from pypi
 ~~~~~~~~~~~~~~~~~~~~
