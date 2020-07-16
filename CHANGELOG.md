@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Feature] Enable sysadmin dashboard in LMS at /sysadmin
+
 ## v10.0.10 (2020-07-01)
 
 - [Bugfix] Fix pycontracts installation error when building openedx Docker image
