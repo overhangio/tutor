@@ -5,6 +5,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## Unreleased
 
 - [Feature] Upgrade all repositories to open-release/juniper.2
+- [Bugfix] Fix `reload-gunicorn` command
 - [Feature] Enable sysadmin dashboard in LMS at /sysadmin
 
 ## v10.0.10 (2020-07-01)
