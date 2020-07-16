@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.0.11 (2020-07-16)
 
 - [Feature] Upgrade all repositories to open-release/juniper.2
 - [Bugfix] Fix `reload-gunicorn` command
