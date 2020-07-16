@@ -30,14 +30,19 @@ def images_command():
     multiple=True,
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times.",
 )
+@click.option(
+    "--add-host",
+    multiple=True,
+    help="Set a custom host-to-IP mapping (host:ip).",
+)
 @click.pass_obj
-def build(context, image, no_cache, build_arg):
+def build(context, image, no_cache, build_arg, add_host):
     config = tutor_config.load(context.root)
     for i in image:
-        build_image(context.root, config, i, no_cache, build_arg)
+        build_image(context.root, config, i, no_cache, build_arg, add_host)
 
 
-def build_image(root, config, image, no_cache, build_arg):
+def build_image(root, config, image, no_cache, build_arg, add_host):
     # Build base images
     for img in BASE_IMAGE_NAMES:
         if image in [img, "all"]:
@@ -47,6 +52,7 @@ def build_image(root, config, image, no_cache, build_arg):
                 tag,
                 no_cache=no_cache,
                 build_args=build_arg,
+                add_hosts=add_host,
             )
 
     # Build plugin images
@@ -59,6 +65,7 @@ def build_image(root, config, image, no_cache, build_arg):
                     tag,
                     no_cache=no_cache,
                     build_args=build_arg,
+                    add_hosts=add_host,
                 )
 
     # Build dev images
@@ -72,6 +79,7 @@ def build_image(root, config, image, no_cache, build_arg):
                 tag,
                 no_cache=no_cache,
                 build_args=dev_build_args,
+                add_hosts=add_host,
             )
 
 
