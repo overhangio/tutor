@@ -31,9 +31,7 @@ def images_command():
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times.",
 )
 @click.option(
-    "--add-host",
-    multiple=True,
-    help="Set a custom host-to-IP mapping (host:ip).",
+    "--add-host", multiple=True, help="Set a custom host-to-IP mapping (host:ip).",
 )
 @click.pass_obj
 def build(context, image, no_cache, build_arg, add_host):
