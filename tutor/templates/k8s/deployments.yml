@@ -61,7 +61,7 @@ spec:
       containers:
         - name: cms-worker
           image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
-          args: ["./manage.py", "cms", "celery", "worker", "--loglevel=info", "--hostname=edx.cms.core.default.%%h", "--maxtasksperchild", "100"]
+          args: ["./manage.py", "cms", "celery", "worker", "--loglevel=info", "--hostname=edx.cms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.lms.core.default"]
           env:
           - name: SERVICE_VARIANT
             value: cms
@@ -176,7 +176,7 @@ spec:
       containers:
         - name: lms-worker
           image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
-          args: ["./manage.py", "lms", "celery", "worker", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild", "100"]
+          args: ["./manage.py", "lms", "celery", "worker", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.cms.core.default"]
           env:
           - name: SERVICE_VARIANT
             value: lms
