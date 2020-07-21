@@ -100,7 +100,7 @@ In order to run a fork of edx-platform, dependencies need to be properly install
     tutor dev run -v /path/to/edx-platform:/openedx/edx-platform lms bash
     pip install --requirement requirements/edx/development.txt
     python setup.py install
-    paver update_assets --settings=tutor.development
+    openedx-assets build --env=dev
 
 Debug edx-platform
 ~~~~~~~~~~~~~~~~~~
