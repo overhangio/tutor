@@ -11,7 +11,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: lms
-        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        image: {{ DOCKER_IMAGE_OPENEDX }}
         volumeMounts:
           - mountPath: /openedx/edx-platform/lms/envs/tutor/
             name: settings-lms
@@ -42,7 +42,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: cms
-        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+        image: {{ DOCKER_IMAGE_OPENEDX }}
         env:
         - name: SERVICE_VARIANT
           value: cms
@@ -76,7 +76,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: mysql
-        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+        image: {{ DOCKER_IMAGE_MYSQL }}
         command: []
 ---
 apiVersion: batch/v1
@@ -91,7 +91,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: forum
-        image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
+        image: {{ DOCKER_IMAGE_FORUM }}
         env:
           - name: SEARCH_SERVER
             value: "{{ ELASTICSEARCH_SCHEME }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"

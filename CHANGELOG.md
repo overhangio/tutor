@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- 💥[Feature] Make it possible to override the docker registry for just a few services by setting `DOCKER_IMAGE_SERVICENAME` values.
+
 ## v10.0.11 (2020-07-16)
 
 - [Feature] Upgrade all repositories to open-release/juniper.2

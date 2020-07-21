@@ -3,8 +3,7 @@ from . import utils
 
 
 def get_tag(config, name):
-    image = config["DOCKER_IMAGE_" + name.upper().replace("-", "_")]
-    return "{registry}{image}".format(registry=config["DOCKER_REGISTRY"], image=image)
+    return config["DOCKER_IMAGE_" + name.upper().replace("-", "_")]
 
 
 def build(path, tag, no_cache=False, build_args=None):

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: cms
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_IMAGE_OPENEDX }}
           env:
           - name: SERVICE_VARIANT
             value: cms
@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
         - name: cms-worker
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_IMAGE_OPENEDX }}
           args: ["./manage.py", "cms", "celery", "worker", "--loglevel=info", "--hostname=edx.cms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.lms.core.default"]
           env:
           - name: SERVICE_VARIANT
@@ -103,7 +103,7 @@ spec:
     spec:
       containers:
         - name: forum
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
+          image: {{ DOCKER_IMAGE_FORUM }}
           ports:
             - containerPort: 4567
           env:
@@ -134,7 +134,7 @@ spec:
     spec:
       containers:
         - name: lms
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_IMAGE_OPENEDX }}
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -175,7 +175,7 @@ spec:
     spec:
       containers:
         - name: lms-worker
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_IMAGE_OPENEDX }}
           args: ["./manage.py", "lms", "celery", "worker", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.cms.core.default"]
           env:
           - name: SERVICE_VARIANT
@@ -220,7 +220,7 @@ spec:
     spec:
       containers:
         - name: elasticsearch
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_ELASTICSEARCH }}
+          image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
           env:
             - name: ES_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
@@ -257,7 +257,7 @@ spec:
     spec:
       containers:
         - name: memcached
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MEMCACHED }}
+          image: {{ DOCKER_IMAGE_MEMCACHED }}
           ports:
             - containerPort: 11211
 {% endif %}
@@ -282,7 +282,7 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MONGODB }}
+          image: {{ DOCKER_IMAGE_MONGODB }}
           args: ["mongod", "--smallfiles", "--nojournal", "--storageEngine", "wiredTiger"]
           ports:
             - containerPort: 27017
@@ -316,7 +316,7 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+          image: {{ DOCKER_IMAGE_MYSQL }}
           args: ["mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci"]
           env:
             - name: MYSQL_ROOT_PASSWORD
@@ -350,7 +350,7 @@ spec:
     spec:
       containers:
         - name: smtp
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_SMTP }}
+          image: {{ DOCKER_IMAGE_SMTP }}
           ports:
             - containerPort: 25
 {% endif %}
@@ -372,13 +372,13 @@ spec:
     spec:
       initContainers:
         - name: clean-openedx-staticfiles
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_IMAGE_OPENEDX }}
           args: ['rm', '-rf', '/var/www/openedx/staticfiles']
           volumeMounts:
             - mountPath: /var/www/openedx/
               name: openedx-staticfiles
         - name: init-openedx-staticfiles
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+          image: {{ DOCKER_IMAGE_OPENEDX }}
           args: ['cp', '-r', '/openedx/staticfiles', '/var/www/openedx/']
           volumeMounts:
             - mountPath: /var/www/openedx/
@@ -386,7 +386,7 @@ spec:
         {{ patch("k8s-deployments-nginx-init-containers")|indent(8) }}
       containers:
         - name: nginx
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NGINX }}
+          image: {{ DOCKER_IMAGE_NGINX }}
           volumeMounts:
             - mountPath: /etc/nginx/conf.d/
               name: config
@@ -435,7 +435,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_RABBITMQ }}
+          image: {{ DOCKER_IMAGE_RABBITMQ }}
           ports:
             - containerPort: 5672
           volumeMounts:

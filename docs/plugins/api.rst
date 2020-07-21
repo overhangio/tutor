@@ -17,7 +17,7 @@ The ``config`` attribute is used to modify existing and add new configuration pa
  "set" and "default" key names will be automatically prefixed with the plugin name, in upper case.
 
 Example::
-  
+
     config = {
         "add": {
             "SECRET_KEY": "{{ 8|random_string }}"

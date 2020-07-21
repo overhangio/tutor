@@ -5,13 +5,13 @@ services:
 
   {% if ACTIVATE_MEMCACHED %}
   memcached:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MEMCACHED }}
+    image: {{ DOCKER_IMAGE_MEMCACHED }}
     restart: unless-stopped
   {% endif %}
 
   {% if ACTIVATE_MONGODB %}
   mongodb:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MONGODB }}
+    image: {{ DOCKER_IMAGE_MONGODB }}
     # Use WiredTiger in all environments, just like at edx.org
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
 
   {% if ACTIVATE_MYSQL %}
   mysql:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_MYSQL }}
+    image: {{ DOCKER_IMAGE_MYSQL }}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     restart: unless-stopped
     volumes:
@@ -32,7 +32,7 @@ services:
 
   {% if ACTIVATE_ELASTICSEARCH %}
   elasticsearch:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_ELASTICSEARCH }}
+    image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
     command: ["elasticsearch", "-Xms{{ ELASTICSEARCH_HEAP_SIZE }}", "-Xmx{{ ELASTICSEARCH_HEAP_SIZE }}", "--cluster.name=openedx", "--bootstrap.mlockall=true"]
     ulimits:
       memlock:
@@ -45,7 +45,7 @@ services:
 
   {% if ACTIVATE_RABBITMQ %}
   rabbitmq:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_RABBITMQ }}
+    image: {{ DOCKER_IMAGE_RABBITMQ }}
     volumes:
       - ../../data/rabbitmq:/var/lib/rabbitmq
     restart: unless-stopped
@@ -53,7 +53,7 @@ services:
 
   {% if ACTIVATE_SMTP %}
   smtp:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_SMTP }}
+    image: {{ DOCKER_IMAGE_SMTP }}
     restart: unless-stopped
   {% endif %}
 
@@ -61,7 +61,7 @@ services:
 
   {% if ACTIVATE_FORUM %}
   forum:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_FORUM }}
+    image: {{ DOCKER_IMAGE_FORUM }}
     environment:
       SEARCH_SERVER: "{{ ELASTICSEARCH_SCHEME }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
       MONGODB_AUTH: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
@@ -75,7 +75,7 @@ services:
 
   {% if ACTIVATE_LMS %}
   lms:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
       GUNICORN_WORKERS: {{ OPENEDX_LMS_GUNICORN_WORKERS }}
@@ -100,7 +100,7 @@ services:
 
   {% if ACTIVATE_CMS %}
   cms:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
       GUNICORN_WORKERS: {{ OPENEDX_CMS_GUNICORN_WORKERS }}
@@ -127,7 +127,7 @@ services:
 
   {% if ACTIVATE_LMS %}
   lms-worker:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
@@ -146,7 +146,7 @@ services:
 
   {% if ACTIVATE_CMS %}
   cms-worker:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}

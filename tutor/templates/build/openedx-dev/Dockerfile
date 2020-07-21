@@ -1,4 +1,4 @@
-FROM {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+FROM {{ DOCKER_IMAGE_OPENEDX }}
 MAINTAINER Overhang.io <contact@overhang.io>
 
 # Install useful system requirements

@@ -61,9 +61,9 @@ Docker
 Custom images
 *************
 
-- ``DOCKER_IMAGE_OPENEDX`` (default: ``"overhangio/openedx:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_ANDROID`` (default: ``"overhangio/openedx-android:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_FORUM`` (default: ``"overhangio/openedx-forum:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_OPENEDX`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_ANDROID`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-android:{{ TUTOR_VERSION }}"``)
+- ``DOCKER_IMAGE_FORUM`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-forum:{{ TUTOR_VERSION }}"``)
 
 These configuration parameters define which image to run for each service. By default, the docker image tag matches the Tutor version it was built with.
 
@@ -309,7 +309,7 @@ With django.po containing::
     msgstr "Ça marche ! Propulsé by Open edX{registered_trademark}"
 
 And djangojs.po::
-    
+
     msgid "%(num_points)s point possible (graded, results hidden)"
     msgid_plural "%(num_points)s points possible (graded, results hidden)"
     msgstr[0] "%(num_points)s point possible (noté, résultats cachés)"
@@ -320,14 +320,14 @@ Then you will have to re-build the openedx Docker image::
     tutor images build openedx openedx-dev
 
 Beware that this will take a long time! Unfortunately it's difficult to accelerate this process, as translation files need to be compiled prior to collecting the assets. In development it's possible to accelerate the iteration loop -- but that exercise is left to the reader.
-    
+
 
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, Tutor runs the `overhangio/openedx <https://hub.docker.com/r/overhangio/openedx/>`_ docker image from Docker Hub. If you have an account on `hub.docker.com <https://hub.docker.com>`_ or you have a private image registry, you can build your image and push it to your registry with::
 
-    tutor config save --set DOCKER_IMAGE_OPENEDX=myusername/openedx:mytag
+    tutor config save --set DOCKER_IMAGE_OPENEDX=docker.io/myusername/openedx:mytag
     tutor images build openedx
     tutor images push openedx
 

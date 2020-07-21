@@ -1,13 +1,13 @@
 version: "3.7"
 services:
   openedx-assets:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_OPENEDX }}
+    image: {{ DOCKER_IMAGE_OPENEDX }}
     volumes:
       - ../../data/openedx:/var/www/openedx
     command: sh -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
 
   nginx:
-    image: {{ DOCKER_REGISTRY }}{{ DOCKER_IMAGE_NGINX }}
+    image: {{ DOCKER_IMAGE_NGINX }}
     restart: unless-stopped
     ports:
       - "{{ NGINX_HTTP_PORT }}:80"

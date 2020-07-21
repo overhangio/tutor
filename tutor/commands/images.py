@@ -95,7 +95,7 @@ def pull_image(config, image):
     for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
         for img, tag in hook.items():
             if image in [img, "all"]:
-                tag = config["DOCKER_REGISTRY"] + tutor_env.render_str(config, tag)
+                tag = tutor_env.render_str(config, tag)
                 images.pull(tag)
 
 
@@ -119,7 +119,7 @@ def push_image(config, image):
     for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
         for img, tag in hook.items():
             if image in [img, "all"]:
-                tag = config["DOCKER_REGISTRY"] + tutor_env.render_str(config, tag)
+                tag = tutor_env.render_str(config, tag)
                 images.push(tag)
 
 
