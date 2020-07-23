@@ -46,6 +46,9 @@ RUN curl https://github.com/overhangio/edx-platform/commit/089b26eed0302ed1f9a5b
 # https://github.com/edx/edx-platform/pull/24237
 # https://github.com/overhangio/edx-platform/tree/overhangio/fix-no-csmh
 RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b51edf5e131106d69e19.patch | git apply -
+# xsslint security patch
+# https://github.com/edx/edx-platform/pull/24568
+RUN curl https://github.com/edx/edx-platform/commit/0e45ecb743a1f329be825367e72695af4113f882.patch | git apply -
 
 # Download extra locales to /openedx/locale/contrib/locale
 RUN cd /tmp \

@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply edx-platform upstream xss security fixes ([pull request](https://github.com/edx/edx-platform/pull/24568))
 - 💥[Feature] Make it possible to override the docker registry for just a few services by setting `DOCKER_IMAGE_SERVICENAME` values.
 
 ## v10.0.11 (2020-07-16)

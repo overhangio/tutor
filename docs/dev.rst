@@ -125,7 +125,7 @@ The ``requirements`` folder should have the following content::
             ...
 
 You will have to re-build the openedx Docker image once::
-    
+
     tutor images build openedx
 
 You should then run the development server as usual, with ``runserver``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
