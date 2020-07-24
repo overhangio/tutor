@@ -17,7 +17,7 @@ API_ACCESS_FROM_EMAIL = ENV_TOKENS["CONTACT_EMAIL"]
 
 # Load module store settings from config files
 update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
-DATA_DIR = path("/openedx/data/")
+DATA_DIR = "/openedx/data/"
 for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
    store["OPTIONS"]["fs_root"] = DATA_DIR
 

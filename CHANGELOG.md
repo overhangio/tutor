@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Feature] Get rid of outdated sysadmin dashboard in LMS at /sysadmin
+
 ## v10.1.0 (2020-07-23)
 
 - [Security] Apply edx-platform upstream xss security fixes ([pull request](https://github.com/edx/edx-platform/pull/24568))
