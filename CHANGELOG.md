@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Improve openedx Docker image build time and size with multi-stage build
 - [Feature] Get rid of outdated sysadmin dashboard in LMS at /sysadmin
 
 ## v10.1.0 (2020-07-23)

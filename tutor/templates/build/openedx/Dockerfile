@@ -1,32 +1,32 @@
-FROM docker.io/ubuntu:16.04
+###### Minimal image with base system requirements for most stages
+FROM docker.io/ubuntu:16.04 as minimal
 MAINTAINER Overhang.io <contact@overhang.io>
 
-############ common to lms & cms
-
-# Install system requirements
 RUN apt update && \
-    # Global requirements
-    apt install -y language-pack-en git build-essential software-properties-common curl git-core libmysqlclient-dev libxml2-dev libxslt1-dev libxmlsec1-dev libfreetype6-dev swig gcc g++ \
-    # pyenv/python requirements
-    libbz2-dev libreadline-dev \
-    # openedx requirements
-    gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng12-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev lynx nodejs npm ntp pkg-config \
-    && rm -rf /var/lib/apt/lists/*
+    apt install -y build-essential curl git language-pack-en
 ENV LC_ALL en_US.UTF-8
 
-# Install python with pyenv
+###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
+FROM minimal as python
+# https://github.com/pyenv/pyenv/wiki/Common-build-problems#prerequisites
+RUN apt install -y libssl-dev zlib1g-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+    xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 ARG PYTHON_VERSION=3.5.9
 ENV PYENV_ROOT /opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v1.2.18 --depth 1 \
-    && $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
+RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v1.2.18 --depth 1
+RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
+RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/pyvenv /openedx/venv
 
-# Dockerize will be useful to wait for mysql DB availability
+###### Install Dockerize to wait for mysql DB availability
+FROM minimal as dockerize
 ARG DOCKERIZE_VERSION=v0.6.1
 RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
     && rm /tmp/dockerize.tar.gz
 
-# Checkout edx-platform code
+###### Checkout edx-platform code
+FROM minimal as code
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
 ARG EDX_PLATFORM_VERSION=open-release/juniper.2
 RUN mkdir -p /openedx/edx-platform && \
@@ -50,7 +50,8 @@ RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b
 # https://github.com/edx/edx-platform/pull/24568
 RUN curl https://github.com/edx/edx-platform/commit/0e45ecb743a1f329be825367e72695af4113f882.patch | git apply -
 
-# Download extra locales to /openedx/locale/contrib/locale
+###### Download extra locales to /openedx/locale/contrib/locale
+FROM minimal as locales
 RUN cd /tmp \
     && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/juniper.2.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
@@ -58,12 +59,24 @@ RUN cd /tmp \
     && mv openedx-i18n-juniper.2/edx-platform/locale /openedx/locale/contrib \
     && rm -rf openedx-i18n*
 
-# Install python requirements in a virtualenv
-RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/pyvenv /openedx/venv
+###### Install python requirements in virtualenv
+FROM python as python-requirements
 ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
+
+RUN apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev
+
+# Note that this means that we need to reinstall all requirements whenever there is a
+# change in edx-platform, which sucks. But there is no obvious alternative, as we need
+# to install some packages from edx-platform.
+COPY --from=code /openedx/edx-platform /openedx/edx-platform
+WORKDIR /openedx/edx-platform
+
+# Install the right version of pip/setuptools
 RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
-RUN pip install -r requirements/edx/base.txt
+
+# Install base requirements
+RUN pip install -r ./requirements/edx/base.txt
 
 # Install patched version of ora2
 RUN pip install https://github.com/overhangio/edx-ora2/archive/overhangio/boto2to3.zip
@@ -71,20 +84,48 @@ RUN pip install https://github.com/overhangio/edx-ora2/archive/overhangio/boto2t
 # Install scorm xblock
 RUN pip install "openedx-scorm-xblock<11.0.0,>=10.0.0"
 
-# Install a recent version of nodejs
-RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
-ENV PATH /openedx/nodeenv/bin:${PATH}
-
-# Install nodejs requirements
-ARG NPM_REGISTRY=https://registry.npmjs.org/
-RUN npm install --verbose --registry=$NPM_REGISTRY
-ENV PATH ./node_modules/.bin:${PATH}
-
 # Install private requirements: this is useful for installing custom xblocks.
 COPY ./requirements/ /openedx/requirements
 RUN cd /openedx/requirements/ \
   && touch ./private.txt \
   && pip install -r ./private.txt
+
+###### Install nodejs with nodeenv in /openedx/nodeenv
+FROM python as nodejs-requirements
+ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
+
+# Install nodeenv with the version provided by edx-platform
+RUN pip install nodeenv==1.4.0
+RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
+
+# Install nodejs requirements
+ARG NPM_REGISTRY=https://registry.npmjs.org/
+COPY --from=code /openedx/edx-platform/package.json /openedx/edx-platform/package.json
+WORKDIR /openedx/edx-platform
+RUN npm install --verbose --registry=$NPM_REGISTRY
+
+###### Production image with system and python requirements
+FROM minimal as production
+
+# Install system requirements
+RUN apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng12-dev libsqlite3-dev libxmlsec1-dev lynx ntp pkg-config \
+&& rm -rf /var/lib/apt/lists/*
+
+COPY --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
+COPY --from=code /openedx/edx-platform /openedx/edx-platform
+COPY --from=locales /openedx/locale/contrib/locale /openedx/locale/contrib/locale
+COPY --from=python /opt/pyenv /opt/pyenv
+COPY --from=python-requirements /openedx/venv /openedx/venv
+COPY --from=python-requirements /openedx/requirements /openedx/requirements
+COPY --from=nodejs-requirements /openedx/nodeenv /openedx/nodeenv
+COPY --from=nodejs-requirements /openedx/edx-platform/node_modules /openedx/edx-platform/node_modules
+
+ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
+ENV VIRTUAL_ENV /openedx/venv/
+WORKDIR /openedx/edx-platform
+
+# Re-install local requirements, otherwise egg-info folders are missing
+RUN pip install -r requirements/edx/local.in
 
 # Create folder that will store lms/cms.env.json files, as well as
 # the tutor-specific settings files.
@@ -101,7 +142,8 @@ RUN mkdir -p /openedx/locale/user
 COPY ./locale/ /openedx/locale/user/locale/
 RUN cd /openedx/locale/user && \
     django-admin.py compilemessages -v1
-# Compile i18n strings: in Ironwood, js locales are not properly compiled out of the box
+
+# Compile i18n strings: in some cases, js locales are not properly compiled out of the box
 # and we need to do a pass ourselves. Also, we need to compile the djangojs.js files for
 # the downloaded locales.
 RUN ./manage.py lms --settings=tutor.i18n compilejsi18n
