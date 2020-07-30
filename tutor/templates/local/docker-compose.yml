@@ -88,7 +88,7 @@ services:
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
-      - mysql
+      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_FORUM %}- forum{% endif %}
       {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
@@ -113,7 +113,7 @@ services:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
-      - mysql
+      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
       {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
       {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
