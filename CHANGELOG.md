@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix dependency on mysql service when mysql is not activated
 - [Improvement] Improve openedx Docker image build time and size with multi-stage build
 - [Feature] Get rid of outdated sysadmin dashboard in LMS at /sysadmin
 
