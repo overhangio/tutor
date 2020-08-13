@@ -32,6 +32,10 @@ spec:
           resources:
             requests:
               memory: 2Gi
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200        
       volumes:
         - name: settings-lms
           configMap:
@@ -74,6 +78,10 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200   
       volumes:
         - name: settings-lms
           configMap:
@@ -115,6 +123,10 @@ spec:
               value: "{{ MONGODB_HOST }}"
             - name: MONGODB_PORT
               value: "{{ MONGODB_PORT }}"
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200   
 {% endif %}
 ---
 apiVersion: apps/v1
@@ -147,6 +159,10 @@ spec:
           resources:
             requests:
               memory: 2Gi
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200   
       volumes:
         - name: settings-lms
           configMap:
@@ -189,6 +205,10 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200   
       volumes:
         - name: settings-lms
           configMap:
@@ -233,6 +253,10 @@ spec:
           volumeMounts:
             - mountPath: /usr/share/elasticsearch/data
               name: data
+      securityContext:
+        fsGroup: 108
+        runAsNonRoot: true
+        runAsUser: 105   
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -260,6 +284,10 @@ spec:
           image: {{ DOCKER_IMAGE_MEMCACHED }}
           ports:
             - containerPort: 11211
+      securityContext:
+        fsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999   
 {% endif %}
 {% if ACTIVATE_MONGODB %}
 ---
@@ -289,7 +317,10 @@ spec:
           volumeMounts:
             - mountPath: /data/db
               name: data
-
+      securityContext:
+        fsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999   
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -326,6 +357,10 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: data
+      securityContext:
+        fsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999   
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -353,6 +388,10 @@ spec:
           image: {{ DOCKER_IMAGE_SMTP }}
           ports:
             - containerPort: 25
+      securityContext:
+        fsGroup: 101
+        runAsNonRoot: true
+        runAsUser: 101   
 {% endif %}
 ---
 apiVersion: apps/v1
@@ -401,8 +440,12 @@ spec:
               readOnly: true
             {{ patch("k8s-deployments-nginx-volume-mounts")|indent(12) }}
           ports:
-            - containerPort: 80
-            - containerPort: 443
+            - containerPort: 8080
+            - containerPort: 8443
+      securityContext:
+        fsGroup: 101
+        runAsNonRoot: true
+        runAsUser: 101   
       volumes:
         - name: config
           configMap:
@@ -441,6 +484,10 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/rabbitmq
               name: data
+      securityContext:
+        fsGroup: 101
+        runAsNonRoot: true
+        runAsUser: 100   
       volumes:
         - name: data
           persistentVolumeClaim:

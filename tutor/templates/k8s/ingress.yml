@@ -24,7 +24,7 @@ spec:
       paths:
       - backend:
           serviceName: nginx
-          servicePort: {% if ACTIVATE_HTTPS %}443{% else %}80{% endif %}{% endfor %}
+          servicePort: {% if ACTIVATE_HTTPS %}8443{% else %}8000{% endif %}{% endfor %}
   {{ patch("k8s-ingress-rules")|indent(2) }}
   {% if ACTIVATE_HTTPS %}
   tls:

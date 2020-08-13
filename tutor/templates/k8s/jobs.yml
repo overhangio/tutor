@@ -19,6 +19,10 @@ spec:
             name: settings-cms
           - mountPath: /openedx/config
             name: config
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200    
       volumes:
       - name: settings-lms
         configMap:
@@ -53,6 +57,10 @@ spec:
             name: settings-cms
           - mountPath: /openedx/config
             name: config
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200    
       volumes:
       - name: settings-lms
         configMap:
@@ -78,6 +86,10 @@ spec:
       - name: mysql
         image: {{ DOCKER_IMAGE_MYSQL }}
         command: []
+      securityContext:
+        fsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999  
 ---
 apiVersion: batch/v1
 kind: Job
@@ -101,6 +113,9 @@ spec:
             value: "{{ MONGODB_HOST }}"
           - name: MONGODB_PORT
             value: "{{ MONGODB_PORT }}"
-
+      securityContext:
+        fsGroup: 200
+        runAsNonRoot: true
+        runAsUser: 200
 {{ patch("k8s-jobs") }}
 
