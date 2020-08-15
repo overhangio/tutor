@@ -49,6 +49,9 @@ RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b
 # xsslint security patch
 # https://github.com/edx/edx-platform/pull/24568
 RUN curl https://github.com/edx/edx-platform/commit/0e45ecb743a1f329be825367e72695af4113f882.patch | git apply -
+# Sustaining security fixes 2
+# https://github.com/edx/edx-platform/pull/24762/commits
+RUN curl https://github.com/edx/edx-platform/commit/d9e0ca5e70d66e528262f80413f125d6bfac9e4e.patch | git apply -
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
