@@ -6,7 +6,7 @@ Local deployment
 This method is for deploying Open edX locally on a single server, where docker images are orchestrated with `docker-compose <https://docs.docker.com/compose/overview/>`_.
 
 In the following, environment and data files will be generated in a user-specific project folder which will be referred to as the "**project root**". On Linux, the default project root is ``~/.local/share/tutor``. An alternative project root can be defined by passing the ``--root=...`` option to the ``tutor`` command, or defining the ``TUTOR_ROOT=...`` environment variable::
-    
+
     tutor --root=/path/to/tutorroot run ...
     # Or equivalently:
     export TUTOR_ROOT=/path/to/tutorroot
@@ -69,7 +69,7 @@ In production, you will probably want to daemonize the services. To do so, run::
 And then, to stop all services::
 
     tutor local stop
-    
+
 Service initialisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -87,7 +87,7 @@ Logging
 By default, logs from all containers are forwarded to the `default Docker logging driver <https://docs.docker.com/config/containers/logging/configure/>`_: this means that logs are printed to the standard output when running in non-daemon mode (``tutor local start``). In daemon mode, logs can still be accessed with ``tutor local logs`` commands (see :ref:`logging <logging>`).
 
 In addition, all LMS and CMS logs are persisted to disk by default in the following files::
-    
+
     $(tutor config printroot)/data/lms/logs/all.log
     $(tutor config printroot)/data/cms/logs/all.log
 
@@ -126,7 +126,7 @@ Setting a new theme
 ~~~~~~~~~~~~~~~~~~~
 
 The default Open edX theme is rather bland, so Tutor makes it easy to switch to a different theme::
-    
+
     tutor local settheme mytheme $(tutor config printvalue LMS_HOST) $(tutor config printvalue CMS_HOST)
 
 Notice that we pass the hostnames of the LMS and the CMS to the ``settheme`` command: this is because in Open edX, themes are assigned per domain name.
@@ -137,7 +137,7 @@ Running arbitrary ``manage.py`` commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Any ``./manage.py`` command provided by Open edX can be run in a local platform deployed with Tutor. For instance, to delete a course, run::
-    
+
     tutor local run cms ./manage.py cms delete_course <your_course_id>
 
 To update the course search index, run::
@@ -149,7 +149,7 @@ Reloading Open edX settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) or just a single service (``tutor local restart lms``) but that is overkill. A quicker alternative is to send the HUP signal to the gunicorn processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
-    
+
     tutor local exec lms reload-gunicorn
 
 .. _portainer:
@@ -264,7 +264,7 @@ Then, install Tutor using one of the :ref:`installation methods <install>`. Then
     mv config.json data/ "$(tutor config printroot)"
 
 Finally, launch your platform with::
-    
+
     tutor local quickstart
 
 Backups/Migrating to a different server
@@ -274,19 +274,19 @@ With Tutor, all data are stored in a single folder. This means that it's extreme
 
 1. Make sure `tutor` is installed on both servers with the same version.
 2. Stop any running platform on server 1::
-    
+
     tutor local stop
 
 3. Transfer the configuration, environment and platform data from server 1 to server 2::
 
-    rsync -avr "$(tutor config printroot)/" username@server2:/tmp/tutor/ 
+    rsync -avr "$(tutor config printroot)/" username@server2:/tmp/tutor/
 
 4. On server 2, move the data to the right location::
-    
+
     mv /tmp/tutor "$(tutor config printroot)"
 
 5. Start the instance with::
-    
+
     tutor local start -d
 
 Making database dumps
