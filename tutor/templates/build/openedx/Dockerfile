@@ -46,11 +46,14 @@ RUN curl https://github.com/overhangio/edx-platform/commit/089b26eed0302ed1f9a5b
 # https://github.com/edx/edx-platform/pull/24237
 # https://github.com/overhangio/edx-platform/tree/overhangio/fix-no-csmh
 RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b51edf5e131106d69e19.patch | git apply -
+# Fix Google Chrome error with samesite=none secure=false in development
+# https://github.com/edx/edx-platform/pull/24592
+RUN curl https://github.com/edx/edx-platform/commit/b295389e96d7690e657a70afdffc2d931463b2b4.patch | git apply -
 # xsslint security patch
 # https://github.com/edx/edx-platform/pull/24568
 RUN curl https://github.com/edx/edx-platform/commit/0e45ecb743a1f329be825367e72695af4113f882.patch | git apply -
 # Sustaining security fixes 2
-# https://github.com/edx/edx-platform/pull/24762/commits
+# https://github.com/edx/edx-platform/pull/24762
 RUN curl https://github.com/edx/edx-platform/commit/d9e0ca5e70d66e528262f80413f125d6bfac9e4e.patch | git apply -
 
 ###### Download extra locales to /openedx/locale/contrib/locale

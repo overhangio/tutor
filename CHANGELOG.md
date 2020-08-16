@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix Samesite=None Secure=False cookie error for users accessing the LMS with the latest release of Google Chrome
 - [Security] Apply javascript security patch ([pull request](https://github.com/edx/edx-platform/pull/24762))
 - [Bugfix] Fix "FileError" on Scorm package upload in Scorm XBlock
 - 💥[Improvement] Serve openedx static assets with [whitenoise](http://whitenoise.evans.io/en/stable/) instead of nginx. This removes the `k8s-deployments-nginx-init-containers` patch. Plugins are encouraged to implement static asset serving with Whitenoise as well.

@@ -12,6 +12,19 @@ ALLOWED_HOSTS = [
 
 MIDDLEWARE.insert(0, "whitenoise.middleware.WhiteNoiseMiddleware")
 
+{% if ACTIVATE_HTTPS %}
+# Properly set the "secure" attribute on session/csrf cookies. This is required in
+# Chrome to support samesite=none cookies.
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+DCS_SESSION_COOKIE_SAMESITE = "None"
+{% else %}
+# When we cannot provide secure session/csrf cookies, we must disable samesite=none
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+DCS_SESSION_COOKIE_SAMESITE = "Lax"
+{% endif %}
+
 # Required to display all courses on start page
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
