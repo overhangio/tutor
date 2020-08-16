@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.2.0 (2020-08-16)
 
 - [Bugfix] Fix incorrect loading of some resources from localhost:18000 in development
 - [Bugfix] Fix Samesite=None Secure=False cookie error for users accessing the LMS with the latest release of Google Chrome
