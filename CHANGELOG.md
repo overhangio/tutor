@@ -11,7 +11,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - 💥[Improvement] Serve openedx static assets with [whitenoise](http://whitenoise.evans.io/en/stable/) instead of nginx. This removes the `k8s-deployments-nginx-init-containers` patch. Plugins are encouraged to implement static asset serving with Whitenoise as well.
 - [Bugfix] Fix dependency on mysql service when mysql is not activated
 - [Improvement] Improve openedx Docker image build time and size with multi-stage build
-- [Feature] Get rid of outdated sysadmin dashboard in LMS at /sysadmin
+- 💥[Feature] Get rid of outdated sysadmin dashboard in LMS at /sysadmin
 
 ## v10.1.0 (2020-07-23)
 
