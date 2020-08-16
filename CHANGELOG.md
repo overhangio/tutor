@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix incorrect loading of some resources from localhost:18000 in development
 - [Bugfix] Fix Samesite=None Secure=False cookie error for users accessing the LMS with the latest release of Google Chrome
 - [Security] Apply javascript security patch ([pull request](https://github.com/edx/edx-platform/pull/24762))
 - [Bugfix] Fix "FileError" on Scorm package upload in Scorm XBlock
