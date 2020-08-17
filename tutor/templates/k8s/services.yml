@@ -4,10 +4,11 @@ kind: Service
 metadata:
   name: cms
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 8000
       protocol: TCP
+      
   selector:
     app.kubernetes.io/name: cms
 {% if ACTIVATE_FORUM %}
@@ -17,7 +18,7 @@ kind: Service
 metadata:
   name: forum
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 4567
       protocol: TCP
@@ -30,7 +31,7 @@ kind: Service
 metadata:
   name: lms
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 8000
       protocol: TCP
@@ -43,7 +44,7 @@ kind: Service
 metadata:
   name: elasticsearch
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 9200
       protocol: TCP
@@ -57,7 +58,7 @@ kind: Service
 metadata:
   name: memcached
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 11211
       protocol: TCP
@@ -71,7 +72,7 @@ kind: Service
 metadata:
   name: mongodb
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 27017
       protocol: TCP
@@ -85,7 +86,7 @@ kind: Service
 metadata:
   name: mysql
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 3306
       protocol: TCP
@@ -98,7 +99,7 @@ kind: Service
 metadata:
   name: nginx
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 8000
       name: http
@@ -113,7 +114,7 @@ kind: Service
 metadata:
   name: rabbitmq
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 5672
       protocol: TCP
@@ -127,7 +128,7 @@ kind: Service
 metadata:
   name: smtp
 spec:
-  type: NodePort
+  type: {{K8S_SERVICE_TYPE}}
   ports:
     - port: 25
       protocol: TCP

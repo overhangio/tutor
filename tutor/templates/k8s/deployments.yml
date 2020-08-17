@@ -391,7 +391,7 @@ spec:
       securityContext:
         fsGroup: 101
         runAsNonRoot: true
-        runAsUser: 101   
+        runAsUser: 100   
 {% endif %}
 ---
 apiVersion: apps/v1
