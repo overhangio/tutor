@@ -40,7 +40,7 @@ ENV PATH /openedx/bin:${PATH}
 
 # Add openedx user account
 RUN /usr/sbin/groupadd --gid 200 edx && /usr/sbin/useradd --gid 200 --uid 200 edx 
-RUN /usr/bin/chown -R 200:200 /openedx
+RUN /bin/chown -R 200:200 /openedx
 
 USER edx
 
