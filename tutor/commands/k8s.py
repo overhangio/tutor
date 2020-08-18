@@ -35,6 +35,7 @@ def quickstart(context, non_interactive):
     tutor_env.save(context.root, config)
     click.echo(fmt.title("Starting the platform"))
     start.callback()
+    sleep(5)
     click.echo(fmt.title("Database creation and migrations"))
     init.callback(limit=None)
 
