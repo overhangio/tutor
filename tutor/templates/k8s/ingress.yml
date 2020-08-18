@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/name: web
     app.kubernetes.io/component: ingress
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: {{K8S_INGRESS_CLASS}}
     nginx.ingress.kubernetes.io/proxy-body-size: 1000m
     {% if ACTIVATE_HTTPS%}kubernetes.io/tls-acme: "true"
     cert-manager.io/issuer: letsencrypt{% endif %}
@@ -24,7 +24,7 @@ spec:
       paths:
       - backend:
           serviceName: nginx
-          servicePort: {% if ACTIVATE_HTTPS %}8443{% else %}8000{% endif %}{% endfor %}
+          servicePort: {% if ACTIVATE_HTTPS %}8443{% else %}8080{% endif %}{% endfor %}
   {{ patch("k8s-ingress-rules")|indent(2) }}
   {% if ACTIVATE_HTTPS %}
   tls:

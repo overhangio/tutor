@@ -101,7 +101,7 @@ metadata:
 spec:
   type: {{K8S_SERVICE_TYPE}}
   ports:
-    - port: 8000
+    - port: 8080
       name: http
     - port: 8443
       name: https
@@ -130,7 +130,7 @@ metadata:
 spec:
   type: {{K8S_SERVICE_TYPE}}
   ports:
-    - port: 25
+    - port: 8025
       protocol: TCP
   selector:
     app.kubernetes.io/name: smtp

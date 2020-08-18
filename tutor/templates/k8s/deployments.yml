@@ -21,7 +21,7 @@ spec:
           - name: SERVICE_VARIANT
             value: cms
           ports:
-            - containerPort: 8000
+            - containerPort: 8080
           volumeMounts:
             - mountPath: /openedx/edx-platform/lms/envs/tutor/
               name: settings-lms
