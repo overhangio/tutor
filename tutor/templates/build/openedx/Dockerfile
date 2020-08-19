@@ -55,6 +55,9 @@ RUN curl https://github.com/edx/edx-platform/commit/0e45ecb743a1f329be825367e726
 # Sustaining security fixes 2
 # https://github.com/edx/edx-platform/pull/24762
 RUN curl https://github.com/edx/edx-platform/commit/d9e0ca5e70d66e528262f80413f125d6bfac9e4e.patch | git apply -
+# Fix upload of video transcripts to s3
+# https://github.com/edx/edx-platform/pull/24800
+RUN curl https://github.com/edx/edx-platform/commit/80fa2cae128e2a1fd8ab298351b7b36c9d139e6c.patch | git apply -
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales

@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix upload of video transcripts to S3
 - [Improvement] Memorize whether the user is running a production platform during interactive configuration
 
 ## v10.2.0 (2020-08-16)
