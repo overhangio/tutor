@@ -28,12 +28,13 @@ def load_all(root, interactive=True):
 
 
 def ask_questions(config, defaults):
+    run_for_prod = config.get("LMS_HOST") != "local.overhang.io"
     run_for_prod = click.confirm(
         fmt.question(
             "Are you configuring a production platform? Type 'n' if you are just testing Tutor on your local computer"
         ),
         prompt_suffix=" ",
-        default=True,
+        default=run_for_prod,
     )
     if not run_for_prod:
         dev_values = {
