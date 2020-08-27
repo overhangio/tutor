@@ -28,7 +28,7 @@ RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releas
 ###### Checkout edx-platform code
 FROM minimal as code
 ARG EDX_PLATFORM_REPOSITORY=https://github.com/edx/edx-platform.git
-ARG EDX_PLATFORM_VERSION=open-release/juniper.2
+ARG EDX_PLATFORM_VERSION=open-release/juniper.3
 RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
@@ -46,15 +46,6 @@ RUN curl https://github.com/overhangio/edx-platform/commit/089b26eed0302ed1f9a5b
 # https://github.com/edx/edx-platform/pull/24237
 # https://github.com/overhangio/edx-platform/tree/overhangio/fix-no-csmh
 RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b51edf5e131106d69e19.patch | git apply -
-# Fix Google Chrome error with samesite=none secure=false in development
-# https://github.com/edx/edx-platform/pull/24592
-RUN curl https://github.com/edx/edx-platform/commit/b295389e96d7690e657a70afdffc2d931463b2b4.patch | git apply -
-# xsslint security patch
-# https://github.com/edx/edx-platform/pull/24568
-RUN curl https://github.com/edx/edx-platform/commit/0e45ecb743a1f329be825367e72695af4113f882.patch | git apply -
-# Sustaining security fixes 2
-# https://github.com/edx/edx-platform/pull/24762
-RUN curl https://github.com/edx/edx-platform/commit/d9e0ca5e70d66e528262f80413f125d6bfac9e4e.patch | git apply -
 # Fix upload of video transcripts to s3
 # https://github.com/edx/edx-platform/pull/24800
 RUN curl https://github.com/edx/edx-platform/commit/80fa2cae128e2a1fd8ab298351b7b36c9d139e6c.patch | git apply -
@@ -62,10 +53,10 @@ RUN curl https://github.com/edx/edx-platform/commit/80fa2cae128e2a1fd8ab298351b7
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
 RUN cd /tmp \
-    && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/juniper.2.tar.gz \
+    && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/juniper.3.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
     && mkdir -p /openedx/locale/contrib \
-    && mv openedx-i18n-juniper.2/edx-platform/locale /openedx/locale/contrib \
+    && mv openedx-i18n-juniper.3/edx-platform/locale /openedx/locale/contrib \
     && rm -rf openedx-i18n*
 
 ###### Install python requirements in virtualenv

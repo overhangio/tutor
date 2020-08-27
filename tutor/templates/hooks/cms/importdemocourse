@@ -1,7 +1,7 @@
 echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 # Import demo course
-git clone https://github.com/edx/edx-demo-course --branch open-release/juniper.2 --depth 1 ../edx-demo-course
+git clone https://github.com/edx/edx-demo-course --branch open-release/juniper.3 --depth 1 ../edx-demo-course
 python ./manage.py cms import ../data ../edx-demo-course
 
 # Re-index courses

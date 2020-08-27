@@ -30,7 +30,7 @@ RUN gem install bundler -v $BUNDLER_VERSION
 RUN gem install rake -v $RAKE_VERSION
 
 # Install forum
-RUN git clone https://github.com/edx/cs_comments_service.git --branch open-release/juniper.2 --depth 1 /openedx/cs_comments_service
+RUN git clone https://github.com/edx/cs_comments_service.git --branch open-release/juniper.3 --depth 1 /openedx/cs_comments_service
 WORKDIR /openedx/cs_comments_service
 RUN bundle install --deployment
 

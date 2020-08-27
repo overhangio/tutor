@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Upgrade all services to open-release/juniper.3
 - [Bugfix] Fix upload of video transcripts to S3
 - [Improvement] Memorize whether the user is running a production platform during interactive configuration
 
@@ -25,7 +26,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v10.0.11 (2020-07-16)
 
-- [Feature] Upgrade all repositories to open-release/juniper.2
+- [Feature] Upgrade all repositories to open-release/juniper.3
 - [Bugfix] Fix `reload-gunicorn` command
 - [Feature] Enable sysadmin dashboard in LMS at /sysadmin
 
