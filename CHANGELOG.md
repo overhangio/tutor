@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Reduce "openedx" Docker image size with static asset de-duplication
+
 ## v10.2.1 (2020-08-27)
 
 - [Bugfix] Upgrade all services to open-release/juniper.3
