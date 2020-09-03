@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Make it possible to run init jobs without starting the entire platform
 - [Improvement] Reduce "openedx" Docker image size with static asset de-duplication
 
 ## v10.2.1 (2020-08-27)

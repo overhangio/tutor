@@ -16,6 +16,7 @@ services:
         - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
         - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
         - ../apps/openedx/config/:/openedx/config/:ro
+      depends_on: {{ [("mysql", ACTIVATE_MYSQL)]|list_if }}
 
     cms-job:
       image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -26,6 +27,7 @@ services:
         - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
         - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
         - ../apps/openedx/config/:/openedx/config/:ro
+      depends_on: {{ [("mysql", ACTIVATE_MYSQL)]|list_if }}
 
     forum-job:
       image: {{ DOCKER_IMAGE_FORUM }}
@@ -34,5 +36,6 @@ services:
         MONGODB_AUTH: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
         MONGODB_HOST: "{{ MONGODB_HOST }}"
         MONGODB_PORT: "{{ MONGODB_PORT }}"
+      depends_on: {{ [("elasticsearch", ACTIVATE_ELASTICSEARCH), ("mongodb", ACTIVATE_MONGODB)]|list_if }}
 
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}
