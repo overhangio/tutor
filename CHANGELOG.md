@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add CORS basic configuration to LMS for subdomains of the LMS
 - [Feature] Add support for `images build --add-host` option (thanks @grinderz!)
 - [Bugfix] Fix podman compatibility by replacing `docker-compose rm` command by `docker-compose stop` when stopping containers
 - [Improvement] Improve plugin data deletion
