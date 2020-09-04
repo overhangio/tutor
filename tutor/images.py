@@ -6,15 +6,9 @@ def get_tag(config, name):
     return config["DOCKER_IMAGE_" + name.upper().replace("-", "_")]
 
 
-def build(path, tag, no_cache=False, build_args=None):
+def build(path, tag, *args):
     fmt.echo_info("Building image {}".format(tag))
-    command = ["build", "-t", tag, path]
-    build_args = build_args or {}
-    if no_cache:
-        command.append("--no-cache")
-    for arg in build_args:
-        command += ["--build-arg", arg]
-    utils.docker(*command)
+    utils.docker("build", "-t", tag, *args, path)
 
 
 def pull(tag):

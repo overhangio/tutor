@@ -27,27 +27,36 @@ def images_command():
 @click.option(
     "-a",
     "--build-arg",
+    "build_args",
     multiple=True,
     help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times.",
 )
+@click.option(
+    "--add-host",
+    "add_hosts",
+    multiple=True,
+    help="Set a custom host-to-IP mapping (host:ip).",
+)
 @click.pass_obj
-def build(context, image, no_cache, build_arg):
+def build(context, image, no_cache, build_args, add_hosts):
     config = tutor_config.load(context.root)
+    command_args = []
+    if no_cache:
+        command_args.append("--no-cache")
+    for build_arg in build_args:
+        command_args += ["--build-arg", build_arg]
+    for add_host in add_hosts:
+        command_args += ["--add-host", add_host]
     for i in image:
-        build_image(context.root, config, i, no_cache, build_arg)
+        build_image(context.root, config, i, *command_args)
 
 
-def build_image(root, config, image, no_cache, build_arg):
+def build_image(root, config, image, *args):
     # Build base images
     for img in BASE_IMAGE_NAMES:
         if image in [img, "all"]:
             tag = images.get_tag(config, img)
-            images.build(
-                tutor_env.pathjoin(root, "build", img),
-                tag,
-                no_cache=no_cache,
-                build_args=build_arg,
-            )
+            images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
 
     # Build plugin images
     for plugin, hook in plugins.iter_hooks(config, "build-image"):
@@ -57,21 +66,17 @@ def build_image(root, config, image, no_cache, build_arg):
                 images.build(
                     tutor_env.pathjoin(root, "plugins", plugin, "build", img),
                     tag,
-                    no_cache=no_cache,
-                    build_args=build_arg,
+                    *args
                 )
 
-    # Build dev images
+    # Build dev images with user id argument
     user_id = subprocess.check_output(["id", "-u"]).strip().decode()
-    dev_build_args = list(build_arg) + ["USERID={}".format(user_id)]
+    dev_build_arg = ["--build-arg", "USERID={}".format(user_id)]
     for img in DEV_IMAGE_NAMES:
         if image in [img, "all"]:
             tag = images.get_tag(config, img)
             images.build(
-                tutor_env.pathjoin(root, "build", img),
-                tag,
-                no_cache=no_cache,
-                build_args=dev_build_args,
+                tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args
             )
 
 

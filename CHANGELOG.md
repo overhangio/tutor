@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add support for `images build --add-host` option (thanks @grinderz!)
 - [Bugfix] Fix podman compatibility by replacing `docker-compose rm` command by `docker-compose stop` when stopping containers
 - [Improvement] Improve plugin data deletion
 - [Improvement] Introduce the `OPENEDX_COMMON_VERSION` setting
