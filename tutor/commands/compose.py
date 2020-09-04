@@ -96,7 +96,7 @@ def start(context, detach, services):
 @click.pass_obj
 def stop(context, services):
     config = tutor_config.load(context.root)
-    context.docker_compose(context.root, config, "rm", "--stop", "--force", *services)
+    context.docker_compose(context.root, config, "stop", *services)
 
 
 @click.command(

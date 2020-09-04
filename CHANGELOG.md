@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix podman compatibility by replacing `docker-compose rm` command by `docker-compose stop` when stopping containers
 - [Improvement] Improve plugin data deletion
 - [Improvement] Introduce the `OPENEDX_COMMON_VERSION` setting
 - [Bugfix] Make it possible to run init jobs without starting the entire platform
