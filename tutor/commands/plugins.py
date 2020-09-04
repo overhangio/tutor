@@ -57,16 +57,26 @@ def disable(context, plugin_names):
     config = tutor_config.load_user(context.root)
     for plugin in plugin_names:
         plugins.disable(config, plugin)
-
-        plugin_dir = tutor_env.pathjoin(context.root, "plugins", plugin)
-        if os.path.exists(plugin_dir):
-            shutil.rmtree(plugin_dir)
+        delete_plugin(context.root, plugin)
         fmt.echo_info("Plugin {} disabled".format(plugin))
 
     tutor_config.save_config_file(context.root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
     )
+
+
+def delete_plugin(root, name):
+    plugin_dir = tutor_env.pathjoin(root, "plugins", name)
+    if os.path.exists(plugin_dir):
+        try:
+            shutil.rmtree(plugin_dir)
+        except PermissionError as e:
+            raise exceptions.TutorError(
+                "Could not delete file {} from plugin {} in folder {}".format(
+                    e.filename, name, plugin_dir
+                )
+            )
 
 
 @click.command(

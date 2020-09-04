@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Improve plugin data deletion
 - [Improvement] Introduce the `OPENEDX_COMMON_VERSION` setting
 - [Bugfix] Make it possible to run init jobs without starting the entire platform
 - [Improvement] Reduce "openedx" Docker image size with static asset de-duplication
