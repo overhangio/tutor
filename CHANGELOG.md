@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.2.2 (2020-09-05)
 
 - [Improvement] Add CORS basic configuration to LMS for subdomains of the LMS
 - [Feature] Add support for `images build --add-host` option (thanks @grinderz!)
