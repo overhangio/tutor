@@ -53,10 +53,10 @@ RUN curl https://github.com/edx/edx-platform/commit/80fa2cae128e2a1fd8ab298351b7
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
 RUN cd /tmp \
-    && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/juniper.3.tar.gz \
+    && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/{{ OPENEDX_COMMON_VERSION }}.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
     && mkdir -p /openedx/locale/contrib \
-    && mv openedx-i18n-juniper.3/edx-platform/locale /openedx/locale/contrib \
+    && mv openedx-i18n-{{ OPENEDX_COMMON_VERSION|replace("/", "-") }}/edx-platform/locale /openedx/locale/contrib \
     && rm -rf openedx-i18n*
 
 ###### Install python requirements in virtualenv
