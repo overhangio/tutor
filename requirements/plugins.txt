@@ -1,7 +1,7 @@
 tutor-discovery
 tutor-ecommerce
 #tutor-figures
-tutor-lts
+tutor-license
 tutor-minio
 tutor-notes
 tutor-xqueue

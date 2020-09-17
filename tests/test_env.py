@@ -85,11 +85,11 @@ class EnvTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             config = tutor_config.load_current(root, defaults)
             tutor_config.merge(config, defaults)
-            config["ACTIVATE_HTTPS"] = True
+            config["ENABLE_HTTPS"] = True
             with unittest.mock.patch.object(fmt, "STDOUT"):
                 env.save(root, config)
-                with open(os.path.join(root, "env", "apps", "nginx", "lms.conf")) as f:
-                    self.assertIn("ssl", f.read())
+                with open(os.path.join(root, "env", "apps", "caddy", "Caddyfile")) as f:
+                    self.assertIn("www.myopenedx.com {", f.read())
 
     def test_patch(self):
         patches = {"plugin1": "abcd", "plugin2": "efgh"}

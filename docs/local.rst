@@ -148,9 +148,9 @@ To update the course search index, run::
 Reloading Open edX settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) or just a single service (``tutor local restart lms``) but that is overkill. A quicker alternative is to send the HUP signal to the gunicorn processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
+After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) or just a single service (``tutor local restart lms``) but that is overkill. A quicker alternative is to send the HUP signal to the uwsgi processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
 
-    tutor local exec lms reload-gunicorn
+    tutor local exec lms reload-uwsgi
 
 .. _portainer:
 
@@ -182,26 +182,9 @@ Running Open edX behind a web proxy
 
 The containerized web server (nginx) needs to listen to ports 80 and 443 on the host. If there is already a webserver running on the host, such as Apache or Nginx, the nginx container will not be able to start. Tutor supports running behind a web proxy. To do so, add the following configuration::
 
-       tutor config save --set WEB_PROXY=true --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=444
+       tutor config save --set RUN_CADDY=false --set NGINX_HTTP_PORT=81
 
-In this example, the nginx container ports would be mapped to 81 and 444, instead of 80 and 443. You must then configure the web proxy on the host. Basic configuration files are provided by Tutor which can be used directly by your web proxy.
-
-For nginx::
-
-    sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/
-    sudo systemctl reload nginx
-
-For apache::
-
-    sudo a2enmod proxy
-    sudo a2enmod proxy_http
-    sudo ln -s "$(tutor config printroot)/env/local/proxy/apache2/openedx.conf" /etc/apache2/sites-enabled/
-    sudo systemctl reload apache2
-
-If you have configured your platform to use SSL/TLS certificates for HTTPS access, the generation and renewal of certificates will not be managed by Tutor: you are supposed to take care of it yourself. Suggestions for generating and renewing these certificates with `Let's Encrypt <https://letsencrypt.org/>`_ are given by::
-
-    tutor local https create
-    tutor local https renew
+In this example, the nginx container port would be mapped to 81 instead of 80. You must then configure the web proxy on the host. As of v11.0.0, configuration files are no longer provided for automatic configuration of your web proxy. Basically, you should setup a reverse proxy to `localhost:NGINX_HTTP_PORT` from the following hosts: LMS_HOST, preview.LMS_HOST, CMS_HOST, as well as any additional host exposed by your plugins.
 
 Running multiple Open edX platforms on a single server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -210,7 +193,7 @@ With Tutor, it is easy to run multiple Open edX instances on a single server. To
 
 - ``TUTOR_ROOT``: so that configuration, environment and data are not mixed up between platforms.
 - ``LOCAL_PROJECT_NAME``: the various docker-compose projects cannot share the same name.
-- ``NGINX_HTTP_PORT``, ``NGINX_HTTPS_PORT``: ports cannot be shared by two different containers.
+- ``NGINX_HTTP_PORT``: ports cannot be shared by two different containers.
 - ``LMS_HOST``, ``CMS_HOST``: the different platforms must be accessible from different domain (or subdomain) names.
 
 In addition, a web proxy must be setup on the host, as described :ref:`above <web_proxy>`.
@@ -219,13 +202,13 @@ As an example, here is how to launch two different platforms, with nginx running
 
     # platform 1
     export TUTOR_ROOT=~/openedx/site1
-    tutor config save --interactive --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site1 --set NGINX_HTTP_PORT=81 --set NGINX_HTTPS_PORT=481
+    tutor config save --interactive --set RUN_CADDY=false --set LOCAL_PROJECT_NAME=tutor_site1 --set NGINX_HTTP_PORT=81
     tutor local quickstart
     sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/site1.conf
 
     # platform 2
     export TUTOR_ROOT=~/openedx/site2
-    tutor config save --interactive --set WEB_PROXY=true --set LOCAL_PROJECT_NAME=tutor_site2 --set NGINX_HTTP_PORT=82 --set NGINX_HTTPS_PORT=482
+    tutor config save --interactive --set RUN_CADDY=false --set LOCAL_PROJECT_NAME=tutor_site2 --set NGINX_HTTP_PORT=82
     tutor local quickstart
     sudo ln -s "$(tutor config printroot)/env/local/proxy/nginx/openedx.conf" /etc/nginx/sites-enabled/site2.conf
 

@@ -5,7 +5,7 @@ services:
       image: {{ DOCKER_IMAGE_MYSQL }}
       entrypoint: []
       command: ["echo", "done"]
-      depends_on: {{ [("mysql", ACTIVATE_MYSQL)]|list_if }}
+      depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
 
     lms-job:
       image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -16,7 +16,7 @@ services:
         - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
         - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
         - ../apps/openedx/config/:/openedx/config/:ro
-      depends_on: {{ [("mysql", ACTIVATE_MYSQL)]|list_if }}
+      depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
 
     cms-job:
       image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -27,7 +27,7 @@ services:
         - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
         - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
         - ../apps/openedx/config/:/openedx/config/:ro
-      depends_on: {{ [("mysql", ACTIVATE_MYSQL)]|list_if }}
+      depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
 
     forum-job:
       image: {{ DOCKER_IMAGE_FORUM }}
@@ -36,6 +36,12 @@ services:
         MONGODB_AUTH: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
         MONGODB_HOST: "{{ MONGODB_HOST }}"
         MONGODB_PORT: "{{ MONGODB_PORT }}"
-      depends_on: {{ [("elasticsearch", ACTIVATE_ELASTICSEARCH), ("mongodb", ACTIVATE_MONGODB)]|list_if }}
+      depends_on: {{ [("elasticsearch", RUN_ELASTICSEARCH), ("mongodb", RUN_MONGODB)]|list_if }}
+
+    android-job:
+      image: {{ DOCKER_IMAGE_ANDROID }}
+      volumes:
+        - "../android/:/openedx/config/"
+        - "../data/android/:/openedx/data/"
 
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}

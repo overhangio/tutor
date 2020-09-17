@@ -120,9 +120,9 @@ def restart(context, services):
     else:
         for service in services:
             if service == "openedx":
-                if config["ACTIVATE_LMS"]:
+                if config["RUN_LMS"]:
                     command += ["lms", "lms-worker"]
-                if config["ACTIVATE_CMS"]:
+                if config["RUN_CMS"]:
                     command += ["cms", "cms-worker"]
             else:
                 command.append(service)

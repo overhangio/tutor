@@ -24,12 +24,15 @@ def k8s():
 def quickstart(context, non_interactive):
     click.echo(fmt.title("Interactive platform configuration"))
     config = interactive_config.update(context.root, interactive=(not non_interactive))
-    if config["ACTIVATE_HTTPS"] and not config["WEB_PROXY"]:
+    if not config["RUN_CADDY"]:
         fmt.echo_alert(
-            "Potentially invalid configuration: ACTIVATE_HTTPS=true WEB_PROXY=false\n"
-            "You should either disable HTTPS support or configure your platform to use"
-            " a web proxy. See the Kubernetes section in the Tutor documentation for"
-            " more information."
+            "Potentially invalid configuration: RUN_CADDY=false\n"
+            "This setting might have been defined because you previously set WEB_PROXY=true. This is no longer"
+            " necessary in order to get Tutor to work on Kubernetes. In Tutor v11+ a Caddy-based load balancer is"
+            " provided out of the box to handle SSL/TLS certificate generation at runtime. If you disable this"
+            " service, you will have to configure an Ingress resource and a certificate manager yourself to redirect"
+            " traffic to the nginx service. See the Kubernetes section in the Tutor documentation for more"
+            " information."
         )
     click.echo(fmt.title("Updating the current environment"))
     tutor_env.save(context.root, config)
@@ -37,6 +40,17 @@ def quickstart(context, non_interactive):
     start.callback()
     click.echo(fmt.title("Database creation and migrations"))
     init.callback(limit=None)
+    fmt.echo_info(
+        """Your Open edX platform is ready and can be accessed at the following urls:
+
+    {http}://{lms_host}
+    {http}://{cms_host}
+    """.format(
+            http="https" if config["ENABLE_HTTPS"] else "http",
+            lms_host=config["LMS_HOST"],
+            cms_host=config["CMS_HOST"],
+        )
+    )
 
 
 @click.command(help="Run all configured Open edX services")
@@ -60,13 +74,14 @@ def start(context):
         "--selector",
         "app.kubernetes.io/component=volume",
     )
-    # Create everything else except jobs, ingress and issuer
+    # Create everything else except jobs
     utils.kubectl(
         "apply",
         "--kustomize",
         tutor_env.pathjoin(context.root),
         "--selector",
-        "app.kubernetes.io/component notin (job, ingress, issuer)",
+        # Here use `notin (job, xxx)` when there are other components to ignore
+        "app.kubernetes.io/component!=job",
     )
 
 
@@ -77,7 +92,7 @@ def stop(context):
     utils.kubectl(
         "delete",
         *resource_selector(config),
-        "deployments,services,ingress,configmaps,jobs",
+        "deployments,services,configmaps,jobs",
     )
 
 
@@ -201,6 +216,14 @@ def logs(context, container, follow, tail, service):
     utils.kubectl(*command)
 
 
+@click.command(help="Wait for a pod to become ready")
+@click.argument("name")
+@click.pass_obj
+def wait(context, name):
+    config = tutor_config.load(context.root)
+    wait_for_pod_ready(config, name)
+
+
 @click.command(help="Upgrade from a previous Open edX named release")
 @click.option(
     "--from", "from_version", default="ironwood", type=click.Choice(["ironwood"])
@@ -209,15 +232,26 @@ def logs(context, container, follow, tail, service):
 def upgrade(context, from_version):
     config = tutor_config.load(context.root)
 
-    if from_version == "ironwood":
-        if not config["ACTIVATE_MONGODB"]:
-            fmt.echo_info(
-                "You are not running MongDB (ACTIVATE_MONGODB=false). It is your "
-                "responsibility to upgrade your MongoDb instance to v3.6. There is "
-                "nothing left to do."
-            )
-            return
-        message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Ironwood, you should upgrade your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
+    running_version = from_version
+    if running_version == "ironwood":
+        upgrade_from_ironwood(config)
+        running_version = "juniper"
+
+    if running_version == "juniper":
+
+        running_version = "koa"
+
+
+def upgrade_from_ironwood(config):
+    if not config["RUN_MONGODB"]:
+        fmt.echo_info(
+            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "responsibility to upgrade your MongoDb instance to v3.6. There is "
+            "nothing left to do to upgrade from Ironwood."
+        )
+        return
+    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Ironwood, you should upgrade
+your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
 
     # Upgrade from v3.2 to v3.4
     tutor k8s stop
@@ -232,7 +266,27 @@ def upgrade(context, from_version):
     tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })'
 
     tutor config save --unset DOCKER_IMAGE_MONGODB"""
-        fmt.echo_info(message)
+    fmt.echo_info(message)
+
+
+def upgrade_from_juniper(config):
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v5.7. There is "
+            "nothing left to do to upgrade from Juniper."
+        )
+        return
+
+    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Juniper, you should upgrade
+your MySQL database from v5.6 to v5.7. You should run something similar to:
+
+    tutor k8s start
+    tutor k8s exec mysql bash -e -c "mysql_upgrade \
+        -u $(tutor config printvalue MYSQL_ROOT_USERNAME) \
+        --password='$(tutor config printvalue MYSQL_ROOT_PASSWORD)'
+"""
+    fmt.echo_info(message)
 
 
 class K8sClients:
@@ -329,12 +383,16 @@ class K8sScriptRunner(scripts.BaseRunner):
         job["metadata"]["name"] = job_name
         job["metadata"].setdefault("labels", {})
         job["metadata"]["labels"]["app.kubernetes.io/name"] = job_name
-        job["spec"]["template"]["spec"]["containers"][0]["args"] = [
-            "sh",
-            "-e",
-            "-c",
-            command,
-        ]
+        # Define k8s entrypoint/args
+        shell_command = ["sh", "-e", "-c"]
+        if job["spec"]["template"]["spec"]["containers"][0].get("command") == []:
+            # Empty "command" (aka: entrypoint) might not be taken into account by jobs, so we need to manually
+            # override the entrypoint. We do not do this for every job, because some entrypoints are actually useful.
+            job["spec"]["template"]["spec"]["containers"][0]["command"] = shell_command
+            container_args = [command]
+        else:
+            container_args = shell_command + [command]
+        job["spec"]["template"]["spec"]["containers"][0]["args"] = container_args
         job["spec"]["backoffLimit"] = 1
         job["spec"]["ttlSecondsAfterFinished"] = 3600
         # Save patched job to "jobs.yml" file
@@ -429,4 +487,5 @@ k8s.add_command(importdemocourse)
 k8s.add_command(settheme)
 k8s.add_command(exec_command)
 k8s.add_command(logs)
+k8s.add_command(wait)
 k8s.add_command(upgrade)

@@ -25,7 +25,7 @@ This ``openedx-dev`` development image differs from the ``openedx`` production i
 
 - The user that runs inside the container has the same UID as the user on the host, in order to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
 - Additional python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
-- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/juniper.3/requirements/edx/development.in>`__ are installed.
+- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/koa.1/requirements/edx/development.in>`__ are installed.
 
 Since the ``openedx-dev`` is based upon the ``openedx`` docker image, it should be re-built every time the ``openedx`` docker image is modified.
 
@@ -68,11 +68,11 @@ If you don't want to rewrite this option every time, you can define a command al
     alias tutor-dev-run-lms="tutor dev run -v /path/to/edx-platform:/openedx/edx-platform lms"
 
 For technical reasons, the ``-v`` option is only supported for the ``run`` and ``runserver`` commands. With these commands, only one service is started. But there are cases where you may want to launch and debug a complete Open edX platform with ``tutor dev start`` and mount a custom edx-platform fork. For instance, this might be needed when testing the interaction between multiple services. To do so, you should create a ``docker-compose.override.yml`` file that will specify a custom volume to be used with all ``dev`` commands::
-    
+
     vim "$(tutor config printroot)/env/dev/docker-compose.override.yml"
 
 Then, add the following content::
-    
+
     version: "3.7"
     services:
       lms:
@@ -90,7 +90,7 @@ Then, add the following content::
 
 This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automaticall mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-v`` option from the command line with the ``run`` or ``runserver`` commands.
 
-**Note:** containers are built on the Juniper release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the :ref:`fork edx-platform section <edx_platform_fork>`.
+**Note:** containers are built on the Koa release. If you are working on a different version of Open edX, you will have to rebuild the ``openedx`` docker images with the version. See the :ref:`fork edx-platform section <edx_platform_fork>`.
 
 Prepare the edx-platform repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

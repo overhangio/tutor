@@ -1,3 +1,40 @@
+{% if RUN_CADDY %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caddy
+  labels:
+    app.kubernetes.io/name: caddy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: caddy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: caddy
+    spec:
+      containers:
+        - name: caddy
+          image: {{ DOCKER_IMAGE_CADDY }}
+          volumeMounts:
+            - mountPath: /etc/caddy/
+              name: config
+            - mountPath: /data/
+              name: data
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+      volumes:
+        - name: config
+          configMap:
+            name: caddy-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: caddy
+{% endif %}
+{% if RUN_CMS %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -61,7 +98,7 @@ spec:
       containers:
         - name: cms-worker
           image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ["./manage.py", "cms", "celery", "worker", "--loglevel=info", "--hostname=edx.cms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.lms.core.default"]
+          args: ["celery", "worker", "--app=cms.celery", "--loglevel=info", "--hostname=edx.cms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.lms.core.default"]
           env:
           - name: SERVICE_VARIANT
             value: cms
@@ -84,7 +121,8 @@ spec:
         - name: config
           configMap:
             name: openedx-config
-{% if ACTIVATE_FORUM %}
+{% endif %}
+{% if RUN_FORUM %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -116,6 +154,7 @@ spec:
             - name: MONGODB_PORT
               value: "{{ MONGODB_PORT }}"
 {% endif %}
+{% if RUN_LMS %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -176,7 +215,7 @@ spec:
       containers:
         - name: lms-worker
           image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ["./manage.py", "lms", "celery", "worker", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.cms.core.default"]
+          args: ["celery", "worker", "--app=cms.celery", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.cms.core.default"]
           env:
           - name: SERVICE_VARIANT
             value: lms
@@ -199,7 +238,8 @@ spec:
         - name: config
           configMap:
             name: openedx-config
-{% if ACTIVATE_ELASTICSEARCH %}
+{% endif %}
+{% if RUN_ELASTICSEARCH %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -238,30 +278,7 @@ spec:
           persistentVolumeClaim:
             claimName: elasticsearch
 {% endif %}
-{% if ACTIVATE_MEMCACHED %}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: memcached
-  labels:
-    app.kubernetes.io/name: memcached
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: memcached
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: memcached
-    spec:
-      containers:
-        - name: memcached
-          image: {{ DOCKER_IMAGE_MEMCACHED }}
-          ports:
-            - containerPort: 11211
-{% endif %}
-{% if ACTIVATE_MONGODB %}
+{% if RUN_MONGODB %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -295,7 +312,7 @@ spec:
           persistentVolumeClaim:
             claimName: mongodb
 {% endif %}
-{% if ACTIVATE_MYSQL %}
+{% if RUN_MYSQL %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -317,7 +334,9 @@ spec:
       containers:
         - name: mysql
           image: {{ DOCKER_IMAGE_MYSQL }}
-          args: ["mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci"]
+          # Note the ignore-db-dir: this is because ext4 volumes are created with a lost+found directory in them, which causes mysql
+          # initialization to fail
+          args: ["mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci", "--ignore-db-dir=lost+found"]
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "{{ MYSQL_ROOT_PASSWORD }}"
@@ -331,7 +350,7 @@ spec:
           persistentVolumeClaim:
             claimName: mysql
 {% endif %}
-{% if ACTIVATE_SMTP %}
+{% if RUN_SMTP %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -379,42 +398,46 @@ spec:
             {{ patch("k8s-deployments-nginx-volume-mounts")|indent(12) }}
           ports:
             - containerPort: 80
-            - containerPort: 443
       volumes:
         - name: config
           configMap:
             name: nginx-config
         {{ patch("k8s-deployments-nginx-volumes")|indent(8) }}
-{% if ACTIVATE_RABBITMQ %}
+{% if RUN_REDIS %}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rabbitmq
+  name: redis
   labels:
-    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/name: redis
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: rabbitmq
+      app.kubernetes.io/name: redis
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: rabbitmq
+        app.kubernetes.io/name: redis
     spec:
       containers:
-        - name: rabbitmq
-          image: {{ DOCKER_IMAGE_RABBITMQ }}
+        - name: redis
+          image: {{ DOCKER_IMAGE_REDIS }}
           ports:
-            - containerPort: 5672
+            - containerPort: {{ REDIS_PORT }}
           volumeMounts:
-            - mountPath: /var/lib/rabbitmq
+            - mountPath: /openedx/redis/config/
+              name: config
+            - mountPath: /openedx/redis/data
               name: data
       volumes:
+        - name: config
+          configMap:
+            name: redis-config
         - name: data
           persistentVolumeClaim:
-            claimName: rabbitmq
+            claimName: redis
 {% endif %}
 {{ patch("k8s-deployments") }}

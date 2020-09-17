@@ -8,6 +8,15 @@ from .. import utils
 
 BASE_IMAGE_NAMES = ["openedx", "forum", "android"]
 DEV_IMAGE_NAMES = ["openedx-dev"]
+VENDOR_IMAGES = [
+    "caddy",
+    "elasticsearch",
+    "mongodb",
+    "mysql",
+    "nginx",
+    "redis",
+    "smtp",
+]
 
 
 @click.group(name="images", short_help="Manage docker images")
@@ -131,17 +140,9 @@ def all_image_names(config):
 
 
 def vendor_image_names(config):
-    vendor_images = [
-        "elasticsearch",
-        "memcached",
-        "mongodb",
-        "mysql",
-        "nginx",
-        "rabbitmq",
-        "smtp",
-    ]
-    for image in vendor_images[:]:
-        if not config.get("ACTIVATE_" + image.upper(), True):
+    vendor_images = VENDOR_IMAGES[:]
+    for image in VENDOR_IMAGES:
+        if not config.get("RUN_" + image.upper(), True):
             vendor_images.remove(image)
     return vendor_images
 

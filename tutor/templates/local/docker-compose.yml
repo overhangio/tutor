@@ -3,13 +3,7 @@ services:
 
   ############# External services
 
-  {% if ACTIVATE_MEMCACHED %}
-  memcached:
-    image: {{ DOCKER_IMAGE_MEMCACHED }}
-    restart: unless-stopped
-  {% endif %}
-
-  {% if ACTIVATE_MONGODB %}
+  {% if RUN_MONGODB %}
   mongodb:
     image: {{ DOCKER_IMAGE_MONGODB }}
     # Use WiredTiger in all environments, just like at edx.org
@@ -19,7 +13,7 @@ services:
       - ../../data/mongodb:/data/db
   {% endif %}
 
-  {% if ACTIVATE_MYSQL %}
+  {% if RUN_MYSQL %}
   mysql:
     image: {{ DOCKER_IMAGE_MYSQL }}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
@@ -30,7 +24,7 @@ services:
       MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
   {% endif %}
 
-  {% if ACTIVATE_ELASTICSEARCH %}
+  {% if RUN_ELASTICSEARCH %}
   elasticsearch:
     image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
     command: ["elasticsearch", "-Xms{{ ELASTICSEARCH_HEAP_SIZE }}", "-Xmx{{ ELASTICSEARCH_HEAP_SIZE }}", "--cluster.name=openedx", "--bootstrap.mlockall=true"]
@@ -43,15 +37,17 @@ services:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
   {% endif %}
 
-  {% if ACTIVATE_RABBITMQ %}
-  rabbitmq:
-    image: {{ DOCKER_IMAGE_RABBITMQ }}
+  {% if RUN_REDIS %}
+  redis:
+    image: {{ DOCKER_IMAGE_REDIS }}
     volumes:
-      - ../../data/rabbitmq:/var/lib/rabbitmq
+      - ../../env/redis/redis.conf:/openedx/redis/config/redis.conf:ro
+      - ../../data/redis:/openedx/redis/data
+    command: redis-server /openedx/redis/config/redis.conf
     restart: unless-stopped
   {% endif %}
 
-  {% if ACTIVATE_SMTP %}
+  {% if RUN_SMTP %}
   smtp:
     image: {{ DOCKER_IMAGE_SMTP }}
     restart: unless-stopped
@@ -59,7 +55,7 @@ services:
 
   ############# Forum
 
-  {% if ACTIVATE_FORUM %}
+  {% if RUN_FORUM %}
   forum:
     image: {{ DOCKER_IMAGE_FORUM }}
     environment:
@@ -68,17 +64,17 @@ services:
       MONGODB_HOST: "{{ MONGODB_HOST }}"
       MONGODB_PORT: "{{ MONGODB_PORT }}"
     restart: unless-stopped
-    depends_on: {{ [("elasticsearch", ACTIVATE_ELASTICSEARCH), ("mongodb", ACTIVATE_MONGODB)]|list_if }}
+    depends_on: {{ [("elasticsearch", RUN_ELASTICSEARCH), ("mongodb", RUN_MONGODB)]|list_if }}
   {% endif %}
 
   ############# LMS and CMS
 
-  {% if ACTIVATE_LMS %}
+  {% if RUN_LMS %}
   lms:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
-      GUNICORN_WORKERS: {{ OPENEDX_LMS_GUNICORN_WORKERS }}
+      UWSGI_WORKERS: {{ OPENEDX_LMS_UWSGI_WORKERS }}
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:
@@ -88,22 +84,21 @@ services:
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
-      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
-      {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
-      {% if ACTIVATE_FORUM %}- forum{% endif %}
-      {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
-      {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
-      {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
-      {% if ACTIVATE_SMTP %}- smtp{% endif %}
+      {% if RUN_MYSQL %}- mysql{% endif %}
+      {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
+      {% if RUN_FORUM %}- forum{% endif %}
+      {% if RUN_MONGODB %}- mongodb{% endif %}
+      {% if RUN_REDIS %}- redis{% endif %}
+      {% if RUN_SMTP %}- smtp{% endif %}
       {{ patch("local-docker-compose-lms-dependencies")|indent(6) }}
   {% endif %}
 
-  {% if ACTIVATE_CMS %}
+  {% if RUN_CMS %}
   cms:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
-      GUNICORN_WORKERS: {{ OPENEDX_CMS_GUNICORN_WORKERS }}
+      UWSGI_WORKERS: {{ OPENEDX_CMS_UWSGI_WORKERS }}
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:
@@ -113,26 +108,25 @@ services:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
-      {% if ACTIVATE_MYSQL %}- mysql{% endif %}
-      {% if ACTIVATE_ELASTICSEARCH %}- elasticsearch{% endif %}
-      {% if ACTIVATE_MEMCACHED %}- memcached{% endif %}
-      {% if ACTIVATE_MONGODB %}- mongodb{% endif %}
-      {% if ACTIVATE_RABBITMQ %}- rabbitmq{% endif %}
-      {% if ACTIVATE_SMTP %}- smtp{% endif %}
-      {% if ACTIVATE_LMS %}- lms{% endif %}
+      {% if RUN_MYSQL %}- mysql{% endif %}
+      {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
+      {% if RUN_MONGODB %}- mongodb{% endif %}
+      {% if RUN_REDIS %}- redis{% endif %}
+      {% if RUN_SMTP %}- smtp{% endif %}
+      {% if RUN_LMS %}- lms{% endif %}
       {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}
   {% endif %}
 
   ############# LMS and CMS workers
 
-  {% if ACTIVATE_LMS %}
+  {% if RUN_LMS %}
   lms-worker:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.cms.core.default
+    command: celery worker --app=cms.celery --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.cms.core.default
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
@@ -144,14 +138,14 @@ services:
       - lms
   {% endif %}
 
-  {% if ACTIVATE_CMS %}
+  {% if RUN_CMS %}
   cms-worker:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.lms.core.default
+    command: celery worker --app=cms.celery --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.lms.core.default
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro

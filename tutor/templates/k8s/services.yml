@@ -1,3 +1,20 @@
+{% if RUN_CADDY %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caddy
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      name: http
+    - port: 443
+      name: https
+  selector:
+    app.kubernetes.io/name: caddy
+{% endif %}
+{% if RUN_CMS %}
 ---
 apiVersion: v1
 kind: Service
@@ -10,7 +27,8 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: cms
-{% if ACTIVATE_FORUM %}
+{% endif %}
+{% if RUN_FORUM %}
 ---
 apiVersion: v1
 kind: Service
@@ -24,6 +42,7 @@ spec:
   selector:
     app.kubernetes.io/name: forum
 {% endif %}
+{% if RUN_LMS %}
 ---
 apiVersion: v1
 kind: Service
@@ -36,7 +55,8 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: lms
-{% if ACTIVATE_ELASTICSEARCH %}
+{% endif %}
+{% if RUN_ELASTICSEARCH %}
 ---
 apiVersion: v1
 kind: Service
@@ -50,21 +70,7 @@ spec:
   selector:
     app.kubernetes.io/name: elasticsearch
 {% endif %}
-{% if ACTIVATE_MEMCACHED %}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: memcached
-spec:
-  type: NodePort
-  ports:
-    - port: 11211
-      protocol: TCP
-  selector:
-    app.kubernetes.io/name: memcached
-{% endif %}
-{% if ACTIVATE_MONGODB %}
+{% if RUN_MONGODB %}
 ---
 apiVersion: v1
 kind: Service
@@ -78,7 +84,7 @@ spec:
   selector:
     app.kubernetes.io/name: mongodb
 {% endif %}
-{% if ACTIVATE_MYSQL %}
+{% if RUN_MYSQL %}
 ---
 apiVersion: v1
 kind: Service
@@ -102,25 +108,23 @@ spec:
   ports:
     - port: 80
       name: http
-    - port: 443
-      name: https
   selector:
     app.kubernetes.io/name: nginx
-{% if ACTIVATE_RABBITMQ %}
+{% if RUN_REDIS %}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: rabbitmq
+  name: redis
 spec:
   type: NodePort
   ports:
-    - port: 5672
+    - port: {{ REDIS_PORT }}
       protocol: TCP
   selector:
-    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/name: redis
 {% endif %}
-{% if ACTIVATE_SMTP %}
+{% if RUN_SMTP %}
 ---
 apiVersion: v1
 kind: Service

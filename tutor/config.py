@@ -134,7 +134,7 @@ def load_plugins(config, defaults):
 
 
 def is_service_activated(config, service):
-    return config["ACTIVATE_" + service.upper()]
+    return config["RUN_" + service.upper()]
 
 
 def upgrade_obsolete(config):
@@ -147,16 +147,35 @@ def upgrade_obsolete(config):
         config["OPENEDX_MYSQL_DATABASE"] = config.pop("MYSQL_DATABASE")
     if "MYSQL_USERNAME" in config:
         config["OPENEDX_MYSQL_USERNAME"] = config.pop("MYSQL_USERNAME")
-    if "ACTIVATE_NOTES" in config:
-        if config["ACTIVATE_NOTES"]:
+    if "RUN_NOTES" in config:
+        if config["RUN_NOTES"]:
             plugins.enable(config, "notes")
-        config.pop("ACTIVATE_NOTES")
-    if "ACTIVATE_XQUEUE" in config:
-        if config["ACTIVATE_XQUEUE"]:
+        config.pop("RUN_NOTES")
+    if "RUN_XQUEUE" in config:
+        if config["RUN_XQUEUE"]:
             plugins.enable(config, "xqueue")
-        config.pop("ACTIVATE_XQUEUE")
+        config.pop("RUN_XQUEUE")
     if "SECRET_KEY" in config:
         config["OPENEDX_SECRET_KEY"] = config.pop("SECRET_KEY")
+    # Replace WEB_PROXY by RUN_CADDY
+    if "WEB_PROXY" in config:
+        config["RUN_CADDY"] = not config.pop("WEB_PROXY")
+    # Rename ACTIVATE_HTTPS to ENABLE_HTTPS
+    if "ACTIVATE_HTTPS" in config:
+        config["ENABLE_HTTPS"] = config.pop("ACTIVATE_HTTPS")
+    # Replace RUN_* variables by RUN_*
+    for name in [
+        "ACTIVATE_LMS",
+        "ACTIVATE_CMS",
+        "ACTIVATE_FORUM",
+        "ACTIVATE_ELASTICSEARCH",
+        "ACTIVATE_MONGODB",
+        "ACTIVATE_MYSQL",
+        "ACTIVATE_REDIS",
+        "ACTIVATE_SMTP",
+    ]:
+        if name in config:
+            config[name.replace("ACTIVATE_", "RUN_")] = config.pop(name)
 
 
 def convert_json2yml(root):

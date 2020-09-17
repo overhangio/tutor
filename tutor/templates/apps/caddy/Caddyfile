@@ -1,0 +1,11 @@
+{{ LMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
+    reverse_proxy nginx:80
+}
+preview.{{ LMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
+    reverse_proxy nginx:80
+}
+{{ CMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
+    reverse_proxy nginx:80
+}
+
+{{ patch("caddyfile") }}

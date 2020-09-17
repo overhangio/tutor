@@ -27,57 +27,10 @@ The Kubernetes cluster should have at least 4Gb of RAM on each node. When runnin
 .. image:: img/virtualbox-minikube-system.png
     :alt: Virtualbox memory settings for Minikube
 
-Ingress controller
-~~~~~~~~~~~~~~~~~~
+Ingress controller and SSL/TLS certificates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to access your platform, you will have to setup an Ingress controller. Instructions vary for each cloud provider. To deploy an Nginx Ingress controller, it might be as simple as running::
-
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/mandatory.yaml
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/cloud-generic.yaml
-
-See the `official instructions <https://kubernetes.github.io/ingress-nginx/deploy/>`_ for more details.
-
-
-.. warning::
-    By default, Tutor does *not* launch an Ingress resource or TLS/SSL certificate issuer for you. There are many different ways to create an Ingress resource and issue certificates in a Kubernetes cluster, and it's not the responsibility of Tutor to make this decision. However, Tutor comes with a ready-to-run configuration for an Nginx-based Ingress ressource and a `cert-manager <https://cert-manager.io/docs/>`__ Issuer that delivers `Let's Encrypt <https://letsencrypt.org/>`__ certificates. You may examine the configuration in ``$(tutor config printroot)/env/k8s/ingress.yml``. If you are happy with this configuration, you may apply it with::
-
-        kubectl apply -k $(tutor config printroot)/env --selector="app.kubernetes.io/component in (ingress, issuer)"
-
-On Minikube, run::
-
-    minikube addons enable ingress
-
-With Kubernetes, your Open edX platform will *not* be available at localhost. Instead, you will have to access your platform with the domain names you specified for the LMS and the CMS. To do so on a local computer, you will need to add the following line to /etc/hosts::
-
-    MINIKUBEIP yourdomain.com studio.yourdomain.com preview.yourdomain.com notes.yourdomain.com
-
-where ``MINIKUBEIP`` should be replaced by the result of the command ``minikube ip``.
-
-cert-manager for TLS certificates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Tutor relies on `cert-manager <https://docs.cert-manager.io/>`_ to generate TLS certificates for HTTPS access. In order to activate HTTPS support, you will have to install cert-manager yourself. To do so, follow the `instructions from the official documentation <https://docs.cert-manager.io/en/latest/getting-started/install/kubernetes.html>`_. It might be as simple as running::
-
-    kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.14.0/cert-manager.yaml
-
-If you decide to enable HTTPS certificates, you will also have to set ``WEB_PROXY=true`` in the platform configuration, because the SSL/TLS termination will not occur in the Nginx container, but in the Ingress controller. To do so, run::
-
-    tutor config save --set WEB_PROXY=true
-
-Note that this configuration might conflict with a local installation.
-
-.. warning::
-    On DigitalOcean, there is currently a bug that prevents certificate issuers from successfully fetching TLS certificates from Let's Encrypt. A workaround consists in adding a custom annotation to the "ingress-nginx" service::
-
-        kubectl -n ingress-nginx patch service ingress-nginx -p \
-            '{"metadata": {"annotations": {"service.beta.kubernetes.io/do-loadbalancer-hostname": "YOURLMSHOSTHERE"}}}'
-
-    Sources:
-
-    * https://www.digitalocean.com/community/questions/how-do-i-correct-a-connection-timed-out-error-during-http-01-challenge-propagation-with-cert-manager
-    * https://www.digitalocean.com/community/questions/pod-unable-to-curl-loadbalancer
-    * https://github.com/jetstack/cert-manager/issues/863#issuecomment-567062996
-    * https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/examples/README.md#accessing-pods-over-a-managed-load-balancer-from-inside-the-cluster
+As of Tutor v11, it is no longer required to setup an Ingress controller to access your platform. Instead Caddy exposes a LoadBalancer service and SSL/TLS certificates are transparently generated at runtime.
 
 S3-like object storage with `MinIO <https://www.minio.io/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

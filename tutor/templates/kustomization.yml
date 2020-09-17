@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
 - k8s/namespace.yml
 - k8s/deployments.yml
-- k8s/ingress.yml
 - k8s/jobs.yml
 - k8s/services.yml
 - k8s/volumes.yml
@@ -23,6 +22,9 @@ commonLabels:
   {{ patch("kustomization-commonlabels")|indent(2) }}
 
 configMapGenerator:
+- name: caddy-config
+  files:
+  - apps/caddy/Caddyfile
 - name: openedx-settings-lms
   files:{% for file in "apps/openedx/settings/lms"|walk_templates %}
   - {{ file }}{% endfor %}
@@ -35,6 +37,9 @@ configMapGenerator:
 - name: nginx-config
   files:{% for file in "apps/nginx"|walk_templates %}
   - {{ file }}{% endfor %}
+- name: redis-config
+  files:
+  - apps/redis/redis.conf
 {{ patch("kustomization-configmapgenerator") }}
 
 {{ patch("kustomization") }}

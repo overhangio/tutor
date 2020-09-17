@@ -4,6 +4,31 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.0.0 (2020-12-09)
+
+- 💥[Improvement] Upgrade Open edX to Koa
+    - 💥 Setting changes:
+        - The ``ACTIVATE_HTTPS`` setting was renamed to ``ENABLE_HTTPS``.
+        - Other ``ACTIVATE_*`` variables were all renamed to ``RUN_*``.
+        - The ``WEB_PROXY`` setting was removed and ``RUN_CADDY`` was added.
+        - The ``NGINX_HTTPS_PORT`` setting is deprecated.
+    - Architectural changes:
+        - Use Caddy as a web proxy for automated SSL/TLS certificate generation:
+            - Nginx no longer listens to port 443 for https traffic
+            - The Caddy configuration file comes with a new ``caddyfile`` patch for much simpler SSL/TLS management.
+            - Configuration files for web proxies are no longer provided.
+            - Kubernetes deployment no longer requires setting up a custom Ingress resource or custom manager.
+        - Gunicorn and Whitenoise are replaced by uwsgi: this increases boostrap performance and makes it no longer necessary to mount media folders in the Nginx container.
+        - Replace memcached and rabbitmq by redis.
+    - Additional features:
+        - Make it possible to disable all plugins at once with ``plugins disable all``.
+        - Add ``tutor k8s wait`` command to wait for a pod to become ready
+        - Faster, more reliable static assets with local memory caching
+    - Deprecation: proxy files for Apache and Nginx are no longer provided out of the box.
+    - Removed plugin `{{ patch (...) }}` statements:
+        - "https-create", "k8s-ingress-rules", "k8s-ingress-tls-hosts": these are no longer necessary. Instead, declare your app in the "caddyfile" patch.
+        - "local-docker-compose-nginx-volumes": this patch was primarily used to serve media assets. The recommended is now to serve assets with uwsgi.
+
 ## v10.5.3 (2020-12-09)
 
 - [Security] Apply upstream edx-platform [security patch](https://github.com/edx/edx-platform/pull/25782)

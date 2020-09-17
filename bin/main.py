@@ -6,7 +6,7 @@ for plugin_name in [
     "discovery",
     "ecommerce",
     # "figures",
-    "lts",
+    "license",
     "minio",
     "notes",
     "xqueue",

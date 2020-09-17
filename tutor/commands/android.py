@@ -1,5 +1,7 @@
 import click
 
+from .compose import ScriptRunner
+from .local import LocalContext
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
@@ -42,12 +44,8 @@ cp OpenEdXMobile/build/outputs/apk/prod/{apk_folder}/*.apk /openedx/data/"""
 
 def docker_run(root, command):
     config = tutor_config.load(root)
-    utils.docker_run(
-        "--volume={}:/openedx/config/".format(tutor_env.pathjoin(root, "android")),
-        "--volume={}:/openedx/data/".format(tutor_env.data_path(root, "android")),
-        config["DOCKER_IMAGE_ANDROID"],
-        command,
-    )
+    runner = ScriptRunner(root, config, LocalContext.docker_compose)
+    runner.run_job("android", command)
 
 
 android.add_command(build)

@@ -10,9 +10,7 @@ ALLOWED_HOSTS = [
     "lms",
 ]
 
-MIDDLEWARE.insert(0, "whitenoise.middleware.WhiteNoiseMiddleware")
-
-{% if ACTIVATE_HTTPS %}
+{% if ENABLE_HTTPS %}
 # Properly set the "secure" attribute on session/csrf cookies. This is required in
 # Chrome to support samesite=none cookies.
 SESSION_COOKIE_SECURE = True

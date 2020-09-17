@@ -74,7 +74,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual("studio.{{ LMS_HOST }}", defaults["CMS_HOST"])
 
     def test_is_service_activated(self):
-        config = {"ACTIVATE_SERVICE1": True, "ACTIVATE_SERVICE2": False}
+        config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}
 
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
         self.assertFalse(tutor_config.is_service_activated(config, "service2"))

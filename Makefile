@@ -89,10 +89,10 @@ ci-test-bundle: ## Run basic tests on bundle
 	yes "" | ./dist/tutor config save --interactive
 	./dist/tutor config save
 	./dist/tutor plugins list
-	# ./dist/tutor plugins enable discovery ecommerce figures lts minio notes xqueue
-	./dist/tutor plugins enable discovery ecommerce lts minio notes xqueue
+	# ./dist/tutor plugins enable discovery ecommerce figures license minio notes xqueue
+	./dist/tutor plugins enable discovery ecommerce license minio notes xqueue
 	./dist/tutor plugins list
-	./dist/tutor lts --help
+	./dist/tutor license --help
 
 ./releases/github-release: ## Download github-release binary
 	mkdir -p releases/

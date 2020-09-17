@@ -8,8 +8,10 @@ RUN apt update && \
 
 # Install dev python requirements
 RUN pip install -r requirements/edx/development.txt
-# Pinning the jedi library is required in python 3.5 to avoid deprecation warnings from ipython
-RUN pip install ipdb==0.13.2 ipython==7.9.0 jedi==0.15.2
+# We install ipython from source to avoid too many deprecation warnings
+# https://github.com/ipython/ipython/issues/12206
+# We might be able to avoid this once they make a release later than 7.19.0.
+RUN pip install ipdb==0.13.4 git+https://github.com/ipython/ipython.git@d0649a54a8936a8019d54549779dc92bcbde4e68#egg=ipython
 
 # Recompile static assets: in development mode all static assets are stored in edx-platform,
 # and the location of these files is stored in webpack-stats.json. If we don't recompile

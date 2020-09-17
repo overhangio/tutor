@@ -1,6 +1,7 @@
-FROM docker.io/ubuntu:18.04
+FROM docker.io/ubuntu:20.04
 MAINTAINER Overhang.io <contact@overhang.io>
 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
   apt upgrade -y && \
   apt install -y wget unzip git openjdk-8-jre openjdk-8-jdk
@@ -25,7 +26,7 @@ RUN yes | /openedx/android-sdk/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} -
 
 # Install android app repo
 ARG ANDROID_APP_REPOSITORY=https://github.com/edx/edx-app-android
-ARG ANDROID_APP_VERSION=release/2.21.1
+ARG ANDROID_APP_VERSION=release/2.23.2
 RUN git clone $ANDROID_APP_REPOSITORY --branch $ANDROID_APP_VERSION /openedx/edx-app-android
 WORKDIR /openedx/edx-app-android
 
@@ -37,5 +38,3 @@ RUN ./gradlew tasks
 COPY ./edx.properties ./OpenEdXMobile/edx.properties
 RUN mkdir /openedx/config
 RUN ln -s /openedx/config/gradle.properties ./OpenEdXMobile/gradle.properties
-
-ENTRYPOINT ["sh", "-e", "-c"]

@@ -40,7 +40,7 @@ def ask_questions(config, defaults):
         dev_values = {
             "LMS_HOST": "local.overhang.io",
             "CMS_HOST": "studio.local.overhang.io",
-            "ACTIVATE_HTTPS": False,
+            "ENABLE_HTTPS": False,
         }
         fmt.echo_info(
             """As you are not running this platform in production, we automatically set the following configuration values:"""
@@ -150,7 +150,7 @@ def ask_questions(config, defaults):
                 "Activate SSL/TLS certificates for HTTPS access? Important note:"
                 " this will NOT work in a development environment."
             ),
-            "ACTIVATE_HTTPS",
+            "ENABLE_HTTPS",
             config,
             defaults,
         )

@@ -1,5 +1,4 @@
 import os
-from textwrap import indent
 
 import click
 
@@ -57,8 +56,6 @@ def quickstart(context, non_interactive, pullimages_):
     )
     click.echo(fmt.title("Stopping any existing platform"))
     compose.stop.callback([])
-    click.echo(fmt.title("HTTPS certificates generation"))
-    https_create.callback()
     if pullimages_:
         click.echo(fmt.title("Docker image updates"))
         compose.dc_command.callback(["pull"])
@@ -75,95 +72,19 @@ Your Open edX platform is ready and can be accessed at the following urls:
     {http}://{lms_host}
     {http}://{cms_host}
     """.format(
-            http="https" if config["ACTIVATE_HTTPS"] else "http",
+            http="https" if config["ENABLE_HTTPS"] else "http",
             lms_host=config["LMS_HOST"],
             cms_host=config["CMS_HOST"],
         )
     )
 
 
-@click.group(help="Manage https certificates")
-def https():
-    pass
-
-
-@click.command(help="Create https certificates", name="create")
-@click.pass_obj
-def https_create(context):
-    """
-    Note: there are a couple issues with https certificate generation.
-    1. Certificates are generated and renewed by using port 80, which is not necessarily open.
-        a. It may be occupied by the nginx container
-        b. It may be occupied by an external web server
-    2. On certificate renewal, nginx is not reloaded
-    """
-    config = tutor_config.load(context.root)
-    runner = compose.ScriptRunner(context.root, config, context.docker_compose)
-    if not config["ACTIVATE_HTTPS"]:
-        fmt.echo_info("HTTPS is not activated: certificate generation skipped")
-        return
-
-    script = runner.render("hooks", "certbot", "create")
-
-    if config["WEB_PROXY"]:
-        fmt.echo_info(
-            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
-certificates must be generated on the host. For instance, to generate
-certificates with Let's Encrypt, run:
-
-{}
-
-See the official certbot documentation for your platform: https://certbot.eff.org/""".format(
-                indent(script, "    ")
-            )
-        )
-        return
-
-    utils.docker_run(
-        "--volume",
-        "{}:/etc/letsencrypt/".format(tutor_env.data_path(context.root, "letsencrypt")),
-        "-p",
-        "80:80",
-        "--entrypoint=sh",
-        "docker.io/certbot/certbot:latest",
-        "-e",
-        "-c",
-        script,
-    )
-
-
-@click.command(help="Renew https certificates", name="renew")
-@click.pass_obj
-def https_renew(context):
-    config = tutor_config.load(context.root)
-    if not config["ACTIVATE_HTTPS"]:
-        fmt.echo_info("HTTPS is not activated: certificate renewal skipped")
-        return
-    if config["WEB_PROXY"]:
-        fmt.echo_info(
-            """You are running Tutor behind a web proxy (WEB_PROXY=true): SSL/TLS
-certificates must be renewed on the host. For instance, to renew Let's Encrypt
-certificates, run:
-
-    certbot renew
-
-See the official certbot documentation for your platform: https://certbot.eff.org/"""
-        )
-        return
-    docker_run = [
-        "--volume",
-        "{}:/etc/letsencrypt/".format(tutor_env.data_path(context.root, "letsencrypt")),
-        "-p",
-        "80:80",
-        "certbot/certbot:latest",
-        "renew",
-    ]
-    utils.docker_run(*docker_run)
-
-
 @click.command(help="Upgrade from a previous Open edX named release")
 @click.option(
-    "--from", "from_version", default="ironwood", type=click.Choice(["ironwood"])
+    "--from",
+    "from_version",
+    default="juniper",
+    type=click.Choice(["ironwood", "juniper"]),
 )
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_obj
@@ -183,8 +104,14 @@ Are you sure you want to continue?"""
             fmt.question(question), default=True, abort=True, prompt_suffix=" "
         )
 
-    if from_version == "ironwood":
+    running_version = from_version
+    if running_version == "ironwood":
         upgrade_from_ironwood(context, config)
+        running_version = "juniper"
+
+    if running_version == "juniper":
+        upgrade_from_juniper(context, config)
+        running_version = "koa"
 
 
 def upgrade_from_ironwood(context, config):
@@ -194,11 +121,11 @@ def upgrade_from_ironwood(context, config):
     click.echo(fmt.title("Stopping any existing platform"))
     compose.stop.callback([])
 
-    if not config["ACTIVATE_MONGODB"]:
+    if not config["RUN_MONGODB"]:
         fmt.echo_info(
-            "You are not running MongDB (ACTIVATE_MONGODB=false). It is your "
+            "You are not running MongDB (RUN_MONGODB=false). It is your "
             "responsibility to upgrade your MongoDb instance to v3.6. There is "
-            "nothing left to do."
+            "nothing left to do to upgrade from Ironwood."
         )
         return
 
@@ -233,9 +160,37 @@ def upgrade_from_ironwood(context, config):
     compose.stop.callback([])
 
 
-https.add_command(https_create)
-https.add_command(https_renew)
-local.add_command(https)
+def upgrade_from_juniper(context, config):
+    click.echo(fmt.title("Upgrading from Juniper"))
+    tutor_env.save(context.root, config)
+
+    click.echo(fmt.title("Stopping any existing platform"))
+    compose.stop.callback([])
+
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v5.7. There is "
+            "nothing left to do to upgrade from Juniper."
+        )
+        return
+
+    click.echo(fmt.title("Upgrading MySQL from v5.6 to v5.7"))
+    compose.start.callback(detach=True, services=["mysql"])
+    compose.execute.callback(
+        [
+            "mysql",
+            "bash",
+            "-e",
+            "-c",
+            "mysql_upgrade -u {} --password='{}'".format(
+                config["MYSQL_ROOT_USERNAME"], config["MYSQL_ROOT_PASSWORD"]
+            ),
+        ]
+    )
+    compose.stop.callback([])
+
+
 local.add_command(quickstart)
 local.add_command(upgrade)
 compose.add_commands(local)

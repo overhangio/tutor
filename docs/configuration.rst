@@ -40,16 +40,15 @@ With an up-to-date environment, Tutor is ready to launch an Open edX platform an
 Individual service activation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``ACTIVATE_LMS`` (default: ``true``)
-- ``ACTIVATE_CMS`` (default: ``true``)
-- ``ACTIVATE_FORUM`` (default: ``true``)
-- ``ACTIVATE_ELASTICSEARCH`` (default: ``true``)
-- ``ACTIVATE_MEMCACHED`` (default: ``true``)
-- ``ACTIVATE_MONGODB`` (default: ``true``)
-- ``ACTIVATE_MYSQL`` (default: ``true``)
-- ``ACTIVATE_RABBITMQ`` (default: ``true``)
-- ``ACTIVATE_SMTP`` (default: ``true``)
-- ``ACTIVATE_HTTPS`` (default: ``false``)
+- ``RUN_LMS`` (default: ``true``)
+- ``RUN_CMS`` (default: ``true``)
+- ``RUN_FORUM`` (default: ``true``)
+- ``RUN_ELASTICSEARCH`` (default: ``true``)
+- ``RUN_MONGODB`` (default: ``true``)
+- ``RUN_MYSQL`` (default: ``true``)
+- ``RUN_REDIS`` (default: ``true``)
+- ``RUN_SMTP`` (default: ``true``)
+- ``ENABLE_HTTPS`` (default: ``false``)
 
 Every single Open edX service may be (de)activated at will by these configuration parameters. This is useful if you want, for instance, to distribute the various Open edX services on different servers.
 
@@ -81,32 +80,37 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/juniper.3"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/koa.1"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
-- ``OPENEDX_CMS_GUNICORN_WORKERS`` (default: ``2``)
-- ``OPENEDX_LMS_GUNICORN_WORKERS`` (default: ``2``)
+- ``OPENEDX_CMS_UWSGI_WORKERS`` (default: ``2``)
+- ``OPENEDX_LMS_UWSGI_WORKERS`` (default: ``2``)
 
-By default there are 2 `gunicorn worker processes <https://docs.gunicorn.org/en/stable/settings.html#worker-processes>`__ to serve requests for the LMS and the CMS. However, each workers requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
+By default there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.io/en/latest/Options.html#processes>`__ to serve requests for the LMS and the CMS. However, each workers requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
 
 
 Vendor services
 ~~~~~~~~~~~~~~~
 
+Caddy
+*****
+
+- ``RUN_CADDY`` (default: ``true``)
+
+`Caddy <https://caddyserver.com>`__ is a web server used in Tutor as a web proxy for the generation of SSL/TLS certificates at runtime. If ``RUN_CADDY`` is set to ``false`` then we assume that SSL termination does not occur in the Caddy container, and thus the ``caddy`` container is not started.
+
 Nginx
 *****
 
 - ``NGINX_HTTP_PORT`` (default: ``80``)
-- ``NGINX_HTTPS_PORT`` (default: ``443``)
-- ``WEB_PROXY`` (default: ``false``)
 
-Nginx is used to route web traffic to the various applications and to serve static assets. In case there is another web server in front of the Nginx container (for instance, a web server running on the host or an Ingress controller on Kubernetes), the container exposed ports can be modified. If ``WEB_PROXY`` is set to ``true`` then we assume that SSL termination does not occur in the Nginx container.
+Nginx is used to route web traffic to the various applications and to serve static assets. When ``RUN_CADDY`` is false, the ``NGINX_HTTP_PORT`` is exposed on the host.
 
 MySQL
 *****
 
-- ``ACTIVATE_MYSQL`` (default: ``true``)
+- ``RUN_MYSQL`` (default: ``true``)
 - ``MYSQL_HOST`` (default: ``"mysql"``)
 - ``MYSQL_PORT`` (default: ``3306``)
 - ``MYSQL_ROOT_USERNAME`` (default: ``"root"``)
@@ -114,7 +118,7 @@ MySQL
 
 By default, a running Open edX platform deployed with Tutor includes all necessary 3rd-party services, such as MySQL, MongoDb, etc. But it's also possible to store data on a separate database, such as `Amazon RDS <https://aws.amazon.com/rds/>`_. For instance, to store data on an external MySQL database, set the following configuration::
 
-    ACTIVATE_MYSQL: false
+    RUN_MYSQL: false
     MYSQL_HOST: yourhost
     MYSQL_ROOT_USERNAME: <root user name>
     MYSQL_ROOT_PASSWORD: <root user password>
@@ -127,34 +131,31 @@ Elasticsearch
 - ``ELASTICSEARCH_PORT`` (default: ``9200``)
 - ``ELASTICSEARCH_HEAP_SIZE`` (default: ``"1g"``)
 
-Memcached
-*********
-
-- ``MEMCACHED_HOST`` (default: ``"memcached"``)
-- ``MEMCACHED_PORT`` (default: ``11211``)
-
 Mongodb
 *******
 
-- ``ACTIVATE_MONGODB`` (default: ``true``)
+- ``RUN_MONGODB`` (default: ``true``)
 - ``MONGODB_HOST`` (default: ``"mongodb"``)
 - ``MONGODB_DATABASE`` (default: ``"openedx"``)
 - ``MONGODB_PORT`` (default: ``27017``)
 - ``MONGODB_USERNAME`` (default: ``""``)
 - ``MONGODB_PASSWORD`` (default: ``""``)
 
-Rabbitmq
-********
+Redis
+*****
 
-- ``ACTIVATE_RABBITMQ`` (default: ``true``)
-- ``RABBITMQ_HOST`` (default: ``"rabbitmq"``)
-- ``RABBITMQ_USERNAME`` (default: ``""``)
-- ``RABBITMQ_PASSWORD`` (default: ``""``)
+- ``RUN_REDIS`` (default: ``true``)
+- ``REDIS_HOST`` (default: ``"redis"``)
+- ``REDIS_HOST`` (default: ``6379``)
+- ``REDIS_USERNAME`` (default: ``""``)
+- ``REDIS_PASSWORD`` (default: ``""``)
+
+Note that Redis has replaced Rabbitmq as the Celery message broker since Tutor v11.0.0.
 
 SMTP
 ****
 
-- ``ACTIVATE_SMTP`` (default: ``true``)
+- ``RUN_SMTP`` (default: ``true``)
 - ``SMTP_HOST`` (default: ``"smtp"``)
 - ``SMTP_PORT`` (default: ``25``)
 - ``SMTP_USERNAME`` (default: ``""``)
@@ -167,7 +168,7 @@ Note that the SMTP server shipped with Tutor by default does not implement TLS. 
 SSL/TLS certificates for HTTPS access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``ACTIVATE_HTTPS`` (default: ``false``)
+- ``ENABLE_HTTPS`` (default: ``false``)
 
 By activating this feature, a free SSL/TLS certificate from the `Let's Encrypt <https://letsencrypt.org/>`_ certificate authority will be created for your platform. With this feature, **your platform will no longer be accessible in HTTP**. Calls to http urls will be redirected to https url.
 
@@ -179,15 +180,7 @@ The following DNS records must exist and point to your server::
 
 Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
 
-To create the certificate manually, run::
-
-    tutor local https create
-
-To renew the certificate, run this command once per month::
-
-    tutor local stop nginx
-    tutor local https renew
-    tutor local start -d
+The SSL/TLS certificates will automatically be generated and updated by the Caddy proxy server container at runtime. Thus, as of v11.0.0 you no longer have to generate the certificates manually.
 
 .. _customise:
 
@@ -214,7 +207,7 @@ openedx Docker Image build arguments
 When building the "openedx" Docker image, it is possible to specify a few `arguments <https://docs.docker.com/engine/reference/builder/#arg>`__:
 
 - ``EDX_PLATFORM_REPOSITORY`` (default: ``"https://github.com/edx/edx-platform.git"``)
-- ``EDX_PLATFORM_VERSION`` (default: ``"open-release/juniper.3"``)
+- ``EDX_PLATFORM_VERSION`` (default: ``"open-release/koa.1"``)
 - ``EDX_PLATFORM_VERSION_DATE`` (default: ``"20200227"``)
 - ``NPM_REGISTRY`` (default: ``"https://registry.npmjs.org/"``)
 
@@ -286,16 +279,16 @@ Note that your edx-platform version must be a fork of the latest release **tag**
 
 If you don't create your fork from this tag, you *will* have important compatibility issues with other services. In particular:
 
-- Do not try to run a fork from an older (pre-Juniper) version of edx-platform: this will simply not work.
+- Do not try to run a fork from an older (pre-Koa) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
-- Do not try to run a fork from the open-release/juniper.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/juniper.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/juniper.master branch.
+- Do not try to run a fork from the open-release/koa.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/koa.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/koa.master branch.
 
 .. _i18n:
 
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/juniper.3/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/koa.1/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
@@ -308,9 +301,9 @@ Then, add a "django.po" file there that will contain your custom translations::
     msgid "String to translate"
     msgstr "你翻译的东西 la traduction de votre bidule"
 
-The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/juniper.3/conf/locale/en/LC_MESSAGES/django.po>`__.
+The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/koa.1/conf/locale/en/LC_MESSAGES/django.po>`__.
 
-If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/juniper.3/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
+If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/koa.1/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
 
 To recap, here is an example. To translate a few strings in French, both from django.po and djangojs.po, we would have the following file hierarchy::
 

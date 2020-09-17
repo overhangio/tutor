@@ -50,11 +50,16 @@ def enable(context, plugin_names):
     )
 
 
-@click.command(help="Disable a plugin")
+@click.command(
+    short_help="Disable a plugin",
+    help="Disable one or more plugins. Specify 'all' to disable all enabled plugins at once.",
+)
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
 @click.pass_obj
 def disable(context, plugin_names):
     config = tutor_config.load_user(context.root)
+    if "all" in plugin_names:
+        plugin_names = [plugin.name for plugin in plugins.iter_enabled(config)]
     for plugin_name in plugin_names:
         plugins.disable(config, plugin_name)
         delete_plugin(context.root, plugin_name)

@@ -1,8 +1,7 @@
-FROM docker.io/ubuntu:18.04
+FROM docker.io/ubuntu:20.04
 MAINTAINER Overhang.io <contact@overhang.io>
 
-RUN mkdir /openedx
-
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
   apt upgrade -y && \
   apt install -y git wget autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm-dev
@@ -12,6 +11,8 @@ ARG DOCKERIZE_VERSION=v0.6.1
 RUN wget -O /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
     && rm /tmp/dockerize.tar.gz
+
+RUN mkdir /openedx
 
 # Install ruby-build for building specific version of ruby
 # The ruby-build version should be periodically updated to reflect the latest release
@@ -39,7 +40,7 @@ RUN chmod a+x /openedx/bin/*
 ENV PATH /openedx/bin:${PATH}
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-ENV RACK_ENV staging
+ENV SINATRA_ENV staging
 ENV NEW_RELIC_ENABLE false
 ENV API_KEY forumapikey
 ENV SEARCH_SERVER "http://elasticsearch:9200"

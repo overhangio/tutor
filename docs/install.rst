@@ -63,7 +63,7 @@ Installing from source
     pip install -e .
 
 .. _cloud_install:
-  
+
 Zero-click AWS installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -78,9 +78,9 @@ Upgrading
 
 With Tutor, it is very easy to upgrade to a more recent Open edX or Tutor release. Just install the latest ``tutor`` version (using either methods above) and run the ``quickstart`` command again. If you have :ref:`customised <configuration_customisation>` your docker images, you will have to re-build them prior to running ``quickstart``.
 
-``quickstart`` should take care of automatically running the upgrade process. If for some reason you need to *manually* upgrade from an Open edX release to the next, you should run ``tutor local upgrade``. For instance, to upgrade from Ironwood to Juniper, run::
+``quickstart`` should take care of automatically running the upgrade process. If for some reason you need to *manually* upgrade from an Open edX release to the next, you should run ``tutor local upgrade``. For instance, to upgrade from Juniper to Koa, run::
 
-    tutor local upgrade --from=ironwood
+    tutor local upgrade --from=juniper
 
 .. _autocomplete:
 

@@ -1,0 +1,3 @@
+#! /bin/bash
+echo "Reloading uwsgi process..."
+kill -HUP $(pidof /openedx/venv/bin/python3 /openedx/venv/bin/uwsgi)

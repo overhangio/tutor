@@ -34,7 +34,7 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
 
 **Tutor** is a docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used by dozens of Open edX platforms around the world.
 
-Do you need professional assistance setting up or managing your Open edX platform? Overhang.IO provides online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/lts>`__.
+Do you need professional assistance setting up or managing your Open edX platform? Overhang.IO provides online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/pricing>`__.
 
 Features
 --------
@@ -46,7 +46,7 @@ Features
 * Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins.html>`__
 * Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`__
 * No technical skill required with the `1-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#cloud-deployment>`__
-* Professional support and premium plugins available with `Tutor Long Term Support (LTS) <https://overhang.io/tutor/lts>`__
+* Amazing plugins available with `Tutor Wizard Edition <https://overhang.io/tutor>`__
 
 .. _readme_intro_end:
 
@@ -71,7 +71,7 @@ Extensive documentation is available online: https://docs.tutor.overhang.io/
 Support
 -------
 
-To get community support, go to the official discussion forums: https://discuss.overhang.io. For official support, please subscribe to a Long Term Support (LTS) license at https://overhang.io/tutor/lts.
+To get community support, go to the official discussion forums: https://discuss.overhang.io. For official support, please subscribe to a Long Term Support (LTS) license at https://overhang.io/tutor/pricing.
 
 .. _readme_support_end:
 

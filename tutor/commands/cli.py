@@ -36,6 +36,8 @@ def main():
         cli.add_command(plugins_command)
         add_plugin_commands(cli)
         cli()  # pylint: disable=no-value-for-parameter
+    except KeyboardInterrupt:
+        pass
     except exceptions.TutorError as e:
         fmt.echo_error("Error: {}".format(e.args[0]))
         sys.exit(1)

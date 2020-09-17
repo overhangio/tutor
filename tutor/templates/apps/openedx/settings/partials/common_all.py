@@ -2,6 +2,8 @@
 import json
 import os
 
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
+
 # Mongodb connection parameters: simply modify `mongodb_parameters` to affect all connections to MongoDb.
 mongodb_parameters = {
     "host": "{{ MONGODB_HOST }}",
@@ -27,6 +29,8 @@ DATA_DIR = "/openedx/data/"
 for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
    store["OPTIONS"]["fs_root"] = DATA_DIR
 
+# Behave like memcache when it comes to connection errors
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get("DEFAULT_FROM_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get("DEFAULT_FEEDBACK_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
@@ -42,7 +46,7 @@ API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get("API_ACCESS_MANAGER_EMAIL", ENV_TOKENS
 API_ACCESS_FROM_EMAIL = ENV_TOKENS.get("API_ACCESS_FROM_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 
 # Get rid completely of coursewarehistoryextended, as we do not use the CSMH database
-INSTALLED_APPS.remove("coursewarehistoryextended")
+INSTALLED_APPS.remove("lms.djangoapps.coursewarehistoryextended")
 DATABASE_ROUTERS.remove(
     "openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter"
 )
@@ -82,15 +86,6 @@ LOGGING["handlers"]["tracking"] = {
     "formatter": "standard",
 }
 LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
-# Disable django/drf deprecation warnings
-import logging
-import warnings
-from django.utils.deprecation import RemovedInDjango30Warning, RemovedInDjango31Warning
-from rest_framework import RemovedInDRF310Warning, RemovedInDRF311Warning
-warnings.simplefilter('ignore', RemovedInDjango30Warning)
-warnings.simplefilter('ignore', RemovedInDjango31Warning)
-warnings.simplefilter('ignore', RemovedInDRF310Warning)
-warnings.simplefilter('ignore', RemovedInDRF311Warning)
 
 # Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}

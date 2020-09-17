@@ -3,6 +3,10 @@
 ######## Common LMS settings
 LOGIN_REDIRECT_WHITELIST = ["{{ CMS_HOST }}"]
 
+# Better layout of honor code/tos links during registration
+REGISTRATION_EXTRA_FIELDS["terms_of_service"] = "required"
+REGISTRATION_EXTRA_FIELDS["honor_code"] = "hidden"
+
 # This url must not be None and should not be used anywhere
 LEARNING_MICROFRONTEND_URL = "http://learn.openedx.org"
 
