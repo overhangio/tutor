@@ -8,6 +8,7 @@ import pkg_resources
 import appdirs
 
 from . import exceptions
+from . import fmt
 from . import serialize
 
 
@@ -228,8 +229,10 @@ def get_callable_attr(plugin, attr_name, default=None):
 
 
 def is_installed(name):
-    plugin_names = [plugin.name for plugin in iter_installed()]
-    return name in plugin_names
+    for plugin in iter_installed():
+        if name == plugin.name:
+            return True
+    return False
 
 
 def iter_installed():
@@ -248,8 +251,17 @@ def enable(config, name):
 
 
 def disable(config, name):
+    fmt.echo_info("Disabling plugin {}...".format(name))
+    for plugin in Plugins.instance(config).iter_enabled():
+        if name == plugin.name:
+            # Remove "set" config entries
+            for key, value in plugin.config_set.items():
+                config.pop(key, None)
+                fmt.echo_info("    Removed config entry {}={}".format(key, value))
+    # Remove plugin from list
     while name in config[CONFIG_KEY]:
         config[CONFIG_KEY].remove(name)
+    fmt.echo_info("    Plugin disabled")
 
 
 def iter_enabled(config):

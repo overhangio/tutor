@@ -55,10 +55,9 @@ def enable(context, plugin_names):
 @click.pass_obj
 def disable(context, plugin_names):
     config = tutor_config.load_user(context.root)
-    for plugin in plugin_names:
-        plugins.disable(config, plugin)
-        delete_plugin(context.root, plugin)
-        fmt.echo_info("Plugin {} disabled".format(plugin))
+    for plugin_name in plugin_names:
+        plugins.disable(config, plugin_name)
+        delete_plugin(context.root, plugin_name)
 
     tutor_config.save_config_file(context.root, config)
     fmt.echo_info(

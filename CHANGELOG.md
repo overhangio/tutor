@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Non-plugin settings added by "set" directives are now automatically removed when the plugin is disabled (#241)
+
 ## v10.2.2 (2020-09-05)
 
 - [Improvement] Add CORS basic configuration to LMS for subdomains of the LMS

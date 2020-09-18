@@ -122,14 +122,15 @@ def load_plugins(config, defaults):
             if new_key not in config:
                 config[new_key] = env.render_unknown(config, value)
 
-        # Set existing config key/values: here, we do not override existing values
-        for key, value in plugin.config_set.items():
-            if key not in config:
-                config[key] = env.render_unknown(config, value)
-
         # Create new defaults
         for key, value in plugin.config_defaults.items():
             defaults[plugin.config_key(key)] = value
+
+        # Set existing config key/values: here, we do not override existing values
+        # This must come last, as overridden values may depend on plugin defaults
+        for key, value in plugin.config_set.items():
+            if key not in config:
+                config[key] = env.render_unknown(config, value)
 
 
 def is_service_activated(config, service):
