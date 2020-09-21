@@ -6,8 +6,9 @@ You have the option of running Tutor with `Podman <https://podman.io/>`__, inste
 The ``podman`` CLI aims to be fully compatible with the ``docker`` CLI, and ``podman-compose`` is meant to be a fully-compatible alias of ``docker-compose``. This means that you should be able to use together with Tutor, without making any changes to Tutor itself.
 
 .. warning::
-   Some users have reported that while ``podman`` is a suitable drop-in replacement for ``docker`` for them, some compatibility issues do exist between ``podman-compose`` and ``docker-compose``. If you run into such compatibility issues, please report them on `Discourse <https://discuss.overhang.io/>`_.
+   Since this was written, it was discovered that there are major compatibility issues between ``podman-compose`` and ``docker-compose``. Thus, podman cannot be considered a drop-in replacement of Docker in the context of Tutor -- at least for running Open edX locally.
 
+.. warning::
    You should not attempt to run Tutor with Podman on a system that already has native ``docker`` installed. If you want to switch to ``podman`` using the aliases described here, you should uninstall (or at least stop) the native Docker daemon first.
 
 
