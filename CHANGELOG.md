@@ -1,6 +1,6 @@
 # Changelog
 
-Note: Breaking changes between versions are indicated by "💥".
+<b>Note:</b> Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
