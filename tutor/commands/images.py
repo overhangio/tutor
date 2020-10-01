@@ -51,35 +51,6 @@ def build(context, image, no_cache, build_args, add_hosts):
         build_image(context.root, config, i, *command_args)
 
 
-def build_image(root, config, image, *args):
-    # Build base images
-    for img in BASE_IMAGE_NAMES:
-        if image in [img, "all"]:
-            tag = images.get_tag(config, img)
-            images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
-
-    # Build plugin images
-    for plugin, hook in plugins.iter_hooks(config, "build-image"):
-        for img, tag in hook.items():
-            if image in [img, "all"]:
-                tag = tutor_env.render_str(config, tag)
-                images.build(
-                    tutor_env.pathjoin(root, "plugins", plugin, "build", img),
-                    tag,
-                    *args
-                )
-
-    # Build dev images with user id argument
-    user_id = subprocess.check_output(["id", "-u"]).strip().decode()
-    dev_build_arg = ["--build-arg", "USERID={}".format(user_id)]
-    for img in DEV_IMAGE_NAMES:
-        if image in [img, "all"]:
-            tag = images.get_tag(config, img)
-            images.build(
-                tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args
-            )
-
-
 @click.command(short_help="Pull images from the Docker registry")
 @click.argument("image", nargs=-1)
 @click.pass_obj
@@ -87,21 +58,6 @@ def pull(context, image):
     config = tutor_config.load(context.root)
     for i in image:
         pull_image(config, i)
-
-
-def pull_image(config, image):
-    # Pull base images
-    for img in image_names(config):
-        if image in [img, "all"]:
-            tag = images.get_tag(config, img)
-            images.pull(tag)
-
-    # Pull plugin images
-    for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
-        for img, tag in hook.items():
-            if image in [img, "all"]:
-                tag = tutor_env.render_str(config, tag)
-                images.pull(tag)
 
 
 @click.command(short_help="Push images to the Docker registry")
@@ -113,19 +69,51 @@ def push(context, image):
         push_image(config, i)
 
 
+def build_image(root, config, image, *args):
+    # Build base images
+    for img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
+        images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
+
+    # Build plugin images
+    for plugin, img, tag in iter_plugin_images(config, image, "build-image"):
+        images.build(
+            tutor_env.pathjoin(root, "plugins", plugin, "build", img), tag, *args
+        )
+
+    # Build dev images with user id argument
+    user_id = subprocess.check_output(["id", "-u"]).strip().decode()
+    dev_build_arg = ["--build-arg", "USERID={}".format(user_id)]
+    for img, tag in iter_images(config, image, DEV_IMAGE_NAMES):
+        images.build(tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args)
+
+
+def pull_image(config, image):
+    for _img, tag in iter_images(config, image, image_names(config)):
+        images.pull(tag)
+    for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
+        images.pull(tag)
+
+
 def push_image(config, image):
-    # Push base images
-    for img in BASE_IMAGE_NAMES:
+    for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
+        images.push(tag)
+    for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
+        images.push(tag)
+
+
+def iter_images(config, image, image_list):
+    for img in image_list:
         if image in [img, "all"]:
             tag = images.get_tag(config, img)
-            images.push(tag)
+            yield img, tag
 
-    # Push plugin images
-    for _plugin, hook in plugins.iter_hooks(config, "remote-image"):
+
+def iter_plugin_images(config, image, hook_name):
+    for plugin, hook in plugins.iter_hooks(config, hook_name):
         for img, tag in hook.items():
             if image in [img, "all"]:
                 tag = tutor_env.render_str(config, tag)
-                images.push(tag)
+                yield plugin, img, tag
 
 
 def image_names(config):
