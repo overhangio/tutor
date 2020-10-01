@@ -49,6 +49,11 @@ RUN curl https://github.com/overhangio/edx-platform/commit/6dbf2eddf7a4563c04c3b
 # Fix upload of video transcripts to s3
 # https://github.com/edx/edx-platform/pull/24800
 RUN curl https://github.com/edx/edx-platform/commit/80fa2cae128e2a1fd8ab298351b7b36c9d139e6c.patch | git apply -
+# Make it possible to disable learner records globally
+# https://github.com/edx/edx-platform/pull/25182
+# https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
+RUN curl https://github.com/overhangio/edx-platform/commit/58f20a0547355080eeee346104a1719ad806902e.patch | git apply -
+
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales

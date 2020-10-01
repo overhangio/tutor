@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Disable learner records globally by default
 - [Improvement] Upgrade to the latest release of MySQL 5.6
 - [Improvement] Non-plugin settings added by "set" directives are now automatically removed when the plugin is disabled (#241)
 
