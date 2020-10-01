@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Make it possible to override individual contact email addresses with plugins
+- [Bugfix] Replace "no-reply@LMS_BASE" email address by regular contact email address
 - [Bugfix] Disable learner records globally by default
 - [Improvement] Upgrade to the latest release of MySQL 5.6
 - [Improvement] Non-plugin settings added by "set" directives are now automatically removed when the plugin is disabled (#241)
