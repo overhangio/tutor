@@ -57,7 +57,7 @@ def build(context, image_names, no_cache, build_args, add_hosts):
 def pull(context, image_names):
     config = tutor_config.load(context.root)
     for image in image_names:
-        pull_image(config, i)
+        pull_image(config, image)
 
 
 @click.command(short_help="Push images to the Docker registry")
@@ -100,7 +100,7 @@ def build_image(root, config, image, *args):
 
 
 def pull_image(config, image):
-    for _img, tag in iter_images(config, image, image_names(config)):
+    for _img, tag in iter_images(config, image, all_image_names(config)):
         images.pull(tag)
     for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
         images.pull(tag)
@@ -128,7 +128,7 @@ def iter_plugin_images(config, image, hook_name):
                 yield plugin, img, tag
 
 
-def image_names(config):
+def all_image_names(config):
     return BASE_IMAGE_NAMES + vendor_image_names(config)
 
 
