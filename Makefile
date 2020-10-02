@@ -18,10 +18,13 @@ upgrade-requirements: ## Upgrade requirements files
 	pip-compile --upgrade requirements/dev.in
 	pip-compile --upgrade requirements/docs.in
 
-package: ## Build a package ready to upload to pypi
-	python3 setup.py sdist
+build-pythonpackage: ## Build a python package ready to upload to pypi
+	python setup.py sdist
 
-test: test-lint test-unit test-format test-package ## Run all tests by decreasing order or priority
+push-pythonpackage: ## Push python packages to pypi
+	twine upload --skip-existing dist/tutor-*.tar.gz
+
+test: test-lint test-unit test-format test-pythonpackage ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
@@ -30,13 +33,20 @@ test-lint: ## Run code linting tests
 	pylint --errors-only --ignore=templates ${SRC_DIRS}
 
 test-unit: ## Run unit tests
-	python3 -m unittest discover tests
+	python -m unittest discover tests
 
-test-package: package ## Test that package can be uploaded to pypi
+test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
 	twine check dist/tutor-openedx-$(shell make version).tar.gz
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)
+
+bootstrap-dev: ## Install dev requirements
+	pip install .
+	pip install -r requirements/dev.txt
+
+bootstrap-dev-plugins: bootstrap-dev ## Install dev requirement and all supported plugins
+	pip install -r requirements/plugins.txt
 
 ###### Deployment
 
@@ -69,22 +79,10 @@ release-overhangio:
 ###### Continuous integration tasks
 
 ci-info: ## Print info about environment
-	python3 --version
-	pip3 --version
+	python --version
+	pip --version
 
-ci-install-alpine-requirements: ## Install requirements for a python:alpine image
-	apk add --no-cache docker gcc libffi-dev libressl-dev musl-dev yaml-dev
-
-ci-install-python-requirements: ## Install requirements
-	pip3 install --upgrade pip
-	pip3 install setuptools==44.0.0
-	pip install .
-	pip3 install -r requirements/dev.txt
-
-ci-install-plugins: ci-install-python-requirements ## Install all supported plugins
-	pip3 install -r requirements/plugins.txt
-
-ci-bundle: bundle ## Create bundle and run basic tests
+ci-test-bundle: ## Run basic tests on bundle
 	ls -lh ./dist/tutor
 	./dist/tutor --version
 	./dist/tutor config printroot
@@ -103,7 +101,7 @@ ci-bundle: bundle ## Create bundle and run basic tests
 		&& bzip2 -d -f ./github-release.bz2 \
 		&& chmod a+x ./github-release
 
-ci-github: ./releases/github-release ## Upload assets to github
+ci-push-bundle: ./releases/github-release ## Upload assets to github
 	sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md > releases/description.md
 	git log -1 --pretty=format:%b >> releases/description.md
 	./releases/github-release release \
@@ -121,18 +119,8 @@ ci-github: ./releases/github-release ## Upload assets to github
 			--replace
 
 ci-bootstrap-images:
-	pip install -r requirements/plugins.txt
+	pip install .
 	tutor config save
-
-ci-build-images: ci-bootstrap-images ## Build docker images
-	tutor images build all
-
-ci-push-images: ci-bootstrap-images ## Push docker images to hub.docker.com
-		docker login -u "$$DOCKER_USERNAME" -p "$$DOCKER_PASSWORD"
-		tutor images push all
-
-ci-pypi: ## Push packages to pypi
-	twine upload --skip-existing dist/tutor-*.tar.gz
 
 ###### Additional commands
 

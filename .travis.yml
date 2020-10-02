@@ -9,16 +9,24 @@ matrix:
     - os: osx
       language: generic
 
+env:
+  jobs:
+    - PATH=/tmp/bin/:$PATH
+
 script:
+  # In Mac OS python and pip binaries are v2, so we create symlinks
+  - mkdir /tmp/bin && ln -s $(which python3) /tmp/bin/python && ln -s $(which pip3) /tmp/bin/pip
+  - pip install --upgrade pip setuptools==44.0.0
   - make ci-info
-  - make ci-install-plugins
+  - make bootstrap-dev-plugins
   - make test
-  - make ci-bundle
+  - make bundle
+  - make ci-test-bundle
 
 deploy:
   # Create github release and push binary to github
   - provider: script
-    script: make ci-github
+    script: make ci-push-bundle
     skip_cleanup: true
     on:
       tags: true
