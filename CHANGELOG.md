@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.2.3 (2020-10-02)
 
 - [Feature] Add ``images printtag`` command
 - [Improvement] Make it possible to override individual contact email addresses with plugins
