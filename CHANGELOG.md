@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.2.4 (2020-10-06)
 
 - [Bugfix] Fix Apache proxy configuration when HTTPS is enabled (#370)
 
