@@ -15,7 +15,7 @@ Skip email validation for new users
     patches:
       common-env-features: |
         "SKIP_EMAIL_VALIDATION": true
-        
+
 Enable bulk enrollment view in the LMS
 --------------------------------------
 
@@ -56,7 +56,7 @@ Enable SAML authentication
         THIRD_PARTY_AUTH_BACKENDS = "third_party_auth.saml.SAMLAuthBackend"
 
       openedx-auth: |
-        "SOCIAL_AUTH_SAML_SP_PRIVATE_KEY" : "yoursecretkey"
-        "SOCIAL_AUTH_SAML_SP_PUBLIC_CERT" : "yourpubliccert"
+        "SOCIAL_AUTH_SAML_SP_PRIVATE_KEY": "yoursecretkey",
+        "SOCIAL_AUTH_SAML_SP_PUBLIC_CERT": "yourpubliccert"
 
 Do not forget to replace "yoursecretkey" and "yourpubliccert" with your own values.
