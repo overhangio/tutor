@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix Apache proxy configuration when HTTPS is enabled (#370)
+
 ## v10.2.3 (2020-10-02)
 
 - [Feature] Add ``images printtag`` command
