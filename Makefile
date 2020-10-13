@@ -58,7 +58,7 @@ dist/tutor:
 nightly: ## Create a "nightly" release
 	$(MAKE) tag TAG=nightly
 
-release: ## Create a release tag and push it to origin
+release: test ## Create a release tag and push it to origin
 	$(MAKE) retag release-origin release-overhangio TAG=v$(shell make version)
 
 retag:
