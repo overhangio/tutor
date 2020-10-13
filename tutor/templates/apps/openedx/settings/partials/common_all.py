@@ -30,6 +30,9 @@ DATABASE_ROUTERS.remove(
 # Set uploaded media file path
 MEDIA_ROOT = "/openedx/media/"
 
+# Add your MFE and third-party app domains here
+CORS_ORIGIN_WHITELIST = []
+
 # Video settings
 VIDEO_IMAGE_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
 VIDEO_TRANSCRIPTS_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
