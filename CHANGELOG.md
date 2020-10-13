@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.3.0 (2020-10-13)
 
 - 💥[Improvement] Simplify CORS configuration
 
