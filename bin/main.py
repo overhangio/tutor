@@ -12,7 +12,7 @@ for plugin_name in [
     "xqueue",
 ]:
     try:
-        OfficialPlugin.INSTALLED.append(OfficialPlugin(plugin_name))
+        OfficialPlugin.load(plugin_name)
     except ImportError:
         pass
 
