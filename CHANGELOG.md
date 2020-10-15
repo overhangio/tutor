@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Add support for .woff and .woff2 font files in themes (thanks @mrtndwrd!)
+
 ## v10.3.0 (2020-10-13)
 
 - 💥[Improvement] Simplify CORS configuration
