@@ -26,10 +26,13 @@ class PluginsTests(unittest.TestCase):
         with patch.object(plugins.importlib, "import_module", return_value=43):
             plugin2 = plugins.OfficialPlugin.load("plugin2")
         with patch.object(
-            plugins.EntrypointPlugin, "iter_installed", return_value=[plugin1],
+            plugins.EntrypointPlugin,
+            "iter_installed",
+            return_value=[plugin1],
         ):
             self.assertEqual(
-                [plugin1, plugin2], list(plugins.iter_installed()),
+                [plugin1, plugin2],
+                list(plugins.iter_installed()),
             )
 
     def test_enable(self):

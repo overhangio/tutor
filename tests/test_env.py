@@ -133,7 +133,9 @@ class EnvTests(unittest.TestCase):
 
             # Render templates
             with unittest.mock.patch.object(
-                env.plugins, "iter_enabled", return_value=[plugin1],
+                env.plugins,
+                "iter_enabled",
+                return_value=[plugin1],
             ):
                 with tempfile.TemporaryDirectory() as root:
                     # Render plugin templates
@@ -168,7 +170,9 @@ class EnvTests(unittest.TestCase):
             env1 = env.Renderer.instance(config).environment
 
             with unittest.mock.patch.object(
-                env.plugins, "iter_enabled", return_value=[plugin1],
+                env.plugins,
+                "iter_enabled",
+                return_value=[plugin1],
             ):
                 # Load env a second time
                 config["PLUGINS"].append("myplugin")

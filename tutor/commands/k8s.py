@@ -303,7 +303,10 @@ class K8sScriptRunner(scripts.BaseRunner):
                 "\n"
                 "Old-style job running will be deprecated soon. Please inform "
                 "your plugin maintainer!"
-            ).format(job_name=job_name, command=command.replace("\n", "\n    "),)
+            ).format(
+                job_name=job_name,
+                command=command.replace("\n", "\n    "),
+            )
             fmt.echo_alert(message)
             wait_for_pod_ready(self.config, service)
             kubectl_exec(self.config, service, command)

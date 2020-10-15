@@ -27,7 +27,10 @@ class DevContext(Context):
             if os.path.exists(override_path):
                 args += ["-f", override_path]
         return utils.docker_compose(
-            *args, "--project-name", config["DEV_PROJECT_NAME"], *command,
+            *args,
+            "--project-name",
+            config["DEV_PROJECT_NAME"],
+            *command,
         )
 
 
@@ -38,7 +41,8 @@ def dev(context):
 
 
 @click.command(
-    help="Run a development server", context_settings={"ignore_unknown_options": True},
+    help="Run a development server",
+    context_settings={"ignore_unknown_options": True},
 )
 @click.argument("options", nargs=-1, required=False)
 @click.argument("service")
