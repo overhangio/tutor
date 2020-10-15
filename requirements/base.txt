@@ -5,29 +5,29 @@
 #    pip-compile requirements/base.in
 #
 appdirs==1.4.4            # via -r requirements/base.in
-cachetools==4.1.0         # via google-auth
-certifi==2020.4.5.2       # via kubernetes, requests
+cachetools==4.1.1         # via google-auth
+certifi==2020.6.20        # via kubernetes, requests
 chardet==3.0.4            # via requests
 click-repl==0.1.6         # via -r requirements/base.in
 click==7.1.2              # via -r requirements/base.in, click-repl
-google-auth==1.17.2       # via kubernetes
-idna==2.9                 # via requests
+google-auth==1.22.1       # via kubernetes
+idna==2.10                # via requests
 jinja2==2.11.2            # via -r requirements/base.in
-kubernetes==11.0.0        # via -r requirements/base.in
+kubernetes==12.0.0        # via -r requirements/base.in
 markupsafe==1.1.1         # via jinja2
 oauthlib==3.1.0           # via requests-oauthlib
-prompt-toolkit==3.0.5     # via click-repl
+prompt-toolkit==3.0.8     # via click-repl
 pyasn1-modules==0.2.8     # via google-auth
 pyasn1==0.4.8             # via pyasn1-modules, rsa
-pycryptodome==3.9.7       # via -r requirements/base.in
+pycryptodome==3.9.8       # via -r requirements/base.in
 python-dateutil==2.8.1    # via kubernetes
 pyyaml==5.3.1             # via -r requirements/base.in, kubernetes
 requests-oauthlib==1.3.0  # via kubernetes
-requests==2.23.0          # via kubernetes, requests-oauthlib
+requests==2.24.0          # via kubernetes, requests-oauthlib
 rsa==4.6                  # via google-auth
 six==1.15.0               # via click-repl, google-auth, kubernetes, python-dateutil, websocket-client
-urllib3==1.25.9           # via kubernetes, requests
-wcwidth==0.2.4            # via prompt-toolkit
+urllib3==1.25.10          # via kubernetes, requests
+wcwidth==0.2.5            # via prompt-toolkit
 websocket-client==0.57.0  # via kubernetes
 
 # The following packages are considered to be unsafe in a requirements file:
