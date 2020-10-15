@@ -142,6 +142,7 @@ Mongodb
 - ``MONGODB_PORT`` (default: ``27017``)
 - ``MONGODB_USERNAME`` (default: ``""``)
 - ``MONGODB_PASSWORD`` (default: ``""``)
+- ``MONGODB_REPLICASET`` (default: ``""``)
 
 Rabbitmq
 ********
