@@ -2,6 +2,32 @@
 import json
 import os
 
+# Mongodb connection parameters: simply modify `mongodb_parameters` to affect all connections to MongoDb.
+mongodb_parameters = {
+    "host": "{{ MONGODB_HOST }}",
+    "port": {{ MONGODB_PORT }},
+    {% if MONGODB_USERNAME and MONGODB_PASSWORD %}
+    "user": "{{ MONGODB_USERNAME }}",
+    "password": "{{ MONGODB_PASSWORD }}",
+    {% else %}
+    "user": None,
+    "password": None,
+    {% endif %}
+    "db": "{{ MONGODB_DATABASE }}",
+}
+DOC_STORE_CONFIG = mongodb_parameters
+CONTENTSTORE = {
+    "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",
+    "ADDITIONAL_OPTIONS": {},
+    "DOC_STORE_CONFIG": DOC_STORE_CONFIG
+}
+# Load module store settings from config files
+update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
+DATA_DIR = "/openedx/data/"
+for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
+   store["OPTIONS"]["fs_root"] = DATA_DIR
+
+
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get("DEFAULT_FROM_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get("DEFAULT_FEEDBACK_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 SERVER_EMAIL = ENV_TOKENS.get("SERVER_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
@@ -14,12 +40,6 @@ PAYMENT_SUPPORT_EMAIL = ENV_TOKENS.get("PAYMENT_SUPPORT_EMAIL", ENV_TOKENS["CONT
 BULK_EMAIL_DEFAULT_FROM_EMAIL = ENV_TOKENS.get("BULK_EMAIL_DEFAULT_FROM_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get("API_ACCESS_MANAGER_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 API_ACCESS_FROM_EMAIL = ENV_TOKENS.get("API_ACCESS_FROM_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
-
-# Load module store settings from config files
-update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
-DATA_DIR = "/openedx/data/"
-for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
-   store["OPTIONS"]["fs_root"] = DATA_DIR
 
 # Get rid completely of coursewarehistoryextended, as we do not use the CSMH database
 INSTALLED_APPS.remove("coursewarehistoryextended")

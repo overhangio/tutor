@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Make it easier to override Mongodb connection parameters
 - [Bugfix] Add support for .woff and .woff2 font files in themes (thanks @mrtndwrd!)
 
 ## v10.3.0 (2020-10-13)
