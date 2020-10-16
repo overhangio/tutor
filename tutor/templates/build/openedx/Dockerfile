@@ -9,7 +9,8 @@ ENV LC_ALL en_US.UTF-8
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
 FROM minimal as python
 # https://github.com/pyenv/pyenv/wiki/Common-build-problems#prerequisites
-RUN apt install -y libssl-dev zlib1g-dev libbz2-dev \
+RUN apt update && \
+    apt install -y libssl-dev zlib1g-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
     xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 ARG PYTHON_VERSION=3.5.9
@@ -69,7 +70,7 @@ FROM python as python-requirements
 ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 
-RUN apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev
+RUN apt update && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev
 
 # Note that this means that we need to reinstall all requirements whenever there is a
 # change in edx-platform, which sucks. But there is no obvious alternative, as we need
@@ -116,8 +117,9 @@ RUN npm install --verbose --registry=$NPM_REGISTRY
 FROM minimal as production
 
 # Install system requirements
-RUN apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng12-dev libsqlite3-dev libxmlsec1-dev lynx ntp pkg-config rdfind \
-&& rm -rf /var/lib/apt/lists/*
+RUN apt update && \
+    apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng12-dev libsqlite3-dev libxmlsec1-dev lynx ntp pkg-config rdfind && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
 COPY --from=code /openedx/edx-platform /openedx/edx-platform

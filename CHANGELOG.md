@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Run `apt update` before `apt install` when installing deps in the openedx Dockerfile
+
 ## v10.3.1 (2020-10-16)
 
 - [Improvement] Make all commands considerably faster
@@ -161,7 +163,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v3.11.11 (2020-04-15)
 
 - [Bugfix] Make sure all emails (including "password reset") are properly saved to a local file in development mode (#315)
-- [Improvement] Add `openedx-development-settings` patch to patch the LMS and the CMS simultaneously in development 
+- [Improvement] Add `openedx-development-settings` patch to patch the LMS and the CMS simultaneously in development
 - [Bugfix] Fix missing celery tasks in the CMS
 
 ## v3.11.10 (2020-04-14)
@@ -455,7 +457,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - [Feature] Add cloud deployment script
 - [Improvement] Run `images pull` command
-- [Improvement] Run `indexcourses` on importing demo course 
+- [Improvement] Run `indexcourses` on importing demo course
 - [Improvement] Add `runserver stop` command
 
 ## 3.0.4 (2019-02-13)
