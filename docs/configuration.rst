@@ -280,7 +280,15 @@ You may want to run your own flavor of edx-platform instead of the `official ver
         --build-arg EDX_PLATFORM_REPOSITORY=https://mygitrepo/edx-platform.git \
         --build-arg EDX_PLATFORM_VERSION=my-tag-or-branch
 
-Note that your release must be a fork of the Juniper release in order to work. Otherwise, you may have important compatibility issues with other services. In particular, **don't try to run Tutor with older versions of Open edX**.
+Note that your edx-platform version must be a fork of the latest release **tag** (and not branch) in order to work. This latest tag can be obtained by running::
+
+    tutor config printvalue OPENEDX_COMMON_VERSION
+
+If you don't create your fork from this tag, you *will* have important compatibility issues with other services. In particular:
+
+- Do not try to run a fork from an older (pre-Juniper) version of edx-platform: this will simply not work.
+- Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
+- Do not try to run a fork from the open-release/juniper.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/juniper.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/juniper.master branch.
 
 .. _i18n:
 
