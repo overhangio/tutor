@@ -53,6 +53,10 @@ RUN curl https://github.com/edx/edx-platform/commit/80fa2cae128e2a1fd8ab298351b7
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
 RUN curl https://github.com/overhangio/edx-platform/commit/58f20a0547355080eeee346104a1719ad806902e.patch | git apply -
+# Set the Secure attribute on delete_logged_in_cookies
+# https://github.com/edx/edx-platform/pull/25374
+# https://github.com/moraleja39/edx-platform/tree/moraleja39/delete-logged-in-cookies-over-https
+RUN curl https://github.com/moraleja39/edx-platform/commit/9965113ded8c974efc24d3e4fdbb924010971be3.patch | git apply -
 
 
 ###### Download extra locales to /openedx/locale/contrib/locale
