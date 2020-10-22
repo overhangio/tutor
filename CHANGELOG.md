@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- 💥[Improvement] Enable unit completion tracking by default.
 - [Bugfix] Run `apt update` before `apt install` when installing deps in the openedx Dockerfile
 
 ## v10.3.1 (2020-10-16)
