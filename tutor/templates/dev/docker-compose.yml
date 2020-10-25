@@ -7,9 +7,9 @@ x-openedx-service:
     SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.development}
   volumes:
     # Settings & config
-    - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
-    - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
-    - ../apps/openedx/config/:/openedx/config/
+    - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
+    - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
+    - ../apps/openedx/config/:/openedx/config/:ro
     # theme files
     - ../build/openedx/themes:/openedx/themes
     # editable requirements
@@ -37,7 +37,7 @@ services:
 
   cms-worker:
     <<: *openedx-service
-  
+
   # Additional service for watching theme changes
   watchthemes:
     <<: *openedx-service

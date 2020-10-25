@@ -82,9 +82,9 @@ services:
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:
-      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
-      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
-      - ../apps/openedx/config/:/openedx/config/
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
+      - ../apps/openedx/config/:/openedx/config/:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
@@ -107,9 +107,9 @@ services:
       SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:
-      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
-      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
-      - ../apps/openedx/config/:/openedx/config/
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
+      - ../apps/openedx/config/:/openedx/config/:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
@@ -135,9 +135,9 @@ services:
     command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.cms.core.default
     restart: unless-stopped
     volumes:
-      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
-      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
-      - ../apps/openedx/config/:/openedx/config/
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
+      - ../apps/openedx/config/:/openedx/config/:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
@@ -154,9 +154,9 @@ services:
     command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.lms.core.default
     restart: unless-stopped
     volumes:
-      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/
-      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/
-      - ../apps/openedx/config/:/openedx/config/
+      - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
+      - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
+      - ../apps/openedx/config/:/openedx/config/:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:

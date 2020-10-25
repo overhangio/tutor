@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Mount config and setting files in read-only mode
 - 💥[Improvement] Enable unit completion tracking by default.
 - [Bugfix] Run `apt update` before `apt install` when installing deps in the openedx Dockerfile
 
