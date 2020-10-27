@@ -25,7 +25,7 @@ prompt-toolkit==3.0.8     # via -r requirements/base.txt, click-repl
 pyasn1-modules==0.2.8     # via -r requirements/base.txt, google-auth
 pyasn1==0.4.8             # via -r requirements/base.txt, pyasn1-modules, rsa
 pycryptodome==3.9.8       # via -r requirements/base.txt
-pygments==2.7.1           # via sphinx
+pygments==2.7.2           # via sphinx
 pyparsing==2.4.7          # via packaging
 python-dateutil==2.8.1    # via -r requirements/base.txt, kubernetes
 pytz==2020.1              # via babel
@@ -43,7 +43,7 @@ sphinxcontrib-htmlhelp==1.0.3  # via sphinx
 sphinxcontrib-jsmath==1.0.1  # via sphinx
 sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
-urllib3==1.25.10          # via -r requirements/base.txt, kubernetes, requests
+urllib3==1.25.11          # via -r requirements/base.txt, kubernetes, requests
 wcwidth==0.2.5            # via -r requirements/base.txt, prompt-toolkit
 websocket-client==0.57.0  # via -r requirements/base.txt, kubernetes
 
