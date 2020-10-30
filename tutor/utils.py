@@ -172,10 +172,12 @@ def execute(*command):
             p.kill()
             p.wait()
             raise
-        except Exception:
+        except Exception as e:
             p.kill()
             p.wait()
-            raise exceptions.TutorError("Command failed: {}".format(" ".join(command)))
+            raise exceptions.TutorError(
+                "Command failed: {}".format(" ".join(command))
+            ) from e
         if result > 0:
             raise exceptions.TutorError(
                 "Command failed with status {}: {}".format(result, " ".join(command))
