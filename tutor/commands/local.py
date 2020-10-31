@@ -9,6 +9,7 @@ from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
 from .. import interactive as interactive_config
+from .. import conf_for_treehouses as treehouses_config
 from .. import utils
 
 
@@ -54,6 +55,47 @@ def quickstart(context, non_interactive, pullimages_):
 
     click.echo(fmt.title("Interactive platform configuration"))
     config = interactive_config.update(context.root, interactive=(not non_interactive))
+    click.echo(fmt.title("Updating the current environment"))
+    tutor_env.save(context.root, config)
+    click.echo(fmt.title("Stopping any existing platform"))
+    compose.stop.callback([])
+    click.echo(fmt.title("HTTPS certificates generation"))
+    https_create.callback()
+    if pullimages_:
+        click.echo(fmt.title("Docker image updates"))
+        compose.pullimages.callback()
+    click.echo(fmt.title("Starting the platform in detached mode"))
+    compose.start.callback(True, [])
+    click.echo(fmt.title("Database creation and migrations"))
+    compose.init.callback(limit=None)
+
+    fmt.echo_info(
+        """The Open edX platform is now running in detached mode
+Your Open edX platform is ready and can be accessed at the following urls:
+
+    {http}://{lms_host}
+    {http}://{cms_host}
+    """.format(
+            http="https" if config["ACTIVATE_HTTPS"] else "http",
+            lms_host=config["LMS_HOST"],
+            cms_host=config["CMS_HOST"],
+        )
+    )
+
+@click.command(help="Configure and run Open edX from scratch")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.option(
+    "-p", "--pullimages", "pullimages_", is_flag=True, help="Update docker images"
+)
+@click.pass_obj
+def quickstartfortreehouses(context, non_interactive, pullimages_):
+    if tutor_env.needs_major_upgrade(context.root):
+        click.echo(fmt.title("Upgrading from an older"))
+        upgrade.callback(
+            from_version=tutor_env.current_release(context.root),
+            non_interactive=non_interactive,
+        )
+    config = treehouses_config.update(context.root, interactive=(not non_interactive))
     click.echo(fmt.title("Updating the current environment"))
     tutor_env.save(context.root, config)
     click.echo(fmt.title("Stopping any existing platform"))
@@ -237,5 +279,6 @@ https.add_command(https_create)
 https.add_command(https_renew)
 local.add_command(https)
 local.add_command(quickstart)
+local.add_command(quickstartfortreehouses)
 local.add_command(upgrade)
 compose.add_commands(local)
