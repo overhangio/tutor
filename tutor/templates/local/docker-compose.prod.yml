@@ -10,7 +10,7 @@ services:
     image: {{ DOCKER_IMAGE_NGINX }}
     restart: unless-stopped
     ports:
-      - "{{ NGINX_HTTP_PORT }}:80"
+      - "8089:80"
       - "{{ NGINX_HTTPS_PORT }}:443"
     {% if not WEB_PROXY %}
     networks:
