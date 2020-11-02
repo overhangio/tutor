@@ -5,11 +5,11 @@ Troubleshooting
 
 What should you do if you have a problem?
 
-1. Read the error logs that appear in the console. When running a single server platform as daemon, you can view the logs with the ``docker-compose logs`` command. (see :ref:`logging` below)
+1. Read the error logs that appear in the console. When running a single server platform as daemon, you can view the logs with the ``tutor local logs`` command. (see :ref:`logging` below)
 2. Check if your problem already has a solution right here in the :ref:`troubleshooting` section.
 3. Search for your problem in the `open and closed Github issues <https://github.com/overhangio/tutor/issues?utf8=%E2%9C%93&q=is%3Aissue>`_.
 4. Search for your problem in the `community forums <https://discuss.overhang.io>`__.
-5. If, despite all your efforts, you can't solve the problem, you may want to first discuss it in the `community forums <https://discuss.overhang.io>`__. Please give as much details about your problem as possible! As a rule of thumb, people will not dedicate more time to solving your problem than you took to write your question. 
+5. If, despite all your efforts, you can't solve the problem, you may want to first discuss it in the `community forums <https://discuss.overhang.io>`__. Please give as much details about your problem as possible! As a rule of thumb, people will not dedicate more time to solving your problem than you took to write your question.
 6. If you have a technical background, you may try to decide if the issue is related to Open edX or if it's specific to Tutor. In the latter case, you are most welcome to open an `issue on Github <https://github.com/overhangio/tutor/issues/new>`_. **Please follow the instructions from the issue template!!!** Your issue will be examined in all cases, but you can make our life much easier by giving us as much background information as possible.
 
 Do you need professional assistance with your tutor-managed Open edX platform? Overhang.IO offers online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/lts>`__.
@@ -21,7 +21,7 @@ Logging
 
 .. note::
     Logs are of paramount importance for debugging Tutor. When asking for help on the `Tutor forums <https://discuss.overhang.io>`__, **you should always include the unedited logs of your app**. You can get those with::
-        
+
          tutor local logs --tail=100 -f
 
 To view the logs from all containers use the ``tutor local logs`` command, which was modeled on the standard `docker-compose logs <https://docs.docker.com/compose/reference/logs/>`_ command::
@@ -49,9 +49,9 @@ The containerized Nginx needs to listen to ports 80 and 443 on the host. If ther
 -----------------------------------
 
 This is not an error with Tutor, but with your Docker installation. This is frequently caused by a permission issue. Before running Tutor, you should be able to run::
-    
+
     docker run --rm hello-world
-    
+
 If the above command does not work, you should fix your Docker installation. Some people will suggest to run Docker as root, or with ``sudo``; **do not do this**. Instead, what you should probably do is to add your user to the "docker" group. For more information, check out the `official Docker installation instructions <https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user>`__.
 
 .. _migrations_killed:
@@ -62,11 +62,11 @@ If the above command does not work, you should fix your Docker installation. Som
 Open edX requires at least 4 GB RAM, in particular to run the SQL migrations. If the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to buy more memory or add swap to your machine. On Docker for Mac OS, by default, containers are allocated at most 2 GB of RAM. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 Gb to the Docker daemon.
 
 If migrations were killed halfway, there is a good chance that the MySQL database is in a state that is hard to recover from. The easiest way to recover is simply to delete all the MySQL data and restart the quickstart process. After you have allocated more memory to the Docker daemon, run::
-    
+
     tutor local stop
     sudo rm -rf "$(tutor config printroot)/data/mysql"
     tutor local quickstart
-    
+
 .. warning::
     THIS WILL ERASE ALL YOUR DATA! Do not run this on a production instance. This solution is only viable for new Open edX installations.
 
@@ -110,7 +110,7 @@ When I make changes to a course in the CMS, they are not taken into account by t
 --------------------------------------------------------------------------------------
 
 This issue should only happen in development mode. Long story short, it can be solved by creating a Waffle switch with the following command::
-    
+
     tutor dev run lms ./manage.py lms waffle_switch block_structure.invalidate_cache_on_publish on --create
 
 If you'd like to learn more, please take a look at `this Github issue <https://github.com/overhangio/tutor/issues/302>`__.
