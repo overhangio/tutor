@@ -6,6 +6,10 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v10.4.0 (2020-10-30)
 
+**Note for users of the [Tutor AMI](https://aws.amazon.com/marketplace/pp/B07PV3TB8X):** To upgrade from a previous v10 release, run:
+
+    curl -fsSL https://overhang.io/tutor/ami/upgrade.sh | sh
+
 - [Improvement] Mount config and setting files in read-only mode
 - 💥[Improvement] Enable unit completion tracking by default.
 - [Bugfix] Run `apt update` before `apt install` when installing deps in the openedx Dockerfile
