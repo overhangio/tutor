@@ -1,5 +1,10 @@
 import base64
-from crypt import crypt
+from sys import platform
+if platform == "win32":
+    from pcrypt import crypt
+else:
+    from crypt import crypt
+
 from hmac import compare_digest
 import json
 import os
