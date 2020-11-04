@@ -4,7 +4,6 @@ import os
 
 import jinja2
 import pkg_resources
-from pathlib import Path
 from . import exceptions
 from . import fmt
 from . import plugins
@@ -130,7 +129,6 @@ class Renderer:
                 return f.read()
 
         try:
-            print('PATHHHHHH',path)
             template = self.environment.get_template(path)
         except Exception:
             fmt.echo_error("Error loading template " + path)
