@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Switch to `bcrypt` for htpasswd password generation, for better portability on Windows.
 - [Improvement] In the openedx production docker image, add some jitter to the gunicorn worker restart process to prevent all workers from restarting at the same time.
 
 ## v10.4.0 (2020-10-30)

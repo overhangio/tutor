@@ -1,6 +1,4 @@
 import base64
-from crypt import crypt
-from hmac import compare_digest
 import json
 import os
 import random
@@ -12,6 +10,7 @@ import sys
 
 import click
 from Crypto.PublicKey import RSA
+from Crypto.Protocol.KDF import bcrypt, bcrypt_check
 
 from . import exceptions
 from . import fmt
@@ -19,20 +18,23 @@ from . import fmt
 
 def encrypt(text):
     """
-    Encrypt some textual content. The method employed is the same as suggested in the
-    `python docs <https://docs.python.org/3/library/crypt.html#examples>`__. The
-    encryption process is compatible with the password verification performed by
+    Encrypt some textual content with bcrypt.
+    https://pycryptodome.readthedocs.io/en/latest/src/protocol/kdf.html#bcrypt
+    The encryption process is compatible with the password verification performed by
     `htpasswd <https://httpd.apache.org/docs/2.4/programs/htpasswd.html>`__.
     """
-    hashed = crypt(text)
-    return crypt(text, hashed)
+    return bcrypt(text.encode(), 12).decode()
 
 
 def verify_encrypted(encrypted, text):
     """
     Return True/False if the encrypted content corresponds to the unencrypted text.
     """
-    return compare_digest(crypt(text, encrypted), encrypted)
+    try:
+        bcrypt_check(text.encode(), encrypted.encode())
+        return True
+    except ValueError:
+        return False
 
 
 def ensure_file_directory_exists(path):
