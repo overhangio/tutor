@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix user ID checking under Windows.
 - [Bugfix] Fix template rendering for Windows users.
 - [Improvement] Switch to `bcrypt` for htpasswd password generation, for better portability on Windows.
 - [Improvement] In the openedx production docker image, add some jitter to the gunicorn worker restart process to prevent all workers from restarting at the same time.

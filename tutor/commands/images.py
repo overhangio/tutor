@@ -1,11 +1,10 @@
-import subprocess
-
 import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import images
 from .. import plugins
+from .. import utils
 
 BASE_IMAGE_NAMES = ["openedx", "forum", "android"]
 DEV_IMAGE_NAMES = ["openedx-dev"]
@@ -93,8 +92,7 @@ def build_image(root, config, image, *args):
         )
 
     # Build dev images with user id argument
-    user_id = subprocess.check_output(["id", "-u"]).strip().decode()
-    dev_build_arg = ["--build-arg", "USERID={}".format(user_id)]
+    dev_build_arg = ["--build-arg", "USERID={}".format(utils.get_user_id())]
     for img, tag in iter_images(config, image, DEV_IMAGE_NAMES):
         images.build(tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args)
 

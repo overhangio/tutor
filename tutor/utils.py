@@ -126,6 +126,15 @@ def walk_files(path):
             yield os.path.join(dirpath, filename)
 
 
+def get_user_id():
+    """
+    Portable way to get user ID. Note: I have no idea if it actually works on windows...
+    """
+    if sys.platform == "windows":
+        return int(check_output("id", "-u").decode())
+    return os.getuid()
+
+
 def docker_run(*command):
     args = ["run", "--rm"]
     if is_a_tty():
@@ -190,6 +199,5 @@ def check_output(*command):
     click.echo(fmt.command(" ".join(command)))
     try:
         return subprocess.check_output(command)
-    except:
+    finally:
         fmt.echo_error("Command failed: {}".format(" ".join(command)))
-        raise
