@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix dependency error during `pip install tutor` due to urllib3 incompatibility
 - [Bugfix] Fix user ID checking under Windows.
 - [Bugfix] Fix template rendering for Windows users.
 - [Improvement] Switch to `bcrypt` for htpasswd password generation, for better portability on Windows.
