@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v10.4.1 (2020-11-11)
+
 - [Bugfix] Fix dependency error during `pip install tutor` due to urllib3 incompatibility
 - [Bugfix] Fix user ID checking under Windows.
 - [Bugfix] Fix template rendering for Windows users.
