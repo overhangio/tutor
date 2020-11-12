@@ -231,7 +231,7 @@ def write_to(content, path):
     if isinstance(content, bytes):
         open_mode += "b"
     utils.ensure_file_directory_exists(path)
-    with open(path, open_mode, encoding='utf8') as of:
+    with open(path, open_mode, encoding="utf8") as of:
         of.write(content)
 
 

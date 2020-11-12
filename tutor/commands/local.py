@@ -3,13 +3,12 @@ from textwrap import indent
 
 import click
 
-from . import compose
-from .context import Context
 from .. import config as tutor_config
 from .. import env as tutor_env
-from .. import fmt
-from .. import interactive as interactive_config
-from .. import utils
+from .. import fmt, utils
+from . import compose
+from .config import save as config_save_command
+from .context import Context
 
 
 # pylint: disable=too-few-public-methods
@@ -53,9 +52,7 @@ def quickstart(context, non_interactive, pullimages_):
         )
 
     click.echo(fmt.title("Interactive platform configuration"))
-    config = interactive_config.update(context.root, interactive=(not non_interactive))
-    click.echo(fmt.title("Updating the current environment"))
-    tutor_env.save(context.root, config)
+    config_save_command.callback(interactive=(not non_interactive), set_vars=[], unset_vars=[])
     click.echo(fmt.title("Stopping any existing platform"))
     compose.stop.callback([])
     click.echo(fmt.title("HTTPS certificates generation"))
@@ -68,6 +65,7 @@ def quickstart(context, non_interactive, pullimages_):
     click.echo(fmt.title("Database creation and migrations"))
     compose.init.callback(limit=None)
 
+    config = tutor_config.load(context.root)
     fmt.echo_info(
         """The Open edX platform is now running in detached mode
 Your Open edX platform is ready and can be accessed at the following urls:
