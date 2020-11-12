@@ -4,6 +4,9 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix `config save` on Windows.
+- [Bugfix] Fix platform checking in user ID function
+
 ## v10.4.1 (2020-11-11)
 
 - [Bugfix] Fix dependency error during `pip install tutor` due to urllib3 incompatibility
