@@ -130,8 +130,8 @@ def get_user_id():
     """
     Portable way to get user ID. Note: I have no idea if it actually works on windows...
     """
-    if sys.platform == "windows":
-        return int(check_output("id", "-u").decode())
+    if sys.platform == "win32":
+        return 'win32'
     return os.getuid()
 
 
