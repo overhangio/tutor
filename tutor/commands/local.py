@@ -52,7 +52,9 @@ def quickstart(context, non_interactive, pullimages_):
         )
 
     click.echo(fmt.title("Interactive platform configuration"))
-    config_save_command.callback(interactive=(not non_interactive), set_vars=[], unset_vars=[])
+    config_save_command.callback(
+        interactive=(not non_interactive), set_vars=[], unset_vars=[]
+    )
     click.echo(fmt.title("Stopping any existing platform"))
     compose.stop.callback([])
     click.echo(fmt.title("HTTPS certificates generation"))
