@@ -1,7 +1,6 @@
 import codecs
 from copy import deepcopy
 import os
-
 import jinja2
 import pkg_resources
 from . import exceptions

@@ -1,10 +1,8 @@
 #! /usr/bin/env python3
 import sys
-import getpass
 import appdirs
 import click
 import click_repl
-from sys import platform
 from .android import android
 from .config import config_command
 from .context import Context
@@ -15,10 +13,10 @@ from .local import local
 from .plugins import plugins_command, add_plugin_commands
 from .ui import ui
 from .webui import webui
-from ..__about__ import __version__
 from .. import exceptions
 from .. import fmt
 from .. import utils
+from ..__about__ import __version__
 
 
 def main():
