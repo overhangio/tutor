@@ -101,8 +101,10 @@ def printvalue(context, key):
     try:
         # Note that this will incorrectly print None values
         fmt.echo(config[key])
-    except KeyError:
-        raise exceptions.TutorError("Missing configuration value: {}".format(key))
+    except KeyError as e:
+        raise exceptions.TutorError(
+            "Missing configuration value: {}".format(key)
+        ) from e
 
 
 config_command.add_command(save)

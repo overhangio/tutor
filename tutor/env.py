@@ -56,8 +56,11 @@ class Renderer:
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
 
-    def iter_templates_in(self, *path):
-        prefix = "/".join(path)
+    def iter_templates_in(self, *prefix):
+        """
+        The elements of `prefix` must contain only "/", and not os.sep.
+        """
+        prefix = "/".join(prefix)
         for template in self.environment.loader.list_templates():
             if template.startswith(prefix) and self.is_part_of_env(template):
                 yield template
@@ -87,7 +90,8 @@ class Renderer:
             is_excluded = is_excluded or ignore_folder in parts
         return not is_excluded
 
-    def find_path(self, path):
+    def find_os_path(self, template_name):
+        path = template_name.replace("/", os.sep)
         for templates_root in self.template_roots:
             full_path = os.path.join(templates_root, path)
             if os.path.exists(full_path):
@@ -118,35 +122,41 @@ class Renderer:
         template = self.environment.from_string(text)
         return self.__render(template)
 
-    def render_file(self, path):
+    def render_template(self, template_name):
         """
         Render a template file. Return the corresponding string. If it's a binary file
         (as indicated by its path), return bytes.
+
+        The template_name *always* uses "/" separators, and is not os-dependent. Do not pass the result of
+        os.path.join(...) to this function.
         """
-        if is_binary_file(path):
+        if is_binary_file(template_name):
             # Don't try to render binary files
-            with open(self.find_path(path), "rb") as f:
+            with open(self.find_os_path(template_name), "rb") as f:
                 return f.read()
 
         try:
-            template = self.environment.get_template(path)
+            template = self.environment.get_template(template_name)
         except Exception:
-            fmt.echo_error("Error loading template " + path)
+            fmt.echo_error("Error loading template " + template_name)
             raise
 
         try:
             return self.__render(template)
         except (jinja2.exceptions.TemplateError, exceptions.TutorError):
-            fmt.echo_error("Error rendering template " + path)
+            fmt.echo_error("Error rendering template " + template_name)
             raise
         except Exception:
-            fmt.echo_error("Unknown error rendering template " + path)
+            fmt.echo_error("Unknown error rendering template " + template_name)
             raise
 
-    def render_all_to(self, root):
-        for template in self.iter_templates_in():
-            rendered = self.render_file(template)
-            dst = os.path.join(root, template)
+    def render_all_to(self, root, *prefix):
+        """
+        `prefix` can be used to limit the templates to render.
+        """
+        for template_name in self.iter_templates_in(*prefix):
+            rendered = self.render_template(template_name)
+            dst = os.path.join(root, template_name.replace("/", os.sep))
             write_to(rendered, dst)
 
     def __render(self, template):
@@ -206,13 +216,10 @@ def save_plugin_templates(plugin, root, config):
 def save_all_from(prefix, root, config):
     """
     Render the templates that start with `prefix` and store them with the same
-    hierarchy at `root`.
+    hierarchy at `root`. Here, `prefix` can be the result of os.path.join(...).
     """
     renderer = Renderer.instance(config)
-    for template in renderer.iter_templates_in(prefix):
-        rendered = renderer.render_file(template)
-        dst = os.path.join(root, template)
-        write_to(rendered, dst)
+    renderer.render_all_to(root, prefix.replace(os.sep, "/"))
 
 
 def write_to(content, path):
@@ -223,23 +230,16 @@ def write_to(content, path):
     if isinstance(content, bytes):
         open_mode += "b"
     utils.ensure_file_directory_exists(path)
-    if platform == "win32":
-        with open(path, open_mode,encoding='utf8') as of:
-            of.write(content)
-    else:
-        with open(path, open_mode) as of:
-            of.write(content)
+    with open(path, open_mode) as of:
+        of.write(content)
 
 def render_file(config, *path):
     """
     Return the rendered contents of a template.
     """
     renderer = Renderer.instance(config)
-    if platform == "win32":
-        file_path = '/'.join(path)
-    else:
-        file_path = os.path.join(*path)
-    return renderer.render_file(file_path)
+    template_name = "/".join(path)
+    return renderer.render_template(template_name)
 
 
 def render_dict(config):

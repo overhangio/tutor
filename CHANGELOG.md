@@ -4,6 +4,14 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v10.4.1 (2020-11-11)
+
+- [Bugfix] Fix dependency error during `pip install tutor` due to urllib3 incompatibility
+- [Bugfix] Fix user ID checking under Windows.
+- [Bugfix] Fix template rendering for Windows users.
+- [Improvement] Switch to `bcrypt` for htpasswd password generation, for better portability on Windows.
+- [Improvement] In the openedx production docker image, add some jitter to the gunicorn worker restart process to prevent all workers from restarting at the same time.
+
 ## v10.4.0 (2020-10-30)
 
 **Note for users of the [Tutor AMI](https://aws.amazon.com/marketplace/pp/B07PV3TB8X):** To upgrade from a previous v10 release, run:

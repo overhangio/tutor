@@ -1,5 +1,4 @@
 #! /usr/bin/env python3
-import os
 import sys
 import getpass
 import appdirs
@@ -19,6 +18,7 @@ from .webui import webui
 from ..__about__ import __version__
 from .. import exceptions
 from .. import fmt
+from .. import utils
 
 
 def main():
@@ -54,13 +54,11 @@ def main():
 )
 @click.pass_context
 def cli(context, root):
-    if platform == "win32":
-        uid = getpass.getuser()
-    else:
-        uid = os.getuid()
-    if uid == 0:
+    if utils.get_user_id() == 0:
         fmt.echo_alert(
-            "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
+            "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
+            " the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com"
+            "/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
         )
     context.obj = Context(root)
 
