@@ -1,14 +1,16 @@
 import codecs
 from copy import deepcopy
 import os
+
 import jinja2
 import pkg_resources
+
 from . import exceptions
 from . import fmt
 from . import plugins
 from . import utils
 from .__about__ import __version__
-from sys import platform
+
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
@@ -229,12 +231,9 @@ def write_to(content, path):
     if isinstance(content, bytes):
         open_mode += "b"
     utils.ensure_file_directory_exists(path)
-    if platform == "win32":
-        with open(path, open_mode, encoding='utf8') as of:
-            of.write(content)
-    else:
-        with open(path, open_mode) as of:
-            of.write(content)
+    with open(path, open_mode, encoding="utf8") as of:
+        of.write(content)
+
 
 def render_file(config, *path):
     """

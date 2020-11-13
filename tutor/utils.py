@@ -7,9 +7,11 @@ import string
 import struct
 import subprocess
 import sys
+
 import click
 from Crypto.PublicKey import RSA
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
+
 from . import exceptions
 from . import fmt
 
@@ -129,7 +131,7 @@ def get_user_id():
     Portable way to get user ID. Note: I have no idea if it actually works on windows...
     """
     if sys.platform == "win32":
-        return 'win32'
+        return int(check_output("id", "-u").decode())
     return os.getuid()
 
 
