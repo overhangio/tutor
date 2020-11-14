@@ -228,10 +228,12 @@ def write_to(content, path):
     Write some content to a path. Content can be either str or bytes.
     """
     open_mode = "w"
+    encoding = "utf8"
     if isinstance(content, bytes):
         open_mode += "b"
+        encoding = None
     utils.ensure_file_directory_exists(path)
-    with open(path, open_mode, encoding="utf8") as of:
+    with open(path, open_mode, encoding=encoding) as of:
         of.write(content)
 
 
