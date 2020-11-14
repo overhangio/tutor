@@ -28,7 +28,7 @@ def build(context, mode):
 @click.pass_obj
 def pullimage(context):
     config = tutor_config.load(context.root)
-    utils.execute("docker", "pull", config["DOCKER_IMAGE_ANDROID"])
+    utils.docker("pull", config["DOCKER_IMAGE_ANDROID"])
 
 
 def build_command(config, target):
