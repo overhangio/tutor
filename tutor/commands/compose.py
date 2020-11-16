@@ -173,28 +173,6 @@ def init(context, limit):
     scripts.initialise(runner, limit_to=limit)
 
 
-@click.command(
-    short_help="Manually trigger hook (advanced users only)",
-    help="""
-Manually trigger a hook for a given plugin/service. This is a low-level command
-that is convenient when developing new plugins. Ex:
-
-    tutor local hook mysql hooks mysql init
-    tutor local hook discovery discovery hooks discovery init""",
-    name="hook",
-)
-@click.argument("service")
-@click.argument("path", nargs=-1)
-@click.pass_obj
-def run_hook(context, service, path):
-    config = tutor_config.load(context.root)
-    runner = ScriptRunner(context.root, config, context.docker_compose)
-    fmt.echo_info(
-        "Running '{}' hook in '{}' container...".format(".".join(path), service)
-    )
-    runner.run_job_from_template(service, *path)
-
-
 @click.command(help="View output from containers")
 @click.option("-f", "--follow", is_flag=True, help="Follow log output")
 @click.option("--tail", type=int, help="Number of lines to show from each container")
@@ -266,4 +244,3 @@ def add_commands(command_group):
     command_group.add_command(createuser)
     command_group.add_command(importdemocourse)
     command_group.add_command(settheme)
-    # command_group.add_command(run_hook) # Disabled for now
