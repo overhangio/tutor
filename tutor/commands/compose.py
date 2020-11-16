@@ -71,13 +71,6 @@ class ScriptRunner(scripts.BaseRunner):
             )
 
 
-@click.command(help="Update docker images")
-@click.pass_obj
-def pullimages(context):
-    config = tutor_config.load(context.root)
-    context.docker_compose(context.root, config, "pull")
-
-
 @click.command(help="Run all or a selection of configured Open edX services")
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
@@ -254,7 +247,6 @@ def logs(follow, tail, service):
 
 
 def add_commands(command_group):
-    command_group.add_command(pullimages)
     command_group.add_command(start)
     command_group.add_command(stop)
     command_group.add_command(restart)

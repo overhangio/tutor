@@ -61,7 +61,7 @@ def quickstart(context, non_interactive, pullimages_):
     https_create.callback()
     if pullimages_:
         click.echo(fmt.title("Docker image updates"))
-        compose.pullimages.callback()
+        compose.dc_command.callback(["pull"])
     click.echo(fmt.title("Starting the platform in detached mode"))
     compose.start.callback(True, [])
     click.echo(fmt.title("Database creation and migrations"))
