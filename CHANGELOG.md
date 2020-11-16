@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- 💥[Improvement] Remove `tutor android pullimage` command. Instead, run `tutor images pull android`.
 - [Bugfix] Fix `config save` on Windows.
 - [Bugfix] Fix platform checking in user ID function
 
