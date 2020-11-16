@@ -136,34 +136,6 @@ def restart(context, services):
     context.docker_compose(context.root, config, *command)
 
 
-@click.command(
-    short_help="Run a command in a new container",
-    help="This is a wrapper around `docker-compose run`. Any option or argument passed to this command will be forwarded to docker-compose. Thus, you may use `-v` or `-p` to mount volumes and expose ports.",
-    context_settings={"ignore_unknown_options": True},
-)
-@click.argument("args", nargs=-1, required=True)
-@click.pass_obj
-def run(context, args):
-    config = tutor_config.load(context.root)
-    command = ["run", "--rm"]
-    if not utils.is_a_tty():
-        command.append("-T")
-    context.docker_compose(context.root, config, *command, *args)
-
-
-@click.command(
-    short_help="Run a command in a running container",
-    help="This is a wrapper around `docker-compose exec`. Any option or argument passed to this command will be forwarded to docker-compose. Thus, you may use `-e` to manually define environment variables.",
-    context_settings={"ignore_unknown_options": True},
-    name="exec",
-)
-@click.argument("args", nargs=-1, required=True)
-@click.pass_obj
-def execute(context, args):
-    config = tutor_config.load(context.root)
-    context.docker_compose(context.root, config, "exec", *args)
-
-
 @click.command(help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 @click.pass_obj
@@ -171,22 +143,6 @@ def init(context, limit):
     config = tutor_config.load(context.root)
     runner = ScriptRunner(context.root, config, context.docker_compose)
     scripts.initialise(runner, limit_to=limit)
-
-
-@click.command(help="View output from containers")
-@click.option("-f", "--follow", is_flag=True, help="Follow log output")
-@click.option("--tail", type=int, help="Number of lines to show from each container")
-@click.argument("service", nargs=-1)
-@click.pass_obj
-def logs(context, follow, tail, service):
-    command = ["logs"]
-    if follow:
-        command += ["--follow"]
-    if tail is not None:
-        command += ["--tail", str(tail)]
-    command += service
-    config = tutor_config.load(context.root)
-    context.docker_compose(context.root, config, *command)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -231,16 +187,83 @@ def importdemocourse(context):
     scripts.import_demo_course(runner)
 
 
+@click.command(
+    short_help="Direct interface to docker-compose.",
+    help=(
+        "Direct interface to docker-compose. This is a wrapper around `docker-compose`. All commands, options and"
+        " arguments passed to this command will be forwarded to docker-compose."
+    ),
+    context_settings={"ignore_unknown_options": True},
+    name="dc",
+)
+@click.argument("args", nargs=-1, required=True)
+@click.pass_obj
+def dc_command(context, args):
+    config = tutor_config.load(context.root)
+    context.docker_compose(context.root, config, *args)
+
+
+@click.command(
+    short_help="Run a command in a new container",
+    help=(
+        "Run a command in a new container. This is a wrapper around `docker-compose run`. Any option or argument passed"
+        " to this command will be forwarded to docker-compose. Thus, you may use `-v` or `-p` to mount volumes and"
+        " expose ports."
+    ),
+    context_settings={"ignore_unknown_options": True},
+)
+@click.argument("args", nargs=-1, required=True)
+@click.pass_obj
+def run(args):
+    command = ["run", "--rm"]
+    if not utils.is_a_tty():
+        command.append("-T")
+    dc_command.callback(command + args)
+
+
+@click.command(
+    short_help="Run a command in a running container",
+    help=(
+        "Run a command in a running container. This is a wrapper around `docker-compose exec`. Any option or argument"
+        " passed to this command will be forwarded to docker-compose. Thus, you may use `-e` to manually define"
+        " environment variables."
+    ),
+    context_settings={"ignore_unknown_options": True},
+    name="exec",
+)
+@click.argument("args", nargs=-1, required=True)
+def execute(args):
+    dc_command.callback(["exec"] + args)
+
+
+@click.command(
+    short_help="View output from containers",
+    help="View output from containers. This is a wrapper around `docker-compose logs`.",
+)
+@click.option("-f", "--follow", is_flag=True, help="Follow log output")
+@click.option("--tail", type=int, help="Number of lines to show from each container")
+@click.argument("service", nargs=-1)
+def logs(follow, tail, service):
+    command = ["logs"]
+    if follow:
+        command += ["--follow"]
+    if tail is not None:
+        command += ["--tail", str(tail)]
+    command += service
+    dc_command.callback(command)
+
+
 def add_commands(command_group):
     command_group.add_command(pullimages)
     command_group.add_command(start)
     command_group.add_command(stop)
     command_group.add_command(restart)
     command_group.add_command(reboot)
-    command_group.add_command(run)
-    command_group.add_command(execute)
     command_group.add_command(init)
-    command_group.add_command(logs)
     command_group.add_command(createuser)
     command_group.add_command(importdemocourse)
     command_group.add_command(settheme)
+    command_group.add_command(dc_command)
+    command_group.add_command(run)
+    command_group.add_command(execute)
+    command_group.add_command(logs)

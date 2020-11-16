@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- 💥[Improvement] Add `dev dc` and `local dc` commands as thin wrappers of the `docker-compose` CLI.
 - 💥[Improvement] Remove the undocumented `local run_hook` command. Instead, run `local init --limit=...`.
 - 💥[Improvement] Remove `tutor android pullimage` command. Instead, run `tutor images pull android`.
 - [Bugfix] Fix `config save` on Windows.
