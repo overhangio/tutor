@@ -206,12 +206,11 @@ def dc_command(context, args):
     context_settings={"ignore_unknown_options": True},
 )
 @click.argument("args", nargs=-1, required=True)
-@click.pass_obj
 def run(args):
     command = ["run", "--rm"]
     if not utils.is_a_tty():
         command.append("-T")
-    dc_command.callback(command + args)
+    dc_command.callback([*command, *args])
 
 
 @click.command(
@@ -226,7 +225,7 @@ def run(args):
 )
 @click.argument("args", nargs=-1, required=True)
 def execute(args):
-    dc_command.callback(["exec"] + args)
+    dc_command.callback(["exec", *args])
 
 
 @click.command(
