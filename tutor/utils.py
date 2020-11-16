@@ -126,6 +126,13 @@ def walk_files(path):
             yield os.path.join(dirpath, filename)
 
 
+def is_root():
+    """
+    Check whether tutor is being run as root/sudo.
+    """
+    return get_user_id() == 0
+
+
 def get_user_id():
     """
     Portable way to get user ID. Note: I have no idea if it actually works on windows...

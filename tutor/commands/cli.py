@@ -54,7 +54,7 @@ def main():
 )
 @click.pass_context
 def cli(context, root):
-    if utils.get_user_id() == 0:
+    if utils.is_root():
         fmt.echo_alert(
             "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
             " the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com"
