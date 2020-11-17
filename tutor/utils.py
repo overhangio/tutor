@@ -206,5 +206,7 @@ def check_output(*command):
     click.echo(fmt.command(" ".join(command)))
     try:
         return subprocess.check_output(command)
-    finally:
-        fmt.echo_error("Command failed: {}".format(" ".join(command)))
+    except Exception as e:
+        raise exceptions.TutorError(
+            "Command failed: {}".format(" ".join(command))
+        ) from e
