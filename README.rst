@@ -36,17 +36,6 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
 
 Do you need professional assistance setting up or managing your Open edX platform? Overhang.IO provides online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/lts>`__.
 
-A note to US users
-------------------
-
-Dear US voters,
-
-At the risk of stating the obvious, the coming election that will happen in your country will deeply affect you as well as the rest of the world. We are all waiting in anguish, hoping that you will not re-elect a dangerous, racist maniac that borders on fascism.
-
-Please *do not* fuck this up. Thank you.
-
-Régis Behmo, principal Tutor maintainer
-
 Features
 --------
 
