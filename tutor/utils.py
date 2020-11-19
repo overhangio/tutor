@@ -130,6 +130,9 @@ def is_root():
     """
     Check whether tutor is being run as root/sudo.
     """
+    if sys.platform == "win32":
+        # Don't even try
+        return False
     return get_user_id() == 0
 
 
@@ -138,7 +141,8 @@ def get_user_id():
     Portable way to get user ID. Note: I have no idea if it actually works on windows...
     """
     if sys.platform == "win32":
-        return int(check_output("id", "-u").decode())
+        # Don't even try
+        return 0
     return os.getuid()
 
 
