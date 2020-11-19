@@ -37,7 +37,7 @@ class YamlParamType(click.ParamType):
 @click.option(
     "-s",
     "--set",
-    "set_",
+    "set_vars",
     type=YamlParamType(),
     multiple=True,
     metavar="KEY=VAL",
@@ -46,17 +46,18 @@ class YamlParamType(click.ParamType):
 @click.option(
     "-U",
     "--unset",
+    "unset_vars",
     multiple=True,
     help="Remove a configuration value (can be used multiple times)",
 )
 @click.pass_obj
-def save(context, interactive, set_, unset):
+def save(context, interactive, set_vars, unset_vars):
     config, defaults = interactive_config.load_all(
         context.root, interactive=interactive
     )
-    if set_:
-        tutor_config.merge(config, dict(set_), force=True)
-    for key in unset:
+    if set_vars:
+        tutor_config.merge(config, dict(set_vars), force=True)
+    for key in unset_vars:
         config.pop(key, None)
     tutor_config.save_config_file(context.root, config)
     tutor_config.merge(config, defaults)

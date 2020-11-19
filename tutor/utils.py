@@ -7,9 +7,11 @@ import string
 import struct
 import subprocess
 import sys
+
 import click
 from Crypto.PublicKey import RSA
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
+
 from . import exceptions
 from . import fmt
 
