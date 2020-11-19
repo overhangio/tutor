@@ -230,7 +230,7 @@ def write_to(content, path):
         open_mode += "b"
     utils.ensure_file_directory_exists(path)
     if platform == "win32":
-        with open(path, open_mode, encoding='utf8') as of:
+        with open(path, open_mode, encoding='utf8',newline='\n') as of:
             of.write(content)
     else:
         with open(path, open_mode) as of:
