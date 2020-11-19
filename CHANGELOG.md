@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v10.5.0 (2020-11-19)
+
 - 💥[Improvement] Remove `dev/local pullimages`. Instead, run `dev/local dc pull`.
 - 💥[Improvement] Add `dev dc` and `local dc` commands as thin wrappers of the `docker-compose` CLI.
 - 💥[Improvement] Remove the undocumented `local run_hook` command. Instead, run `local init --limit=...`.
