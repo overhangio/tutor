@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix Dockerfile parsing on Windows
+
 ## v10.5.0 (2020-11-19)
 
 - 💥[Improvement] Remove `dev/local pullimages`. Instead, run `dev/local dc pull`.
