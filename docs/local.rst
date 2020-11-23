@@ -47,9 +47,9 @@ Update docker images
 
 ::
 
-    tutor local pullimages
+    tutor local dc pull
 
-This downloads the latest version of the docker images from `Docker Hub <https://hub.docker.com/r/overhangio/openedx/>`_. Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
+This downloads the latest version of the Docker images from `Docker Hub <https://hub.docker.com/r/overhangio/openedx/>`_. Depending on your bandwidth, this might take a long time. Minor image updates will be incremental, and thus much faster.
 
 Running Open edX
 ~~~~~~~~~~~~~~~~

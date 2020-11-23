@@ -126,12 +126,23 @@ def walk_files(path):
             yield os.path.join(dirpath, filename)
 
 
+def is_root():
+    """
+    Check whether tutor is being run as root/sudo.
+    """
+    if sys.platform == "win32":
+        # Don't even try
+        return False
+    return get_user_id() == 0
+
+
 def get_user_id():
     """
     Portable way to get user ID. Note: I have no idea if it actually works on windows...
     """
     if sys.platform == "win32":
-        return 'win32'
+        # Don't even try
+        return 0
     return os.getuid()
 
 
@@ -199,5 +210,7 @@ def check_output(*command):
     click.echo(fmt.command(" ".join(command)))
     try:
         return subprocess.check_output(command)
-    finally:
-        fmt.echo_error("Command failed: {}".format(" ".join(command)))
+    except Exception as e:
+        raise exceptions.TutorError(
+            "Command failed: {}".format(" ".join(command))
+        ) from e

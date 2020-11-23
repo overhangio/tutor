@@ -227,11 +227,15 @@ def write_to(content, path):
     """
     Write some content to a path. Content can be either str or bytes.
     """
-    open_mode = "w"
+    open_kwargs = {"mode": "w"}
     if isinstance(content, bytes):
-        open_mode += "b"
+        open_kwargs["mode"] += "b"
+    else:
+        # Make files readable by Docker on Windows
+        open_kwargs["encoding"] = "utf8"
+        open_kwargs["newline"] = "\n"
     utils.ensure_file_directory_exists(path)
-    with open(path, open_mode, encoding="utf8",newline='\n') as of:
+    with open(path, **open_kwargs) as of:
         of.write(content)
 
 

@@ -24,13 +24,6 @@ def build(context, mode):
     )
 
 
-@click.command(help="Pull the docker image")
-@click.pass_obj
-def pullimage(context):
-    config = tutor_config.load(context.root)
-    utils.execute("docker", "pull", config["DOCKER_IMAGE_ANDROID"])
-
-
 def build_command(config, target):
     gradle_target = {
         "debug": "assembleProdDebuggable",
@@ -58,4 +51,3 @@ def docker_run(root, command):
 
 
 android.add_command(build)
-android.add_command(pullimage)

@@ -117,7 +117,7 @@ def install(location):
     # Save file
     if not os.path.exists(plugins.DictPlugin.ROOT):
         os.makedirs(plugins.DictPlugin.ROOT)
-    with open(plugin_path, "w") as f:
+    with open(plugin_path, "w", newline="\n") as f:
         f.write(content)
     fmt.echo_info("Plugin installed at {}".format(plugin_path))
 

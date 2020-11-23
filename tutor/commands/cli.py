@@ -1,8 +1,10 @@
 #! /usr/bin/env python3
 import sys
+
 import appdirs
 import click
 import click_repl
+
 from .android import android
 from .config import config_command
 from .context import Context
@@ -13,11 +15,10 @@ from .local import local
 from .plugins import plugins_command, add_plugin_commands
 from .ui import ui
 from .webui import webui
+from ..__about__ import __version__
 from .. import exceptions
 from .. import fmt
 from .. import utils
-from ..__about__ import __version__
-import ctypes, os
 
 def main():
     try:
@@ -52,11 +53,7 @@ def main():
 )
 @click.pass_context
 def cli(context, root):
-    try:
-        is_admin = (os.getuid() == 0)
-    except AttributeError:
-        is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
-    if is_admin:
+    if utils.is_root():
         fmt.echo_alert(
             "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
             " the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com"
