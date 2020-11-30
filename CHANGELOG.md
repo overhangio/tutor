@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v10.5.1 (2020-11-30)
 
 - [Bugfix] Fix Dockerfile parsing on Windows
 - [Improvement] Add option to patch lms and cms nginx server blocks
