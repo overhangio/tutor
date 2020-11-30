@@ -63,8 +63,27 @@ Releasing a new version
 -----------------------
 
 - Bump the ``__version__`` value in ``tutor/__about__.py``.
-- Replace "Latest" by the version name and date in CHANGELOG.md.
+- Replace "Unreleased" by the version name and date in CHANGELOG.md.
 - Create a commit with the version changelog.
 - ``make release`` (this assumes that there are two remotes named "origin" and "overhangio")
 
 After a regular push to ``master``, run ``make nightly`` to update the "nightly" tag.
+
+.. _contributing:
+
+Contributing to Tutor
+---------------------
+
+Third-party contributions to Tutor and its plugins are more than welcome! Just make sure to follow these guidelines:
+
+- Outside of obvious bugs, contributions should be discussed first in the `official Tutor forums <https://discuss.overhang.io>`__.
+- Once we agree on a high-level solution, you should open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ or the corresponding plugin.
+- Write a good Git commit title and message: explain why you are making this change, what problem you are solving and which solution you adopted. Link to the relevant conversation topics in the forums and describe your use case. We *love* long, verbose descriptions :)
+- Make sure that all tests pass by running ``make test`` (see above).
+- If your PR is in the Tutor core repository, add an item to the CHANGELOG file, in the "Unreleased" section. Use the same format as the other items::
+
+    - [TYPE] DESCRIPTION
+
+Where "TYPE" is either "Bugfix", "Improvement", "Feature" or "Security". You should add an explosion emoji ("💥") before "[TYPE]" if you are making a breaking change.
+
+Happy hacking! ☘️
