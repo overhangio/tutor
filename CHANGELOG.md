@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v10.5.2 (2020-12-07)
+
 - [Improvement] Increase the timeout of the gunicorn worker command in openedx Dockerfile
 
 ## v10.5.1 (2020-11-30)
