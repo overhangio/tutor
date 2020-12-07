@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Improvement] Increase the timeout of the gunicorn worker command in openedx Dockerfile
+
 ## v10.5.1 (2020-11-30)
 
 - [Bugfix] Fix Dockerfile parsing on Windows
