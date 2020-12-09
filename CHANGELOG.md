@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v10.5.3 (2020-12-09)
+
 - [Security] Apply upstream edx-platform [security patch](https://github.com/edx/edx-platform/pull/25782)
 
 ## v10.5.2 (2020-12-07)
