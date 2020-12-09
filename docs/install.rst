@@ -20,11 +20,11 @@ Requirements
 * Ports 80 and 443 should be open. If other web services run on these ports, check the section on :ref:`how to setup a web proxy <web_proxy>`.
 * Hardware:
 
-    - Minimum configuration: 4 Gb RAM, 2 CPU, 8 Gb disk space
-    - Recommended configuration: 8 Gb RAM, 4 CPU, 25 Gb disk space
+    - Minimum configuration: 4 GB RAM, 2 CPU, 8 GB disk space
+    - Recommended configuration: 8 GB RAM, 4 CPU, 25 GB disk space
 
 .. note::
-    On Mac OS, by default, containers are allocated 2 GB of RAM, which is not enough. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 Gb to the Docker daemon. If the deployment fails because of insufficient memory during database migrations, check the :ref:`relevant section in the troubleshooting guide <migrations_killed>`.
+    On Mac OS, by default, containers are allocated 2 GB of RAM, which is not enough. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 GB to the Docker daemon. If the deployment fails because of insufficient memory during database migrations, check the :ref:`relevant section in the troubleshooting guide <migrations_killed>`.
 
 .. _install_binary:
 
