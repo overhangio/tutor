@@ -69,13 +69,13 @@ Urls:
 * Analytics (from the `Figures plugin <https://pypi.org/project/tutor-figures/>`__): https://demo.openedx.overhang.io/figures
 * Studio (CMS): https://studio.demo.openedx.overhang.io
 
-The platform is reset every day at midnight, `UTC time <https://time.is/UTC>`__, so feel free to try and break things as much as you want.
+The platform is reset every day at 9:00 AM, `Paris (France) time <https://time.is/Paris>`__, so feel free to try and break things as much as you want.
 
 How does Tutor work?
 --------------------
 
 You can experiment with Tutor very quickly: start by `installing <install>`_ Tutor. Then run::
-  
+
     tutor config save --interactive
 
 This command does two things:
