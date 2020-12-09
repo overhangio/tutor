@@ -54,7 +54,9 @@ RUN curl https://github.com/edx/edx-platform/commit/80fa2cae128e2a1fd8ab298351b7
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
 RUN curl https://github.com/overhangio/edx-platform/commit/58f20a0547355080eeee346104a1719ad806902e.patch | git apply -
-
+# Fix security issues
+# https://github.com/edx/edx-platform/pull/25782/commits
+RUN curl https://github.com/edx/edx-platform/commit/c03857b78d6204ed3b9a3093367348ebfaaf7d04.patch | git apply -
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales

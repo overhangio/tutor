@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply upstream edx-platform [security patch](https://github.com/edx/edx-platform/pull/25782)
+
 ## v10.5.2 (2020-12-07)
 
 - [Improvement] Increase the timeout of the gunicorn worker command in openedx Dockerfile
