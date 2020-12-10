@@ -42,6 +42,6 @@ services:
       image: {{ DOCKER_IMAGE_ANDROID }}
       volumes:
         - "../android/:/openedx/config/"
-        - "../data/android/:/openedx/data/"
+        - "../../data/android/:/openedx/data/"
 
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}
