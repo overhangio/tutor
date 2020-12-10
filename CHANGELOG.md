@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply security patch [25834](https://github.com/edx/edx-platform/pull/25834)
 - [Bugfix] Fix Android apk directory mount path
 
 ## v11.0.0 (2020-12-09)

@@ -44,6 +44,9 @@ RUN curl https://github.com/overhangio/edx-platform/commit/63e8fcb403f18ff24ef9e
 # https://github.com/edx/edx-platform/pull/25771
 # https://github.com/overhangio/edx-platform/tree/overhangio/fix-paver-warning
 RUN curl https://github.com/overhangio/edx-platform/commit/bc0ab09f9945bd14aa6be1dbbf928cce58f079d2.patch | git apply -
+# Apply security fixes
+RUN curl https://github.com/overhangio/edx-platform/commit/fab755d80083575d3466b990cfcef3b9fd97e755.patch | git apply -
+
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
