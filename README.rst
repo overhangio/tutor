@@ -80,6 +80,6 @@ To get community support, go to the official discussion forums: https://discuss.
 Contributing
 ------------
 
-We are very much open to new ideas and features for Tutor. If you have an improvement idea, feel free to first discuss it on the `Tutor forums <https://discuss.overhang.io>`_. If you are not quite familiar with Open edX or if you need technical advice, the forums are a great place to start, too. Did you find an issue with Tutor? Please first make sure that it's related to Tutor, and not an upstream issue with Open edX. Then, `open an issue on Github <https://github.com/overhangio/tutor/issues/new/choose>`_. `Pull requests <https://github.com/overhangio/tutor/pulls>`_ will be happily examined, too!
+We welcome contributions to Tutor! To learn how you can contribute, please check the relevant section of the Tutor docs: `https://docs.tutor.overhang.io/tutor.html#contributing <https://docs.tutor.overhang.io/tutor.html#contributing>`__.
 
 .. _readme_contributing_end:
