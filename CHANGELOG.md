@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix missing celery tasks from edx-platform (see [upstream PR](https://github.com/edx/edx-platform/pull/25840))
+
 ## v11.0.1 (2020-12-10)
 
 - [Security] Apply security patch [25834](https://github.com/edx/edx-platform/pull/25834)

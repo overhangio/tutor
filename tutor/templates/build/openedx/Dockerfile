@@ -46,6 +46,9 @@ RUN curl https://github.com/overhangio/edx-platform/commit/63e8fcb403f18ff24ef9e
 RUN curl https://github.com/overhangio/edx-platform/commit/bc0ab09f9945bd14aa6be1dbbf928cce58f079d2.patch | git apply -
 # Apply security fixes
 RUN curl https://github.com/overhangio/edx-platform/commit/fab755d80083575d3466b990cfcef3b9fd97e755.patch | git apply -
+# Fix lost celery tasks
+# https://github.com/edx/edx-platform/pull/25840
+RUN curl https://github.com/overhangio/edx-platform/commit/928fe14a5656303b538281edce897faf082b549c.patch | git apply -
 
 
 ###### Download extra locales to /openedx/locale/contrib/locale
