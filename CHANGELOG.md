@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix upload of video transcripts to S3 (again)
+
 ## v11.0.2 (2020-12-12)
 
 - [Bugfix] Fix missing celery tasks from edx-platform (see [upstream PR](https://github.com/edx/edx-platform/pull/25840))

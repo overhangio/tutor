@@ -49,6 +49,10 @@ RUN curl https://github.com/overhangio/edx-platform/commit/fab755d80083575d3466b
 # Fix lost celery tasks
 # https://github.com/edx/edx-platform/pull/25840
 RUN curl https://github.com/overhangio/edx-platform/commit/928fe14a5656303b538281edce897faf082b549c.patch | git apply -
+# Fix video transcript upload to S3
+# https://github.com/edx/edx-platform/pull/24800
+RUN curl https://github.com/overhangio/edx-platform/commit/81b18b1b97ca89e2d941c9f7283e3f6e385c5f92.patch | git apply -
+
 
 
 ###### Download extra locales to /openedx/locale/contrib/locale
