@@ -148,11 +148,11 @@ Then, run a local webserver::
     tutor dev runserver lms
 
 The LMS can then be accessed at http://local.overhang.io:8000. You will then have to :ref:`enable that theme <settheme>` for the development domain names::
-    
+
     tutor dev settheme mythemename local.overhang.io:8000 studio.local.overhang.io:8001
 
 Re-build development docker image (and compile assets)::
-    
+
     tutor images build openedx-dev
 
 Watch the themes folders for changes (in a different terminal)::
