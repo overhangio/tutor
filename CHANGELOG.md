@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.0.3 (2020-12-15)
+
 - [Bugfix] Fix upload of video transcripts to S3 (again)
 
 ## v11.0.2 (2020-12-12)
