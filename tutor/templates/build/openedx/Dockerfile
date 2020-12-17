@@ -39,7 +39,7 @@ WORKDIR /openedx/edx-platform
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
-RUN curl https://github.com/overhangio/edx-platform/commit/63e8fcb403f18ff24ef9ef6dbd5d38a7fa82fed6.patch | git apply -
+RUN curl https://github.com/overhangio/edx-platform/commit/bd038bab3cf02df147e754f7743e46b68b43bac8.patch | git apply -
 # Fix inconvenient pavelib warning
 # https://github.com/edx/edx-platform/pull/25771
 # https://github.com/overhangio/edx-platform/tree/overhangio/fix-paver-warning
