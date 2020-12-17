@@ -4,7 +4,9 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
-- [Bugfix] Fix "Read-only file system" errors when running `tutor dev runserver` commands on Mac OS.
+## v11.0.4 (2020-12-17)
+
+- [Bugfix] Fix "Read-only file system" errors when running `tutor dev runserver` commands on Mac OS. (#392)
 
 ## v11.0.3 (2020-12-15)
 
