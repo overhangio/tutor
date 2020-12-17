@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "Read-only file system" errors when running `tutor dev runserver` commands on Mac OS.
+
 ## v11.0.3 (2020-12-15)
 
 - [Bugfix] Fix upload of video transcripts to S3 (again)
