@@ -62,6 +62,16 @@ Installing from source
     cd tutor
     pip install -e .
 
+DNS records
+-----------
+
+When running a server in production, it is necessary to define `DNS records <https://en.wikipedia.org/wiki/Domain_Name_System#Resource_records>`__ which will make it possible to access your Open edX platform by name in your browser. The precise procedure to create DNS records vary from one provider to the next and is beyond the scope of these docs. You should create a record of type A with a name equal to your LMS hostname (given by ``tutor config printvalue LMS_HOST``) and a value that indicates the IP address of your server. Applications other than the LMS, such as the studio, ecommerce, etc. typically reside in subdomains of the LMS. Thus, you should also create a CNAME record to point all subdomains of the LMS to the LMS_HOST.
+
+For instance, the demo Open edX server that runs at http://demo.openedx.overhang.io has the following DNS records::
+
+    demo.openedx 1800 IN A 172.105.89.208
+    *.demo.openedx 1800 IN CNAME demo.openedx.overhang.io.
+
 .. _cloud_install:
 
 Zero-click AWS installation
@@ -107,19 +117,19 @@ Uninstallation
 It is fairly easy to completely uninstall Tutor and to delete the Open edX platforms that is running locally.
 
 First of all, stop any locally-running platform::
-    
+
     tutor local stop
     tutor dev stop
 
 Then, delete all data associated to your Open edX platform::
-    
+
     # WARNING: this step is irreversible
     sudo rm -rf "$(tutor config printroot)"
 
 Finally, uninstall Tutor itself::
-    
+
     # If you installed tutor from source
     pip uninstall tutor-openedx
-    
+
     # If you downloaded the tutor binary
     sudo rm /usr/local/bin/tutor
