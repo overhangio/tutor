@@ -57,8 +57,6 @@ RUN curl https://github.com/overhangio/edx-platform/commit/81b18b1b97ca89e2d941c
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
-# TODO: openedx-i18n is not yet tagged for koa.1: replace versions below by OPENEDX_COMMON_VERSION
-ARG OPENEDX_I18N_VERSION=open-release/koa.test02
 RUN cd /tmp \
     && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/{{ OPENEDX_COMMON_VERSION }}.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
