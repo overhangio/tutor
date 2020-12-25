@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Automatically bind-mount volumes from the `volumes/` directory with the `--volume=/...` syntax.
+
 ## v11.0.7 (2021-01-11)
 
 - [Security] Apply security patch [26029](https://github.com/edx/edx-platform/pull/26029)
@@ -319,14 +321,14 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## 3.10.1 (2020-01-13)
 
-- [Improvement] Explicitely point to docker.io images, when necessary, for [podman](https://podman.io/) compatibility
+- [Improvement] Explicitly point to docker.io images, when necessary, for [podman](https://podman.io/) compatibility
 
 ## 3.10.0 (2020-01-10)
 
 - [Bugfix] Fix oauth authentication in dev mode
 - [Improvement] Upgrade to the 3.7 docker-compose syntax
 - [Improvement] The `dev runserver` command can now be run for just any service
-- 💥[Feature] `dev run/exec` commands now support generic options which are passed to docker-compose. Consequently, defining the `TUTOR_EDX_PLATFORM_PATH` environment variable no longer works. Instead, users are encouraged to explicitely pass the `-v` option, define a command alias or create a `docker-compose.override.yml` file.
+- 💥[Feature] `dev run/exec` commands now support generic options which are passed to docker-compose. Consequently, defining the `TUTOR_EDX_PLATFORM_PATH` environment variable no longer works. Instead, users are encouraged to explicitly pass the `-v` option, define a command alias or create a `docker-compose.override.yml` file.
 
 ## 3.9.1 (2020-01-08)
 

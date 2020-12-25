@@ -1,7 +1,11 @@
+import os
+
 import click
 
+from .. import bindmounts
 from .. import config as tutor_config
 from .. import env as tutor_env
+from ..exceptions import TutorError
 from .. import fmt
 from .. import scripts
 from .. import serialize
@@ -181,22 +185,6 @@ def importdemocourse(context):
 
 
 @click.command(
-    short_help="Direct interface to docker-compose.",
-    help=(
-        "Direct interface to docker-compose. This is a wrapper around `docker-compose`. All commands, options and"
-        " arguments passed to this command will be forwarded to docker-compose."
-    ),
-    context_settings={"ignore_unknown_options": True},
-    name="dc",
-)
-@click.argument("args", nargs=-1, required=True)
-@click.pass_obj
-def dc_command(context, args):
-    config = tutor_config.load(context.root)
-    context.docker_compose(context.root, config, *args)
-
-
-@click.command(
     short_help="Run a command in a new container",
     help=(
         "Run a command in a new container. This is a wrapper around `docker-compose run`. Any option or argument passed"
@@ -207,10 +195,31 @@ def dc_command(context, args):
 )
 @click.argument("args", nargs=-1, required=True)
 def run(args):
-    command = ["run", "--rm"]
+    extra_args = ["--rm"]
     if not utils.is_a_tty():
-        command.append("-T")
-    dc_command.callback([*command, *args])
+        extra_args.append("-T")
+    dc_command.callback("run", [*extra_args, *args])
+
+
+@click.command(
+    name="bindmount",
+    help="Copy the contents of a container directory to a ready-to-bind-mount host directory",
+)
+@click.argument(
+    "service",
+)
+@click.argument("path")
+@click.pass_obj
+def bindmount_command(context, service, path):
+    config = tutor_config.load(context.root)
+    host_path = bindmounts.create(
+        context.root, config, context.docker_compose, service, path
+    )
+    fmt.echo_info(
+        "Bind-mount volume created at {}. You can now use it in all `local` and `dev` commands with the `--volume={}` option.".format(
+            host_path, path
+        )
+    )
 
 
 @click.command(
@@ -225,7 +234,7 @@ def run(args):
 )
 @click.argument("args", nargs=-1, required=True)
 def execute(args):
-    dc_command.callback(["exec", *args])
+    dc_command.callback("exec", args)
 
 
 @click.command(
@@ -236,13 +245,47 @@ def execute(args):
 @click.option("--tail", type=int, help="Number of lines to show from each container")
 @click.argument("service", nargs=-1)
 def logs(follow, tail, service):
-    command = ["logs"]
+    args = []
     if follow:
-        command += ["--follow"]
+        args.append("--follow")
     if tail is not None:
-        command += ["--tail", str(tail)]
-    command += service
-    dc_command.callback(command)
+        args += ["--tail", str(tail)]
+    args += service
+    dc_command.callback("logs", args)
+
+
+@click.command(
+    short_help="Direct interface to docker-compose.",
+    help=(
+        "Direct interface to docker-compose. This is a wrapper around `docker-compose`. Most commands, options and"
+        " arguments passed to this command will be forwarded as-is to docker-compose."
+    ),
+    context_settings={"ignore_unknown_options": True},
+    name="dc",
+)
+@click.argument("command")
+@click.argument("args", nargs=-1, required=True)
+@click.pass_obj
+def dc_command(context, command, args):
+    config = tutor_config.load(context.root)
+    volumes, non_volume_args = bindmounts.parse_volumes(args)
+    volume_args = []
+    for volume_arg in volumes:
+        if ":" not in volume_arg:
+            # This is a bind-mounted volume from the "volumes/" folder.
+            host_bind_path = bindmounts.get_path(context.root, volume_arg)
+            if not os.path.exists(host_bind_path):
+                raise TutorError(
+                    (
+                        "Bind-mount volume directory {} does not exist. It must first be created"
+                        " with the '{}' command."
+                    ).format(host_bind_path, bindmount_command.name)
+                )
+            volume_arg = "{}:{}".format(host_bind_path, volume_arg)
+        volume_args += ["--volume", volume_arg]
+    context.docker_compose(
+        context.root, config, command, *volume_args, *non_volume_args
+    )
 
 
 def add_commands(command_group):
@@ -256,5 +299,6 @@ def add_commands(command_group):
     command_group.add_command(settheme)
     command_group.add_command(dc_command)
     command_group.add_command(run)
+    command_group.add_command(bindmount_command)
     command_group.add_command(execute)
     command_group.add_command(logs)
