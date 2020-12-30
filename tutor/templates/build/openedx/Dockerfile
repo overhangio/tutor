@@ -52,8 +52,10 @@ RUN curl https://github.com/overhangio/edx-platform/commit/928fe14a5656303b53828
 # Fix video transcript upload to S3
 # https://github.com/edx/edx-platform/pull/24800
 RUN curl https://github.com/overhangio/edx-platform/commit/81b18b1b97ca89e2d941c9f7283e3f6e385c5f92.patch | git apply -
-
-
+# Fix js upload in scorm packages by upgrading django-pipeline
+# https://github.com/edx/edx-platform/pull/25957
+# https://github.com/overhangio/edx-platform/tree/overhangio/upgrade-django-pipeline
+RUN curl https://github.com/overhangio/edx-platform/commit/1c733e3ba11249cf16358684169e6137a308e796.patch | git apply -
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales

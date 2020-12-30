@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "Invalid type for parameter ContentType" error on js upload in Scorm xblock ([openedx-scorm-xblock #16](https://github.com/overhangio/openedx-scorm-xblock/issues/16))
+
 ## v11.0.4 (2020-12-17)
 
 - [Bugfix] Fix "Read-only file system" errors when running `tutor dev runserver` commands on Mac OS. (#392)
