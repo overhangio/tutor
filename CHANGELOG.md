@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Security] Apply security patch [25974](https://github.com/edx/edx-platform/pull/25974)
+
 ## v11.0.5 (2020-12-30)
 
 - [Bugfix] Fix "Invalid type for parameter ContentType" error on js upload in Scorm xblock ([openedx-scorm-xblock #16](https://github.com/overhangio/openedx-scorm-xblock/issues/16))
