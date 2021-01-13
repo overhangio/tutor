@@ -7,7 +7,7 @@ if id -u openedx > /dev/null 2>&1; then
     find /openedx \
         -not -path "/openedx/edx-platform/*" \
         -not -user openedx \
-        -perm /u=w \
+        -writable \
         -exec chown openedx:openedx {} \+
     echo "File permissions set."
 

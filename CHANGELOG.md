@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "Read-only file system" errors when running `tutor dev runserver` commands on Mac OS. (again, see #392)
 - [Feature] Automatically bind-mount volumes from the `volumes/` directory with the `--volume=/...` syntax.
 
 ## v11.0.7 (2021-01-11)
