@@ -87,3 +87,23 @@ Third-party contributions to Tutor and its plugins are more than welcome! Just m
 Where "TYPE" is either "Bugfix", "Improvement", "Feature" or "Security". You should add an explosion emoji ("💥") before "[TYPE]" if you are making a breaking change.
 
 Happy hacking! ☘️
+
+Becoming a Tutor Maintainer
+---------------------------
+
+Is Tutor a core part of your infrastructure? Would you like to contribute to the project roadmap? Then you should consider becoming a Tutor maintainer. Tutor maintainers are individuals and companies who help make decisions on the future of the prject. Their goal is to support the Tutor community and to make the software as best as possible.
+
+More precisely, project maintainers are responsible for one or more of the following tasks:
+
+- Interaction with the community on the `Tutor forums <discuss.overhang.io/>`__: maintainers are there to answer questions, help users troubleshoot issues, announce new features and changes.
+- Address Github issues by triaging, commenting and, when possible, proposing a fix for them.
+- Review Github pull requests, both from external contributors and other maintainers.
+
+As a Tutor maintainer, you should expect that your role will require about 4-8 hours of work per month. If maintainers work more than that, then it means that more maintainers should be brought on board. If you find that you cannot sustain this pace of work for an extended period of time (~1 month), then we ask that you clearly signal your new situation by removing yourself from the maintainers group. This will not impede your ability to join the group again at a later time.
+
+In exchange for these responsibilities, Tutor maintainers can contribute to every major decision of the project, including the roadmap. Every pull request must be approved by at least one Tutor maintainer (other than the author). In discussions, every maintainer who contributes as an invididual has one voice. Contributing companies also have once voice, independently of how many maintainers are affiliated to them. In decisions, Tutor maintainers should strive to achieve consensus. When consensus is not possible, Régis Behmo is responsible for making the final decision.
+
+It should be made clear that joining the Tutor maintainers program does *not* grant the following:
+
+- Merge rights to Github repositories from the `Overhang.IO <https://github.com/overhangio>`__ organization.
+- Payment or material reward of any nature.
