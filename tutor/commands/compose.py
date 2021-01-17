@@ -234,7 +234,7 @@ def bindmount_command(context, service, path):
 )
 @click.argument("args", nargs=-1, required=True)
 def execute(args):
-    dc_command.callback("exec", args)
+    dc_command.callback("exec", list(args))
 
 
 @click.command(
