@@ -236,3 +236,35 @@ You should then specify the settings to use on the host::
 From then on, all ``dev`` commands will use the ``mysettings`` module. For instance::
 
     tutor dev runserver lms
+
+Running edx-platform unit tests
+-------------------------------
+
+It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/edx/edx-platform/>`__. To do so, you should first build the "test" target of the "openedx-dev" Docker image::
+
+    tutor images build --target=test openedx-dev
+
+.. warning::
+    Don't forget to re-build the development image afterwards if you'd like to run ``dev`` commands again! To do so, run ``tutor images build openedx-dev`` after you are done testing.
+
+Then, run unit tests with ``pytest`` commands::
+
+    # Run a test container
+    tutor dev run lms bash
+
+    # Run tests on common apps
+    unset DJANGO_SETTINGS_MODULE
+    export EDXAPP_TEST_MONGO_HOST=mongodb
+    pytest common
+    pytest openedx
+
+    # Run tests on LMS
+    export DJANGO_SETTINGS_MODULE=lms.envs.tutor.test
+    pytest lms
+
+    # Run tests on CMS
+    export DJANGO_SETTINGS_MODULE=cms.envs.tutor.test
+    pytest cms
+
+.. note::
+    Getting all edx-platform unit tests to pass on Tutor is currently a work-in-progress. Some unit tests are still failing. If you manage to fix some of these, please report your findings in the `Tutor forums <https://discuss.overhang.io>`__.

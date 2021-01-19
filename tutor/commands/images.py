@@ -45,8 +45,12 @@ def images_command():
     multiple=True,
     help="Set a custom host-to-IP mapping (host:ip).",
 )
+@click.option(
+    "--target",
+    help="Set the target build stage to build.",
+)
 @click.pass_obj
-def build(context, image_names, no_cache, build_args, add_hosts):
+def build(context, image_names, no_cache, build_args, add_hosts, target):
     config = tutor_config.load(context.root)
     command_args = []
     if no_cache:
@@ -55,6 +59,8 @@ def build(context, image_names, no_cache, build_args, add_hosts):
         command_args += ["--build-arg", build_arg]
     for add_host in add_hosts:
         command_args += ["--add-host", add_host]
+    if target:
+        command_args += ["--target", target]
     for image in image_names:
         build_image(context.root, config, image, *command_args)
 

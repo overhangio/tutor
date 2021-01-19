@@ -1,4 +1,4 @@
-FROM {{ DOCKER_IMAGE_OPENEDX }}
+FROM {{ DOCKER_IMAGE_OPENEDX }} as base
 MAINTAINER Overhang.io <contact@overhang.io>
 
 # Install useful system requirements
@@ -27,6 +27,16 @@ RUN chmod a+x /openedx/bin/*
 # Configure new user
 ARG USERID=1000
 RUN create-user.sh $USERID
+
+######## Test image
+FROM base as test
+
+# Run all tests by default
+ENTRYPOINT ["docker-entrypoint-test.sh"]
+CMD pytest
+
+######## Development image
+FROM base as dev
 
 # Default django settings
 ENV SETTINGS tutor.development
