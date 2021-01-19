@@ -59,7 +59,7 @@ def get_root_path(root):
     return os.path.join(root, "volumes")
 
 
-def parse_volumes(args):
+def parse_volumes(docker_compose_args):
     """
     Parse `-v/--volume` options from an arbitrary list of arguments.
     """
@@ -70,5 +70,7 @@ def parse_volumes(args):
     def custom_docker_compose(volumes, args):  # pylint: disable=unused-argument
         pass
 
-    context = custom_docker_compose.make_context("custom", args)
+    if isinstance(docker_compose_args, tuple):
+        docker_compose_args = list(docker_compose_args)
+    context = custom_docker_compose.make_context("custom", docker_compose_args)
     return context.params["volumes"], context.params["args"]

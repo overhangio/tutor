@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix `local exec` command which crashed with a `AttributeError`.
+
 ## v11.1.0 (2021-01-13)
 
 - [Bugfix] Fix "Read-only file system" errors when running `tutor dev runserver` commands on Mac OS. (again, see #392)
