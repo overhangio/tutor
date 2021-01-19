@@ -54,7 +54,7 @@ You can then import edx-platform and django modules and execute python code.
 
 To collect assets, you can use the ``openedx-assets`` command that ships with Tutor::
 
-    tutor dev run lms openedx-assets --env=dev
+    tutor dev run lms openedx-assets build --env=dev
 
 .. _bind_mounts:
 
