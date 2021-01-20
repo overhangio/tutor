@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply security patch [26112](https://github.com/edx/edx-platform/pull/26112)
 - [Bugfix] Fix `local exec` command which crashed with a `AttributeError`.
 
 ## v11.1.0 (2021-01-13)
