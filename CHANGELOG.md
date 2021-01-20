@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.1.1 (2021-01-20)
+
 - [Feature] Add a `tutor images build --target=...` argument for [multi-stage Docker builds](https://docs.docker.com/develop/develop-images/multistage-build/).
 - [Feature] Create a test version of the openedx-dev Docker image for running edx-platform unit tests.
 - [Security] Apply security patch [26112](https://github.com/edx/edx-platform/pull/26112)
