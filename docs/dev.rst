@@ -217,7 +217,7 @@ Custom edx-platform settings
 
 By default, tutor settings files are mounted inside the docker images at ``/openedx/edx-platform/lms/envs/tutor/`` and ``/openedx/edx-platform/cms/envs/tutor/``. In the various ``dev`` commands, the default ``edx-platform`` settings module is set to ``tutor.development`` and you don't have to do anything to set up these settings.
 
-If, for some reason, you want to use different settings, you will need to pass the ``-e SETTINGS=mycustomsettings`` option to each command. Alternatively, you can define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
+If, for some reason, you want to use different settings, you will need to define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
 
 For instance, let's assume you have created the ``/path/to/edx-platform/lms/envs/mysettings.py`` and ``/path/to/edx-platform/cms/envs/mysettings.py`` modules. These settings should be pretty similar to the following files::
 

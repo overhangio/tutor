@@ -75,7 +75,7 @@ services:
     environment:
       SERVICE_VARIANT: lms
       UWSGI_WORKERS: {{ OPENEDX_LMS_UWSGI_WORKERS }}
-      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+      SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
@@ -99,7 +99,7 @@ services:
     environment:
       SERVICE_VARIANT: cms
       UWSGI_WORKERS: {{ OPENEDX_CMS_UWSGI_WORKERS }}
-      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+      SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
@@ -124,7 +124,7 @@ services:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: lms
-      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+      SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: celery worker --app=cms.celery --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.cms.core.default
     restart: unless-stopped
@@ -143,7 +143,7 @@ services:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
       SERVICE_VARIANT: cms
-      SETTINGS: ${EDX_PLATFORM_SETTINGS:-tutor.production}
+      SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: celery worker --app=cms.celery --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.lms.core.default
     restart: unless-stopped

@@ -3,6 +3,8 @@ version: "3.7"
 x-openedx-service:
   &openedx-service
   image: {{ DOCKER_IMAGE_OPENEDX_DEV }}
+  environment:
+    SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.development}
   volumes:
     # Settings & config
     - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
