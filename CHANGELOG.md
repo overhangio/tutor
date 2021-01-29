@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.1.2 (2021-01-29)
+
 - [Bugfix] Fix django setting value and static asset loading in openedx-dev image
 
 ## v11.1.1 (2021-01-20)
