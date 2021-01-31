@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply security patch [26253](https://github.com/edx/edx-platform/pull/26253).
+
 ## v11.1.2 (2021-01-29)
 
 - [Bugfix] Fix django setting value and static asset loading in openedx-dev image
