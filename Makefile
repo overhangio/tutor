@@ -97,7 +97,7 @@ ci-test-bundle: ## Run basic tests on bundle
 ./releases/github-release: ## Download github-release binary
 	mkdir -p releases/
 	cd releases/ \
-		&& curl -sSL -o ./github-release.bz2 "https://github.com/meterup/github-release/releases/download/v0.7.5/$(shell uname -s | tr "[:upper:]" "[:lower:]")-amd64-github-release.bz2" \
+		&& curl -sSL -o ./github-release.bz2 "https://github.com/github-release/github-release/releases/download/v0.10.0/$(shell uname -s | tr "[:upper:]" "[:lower:]")-amd64-github-release.bz2" \
 		&& bzip2 -d -f ./github-release.bz2 \
 		&& chmod a+x ./github-release
 
