@@ -42,6 +42,7 @@ RUN curl https://github.com/edx/edx-platform/commit/4abb0f85df3f01b791953bb021b7
 RUN curl https://github.com/edx/edx-platform/commit/835c5082a336a4b003fc36be4b4745a641d097d7.patch | git apply -
 RUN curl https://github.com/edx/edx-platform/commit/a8e7b984482ec237161bb3fe517c4b34753cbd2e.patch | git apply -
 RUN curl https://github.com/edx/edx-platform/commit/5afe578528d002debca9a5074bd1ae56703264ce.patch | git apply -
+RUN curl https://github.com/edx/edx-platform/commit/a8edfa9d5b24f930d451d2e01cd17fc4d8088acf.patch | git apply -
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
