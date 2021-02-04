@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.1.4 (2021-02-04)
+
 - [Security] Apply security patch [26358](https://github.com/edx/edx-platform/pull/26358).
 
 ## v11.1.3 (2021-01-31)
