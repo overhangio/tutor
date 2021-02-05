@@ -37,7 +37,7 @@ def question(text):
 
 
 def echo_alert(text):
-    echo(alert(text))
+    echo_error(alert(text))
 
 
 def alert(text):
