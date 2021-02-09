@@ -4,9 +4,11 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.0 (2021-02-10)
+
 - [Bugfix] Upgrade all services to open-release/koa.2
 
-## v11.1.5 (2021-02-009)
+## v11.1.5 (2021-02-09)
 
 - [Security] Apply security patch [26432](https://github.com/edx/edx-platform/pull/26432).
 - [Bugfix] Print warnings to stderr
