@@ -36,14 +36,6 @@ RUN mkdir -p /openedx/edx-platform && \
 WORKDIR /openedx/edx-platform
 
 # Patch edx-platform
-# Apply security fixes
-RUN curl https://github.com/edx/edx-platform/commit/fab755d80083575d3466b990cfcef3b9fd97e755.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/4abb0f85df3f01b791953bb021b754a210b9a99f.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/835c5082a336a4b003fc36be4b4745a641d097d7.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/a8e7b984482ec237161bb3fe517c4b34753cbd2e.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/5afe578528d002debca9a5074bd1ae56703264ce.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/a8edfa9d5b24f930d451d2e01cd17fc4d8088acf.patch | git apply -
-RUN curl https://github.com/edx/edx-platform/commit/cba2c8407373f0bcfb52bfdfb33d711705afb577.patch | git apply -
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
@@ -52,12 +44,6 @@ RUN curl https://github.com/overhangio/edx-platform/commit/bd038bab3cf02df147e75
 # https://github.com/edx/edx-platform/pull/25771
 # https://github.com/overhangio/edx-platform/tree/overhangio/fix-paver-warning
 RUN curl https://github.com/overhangio/edx-platform/commit/bc0ab09f9945bd14aa6be1dbbf928cce58f079d2.patch | git apply -
-# Fix lost celery tasks
-# https://github.com/edx/edx-platform/pull/25840
-RUN curl https://github.com/overhangio/edx-platform/commit/928fe14a5656303b538281edce897faf082b549c.patch | git apply -
-# Fix video transcript upload to S3
-# https://github.com/edx/edx-platform/pull/24800
-RUN curl https://github.com/overhangio/edx-platform/commit/81b18b1b97ca89e2d941c9f7283e3f6e385c5f92.patch | git apply -
 # Fix js upload in scorm packages by upgrading django-pipeline
 # https://github.com/edx/edx-platform/pull/25957
 # https://github.com/overhangio/edx-platform/tree/overhangio/upgrade-django-pipeline

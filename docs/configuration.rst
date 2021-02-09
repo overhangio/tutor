@@ -80,7 +80,7 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/koa.1"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/koa.2"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -207,7 +207,7 @@ openedx Docker Image build arguments
 When building the "openedx" Docker image, it is possible to specify a few `arguments <https://docs.docker.com/engine/reference/builder/#arg>`__:
 
 - ``EDX_PLATFORM_REPOSITORY`` (default: ``"https://github.com/edx/edx-platform.git"``)
-- ``EDX_PLATFORM_VERSION`` (default: ``"open-release/koa.1"``)
+- ``EDX_PLATFORM_VERSION`` (default: ``"open-release/koa.2"``)
 - ``EDX_PLATFORM_VERSION_DATE`` (default: ``"20200227"``)
 - ``NPM_REGISTRY`` (default: ``"https://registry.npmjs.org/"``)
 
@@ -288,7 +288,7 @@ If you don't create your fork from this tag, you *will* have important compatibi
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/koa.1/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/koa.2/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
@@ -301,9 +301,9 @@ Then, add a "django.po" file there that will contain your custom translations::
     msgid "String to translate"
     msgstr "你翻译的东西 la traduction de votre bidule"
 
-The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/koa.1/conf/locale/en/LC_MESSAGES/django.po>`__.
+The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/koa.2/conf/locale/en/LC_MESSAGES/django.po>`__.
 
-If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/koa.1/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
+If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/koa.2/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
 
 To recap, here is an example. To translate a few strings in French, both from django.po and djangojs.po, we would have the following file hierarchy::
 
