@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply security patch [26432](https://github.com/edx/edx-platform/pull/26432).
 - [Bugfix] Print warnings to stderr
 
 ## v11.1.4 (2021-02-04)
