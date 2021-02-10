@@ -40,7 +40,7 @@ pyasn1==0.4.8
     # via
     #   pyasn1-modules
     #   rsa
-pycryptodome==3.9.9
+pycryptodome==3.10.1
     # via -r requirements/base.in
 python-dateutil==2.8.1
     # via kubernetes

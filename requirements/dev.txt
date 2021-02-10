@@ -41,7 +41,7 @@ click==7.1.2
     #   pip-tools
 colorama==0.4.4
     # via twine
-cryptography==3.3.1
+cryptography==3.4.4
     # via secretstorage
 docutils==0.16
     # via readme-renderer
@@ -102,7 +102,7 @@ pyasn1==0.4.8
     #   rsa
 pycparser==2.20
     # via cffi
-pycryptodome==3.9.9
+pycryptodome==3.10.1
     # via -r requirements/base.txt
 pygments==2.7.4
     # via readme-renderer
@@ -145,7 +145,7 @@ rsa==4.7
     # via
     #   -r requirements/base.txt
     #   google-auth
-secretstorage==3.3.0
+secretstorage==3.3.1
     # via keyring
 six==1.15.0
     # via
@@ -153,7 +153,6 @@ six==1.15.0
     #   astroid
     #   bleach
     #   click-repl
-    #   cryptography
     #   google-auth
     #   kubernetes
     #   python-dateutil
@@ -163,7 +162,7 @@ toml==0.10.2
     # via
     #   black
     #   pylint
-tqdm==4.56.0
+tqdm==4.56.1
     # via twine
 twine==3.3.0
     # via -r requirements/dev.in

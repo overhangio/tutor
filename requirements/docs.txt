@@ -70,7 +70,7 @@ pyasn1==0.4.8
     #   -r requirements/base.txt
     #   pyasn1-modules
     #   rsa
-pycryptodome==3.9.9
+pycryptodome==3.10.1
     # via -r requirements/base.txt
 pygments==2.7.4
     # via sphinx
