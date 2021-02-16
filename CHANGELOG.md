@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.1 (2021-02-10)
+
 - [Bugfix] Actually persist Redis data
 
 ## v11.2.0 (2021-02-10)
