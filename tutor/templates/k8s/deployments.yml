@@ -425,6 +425,8 @@ spec:
       containers:
         - name: redis
           image: {{ DOCKER_IMAGE_REDIS }}
+          args: ["redis-server", "/openedx/redis/config/redis.conf"]
+          workingDir: /openedx/redis/data
           ports:
             - containerPort: {{ REDIS_PORT }}
           volumeMounts:

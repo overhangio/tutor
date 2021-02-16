@@ -40,8 +40,9 @@ services:
   {% if RUN_REDIS %}
   redis:
     image: {{ DOCKER_IMAGE_REDIS }}
+    working_dir: /openedx/redis/data
     volumes:
-      - ../../env/redis/redis.conf:/openedx/redis/config/redis.conf:ro
+      - ../apps/redis/redis.conf:/openedx/redis/config/redis.conf:ro
       - ../../data/redis:/openedx/redis/data
     command: redis-server /openedx/redis/config/redis.conf
     restart: unless-stopped

@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Actually persist Redis data
+
 ## v11.2.0 (2021-02-10)
 
 - [Bugfix] Upgrade all services to open-release/koa.2
