@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply security patch [26592](https://github.com/edx/edx-platform/pull/26592)
+
 ## v11.2.1 (2021-02-10)
 
 - [Bugfix] Actually persist Redis data

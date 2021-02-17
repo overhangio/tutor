@@ -36,6 +36,8 @@ RUN mkdir -p /openedx/edx-platform && \
 WORKDIR /openedx/edx-platform
 
 # Patch edx-platform
+# Security patches
+RUN curl https://github.com/overhangio/edx-platform/commit/a4369d300b85d94442844443a3d258a2b516955c.patch | git apply -
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
