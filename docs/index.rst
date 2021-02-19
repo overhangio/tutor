@@ -1,7 +1,7 @@
 .. include:: ../README.rst
     :start-after: _readme_intro_start:
     :end-before: _readme_intro_end:
-    
+
 .. image:: ./img/quickstart.gif
     :alt: Tutor local quickstart
     :target: https://terminalizer.com/view/91b0bfdd557
@@ -36,11 +36,11 @@ The complete source code for Tutor is available on Github: https://github.com/ov
 .. include:: ../README.rst
     :start-after: _readme_support_start:
     :end-before: _readme_support_end:
-    
+
 .. include:: ../README.rst
     :start-after: _readme_contributing_start:
     :end-before: _readme_contributing_end:
-    
+
 License
 -------
 
@@ -51,3 +51,5 @@ The AGPL license covers the Tutor code, including the Dockerfiles, but not the c
 The Tutor plugin system is licensed under the terms of the `Apache License, Version 2.0 <https://opensource.org/licenses/Apache-2.0>`__.
 
 The :ref:`Tutor Web UI <webui>` depends on the `Gotty <https://github.com/yudai/gotty/>`_ binary, which is provided under the terms of the `MIT license <https://github.com/yudai/gotty/blob/master/LICENSE>`_.
+
+© 2021 Tutor is a registered trademark of SASU NULI NULI. All Rights Reserved.
