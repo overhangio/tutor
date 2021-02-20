@@ -215,7 +215,7 @@ spec:
       containers:
         - name: lms-worker
           image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ["celery", "worker", "--app=cms.celery", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild", "100", "--exclude-queues=edx.cms.core.default"]
+          args: ["celery", "worker", "--app=lms.celery", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--maxtasksperchild=100", "--exclude-queues=edx.cms.core.default"]
           env:
           - name: SERVICE_VARIANT
             value: lms

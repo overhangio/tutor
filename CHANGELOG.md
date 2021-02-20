@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Make LMS celery workers actually process LMS tasks, and not CMS tasks.
+
 ## v11.2.2 (2021-02-17)
 
 - [Security] Apply security patch [26592](https://github.com/edx/edx-platform/pull/26592)

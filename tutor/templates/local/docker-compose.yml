@@ -127,7 +127,7 @@ services:
       SERVICE_VARIANT: lms
       SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
       C_FORCE_ROOT: "1" # run celery tasks as root #nofear
-    command: celery worker --app=cms.celery --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.cms.core.default
+    command: celery worker --app=lms.celery --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild=100 --exclude-queues=edx.cms.core.default
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
