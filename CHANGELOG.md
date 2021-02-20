@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.3 (2021-02-20)
+
 - [Bugfix] Make LMS celery workers actually process LMS tasks, and not CMS tasks.
 
 ## v11.2.2 (2021-02-17)
