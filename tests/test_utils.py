@@ -33,4 +33,6 @@ class UtilsTests(unittest.TestCase):
         self.assertTrue(utils.verify_encrypted(encrypted2, password))
 
     def test_long_to_base64(self):
-        self.assertEqual(b"\x00", base64.urlsafe_b64decode(utils.long_to_base64(0) + "=="))
+        self.assertEqual(
+            b"\x00", base64.urlsafe_b64decode(utils.long_to_base64(0) + "==")
+        )
