@@ -1,3 +1,5 @@
+from typing import cast, Any, Dict, Iterator, List, Tuple
+
 import click
 
 from .. import config as tutor_config
@@ -5,6 +7,7 @@ from .. import env as tutor_env
 from .. import images
 from .. import plugins
 from .. import utils
+from .context import Context
 
 BASE_IMAGE_NAMES = ["openedx", "forum", "android"]
 DEV_IMAGE_NAMES = ["openedx-dev"]
@@ -20,7 +23,7 @@ VENDOR_IMAGES = [
 
 
 @click.group(name="images", short_help="Manage docker images")
-def images_command():
+def images_command() -> None:
     pass
 
 
@@ -50,7 +53,14 @@ def images_command():
     help="Set the target build stage to build.",
 )
 @click.pass_obj
-def build(context, image_names, no_cache, build_args, add_hosts, target):
+def build(
+    context: Context,
+    image_names: List[str],
+    no_cache: bool,
+    build_args: List[str],
+    add_hosts: List[str],
+    target: str,
+) -> None:
     config = tutor_config.load(context.root)
     command_args = []
     if no_cache:
@@ -68,7 +78,7 @@ def build(context, image_names, no_cache, build_args, add_hosts, target):
 @click.command(short_help="Pull images from the Docker registry")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def pull(context, image_names):
+def pull(context: Context, image_names: List[str]) -> None:
     config = tutor_config.load(context.root)
     for image in image_names:
         pull_image(config, image)
@@ -77,7 +87,7 @@ def pull(context, image_names):
 @click.command(short_help="Push images to the Docker registry")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def push(context, image_names):
+def push(context: Context, image_names: List[str]) -> None:
     config = tutor_config.load(context.root)
     for image in image_names:
         push_image(config, image)
@@ -86,16 +96,16 @@ def push(context, image_names):
 @click.command(short_help="Print tag associated to a Docker image")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def printtag(context, image_names):
+def printtag(context: Context, image_names: List[str]) -> None:
     config = tutor_config.load(context.root)
     for image in image_names:
         for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
             print(tag)
-        for _img, tag in iter_plugin_images(config, image, "build-image"):
+        for _plugin, _img, tag in iter_plugin_images(config, image, "build-image"):
             print(tag)
 
 
-def build_image(root, config, image, *args):
+def build_image(root: str, config: Dict[str, Any], image: str, *args: str) -> None:
     # Build base images
     for img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
         images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
@@ -112,40 +122,45 @@ def build_image(root, config, image, *args):
         images.build(tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args)
 
 
-def pull_image(config, image):
+def pull_image(config: Dict[str, Any], image: str) -> None:
     for _img, tag in iter_images(config, image, all_image_names(config)):
         images.pull(tag)
     for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
         images.pull(tag)
 
 
-def push_image(config, image):
+def push_image(config: Dict[str, Any], image: str) -> None:
     for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
         images.push(tag)
     for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
         images.push(tag)
 
 
-def iter_images(config, image, image_list):
+def iter_images(
+    config: Dict[str, Any], image: str, image_list: List[str]
+) -> Iterator[Tuple[str, str]]:
     for img in image_list:
         if image in [img, "all"]:
             tag = images.get_tag(config, img)
             yield img, tag
 
 
-def iter_plugin_images(config, image, hook_name):
+def iter_plugin_images(
+    config: Dict[str, Any], image: str, hook_name: str
+) -> Iterator[Tuple[str, str, str]]:
     for plugin, hook in plugins.iter_hooks(config, hook_name):
+        hook = cast(Dict[str, str], hook)
         for img, tag in hook.items():
             if image in [img, "all"]:
                 tag = tutor_env.render_str(config, tag)
                 yield plugin, img, tag
 
 
-def all_image_names(config):
+def all_image_names(config: Dict[str, Any]) -> List[str]:
     return BASE_IMAGE_NAMES + vendor_image_names(config)
 
 
-def vendor_image_names(config):
+def vendor_image_names(config: Dict[str, Any]) -> List[str]:
     vendor_images = VENDOR_IMAGES[:]
     for image in VENDOR_IMAGES:
         if not config.get("RUN_" + image.upper(), True):

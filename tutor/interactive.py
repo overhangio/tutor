@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Tuple
 import click
 
 from . import config as tutor_config
@@ -7,7 +8,7 @@ from . import fmt
 from .__about__ import __version__
 
 
-def update(root, interactive=True):
+def update(root: str, interactive: bool = True) -> Dict[str, Any]:
     """
     Load and save the configuration.
     """
@@ -17,7 +18,9 @@ def update(root, interactive=True):
     return config
 
 
-def load_all(root, interactive=True):
+def load_all(
+    root: str, interactive: bool = True
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Load configuration and interactively ask questions to collect param values from the user.
     """
@@ -27,7 +30,7 @@ def load_all(root, interactive=True):
     return config, defaults
 
 
-def ask_questions(config, defaults):
+def ask_questions(config: Dict[str, Any], defaults: Dict[str, Any]) -> None:
     run_for_prod = config.get("LMS_HOST") != "local.overhang.io"
     run_for_prod = click.confirm(
         fmt.question(
@@ -156,21 +159,31 @@ def ask_questions(config, defaults):
         )
 
 
-def ask(question, key, config, defaults):
+def ask(
+    question: str, key: str, config: Dict[str, Any], defaults: Dict[str, Any]
+) -> None:
     default = env.render_str(config, config.get(key, defaults[key]))
     config[key] = click.prompt(
         fmt.question(question), prompt_suffix=" ", default=default, show_default=True
     )
 
 
-def ask_bool(question, key, config, defaults):
+def ask_bool(
+    question: str, key: str, config: Dict[str, Any], defaults: Dict[str, Any]
+) -> None:
     default = config.get(key, defaults[key])
     config[key] = click.confirm(
         fmt.question(question), prompt_suffix=" ", default=default
     )
 
 
-def ask_choice(question, key, config, defaults, choices):
+def ask_choice(
+    question: str,
+    key: str,
+    config: Dict[str, Any],
+    defaults: Dict[str, Any],
+    choices: List[str],
+) -> None:
     default = config.get(key, defaults[key])
     answer = click.prompt(
         fmt.question(question),

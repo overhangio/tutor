@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import List
 import urllib.request
 
 import click
@@ -9,6 +10,7 @@ from .. import env as tutor_env
 from .. import exceptions
 from .. import fmt
 from .. import plugins
+from .context import Context
 
 
 @click.group(
@@ -16,7 +18,7 @@ from .. import plugins
     short_help="Manage Tutor plugins",
     help="Manage Tutor plugins to add new features and customize your Open edX platform",
 )
-def plugins_command():
+def plugins_command() -> None:
     """
     All plugin commands should work even if there is no existing config file. This is
     because users might enable plugins prior to configuration or environment generation.
@@ -25,7 +27,7 @@ def plugins_command():
 
 @click.command(name="list", help="List installed plugins")
 @click.pass_obj
-def list_command(context):
+def list_command(context: Context) -> None:
     config = tutor_config.load_user(context.root)
     for plugin in plugins.iter_installed():
         status = "" if plugins.is_enabled(config, plugin.name) else " (disabled)"
@@ -39,7 +41,7 @@ def list_command(context):
 @click.command(help="Enable a plugin")
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
 @click.pass_obj
-def enable(context, plugin_names):
+def enable(context: Context, plugin_names: List[str]) -> None:
     config = tutor_config.load_user(context.root)
     for plugin in plugin_names:
         plugins.enable(config, plugin)
@@ -56,7 +58,7 @@ def enable(context, plugin_names):
 )
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
 @click.pass_obj
-def disable(context, plugin_names):
+def disable(context: Context, plugin_names: List[str]) -> None:
     config = tutor_config.load_user(context.root)
     if "all" in plugin_names:
         plugin_names = [plugin.name for plugin in plugins.iter_enabled(config)]
@@ -70,7 +72,7 @@ def disable(context, plugin_names):
     )
 
 
-def delete_plugin(root, name):
+def delete_plugin(root: str, name: str) -> None:
     plugin_dir = tutor_env.pathjoin(root, "plugins", name)
     if os.path.exists(plugin_dir):
         try:
@@ -90,7 +92,7 @@ defined by setting the {} environment variable""".format(
         plugins.DictPlugin.ROOT_ENV_VAR_NAME
     ),
 )
-def printroot():
+def printroot() -> None:
     fmt.echo(plugins.DictPlugin.ROOT)
 
 
@@ -102,7 +104,7 @@ location. The plugin will be installed to {}.""".format(
     ),
 )
 @click.argument("location")
-def install(location):
+def install(location: str) -> None:
     basename = os.path.basename(location)
     if not basename.endswith(".yml"):
         basename += ".yml"
@@ -127,7 +129,7 @@ def install(location):
     fmt.echo_info("Plugin installed at {}".format(plugin_path))
 
 
-def add_plugin_commands(command_group):
+def add_plugin_commands(command_group: click.Group) -> None:
     """
     Add commands provided by all plugins to the given command group. Each command is
     added with a name that is equal to the plugin name.

@@ -1,4 +1,5 @@
 import os
+from typing import Dict, Any, Tuple
 
 from . import exceptions
 from . import env
@@ -8,7 +9,7 @@ from . import serialize
 from . import utils
 
 
-def update(root):
+def update(root: str) -> Dict[str, Any]:
     """
     Load and save the configuration.
     """
@@ -18,7 +19,7 @@ def update(root):
     return config
 
 
-def load(root):
+def load(root: str) -> Dict[str, Any]:
     """
     Load full configuration. This will raise an exception if there is no current
     configuration in the project root.
@@ -27,13 +28,13 @@ def load(root):
     return load_no_check(root)
 
 
-def load_no_check(root):
+def load_no_check(root: str) -> Dict[str, Any]:
     config, defaults = load_all(root)
     merge(config, defaults)
     return config
 
 
-def load_all(root):
+def load_all(root: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Return:
         current (dict): params currently saved in config.yml
@@ -45,7 +46,9 @@ def load_all(root):
     return current, defaults
 
 
-def merge(config, defaults, force=False):
+def merge(
+    config: Dict[str, str], defaults: Dict[str, str], force: bool = False
+) -> None:
     """
     Merge default values with user configuration and perform rendering of "{{...}}"
     values.
@@ -55,16 +58,16 @@ def merge(config, defaults, force=False):
             config[key] = env.render_unknown(config, value)
 
 
-def load_defaults():
+def load_defaults() -> Dict[str, Any]:
     return serialize.load(env.read_template_file("config.yml"))
 
 
-def load_config_file(path):
+def load_config_file(path: str) -> Dict[str, Any]:
     with open(path) as f:
         return serialize.load(f.read())
 
 
-def load_current(root, defaults):
+def load_current(root: str, defaults: Dict[str, str]) -> Dict[str, Any]:
     """
     Load the configuration currently stored on disk.
     Note: this modifies the defaults with the plugin default values.
@@ -77,7 +80,7 @@ def load_current(root, defaults):
     return config
 
 
-def load_user(root):
+def load_user(root: str) -> Dict[str, Any]:
     path = config_path(root)
     if not os.path.exists(path):
         return {}
@@ -87,14 +90,14 @@ def load_user(root):
     return config
 
 
-def load_env(config, defaults):
+def load_env(config: Dict[str, str], defaults: Dict[str, str]) -> None:
     for k in defaults.keys():
         env_var = "TUTOR_" + k
         if env_var in os.environ:
             config[k] = serialize.parse(os.environ[env_var])
 
 
-def load_required(config, defaults):
+def load_required(config: Dict[str, str], defaults: Dict[str, str]) -> None:
     """
     All these keys must be present in the user's config.yml. This includes all values
     that are generated once and must be kept after that, such as passwords.
@@ -111,7 +114,7 @@ def load_required(config, defaults):
             config[key] = env.render_unknown(config, defaults[key])
 
 
-def load_plugins(config, defaults):
+def load_plugins(config: Dict[str, str], defaults: Dict[str, str]) -> None:
     """
     Add, override and set new defaults from plugins.
     """
@@ -133,11 +136,11 @@ def load_plugins(config, defaults):
                 config[key] = env.render_unknown(config, value)
 
 
-def is_service_activated(config, service):
-    return config["RUN_" + service.upper()]
+def is_service_activated(config: Dict[str, Any], service: str) -> bool:
+    return config["RUN_" + service.upper()] is not False
 
 
-def upgrade_obsolete(config):
+def upgrade_obsolete(config: Dict[str, Any]) -> None:
     # Openedx-specific mysql passwords
     if "MYSQL_PASSWORD" in config:
         config["MYSQL_ROOT_PASSWORD"] = config["MYSQL_PASSWORD"]
@@ -178,7 +181,7 @@ def upgrade_obsolete(config):
             config[name.replace("ACTIVATE_", "RUN_")] = config.pop(name)
 
 
-def convert_json2yml(root):
+def convert_json2yml(root: str) -> None:
     """
     Older versions of tutor used to have json config files.
     """
@@ -199,7 +202,7 @@ def convert_json2yml(root):
     )
 
 
-def save_config_file(root, config):
+def save_config_file(root: str, config: Dict[str, str]) -> None:
     path = config_path(root)
     utils.ensure_file_directory_exists(path)
     with open(path, "w") as of:
@@ -207,7 +210,7 @@ def save_config_file(root, config):
     fmt.echo_info("Configuration saved to {}".format(path))
 
 
-def check_existing_config(root):
+def check_existing_config(root: str) -> None:
     """
     Check there is a configuration on disk and the current environment is up-to-date.
     """
@@ -220,5 +223,5 @@ def check_existing_config(root):
     env.check_is_up_to_date(root)
 
 
-def config_path(root):
+def config_path(root: str) -> str:
     return os.path.join(root, "config.yml")

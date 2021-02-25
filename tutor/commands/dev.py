@@ -1,15 +1,17 @@
 import os
+from typing import Any, Dict, List
 
 import click
 
-from . import compose
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
 from .. import utils
+from . import compose
+from .context import Context
 
 
-def docker_compose(root, config, *command):
+def docker_compose(root: str, config: Dict[str, Any], *command: str) -> int:
     """
     Run docker-compose with dev arguments.
     """
@@ -27,15 +29,15 @@ def docker_compose(root, config, *command):
     return utils.docker_compose(
         *args,
         "--project-name",
-        config["DEV_PROJECT_NAME"],
+        str(config["DEV_PROJECT_NAME"]),
         *command,
     )
 
 
 @click.group(help="Run Open edX locally with development settings")
 @click.pass_obj
-def dev(context):
-    context.docker_compose = docker_compose
+def dev(context: Context) -> None:
+    context.docker_compose_func = docker_compose
 
 
 @click.command(
@@ -44,9 +46,9 @@ def dev(context):
 )
 @click.argument("options", nargs=-1, required=False)
 @click.argument("service")
-@click.pass_obj
-def runserver(context, options, service):
-    config = tutor_config.load(context.root)
+@click.pass_context
+def runserver(context: click.Context, options: List[str], service: str) -> None:
+    config = tutor_config.load(context.obj.root)
     if service in ["lms", "cms"]:
         port = 8000 if service == "lms" else 8001
         host = config["LMS_HOST"] if service == "lms" else config["CMS_HOST"]
@@ -56,7 +58,7 @@ def runserver(context, options, service):
             )
         )
     args = ["--service-ports", *options, service]
-    compose.run.callback(args)
+    context.invoke(compose.run, args=args)
 
 
 dev.add_command(runserver)

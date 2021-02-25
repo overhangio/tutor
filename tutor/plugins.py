@@ -3,9 +3,10 @@ from copy import deepcopy
 from glob import glob
 import importlib
 import os
-import pkg_resources
+from typing import cast, Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 import appdirs
+import pkg_resources
 
 from . import exceptions
 from . import fmt
@@ -47,41 +48,50 @@ class BasePlugin:
     `command` (click.Command): if a plugin exposes a `command` attribute, users will be able to run it from the command line as `tutor pluginname`.
     """
 
-    INSTALLED = []
+    INSTALLED: List["BasePlugin"] = []
     _IS_LOADED = False
 
-    def __init__(self, name, obj):
+    def __init__(self, name: str, obj: Any) -> None:
         self.name = name
-        self.config = get_callable_attr(obj, "config", {})
-        self.patches = get_callable_attr(obj, "patches", default={})
-        self.hooks = get_callable_attr(obj, "hooks", default={})
-        self.templates_root = get_callable_attr(obj, "templates", default=None)
+        self.config = cast(
+            Dict[str, Dict[str, Any]], get_callable_attr(obj, "config", {})
+        )
+        self.patches = cast(
+            Dict[str, str], get_callable_attr(obj, "patches", default={})
+        )
+        self.hooks = cast(
+            Dict[str, Union[Dict[str, str], List[str]]],
+            get_callable_attr(obj, "hooks", default={}),
+        )
+        self.templates_root = cast(
+            Optional[str], get_callable_attr(obj, "templates", default=None)
+        )
         self.command = getattr(obj, "command", None)
 
-    def config_key(self, key):
+    def config_key(self, key: str) -> str:
         """
         Config keys in the "add" and "defaults" dicts should be prefixed by the plugin name, in uppercase.
         """
         return self.name.upper() + "_" + key
 
     @property
-    def config_add(self):
+    def config_add(self) -> Dict[str, Any]:
         return self.config.get("add", {})
 
     @property
-    def config_set(self):
+    def config_set(self) -> Dict[str, Any]:
         return self.config.get("set", {})
 
     @property
-    def config_defaults(self):
+    def config_defaults(self) -> Dict[str, Any]:
         return self.config.get("defaults", {})
 
     @property
-    def version(self):
+    def version(self) -> str:
         raise NotImplementedError
 
     @classmethod
-    def iter_installed(cls):
+    def iter_installed(cls) -> Iterator["BasePlugin"]:
         if not cls._IS_LOADED:
             for plugin in cls.iter_load():
                 cls.INSTALLED.append(plugin)
@@ -89,7 +99,7 @@ class BasePlugin:
         yield from cls.INSTALLED
 
     @classmethod
-    def iter_load(cls):
+    def iter_load(cls) -> Iterator["BasePlugin"]:
         raise NotImplementedError
 
 
@@ -103,16 +113,18 @@ class EntrypointPlugin(BasePlugin):
 
     ENTRYPOINT = "tutor.plugin.v0"
 
-    def __init__(self, entrypoint):
+    def __init__(self, entrypoint: pkg_resources.EntryPoint) -> None:
         super().__init__(entrypoint.name, entrypoint.load())
         self.entrypoint = entrypoint
 
     @property
-    def version(self):
+    def version(self) -> str:
+        if not self.entrypoint.dist:
+            return "0.0.0"
         return self.entrypoint.dist.version
 
     @classmethod
-    def iter_load(cls):
+    def iter_load(cls) -> Iterator["EntrypointPlugin"]:
         for entrypoint in pkg_resources.iter_entry_points(cls.ENTRYPOINT):
             yield cls(entrypoint)
 
@@ -124,21 +136,24 @@ class OfficialPlugin(BasePlugin):
     """
 
     @classmethod
-    def load(cls, name):
+    def load(cls, name: str) -> BasePlugin:
         plugin = cls(name)
         cls.INSTALLED.append(plugin)
         return plugin
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.module = importlib.import_module("tutor{}.plugin".format(name))
         super().__init__(name, self.module)
 
     @property
-    def version(self):
-        return self.module.__version__
+    def version(self) -> str:
+        version = getattr(self.module, "__version__")
+        if not isinstance(version, str):
+            raise TypeError("OfficialPlugin __version__ must be 'str'")
+        return version
 
     @classmethod
-    def iter_load(cls):
+    def iter_load(cls) -> Iterator[BasePlugin]:
         yield from []
 
 
@@ -148,18 +163,20 @@ class DictPlugin(BasePlugin):
         os.environ.get(ROOT_ENV_VAR_NAME, "")
     ) or appdirs.user_data_dir(appname="tutor-plugins")
 
-    def __init__(self, data):
-        Module = namedtuple("Module", data.keys())
-        obj = Module(**data)
+    def __init__(self, data: Dict[str, Any]):
+        Module = namedtuple("Module", data.keys())  # type: ignore
+        obj = Module(**data)  # type: ignore
         super().__init__(data["name"], obj)
         self._version = data["version"]
 
     @property
-    def version(self):
+    def version(self) -> str:
+        if not isinstance(self._version, str):
+            raise TypeError("DictPlugin.__version__ must be str")
         return self._version
 
     @classmethod
-    def iter_load(cls):
+    def iter_load(cls) -> Iterator[BasePlugin]:
         for path in glob(os.path.join(cls.ROOT, "*.yml")):
             with open(path) as f:
                 data = serialize.load(f)
@@ -176,13 +193,17 @@ class DictPlugin(BasePlugin):
 
 
 class Plugins:
-    PLUGIN_CLASSES = [OfficialPlugin, EntrypointPlugin, DictPlugin]
+    PLUGIN_CLASSES: List[Type[BasePlugin]] = [
+        OfficialPlugin,
+        EntrypointPlugin,
+        DictPlugin,
+    ]
 
-    def __init__(self, config):
+    def __init__(self, config: Dict[str, Any]):
         self.config = deepcopy(config)
-        self.patches = {}
-        self.hooks = {}
-        self.template_roots = {}
+        self.patches: Dict[str, Dict[str, str]] = {}
+        self.hooks: Dict[str, Dict[str, Union[Dict[str, str], List[str]]]] = {}
+        self.template_roots: Dict[str, str] = {}
 
         for plugin in self.iter_enabled():
             for patch_name, content in plugin.patches.items():
@@ -196,12 +217,12 @@ class Plugins:
                 self.hooks[hook_name][plugin.name] = services
 
     @classmethod
-    def clear(cls):
+    def clear(cls) -> None:
         for PluginClass in cls.PLUGIN_CLASSES:
             PluginClass.INSTALLED.clear()
 
     @classmethod
-    def iter_installed(cls):
+    def iter_installed(cls) -> Iterator[BasePlugin]:
         """
         Iterate on all installed plugins. Plugins are deduplicated by name. The list of installed plugins is cached to
         prevent too many re-computations, which happens a lot.
@@ -213,40 +234,44 @@ class Plugins:
                     installed_plugin_names.add(plugin.name)
                     yield plugin
 
-    def iter_enabled(self):
+    def iter_enabled(self) -> Iterator[BasePlugin]:
         for plugin in self.iter_installed():
             if is_enabled(self.config, plugin.name):
                 yield plugin
 
-    def iter_patches(self, name):
+    def iter_patches(self, name: str) -> Iterator[Tuple[str, str]]:
         plugin_patches = self.patches.get(name, {})
         plugins = sorted(plugin_patches.keys())
         for plugin in plugins:
             yield plugin, plugin_patches[plugin]
 
-    def iter_hooks(self, hook_name):
+    def iter_hooks(
+        self, hook_name: str
+    ) -> Iterator[Tuple[str, Union[Dict[str, str], List[str]]]]:
         yield from self.hooks.get(hook_name, {}).items()
 
 
-def get_callable_attr(plugin, attr_name, default=None):
+def get_callable_attr(
+    plugin: Any, attr_name: str, default: Optional[Any] = None
+) -> Optional[Any]:
     attr = getattr(plugin, attr_name, default)
     if callable(attr):
         attr = attr()
     return attr
 
 
-def is_installed(name):
+def is_installed(name: str) -> bool:
     for plugin in iter_installed():
         if name == plugin.name:
             return True
     return False
 
 
-def iter_installed():
+def iter_installed() -> Iterator[BasePlugin]:
     yield from Plugins.iter_installed()
 
 
-def enable(config, name):
+def enable(config: Dict[str, Any], name: str) -> None:
     if not is_installed(name):
         raise exceptions.TutorError("plugin '{}' is not installed.".format(name))
     if is_enabled(config, name):
@@ -257,7 +282,7 @@ def enable(config, name):
     config[CONFIG_KEY].sort()
 
 
-def disable(config, name):
+def disable(config: Dict[str, Any], name: str) -> None:
     fmt.echo_info("Disabling plugin {}...".format(name))
     for plugin in Plugins(config).iter_enabled():
         if name == plugin.name:
@@ -271,17 +296,19 @@ def disable(config, name):
     fmt.echo_info("    Plugin disabled")
 
 
-def iter_enabled(config):
+def iter_enabled(config: Dict[str, Any]) -> Iterator[BasePlugin]:
     yield from Plugins(config).iter_enabled()
 
 
-def is_enabled(config, name):
+def is_enabled(config: Dict[str, Any], name: str) -> bool:
     return name in config.get(CONFIG_KEY, [])
 
 
-def iter_patches(config, name):
+def iter_patches(config: Dict[str, str], name: str) -> Iterator[Tuple[str, str]]:
     yield from Plugins(config).iter_patches(name)
 
 
-def iter_hooks(config, hook_name):
+def iter_hooks(
+    config: Dict[str, Any], hook_name: str
+) -> Iterator[Tuple[str, Union[Dict[str, str], List[str]]]]:
     yield from Plugins(config).iter_hooks(hook_name)

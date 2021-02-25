@@ -7,16 +7,17 @@ import string
 import struct
 import subprocess
 import sys
+from typing import List, Tuple
 
 import click
-from Crypto.PublicKey import RSA
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
+from Crypto.PublicKey import RSA
+from Crypto.PublicKey.RSA import RsaKey
 
-from . import exceptions
-from . import fmt
+from . import exceptions, fmt
 
 
-def encrypt(text):
+def encrypt(text: str) -> str:
     """
     Encrypt some textual content with bcrypt.
     https://pycryptodome.readthedocs.io/en/latest/src/protocol/kdf.html#bcrypt
@@ -26,7 +27,7 @@ def encrypt(text):
     return bcrypt(text.encode(), 12).decode()
 
 
-def verify_encrypted(encrypted, text):
+def verify_encrypted(encrypted: str, text: str) -> bool:
     """
     Return True/False if the encrypted content corresponds to the unencrypted text.
     """
@@ -37,7 +38,7 @@ def verify_encrypted(encrypted, text):
         return False
 
 
-def ensure_file_directory_exists(path):
+def ensure_file_directory_exists(path: str) -> None:
     """
     Create file's base directory if it does not exist.
     """
@@ -46,17 +47,17 @@ def ensure_file_directory_exists(path):
         os.makedirs(directory)
 
 
-def random_string(length):
+def random_string(length: int) -> str:
     return "".join(
         [random.choice(string.ascii_letters + string.digits) for _ in range(length)]
     )
 
 
-def list_if(services):
+def list_if(services: List[Tuple[str, bool]]) -> str:
     return json.dumps([service[0] for service in services if service[1]])
 
 
-def common_domain(d1, d2):
+def common_domain(d1: str, d2: str) -> str:
     """
     Return the common domain between two domain names.
 
@@ -73,7 +74,7 @@ def common_domain(d1, d2):
     return ".".join(common[::-1])
 
 
-def reverse_host(domain):
+def reverse_host(domain: str) -> str:
     """
     Return the reverse domain name, java-style.
 
@@ -82,7 +83,7 @@ def reverse_host(domain):
     return ".".join(domain.split(".")[::-1])
 
 
-def rsa_private_key(bits=2048):
+def rsa_private_key(bits: int = 2048) -> str:
     """
     Export an RSA private key in PEM format.
     """
@@ -90,20 +91,20 @@ def rsa_private_key(bits=2048):
     return key.export_key().decode()
 
 
-def rsa_import_key(key):
+def rsa_import_key(key: str) -> RsaKey:
     """
     Import PEM-formatted RSA key and return the corresponding object.
     """
     return RSA.import_key(key.encode())
 
 
-def long_to_base64(n):
+def long_to_base64(n: int) -> str:
     """
     Borrowed from jwkest.__init__
     """
 
-    def long2intarr(long_int):
-        _bytes = []
+    def long2intarr(long_int: int) -> List[int]:
+        _bytes: List[int] = []
         while long_int:
             long_int, r = divmod(long_int, 256)
             _bytes.insert(0, r)
@@ -117,16 +118,7 @@ def long_to_base64(n):
     return s.decode("ascii")
 
 
-def walk_files(path):
-    """
-    Iterate on file paths located in directory.
-    """
-    for dirpath, _, filenames in os.walk(path):
-        for filename in filenames:
-            yield os.path.join(dirpath, filename)
-
-
-def is_root():
+def is_root() -> bool:
     """
     Check whether tutor is being run as root/sudo.
     """
@@ -136,7 +128,7 @@ def is_root():
     return get_user_id() == 0
 
 
-def get_user_id():
+def get_user_id() -> int:
     """
     Portable way to get user ID. Note: I have no idea if it actually works on windows...
     """
@@ -146,14 +138,14 @@ def get_user_id():
     return os.getuid()
 
 
-def docker_run(*command):
+def docker_run(*command: str) -> int:
     args = ["run", "--rm"]
     if is_a_tty():
         args.append("-it")
     return docker(*args, *command)
 
 
-def docker(*command):
+def docker(*command: str) -> int:
     if shutil.which("docker") is None:
         raise exceptions.TutorError(
             "docker is not installed. Please follow instructions from https://docs.docker.com/install/"
@@ -161,7 +153,7 @@ def docker(*command):
     return execute("docker", *command)
 
 
-def docker_compose(*command):
+def docker_compose(*command: str) -> int:
     if shutil.which("docker-compose") is None:
         raise exceptions.TutorError(
             "docker-compose is not installed. Please follow instructions from https://docs.docker.com/compose/install/"
@@ -169,7 +161,7 @@ def docker_compose(*command):
     return execute("docker-compose", *command)
 
 
-def kubectl(*command):
+def kubectl(*command: str) -> int:
     if shutil.which("kubectl") is None:
         raise exceptions.TutorError(
             "kubectl is not installed. Please follow instructions from https://kubernetes.io/docs/tasks/tools/install-kubectl/"
@@ -177,7 +169,7 @@ def kubectl(*command):
     return execute("kubectl", *command)
 
 
-def is_a_tty():
+def is_a_tty() -> bool:
     """
     Return True if stdin is able to allocate a tty. Tty allocation sometimes cannot be
     enabled, for instance in cron jobs
@@ -185,7 +177,7 @@ def is_a_tty():
     return os.isatty(sys.stdin.fileno())
 
 
-def execute(*command):
+def execute(*command: str) -> int:
     click.echo(fmt.command(" ".join(command)))
     with subprocess.Popen(command) as p:
         try:
@@ -204,9 +196,10 @@ def execute(*command):
             raise exceptions.TutorError(
                 "Command failed with status {}: {}".format(result, " ".join(command))
             )
+    return result
 
 
-def check_output(*command):
+def check_output(*command: str) -> bytes:
     click.echo(fmt.command(" ".join(command)))
     try:
         return subprocess.check_output(command)

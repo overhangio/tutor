@@ -6,7 +6,7 @@ import click_repl
     short_help="Interactive shell",
     help="Launch an interactive shell for launching Tutor commands",
 )
-def ui():
+def ui() -> None:
     click.echo(
         """Welcome to the Tutor interactive shell UI!
 Type "help" to view all available commands.

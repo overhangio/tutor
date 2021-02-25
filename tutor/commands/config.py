@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 import click
 
 from .. import config as tutor_config
@@ -6,6 +8,7 @@ from .. import exceptions
 from .. import fmt
 from .. import interactive as interactive_config
 from .. import serialize
+from .context import Context
 
 
 @click.group(
@@ -13,7 +16,7 @@ from .. import serialize
     short_help="Configure Open edX",
     help="""Configure Open edX and store configuration values in $TUTOR_ROOT/config.yml""",
 )
-def config_command():
+def config_command() -> None:
     pass
 
 
@@ -36,7 +39,9 @@ def config_command():
     help="Remove a configuration value (can be used multiple times)",
 )
 @click.pass_obj
-def save(context, interactive, set_vars, unset_vars):
+def save(
+    context: Context, interactive: bool, set_vars: Dict[str, Any], unset_vars: List[str]
+) -> None:
     config, defaults = interactive_config.load_all(
         context.root, interactive=interactive
     )
@@ -61,7 +66,7 @@ def save(context, interactive, set_vars, unset_vars):
 @click.argument("src", type=click.Path(exists=True, resolve_path=True))
 @click.argument("dst")
 @click.pass_obj
-def render(context, extra_configs, src, dst):
+def render(context: Context, extra_configs: List[str], src: str, dst: str) -> None:
     config = tutor_config.load(context.root)
     for extra_config in extra_configs:
         tutor_config.merge(
@@ -75,14 +80,14 @@ def render(context, extra_configs, src, dst):
 
 @click.command(help="Print the project root")
 @click.pass_obj
-def printroot(context):
+def printroot(context: Context) -> None:
     click.echo(context.root)
 
 
 @click.command(help="Print a configuration value")
 @click.argument("key")
 @click.pass_obj
-def printvalue(context, key):
+def printvalue(context: Context, key: str) -> None:
     config = tutor_config.load(context.root)
     try:
         # Note that this will incorrectly print None values

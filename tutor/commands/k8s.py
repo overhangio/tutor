@@ -1,5 +1,6 @@
 from datetime import datetime
 from time import sleep
+from typing import cast, Any, Dict, List, Optional, Type
 
 import click
 
@@ -11,286 +12,13 @@ from .. import interactive as interactive_config
 from .. import jobs
 from .. import serialize
 from .. import utils
-
-
-@click.group(help="Run Open edX on Kubernetes")
-def k8s():
-    pass
-
-
-@click.command(help="Configure and run Open edX from scratch")
-@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
-@click.pass_obj
-def quickstart(context, non_interactive):
-    click.echo(fmt.title("Interactive platform configuration"))
-    config = interactive_config.update(context.root, interactive=(not non_interactive))
-    if not config["RUN_CADDY"]:
-        fmt.echo_alert(
-            "Potentially invalid configuration: RUN_CADDY=false\n"
-            "This setting might have been defined because you previously set WEB_PROXY=true. This is no longer"
-            " necessary in order to get Tutor to work on Kubernetes. In Tutor v11+ a Caddy-based load balancer is"
-            " provided out of the box to handle SSL/TLS certificate generation at runtime. If you disable this"
-            " service, you will have to configure an Ingress resource and a certificate manager yourself to redirect"
-            " traffic to the nginx service. See the Kubernetes section in the Tutor documentation for more"
-            " information."
-        )
-    click.echo(fmt.title("Updating the current environment"))
-    tutor_env.save(context.root, config)
-    click.echo(fmt.title("Starting the platform"))
-    start.callback()
-    click.echo(fmt.title("Database creation and migrations"))
-    init.callback(limit=None)
-    fmt.echo_info(
-        """Your Open edX platform is ready and can be accessed at the following urls:
-
-    {http}://{lms_host}
-    {http}://{cms_host}
-    """.format(
-            http="https" if config["ENABLE_HTTPS"] else "http",
-            lms_host=config["LMS_HOST"],
-            cms_host=config["CMS_HOST"],
-        )
-    )
-
-
-@click.command(help="Run all configured Open edX services")
-@click.pass_obj
-def start(context):
-    # Create namespace
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--wait",
-        "--selector",
-        "app.kubernetes.io/component=namespace",
-    )
-    # Create volumes
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--wait",
-        "--selector",
-        "app.kubernetes.io/component=volume",
-    )
-    # Create everything else except jobs
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--selector",
-        # Here use `notin (job, xxx)` when there are other components to ignore
-        "app.kubernetes.io/component!=job",
-    )
-
-
-@click.command(help="Stop a running platform")
-@click.pass_obj
-def stop(context):
-    config = tutor_config.load(context.root)
-    utils.kubectl(
-        "delete",
-        *resource_selector(config),
-        "deployments,services,configmaps,jobs",
-    )
-
-
-@click.command(help="Reboot an existing platform")
-def reboot():
-    stop.callback()
-    start.callback()
-
-
-def resource_selector(config, *selectors):
-    """
-    Convenient utility for filtering only the resources that belong to this project.
-    """
-    selector = ",".join(
-        ["app.kubernetes.io/instance=openedx-" + config["ID"]] + list(selectors)
-    )
-    return ["--namespace", config["K8S_NAMESPACE"], "--selector=" + selector]
-
-
-@click.command(help="Completely delete an existing platform")
-@click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
-@click.pass_obj
-def delete(context, yes):
-    if not yes:
-        click.confirm(
-            "Are you sure you want to delete the platform? All data will be removed.",
-            abort=True,
-        )
-    utils.kubectl(
-        "delete",
-        "-k",
-        tutor_env.pathjoin(context.root),
-        "--ignore-not-found=true",
-        "--wait",
-    )
-
-
-@click.command(help="Initialise all applications")
-@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
-@click.pass_obj
-def init(context, limit):
-    config = tutor_config.load(context.root)
-    runner = K8sJobRunner(context.root, config)
-    for service in ["mysql", "elasticsearch", "mongodb"]:
-        if tutor_config.is_service_activated(config, service):
-            wait_for_pod_ready(config, service)
-    jobs.initialise(runner, limit_to=limit)
-
-
-@click.command(help="Create an Open edX user and interactively set their password")
-@click.option("--superuser", is_flag=True, help="Make superuser")
-@click.option("--staff", is_flag=True, help="Make staff user")
-@click.option(
-    "-p",
-    "--password",
-    help="Specify password from the command line. If undefined, you will be prompted to input a password",
-)
-@click.argument("name")
-@click.argument("email")
-@click.pass_obj
-def createuser(context, superuser, staff, password, name, email):
-    config = tutor_config.load(context.root)
-    command = jobs.create_user_command(superuser, staff, name, email, password=password)
-    # This needs to be interactive in case the user needs to type a password
-    kubectl_exec(config, "lms", command, attach=True)
-
-
-@click.command(help="Import the demo course")
-@click.pass_obj
-def importdemocourse(context):
-    fmt.echo_info("Importing demo course")
-    config = tutor_config.load(context.root)
-    runner = K8sJobRunner(context.root, config)
-    jobs.import_demo_course(runner)
-
-
-@click.command(
-    help="Set a theme for a given domain name. To reset to the default theme , use 'default' as the theme name."
-)
-@click.argument("theme_name")
-@click.argument("domain_names", metavar="domain_name", nargs=-1)
-@click.pass_obj
-def settheme(context, theme_name, domain_names):
-    config = tutor_config.load(context.root)
-    runner = K8sJobRunner(context.root, config)
-    for domain_name in domain_names:
-        jobs.set_theme(theme_name, domain_name, runner)
-
-
-@click.command(name="exec", help="Execute a command in a pod of the given application")
-@click.argument("service")
-@click.argument("command")
-@click.pass_obj
-def exec_command(context, service, command):
-    config = tutor_config.load(context.root)
-    kubectl_exec(config, service, command, attach=True)
-
-
-@click.command(help="View output from containers")
-@click.option("-c", "--container", help="Print the logs of this specific container")
-@click.option("-f", "--follow", is_flag=True, help="Follow log output")
-@click.option("--tail", type=int, help="Number of lines to show from each container")
-@click.argument("service")
-@click.pass_obj
-def logs(context, container, follow, tail, service):
-    config = tutor_config.load(context.root)
-
-    command = ["logs"]
-    selectors = ["app.kubernetes.io/name=" + service] if service else []
-    command += resource_selector(config, *selectors)
-
-    if container:
-        command += ["-c", container]
-    if follow:
-        command += ["--follow"]
-    if tail is not None:
-        command += ["--tail", str(tail)]
-
-    utils.kubectl(*command)
-
-
-@click.command(help="Wait for a pod to become ready")
-@click.argument("name")
-@click.pass_obj
-def wait(context, name):
-    config = tutor_config.load(context.root)
-    wait_for_pod_ready(config, name)
-
-
-@click.command(help="Upgrade from a previous Open edX named release")
-@click.option(
-    "--from", "from_version", default="ironwood", type=click.Choice(["ironwood"])
-)
-@click.pass_obj
-def upgrade(context, from_version):
-    config = tutor_config.load(context.root)
-
-    running_version = from_version
-    if running_version == "ironwood":
-        upgrade_from_ironwood(config)
-        running_version = "juniper"
-
-    if running_version == "juniper":
-
-        running_version = "koa"
-
-
-def upgrade_from_ironwood(config):
-    if not config["RUN_MONGODB"]:
-        fmt.echo_info(
-            "You are not running MongDB (RUN_MONGODB=false). It is your "
-            "responsibility to upgrade your MongoDb instance to v3.6. There is "
-            "nothing left to do to upgrade from Ironwood."
-        )
-        return
-    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Ironwood, you should upgrade
-your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
-
-    # Upgrade from v3.2 to v3.4
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.4.24
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.4" })'
-
-    # Upgrade from v3.4 to v3.6
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.6.18
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })'
-
-    tutor config save --unset DOCKER_IMAGE_MONGODB"""
-    fmt.echo_info(message)
-
-
-def upgrade_from_juniper(config):
-    if not config["RUN_MYSQL"]:
-        fmt.echo_info(
-            "You are not running MySQL (RUN_MYSQL=false). It is your "
-            "responsibility to upgrade your MySQL instance to v5.7. There is "
-            "nothing left to do to upgrade from Juniper."
-        )
-        return
-
-    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Juniper, you should upgrade
-your MySQL database from v5.6 to v5.7. You should run something similar to:
-
-    tutor k8s start
-    tutor k8s exec mysql bash -e -c "mysql_upgrade \
-        -u $(tutor config printvalue MYSQL_ROOT_USERNAME) \
-        --password='$(tutor config printvalue MYSQL_ROOT_PASSWORD)'
-"""
-    fmt.echo_info(message)
+from .context import Context
 
 
 class K8sClients:
     _instance = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Loading the kubernetes module here to avoid import overhead
         from kubernetes import client, config  # pylint: disable=import-outside-toplevel
 
@@ -300,33 +28,34 @@ class K8sClients:
         self._client = client
 
     @classmethod
-    def instance(cls):
+    def instance(cls: Type["K8sClients"]) -> "K8sClients":
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
 
     @property
-    def batch_api(self):
+    def batch_api(self):  # type: ignore
         if self._batch_api is None:
             self._batch_api = self._client.BatchV1Api()
         return self._batch_api
 
     @property
-    def core_api(self):
+    def core_api(self):  # type: ignore
         if self._core_api is None:
             self._core_api = self._client.CoreV1Api()
         return self._core_api
 
 
 class K8sJobRunner(jobs.BaseJobRunner):
-    def load_job(self, name):
-        jobs = self.render("k8s", "jobs.yml")
-        for job in serialize.load_all(jobs):
-            if job["metadata"]["name"] == name:
+    def load_job(self, name: str) -> Any:
+        all_jobs = self.render("k8s", "jobs.yml")
+        for job in serialize.load_all(all_jobs):
+            job_name = cast(str, job["metadata"]["name"])
+            if job_name == name:
                 return job
         raise ValueError("Could not find job '{}'".format(name))
 
-    def active_job_names(self):
+    def active_job_names(self) -> List[str]:
         """
         Return a list of active job names
         Docs:
@@ -339,7 +68,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             if job.status.active
         ]
 
-    def run_job(self, service, command):
+    def run_job(self, service: str, command: str) -> int:
         job_name = "{}-job".format(service)
         try:
             job = self.load_job(job_name)
@@ -361,8 +90,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             )
             fmt.echo_alert(message)
             wait_for_pod_ready(self.config, service)
-            kubectl_exec(self.config, service, command)
-            return
+            return kubectl_exec(self.config, service, command)
         # Create a unique job name to make it deduplicate jobs and make it easier to
         # find later. Logs of older jobs will remain available for some time.
         job_name += "-" + datetime.now().strftime("%Y%m%d%H%M%S")
@@ -417,12 +145,12 @@ class K8sJobRunner(jobs.BaseJobRunner):
         # Wait for completion
         field_selector = "metadata.name={}".format(job_name)
         while True:
-            jobs = K8sClients.instance().batch_api.list_namespaced_job(
+            namespaced_jobs = K8sClients.instance().batch_api.list_namespaced_job(
                 self.config["K8S_NAMESPACE"], field_selector=field_selector
             )
-            if not jobs.items:
+            if not namespaced_jobs.items:
                 continue
-            job = jobs.items[0]
+            job = namespaced_jobs.items[0]
             if not job.status.active:
                 if job.status.succeeded:
                     fmt.echo_info("Job {} successful.".format(job_name))
@@ -434,9 +162,292 @@ class K8sJobRunner(jobs.BaseJobRunner):
                         )
                     )
             sleep(5)
+        return 0
 
 
-def kubectl_exec(config, service, command, attach=False):
+@click.group(help="Run Open edX on Kubernetes")
+def k8s() -> None:
+    pass
+
+
+@click.command(help="Configure and run Open edX from scratch")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.pass_context
+def quickstart(context: click.Context, non_interactive: bool) -> None:
+    click.echo(fmt.title("Interactive platform configuration"))
+    config = interactive_config.update(
+        context.obj.root, interactive=(not non_interactive)
+    )
+    if not config["RUN_CADDY"]:
+        fmt.echo_alert(
+            "Potentially invalid configuration: RUN_CADDY=false\n"
+            "This setting might have been defined because you previously set WEB_PROXY=true. This is no longer"
+            " necessary in order to get Tutor to work on Kubernetes. In Tutor v11+ a Caddy-based load balancer is"
+            " provided out of the box to handle SSL/TLS certificate generation at runtime. If you disable this"
+            " service, you will have to configure an Ingress resource and a certificate manager yourself to redirect"
+            " traffic to the nginx service. See the Kubernetes section in the Tutor documentation for more"
+            " information."
+        )
+    click.echo(fmt.title("Updating the current environment"))
+    tutor_env.save(context.obj.root, config)
+    click.echo(fmt.title("Starting the platform"))
+    context.invoke(start)
+    click.echo(fmt.title("Database creation and migrations"))
+    context.invoke(init, limit=None)
+    fmt.echo_info(
+        """Your Open edX platform is ready and can be accessed at the following urls:
+
+    {http}://{lms_host}
+    {http}://{cms_host}
+    """.format(
+            http="https" if config["ENABLE_HTTPS"] else "http",
+            lms_host=config["LMS_HOST"],
+            cms_host=config["CMS_HOST"],
+        )
+    )
+
+
+@click.command(help="Run all configured Open edX services")
+@click.pass_obj
+def start(context: Context) -> None:
+    # Create namespace
+    utils.kubectl(
+        "apply",
+        "--kustomize",
+        tutor_env.pathjoin(context.root),
+        "--wait",
+        "--selector",
+        "app.kubernetes.io/component=namespace",
+    )
+    # Create volumes
+    utils.kubectl(
+        "apply",
+        "--kustomize",
+        tutor_env.pathjoin(context.root),
+        "--wait",
+        "--selector",
+        "app.kubernetes.io/component=volume",
+    )
+    # Create everything else except jobs
+    utils.kubectl(
+        "apply",
+        "--kustomize",
+        tutor_env.pathjoin(context.root),
+        "--selector",
+        # Here use `notin (job, xxx)` when there are other components to ignore
+        "app.kubernetes.io/component!=job",
+    )
+
+
+@click.command(help="Stop a running platform")
+@click.pass_obj
+def stop(context: Context) -> None:
+    config = tutor_config.load(context.root)
+    utils.kubectl(
+        "delete",
+        *resource_selector(config),
+        "deployments,services,configmaps,jobs",
+    )
+
+
+@click.command(help="Reboot an existing platform")
+@click.pass_context
+def reboot(context: click.Context) -> None:
+    context.invoke(stop)
+    context.invoke(start)
+
+
+def resource_selector(config: Dict[str, str], *selectors: str) -> List[str]:
+    """
+    Convenient utility for filtering only the resources that belong to this project.
+    """
+    selector = ",".join(
+        ["app.kubernetes.io/instance=openedx-" + config["ID"]] + list(selectors)
+    )
+    return ["--namespace", config["K8S_NAMESPACE"], "--selector=" + selector]
+
+
+@click.command(help="Completely delete an existing platform")
+@click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
+@click.pass_obj
+def delete(context: Context, yes: bool) -> None:
+    if not yes:
+        click.confirm(
+            "Are you sure you want to delete the platform? All data will be removed.",
+            abort=True,
+        )
+    utils.kubectl(
+        "delete",
+        "-k",
+        tutor_env.pathjoin(context.root),
+        "--ignore-not-found=true",
+        "--wait",
+    )
+
+
+@click.command(help="Initialise all applications")
+@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
+@click.pass_obj
+def init(context: Context, limit: Optional[str]) -> None:
+    config = tutor_config.load(context.root)
+    runner = K8sJobRunner(context.root, config)
+    for service in ["mysql", "elasticsearch", "mongodb"]:
+        if tutor_config.is_service_activated(config, service):
+            wait_for_pod_ready(config, service)
+    jobs.initialise(runner, limit_to=limit)
+
+
+@click.command(help="Create an Open edX user and interactively set their password")
+@click.option("--superuser", is_flag=True, help="Make superuser")
+@click.option("--staff", is_flag=True, help="Make staff user")
+@click.option(
+    "-p",
+    "--password",
+    help="Specify password from the command line. If undefined, you will be prompted to input a password",
+)
+@click.argument("name")
+@click.argument("email")
+@click.pass_obj
+def createuser(
+    context: Context, superuser: str, staff: bool, password: str, name: str, email: str
+) -> None:
+    config = tutor_config.load(context.root)
+    command = jobs.create_user_command(superuser, staff, name, email, password=password)
+    # This needs to be interactive in case the user needs to type a password
+    kubectl_exec(config, "lms", command, attach=True)
+
+
+@click.command(help="Import the demo course")
+@click.pass_obj
+def importdemocourse(context: Context) -> None:
+    fmt.echo_info("Importing demo course")
+    config = tutor_config.load(context.root)
+    runner = K8sJobRunner(context.root, config)
+    jobs.import_demo_course(runner)
+
+
+@click.command(
+    help="Set a theme for a given domain name. To reset to the default theme , use 'default' as the theme name."
+)
+@click.argument("theme_name")
+@click.argument("domain_names", metavar="domain_name", nargs=-1)
+@click.pass_obj
+def settheme(context: Context, theme_name: str, domain_names: List[str]) -> None:
+    config = tutor_config.load(context.root)
+    runner = K8sJobRunner(context.root, config)
+    for domain_name in domain_names:
+        jobs.set_theme(theme_name, domain_name, runner)
+
+
+@click.command(name="exec", help="Execute a command in a pod of the given application")
+@click.argument("service")
+@click.argument("command")
+@click.pass_obj
+def exec_command(context: Context, service: str, command: str) -> None:
+    config = tutor_config.load(context.root)
+    kubectl_exec(config, service, command, attach=True)
+
+
+@click.command(help="View output from containers")
+@click.option("-c", "--container", help="Print the logs of this specific container")
+@click.option("-f", "--follow", is_flag=True, help="Follow log output")
+@click.option("--tail", type=int, help="Number of lines to show from each container")
+@click.argument("service")
+@click.pass_obj
+def logs(
+    context: Context, container: str, follow: bool, tail: bool, service: str
+) -> None:
+    config = tutor_config.load(context.root)
+
+    command = ["logs"]
+    selectors = ["app.kubernetes.io/name=" + service] if service else []
+    command += resource_selector(config, *selectors)
+
+    if container:
+        command += ["-c", container]
+    if follow:
+        command += ["--follow"]
+    if tail is not None:
+        command += ["--tail", str(tail)]
+
+    utils.kubectl(*command)
+
+
+@click.command(help="Wait for a pod to become ready")
+@click.argument("name")
+@click.pass_obj
+def wait(context: Context, name: str) -> None:
+    config = tutor_config.load(context.root)
+    wait_for_pod_ready(config, name)
+
+
+@click.command(help="Upgrade from a previous Open edX named release")
+@click.option(
+    "--from", "from_version", default="ironwood", type=click.Choice(["ironwood"])
+)
+@click.pass_obj
+def upgrade(context: Context, from_version: str) -> None:
+    config = tutor_config.load(context.root)
+
+    running_version = from_version
+    if running_version == "ironwood":
+        upgrade_from_ironwood(config)
+        running_version = "juniper"
+
+    if running_version == "juniper":
+        running_version = "koa"
+
+
+def upgrade_from_ironwood(config: Dict[str, Any]) -> None:
+    if not config["RUN_MONGODB"]:
+        fmt.echo_info(
+            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "responsibility to upgrade your MongoDb instance to v3.6. There is "
+            "nothing left to do to upgrade from Ironwood."
+        )
+        return
+    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Ironwood, you should upgrade
+your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
+
+    # Upgrade from v3.2 to v3.4
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.4.24
+    tutor k8s start
+    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.4" })'
+
+    # Upgrade from v3.4 to v3.6
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.6.18
+    tutor k8s start
+    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })'
+
+    tutor config save --unset DOCKER_IMAGE_MONGODB"""
+    fmt.echo_info(message)
+
+
+def upgrade_from_juniper(config: Dict[str, Any]) -> None:
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v5.7. There is "
+            "nothing left to do to upgrade from Juniper."
+        )
+        return
+
+    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Juniper, you should upgrade
+your MySQL database from v5.6 to v5.7. You should run something similar to:
+
+    tutor k8s start
+    tutor k8s exec mysql bash -e -c "mysql_upgrade \
+        -u $(tutor config printvalue MYSQL_ROOT_USERNAME) \
+        --password='$(tutor config printvalue MYSQL_ROOT_PASSWORD)'
+"""
+    fmt.echo_info(message)
+
+
+def kubectl_exec(
+    config: Dict[str, Any], service: str, command: str, attach: bool = False
+) -> int:
     selector = "app.kubernetes.io/name={}".format(service)
     pods = K8sClients.instance().core_api.list_namespaced_pod(
         namespace=config["K8S_NAMESPACE"], label_selector=selector
@@ -449,7 +460,7 @@ def kubectl_exec(config, service, command, attach=False):
 
     # Run command
     attach_opts = ["-i", "-t"] if attach else []
-    utils.kubectl(
+    return utils.kubectl(
         "exec",
         *attach_opts,
         "--namespace",
@@ -463,7 +474,7 @@ def kubectl_exec(config, service, command, attach=False):
     )
 
 
-def wait_for_pod_ready(config, service):
+def wait_for_pod_ready(config: Dict[str, str], service: str) -> None:
     fmt.echo_info("Waiting for a {} pod to be ready...".format(service))
     utils.kubectl(
         "wait",

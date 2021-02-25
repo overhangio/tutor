@@ -1,3 +1,5 @@
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+
 from . import env
 from . import fmt
 from . import plugins
@@ -9,25 +11,30 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 
 class BaseJobRunner:
-    def __init__(self, root, config):
+    def __init__(self, root: str, config: Dict[str, Any]):
         self.root = root
         self.config = config
 
-    def run_job_from_template(self, service, *path):
+    def run_job_from_template(self, service: str, *path: str) -> None:
         command = self.render(*path)
         self.run_job(service, command)
 
-    def render(self, *path):
-        return env.render_file(self.config, *path).strip()
+    def render(self, *path: str) -> str:
+        rendered = env.render_file(self.config, *path).strip()
+        if isinstance(rendered, bytes):
+            raise TypeError("Cannot load job from binary file")
+        return rendered
 
-    def run_job(self, service, command):
+    def run_job(self, service: str, command: str) -> int:
         raise NotImplementedError
 
-    def iter_plugin_hooks(self, hook):
+    def iter_plugin_hooks(
+        self, hook: str
+    ) -> Iterator[Tuple[str, Union[Dict[str, str], List[str]]]]:
         yield from plugins.iter_hooks(self.config, hook)
 
 
-def initialise(runner, limit_to=None):
+def initialise(runner: BaseJobRunner, limit_to: Optional[str] = None) -> None:
     fmt.echo_info("Initialising all services...")
     if limit_to is None or limit_to == "mysql":
         runner.run_job_from_template("mysql", "hooks", "mysql", "init")
@@ -60,7 +67,13 @@ def initialise(runner, limit_to=None):
     fmt.echo_info("All services initialised.")
 
 
-def create_user_command(superuser, staff, username, email, password=None):
+def create_user_command(
+    superuser: str,
+    staff: bool,
+    username: str,
+    email: str,
+    password: Optional[str] = None,
+) -> str:
     command = BASE_OPENEDX_COMMAND
 
     opts = ""
@@ -86,11 +99,11 @@ u.save()"
     return command.format(opts=opts, username=username, email=email, password=password)
 
 
-def import_demo_course(runner):
+def import_demo_course(runner: BaseJobRunner) -> None:
     runner.run_job_from_template("cms", "hooks", "cms", "importdemocourse")
 
 
-def set_theme(theme_name, domain_name, runner):
+def set_theme(theme_name: str, domain_name: str, runner: BaseJobRunner) -> None:
     command = BASE_OPENEDX_COMMAND
     command += """
 echo "Assigning theme {theme_name} to {domain_name}..."

@@ -51,6 +51,12 @@ markupsafe==1.1.1
     # via
     #   -r requirements/base.txt
     #   jinja2
+mypy-extensions==0.4.3
+    # via
+    #   -r requirements/base.txt
+    #   mypy
+mypy==0.812
+    # via -r requirements/base.txt
 oauthlib==3.1.0
     # via
     #   -r requirements/base.txt
@@ -128,6 +134,14 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
+typed-ast==1.4.2
+    # via
+    #   -r requirements/base.txt
+    #   mypy
+typing-extensions==3.7.4.3
+    # via
+    #   -r requirements/base.txt
+    #   mypy
 urllib3==1.25.11
     # via
     #   -r requirements/base.txt

@@ -4,6 +4,7 @@ import platform
 import subprocess
 import sys
 import tarfile
+from typing import Any, Dict
 from urllib.request import urlopen
 
 import click
@@ -13,12 +14,13 @@ import click
 from .. import fmt
 from .. import env as tutor_env
 from .. import serialize
+from .context import Context
 
 
 @click.group(
     short_help="Web user interface", help="""Run Tutor commands from a web terminal"""
 )
-def webui():
+def webui() -> None:
     pass
 
 
@@ -35,7 +37,7 @@ def webui():
     "-h", "--host", default="0.0.0.0", show_default=True, help="Host address to listen"
 )
 @click.pass_obj
-def start(context, port, host):
+def start(context: Context, port: int, host: str) -> None:
     check_gotty_binary(context.root)
     fmt.echo_info("Access the Tutor web UI at http://{}:{}".format(host, port))
     while True:
@@ -86,7 +88,7 @@ def start(context, port, host):
     help="Authentication password",
 )
 @click.pass_obj
-def configure(context, user, password):
+def configure(context: Context, user: str, password: str) -> None:
     save_webui_config_file(context.root, {"user": user, "password": password})
     fmt.echo_info(
         "The web UI configuration has been updated. "
@@ -95,7 +97,7 @@ def configure(context, user, password):
     )
 
 
-def check_gotty_binary(root):
+def check_gotty_binary(root: str) -> None:
     path = gotty_path(root)
     if os.path.exists(path):
         return
@@ -119,7 +121,7 @@ def check_gotty_binary(root):
     compressed.extract("./gotty", dirname)
 
 
-def load_config(root):
+def load_config(root: str) -> Dict[str, Any]:
     path = config_path(root)
     if not os.path.exists(path):
         save_webui_config_file(root, {"user": None, "password": None})
@@ -127,7 +129,7 @@ def load_config(root):
         return serialize.load(f)
 
 
-def save_webui_config_file(root, config):
+def save_webui_config_file(root: str, config: Dict[str, Any]) -> None:
     path = config_path(root)
     directory = os.path.dirname(path)
     if not os.path.exists(directory):
@@ -136,15 +138,15 @@ def save_webui_config_file(root, config):
         serialize.dump(config, of)
 
 
-def gotty_path(root):
+def gotty_path(root: str) -> str:
     return get_path(root, "gotty")
 
 
-def config_path(root):
+def config_path(root: str) -> str:
     return get_path(root, "config.yml")
 
 
-def get_path(root, filename):
+def get_path(root: str, filename: str) -> str:
     return tutor_env.pathjoin(root, "webui", filename)
 
 

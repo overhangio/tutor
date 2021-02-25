@@ -1,6 +1,7 @@
 import codecs
 from copy import deepcopy
 import os
+from typing import Dict, Any, Iterable, List, Optional, Type, Union
 
 import jinja2
 import pkg_resources
@@ -19,7 +20,7 @@ BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf", ".woff", ".woff2"]
 
 class Renderer:
     @classmethod
-    def instance(cls, config):
+    def instance(cls: Type["Renderer"], config: Dict[str, Any]) -> "Renderer":
         # Load template roots: these are required to be able to use
         # {% include .. %} directives
         template_roots = [TEMPLATES_ROOT]
@@ -29,11 +30,12 @@ class Renderer:
 
         return cls(config, template_roots, ignore_folders=["partials"])
 
-    @classmethod
-    def reset(cls):
-        cls.INSTANCE = None
-
-    def __init__(self, config, template_roots, ignore_folders=None):
+    def __init__(
+        self,
+        config: Dict[str, Any],
+        template_roots: List[str],
+        ignore_folders: Optional[List[str]] = None,
+    ):
         self.config = deepcopy(config)
         self.template_roots = template_roots
         self.ignore_folders = ignore_folders or []
@@ -57,16 +59,16 @@ class Renderer:
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
 
-    def iter_templates_in(self, *prefix):
+    def iter_templates_in(self, *prefix: str) -> Iterable[str]:
         """
         The elements of `prefix` must contain only "/", and not os.sep.
         """
-        prefix = "/".join(prefix)
-        for template in self.environment.loader.list_templates():
-            if template.startswith(prefix) and self.is_part_of_env(template):
+        full_prefix = "/".join(prefix)
+        for template in self.environment.loader.list_templates():  # type: ignore
+            if template.startswith(full_prefix) and self.is_part_of_env(template):
                 yield template
 
-    def walk_templates(self, subdir):
+    def walk_templates(self, subdir: str) -> Iterable[str]:
         """
         Iterate on the template files from `templates/<subdir>`.
 
@@ -75,7 +77,7 @@ class Renderer:
         """
         yield from self.iter_templates_in(subdir + "/")
 
-    def is_part_of_env(self, path):
+    def is_part_of_env(self, path: str) -> bool:
         """
         Determines whether a template should be rendered or not. Note that here we don't
         rely on the OS separator, as we are handling templates
@@ -91,7 +93,7 @@ class Renderer:
             is_excluded = is_excluded or ignore_folder in parts
         return not is_excluded
 
-    def find_os_path(self, template_name):
+    def find_os_path(self, template_name: str) -> str:
         path = template_name.replace("/", os.sep)
         for templates_root in self.template_roots:
             full_path = os.path.join(templates_root, path)
@@ -99,7 +101,7 @@ class Renderer:
                 return full_path
         raise ValueError("Template path does not exist")
 
-    def patch(self, name, separator="\n", suffix=""):
+    def patch(self, name: str, separator: str = "\n", suffix: str = "") -> str:
         """
         Render calls to {{ patch("...") }} in environment templates from plugin patches.
         """
@@ -119,11 +121,11 @@ class Renderer:
             rendered += suffix
         return rendered
 
-    def render_str(self, text):
+    def render_str(self, text: str) -> str:
         template = self.environment.from_string(text)
         return self.__render(template)
 
-    def render_template(self, template_name):
+    def render_template(self, template_name: str) -> Union[str, bytes]:
         """
         Render a template file. Return the corresponding string. If it's a binary file
         (as indicated by its path), return bytes.
@@ -151,7 +153,7 @@ class Renderer:
             fmt.echo_error("Unknown error rendering template " + template_name)
             raise
 
-    def render_all_to(self, root, *prefix):
+    def render_all_to(self, root: str, *prefix: str) -> None:
         """
         `prefix` can be used to limit the templates to render.
         """
@@ -160,7 +162,7 @@ class Renderer:
             dst = os.path.join(root, template_name.replace("/", os.sep))
             write_to(rendered, dst)
 
-    def __render(self, template):
+    def __render(self, template: jinja2.Template) -> str:
         try:
             return template.render(**self.config)
         except jinja2.exceptions.UndefinedError as e:
@@ -169,7 +171,7 @@ class Renderer:
             )
 
 
-def save(root, config):
+def save(root: str, config: Dict[str, Any]) -> None:
     """
     Save the full environment, including version information.
     """
@@ -195,7 +197,7 @@ def save(root, config):
     fmt.echo_info("Environment generated in {}".format(base_dir(root)))
 
 
-def upgrade_obsolete(root):
+def upgrade_obsolete(root: str) -> None:
     # tutor.conf was renamed to _tutor.conf in order to be the first config file loaded
     # by nginx
     nginx_tutor_conf = pathjoin(root, "apps", "nginx", "tutor.conf")
@@ -203,7 +205,9 @@ def upgrade_obsolete(root):
         os.remove(nginx_tutor_conf)
 
 
-def save_plugin_templates(plugin, root, config):
+def save_plugin_templates(
+    plugin: plugins.BasePlugin, root: str, config: Dict[str, Any]
+) -> None:
     """
     Save plugin templates to plugins/<plugin name>/*.
     Only the "apps" and "build" subfolders are rendered.
@@ -214,7 +218,7 @@ def save_plugin_templates(plugin, root, config):
         save_all_from(subdir_path, plugins_root, config)
 
 
-def save_all_from(prefix, root, config):
+def save_all_from(prefix: str, root: str, config: Dict[str, Any]) -> None:
     """
     Render the templates that start with `prefix` and store them with the same
     hierarchy at `root`. Here, `prefix` can be the result of os.path.join(...).
@@ -223,23 +227,20 @@ def save_all_from(prefix, root, config):
     renderer.render_all_to(root, prefix.replace(os.sep, "/"))
 
 
-def write_to(content, path):
+def write_to(content: Union[str, bytes], path: str) -> None:
     """
     Write some content to a path. Content can be either str or bytes.
     """
-    open_kwargs = {"mode": "w"}
-    if isinstance(content, bytes):
-        open_kwargs["mode"] += "b"
-    else:
-        # Make files readable by Docker on Windows
-        open_kwargs["encoding"] = "utf8"
-        open_kwargs["newline"] = "\n"
     utils.ensure_file_directory_exists(path)
-    with open(path, **open_kwargs) as of:
-        of.write(content)
+    if isinstance(content, bytes):
+        with open(path, mode="wb") as of_binary:
+            of_binary.write(content)
+    else:
+        with open(path, mode="w", encoding="utf8", newline="\n") as of_text:
+            of_text.write(content)
 
 
-def render_file(config, *path):
+def render_file(config: Dict[str, Any], *path: str) -> Union[str, bytes]:
     """
     Return the rendered contents of a template.
     """
@@ -248,7 +249,7 @@ def render_file(config, *path):
     return renderer.render_template(template_name)
 
 
-def render_dict(config):
+def render_dict(config: Dict[str, Any]) -> None:
     """
     Render the values from the dict. This is useful for rendering the default
     values from config.yml.
@@ -266,13 +267,13 @@ def render_dict(config):
         config[k] = v
 
 
-def render_unknown(config, value):
+def render_unknown(config: Dict[str, Any], value: Any) -> Any:
     if isinstance(value, str):
         return render_str(config, value)
     return value
 
 
-def render_str(config, text):
+def render_str(config: Dict[str, Any], text: str) -> str:
     """
     Args:
         text (str)
@@ -284,7 +285,7 @@ def render_str(config, text):
     return Renderer.instance(config).render_str(text)
 
 
-def check_is_up_to_date(root):
+def check_is_up_to_date(root: str) -> None:
     if not is_up_to_date(root):
         message = (
             "The current environment stored at {} is not up-to-date: it is at "
@@ -298,14 +299,14 @@ def check_is_up_to_date(root):
         )
 
 
-def is_up_to_date(root):
+def is_up_to_date(root: str) -> bool:
     """
     Check if the currently rendered version is equal to the current tutor version.
     """
     return current_version(root) == __version__
 
 
-def needs_major_upgrade(root):
+def needs_major_upgrade(root: str) -> bool:
     """
     Return the current version as a tuple of int. E.g: (1, 0, 2).
     """
@@ -314,7 +315,7 @@ def needs_major_upgrade(root):
     return 0 < current < required
 
 
-def current_release(root):
+def current_release(root: str) -> str:
     """
     Return the name of the current Open edX release.
     """
@@ -323,7 +324,7 @@ def current_release(root):
     ]
 
 
-def current_version(root):
+def current_version(root: str) -> str:
     """
     Return the current environment version. If the current environment has no version,
     return "0.0.0".
@@ -334,7 +335,7 @@ def current_version(root):
     return open(path).read().strip()
 
 
-def read_template_file(*path):
+def read_template_file(*path: str) -> str:
     """
     Read raw content of template located at `path`.
     """
@@ -343,40 +344,40 @@ def read_template_file(*path):
         return fi.read()
 
 
-def is_binary_file(path):
+def is_binary_file(path: str) -> bool:
     ext = os.path.splitext(path)[1]
     return ext in BIN_FILE_EXTENSIONS
 
 
-def template_path(*path, templates_root=TEMPLATES_ROOT):
+def template_path(*path: str, templates_root: str = TEMPLATES_ROOT) -> str:
     """
     Return the template file's absolute path.
     """
     return os.path.join(templates_root, *path)
 
 
-def data_path(root, *path):
+def data_path(root: str, *path: str) -> str:
     """
     Return the file's absolute path inside the data directory.
     """
     return os.path.join(root_dir(root), "data", *path)
 
 
-def pathjoin(root, *path):
+def pathjoin(root: str, *path: str) -> str:
     """
     Return the file's absolute path inside the environment.
     """
     return os.path.join(base_dir(root), *path)
 
 
-def base_dir(root):
+def base_dir(root: str) -> str:
     """
     Return the environment base directory.
     """
     return os.path.join(root_dir(root), "env")
 
 
-def root_dir(root):
+def root_dir(root: str) -> str:
     """
     Return the project root directory.
     """

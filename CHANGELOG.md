@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Annotate types all over the Tutor code base.
 - [Bugfix] Fix parsing of YAML CLI arguments that include equal "=" signs.
 - [Bugfix] Fix minor edge case in `long_to_base64` utility function.
 - [Improvement] Add openedx patches to add settings during build process.

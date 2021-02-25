@@ -1,3 +1,5 @@
+from typing import Dict
+
 import click
 
 from .compose import ComposeJobRunner
@@ -5,17 +7,18 @@ from .local import docker_compose as local_docker_compose
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
+from .context import Context
 
 
 @click.group(help="Build an Android app for your Open edX platform [BETA FEATURE]")
-def android():
+def android() -> None:
     pass
 
 
 @click.command(help="Build the application")
 @click.argument("mode", type=click.Choice(["debug", "release"]))
 @click.pass_obj
-def build(context, mode):
+def build(context: Context, mode: str) -> None:
     config = tutor_config.load(context.root)
     docker_run(context.root, build_command(config, mode))
     fmt.echo_info(
@@ -25,7 +28,7 @@ def build(context, mode):
     )
 
 
-def build_command(config, target):
+def build_command(config: Dict[str, str], target: str) -> str:
     gradle_target = {
         "debug": "assembleProdDebuggable",
         "release": "assembleProdRelease",
@@ -41,7 +44,7 @@ cp OpenEdXMobile/build/outputs/apk/prod/{apk_folder}/*.apk /openedx/data/"""
     return command
 
 
-def docker_run(root, command):
+def docker_run(root: str, command: str) -> None:
     config = tutor_config.load(root)
     runner = ComposeJobRunner(root, config, local_docker_compose)
     runner.run_job("android", command)

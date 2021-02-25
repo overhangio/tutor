@@ -24,7 +24,7 @@ build-pythonpackage: ## Build a python package ready to upload to pypi
 push-pythonpackage: ## Push python packages to pypi
 	twine upload --skip-existing dist/tutor-*.tar.gz
 
-test: test-lint test-unit test-format test-pythonpackage ## Run all tests by decreasing order or priority
+test: test-lint test-unit test-types test-format test-pythonpackage ## Run all tests by decreasing order or priority
 
 test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
@@ -34,6 +34,9 @@ test-lint: ## Run code linting tests
 
 test-unit: ## Run unit tests
 	python -m unittest discover tests
+
+test-types: ## Check type definitions
+	mypy --exclude=templates --ignore-missing-imports --strict tutor/ tests/
 
 test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
 	twine check dist/tutor-openedx-$(shell make version).tar.gz

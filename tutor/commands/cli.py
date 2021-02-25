@@ -21,7 +21,7 @@ from .. import fmt
 from .. import utils
 
 
-def main():
+def main() -> None:
     try:
         click_repl.register_repl(cli, name="ui")
         cli.add_command(images_command)
@@ -55,7 +55,7 @@ def main():
     help="Root project directory (environment variable: TUTOR_ROOT)",
 )
 @click.pass_context
-def cli(context, root):
+def cli(context: click.Context, root: str) -> None:
     if utils.is_root():
         fmt.echo_alert(
             "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
@@ -66,9 +66,9 @@ def cli(context, root):
 
 
 @click.command(help="Print this help", name="help")
-def print_help():
-    with click.Context(cli) as context:
-        click.echo(cli.get_help(context))
+def print_help() -> None:
+    context = click.Context(cli)
+    click.echo(cli.get_help(context))
 
 
 if __name__ == "__main__":

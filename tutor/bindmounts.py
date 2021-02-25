@@ -1,12 +1,20 @@
 import os
+from typing import Any, Callable, Dict, List, Tuple
 
 import click
+from mypy_extensions import VarArg
 
 from .exceptions import TutorError
 from .utils import get_user_id
 
 
-def create(root, config, docker_compose_func, service, path):
+def create(
+    root: str,
+    config: Dict[str, Any],
+    docker_compose_func: Callable[[str, Dict[str, Any], VarArg(str)], int],
+    service: str,
+    path: str,
+) -> str:
     volumes_root_path = get_root_path(root)
     volume_name = get_name(path)
     container_volumes_root_path = "/tmp/volumes"
@@ -41,12 +49,12 @@ chown -R {user_id} {volumes_path}/{volume_name}""".format(
     return os.path.join(volumes_root_path, volume_name)
 
 
-def get_path(root, container_bind_path):
+def get_path(root: str, container_bind_path: str) -> str:
     bind_basename = get_name(container_bind_path)
     return os.path.join(get_root_path(root), bind_basename)
 
 
-def get_name(container_bind_path):
+def get_name(container_bind_path: str) -> str:
     # We rstrip slashes, otherwise os.path.basename returns an empty string
     # We don't use basename here as it will not work on Windows
     name = container_bind_path.rstrip("/").split("/")[-1]
@@ -55,11 +63,11 @@ def get_name(container_bind_path):
     return name
 
 
-def get_root_path(root):
+def get_root_path(root: str) -> str:
     return os.path.join(root, "volumes")
 
 
-def parse_volumes(docker_compose_args):
+def parse_volumes(docker_compose_args: List[str]) -> Tuple[List[str], List[str]]:
     """
     Parse `-v/--volume` options from an arbitrary list of arguments.
     """
@@ -67,7 +75,9 @@ def parse_volumes(docker_compose_args):
     @click.command(context_settings={"ignore_unknown_options": True})
     @click.option("-v", "--volume", "volumes", multiple=True)
     @click.argument("args", nargs=-1, required=True)
-    def custom_docker_compose(volumes, args):  # pylint: disable=unused-argument
+    def custom_docker_compose(
+        volumes: List[str], args: List[str]
+    ) -> None:  # pylint: disable=unused-argument
         pass
 
     if isinstance(docker_compose_args, tuple):

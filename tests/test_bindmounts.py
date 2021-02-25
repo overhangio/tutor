@@ -5,17 +5,17 @@ from tutor.exceptions import TutorError
 
 
 class BindMountsTests(unittest.TestCase):
-    def test_get_name(self):
+    def test_get_name(self) -> None:
         self.assertEqual("venv", bindmounts.get_name("/openedx/venv"))
         self.assertEqual("venv", bindmounts.get_name("/openedx/venv/"))
 
-    def test_get_name_root_folder(self):
+    def test_get_name_root_folder(self) -> None:
         with self.assertRaises(TutorError):
             bindmounts.get_name("/")
         with self.assertRaises(TutorError):
             bindmounts.get_name("")
 
-    def test_parse_volumes(self):
+    def test_parse_volumes(self) -> None:
         volume_args, non_volume_args = bindmounts.parse_volumes(
             [
                 "run",

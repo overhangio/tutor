@@ -5,7 +5,7 @@ from tutor import utils
 
 
 class UtilsTests(unittest.TestCase):
-    def test_common_domain(self):
+    def test_common_domain(self) -> None:
         self.assertEqual(
             "domain.com", utils.common_domain("sub1.domain.com", "sub2.domain.com")
         )
@@ -18,13 +18,13 @@ class UtilsTests(unittest.TestCase):
             "domain.com", utils.common_domain("sub.domain.com", "ub.domain.com")
         )
 
-    def test_reverse_host(self):
+    def test_reverse_host(self) -> None:
         self.assertEqual("com.google.www", utils.reverse_host("www.google.com"))
 
-    def test_list_if(self):
+    def test_list_if(self) -> None:
         self.assertEqual('["cms"]', utils.list_if([("lms", False), ("cms", True)]))
 
-    def test_encrypt_decrypt(self):
+    def test_encrypt_decrypt(self) -> None:
         password = "passw0rd"
         encrypted1 = utils.encrypt(password)
         encrypted2 = utils.encrypt(password)
@@ -32,7 +32,7 @@ class UtilsTests(unittest.TestCase):
         self.assertTrue(utils.verify_encrypted(encrypted1, password))
         self.assertTrue(utils.verify_encrypted(encrypted2, password))
 
-    def test_long_to_base64(self):
+    def test_long_to_base64(self) -> None:
         self.assertEqual(
             b"\x00", base64.urlsafe_b64decode(utils.long_to_base64(0) + "==")
         )

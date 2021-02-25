@@ -53,6 +53,11 @@ idna==2.10
     # via
     #   -r requirements/base.txt
     #   requests
+importlib-metadata==3.7.0
+    # via
+    #   keyring
+    #   pyinstaller
+    #   twine
 isort==5.7.0
     # via pylint
 jeepney==0.6.0
@@ -74,7 +79,12 @@ markupsafe==1.1.1
 mccabe==0.6.1
     # via pylint
 mypy-extensions==0.4.3
-    # via black
+    # via
+    #   -r requirements/base.txt
+    #   black
+    #   mypy
+mypy==0.812
+    # via -r requirements/base.txt
 oauthlib==3.1.0
     # via
     #   -r requirements/base.txt
@@ -167,9 +177,17 @@ tqdm==4.56.1
 twine==3.3.0
     # via -r requirements/dev.in
 typed-ast==1.4.2
-    # via black
+    # via
+    #   -r requirements/base.txt
+    #   astroid
+    #   black
+    #   mypy
 typing-extensions==3.7.4.3
-    # via black
+    # via
+    #   -r requirements/base.txt
+    #   black
+    #   importlib-metadata
+    #   mypy
 urllib3==1.25.11
     # via
     #   -r requirements/base.txt
@@ -187,6 +205,8 @@ websocket-client==0.57.0
     #   kubernetes
 wrapt==1.12.1
     # via astroid
+zipp==3.4.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
