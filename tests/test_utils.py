@@ -1,3 +1,4 @@
+import base64
 import unittest
 
 from tutor import utils
@@ -30,3 +31,6 @@ class UtilsTests(unittest.TestCase):
         self.assertNotEqual(encrypted1, encrypted2)
         self.assertTrue(utils.verify_encrypted(encrypted1, password))
         self.assertTrue(utils.verify_encrypted(encrypted2, password))
+
+    def test_long_to_base64(self):
+        self.assertEqual(b"\x00", base64.urlsafe_b64decode(utils.long_to_base64(0) + "=="))

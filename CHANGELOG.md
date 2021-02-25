@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix minor edge case in `long_to_base64` utility function.
+
 ## v11.2.3 (2021-02-20)
 
 - [Bugfix] Make LMS celery workers actually process LMS tasks, and not CMS tasks.
