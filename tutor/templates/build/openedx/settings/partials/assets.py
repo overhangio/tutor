@@ -17,3 +17,5 @@ XQUEUE_INTERFACE = {
 DATABASES = {
     "default": {},
 }
+
+{{ patch("openedx-common-assets-settings") }}

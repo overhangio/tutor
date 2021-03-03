@@ -5,6 +5,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## Unreleased
 
 - [Bugfix] Fix minor edge case in `long_to_base64` utility function.
+- [Improvement] Add openedx patches to add settings during build process.
 
 ## v11.2.3 (2021-02-20)
 
