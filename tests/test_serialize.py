@@ -1,5 +1,7 @@
 import unittest
 
+import click
+
 from tutor import serialize
 
 
@@ -29,7 +31,11 @@ class SerializeTests(unittest.TestCase):
     def test_parse_empty_string(self):
         self.assertEqual("", serialize.parse("''"))
 
-    # def test_dump_null(self):#     # Unfortunately, this fails as the output is "null\n...\n"
-
-
-#     self.assertEqual("null", serialize.dumps(None))
+    def test_yaml_param_type(self):
+        param = serialize.YamlParamType()
+        self.assertEqual(("name", True), param.convert("name=true", "param", {}))
+        self.assertEqual(("name", "abcd"), param.convert("name=abcd", "param", {}))
+        self.assertEqual(("name", ""), param.convert("name=", "param", {}))
+        with self.assertRaises(click.exceptions.BadParameter):
+            param.convert("name", "param", {})
+        self.assertEqual(("x", "a=bcd"), param.convert("x=a=bcd", "param", {}))

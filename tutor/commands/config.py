@@ -17,28 +17,13 @@ def config_command():
     pass
 
 
-class YamlParamType(click.ParamType):
-    name = "yaml"
-
-    def convert(self, value, param, ctx):
-        try:
-            k, v = value.split("=")
-        except ValueError:
-            self.fail("'{}' is not of the form 'key=value'.".format(value), param, ctx)
-        if not v:
-            # Empty strings are incorrectly interpreted as null values, which is
-            # incorrect.
-            v = "''"
-        return k, serialize.parse(v)
-
-
 @click.command(help="Create and save configuration interactively")
 @click.option("-i", "--interactive", is_flag=True, help="Run interactively")
 @click.option(
     "-s",
     "--set",
     "set_vars",
-    type=YamlParamType(),
+    type=serialize.YamlParamType(),
     multiple=True,
     metavar="KEY=VAL",
     help="Set a configuration value (can be used multiple times)",
