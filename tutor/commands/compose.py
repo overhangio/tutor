@@ -7,12 +7,12 @@ from .. import config as tutor_config
 from .. import env as tutor_env
 from ..exceptions import TutorError
 from .. import fmt
-from .. import scripts
+from .. import jobs
 from .. import serialize
 from .. import utils
 
 
-class ScriptRunner(scripts.BaseRunner):
+class ComposeJobRunner(jobs.BaseJobRunner):
     def __init__(self, root, config, docker_compose_func):
         super().__init__(root, config)
         self.docker_compose_func = docker_compose_func
@@ -138,8 +138,8 @@ def restart(context, services):
 @click.pass_obj
 def init(context, limit):
     config = tutor_config.load(context.root)
-    runner = ScriptRunner(context.root, config, context.docker_compose)
-    scripts.initialise(runner, limit_to=limit)
+    runner = ComposeJobRunner(context.root, config, context.docker_compose)
+    jobs.initialise(runner, limit_to=limit)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -155,10 +155,8 @@ def init(context, limit):
 @click.pass_obj
 def createuser(context, superuser, staff, password, name, email):
     config = tutor_config.load(context.root)
-    runner = ScriptRunner(context.root, config, context.docker_compose)
-    command = scripts.create_user_command(
-        superuser, staff, name, email, password=password
-    )
+    runner = ComposeJobRunner(context.root, config, context.docker_compose)
+    command = jobs.create_user_command(superuser, staff, name, email, password=password)
     runner.run_job("lms", command)
 
 
@@ -170,18 +168,18 @@ def createuser(context, superuser, staff, password, name, email):
 @click.pass_obj
 def settheme(context, theme_name, domain_names):
     config = tutor_config.load(context.root)
-    runner = ScriptRunner(context.root, config, context.docker_compose)
+    runner = ComposeJobRunner(context.root, config, context.docker_compose)
     for domain_name in domain_names:
-        scripts.set_theme(theme_name, domain_name, runner)
+        jobs.set_theme(theme_name, domain_name, runner)
 
 
 @click.command(help="Import the demo course")
 @click.pass_obj
 def importdemocourse(context):
     config = tutor_config.load(context.root)
-    runner = ScriptRunner(context.root, config, context.docker_compose)
+    runner = ComposeJobRunner(context.root, config, context.docker_compose)
     fmt.echo_info("Importing demo course")
-    scripts.import_demo_course(runner)
+    jobs.import_demo_course(runner)
 
 
 @click.command(

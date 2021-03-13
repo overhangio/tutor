@@ -3,42 +3,39 @@ import os
 import click
 
 from . import compose
-from .context import Context
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
 from .. import utils
 
 
-# pylint: disable=too-few-public-methods
-class DevContext(Context):
-    @staticmethod
-    def docker_compose(root, config, *command):
-        args = []
-        for folder in ["local", "dev"]:
-            # Add docker-compose.yml and docker-compose.override.yml (if it exists)
-            # from "local" and "dev" folders (but not docker-compose.prod.yml)
-            args += [
-                "-f",
-                tutor_env.pathjoin(root, folder, "docker-compose.yml"),
-            ]
-            override_path = tutor_env.pathjoin(
-                root, folder, "docker-compose.override.yml"
-            )
-            if os.path.exists(override_path):
-                args += ["-f", override_path]
-        return utils.docker_compose(
-            *args,
-            "--project-name",
-            config["DEV_PROJECT_NAME"],
-            *command,
-        )
+def docker_compose(root, config, *command):
+    """
+    Run docker-compose with dev arguments.
+    """
+    args = []
+    for folder in ["local", "dev"]:
+        # Add docker-compose.yml and docker-compose.override.yml (if it exists)
+        # from "local" and "dev" folders (but not docker-compose.prod.yml)
+        args += [
+            "-f",
+            tutor_env.pathjoin(root, folder, "docker-compose.yml"),
+        ]
+        override_path = tutor_env.pathjoin(root, folder, "docker-compose.override.yml")
+        if os.path.exists(override_path):
+            args += ["-f", override_path]
+    return utils.docker_compose(
+        *args,
+        "--project-name",
+        config["DEV_PROJECT_NAME"],
+        *command,
+    )
 
 
 @click.group(help="Run Open edX locally with development settings")
-@click.pass_context
+@click.pass_obj
 def dev(context):
-    context.obj = DevContext(context.obj.root)
+    context.docker_compose = docker_compose
 
 
 @click.command(

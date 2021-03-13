@@ -8,7 +8,7 @@ from .. import env as tutor_env
 from .. import exceptions
 from .. import fmt
 from .. import interactive as interactive_config
-from .. import scripts
+from .. import jobs
 from .. import serialize
 from .. import utils
 
@@ -135,11 +135,11 @@ def delete(context, yes):
 @click.pass_obj
 def init(context, limit):
     config = tutor_config.load(context.root)
-    runner = K8sScriptRunner(context.root, config)
+    runner = K8sJobRunner(context.root, config)
     for service in ["mysql", "elasticsearch", "mongodb"]:
         if tutor_config.is_service_activated(config, service):
             wait_for_pod_ready(config, service)
-    scripts.initialise(runner, limit_to=limit)
+    jobs.initialise(runner, limit_to=limit)
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -155,9 +155,7 @@ def init(context, limit):
 @click.pass_obj
 def createuser(context, superuser, staff, password, name, email):
     config = tutor_config.load(context.root)
-    command = scripts.create_user_command(
-        superuser, staff, name, email, password=password
-    )
+    command = jobs.create_user_command(superuser, staff, name, email, password=password)
     # This needs to be interactive in case the user needs to type a password
     kubectl_exec(config, "lms", command, attach=True)
 
@@ -167,8 +165,8 @@ def createuser(context, superuser, staff, password, name, email):
 def importdemocourse(context):
     fmt.echo_info("Importing demo course")
     config = tutor_config.load(context.root)
-    runner = K8sScriptRunner(context.root, config)
-    scripts.import_demo_course(runner)
+    runner = K8sJobRunner(context.root, config)
+    jobs.import_demo_course(runner)
 
 
 @click.command(
@@ -179,9 +177,9 @@ def importdemocourse(context):
 @click.pass_obj
 def settheme(context, theme_name, domain_names):
     config = tutor_config.load(context.root)
-    runner = K8sScriptRunner(context.root, config)
+    runner = K8sJobRunner(context.root, config)
     for domain_name in domain_names:
-        scripts.set_theme(theme_name, domain_name, runner)
+        jobs.set_theme(theme_name, domain_name, runner)
 
 
 @click.command(name="exec", help="Execute a command in a pod of the given application")
@@ -320,7 +318,7 @@ class K8sClients:
         return self._core_api
 
 
-class K8sScriptRunner(scripts.BaseRunner):
+class K8sJobRunner(jobs.BaseJobRunner):
     def load_job(self, name):
         jobs = self.render("k8s", "jobs.yml")
         for job in serialize.load_all(jobs):

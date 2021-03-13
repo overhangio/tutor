@@ -1,11 +1,10 @@
 import click
 
-from .compose import ScriptRunner
-from .local import LocalContext
+from .compose import ComposeJobRunner
+from .local import docker_compose as local_docker_compose
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
-from .. import utils
 
 
 @click.group(help="Build an Android app for your Open edX platform [BETA FEATURE]")
@@ -44,7 +43,7 @@ cp OpenEdXMobile/build/outputs/apk/prod/{apk_folder}/*.apk /openedx/data/"""
 
 def docker_run(root, command):
     config = tutor_config.load(root)
-    runner = ScriptRunner(root, config, LocalContext.docker_compose)
+    runner = ComposeJobRunner(root, config, local_docker_compose)
     runner.run_job("android", command)
 
 

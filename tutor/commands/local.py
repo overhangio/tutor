@@ -7,33 +7,32 @@ from .. import env as tutor_env
 from .. import fmt, utils
 from . import compose
 from .config import save as config_save_command
-from .context import Context
 
 
-# pylint: disable=too-few-public-methods
-class LocalContext(Context):
-    @staticmethod
-    def docker_compose(root, config, *command):
-        args = []
-        override_path = tutor_env.pathjoin(root, "local", "docker-compose.override.yml")
-        if os.path.exists(override_path):
-            args += ["-f", override_path]
-        return utils.docker_compose(
-            "-f",
-            tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-            "-f",
-            tutor_env.pathjoin(root, "local", "docker-compose.prod.yml"),
-            *args,
-            "--project-name",
-            config["LOCAL_PROJECT_NAME"],
-            *command
-        )
+def docker_compose(root, config, *command):
+    """
+    Run docker-compose with local and production yml files.
+    """
+    args = []
+    override_path = tutor_env.pathjoin(root, "local", "docker-compose.override.yml")
+    if os.path.exists(override_path):
+        args += ["-f", override_path]
+    return utils.docker_compose(
+        "-f",
+        tutor_env.pathjoin(root, "local", "docker-compose.yml"),
+        "-f",
+        tutor_env.pathjoin(root, "local", "docker-compose.prod.yml"),
+        *args,
+        "--project-name",
+        config["LOCAL_PROJECT_NAME"],
+        *command
+    )
 
 
 @click.group(help="Run Open edX locally with docker-compose")
-@click.pass_context
+@click.pass_obj
 def local(context):
-    context.obj = LocalContext(context.obj.root)
+    context.docker_compose = docker_compose
 
 
 @click.command(help="Configure and run Open edX from scratch")

@@ -8,7 +8,7 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 """
 
 
-class BaseRunner:
+class BaseJobRunner:
     def __init__(self, root, config):
         self.root = root
         self.config = config
