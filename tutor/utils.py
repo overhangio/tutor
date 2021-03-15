@@ -43,6 +43,18 @@ def ensure_file_directory_exists(path: str) -> None:
     Create file's base directory if it does not exist.
     """
     directory = os.path.dirname(path)
+    if os.path.isfile(directory):
+        raise exceptions.TutorError(
+            "Attempting to create a directory, but a file with the same name already exists: {}".format(
+                directory
+            )
+        )
+    if os.path.isdir(path):
+        raise exceptions.TutorError(
+            "Attempting to write to a file, but a directory with the same name already exists: {}".format(
+                directory
+            )
+        )
     if not os.path.exists(directory):
         os.makedirs(directory)
 
