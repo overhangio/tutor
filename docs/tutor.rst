@@ -65,9 +65,7 @@ Releasing a new version
 - Bump the ``__version__`` value in ``tutor/__about__.py``.
 - Replace "Unreleased" by the version name and date in CHANGELOG.md.
 - Create a commit with the version changelog.
-- ``make release`` (this assumes that there are two remotes named "origin" and "overhangio")
-
-After a regular push to ``master``, run ``make nightly`` to update the "nightly" tag.
+- Run ``make release``: this will push to the default repo/branch for the current branch.
 
 .. _contributing:
 
