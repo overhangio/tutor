@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add `make pull-base-images` command to update base images.
 - [Bugfix] Fix crashing installation because of a major release of all Pallets projects.
 - [Bugfix] Fix missing py2neo dependency in `images build openedx` (#411).
 
