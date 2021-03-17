@@ -21,8 +21,8 @@ upgrade-requirements: ## Upgrade requirements files
 build-pythonpackage: ## Build a python package ready to upload to pypi
 	python setup.py sdist
 
-push-pythonpackage: ## Push python packages to pypi
-	twine upload --skip-existing dist/tutor-*.tar.gz
+push-pythonpackage: ## Push python package to pypi
+	twine upload --skip-existing dist/tutor-openedx-$(shell make version).tar.gz
 
 test: test-lint test-unit test-types test-format test-pythonpackage ## Run all tests by decreasing order or priority
 
@@ -55,12 +55,9 @@ bootstrap-dev-plugins: bootstrap-dev ## Install dev requirement and all supporte
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller tutor.spec
-dist/tutor:
-	$(MAKE) bundle
 
 release: test ## Create a release tag and push it to origin
 	$(MAKE) release-tag release-push TAG=v$(shell make version)
-
 release-tag:
 	@echo "=== Creating tag $(TAG)"
 	git tag -d $(TAG) || true
