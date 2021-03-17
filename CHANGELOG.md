@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.4 (2021-03-17)
+
 - [Bugfix] Fix "Invalid Request" error during SAML authentication (thanks @Ant1x!).
 - [Feature] Add `make pull-base-images` command to update base images.
 - [Improvement] Annotate types all over the Tutor code base.
