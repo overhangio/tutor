@@ -52,12 +52,6 @@ def images_command() -> None:
     "--target",
     help="Set the target build stage to build.",
 )
-@click.option(
-    "--pull",
-    "pull_base_images",
-    is_flag=True,
-    help="Always attempt to pull a newer version of the base images",
-)
 @click.pass_obj
 def build(
     context: Context,
@@ -66,7 +60,6 @@ def build(
     build_args: List[str],
     add_hosts: List[str],
     target: str,
-    pull_base_images: bool,
 ) -> None:
     config = tutor_config.load(context.root)
     command_args = []
@@ -78,8 +71,6 @@ def build(
         command_args += ["--add-host", add_host]
     if target:
         command_args += ["--target", target]
-    if pull_base_images:
-        command_args.append("--pull")
     for image in image_names:
         build_image(context.root, config, image, *command_args)
 
