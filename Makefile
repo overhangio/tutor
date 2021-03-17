@@ -58,26 +58,18 @@ bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 dist/tutor:
 	$(MAKE) bundle
 
-nightly: ## Create a "nightly" release
-	$(MAKE) tag TAG=nightly
-
 release: test ## Create a release tag and push it to origin
-	$(MAKE) retag release-origin release-overhangio TAG=v$(shell make version)
+	$(MAKE) release-tag release-push TAG=v$(shell make version)
 
-retag:
+release-tag:
 	@echo "=== Creating tag $(TAG)"
 	git tag -d $(TAG) || true
 	git tag $(TAG)
-release-origin:
+release-push:
 	@echo "=== Pushing tag $(TAG) to origin"
 	git push origin
 	git push origin :$(TAG) || true
 	git push origin $(TAG)
-release-overhangio:
-	@echo "=== Pushing tag $(TAG) to overhangio"
-	git push overhangio
-	git push overhangio :$(TAG) || true
-	git push overhangio $(TAG)
 
 ###### Continuous integration tasks
 
