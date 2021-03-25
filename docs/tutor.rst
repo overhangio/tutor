@@ -85,3 +85,8 @@ Third-party contributions to Tutor and its plugins are more than welcome! Just m
 Where "TYPE" is either "Bugfix", "Improvement", "Feature" or "Security". You should add an explosion emoji ("💥") before "[TYPE]" if you are making a breaking change.
 
 Happy hacking! ☘️
+
+Joining the team of Tutor Maintainers
+-------------------------------------
+
+We have an open team of volunteers who help support the project. You can read all about it `here <https://discuss.overhang.io/t/the-tutor-maintainer-handbook/1375>`__.
