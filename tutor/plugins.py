@@ -3,9 +3,10 @@ from copy import deepcopy
 from glob import glob
 import importlib
 import os
-from typing import cast, Any, Dict, Iterator, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 import appdirs
+import click
 import pkg_resources
 
 from . import exceptions
@@ -53,20 +54,125 @@ class BasePlugin:
 
     def __init__(self, name: str, obj: Any) -> None:
         self.name = name
-        self.config = cast(
-            Dict[str, Dict[str, Any]], get_callable_attr(obj, "config", {})
-        )
-        self.patches = cast(
-            Dict[str, str], get_callable_attr(obj, "patches", default={})
-        )
-        self.hooks = cast(
-            Dict[str, Union[Dict[str, str], List[str]]],
-            get_callable_attr(obj, "hooks", default={}),
-        )
-        self.templates_root = cast(
-            Optional[str], get_callable_attr(obj, "templates", default=None)
-        )
-        self.command = getattr(obj, "command", None)
+        self.config = self.load_config(obj, self.name)
+        self.patches = self.load_patches(obj, self.name)
+        self.hooks = self.load_hooks(obj, self.name)
+
+        templates_root = get_callable_attr(obj, "templates", default=None)
+        if templates_root is not None:
+            assert isinstance(templates_root, str)
+        self.templates_root = templates_root
+
+        command = getattr(obj, "command", None)
+        if command is not None:
+            assert isinstance(command, click.Command)
+        self.command: click.Command = command
+
+    @staticmethod
+    def load_config(obj: Any, plugin_name: str) -> Dict[str, Dict[str, Any]]:
+        """
+        Load config and check types.
+        """
+        config = get_callable_attr(obj, "config", {})
+        if not isinstance(config, dict):
+            raise exceptions.TutorError(
+                "Invalid config in plugin {}. Expected dict, got {}.".format(
+                    plugin_name, config.__class__
+                )
+            )
+        for name, subconfig in config.items():
+            if not isinstance(name, str):
+                raise exceptions.TutorError(
+                    "Invalid config entry '{}' in plugin {}. Expected str, got {}.".format(
+                        name, plugin_name, config.__class__
+                    )
+                )
+            if not isinstance(subconfig, dict):
+                raise exceptions.TutorError(
+                    "Invalid config entry '{}' in plugin {}. Expected str keys, got {}.".format(
+                        name, plugin_name, config.__class__
+                    )
+                )
+            for key in subconfig.keys():
+                if not isinstance(key, str):
+                    raise exceptions.TutorError(
+                        "Invalid config entry '{}.{}' in plugin {}. Expected str, got {}.".format(
+                            name, key, plugin_name, key.__class__
+                        )
+                    )
+        return config
+
+    @staticmethod
+    def load_patches(obj: Any, plugin_name: str) -> Dict[str, str]:
+        """
+        Load patches and check the types are right.
+        """
+        patches = get_callable_attr(obj, "patches", {})
+        if not isinstance(patches, dict):
+            raise exceptions.TutorError(
+                "Invalid patches in plugin {}. Expected dict, got {}.".format(
+                    plugin_name, patches.__class__
+                )
+            )
+        for patch_name, content in patches.items():
+            if not isinstance(patch_name, str):
+                raise exceptions.TutorError(
+                    "Invalid patch name '{}' in plugin {}. Expected str, got {}.".format(
+                        patch_name, plugin_name, patch_name.__class__
+                    )
+                )
+            if not isinstance(content, str):
+                raise exceptions.TutorError(
+                    "Invalid patch '{}' in plugin {}. Expected str, got {}.".format(
+                        patch_name, plugin_name, content.__class__
+                    )
+                )
+        return patches
+
+    @staticmethod
+    def load_hooks(
+        obj: Any, plugin_name: str
+    ) -> Dict[str, Union[Dict[str, str], List[str]]]:
+        """
+        Load hooks and check types.
+        """
+        hooks = get_callable_attr(obj, "hooks", default={})
+        if not isinstance(hooks, dict):
+            raise exceptions.TutorError(
+                "Invalid hooks in plugin {}. Expected dict, got {}.".format(
+                    plugin_name, hooks.__class__
+                )
+            )
+        for hook_name, hook in hooks.items():
+            if not isinstance(hook_name, str):
+                raise exceptions.TutorError(
+                    "Invalid hook name '{}' in plugin {}. Expected str, got {}.".format(
+                        hook_name, plugin_name, hook_name.__class__
+                    )
+                )
+            if isinstance(hook, list):
+                for service in hook:
+                    if not isinstance(service, str):
+                        raise exceptions.TutorError(
+                            "Invalid service in hook '{}' from plugin {}. Expected str, got {}.".format(
+                                hook_name, plugin_name, service.__class__
+                            )
+                        )
+            elif isinstance(hook, dict):
+                for name, value in hook.items():
+                    if not isinstance(name, str) or not isinstance(value, str):
+                        raise exceptions.TutorError(
+                            "Invalid hook '{}' in plugin {}. Only str -> str entries are supported.".format(
+                                hook_name, plugin_name
+                            )
+                        )
+            else:
+                raise exceptions.TutorError(
+                    "Invalid hook '{}' in plugin {}. Expected dict or list, got {}.".format(
+                        hook_name, plugin_name, hook.__class__
+                    )
+                )
+        return hooks
 
     def config_key(self, key: str) -> str:
         """
@@ -201,7 +307,10 @@ class Plugins:
 
     def __init__(self, config: Dict[str, Any]):
         self.config = deepcopy(config)
+        # patches has the following structure:
+        # {patch_name -> {plugin_name -> "content"}}
         self.patches: Dict[str, Dict[str, str]] = {}
+        # some hooks have a dict-like structure, like "build", others are list of services.
         self.hooks: Dict[str, Dict[str, Union[Dict[str, str], List[str]]]] = {}
         self.template_roots: Dict[str, str] = {}
 
