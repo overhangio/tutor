@@ -4,7 +4,7 @@ import platform
 import subprocess
 import sys
 import tarfile
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from urllib.request import urlopen
 
 import click
@@ -13,6 +13,7 @@ import click
 # the web ui can be launched even where there is no configuration.
 from .. import fmt
 from .. import env as tutor_env
+from .. import exceptions
 from .. import serialize
 from .context import Context
 
@@ -121,12 +122,17 @@ def check_gotty_binary(root: str) -> None:
     compressed.extract("./gotty", dirname)
 
 
-def load_config(root: str) -> Dict[str, Any]:
+def load_config(root: str) -> Dict[str, Optional[str]]:
     path = config_path(root)
     if not os.path.exists(path):
         save_webui_config_file(root, {"user": None, "password": None})
     with open(config_path(root)) as f:
-        return serialize.load(f)
+        config = serialize.load(f)
+    if not isinstance(config, dict):
+        raise exceptions.TutorError(
+            "Invalid webui: expected dict, got {}".format(config.__class__)
+        )
+    return config
 
 
 def save_webui_config_file(root: str, config: Dict[str, Any]) -> None:

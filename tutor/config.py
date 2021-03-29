@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Any, Tuple
+from typing import cast, Dict, Any, Tuple
 
 from . import exceptions
 from . import env
@@ -59,12 +59,19 @@ def merge(
 
 
 def load_defaults() -> Dict[str, Any]:
-    return serialize.load(env.read_template_file("config.yml"))
+    config = serialize.load(env.read_template_file("config.yml"))
+    return cast(Dict[str, Any], config)
 
 
 def load_config_file(path: str) -> Dict[str, Any]:
     with open(path) as f:
-        return serialize.load(f.read())
+        config = serialize.load(f.read())
+    if not isinstance(config, dict):
+        raise exceptions.TutorError(
+            "Invalid configuration: expected dict, got {}".format(config.__class__)
+        )
+
+    return config
 
 
 def load_current(root: str, defaults: Dict[str, str]) -> Dict[str, Any]:

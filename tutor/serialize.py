@@ -1,5 +1,5 @@
 import re
-from typing import cast, Any, Dict, IO, Iterator, Tuple, Union
+from typing import Any, IO, Iterator, Tuple, Union
 
 import yaml
 from _io import TextIOWrapper
@@ -9,15 +9,15 @@ from yaml.scanner import ScannerError
 import click
 
 
-def load(stream: Union[str, IO[str]]) -> Dict[str, str]:
-    return cast(Dict[str, str], yaml.load(stream, Loader=yaml.SafeLoader))
+def load(stream: Union[str, IO[str]]) -> Any:
+    return yaml.load(stream, Loader=yaml.SafeLoader)
 
 
 def load_all(stream: str) -> Iterator[Any]:
     return yaml.load_all(stream, Loader=yaml.SafeLoader)
 
 
-def dump(content: Dict[str, str], fileobj: TextIOWrapper) -> None:
+def dump(content: Any, fileobj: TextIOWrapper) -> None:
     yaml.dump(content, stream=fileobj, default_flow_style=False)
 
 
