@@ -81,6 +81,10 @@ class PluginsTests(unittest.TestCase):
             self.assertEqual([], config["PLUGINS"])
             self.assertNotIn("KEY", config)
 
+    def test_none_plugins(self) -> None:
+        config = {plugins.CONFIG_KEY: None}
+        self.assertFalse(plugins.is_enabled(config, "myplugin"))
+
     def test_patches(self) -> None:
         class plugin1:
             patches = {"patch1": "Hello {{ ID }}"}

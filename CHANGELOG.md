@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix edge case where `PLUGINS` entry is null in config.yml.
 - [Bugfix] Fix missing py2neo dependency in `images build openedx` (#411).
 
 ## v11.2.4 (2021-03-17)
