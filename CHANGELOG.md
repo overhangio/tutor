@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix missing py2neo dependency in `images build openedx` (#411).
+
 ## v11.2.4 (2021-03-17)
 
 - [Bugfix] Fix "Invalid Request" error during SAML authentication (thanks @Ant1x!).
