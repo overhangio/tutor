@@ -298,8 +298,16 @@ The language code should be similar to those used in edx-platform or openedx-i18
 
 Then, add a "django.po" file there that will contain your custom translations::
 
+    msgid ""
+    msgstr ""
+    "Content-Type: text/plain; charset=UTF-8"
+
     msgid "String to translate"
     msgstr "你翻译的东西 la traduction de votre bidule"
+
+
+.. warning::
+    Don't forget to specify the file ``Content-Type`` when adding message strings with non-ASCII characters; otherwise a ``UnicodeDecodeError`` will be raised during compilation.
 
 The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/koa.2/conf/locale/en/LC_MESSAGES/django.po>`__.
 
@@ -315,10 +323,18 @@ To recap, here is an example. To translate a few strings in French, both from dj
 
 With django.po containing::
 
+    msgid ""
+    msgstr ""
+    "Content-Type: text/plain; charset=UTF-8"
+
     msgid "It works! Powered by Open edX{registered_trademark}"
     msgstr "Ça marche ! Propulsé by Open edX{registered_trademark}"
 
 And djangojs.po::
+
+    msgid ""
+    msgstr ""
+    "Content-Type: text/plain; charset=UTF-8"
 
     msgid "%(num_points)s point possible (graded, results hidden)"
     msgid_plural "%(num_points)s points possible (graded, results hidden)"
