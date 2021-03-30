@@ -410,7 +410,8 @@ def iter_enabled(config: Dict[str, Any]) -> Iterator[BasePlugin]:
 
 
 def is_enabled(config: Dict[str, Any], name: str) -> bool:
-    return name in config.get(CONFIG_KEY, [])
+    plugin_list = config.get(CONFIG_KEY) or []
+    return name in plugin_list
 
 
 def iter_patches(config: Dict[str, str], name: str) -> Iterator[Tuple[str, str]]:
