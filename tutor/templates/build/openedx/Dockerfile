@@ -83,6 +83,9 @@ WORKDIR /openedx/edx-platform
 # Install the right version of pip/setuptools
 RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
 
+# Install requirements which were stripped from pypi: this can be removed once the fix has been merged in Koa
+RUN pip install -e git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2
+
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
 
