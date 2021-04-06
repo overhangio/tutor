@@ -1,12 +1,11 @@
 import re
-from typing import Any, IO, Iterator, Tuple, Union
+from typing import IO, Any, Iterator, Tuple, Union
 
+import click
 import yaml
 from _io import TextIOWrapper
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
-
-import click
 
 
 def load(stream: Union[str, IO[str]]) -> Any:
@@ -19,6 +18,12 @@ def load_all(stream: str) -> Iterator[Any]:
 
 def dump(content: Any, fileobj: TextIOWrapper) -> None:
     yaml.dump(content, stream=fileobj, default_flow_style=False)
+
+
+def dumps(content: Any) -> str:
+    result = yaml.dump(content, default_flow_style=False)
+    assert isinstance(result, str)
+    return result
 
 
 def parse(v: Union[str, IO[str]]) -> Any:

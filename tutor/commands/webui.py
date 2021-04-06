@@ -4,7 +4,7 @@ import platform
 import subprocess
 import sys
 import tarfile
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 from urllib.request import urlopen
 
 import click
@@ -15,6 +15,7 @@ from .. import fmt
 from .. import env as tutor_env
 from .. import exceptions
 from .. import serialize
+from ..types import Config
 from .context import Context
 
 
@@ -135,7 +136,7 @@ def load_config(root: str) -> Dict[str, Optional[str]]:
     return config
 
 
-def save_webui_config_file(root: str, config: Dict[str, Any]) -> None:
+def save_webui_config_file(root: str, config: Config) -> None:
     path = config_path(root)
     directory = os.path.dirname(path)
     if not os.path.exists(directory):

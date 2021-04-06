@@ -1,17 +1,14 @@
 import codecs
-from copy import deepcopy
 import os
-from typing import Dict, Any, Iterable, List, Optional, Type, Union
+from copy import deepcopy
+from typing import Any, Iterable, List, Optional, Type, Union
 
 import jinja2
 import pkg_resources
 
-from . import exceptions
-from . import fmt
-from . import plugins
-from . import utils
+from . import exceptions, fmt, plugins, utils
 from .__about__ import __version__
-
+from .types import Config
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
@@ -20,7 +17,7 @@ BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf", ".woff", ".woff2"]
 
 class Renderer:
     @classmethod
-    def instance(cls: Type["Renderer"], config: Dict[str, Any]) -> "Renderer":
+    def instance(cls: Type["Renderer"], config: Config) -> "Renderer":
         # Load template roots: these are required to be able to use
         # {% include .. %} directives
         template_roots = [TEMPLATES_ROOT]
@@ -32,7 +29,7 @@ class Renderer:
 
     def __init__(
         self,
-        config: Dict[str, Any],
+        config: Config,
         template_roots: List[str],
         ignore_folders: Optional[List[str]] = None,
     ):
@@ -64,7 +61,10 @@ class Renderer:
         The elements of `prefix` must contain only "/", and not os.sep.
         """
         full_prefix = "/".join(prefix)
-        for template in self.environment.loader.list_templates():  # type: ignore
+        env_templates: List[
+            str
+        ] = self.environment.loader.list_templates()  # type:ignore[no-untyped-call]
+        for template in env_templates:
             if template.startswith(full_prefix) and self.is_part_of_env(template):
                 yield template
 
@@ -171,7 +171,7 @@ class Renderer:
             )
 
 
-def save(root: str, config: Dict[str, Any]) -> None:
+def save(root: str, config: Config) -> None:
     """
     Save the full environment, including version information.
     """
@@ -206,7 +206,7 @@ def upgrade_obsolete(root: str) -> None:
 
 
 def save_plugin_templates(
-    plugin: plugins.BasePlugin, root: str, config: Dict[str, Any]
+    plugin: plugins.BasePlugin, root: str, config: Config
 ) -> None:
     """
     Save plugin templates to plugins/<plugin name>/*.
@@ -218,7 +218,7 @@ def save_plugin_templates(
         save_all_from(subdir_path, plugins_root, config)
 
 
-def save_all_from(prefix: str, root: str, config: Dict[str, Any]) -> None:
+def save_all_from(prefix: str, root: str, config: Config) -> None:
     """
     Render the templates that start with `prefix` and store them with the same
     hierarchy at `root`. Here, `prefix` can be the result of os.path.join(...).
@@ -240,7 +240,7 @@ def write_to(content: Union[str, bytes], path: str) -> None:
             of_text.write(content)
 
 
-def render_file(config: Dict[str, Any], *path: str) -> Union[str, bytes]:
+def render_file(config: Config, *path: str) -> Union[str, bytes]:
     """
     Return the rendered contents of a template.
     """
@@ -249,7 +249,7 @@ def render_file(config: Dict[str, Any], *path: str) -> Union[str, bytes]:
     return renderer.render_template(template_name)
 
 
-def render_dict(config: Dict[str, Any]) -> None:
+def render_dict(config: Config) -> None:
     """
     Render the values from the dict. This is useful for rendering the default
     values from config.yml.
@@ -257,7 +257,7 @@ def render_dict(config: Dict[str, Any]) -> None:
     Args:
         config (dict)
     """
-    rendered = {}
+    rendered: Config = {}
     for key, value in config.items():
         if isinstance(value, str):
             rendered[key] = render_str(config, value)
@@ -267,13 +267,13 @@ def render_dict(config: Dict[str, Any]) -> None:
         config[k] = v
 
 
-def render_unknown(config: Dict[str, Any], value: Any) -> Any:
+def render_unknown(config: Config, value: Any) -> Any:
     if isinstance(value, str):
         return render_str(config, value)
     return value
 
 
-def render_str(config: Dict[str, Any], text: str) -> str:
+def render_str(config: Config, text: str) -> str:
     """
     Args:
         text (str)

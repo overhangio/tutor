@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import List
 
 import click
 
@@ -8,6 +8,7 @@ from .. import exceptions
 from .. import fmt
 from .. import interactive as interactive_config
 from .. import serialize
+from ..types import Config
 from .context import Context
 
 
@@ -40,7 +41,7 @@ def config_command() -> None:
 )
 @click.pass_obj
 def save(
-    context: Context, interactive: bool, set_vars: Dict[str, Any], unset_vars: List[str]
+    context: Context, interactive: bool, set_vars: Config, unset_vars: List[str]
 ) -> None:
     config, defaults = interactive_config.load_all(
         context.root, interactive=interactive
@@ -91,7 +92,7 @@ def printvalue(context: Context, key: str) -> None:
     config = tutor_config.load(context.root)
     try:
         # Note that this will incorrectly print None values
-        fmt.echo(config[key])
+        fmt.echo(str(config[key]))
     except KeyError as e:
         raise exceptions.TutorError(
             "Missing configuration value: {}".format(key)

@@ -1,4 +1,3 @@
-from typing import Any, Dict
 import unittest
 from unittest.mock import Mock, patch
 
@@ -6,6 +5,7 @@ from tutor import config as tutor_config
 from tutor import exceptions
 from tutor import fmt
 from tutor import plugins
+from tutor.types import get_typed, Config
 
 
 class PluginsTests(unittest.TestCase):
@@ -37,26 +37,26 @@ class PluginsTests(unittest.TestCase):
             )
 
     def test_enable(self) -> None:
-        config: Dict[str, Any] = {plugins.CONFIG_KEY: []}
+        config: Config = {plugins.CONFIG_KEY: []}
         with patch.object(plugins, "is_installed", return_value=True):
             plugins.enable(config, "plugin2")
             plugins.enable(config, "plugin1")
         self.assertEqual(["plugin1", "plugin2"], config[plugins.CONFIG_KEY])
 
     def test_enable_twice(self) -> None:
-        config: Dict[str, Any] = {plugins.CONFIG_KEY: []}
+        config: Config = {plugins.CONFIG_KEY: []}
         with patch.object(plugins, "is_installed", return_value=True):
             plugins.enable(config, "plugin1")
             plugins.enable(config, "plugin1")
         self.assertEqual(["plugin1"], config[plugins.CONFIG_KEY])
 
     def test_enable_not_installed_plugin(self) -> None:
-        config: Dict[str, Any] = {"PLUGINS": []}
+        config: Config = {"PLUGINS": []}
         with patch.object(plugins, "is_installed", return_value=False):
             self.assertRaises(exceptions.TutorError, plugins.enable, config, "plugin1")
 
     def test_disable(self) -> None:
-        config: Dict[str, Any] = {"PLUGINS": ["plugin1", "plugin2"]}
+        config: Config = {"PLUGINS": ["plugin1", "plugin2"]}
         with patch.object(fmt, "STDOUT"):
             plugins.disable(config, "plugin1")
         self.assertEqual(["plugin2"], config["PLUGINS"])
@@ -75,14 +75,14 @@ class PluginsTests(unittest.TestCase):
                 )
             ],
         ):
-            config = {"PLUGINS": ["plugin1"], "KEY": "value"}
+            config: Config = {"PLUGINS": ["plugin1"], "KEY": "value"}
             with patch.object(fmt, "STDOUT"):
                 plugins.disable(config, "plugin1")
             self.assertEqual([], config["PLUGINS"])
             self.assertNotIn("KEY", config)
 
     def test_none_plugins(self) -> None:
-        config = {plugins.CONFIG_KEY: None}
+        config: Config = {plugins.CONFIG_KEY: None}
         self.assertFalse(plugins.is_enabled(config, "myplugin"))
 
     def test_patches(self) -> None:
@@ -107,11 +107,11 @@ class PluginsTests(unittest.TestCase):
         self.assertEqual([], patches)
 
     def test_configure(self) -> None:
-        config = {"ID": "id"}
-        defaults: Dict[str, Any] = {}
+        config: Config = {"ID": "id"}
+        defaults: Config = {}
 
         class plugin1:
-            config = {
+            config: Config = {
                 "add": {"PARAM1": "value1", "PARAM2": "value2"},
                 "set": {"PARAM3": "value3"},
                 "defaults": {"PARAM4": "value4"},
@@ -136,10 +136,10 @@ class PluginsTests(unittest.TestCase):
         self.assertEqual({"PLUGIN1_PARAM4": "value4"}, defaults)
 
     def test_configure_set_does_not_override(self) -> None:
-        config = {"ID": "oldid"}
+        config: Config = {"ID": "oldid"}
 
         class plugin1:
-            config = {"set": {"ID": "newid"}}
+            config: Config = {"set": {"ID": "newid"}}
 
         with patch.object(
             plugins.Plugins,
@@ -151,10 +151,10 @@ class PluginsTests(unittest.TestCase):
         self.assertEqual({"ID": "oldid"}, config)
 
     def test_configure_set_random_string(self) -> None:
-        config: Dict[str, Any] = {}
+        config: Config = {}
 
         class plugin1:
-            config = {"set": {"PARAM1": "{{ 128|random_string }}"}}
+            config: Config = {"set": {"PARAM1": "{{ 128|random_string }}"}}
 
         with patch.object(
             plugins.Plugins,
@@ -162,14 +162,14 @@ class PluginsTests(unittest.TestCase):
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
             tutor_config.load_plugins(config, {})
-        self.assertEqual(128, len(config["PARAM1"]))
+        self.assertEqual(128, len(get_typed(config, "PARAM1", str)))
 
     def test_configure_default_value_with_previous_definition(self) -> None:
-        config: Dict[str, Any] = {}
-        defaults = {"PARAM1": "value"}
+        config: Config = {}
+        defaults: Config = {"PARAM1": "value"}
 
         class plugin1:
-            config = {"defaults": {"PARAM2": "{{ PARAM1 }}"}}
+            config: Config = {"defaults": {"PARAM2": "{{ PARAM1 }}"}}
 
         with patch.object(
             plugins.Plugins,
@@ -180,10 +180,10 @@ class PluginsTests(unittest.TestCase):
         self.assertEqual("{{ PARAM1 }}", defaults["PLUGIN1_PARAM2"])
 
     def test_configure_add_twice(self) -> None:
-        config: Dict[str, Any] = {}
+        config: Config = {}
 
         class plugin1:
-            config = {"add": {"PARAM1": "{{ 10|random_string }}"}}
+            config: Config = {"add": {"PARAM1": "{{ 10|random_string }}"}}
 
         with patch.object(
             plugins.Plugins,
@@ -191,14 +191,14 @@ class PluginsTests(unittest.TestCase):
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
             tutor_config.load_plugins(config, {})
-        value1 = config["PLUGIN1_PARAM1"]
+        value1 = get_typed(config, "PLUGIN1_PARAM1", str)
         with patch.object(
             plugins.Plugins,
             "iter_enabled",
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
             tutor_config.load_plugins(config, {})
-        value2 = config["PLUGIN1_PARAM1"]
+        value2 = get_typed(config, "PLUGIN1_PARAM1", str)
 
         self.assertEqual(10, len(value1))
         self.assertEqual(10, len(value2))
@@ -218,10 +218,10 @@ class PluginsTests(unittest.TestCase):
             )
 
     def test_plugins_are_updated_on_config_change(self) -> None:
-        config: Dict[str, Any] = {"PLUGINS": []}
+        config: Config = {"PLUGINS": []}
         plugins1 = plugins.Plugins(config)
         self.assertEqual(0, len(list(plugins1.iter_enabled())))
-        config["PLUGINS"].append("plugin1")
+        config["PLUGINS"] = ["plugin1"]
         with patch.object(
             plugins.Plugins,
             "iter_installed",

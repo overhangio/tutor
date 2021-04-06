@@ -1,17 +1,18 @@
 import os
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Callable, List, Tuple
 
 import click
 from mypy_extensions import VarArg
 
 from .exceptions import TutorError
+from .types import Config
 from .utils import get_user_id
 
 
 def create(
     root: str,
-    config: Dict[str, Any],
-    docker_compose_func: Callable[[str, Dict[str, Any], VarArg(str)], int],
+    config: Config,
+    docker_compose_func: Callable[[str, Config, VarArg(str)], int],
     service: str,
     path: str,
 ) -> str:

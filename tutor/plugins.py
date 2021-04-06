@@ -1,18 +1,15 @@
-from collections import namedtuple
-from copy import deepcopy
-from glob import glob
 import importlib
 import os
+from copy import deepcopy
+from glob import glob
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 import appdirs
 import click
 import pkg_resources
 
-from . import exceptions
-from . import fmt
-from . import serialize
-
+from . import exceptions, fmt, serialize
+from .types import Config, get_typed
 
 CONFIG_KEY = "PLUGINS"
 
@@ -69,7 +66,7 @@ class BasePlugin:
         self.command: click.Command = command
 
     @staticmethod
-    def load_config(obj: Any, plugin_name: str) -> Dict[str, Dict[str, Any]]:
+    def load_config(obj: Any, plugin_name: str) -> Dict[str, Config]:
         """
         Load config and check types.
         """
@@ -181,15 +178,15 @@ class BasePlugin:
         return self.name.upper() + "_" + key
 
     @property
-    def config_add(self) -> Dict[str, Any]:
+    def config_add(self) -> Config:
         return self.config.get("add", {})
 
     @property
-    def config_set(self) -> Dict[str, Any]:
+    def config_set(self) -> Config:
         return self.config.get("set", {})
 
     @property
-    def config_defaults(self) -> Dict[str, Any]:
+    def config_defaults(self) -> Config:
         return self.config.get("defaults", {})
 
     @property
@@ -269,16 +266,32 @@ class DictPlugin(BasePlugin):
         os.environ.get(ROOT_ENV_VAR_NAME, "")
     ) or appdirs.user_data_dir(appname="tutor-plugins")
 
-    def __init__(self, data: Dict[str, Any]):
-        Module = namedtuple("Module", data.keys())  # type: ignore
-        obj = Module(**data)  # type: ignore
-        super().__init__(data["name"], obj)
-        self._version = data["version"]
+    def __init__(self, data: Config):
+        name = data["name"]
+        if not isinstance(name, str):
+            raise exceptions.TutorError(
+                "Invalid plugin name: '{}'. Expected str, got {}".format(
+                    name, name.__class__
+                )
+            )
+
+        # Create a generic object (sort of a named tuple) which will contain all key/values from data
+        class Module:
+            pass
+
+        obj = Module()
+        for key, value in data.items():
+            setattr(obj, key, value)
+
+        super().__init__(name, obj)
+
+        version = data["version"]
+        if not isinstance(version, str):
+            raise TypeError("DictPlugin.__version__ must be str")
+        self._version: str = version
 
     @property
     def version(self) -> str:
-        if not isinstance(self._version, str):
-            raise TypeError("DictPlugin.__version__ must be str")
         return self._version
 
     @classmethod
@@ -305,7 +318,7 @@ class Plugins:
         DictPlugin,
     ]
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Config):
         self.config = deepcopy(config)
         # patches has the following structure:
         # {patch_name -> {plugin_name -> "content"}}
@@ -380,18 +393,17 @@ def iter_installed() -> Iterator[BasePlugin]:
     yield from Plugins.iter_installed()
 
 
-def enable(config: Dict[str, Any], name: str) -> None:
+def enable(config: Config, name: str) -> None:
     if not is_installed(name):
         raise exceptions.TutorError("plugin '{}' is not installed.".format(name))
     if is_enabled(config, name):
         return
-    if CONFIG_KEY not in config:
-        config[CONFIG_KEY] = []
-    config[CONFIG_KEY].append(name)
-    config[CONFIG_KEY].sort()
+    enabled = enabled_plugins(config)
+    enabled.append(name)
+    enabled.sort()
 
 
-def disable(config: Dict[str, Any], name: str) -> None:
+def disable(config: Config, name: str) -> None:
     fmt.echo_info("Disabling plugin {}...".format(name))
     for plugin in Plugins(config).iter_enabled():
         if name == plugin.name:
@@ -400,25 +412,32 @@ def disable(config: Dict[str, Any], name: str) -> None:
                 config.pop(key, None)
                 fmt.echo_info("    Removed config entry {}={}".format(key, value))
     # Remove plugin from list
-    while name in config[CONFIG_KEY]:
-        config[CONFIG_KEY].remove(name)
+    enabled = enabled_plugins(config)
+    while name in enabled:
+        enabled.remove(name)
     fmt.echo_info("    Plugin disabled")
 
 
-def iter_enabled(config: Dict[str, Any]) -> Iterator[BasePlugin]:
+def iter_enabled(config: Config) -> Iterator[BasePlugin]:
     yield from Plugins(config).iter_enabled()
 
 
-def is_enabled(config: Dict[str, Any], name: str) -> bool:
-    plugin_list = config.get(CONFIG_KEY) or []
-    return name in plugin_list
+def is_enabled(config: Config, name: str) -> bool:
+    return name in enabled_plugins(config)
 
 
-def iter_patches(config: Dict[str, str], name: str) -> Iterator[Tuple[str, str]]:
+def enabled_plugins(config: Config) -> List[str]:
+    if not config.get(CONFIG_KEY):
+        config[CONFIG_KEY] = []
+    plugins = get_typed(config, CONFIG_KEY, list)
+    return plugins
+
+
+def iter_patches(config: Config, name: str) -> Iterator[Tuple[str, str]]:
     yield from Plugins(config).iter_patches(name)
 
 
 def iter_hooks(
-    config: Dict[str, Any], hook_name: str
+    config: Config, hook_name: str
 ) -> Iterator[Tuple[str, Union[Dict[str, str], List[str]]]]:
     yield from Plugins(config).iter_hooks(hook_name)

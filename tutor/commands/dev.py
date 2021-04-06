@@ -1,17 +1,18 @@
 import os
-from typing import Any, Dict, List
+from typing import List
 
 import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
+from ..types import Config
 from .. import utils
 from . import compose
 from .context import Context
 
 
-def docker_compose(root: str, config: Dict[str, Any], *command: str) -> int:
+def docker_compose(root: str, config: Config, *command: str) -> int:
     """
     Run docker-compose with dev arguments.
     """
