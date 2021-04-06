@@ -1,18 +1,18 @@
 import os
-from typing import Dict, Any
 
 import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
+from ..types import get_typed, Config
 from .. import utils
 from . import compose
 from .config import save as config_save_command
 from .context import Context
 
 
-def docker_compose(root: str, config: Dict[str, Any], *command: str) -> int:
+def docker_compose(root: str, config: Config, *command: str) -> int:
     """
     Run docker-compose with local and production yml files.
     """
@@ -27,7 +27,7 @@ def docker_compose(root: str, config: Dict[str, Any], *command: str) -> int:
         tutor_env.pathjoin(root, "local", "docker-compose.prod.yml"),
         *args,
         "--project-name",
-        config["LOCAL_PROJECT_NAME"],
+        get_typed(config, "LOCAL_PROJECT_NAME", str),
         *command
     )
 
@@ -118,7 +118,7 @@ Are you sure you want to continue?"""
         running_version = "koa"
 
 
-def upgrade_from_ironwood(context: click.Context, config: Dict[str, Any]) -> None:
+def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
     tutor_env.save(context.obj.root, config)
 
@@ -166,7 +166,7 @@ def upgrade_from_ironwood(context: click.Context, config: Dict[str, Any]) -> Non
     context.invoke(compose.stop)
 
 
-def upgrade_from_juniper(context: click.Context, config: Dict[str, Any]) -> None:
+def upgrade_from_juniper(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Juniper"))
     tutor_env.save(context.obj.root, config)
 

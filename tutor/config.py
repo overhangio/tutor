@@ -1,15 +1,11 @@
 import os
-from typing import cast, Dict, Any, Tuple
+from typing import Tuple
 
-from . import exceptions
-from . import env
-from . import fmt
-from . import plugins
-from . import serialize
-from . import utils
+from . import env, exceptions, fmt, plugins, serialize, utils
+from .types import Config, cast_config
 
 
-def update(root: str) -> Dict[str, Any]:
+def update(root: str) -> Config:
     """
     Load and save the configuration.
     """
@@ -19,7 +15,7 @@ def update(root: str) -> Dict[str, Any]:
     return config
 
 
-def load(root: str) -> Dict[str, Any]:
+def load(root: str) -> Config:
     """
     Load full configuration. This will raise an exception if there is no current
     configuration in the project root.
@@ -28,13 +24,13 @@ def load(root: str) -> Dict[str, Any]:
     return load_no_check(root)
 
 
-def load_no_check(root: str) -> Dict[str, Any]:
+def load_no_check(root: str) -> Config:
     config, defaults = load_all(root)
     merge(config, defaults)
     return config
 
 
-def load_all(root: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+def load_all(root: str) -> Tuple[Config, Config]:
     """
     Return:
         current (dict): params currently saved in config.yml
@@ -46,9 +42,7 @@ def load_all(root: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     return current, defaults
 
 
-def merge(
-    config: Dict[str, str], defaults: Dict[str, str], force: bool = False
-) -> None:
+def merge(config: Config, defaults: Config, force: bool = False) -> None:
     """
     Merge default values with user configuration and perform rendering of "{{...}}"
     values.
@@ -58,23 +52,18 @@ def merge(
             config[key] = env.render_unknown(config, value)
 
 
-def load_defaults() -> Dict[str, Any]:
+def load_defaults() -> Config:
     config = serialize.load(env.read_template_file("config.yml"))
-    return cast(Dict[str, Any], config)
+    return cast_config(config)
 
 
-def load_config_file(path: str) -> Dict[str, Any]:
+def load_config_file(path: str) -> Config:
     with open(path) as f:
         config = serialize.load(f.read())
-    if not isinstance(config, dict):
-        raise exceptions.TutorError(
-            "Invalid configuration: expected dict, got {}".format(config.__class__)
-        )
-
-    return config
+    return cast_config(config)
 
 
-def load_current(root: str, defaults: Dict[str, str]) -> Dict[str, Any]:
+def load_current(root: str, defaults: Config) -> Config:
     """
     Load the configuration currently stored on disk.
     Note: this modifies the defaults with the plugin default values.
@@ -87,7 +76,7 @@ def load_current(root: str, defaults: Dict[str, str]) -> Dict[str, Any]:
     return config
 
 
-def load_user(root: str) -> Dict[str, Any]:
+def load_user(root: str) -> Config:
     path = config_path(root)
     if not os.path.exists(path):
         return {}
@@ -97,14 +86,14 @@ def load_user(root: str) -> Dict[str, Any]:
     return config
 
 
-def load_env(config: Dict[str, str], defaults: Dict[str, str]) -> None:
+def load_env(config: Config, defaults: Config) -> None:
     for k in defaults.keys():
         env_var = "TUTOR_" + k
         if env_var in os.environ:
             config[k] = serialize.parse(os.environ[env_var])
 
 
-def load_required(config: Dict[str, str], defaults: Dict[str, str]) -> None:
+def load_required(config: Config, defaults: Config) -> None:
     """
     All these keys must be present in the user's config.yml. This includes all values
     that are generated once and must be kept after that, such as passwords.
@@ -121,7 +110,7 @@ def load_required(config: Dict[str, str], defaults: Dict[str, str]) -> None:
             config[key] = env.render_unknown(config, defaults[key])
 
 
-def load_plugins(config: Dict[str, str], defaults: Dict[str, str]) -> None:
+def load_plugins(config: Config, defaults: Config) -> None:
     """
     Add, override and set new defaults from plugins.
     """
@@ -143,11 +132,11 @@ def load_plugins(config: Dict[str, str], defaults: Dict[str, str]) -> None:
                 config[key] = env.render_unknown(config, value)
 
 
-def is_service_activated(config: Dict[str, Any], service: str) -> bool:
+def is_service_activated(config: Config, service: str) -> bool:
     return config["RUN_" + service.upper()] is not False
 
 
-def upgrade_obsolete(config: Dict[str, Any]) -> None:
+def upgrade_obsolete(config: Config) -> None:
     # Openedx-specific mysql passwords
     if "MYSQL_PASSWORD" in config:
         config["MYSQL_ROOT_PASSWORD"] = config["MYSQL_PASSWORD"]
@@ -209,7 +198,7 @@ def convert_json2yml(root: str) -> None:
     )
 
 
-def save_config_file(root: str, config: Dict[str, str]) -> None:
+def save_config_file(root: str, config: Config) -> None:
     path = config_path(root)
     utils.ensure_file_directory_exists(path)
     with open(path, "w") as of:

@@ -1,11 +1,13 @@
-from typing import cast, Any, Dict, Iterator, List, Tuple
+from typing import Iterator, List, Tuple
 
 import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
+from .. import exceptions
 from .. import images
 from .. import plugins
+from ..types import Config
 from .. import utils
 from .context import Context
 
@@ -105,7 +107,7 @@ def printtag(context: Context, image_names: List[str]) -> None:
             print(tag)
 
 
-def build_image(root: str, config: Dict[str, Any], image: str, *args: str) -> None:
+def build_image(root: str, config: Config, image: str, *args: str) -> None:
     # Build base images
     for img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
         images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
@@ -122,14 +124,14 @@ def build_image(root: str, config: Dict[str, Any], image: str, *args: str) -> No
         images.build(tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args)
 
 
-def pull_image(config: Dict[str, Any], image: str) -> None:
+def pull_image(config: Config, image: str) -> None:
     for _img, tag in iter_images(config, image, all_image_names(config)):
         images.pull(tag)
     for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
         images.pull(tag)
 
 
-def push_image(config: Dict[str, Any], image: str) -> None:
+def push_image(config: Config, image: str) -> None:
     for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
         images.push(tag)
     for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
@@ -137,7 +139,7 @@ def push_image(config: Dict[str, Any], image: str) -> None:
 
 
 def iter_images(
-    config: Dict[str, Any], image: str, image_list: List[str]
+    config: Config, image: str, image_list: List[str]
 ) -> Iterator[Tuple[str, str]]:
     for img in image_list:
         if image in [img, "all"]:
@@ -146,21 +148,26 @@ def iter_images(
 
 
 def iter_plugin_images(
-    config: Dict[str, Any], image: str, hook_name: str
+    config: Config, image: str, hook_name: str
 ) -> Iterator[Tuple[str, str, str]]:
     for plugin, hook in plugins.iter_hooks(config, hook_name):
-        hook = cast(Dict[str, str], hook)
+        if not isinstance(hook, dict):
+            raise exceptions.TutorError(
+                "Invalid hook '{}': expected dict, got {}".format(
+                    hook_name, hook.__class__
+                )
+            )
         for img, tag in hook.items():
             if image in [img, "all"]:
                 tag = tutor_env.render_str(config, tag)
                 yield plugin, img, tag
 
 
-def all_image_names(config: Dict[str, Any]) -> List[str]:
+def all_image_names(config: Config) -> List[str]:
     return BASE_IMAGE_NAMES + vendor_image_names(config)
 
 
-def vendor_image_names(config: Dict[str, Any]) -> List[str]:
+def vendor_image_names(config: Config) -> List[str]:
     vendor_images = VENDOR_IMAGES[:]
     for image in VENDOR_IMAGES:
         if not config.get("RUN_" + image.upper(), True):

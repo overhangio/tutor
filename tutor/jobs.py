@@ -1,8 +1,7 @@
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
-from . import env
-from . import fmt
-from . import plugins
+from . import env, fmt, plugins
+from .types import Config
 
 BASE_OPENEDX_COMMAND = """
 export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
@@ -11,7 +10,7 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 
 class BaseJobRunner:
-    def __init__(self, root: str, config: Dict[str, Any]):
+    def __init__(self, root: str, config: Config):
         self.root = root
         self.config = config
 

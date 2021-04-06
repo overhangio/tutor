@@ -1,14 +1,14 @@
-from typing import Any, Dict, List, Tuple
+from typing import List, Tuple
+
 import click
 
 from . import config as tutor_config
-from . import env
-from . import exceptions
-from . import fmt
+from . import env, exceptions, fmt
 from .__about__ import __version__
+from .types import Config, get_typed
 
 
-def update(root: str, interactive: bool = True) -> Dict[str, Any]:
+def update(root: str, interactive: bool = True) -> Config:
     """
     Load and save the configuration.
     """
@@ -18,9 +18,7 @@ def update(root: str, interactive: bool = True) -> Dict[str, Any]:
     return config
 
 
-def load_all(
-    root: str, interactive: bool = True
-) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+def load_all(root: str, interactive: bool = True) -> Tuple[Config, Config]:
     """
     Load configuration and interactively ask questions to collect param values from the user.
     """
@@ -30,7 +28,7 @@ def load_all(
     return config, defaults
 
 
-def ask_questions(config: Dict[str, Any], defaults: Dict[str, Any]) -> None:
+def ask_questions(config: Config, defaults: Config) -> None:
     run_for_prod = config.get("LMS_HOST") != "local.overhang.io"
     run_for_prod = click.confirm(
         fmt.question(
@@ -40,7 +38,7 @@ def ask_questions(config: Dict[str, Any], defaults: Dict[str, Any]) -> None:
         default=run_for_prod,
     )
     if not run_for_prod:
-        dev_values = {
+        dev_values: Config = {
             "LMS_HOST": "local.overhang.io",
             "CMS_HOST": "studio.local.overhang.io",
             "ENABLE_HTTPS": False,
@@ -54,7 +52,8 @@ def ask_questions(config: Dict[str, Any], defaults: Dict[str, Any]) -> None:
 
     if run_for_prod:
         ask("Your website domain name for students (LMS)", "LMS_HOST", config, defaults)
-        if "localhost" in config["LMS_HOST"]:
+        lms_host = get_typed(config, "LMS_HOST", str)
+        if "localhost" in lms_host:
             raise exceptions.TutorError(
                 "You may not use 'localhost' as the LMS domain name. To run a local platform for testing purposes you should answer 'n' to the previous question."
             )
@@ -159,19 +158,18 @@ def ask_questions(config: Dict[str, Any], defaults: Dict[str, Any]) -> None:
         )
 
 
-def ask(
-    question: str, key: str, config: Dict[str, Any], defaults: Dict[str, Any]
-) -> None:
-    default = env.render_str(config, config.get(key, defaults[key]))
+def ask(question: str, key: str, config: Config, defaults: Config) -> None:
+    default = get_typed(defaults, key, str)
+    default = get_typed(config, key, str, default=default)
+    default = env.render_str(config, default)
     config[key] = click.prompt(
         fmt.question(question), prompt_suffix=" ", default=default, show_default=True
     )
 
 
-def ask_bool(
-    question: str, key: str, config: Dict[str, Any], defaults: Dict[str, Any]
-) -> None:
-    default = config.get(key, defaults[key])
+def ask_bool(question: str, key: str, config: Config, defaults: Config) -> None:
+    default = get_typed(defaults, key, bool)
+    default = get_typed(config, key, bool, default=default)
     config[key] = click.confirm(
         fmt.question(question), prompt_suffix=" ", default=default
     )
@@ -180,11 +178,11 @@ def ask_bool(
 def ask_choice(
     question: str,
     key: str,
-    config: Dict[str, Any],
-    defaults: Dict[str, Any],
+    config: Config,
+    defaults: Config,
     choices: List[str],
 ) -> None:
-    default = config.get(key, defaults[key])
+    default = str(config.get(key, defaults[key]))
     answer = click.prompt(
         fmt.question(question),
         type=click.Choice(choices),

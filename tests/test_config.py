@@ -1,10 +1,10 @@
-from typing import Any, Dict
 import unittest
 from unittest.mock import Mock, patch
 import tempfile
 
 from tutor import config as tutor_config
 from tutor import interactive
+from tutor.types import get_typed, Config
 
 
 class ConfigTests(unittest.TestCase):
@@ -13,13 +13,13 @@ class ConfigTests(unittest.TestCase):
         self.assertNotIn("TUTOR_VERSION", defaults)
 
     def test_merge(self) -> None:
-        config1 = {"x": "y"}
-        config2 = {"x": "z"}
+        config1: Config = {"x": "y"}
+        config2: Config = {"x": "z"}
         tutor_config.merge(config1, config2)
         self.assertEqual({"x": "y"}, config1)
 
     def test_merge_render(self) -> None:
-        config: Dict[str, Any] = {}
+        config: Config = {}
         defaults = tutor_config.load_defaults()
         with patch.object(tutor_config.utils, "random_string", return_value="abcd"):
             tutor_config.merge(config, defaults)
@@ -62,13 +62,13 @@ class ConfigTests(unittest.TestCase):
             config, defaults = interactive.load_all(rootdir, interactive=False)
 
         self.assertIn("MYSQL_ROOT_PASSWORD", config)
-        self.assertEqual(8, len(config["MYSQL_ROOT_PASSWORD"]))
+        self.assertEqual(8, len(get_typed(config, "MYSQL_ROOT_PASSWORD", str)))
         self.assertNotIn("LMS_HOST", config)
         self.assertEqual("www.myopenedx.com", defaults["LMS_HOST"])
         self.assertEqual("studio.{{ LMS_HOST }}", defaults["CMS_HOST"])
 
     def test_is_service_activated(self) -> None:
-        config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}
+        config: Config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}
 
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
         self.assertFalse(tutor_config.is_service_activated(config, "service2"))

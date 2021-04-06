@@ -1,6 +1,5 @@
 import os
 import tempfile
-from typing import Any, Dict
 import unittest
 from unittest.mock import patch, Mock
 
@@ -8,6 +7,7 @@ from tutor import config as tutor_config
 from tutor import env
 from tutor import fmt
 from tutor import exceptions
+from tutor.types import Config
 
 
 class EnvTests(unittest.TestCase):
@@ -55,7 +55,7 @@ class EnvTests(unittest.TestCase):
         self.assertRaises(exceptions.TutorError, env.render_str, {}, "hello {{ name }}")
 
     def test_render_file(self) -> None:
-        config: Dict[str, Any] = {}
+        config: Config = {}
         tutor_config.merge(config, tutor_config.load_defaults())
         config["MYSQL_ROOT_PASSWORD"] = "testpassword"
         rendered = env.render_file(config, "hooks", "mysql", "init")
@@ -125,7 +125,7 @@ class EnvTests(unittest.TestCase):
                 f.write("Hello my ID is {{ ID }}")
 
             # Create configuration
-            config = {"ID": "abcd"}
+            config: Config = {"ID": "abcd"}
 
             # Render templates
             with patch.object(
@@ -162,7 +162,7 @@ class EnvTests(unittest.TestCase):
                 f.write("some content")
 
             # Load env once
-            config: Dict[str, Any] = {"PLUGINS": []}
+            config: Config = {"PLUGINS": []}
             env1 = env.Renderer.instance(config).environment
 
             with patch.object(
@@ -171,7 +171,7 @@ class EnvTests(unittest.TestCase):
                 return_value=[plugin1],
             ):
                 # Load env a second time
-                config["PLUGINS"].append("myplugin")
+                config["PLUGINS"] = ["myplugin"]
                 env2 = env.Renderer.instance(config).environment
 
             self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())  # type: ignore

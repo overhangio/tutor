@@ -1,6 +1,6 @@
 from datetime import datetime
 from time import sleep
-from typing import cast, Any, Dict, List, Optional, Type
+from typing import Any, List, Optional, Type
 
 import click
 
@@ -11,6 +11,7 @@ from .. import fmt
 from .. import interactive as interactive_config
 from .. import jobs
 from .. import serialize
+from ..types import Config, get_typed
 from .. import utils
 from .context import Context
 
@@ -50,7 +51,11 @@ class K8sJobRunner(jobs.BaseJobRunner):
     def load_job(self, name: str) -> Any:
         all_jobs = self.render("k8s", "jobs.yml")
         for job in serialize.load_all(all_jobs):
-            job_name = cast(str, job["metadata"]["name"])
+            job_name = job["metadata"]["name"]
+            if not isinstance(job_name, str):
+                raise exceptions.TutorError(
+                    "Invalid job name: '{}'. Expected str.".format(job_name)
+                )
             if job_name == name:
                 return job
         raise ValueError("Could not find job '{}'".format(name))
@@ -64,7 +69,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
         api = K8sClients.instance().batch_api
         return [
             job.metadata.name
-            for job in api.list_namespaced_job(self.config["K8S_NAMESPACE"]).items
+            for job in api.list_namespaced_job(k8s_namespace(self.config)).items
             if job.status.active
         ]
 
@@ -139,7 +144,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             """    kubectl logs --namespace={namespace} --follow $(kubectl get --namespace={namespace} pods """
             """--selector=job-name={job_name} -o=jsonpath="{{.items[0].metadata.name}}")\n\n"""
             "Waiting for job completion..."
-        ).format(job_name=job_name, namespace=self.config["K8S_NAMESPACE"])
+        ).format(job_name=job_name, namespace=k8s_namespace(self.config))
         fmt.echo_info(message)
 
         # Wait for completion
@@ -257,14 +262,15 @@ def reboot(context: click.Context) -> None:
     context.invoke(start)
 
 
-def resource_selector(config: Dict[str, str], *selectors: str) -> List[str]:
+def resource_selector(config: Config, *selectors: str) -> List[str]:
     """
     Convenient utility for filtering only the resources that belong to this project.
     """
     selector = ",".join(
-        ["app.kubernetes.io/instance=openedx-" + config["ID"]] + list(selectors)
+        ["app.kubernetes.io/instance=openedx-" + get_typed(config, "ID", str)]
+        + list(selectors)
     )
-    return ["--namespace", config["K8S_NAMESPACE"], "--selector=" + selector]
+    return ["--namespace", k8s_namespace(config), "--selector=" + selector]
 
 
 @click.command(help="Completely delete an existing platform")
@@ -398,7 +404,7 @@ def upgrade(context: Context, from_version: str) -> None:
         running_version = "koa"
 
 
-def upgrade_from_ironwood(config: Dict[str, Any]) -> None:
+def upgrade_from_ironwood(config: Config) -> None:
     if not config["RUN_MONGODB"]:
         fmt.echo_info(
             "You are not running MongDB (RUN_MONGODB=false). It is your "
@@ -425,7 +431,7 @@ your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
     fmt.echo_info(message)
 
 
-def upgrade_from_juniper(config: Dict[str, Any]) -> None:
+def upgrade_from_juniper(config: Config) -> None:
     if not config["RUN_MYSQL"]:
         fmt.echo_info(
             "You are not running MySQL (RUN_MYSQL=false). It is your "
@@ -446,7 +452,7 @@ your MySQL database from v5.6 to v5.7. You should run something similar to:
 
 
 def kubectl_exec(
-    config: Dict[str, Any], service: str, command: str, attach: bool = False
+    config: Config, service: str, command: str, attach: bool = False
 ) -> int:
     selector = "app.kubernetes.io/name={}".format(service)
     pods = K8sClients.instance().core_api.list_namespaced_pod(
@@ -464,7 +470,7 @@ def kubectl_exec(
         "exec",
         *attach_opts,
         "--namespace",
-        config["K8S_NAMESPACE"],
+        k8s_namespace(config),
         pod_name,
         "--",
         "sh",
@@ -474,7 +480,7 @@ def kubectl_exec(
     )
 
 
-def wait_for_pod_ready(config: Dict[str, str], service: str) -> None:
+def wait_for_pod_ready(config: Config, service: str) -> None:
     fmt.echo_info("Waiting for a {} pod to be ready...".format(service))
     utils.kubectl(
         "wait",
@@ -483,6 +489,10 @@ def wait_for_pod_ready(config: Dict[str, str], service: str) -> None:
         "--timeout=600s",
         "pod",
     )
+
+
+def k8s_namespace(config: Config) -> str:
+    return get_typed(config, "K8S_NAMESPACE", str)
 
 
 k8s.add_command(quickstart)

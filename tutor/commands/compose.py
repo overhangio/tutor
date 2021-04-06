@@ -1,5 +1,5 @@
 import os
-from typing import Any, Callable, Dict, List
+from typing import Callable, List
 
 import click
 from mypy_extensions import VarArg
@@ -11,6 +11,7 @@ from ..exceptions import TutorError
 from .. import fmt
 from .. import jobs
 from .. import serialize
+from ..types import Config
 from .. import utils
 from .context import Context
 
@@ -19,8 +20,8 @@ class ComposeJobRunner(jobs.BaseJobRunner):
     def __init__(
         self,
         root: str,
-        config: Dict[str, Any],
-        docker_compose_func: Callable[[str, Dict[str, Any], VarArg(str)], int],
+        config: Config,
+        docker_compose_func: Callable[[str, Config, VarArg(str)], int],
     ):
         super().__init__(root, config)
         self.docker_compose_func = docker_compose_func

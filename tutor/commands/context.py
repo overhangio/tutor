@@ -1,9 +1,7 @@
-from typing import Any, Dict
+from ..types import Config
 
 
-def unimplemented_docker_compose(
-    root: str, config: Dict[str, Any], *command: str
-) -> int:
+def unimplemented_docker_compose(root: str, config: Config, *command: str) -> int:
     raise NotImplementedError
 
 
@@ -13,5 +11,5 @@ class Context:
         self.root = root
         self.docker_compose_func = unimplemented_docker_compose
 
-    def docker_compose(self, root: str, config: Dict[str, Any], *command: str) -> int:
+    def docker_compose(self, root: str, config: Config, *command: str) -> int:
         return self.docker_compose_func(root, config, *command)

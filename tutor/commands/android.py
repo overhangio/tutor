@@ -1,5 +1,3 @@
-from typing import Dict
-
 import click
 
 from .compose import ComposeJobRunner
@@ -7,6 +5,7 @@ from .local import docker_compose as local_docker_compose
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
+from ..types import Config
 from .context import Context
 
 
@@ -28,7 +27,7 @@ def build(context: Context, mode: str) -> None:
     )
 
 
-def build_command(config: Dict[str, str], target: str) -> str:
+def build_command(config: Config, target: str) -> str:
     gradle_target = {
         "debug": "assembleProdDebuggable",
         "release": "assembleProdRelease",
