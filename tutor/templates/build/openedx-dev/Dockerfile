@@ -13,6 +13,8 @@ RUN pip install -r requirements/edx/development.txt
 # We might be able to avoid this once they make a release later than 7.19.0.
 RUN pip install ipdb==0.13.4 git+https://github.com/ipython/ipython.git@d0649a54a8936a8019d54549779dc92bcbde4e68#egg=ipython
 
+{{ patch("openedx-dev-dockerfile-post-python-requirements") }}
+
 # Recompile static assets: in development mode all static assets are stored in edx-platform,
 # and the location of these files is stored in webpack-stats.json. If we don't recompile
 # static assets, then production assets will be served instead.

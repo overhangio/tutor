@@ -87,6 +87,8 @@ RUN pip install django-redis==4.12.1
 # Install uwsgi
 RUN pip install uwsgi==2.0.19.1
 
+{{ patch("openedx-dockerfile-post-python-requirements") }}
+
 # Install private requirements: this is useful for installing custom xblocks.
 COPY ./requirements/ /openedx/requirements
 RUN cd /openedx/requirements/ \
