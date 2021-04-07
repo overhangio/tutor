@@ -3,6 +3,7 @@
 Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
+- [Feature] Add patches to extend python requirements installation process in openedx and openedx-dev Dockerfiles.
 
 ## v11.2.6 (2021-04-09)
 
