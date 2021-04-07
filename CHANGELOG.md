@@ -4,6 +4,9 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Upgrade all services to open-release/koa.3.
+- [Feature] Make it possible to build the openedx Docker image with a custom openedx-i18n version with the ``--build-arg OPENEDX_I18N_VERSION=custom`` command line argument.
+
 ## v11.2.5 (2021-03-30)
 
 - [Bugfix] Fix edge case where `PLUGINS` entry is null in config.yml.

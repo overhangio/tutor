@@ -36,8 +36,6 @@ RUN mkdir -p /openedx/edx-platform && \
 WORKDIR /openedx/edx-platform
 
 # Patch edx-platform
-# Security patches
-RUN curl https://github.com/overhangio/edx-platform/commit/a4369d300b85d94442844443a3d258a2b516955c.patch | git apply -
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
@@ -53,11 +51,12 @@ RUN curl https://github.com/overhangio/edx-platform/commit/1c733e3ba11249cf16358
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
+ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
 RUN cd /tmp \
-    && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/{{ OPENEDX_COMMON_VERSION }}.tar.gz \
+    && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/$OPENEDX_I18N_VERSION.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
     && mkdir -p /openedx/locale/contrib \
-    && mv openedx-i18n-{{ OPENEDX_COMMON_VERSION|replace("/", "-") }}/edx-platform/locale /openedx/locale/contrib \
+    && mv openedx-i18n-*/edx-platform/locale /openedx/locale/contrib \
     && rm -rf openedx-i18n*
 
 ###### Install python requirements in virtualenv
@@ -75,9 +74,6 @@ WORKDIR /openedx/edx-platform
 
 # Install the right version of pip/setuptools
 RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
-
-# Install requirements which were stripped from pypi: this can be removed once the fix has been merged in Koa
-RUN pip install -e git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2
 
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
