@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.6 (2021-04-09)
+
 - [Improvement] Upgrade all services to open-release/koa.3.
 - [Feature] Make it possible to build the openedx Docker image with a custom openedx-i18n version with the ``--build-arg OPENEDX_I18N_VERSION=custom`` command line argument.
 
