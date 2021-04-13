@@ -83,7 +83,10 @@ class ComposeJobRunner(jobs.BaseJobRunner):
         )
 
 
-@click.command(help="Run all or a selection of configured Open edX services")
+@click.command(
+    short_help="Run all or a selection of services.",
+    help="Run all or a selection of services. Docker images will be rebuilt where necessary.",
+)
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
@@ -93,6 +96,9 @@ def start(context: Context, detach: bool, services: List[str]) -> None:
         command.append("-d")
 
     config = tutor_config.load(context.root)
+    # Rebuild Docker images with a `build: ...` context.
+    context.docker_compose(context.root, config, "build")
+    # Start services
     context.docker_compose(context.root, config, *command, *services)
 
 

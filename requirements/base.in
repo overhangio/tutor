@@ -1,6 +1,5 @@
 appdirs
 click
-click_repl
 mypy
 pycryptodome
 jinja2

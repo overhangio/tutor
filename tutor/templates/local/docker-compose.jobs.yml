@@ -38,10 +38,4 @@ services:
         MONGODB_PORT: "{{ MONGODB_PORT }}"
       depends_on: {{ [("elasticsearch", RUN_ELASTICSEARCH), ("mongodb", RUN_MONGODB)]|list_if }}
 
-    android-job:
-      image: {{ DOCKER_IMAGE_ANDROID }}
-      volumes:
-        - "../android/:/openedx/config/"
-        - "../../data/android/:/openedx/data/"
-
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}

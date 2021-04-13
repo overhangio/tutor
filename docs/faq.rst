@@ -28,7 +28,7 @@ The `native installation <https://openedx.atlassian.net/wiki/spaces/OpenOPS/page
 4. Security: because you are no longer bound to a single OS, with Tutor you are now free to install security-related upgrades as soon as they become available.
 5. Portability: Tutor makes it easy to move your platform from one server to another. Just zip-compress your Tutor project root, send it to another server and you're done.
 
-There are also many features that are not included in the native installation, such as a :ref:`web user interface <webui>` for remotely installing the platform, :ref:`Kubernetes deployment <k8s>`, additional languages, etc. You'll discover these differences as you explore Tutor :)
+There are also many features that are not included in the native installation, such as a `web user interface <https://github.com/overhangio/tutor-webui>`__ for remotely installing the platform, :ref:`Kubernetes deployment <k8s>`, additional languages, etc. You'll discover these differences as you explore Tutor :)
 
 What's the difference with the official devstack?
 -------------------------------------------------
@@ -45,12 +45,12 @@ What features are missing from Tutor?
 
 Tutor tries very hard to support all major Open edX features, notably in the form of :ref:`plugins <existing_plugins>`. In particular, the discovery and ecommerce services, once unavailable in Tutor, can now be easily installed via plugins. If you are interested in sponsoring the development of a new plugin, please `get in touch <mailto:worktogether@overhang.io>`__!
 
-It should be noted that the `Analytics <https://github.com/edx/edx-analytics-pipeline>`__ stack is currently unsupported, and will likely stay so in the future, as it would require a tremendous amount of work to containerize all the components. For generating great-looking analytics reports, we recommend the `Figures plugin <https://github.com/overhangio/tutor-figures>`__.
+It should be noted that the `Analytics <https://github.com/edx/edx-analytics-pipeline>`__ stack is currently unsupported, and will likely stay so in the future, as it would require a tremendous amount of work to containerize all the components. We are currently working on a replacement solution.
 
 Are there people already running this in production?
 ----------------------------------------------------
 
-Yes, many of them. There is no way to count precisely how many running Open edX platforms were deployed with Tutor, but from feedback collected directly from real users, there must be dozens, if not hundreds. Tutor is also used by some Open edX providers who are hosting platforms for their customers.
+Yes, many of them. There is no way to count precisely how many running Open edX platforms were deployed with Tutor, but from feedback collected directly from real users, there must be hundreds, if not thousands. Tutor is also used by some Open edX providers who are hosting platforms for their customers.
 
 Why should I trust software written by some random guy on the Internet?
 -----------------------------------------------------------------------

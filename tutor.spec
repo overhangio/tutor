@@ -2,15 +2,11 @@
 import importlib
 import os
 import pkg_resources
-import wcwidth
 
 block_cipher = None
 
 datas = [("./tutor/templates", "./tutor/templates")]
 hidden_imports = []
-
-# Fix missing wcwidth/version.json file
-datas.append((os.path.dirname(wcwidth.__file__), 'wcwidth'))
 
 # Auto-discover plugins and include patches & templates folders
 for entrypoint in pkg_resources.iter_entry_points("tutor.plugin.v0"):

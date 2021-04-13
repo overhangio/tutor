@@ -3,9 +3,7 @@ import sys
 
 import appdirs
 import click
-import click_repl
 
-from .android import android
 from .config import config_command
 from .context import Context
 from .dev import dev
@@ -13,8 +11,6 @@ from .images import images_command
 from .k8s import k8s
 from .local import local
 from .plugins import plugins_command, add_plugin_commands
-from .ui import ui
-from .webui import webui
 from ..__about__ import __version__
 from .. import exceptions
 from .. import fmt
@@ -23,15 +19,11 @@ from .. import utils
 
 def main() -> None:
     try:
-        click_repl.register_repl(cli, name="ui")
         cli.add_command(images_command)
         cli.add_command(config_command)
         cli.add_command(local)
         cli.add_command(dev)
-        cli.add_command(android)
         cli.add_command(k8s)
-        cli.add_command(ui)
-        cli.add_command(webui)
         cli.add_command(print_help)
         cli.add_command(plugins_command)
         add_plugin_commands(cli)

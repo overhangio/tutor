@@ -23,12 +23,8 @@ chardet==4.0.0
     # via
     #   -r requirements/base.txt
     #   requests
-click-repl==0.2.0
-    # via -r requirements/base.txt
 click==8.0.1
-    # via
-    #   -r requirements/base.txt
-    #   click-repl
+    # via -r requirements/base.txt
 docutils==0.16
     # via
     #   sphinx
@@ -65,10 +61,6 @@ oauthlib==3.1.1
     #   requests-oauthlib
 packaging==20.9
     # via sphinx
-prompt-toolkit==3.0.18
-    # via
-    #   -r requirements/base.txt
-    #   click-repl
 pyasn1-modules==0.2.8
     # via
     #   -r requirements/base.txt
@@ -111,7 +103,6 @@ rsa==4.7.2
 six==1.16.0
     # via
     #   -r requirements/base.txt
-    #   click-repl
     #   google-auth
     #   kubernetes
     #   python-dateutil
@@ -148,10 +139,6 @@ urllib3==1.26.5
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-wcwidth==0.2.5
-    # via
-    #   -r requirements/base.txt
-    #   prompt-toolkit
 websocket-client==1.0.1
     # via
     #   -r requirements/base.txt

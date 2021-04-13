@@ -11,7 +11,7 @@ from ..types import Config
 from .. import utils
 from .context import Context
 
-BASE_IMAGE_NAMES = ["openedx", "forum", "android"]
+BASE_IMAGE_NAMES = ["openedx", "forum"]
 DEV_IMAGE_NAMES = ["openedx-dev"]
 VENDOR_IMAGES = [
     "caddy",

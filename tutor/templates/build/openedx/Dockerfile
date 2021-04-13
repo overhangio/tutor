@@ -36,29 +36,11 @@ RUN mkdir -p /openedx/edx-platform && \
 WORKDIR /openedx/edx-platform
 
 {% if patch("openedx-dockerfile-git-patches-default") %}
-# Custom edx-platform default patches
+# Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# Security patches
-# https://github.com/edx/edx-platform/pull/27394
-RUN curl https://github.com/overhangio/edx-platform/commit/a0fdc97f1704659d26e167de3fbf2ab8c371d67b.patch | git apply -
-# Django security releases
-RUN curl https://github.com/overhangio/edx-platform/commit/67973f2445f667af23f779d5551070835de03efe.patch | git apply -
-# Fix video unit completion
-RUN curl https://github.com/overhangio/edx-platform/commit/3d489952f7cfd83fed47c700c7cd0b477b68351e.patch | git apply -
-# Make it possible to disable learner records globally
-# https://github.com/edx/edx-platform/pull/25182
-# https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
-RUN curl https://github.com/overhangio/edx-platform/commit/bd038bab3cf02df147e754f7743e46b68b43bac8.patch | git apply -
-# Fix inconvenient pavelib warning
-# https://github.com/edx/edx-platform/pull/25771
-# https://github.com/overhangio/edx-platform/tree/overhangio/fix-paver-warning
-RUN curl https://github.com/overhangio/edx-platform/commit/bc0ab09f9945bd14aa6be1dbbf928cce58f079d2.patch | git apply -
-# Fix js upload in scorm packages by upgrading django-pipeline
-# https://github.com/edx/edx-platform/pull/25957
-# https://github.com/overhangio/edx-platform/tree/overhangio/upgrade-django-pipeline
-RUN curl https://github.com/overhangio/edx-platform/commit/1c733e3ba11249cf16358684169e6137a308e796.patch | git apply -
+# RUN curl https://github.com/overhangio/edx-platform/commit/<sha1>.patch | git apply -
 {% endif %}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
@@ -91,7 +73,7 @@ RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
 RUN pip install -r ./requirements/edx/base.txt
 
 # Install scorm xblock
-RUN pip install "openedx-scorm-xblock<12.0.0,>=11.0.0"
+RUN pip install "openedx-scorm-xblock<13.0.0,>=12.0.0"
 
 # Install django-redis for using redis as a django cache
 RUN pip install django-redis==4.12.1
@@ -112,7 +94,7 @@ FROM python as nodejs-requirements
 ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
-RUN pip install nodeenv==1.4.0
+RUN pip install nodeenv==1.6.0
 RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
 
 # Install nodejs requirements

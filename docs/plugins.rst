@@ -20,33 +20,28 @@ Commands
 --------
 
 List installed plugins::
-  
+
     tutor plugins list
-    
+
 Enable/disable a plugin::
-  
+
     tutor plugins enable myplugin
     tutor plugins disable myplugin
-    
+
 After enabling or disabling a plugin, the environment should be re-generated with::
-  
+
     tutor config save
-    
+
 .. _existing_plugins:
 
 Existing plugins
 ----------------
 
-- `Course discovery <https://pypi.org/project/tutor-discovery>`__: Deploy an API for interacting with your course catalog
-- `Ecommerce <https://pypi.org/project/tutor-ecommerce>`__: Sell courses and products on your Open edX platform
-- `Figures <https://pypi.org/project/tutor-figures>`__: Visualize daily stats about course engagement
-- `MinIO <https://pypi.org/project/tutor-minio>`__: S3 emulator for object storage and scalable Open edX deployment.
-- `Notes <https://pypi.org/project/tutor-notes>`__:  Allows students to annotate portions of the courseware.
-- `Xqueue <https://pypi.org/project/tutor-xqueue>`__: for external grading
+Officially-supported plugins are listed on the `Overhang.IO <https://overhang.io/tutor/plugins>`__ website.
 
 Plugin development
 ------------------
- 
+
 .. toctree::
    :maxdepth: 2
 

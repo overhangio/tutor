@@ -102,7 +102,6 @@ def load_required(config: Config, defaults: Config) -> None:
         "OPENEDX_SECRET_KEY",
         "MYSQL_ROOT_PASSWORD",
         "OPENEDX_MYSQL_PASSWORD",
-        "ANDROID_OAUTH2_SECRET",
         "ID",
         "JWT_RSA_PRIVATE_KEY",
     ]:

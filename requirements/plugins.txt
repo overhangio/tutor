@@ -1,7 +1,10 @@
-tutor-discovery
-tutor-ecommerce
-#tutor-figures
-tutor-license
-tutor-minio
-tutor-notes
-tutor-xqueue
+# change version ranges when upgrading from lilac
+tutor-android>=12.0.0,<13.0.0
+tutor-discovery>=12.0.0,<13.0.0
+tutor-ecommerce>=12.0.0,<13.0.0
+tutor-license>=12.0.0,<13.0.0
+tutor-mfe>=12.0.0,<13.0.0
+tutor-minio>=12.0.0,<13.0.0
+tutor-notes>=12.0.0,<13.0.0
+tutor-webui>=12.0.0,<13.0.0
+tutor-xqueue>=12.0.0,<13.0.0

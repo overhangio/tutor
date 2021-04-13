@@ -8,7 +8,7 @@ import pkg_resources
 
 from . import exceptions, fmt, plugins, utils
 from .__about__ import __version__
-from .types import Config
+from .types import Config, ConfigValue
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
@@ -52,12 +52,13 @@ class Renderer:
         environment.filters["encrypt"] = utils.encrypt
         environment.filters["list_if"] = utils.list_if
         environment.filters["long_to_base64"] = utils.long_to_base64
+        environment.globals["iter_values_named"] = self.iter_values_named
+        environment.globals["patch"] = self.patch
         environment.filters["random_string"] = utils.random_string
         environment.filters["reverse_host"] = utils.reverse_host
+        environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.filters["rsa_private_key"] = utils.rsa_private_key
         environment.filters["walk_templates"] = self.walk_templates
-        environment.globals["patch"] = self.patch
-        environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
 
@@ -70,6 +71,29 @@ class Renderer:
         for template in env_templates:
             if template.startswith(full_prefix) and self.is_part_of_env(template):
                 yield template
+
+    def iter_values_named(
+        self,
+        prefix: Optional[str] = None,
+        suffix: Optional[str] = None,
+        allow_empty: bool = False,
+    ) -> Iterable[ConfigValue]:
+        """
+        Iterate on all config values for which the name match the given pattern.
+
+        Note that here we only iterate on the values, not the key names. Empty
+        values (those that evaluate to boolean `false`) will not be yielded, unless
+        `allow_empty` is True.
+        TODO document this in the plugins API
+        """
+        for var_name, value in self.config.items():
+            if prefix is not None and not var_name.startswith(prefix):
+                continue
+            if suffix is not None and not var_name.endswith(suffix):
+                continue
+            if not allow_empty and not value:
+                continue
+            yield value
 
     def walk_templates(self, subdir: str) -> Iterable[str]:
         """
@@ -110,15 +134,13 @@ class Renderer:
         """
         patches = []
         for plugin, patch in plugins.iter_patches(self.config, name):
-            patch_template = self.environment.from_string(patch)
             try:
-                patches.append(patch_template.render(**self.config))
-            except jinja2.exceptions.UndefinedError as e:
-                raise exceptions.TutorError(
-                    "Missing configuration value: {} in patch '{}' from plugin {}".format(
-                        e.args[0], name, plugin
-                    )
+                patches.append(self.render_str(patch))
+            except exceptions.TutorError:
+                fmt.echo_error(
+                    "Error rendering patch '{}' from plugin {}".format(name, plugin)
                 )
+                raise
         rendered = separator.join(patches)
         if rendered:
             rendered += suffix
@@ -180,13 +202,11 @@ def save(root: str, config: Config) -> None:
     """
     root_env = pathjoin(root)
     for prefix in [
-        "android/",
         "apps/",
         "build/",
         "dev/",
         "k8s/",
         "local/",
-        "webui/",
         VERSION_FILENAME,
         "kustomization.yml",
     ]:
@@ -252,27 +272,16 @@ def render_file(config: Config, *path: str) -> Union[str, bytes]:
     return renderer.render_template(template_name)
 
 
-def render_dict(config: Config) -> None:
-    """
-    Render the values from the dict. This is useful for rendering the default
-    values from config.yml.
-
-    Args:
-        config (dict)
-    """
-    rendered: Config = {}
-    for key, value in config.items():
-        if isinstance(value, str):
-            rendered[key] = render_str(config, value)
-        else:
-            rendered[key] = value
-    for k, v in rendered.items():
-        config[k] = v
-
-
 def render_unknown(config: Config, value: Any) -> Any:
+    """
+    Render an unknown `value` object with the selected config.
+
+    If `value` is a dict, its values are also rendered.
+    """
     if isinstance(value, str):
         return render_str(config, value)
+    elif isinstance(value, dict):
+        return {k: render_unknown(config, v) for k, v in value.items()}
     return value
 
 

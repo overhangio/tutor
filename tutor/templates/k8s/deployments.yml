@@ -262,12 +262,16 @@ spec:
         - name: elasticsearch
           image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
           env:
-            - name: ES_JAVA_OPTS
-              value: "-Xms1g -Xmx1g"
-            - name: "cluster.name"
-              value: openedx
-            - name: "bootstrap.memory_lock"
+            - name: cluster.name
+              value: "openedx"
+            - name: bootstrap.memory_lock
               value: "true"
+            - name: discovery.type
+              value: "single-node"
+            - name: ES_JAVA_OPTS
+              value: "-Xms{{ ELASTICSEARCH_HEAP_SIZE }} -Xmx{{ ELASTICSEARCH_HEAP_SIZE }}"
+            - name: TAKE_FILE_OWNERSHIP
+              value: "1"
           ports:
             - containerPort: 9200
           volumeMounts:
