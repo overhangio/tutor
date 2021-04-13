@@ -3,12 +3,13 @@ from tutor.plugins import OfficialPlugin
 
 # Manually install plugins (this is for creating the bundle)
 for plugin_name in [
+    "android",
     "discovery",
     "ecommerce",
-    # "figures",
     "license",
     "minio",
     "notes",
+    "webui",
     "xqueue",
 ]:
     try:

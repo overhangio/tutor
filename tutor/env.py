@@ -8,7 +8,7 @@ import pkg_resources
 
 from . import exceptions, fmt, plugins, utils
 from .__about__ import __version__
-from .types import Config
+from .types import Config, ConfigValue
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
@@ -47,12 +47,13 @@ class Renderer:
         environment.filters["encrypt"] = utils.encrypt
         environment.filters["list_if"] = utils.list_if
         environment.filters["long_to_base64"] = utils.long_to_base64
+        environment.globals["iter_values_named"] = self.iter_values_named
+        environment.globals["patch"] = self.patch
         environment.filters["random_string"] = utils.random_string
         environment.filters["reverse_host"] = utils.reverse_host
+        environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.filters["rsa_private_key"] = utils.rsa_private_key
         environment.filters["walk_templates"] = self.walk_templates
-        environment.globals["patch"] = self.patch
-        environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
 
@@ -67,6 +68,28 @@ class Renderer:
         for template in env_templates:
             if template.startswith(full_prefix) and self.is_part_of_env(template):
                 yield template
+
+    def iter_values_named(
+        self,
+        prefix: Optional[str] = None,
+        suffix: Optional[str] = None,
+        allow_empty: bool = False,
+    ) -> Iterable[ConfigValue]:
+        """
+        Iterate on all config values for which the name match the given pattern.
+
+        Note that here we only iterate on the values, not the key names. Empty
+        values (those that evaluate to boolean `false`) will not be yielded, unless
+        `allow_empty` is True.
+        """
+        for var_name, value in self.config.items():
+            if prefix is not None and not var_name.startswith(prefix):
+                continue
+            if suffix is not None and not var_name.endswith(suffix):
+                continue
+            if not allow_empty and not value:
+                continue
+            yield value
 
     def walk_templates(self, subdir: str) -> Iterable[str]:
         """
@@ -177,13 +200,11 @@ def save(root: str, config: Config) -> None:
     """
     root_env = pathjoin(root)
     for prefix in [
-        "android/",
         "apps/",
         "build/",
         "dev/",
         "k8s/",
         "local/",
-        "webui/",
         VERSION_FILENAME,
         "kustomization.yml",
     ]:

@@ -23,7 +23,7 @@ Tutor makes it easy to :ref:`develop <theming>` and :ref:`install <settheme>` yo
 Adding features
 ---------------
 
-Check out the Tutor :ref:`plugins <plugins>`, :ref:`extra features <extra>` and :ref:`configuration/customization options <configuration_customisation>`.
+Check out the Tutor :ref:`plugins <plugins>` and :ref:`configuration/customization options <configuration_customisation>`.
 
 Hacking into Open edX
 ---------------------

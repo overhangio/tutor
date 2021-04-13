@@ -1,7 +1,8 @@
+tutor-android
 tutor-discovery
 tutor-ecommerce
-#tutor-figures
 tutor-license
 tutor-minio
 tutor-notes
+tutor-webui
 tutor-xqueue

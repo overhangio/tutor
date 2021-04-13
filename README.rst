@@ -42,7 +42,7 @@ Features
 * 100% `open source <https://github.com/overhangio/tutor>`__
 * Runs entirely on Docker
 * World-famous 1-click `installation and upgrades <https://docs.tutor.overhang.io/install.html>`__
-* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.overhang.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://docs.tutor.overhang.io/extra.html#web-ui>`__, `mobile app <https://docs.tutor.overhang.io/extra.html#mobile-android-application>`__, `custom translations <https://docs.tutor.overhang.io/configuration.html#adding-custom-translations>`__...
+* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.overhang.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/tutor/tutor-android>`__, `custom translations <https://docs.tutor.overhang.io/configuration.html#adding-custom-translations>`__...
 * Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins.html>`__
 * Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`__
 * No technical skill required with the `1-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#cloud-deployment>`__

@@ -4,6 +4,12 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v12.0.0 (2021-06-09)
+
+- 💥[Improvement] Upgrade all services to open-release/lilac.master.
+- 💥[Feature] Migrate Android app building and the WebUI frontend away from core Tutor and to dedicated plugins (see [TEP](https://discuss.overhang.io/c/community/tep/9)). The `DOCKER_IMAGE_ANDROID` setting is thus renamed to `ANDROID_DOCKER_IMAGE`.
+- [Feature] Run `docker-compose build` as part of `tutor local start`.
+
 ## v11.2.11 (2021-05-18)
 
 - [Feature] Add redis database configuration for both cache and celery.

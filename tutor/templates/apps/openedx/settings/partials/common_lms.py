@@ -7,9 +7,6 @@ LOGIN_REDIRECT_WHITELIST = ["{{ CMS_HOST }}"]
 REGISTRATION_EXTRA_FIELDS["terms_of_service"] = "required"
 REGISTRATION_EXTRA_FIELDS["honor_code"] = "hidden"
 
-# This url must not be None and should not be used anywhere
-LEARNING_MICROFRONTEND_URL = "http://learn.openedx.org"
-
 # Fix media files paths
 PROFILE_IMAGE_BACKEND["options"]["location"] = os.path.join(
     MEDIA_ROOT, "profile-images/"

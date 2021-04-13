@@ -61,7 +61,6 @@ Custom images
 *************
 
 - ``DOCKER_IMAGE_OPENEDX`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_ANDROID`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-android:{{ TUTOR_VERSION }}"``)
 - ``DOCKER_IMAGE_FORUM`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-forum:{{ TUTOR_VERSION }}"``)
 
 These configuration parameters define which image to run for each service. By default, the docker image tag matches the Tutor version it was built with.

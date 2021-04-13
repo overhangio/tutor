@@ -87,8 +87,8 @@ Your Open edX platform is ready and can be accessed at the following urls:
 @click.option(
     "--from",
     "from_version",
-    default="juniper",
-    type=click.Choice(["ironwood", "juniper"]),
+    default="koa",
+    type=click.Choice(["ironwood", "juniper", "koa"]),
 )
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
@@ -117,6 +117,10 @@ Are you sure you want to continue?"""
         upgrade_from_juniper(context, config)
         running_version = "koa"
 
+    if running_version == "koa":
+        upgrade_from_koa(context, config)
+        running_version = "lilac"
+
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
@@ -129,40 +133,13 @@ def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
         fmt.echo_info(
             "You are not running MongDB (RUN_MONGODB=false). It is your "
             "responsibility to upgrade your MongoDb instance to v3.6. There is "
-            "nothing left to do to upgrade from Ironwood."
+            "nothing left to do to upgrade from Ironwood to Juniper."
         )
         return
 
-    # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
-    # environment, not the configuration.
-    click.echo(fmt.title("Upgrading MongoDb from v3.2 to v3.4"))
-    config["DOCKER_IMAGE_MONGODB"] = "mongo:3.4.24"
-    tutor_env.save(context.obj.root, config)
-    context.invoke(compose.start, detach=True, services=["mongodb"])
-    context.invoke(
-        compose.execute,
-        args=[
-            "mongodb",
-            "mongo",
-            "--eval",
-            'db.adminCommand({ setFeatureCompatibilityVersion: "3.4" })',
-        ],
-    )
+    upgrade_mongodb(context, config, "3.4")
     context.invoke(compose.stop)
-
-    click.echo(fmt.title("Upgrading MongoDb from v3.4 to v3.6"))
-    config["DOCKER_IMAGE_MONGODB"] = "mongo:3.6.18"
-    tutor_env.save(context.obj.root, config)
-    context.invoke(compose.start, detach=True, services=["mongodb"])
-    context.invoke(
-        compose.execute,
-        args=[
-            "mongodb",
-            "mongo",
-            "--eval",
-            'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })',
-        ],
-    )
+    upgrade_mongodb(context, config, "3.6")
     context.invoke(compose.stop)
 
 
@@ -193,6 +170,36 @@ def upgrade_from_juniper(context: click.Context, config: Config) -> None:
             "mysql_upgrade -u {} --password='{}'".format(
                 config["MYSQL_ROOT_USERNAME"], config["MYSQL_ROOT_PASSWORD"]
             ),
+        ],
+    )
+    context.invoke(compose.stop)
+
+
+def upgrade_from_koa(context: click.Context, config: Config) -> None:
+    if not config["RUN_MONGODB"]:
+        fmt.echo_info(
+            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "responsibility to upgrade your MongoDb instance to v4.0. There is "
+            "nothing left to do to upgrade from Koa to Lilac."
+        )
+        return
+    upgrade_mongodb(context, config, "4.0")
+
+
+def upgrade_mongodb(context: click.Context, config: Config, to_version: str) -> None:
+    click.echo(fmt.title("Upgrading MongoDb to v{}".format(to_version)))
+    # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
+    # environment, not the configuration.
+    config["DOCKER_IMAGE_MONGODB"] = "mongo:{}".format(to_version)
+    tutor_env.save(context.obj.root, config)
+    context.invoke(compose.start, detach=True, services=["mongodb"])
+    context.invoke(
+        compose.execute,
+        args=[
+            "mongodb",
+            "mongo",
+            "--eval",
+            'db.adminCommand({ setFeatureCompatibilityVersion: "%s" })' % to_version,
         ],
     )
     context.invoke(compose.stop)

@@ -176,3 +176,22 @@ class EnvTests(unittest.TestCase):
 
             self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())  # type: ignore
             self.assertIn("plugin1/myplugin.txt", env2.loader.list_templates())  # type: ignore
+
+    def test_iter_values_named(self) -> None:
+        config: Config = {
+            "something0_test_app": 0,
+            "something1_test_not_app": 1,
+            "notsomething_test_app": 2,
+            "something3_test_app": 3,
+        }
+        renderer = env.Renderer.instance(config)
+        self.assertEqual([2, 3], list(renderer.iter_values_named(suffix="test_app")))
+        self.assertEqual([1, 3], list(renderer.iter_values_named(prefix="something")))
+        self.assertEqual(
+            [0, 3],
+            list(
+                renderer.iter_values_named(
+                    prefix="something", suffix="test_app", allow_empty=True
+                )
+            ),
+        )

@@ -389,7 +389,10 @@ def wait(context: Context, name: str) -> None:
 
 @click.command(help="Upgrade from a previous Open edX named release")
 @click.option(
-    "--from", "from_version", default="ironwood", type=click.Choice(["ironwood"])
+    "--from",
+    "from_version",
+    default="koa",
+    type=click.Choice(["ironwood", "juniper", "koa"]),
 )
 @click.pass_obj
 def upgrade(context: Context, from_version: str) -> None:
@@ -401,7 +404,12 @@ def upgrade(context: Context, from_version: str) -> None:
         running_version = "juniper"
 
     if running_version == "juniper":
+        upgrade_from_juniper(config)
         running_version = "koa"
+
+    if running_version == "koa":
+        upgrade_from_koa(config)
+        running_version = "lilac"
 
 
 def upgrade_from_ironwood(config: Config) -> None:
@@ -448,6 +456,26 @@ your MySQL database from v5.6 to v5.7. You should run something similar to:
         -u $(tutor config printvalue MYSQL_ROOT_USERNAME) \
         --password='$(tutor config printvalue MYSQL_ROOT_PASSWORD)'
 """
+    fmt.echo_info(message)
+
+
+def upgrade_from_koa(config: Config) -> None:
+    if not config["RUN_MONGODB"]:
+        fmt.echo_info(
+            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "responsibility to upgrade your MongoDb instance to v4.0. There is "
+            "nothing left to do to upgrade to Lilac from Koa."
+        )
+        return
+    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Koa to Lilac, you should upgrade
+your MongoDb cluster from v3.6 to v4.0. You should run something similar to:
+
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:4.0
+    tutor k8s start
+    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "4.0" })'
+    tutor config save --unset DOCKER_IMAGE_MONGODB
+    """
     fmt.echo_info(message)
 
 
