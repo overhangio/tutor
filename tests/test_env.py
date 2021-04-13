@@ -42,6 +42,13 @@ class EnvTests(unittest.TestCase):
             "hello world", env.render_str({"name": "world"}, "hello {{ name }}")
         )
 
+    def test_render_unknown(self) -> None:
+        config: Config = {
+            "var1": "a",
+        }
+        self.assertEqual("ab", env.render_unknown(config, "{{ var1 }}b"))
+        self.assertEqual({"x": "ac"}, env.render_unknown(config, {"x": "{{ var1 }}c"}))
+
     def test_common_domain(self) -> None:
         self.assertEqual(
             "mydomain.com",
@@ -176,3 +183,22 @@ class EnvTests(unittest.TestCase):
 
             self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())
             self.assertIn("plugin1/myplugin.txt", env2.loader.list_templates())
+
+    def test_iter_values_named(self) -> None:
+        config: Config = {
+            "something0_test_app": 0,
+            "something1_test_not_app": 1,
+            "notsomething_test_app": 2,
+            "something3_test_app": 3,
+        }
+        renderer = env.Renderer.instance(config)
+        self.assertEqual([2, 3], list(renderer.iter_values_named(suffix="test_app")))
+        self.assertEqual([1, 3], list(renderer.iter_values_named(prefix="something")))
+        self.assertEqual(
+            [0, 3],
+            list(
+                renderer.iter_values_named(
+                    prefix="something", suffix="test_app", allow_empty=True
+                )
+            ),
+        )

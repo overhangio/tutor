@@ -31,13 +31,10 @@ chardet==4.0.0
     # via
     #   -r requirements/base.txt
     #   requests
-click-repl==0.2.0
-    # via -r requirements/base.txt
 click==8.0.1
     # via
     #   -r requirements/base.txt
     #   black
-    #   click-repl
     #   pip-tools
 colorama==0.4.4
     # via twine
@@ -98,10 +95,6 @@ pip-tools==6.1.0
     # via -r requirements/dev.in
 pkginfo==1.7.0
     # via twine
-prompt-toolkit==3.0.18
-    # via
-    #   -r requirements/base.txt
-    #   click-repl
 pyasn1-modules==0.2.8
     # via
     #   -r requirements/base.txt
@@ -162,7 +155,6 @@ six==1.16.0
     # via
     #   -r requirements/base.txt
     #   bleach
-    #   click-repl
     #   google-auth
     #   kubernetes
     #   python-dateutil
@@ -189,10 +181,6 @@ urllib3==1.26.5
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-wcwidth==0.2.5
-    # via
-    #   -r requirements/base.txt
-    #   prompt-toolkit
 webencodings==0.5.1
     # via bleach
 websocket-client==1.0.1

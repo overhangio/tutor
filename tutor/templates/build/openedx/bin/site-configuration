@@ -1,0 +1,81 @@
+#! /usr/bin/env python3
+import argparse
+import lms.startup
+
+lms.startup.run()
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Manage site configuration")
+    subparsers = parser.add_subparsers()
+
+    # Set command
+    parser_set = subparsers.add_parser("set", help="Set a site configuration key/value")
+    parser_set.add_argument(
+        "-d", "--domain", help="Site domain: by default this will be the LMS domain"
+    )
+    parser_set.add_argument("key", help="Configuration key")
+    parser_set.add_argument(
+        "value",
+        help="Configuration value: 'true' and 'false' will be converted to booleans.",
+    )
+    parser_set.set_defaults(func=set_command)
+
+    # Unset command
+    parser_unset = subparsers.add_parser(
+        "unset", help="Remove a site configuration key"
+    )
+    parser_unset.add_argument(
+        "-d", "--domain", help="Site domain: by default this will be the LMS domain"
+    )
+    parser_unset.add_argument("key", help="Configuration key")
+    parser_unset.set_defaults(func=unset_command)
+
+    args = parser.parse_args()
+    if hasattr(args, "func"):
+        args.func(args)
+    else:
+        parser.print_help()
+
+
+def set_command(args):
+    configuration = get_site_configuration(args.domain)
+
+    value = args.value
+    if value == "true":
+        value = True
+    elif value == "false":
+        value = False
+
+    configuration.site_values[args.key] = args.value
+    configuration.save()
+
+
+def get_site_configuration(domain):
+    domain = domain or settings.LMS_BASE
+    site, site_created = Site.objects.get_or_create(domain=domain)
+    if site_created:
+        site.name = domain
+        site.save()
+    configuration, configuration_created = SiteConfiguration.objects.get_or_create(site=site)
+    if configuration_created:
+        # Configuration is disabled by default
+        configuration.enabled = True
+        configuration.save()
+    return configuration
+
+
+def unset_command(args):
+    configuration = get_site_configuration(args.domain)
+    if args.key in configuration.site_values:
+        configuration.site_values.pop(args.key)
+        configuration.save()
+
+
+if __name__ == "__main__":
+    main()

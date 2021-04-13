@@ -66,7 +66,6 @@ The Android mobile application for this website can be downloaded at this url: h
 Urls:
 
 * LMS: https://demo.openedx.overhang.io
-* Analytics (from the `Figures plugin <https://pypi.org/project/tutor-figures/>`__): https://demo.openedx.overhang.io/figures
 * Studio (CMS): https://studio.demo.openedx.overhang.io
 
 The platform is reset every day at 9:00 AM, `Paris (France) time <https://time.is/Paris>`__, so feel free to try and break things as much as you want.
@@ -86,9 +85,9 @@ This command does two things:
 All these files are stored in a single folder, called the Tutor project root. On Linux, this folder is in ``~/.local/share/tutor``. On Mac OS it is ``~/Library/Application Support/tutor``.
 
 The values from ``config.yml`` are used to generate the environment files in ``env/``. As a consequence, **every time the values from** ``config.yml`` **are modified, the environment must be regenerated**. This can be done with::
-    
+
     tutor config save
-    
+
 Another consequence is that **any manual change made to a file in** ``env/`` **will be overwritten by** ``tutor config save`` **commands**. Consider yourself warned!
 
 I'm ready, where do I start?

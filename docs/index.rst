@@ -23,7 +23,6 @@
    run
    configuration
    plugins
-   extra
    troubleshooting
    tutor
    faq
@@ -49,7 +48,5 @@ This work is licensed under the terms of the `GNU Affero General Public License 
 The AGPL license covers the Tutor code, including the Dockerfiles, but not the content of the Docker images which can be downloaded from https://hub.docker.com. Software other than Tutor provided with the docker images retain their original license.
 
 The Tutor plugin system is licensed under the terms of the `Apache License, Version 2.0 <https://opensource.org/licenses/Apache-2.0>`__.
-
-The :ref:`Tutor Web UI <webui>` depends on the `Gotty <https://github.com/yudai/gotty/>`_ binary, which is provided under the terms of the `MIT license <https://github.com/yudai/gotty/blob/master/LICENSE>`_.
 
 © 2021 Tutor is a registered trademark of SASU NULI NULI. All Rights Reserved.
