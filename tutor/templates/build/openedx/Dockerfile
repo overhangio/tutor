@@ -35,6 +35,10 @@ RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
+{% if patch("openedx-dockerfile-git-patches-default") %}
+# Custom edx-platform default patches
+{{ patch("openedx-dockerfile-git-patches-default") }}
+{% else %}
 # Patch edx-platform
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
@@ -48,6 +52,7 @@ RUN curl https://github.com/overhangio/edx-platform/commit/bc0ab09f9945bd14aa6be
 # https://github.com/edx/edx-platform/pull/25957
 # https://github.com/overhangio/edx-platform/tree/overhangio/upgrade-django-pipeline
 RUN curl https://github.com/overhangio/edx-platform/commit/1c733e3ba11249cf16358684169e6137a308e796.patch | git apply -
+{% endif %}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
