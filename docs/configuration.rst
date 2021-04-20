@@ -149,7 +149,7 @@ Redis
 
 - ``RUN_REDIS`` (default: ``true``)
 - ``REDIS_HOST`` (default: ``"redis"``)
-- ``REDIS_HOST`` (default: ``6379``)
+- ``REDIS_PORT`` (default: ``6379``)
 - ``REDIS_USERNAME`` (default: ``""``)
 - ``REDIS_PASSWORD`` (default: ``""``)
 
