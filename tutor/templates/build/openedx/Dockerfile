@@ -40,6 +40,9 @@ WORKDIR /openedx/edx-platform
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
+# Security patches
+# https://github.com/edx/edx-platform/pull/27394
+RUN curl https://github.com/overhangio/edx-platform/commit/a0fdc97f1704659d26e167de3fbf2ab8c371d67b.patch | git apply -
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
