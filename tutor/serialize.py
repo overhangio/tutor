@@ -39,7 +39,7 @@ def parse(v: Union[str, IO[str]]) -> Any:
 
 class YamlParamType(click.ParamType):
     name = "yaml"
-    PARAM_REGEXP = r"(?P<key>[a-zA-Z0-9_-]+)=(?P<value>.*)"
+    PARAM_REGEXP = r"(?P<key>[a-zA-Z0-9_-]+)=(?P<value>(.|\n|\r)*)"
 
     def convert(self, value: str, param: Any, ctx: Any) -> Tuple[str, Any]:
         match = re.match(self.PARAM_REGEXP, value)

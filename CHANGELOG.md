@@ -2,6 +2,9 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+- [Bugfix] Fix YamlParamType regex to support line terminators.
+
 ## v11.2.7 (2021-04-23)
 
 - [Security] Apply security patch [27394](https://github.com/edx/edx-platform/pull/27394).
