@@ -39,3 +39,9 @@ class SerializeTests(unittest.TestCase):
         with self.assertRaises(click.exceptions.BadParameter):
             param.convert("name", "param", {})
         self.assertEqual(("x", "a=bcd"), param.convert("x=a=bcd", "param", {}))
+        self.assertEqual(
+            ("x", {"key1": {"subkey": "value"}, "key2": {"subkey": "value"}}),
+            param.convert(
+                "x=key1:\n  subkey: value\nkey2:\n  subkey: value", "param", {}
+            ),
+        )
