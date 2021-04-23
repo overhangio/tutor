@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply security patch [27394](https://github.com/edx/edx-platform/pull/27394).
 - [Feature] Add patches to extend python requirements installation process in openedx and openedx-dev Dockerfiles.
 - [Improvement] Apply edx-platform patches during Docker image build using tutor patch 'openedx-dockerfile-git-patches-default'.
 
