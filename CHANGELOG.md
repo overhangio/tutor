@@ -2,8 +2,9 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
-- [Bugfix] Fix YamlParamType regex to support line terminators.
+## v11.2.8 (2021-04-27)
+
+- [Bugfix] Fix parsing of YAML-formatted values in ``config save --set KEY=VALUE`` commands, in use for instance with Ecommerce.
 
 ## v11.2.7 (2021-04-23)
 
