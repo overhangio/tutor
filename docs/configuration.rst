@@ -140,6 +140,10 @@ Mongodb
 - ``MONGODB_PORT`` (default: ``27017``)
 - ``MONGODB_USERNAME`` (default: ``""``)
 - ``MONGODB_PASSWORD`` (default: ``""``)
+- ``MONGODB_REPLICA_SET`` (default: ``""``)
+- ``MONGODB_USE_SSL`` (default: ``false``)
+- ``MONGODB_AUTH_SOURCE`` (default: ``""``)
+- ``MONGODB_PROTOCOL`` (default: ``"mongodb"``)
 
 Redis
 *****

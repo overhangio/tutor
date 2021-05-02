@@ -101,6 +101,12 @@ spec:
             value: "{{ MONGODB_HOST }}"
           - name: MONGODB_PORT
             value: "{{ MONGODB_PORT }}"
+          - name: MONGODB_PROTOCOL
+            value: "{{ MONGODB_PROTOCOL }}"
+          - name: MONGOID_AUTH_SOURCE
+            value: "{{ MONGODB_AUTH_SOURCE }}"
+          - name: MONGOID_USE_SSL
+            value: "{{ MONGODB_USE_SSL }}"
 
 {{ patch("k8s-jobs") }}
 

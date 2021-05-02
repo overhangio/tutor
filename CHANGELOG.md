@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add configuration support to connect to a MongoDB cluster
+
 ## v11.2.5 (2021-03-30)
 
 - [Bugfix] Fix edge case where `PLUGINS` entry is null in config.yml.

@@ -16,6 +16,13 @@ mongodb_parameters = {
     "password": None,
     {% endif %}
     "db": "{{ MONGODB_DATABASE }}",
+    {% if MONGODB_REPLICA_SET %}
+    "replicaSet": "{{ MONGODB_REPLICA_SET }}",
+    {% endif %}
+    "ssl": {% if MONGODB_USE_SSL %} True {% else %} False {% endif %},
+    {% if MONGODB_AUTH_SOURCE %}
+    "authsource": "{{ MONGODB_AUTH_SOURCE }}",
+    {% endif %}
 }
 DOC_STORE_CONFIG = mongodb_parameters
 CONTENTSTORE = {
