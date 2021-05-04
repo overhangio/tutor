@@ -29,3 +29,8 @@ class BindMountsTests(unittest.TestCase):
         )
         self.assertEqual(("/openedx/venv", "/tmp/openedx:/openedx"), volume_args)
         self.assertEqual(("run", "lms", "echo", "boom"), non_volume_args)
+
+    def test_parse_volumes_empty_list(self) -> None:
+        volume_args, non_volume_args = bindmounts.parse_volumes([])
+        self.assertEqual((), volume_args)
+        self.assertEqual((), non_volume_args)

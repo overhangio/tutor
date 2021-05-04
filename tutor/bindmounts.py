@@ -75,7 +75,7 @@ def parse_volumes(docker_compose_args: List[str]) -> Tuple[List[str], List[str]]
 
     @click.command(context_settings={"ignore_unknown_options": True})
     @click.option("-v", "--volume", "volumes", multiple=True)
-    @click.argument("args", nargs=-1, required=True)
+    @click.argument("args", nargs=-1)
     def custom_docker_compose(
         volumes: List[str], args: List[str]
     ) -> None:  # pylint: disable=unused-argument

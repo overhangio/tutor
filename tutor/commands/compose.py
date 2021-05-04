@@ -276,7 +276,7 @@ def logs(context: click.Context, follow: bool, tail: bool, service: str) -> None
     name="dc",
 )
 @click.argument("command")
-@click.argument("args", nargs=-1, required=True)
+@click.argument("args", nargs=-1)
 @click.pass_obj
 def dc_command(context: Context, command: str, args: List[str]) -> None:
     config = tutor_config.load(context.root)
