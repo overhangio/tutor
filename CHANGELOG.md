@@ -2,9 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## unreleased
+## Unreleased
 
-- [Bugfix] Fix 502 error on request to lms with header larger than the maximum uwsgi buffer size
+- [Bugfix] Fix crash in `local quickstart -p` command.
+- [Bugfix] Fix 502 error on request to lms with header larger than the maximum uwsgi buffer size.
 
 ## v11.2.8 (2021-04-27)
 
