@@ -2,9 +2,11 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## unreleased
+## Unreleased
 
-- [Bugfix] Fix 502 error on request to lms with header larger than the maximum uwsgi buffer size
+- [Security] Apply Django security patches by upgrading from 2.2.20 to 2.2.22.
+- [Fix] Fix video unit completion (see [pull request](https://github.com/edx/edx-platform/pull/27230)).
+- [Bugfix] Fix 502 error on request to lms with header larger than the maximum uwsgi buffer size.
 
 ## v11.2.8 (2021-04-27)
 

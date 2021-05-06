@@ -43,6 +43,11 @@ WORKDIR /openedx/edx-platform
 # Security patches
 # https://github.com/edx/edx-platform/pull/27394
 RUN curl https://github.com/overhangio/edx-platform/commit/a0fdc97f1704659d26e167de3fbf2ab8c371d67b.patch | git apply -
+# Django security releases
+RUN curl https://github.com/overhangio/edx-platform/commit/0cdfd0c04c8d372998d1f7948c6d309874c18009.patch | git apply -
+RUN curl https://github.com/overhangio/edx-platform/commit/4cb7653bb20a775b06692d783aa9e6edd2c90759.patch | git apply -
+# Fix video unit completion
+RUN curl https://github.com/overhangio/edx-platform/commit/3d489952f7cfd83fed47c700c7cd0b477b68351e.patch | git apply -
 # Make it possible to disable learner records globally
 # https://github.com/edx/edx-platform/pull/25182
 # https://github.com/overhangio/edx-platform/tree/overhangio/disable-learner-records-from-settings
