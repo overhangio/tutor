@@ -4,6 +4,9 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Apply Django security patches by upgrading from 2.2.20 to 2.2.23.
+- [Bugfix] Fix video unit completion (see [pull request](https://github.com/edx/edx-platform/pull/27230)).
+
 ## v11.2.9 (2021-05-12)
 
 - [Bugfix] Fix crashing installation because of a major release of all Pallets projects.
