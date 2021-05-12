@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.9 (2021-05-12)
+
 - [Bugfix] Fix crashing installation because of a major release of all Pallets projects.
 - [Bugfix] Fix crash in `local quickstart -p` command.
 - [Bugfix] Fix 502 error on request to lms with header larger than the maximum uwsgi buffer size.
