@@ -1,10 +1,12 @@
 appdirs
-click>=7.0
+click>=7.0,<8.0
 click_repl
 pycryptodome
-jinja2>=2.9
+jinja2>=2.9,<3.0
 kubernetes
 pyyaml>=4.2b1
 
+# Add constraints until we are compatible with click 8.0
+markupsafe<2.0
 # Installing urllib3==1.26.0 causes compatibility errors with requests==2.24.0
 urllib3<1.26.0

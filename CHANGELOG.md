@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix crashing installation because of a major release of all Pallets projects.
 - [Bugfix] Fix missing py2neo dependency in `images build openedx` (#411).
 
 ## v10.5.3 (2020-12-09)
