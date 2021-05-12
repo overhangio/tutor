@@ -10,13 +10,13 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   black
-astroid==2.4.2
+astroid==2.5.6
     # via pylint
-black==20.8b1
+black==21.5b1
     # via -r requirements/dev.in
 bleach==3.3.0
     # via readme-renderer
-cachetools==4.2.1
+cachetools==4.2.2
     # via
     #   -r requirements/base.txt
     #   google-auth
@@ -25,7 +25,7 @@ certifi==2020.12.5
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-cffi==1.14.4
+cffi==1.14.5
     # via cryptography
 chardet==4.0.0
     # via
@@ -41,11 +41,11 @@ click==7.1.2
     #   pip-tools
 colorama==0.4.4
     # via twine
-cryptography==3.4.4
+cryptography==3.4.7
     # via secretstorage
-docutils==0.16
+docutils==0.17.1
     # via readme-renderer
-google-auth==1.25.0
+google-auth==1.30.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -53,12 +53,13 @@ idna==2.10
     # via
     #   -r requirements/base.txt
     #   requests
-importlib-metadata==3.7.0
+importlib-metadata==4.0.1
     # via
     #   keyring
+    #   pep517
     #   pyinstaller
     #   twine
-isort==5.7.0
+isort==5.8.0
     # via pylint
 jeepney==0.6.0
     # via
@@ -66,11 +67,11 @@ jeepney==0.6.0
     #   secretstorage
 jinja2==2.11.3
     # via -r requirements/base.txt
-keyring==22.0.1
+keyring==23.0.1
     # via twine
 kubernetes==12.0.1
     # via -r requirements/base.txt
-lazy-object-proxy==1.4.3
+lazy-object-proxy==1.6.0
     # via astroid
 markupsafe==1.1.1
     # via
@@ -93,11 +94,13 @@ packaging==20.9
     # via bleach
 pathspec==0.8.1
     # via black
-pip-tools==5.5.0
+pep517==0.10.0
+    # via pip-tools
+pip-tools==6.1.0
     # via -r requirements/dev.in
 pkginfo==1.7.0
     # via twine
-prompt-toolkit==3.0.14
+prompt-toolkit==3.0.18
     # via
     #   -r requirements/base.txt
     #   click-repl
@@ -114,13 +117,13 @@ pycparser==2.20
     # via cffi
 pycryptodome==3.10.1
     # via -r requirements/base.txt
-pygments==2.7.4
+pygments==2.9.0
     # via readme-renderer
-pyinstaller-hooks-contrib==2020.11
+pyinstaller-hooks-contrib==2021.1
     # via pyinstaller
-pyinstaller==4.2
+pyinstaller==4.3
     # via -r requirements/dev.in
-pylint==2.6.0
+pylint==2.8.2
     # via -r requirements/dev.in
 pyparsing==2.4.7
     # via packaging
@@ -132,9 +135,9 @@ pyyaml==5.4.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
-readme-renderer==28.0
+readme-renderer==29.0
     # via twine
-regex==2020.11.13
+regex==2021.4.4
     # via black
 requests-oauthlib==1.3.0
     # via
@@ -149,18 +152,17 @@ requests==2.25.1
     #   requests-oauthlib
     #   requests-toolbelt
     #   twine
-rfc3986==1.4.0
+rfc3986==1.5.0
     # via twine
-rsa==4.7
+rsa==4.7.2
     # via
     #   -r requirements/base.txt
     #   google-auth
 secretstorage==3.3.1
     # via keyring
-six==1.15.0
+six==1.16.0
     # via
     #   -r requirements/base.txt
-    #   astroid
     #   bleach
     #   click-repl
     #   google-auth
@@ -171,18 +173,19 @@ six==1.15.0
 toml==0.10.2
     # via
     #   black
+    #   pep517
     #   pylint
-tqdm==4.56.1
+tqdm==4.60.0
     # via twine
-twine==3.3.0
+twine==3.4.1
     # via -r requirements/dev.in
-typed-ast==1.4.2
+typed-ast==1.4.3
     # via
     #   -r requirements/base.txt
     #   astroid
     #   black
     #   mypy
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
     # via
     #   -r requirements/base.txt
     #   black
@@ -199,14 +202,16 @@ wcwidth==0.2.5
     #   prompt-toolkit
 webencodings==0.5.1
     # via bleach
-websocket-client==0.57.0
+websocket-client==0.59.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
 wrapt==1.12.1
     # via astroid
-zipp==3.4.0
-    # via importlib-metadata
+zipp==3.4.1
+    # via
+    #   importlib-metadata
+    #   pep517
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

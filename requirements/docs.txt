@@ -8,9 +8,9 @@ alabaster==0.7.12
     # via sphinx
 appdirs==1.4.4
     # via -r requirements/base.txt
-babel==2.9.0
+babel==2.9.1
     # via sphinx
-cachetools==4.2.1
+cachetools==4.2.2
     # via
     #   -r requirements/base.txt
     #   google-auth
@@ -30,8 +30,10 @@ click==7.1.2
     #   -r requirements/base.txt
     #   click-repl
 docutils==0.16
-    # via sphinx
-google-auth==1.25.0
+    # via
+    #   sphinx
+    #   sphinx-rtd-theme
+google-auth==1.30.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -51,6 +53,7 @@ markupsafe==1.1.1
     # via
     #   -r requirements/base.txt
     #   jinja2
+    #   sphinx
 mypy-extensions==0.4.3
     # via
     #   -r requirements/base.txt
@@ -63,7 +66,7 @@ oauthlib==3.1.0
     #   requests-oauthlib
 packaging==20.9
     # via sphinx
-prompt-toolkit==3.0.14
+prompt-toolkit==3.0.18
     # via
     #   -r requirements/base.txt
     #   click-repl
@@ -78,7 +81,7 @@ pyasn1==0.4.8
     #   rsa
 pycryptodome==3.10.1
     # via -r requirements/base.txt
-pygments==2.7.4
+pygments==2.9.0
     # via sphinx
 pyparsing==2.4.7
     # via packaging
@@ -102,11 +105,11 @@ requests==2.25.1
     #   kubernetes
     #   requests-oauthlib
     #   sphinx
-rsa==4.7
+rsa==4.7.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-six==1.15.0
+six==1.16.0
     # via
     #   -r requirements/base.txt
     #   click-repl
@@ -116,9 +119,9 @@ six==1.15.0
     #   websocket-client
 snowballstemmer==2.1.0
     # via sphinx
-sphinx-rtd-theme==0.5.1
+sphinx-rtd-theme==0.5.2
     # via -r requirements/docs.in
-sphinx==3.4.3
+sphinx==4.0.1
     # via
     #   -r requirements/docs.in
     #   sphinx-rtd-theme
@@ -134,11 +137,11 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
-typed-ast==1.4.2
+typed-ast==1.4.3
     # via
     #   -r requirements/base.txt
     #   mypy
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
     # via
     #   -r requirements/base.txt
     #   mypy
@@ -151,7 +154,7 @@ wcwidth==0.2.5
     # via
     #   -r requirements/base.txt
     #   prompt-toolkit
-websocket-client==0.57.0
+websocket-client==0.59.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
