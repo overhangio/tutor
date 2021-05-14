@@ -89,6 +89,10 @@ This defines the default version that will be pulled from all Open edX git repos
 
 By default there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.io/en/latest/Options.html#processes>`__ to serve requests for the LMS and the CMS. However, each workers requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
 
+- ``OPENEDX_CELERY_REDIS_DB`` (default: ``0``)
+- ``OPENEDX_CACHE_REDIS_DB`` (default: ``1``)
+
+These two configuration parameters define which redis database to use for Open edX cache and celery task.
 
 Vendor services
 ~~~~~~~~~~~~~~~
