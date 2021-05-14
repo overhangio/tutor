@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add redis database configuration for both cache and celery.
+
 ## v11.2.10 (2021-05-17)
 
 - [Security] Apply Django security patches by upgrading from 2.2.20 to 2.2.23.
