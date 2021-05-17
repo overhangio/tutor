@@ -56,7 +56,8 @@ bootstrap-dev-plugins: bootstrap-dev ## Install dev requirement and all supporte
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller tutor.spec
 
-release: test ## Create a release tag and push it to origin
+release: test release-unsafe ## Create a release tag and push it to origin
+release-unsafe:
 	$(MAKE) release-tag release-push TAG=v$(shell make version)
 release-tag:
 	@echo "=== Creating tag $(TAG)"
@@ -67,6 +68,10 @@ release-push:
 	git push origin
 	git push origin :$(TAG) || true
 	git push origin $(TAG)
+
+release-description:  ## Write the current release description to a file
+	sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md > release_description.md
+	git log -1 --pretty=format:%b >> release_description.md
 
 ###### Continuous integration tasks
 
@@ -89,30 +94,6 @@ ci-test-bundle: ## Run basic tests on bundle
 	./dist/tutor plugins enable discovery ecommerce license minio notes xqueue
 	./dist/tutor plugins list
 	./dist/tutor license --help
-
-./releases/github-release: ## Download github-release binary
-	mkdir -p releases/
-	cd releases/ \
-		&& curl -sSL -o ./github-release.bz2 "https://github.com/github-release/github-release/releases/download/v0.10.0/$(shell uname -s | tr "[:upper:]" "[:lower:]")-amd64-github-release.bz2" \
-		&& bzip2 -d -f ./github-release.bz2 \
-		&& chmod a+x ./github-release
-
-ci-push-bundle: ./releases/github-release ## Upload assets to github
-	sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md > releases/description.md
-	git log -1 --pretty=format:%b >> releases/description.md
-	./releases/github-release release \
-		--user overhangio \
-		--repo tutor \
-		--tag "v$(shell make version)" \
-		--name "v$(shell make version)" \
-		--description "$$(cat releases/description.md)" || true
-	./releases/github-release upload \
-	    --user overhangio \
-	    --repo tutor \
-	    --tag "v$(shell make version)" \
-	    --name "tutor-$$(uname -s)_$$(uname -m)" \
-	    --file ./dist/tutor \
-			--replace
 
 ci-bootstrap-images:
 	pip install .

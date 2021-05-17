@@ -12,9 +12,9 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
 
 |
 
-.. image:: https://img.shields.io/travis/overhangio/tutor.svg?label=Release%20build&style=flat-square
+.. image:: https://github.com/overhangio/tutor/actions/workflows/release.yml/badge.svg
     :alt: Release build status
-    :target: https://travis-ci.org/overhangio/tutor
+    :target: https://github.com/overhangio/tutor/actions/workflows/release.yml
 
 .. image:: https://img.shields.io/badge/docs-current-blue.svg?style=flat-square
     :alt: Documentation
