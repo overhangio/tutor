@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.10 (2021-05-17)
+
 - [Security] Apply Django security patches by upgrading from 2.2.20 to 2.2.23.
 - [Bugfix] Fix video unit completion (see [pull request](https://github.com/edx/edx-platform/pull/27230)).
 
