@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.2.11 (2021-05-18)
+
 - [Feature] Add redis database configuration for both cache and celery.
 
 ## v11.2.10 (2021-05-17)
