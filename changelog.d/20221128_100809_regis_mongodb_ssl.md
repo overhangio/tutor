@@ -1,0 +1,1 @@
+- [Feature] Add support for MongoDB SSL, authentication source, mechanism and replica set via the `MONGODB_USE_SSL`, `MONGODB_AUTH_MECHANISM`, `MONGODB_AUTH_SOURCE`, `MONGODB_REPLICA_SET` settings. (by @zakum1 and @regisb)
