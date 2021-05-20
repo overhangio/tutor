@@ -229,7 +229,15 @@ class EntrypointPlugin(BasePlugin):
     @classmethod
     def iter_load(cls) -> Iterator["EntrypointPlugin"]:
         for entrypoint in pkg_resources.iter_entry_points(cls.ENTRYPOINT):
-            yield cls(entrypoint)
+            try:
+                yield cls(entrypoint)
+            except:
+                fmt.echo_error(
+                    "Failed to load entrypoint '{} = {}' from distribution {}".format(
+                        entrypoint.name, entrypoint.module_name, entrypoint.dist
+                    )
+                )
+                raise
 
 
 class OfficialPlugin(BasePlugin):
