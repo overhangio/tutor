@@ -11,5 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Add remote
         run: git remote add overhangio https://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_PASSWORD }}@git.overhang.io/core/tutor.git
+      - name: Fetch
+        run: git fetch overhangio master
       - name: Push
         run: git push overhangio master
