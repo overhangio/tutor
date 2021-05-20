@@ -7,3 +7,4 @@ __pycache__
 /build/
 /dist/
 /release_description.md
+.python-version

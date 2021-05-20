@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Add configuration support to connect to a MongoDB cluster
+
 ## v12.0.0 (2021-06-09)
 
 - 💥[Improvement] Upgrade all services to open-release/lilac.master.

@@ -1,10 +1,16 @@
 #!/bin/sh -e
 
-export MONGOHQ_URL="mongodb://$MONGODB_AUTH$MONGODB_HOST:$MONGODB_PORT/cs_comments_service"
-# the search server variable was renamed after the upgrade to elasticsearch 7
-export SEARCH_SERVER_ES7="$SEARCH_SERVER"
+if test "$MONGODB_PROTOCOL" = 'mongodb+srv'; then
+  export MONGOHQ_URL="$MONGODB_PROTOCOL://$MONGODB_AUTH$MONGODB_HOST/cs_comments_service$MONGODB_PARAMS"
+  MONGO_WAIT=""
+  services='elasticsearch'
+else
+  export MONGOHQ_URL="$MONGODB_PROTOCOL://$MONGODB_AUTH$MONGODB_HOST:$MONGODB_PORT/cs_comments_service$MONGODB_PARAMS"
+  MONGO_WAIT="-wait tcp://$MONGODB_HOST:$MONGODB_PORT"
+  services='mongodb/elasticsearch'
+fi
 
-echo "Waiting for mongodb/elasticsearch..."
-dockerize -wait tcp://$MONGODB_HOST:$MONGODB_PORT -wait $SEARCH_SERVER -wait-retry-interval 5s -timeout 600s
+echo "Waiting for $services"
+dockerize $MONGO_WAIT -wait $SEARCH_SERVER -wait-retry-interval 5s -timeout 600s
 
 exec "$@"

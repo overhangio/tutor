@@ -16,6 +16,7 @@ mongodb_parameters = {
     "password": None,
     {% endif %}
     "db": "{{ MONGODB_DATABASE }}",
+    "ssl": {% if MONGODB_USE_SSL %} True {% else %} False {% endif %},
 }
 DOC_STORE_CONFIG = mongodb_parameters
 CONTENTSTORE = {
