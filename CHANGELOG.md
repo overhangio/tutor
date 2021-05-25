@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix discussion notification not work.
 - [Improvement] Better error logging when loading a plugin from an incompatible version.
 
 ## v11.2.11 (2021-05-18)
