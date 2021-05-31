@@ -4,7 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
-- [Bugfix] Fix discussion notification not work.
+- 💥[Security] Disable python-evaluated input by default as we don't run codejail.
+- [Bugfix] Fix missing discussion notifications.
 - [Improvement] Better error logging when loading a plugin from an incompatible version.
 
 ## v11.2.11 (2021-05-18)
