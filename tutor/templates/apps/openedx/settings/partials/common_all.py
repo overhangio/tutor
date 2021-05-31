@@ -136,5 +136,15 @@ JWT_AUTH["JWT_ISSUERS"] = [
     }
 ]
 
+# Disable codejail support
+# explicitely configuring python is necessary to prevent unsafe calls
+import codejail.jail_code
+codejail.jail_code.configure("python", "nonexistingpythonbinary", user=None)
+# another configuration entry is required to override prod/dev settings
+CODE_JAIL = {
+    "python_bin": "nonexistingpythonbinary",
+    "user": None,
+}
+
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS
