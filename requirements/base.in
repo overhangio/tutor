@@ -10,4 +10,4 @@ pyyaml>=4.2b1
 # Add constraints until we are compatible with click 8.0
 markupsafe<2.0
 # Installing urllib3==1.26.0 causes compatibility errors with requests==2.24.0
-urllib3<1.26.0
+urllib3<1.27.0
