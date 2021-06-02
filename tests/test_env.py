@@ -20,7 +20,7 @@ class EnvTests(unittest.TestCase):
         template_name = "apps/openedx/settings/partials/common_all.py"
         renderer = env.Renderer({}, [env.TEMPLATES_ROOT], ignore_folders=["partials"])
         templates = list(renderer.walk_templates("apps"))
-        self.assertIn(template_name, renderer.environment.loader.list_templates())  # type: ignore
+        self.assertIn(template_name, renderer.environment.loader.list_templates())
         self.assertNotIn(template_name, templates)
 
     def test_is_binary_file(self) -> None:
@@ -174,5 +174,5 @@ class EnvTests(unittest.TestCase):
                 config["PLUGINS"] = ["myplugin"]
                 env2 = env.Renderer.instance(config).environment
 
-            self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())  # type: ignore
-            self.assertIn("plugin1/myplugin.txt", env2.loader.list_templates())  # type: ignore
+            self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())
+            self.assertIn("plugin1/myplugin.txt", env2.loader.list_templates())

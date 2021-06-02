@@ -14,7 +14,7 @@ cachetools==4.2.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -23,9 +23,9 @@ chardet==4.0.0
     # via
     #   -r requirements/base.txt
     #   requests
-click-repl==0.1.6
+click-repl==0.2.0
     # via -r requirements/base.txt
-click==7.1.2
+click==8.0.1
     # via
     #   -r requirements/base.txt
     #   click-repl
@@ -33,7 +33,7 @@ docutils==0.16
     # via
     #   sphinx
     #   sphinx-rtd-theme
-google-auth==1.30.0
+google-auth==1.30.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -43,24 +43,23 @@ idna==2.10
     #   requests
 imagesize==1.2.0
     # via sphinx
-jinja2==2.11.3
+jinja2==3.0.1
     # via
     #   -r requirements/base.txt
     #   sphinx
-kubernetes==12.0.1
+kubernetes==17.17.0
     # via -r requirements/base.txt
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
     #   -r requirements/base.txt
     #   jinja2
-    #   sphinx
 mypy-extensions==0.4.3
     # via
     #   -r requirements/base.txt
     #   mypy
 mypy==0.812
     # via -r requirements/base.txt
-oauthlib==3.1.0
+oauthlib==3.1.1
     # via
     #   -r requirements/base.txt
     #   requests-oauthlib
@@ -116,12 +115,11 @@ six==1.16.0
     #   google-auth
     #   kubernetes
     #   python-dateutil
-    #   websocket-client
 snowballstemmer==2.1.0
     # via sphinx
 sphinx-rtd-theme==0.5.2
     # via -r requirements/docs.in
-sphinx==4.0.1
+sphinx==4.0.2
     # via
     #   -r requirements/docs.in
     #   sphinx-rtd-theme
@@ -129,13 +127,13 @@ sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 typed-ast==1.4.3
     # via
@@ -145,7 +143,7 @@ typing-extensions==3.10.0.0
     # via
     #   -r requirements/base.txt
     #   mypy
-urllib3==1.25.11
+urllib3==1.26.5
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -154,7 +152,7 @@ wcwidth==0.2.5
     # via
     #   -r requirements/base.txt
     #   prompt-toolkit
-websocket-client==0.59.0
+websocket-client==1.0.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
