@@ -8,35 +8,33 @@ appdirs==1.4.4
     # via -r requirements/base.in
 cachetools==4.2.2
     # via google-auth
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   kubernetes
     #   requests
 chardet==4.0.0
     # via requests
-click-repl==0.1.6
+click-repl==0.2.0
     # via -r requirements/base.in
-click==7.1.2
+click==8.0.1
     # via
     #   -r requirements/base.in
     #   click-repl
-google-auth==1.30.0
+google-auth==1.30.1
     # via kubernetes
 idna==2.10
     # via requests
-jinja2==2.11.3
+jinja2==3.0.1
     # via -r requirements/base.in
-kubernetes==12.0.1
+kubernetes==17.17.0
     # via -r requirements/base.in
-markupsafe==1.1.1
-    # via
-    #   -r requirements/base.in
-    #   jinja2
+markupsafe==2.0.1
+    # via jinja2
 mypy-extensions==0.4.3
     # via mypy
 mypy==0.812
     # via -r requirements/base.in
-oauthlib==3.1.0
+oauthlib==3.1.1
     # via requests-oauthlib
 prompt-toolkit==3.0.18
     # via click-repl
@@ -68,19 +66,17 @@ six==1.16.0
     #   google-auth
     #   kubernetes
     #   python-dateutil
-    #   websocket-client
 typed-ast==1.4.3
     # via mypy
 typing-extensions==3.10.0.0
     # via mypy
-urllib3==1.25.11
+urllib3==1.26.5
     # via
-    #   -r requirements/base.in
     #   kubernetes
     #   requests
 wcwidth==0.2.5
     # via prompt-toolkit
-websocket-client==0.59.0
+websocket-client==1.0.1
     # via kubernetes
 
 # The following packages are considered to be unsafe in a requirements file:

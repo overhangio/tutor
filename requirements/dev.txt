@@ -12,7 +12,7 @@ appdirs==1.4.4
     #   black
 astroid==2.5.6
     # via pylint
-black==21.5b1
+black==21.5b2
     # via -r requirements/dev.in
 bleach==3.3.0
     # via readme-renderer
@@ -20,7 +20,7 @@ cachetools==4.2.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -31,9 +31,9 @@ chardet==4.0.0
     # via
     #   -r requirements/base.txt
     #   requests
-click-repl==0.1.6
+click-repl==0.2.0
     # via -r requirements/base.txt
-click==7.1.2
+click==8.0.1
     # via
     #   -r requirements/base.txt
     #   black
@@ -45,7 +45,7 @@ cryptography==3.4.7
     # via secretstorage
 docutils==0.17.1
     # via readme-renderer
-google-auth==1.30.0
+google-auth==1.30.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -53,11 +53,9 @@ idna==2.10
     # via
     #   -r requirements/base.txt
     #   requests
-importlib-metadata==4.0.1
+importlib-metadata==4.4.0
     # via
     #   keyring
-    #   pep517
-    #   pyinstaller
     #   twine
 isort==5.8.0
     # via pylint
@@ -65,15 +63,15 @@ jeepney==0.6.0
     # via
     #   keyring
     #   secretstorage
-jinja2==2.11.3
+jinja2==3.0.1
     # via -r requirements/base.txt
 keyring==23.0.1
     # via twine
-kubernetes==12.0.1
+kubernetes==17.17.0
     # via -r requirements/base.txt
 lazy-object-proxy==1.6.0
     # via astroid
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
     #   -r requirements/base.txt
     #   jinja2
@@ -86,7 +84,7 @@ mypy-extensions==0.4.3
     #   mypy
 mypy==0.812
     # via -r requirements/base.txt
-oauthlib==3.1.0
+oauthlib==3.1.1
     # via
     #   -r requirements/base.txt
     #   requests-oauthlib
@@ -123,7 +121,7 @@ pyinstaller-hooks-contrib==2021.1
     # via pyinstaller
 pyinstaller==4.3
     # via -r requirements/dev.in
-pylint==2.8.2
+pylint==2.8.3
     # via -r requirements/dev.in
 pyparsing==2.4.7
     # via packaging
@@ -169,29 +167,24 @@ six==1.16.0
     #   kubernetes
     #   python-dateutil
     #   readme-renderer
-    #   websocket-client
 toml==0.10.2
     # via
     #   black
     #   pep517
     #   pylint
-tqdm==4.60.0
+tqdm==4.61.0
     # via twine
 twine==3.4.1
     # via -r requirements/dev.in
 typed-ast==1.4.3
     # via
     #   -r requirements/base.txt
-    #   astroid
-    #   black
     #   mypy
 typing-extensions==3.10.0.0
     # via
     #   -r requirements/base.txt
-    #   black
-    #   importlib-metadata
     #   mypy
-urllib3==1.25.11
+urllib3==1.26.5
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -202,16 +195,14 @@ wcwidth==0.2.5
     #   prompt-toolkit
 webencodings==0.5.1
     # via bleach
-websocket-client==0.59.0
+websocket-client==1.0.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
 wrapt==1.12.1
     # via astroid
 zipp==3.4.1
-    # via
-    #   importlib-metadata
-    #   pep517
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

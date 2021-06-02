@@ -15,6 +15,14 @@ VERSION_FILENAME = "version"
 BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf", ".woff", ".woff2"]
 
 
+class JinjaEnvironment(jinja2.Environment):
+    loader: jinja2.BaseLoader
+
+    def __init__(self, template_roots: List[str]) -> None:
+        loader = jinja2.FileSystemLoader(template_roots)
+        super().__init__(loader=loader, undefined=jinja2.StrictUndefined)
+
+
 class Renderer:
     @classmethod
     def instance(cls: Type["Renderer"], config: Config) -> "Renderer":
@@ -39,10 +47,7 @@ class Renderer:
         self.ignore_folders.append(".git")
 
         # Create environment
-        environment = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(template_roots),
-            undefined=jinja2.StrictUndefined,
-        )
+        environment = JinjaEnvironment(template_roots)
         environment.filters["common_domain"] = utils.common_domain
         environment.filters["encrypt"] = utils.encrypt
         environment.filters["list_if"] = utils.list_if
@@ -61,9 +66,7 @@ class Renderer:
         The elements of `prefix` must contain only "/", and not os.sep.
         """
         full_prefix = "/".join(prefix)
-        env_templates: List[
-            str
-        ] = self.environment.loader.list_templates()  # type:ignore[no-untyped-call]
+        env_templates: List[str] = self.environment.loader.list_templates()
         for template in env_templates:
             if template.startswith(full_prefix) and self.is_part_of_env(template):
                 yield template
