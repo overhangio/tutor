@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Avoid permission issues in Kubernetes/Openshift for users who do not have the rights to edit their namespace.
 - [Improvement] Better Kubernetes object creation.
 
 ## v11.3.0 (2021-05-18)

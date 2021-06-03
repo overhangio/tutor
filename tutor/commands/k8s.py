@@ -151,7 +151,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
         field_selector = "metadata.name={}".format(job_name)
         while True:
             namespaced_jobs = K8sClients.instance().batch_api.list_namespaced_job(
-                self.config["K8S_NAMESPACE"], field_selector=field_selector
+                k8s_namespace(self.config), field_selector=field_selector
             )
             if not namespaced_jobs.items:
                 continue
@@ -215,15 +215,23 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
 @click.command(help="Run all configured Open edX services")
 @click.pass_obj
 def start(context: Context) -> None:
-    # Create namespace
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--wait",
-        "--selector",
-        "app.kubernetes.io/component=namespace",
-    )
+    config = tutor_config.load(context.root)
+    # Create namespace, if necessary
+    # Note that this step should not be run for some users, in particular those
+    # who do not have permission to edit the namespace.
+    try:
+        utils.kubectl("get", "namespaces", k8s_namespace(config))
+        fmt.echo_info("Namespace already exists: skipping creation.")
+    except exceptions.TutorError:
+        fmt.echo_info("Namespace does not exist: now creating it...")
+        utils.kubectl(
+            "apply",
+            "--kustomize",
+            tutor_env.pathjoin(context.root),
+            "--wait",
+            "--selector",
+            "app.kubernetes.io/component=namespace",
+        )
     # Create volumes
     utils.kubectl(
         "apply",
@@ -455,7 +463,7 @@ def kubectl_exec(
 ) -> int:
     selector = "app.kubernetes.io/name={}".format(service)
     pods = K8sClients.instance().core_api.list_namespaced_pod(
-        namespace=config["K8S_NAMESPACE"], label_selector=selector
+        namespace=k8s_namespace(config), label_selector=selector
     )
     if not pods.items:
         raise exceptions.TutorError(
