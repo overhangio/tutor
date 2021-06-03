@@ -239,8 +239,7 @@ def start(context: Context) -> None:
         "--kustomize",
         tutor_env.pathjoin(context.root),
         "--selector",
-        # Here use `notin (job, xxx)` when there are other components to ignore
-        "app.kubernetes.io/component!=job",
+        "app.kubernetes.io/component notin (job,volume,namespace)",
     )
 
 
