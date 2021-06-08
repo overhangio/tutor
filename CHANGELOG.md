@@ -4,10 +4,12 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v11.3.1 (2021-06-08)
+
 - [Improvement] Avoid permission issues in Kubernetes/Openshift for users who do not have the rights to edit their namespace.
 - [Improvement] Better Kubernetes object creation.
 
-## v11.3.0 (2021-05-18)
+## v11.3.0 (2021-06-06)
 
 - 💥[Security] Disable python-evaluated input by default as we don't run codejail.
 - [Bugfix] Fix missing discussion notifications.
