@@ -3,6 +3,7 @@
 Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
+- [Bugfix] Fix double pulling mongodb image when upgrading from Koa to Lilac.
 
 ## v12.0.0 (2021-06-09)
 
