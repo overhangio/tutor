@@ -183,7 +183,7 @@ def upgrade_from_koa(context: click.Context, config: Config) -> None:
             "nothing left to do to upgrade from Koa to Lilac."
         )
         return
-    upgrade_mongodb(context, config, "4.0")
+    upgrade_mongodb(context, config, "4.0.25")
 
 
 def upgrade_mongodb(context: click.Context, config: Config, to_version: str) -> None:
