@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Better logging during `plugins disable`.
 - [Bugfix] Fix "upstream sent too big header" error during login of existing users after a Koa to Lilac upgrade.
 
 ## v12.0.0 (2021-06-09)
