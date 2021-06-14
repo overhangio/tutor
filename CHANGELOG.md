@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix Mongodb compatibility version upgrade when upgrading from Koa to Lilac.
+
 ## v12.1.2 (2021-09-18)
 
 - [Bugfix] Fix (agin) forum starting issue: "NoMethodError: undefined method 'encode' for nil:NilClass".
