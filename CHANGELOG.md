@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "upstream sent too big header" error during login of existing users after a Koa to Lilac upgrade.
+
 ## v12.0.0 (2021-06-09)
 
 - 💥[Improvement] Upgrade all services to open-release/lilac.master.
