@@ -1,4 +1,5 @@
 import os
+from time import sleep
 
 import click
 
@@ -198,6 +199,8 @@ def upgrade_mongodb(
     config["DOCKER_IMAGE_MONGODB"] = "mongo:{}".format(to_docker_version)
     tutor_env.save(context.obj.root, config)
     context.invoke(compose.start, detach=True, services=["mongodb"])
+    fmt.echo_info("Waiting for mongodb to boot...")
+    sleep(10)
     context.invoke(
         compose.execute,
         args=[
