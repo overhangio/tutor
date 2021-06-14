@@ -411,19 +411,22 @@ def enable(config: Config, name: str) -> None:
     enabled.sort()
 
 
-def disable(config: Config, name: str) -> None:
-    fmt.echo_info("Disabling plugin {}...".format(name))
-    for plugin in Plugins(config).iter_enabled():
-        if name == plugin.name:
-            # Remove "set" config entries
-            for key, value in plugin.config_set.items():
-                config.pop(key, None)
-                fmt.echo_info("    Removed config entry {}={}".format(key, value))
-    # Remove plugin from list
+def disable(config: Config, plugin: BasePlugin) -> None:
+    # Remove plugin-specific set config
+    for key in plugin.config_set.keys():
+        config.pop(key, None)
+
+    # Remove plugin from list of enabled plugins
     enabled = enabled_plugins(config)
-    while name in enabled:
-        enabled.remove(name)
-    fmt.echo_info("    Plugin disabled")
+    while plugin.name in enabled:
+        enabled.remove(plugin.name)
+
+
+def get_enabled(config: Config, name: str) -> BasePlugin:
+    for plugin in iter_enabled(config):
+        if plugin.name == name:
+            return plugin
+    raise ValueError("Enabled plugin {} could not be found.".format(plugin.name))
 
 
 def iter_enabled(config: Config) -> Iterator[BasePlugin]:

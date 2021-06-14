@@ -5,6 +5,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## Unreleased
 - [Bugfix] Fix double pulling mongodb image when upgrading from Koa to Lilac.
 
+- [Improvement] Better logging during `plugins disable`.
 - [Bugfix] Fix "upstream sent too big header" error during login of existing users after a Koa to Lilac upgrade.
 - [Feature] Added the ability to skip `config.yml` file modification while running `tutor config save` command with `-e` or `--env-only` flag.
 

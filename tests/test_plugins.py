@@ -55,31 +55,52 @@ class PluginsTests(unittest.TestCase):
         with patch.object(plugins, "is_installed", return_value=False):
             self.assertRaises(exceptions.TutorError, plugins.enable, config, "plugin1")
 
-    def test_disable(self) -> None:
+    @patch.object(
+        plugins.Plugins,
+        "iter_installed",
+        return_value=[
+            plugins.DictPlugin(
+                {
+                    "name": "plugin1",
+                    "version": "1.0.0",
+                    "config": {"set": {"KEY": "value"}},
+                }
+            ),
+            plugins.DictPlugin(
+                {
+                    "name": "plugin2",
+                    "version": "1.0.0",
+                }
+            ),
+        ],
+    )
+    def test_disable(self, _iter_installed_mock: Mock) -> None:
         config: Config = {"PLUGINS": ["plugin1", "plugin2"]}
         with patch.object(fmt, "STDOUT"):
-            plugins.disable(config, "plugin1")
+            plugin = plugins.get_enabled(config, "plugin1")
+            plugins.disable(config, plugin)
         self.assertEqual(["plugin2"], config["PLUGINS"])
 
-    def test_disable_removes_set_config(self) -> None:
-        with patch.object(
-            plugins.Plugins,
-            "iter_enabled",
-            return_value=[
-                plugins.DictPlugin(
-                    {
-                        "name": "plugin1",
-                        "version": "1.0.0",
-                        "config": {"set": {"KEY": "value"}},
-                    }
-                )
-            ],
-        ):
-            config: Config = {"PLUGINS": ["plugin1"], "KEY": "value"}
-            with patch.object(fmt, "STDOUT"):
-                plugins.disable(config, "plugin1")
-            self.assertEqual([], config["PLUGINS"])
-            self.assertNotIn("KEY", config)
+    @patch.object(
+        plugins.Plugins,
+        "iter_installed",
+        return_value=[
+            plugins.DictPlugin(
+                {
+                    "name": "plugin1",
+                    "version": "1.0.0",
+                    "config": {"set": {"KEY": "value"}},
+                }
+            ),
+        ],
+    )
+    def test_disable_removes_set_config(self, _iter_installed_mock: Mock) -> None:
+        config: Config = {"PLUGINS": ["plugin1"], "KEY": "value"}
+        plugin = plugins.get_enabled(config, "plugin1")
+        with patch.object(fmt, "STDOUT"):
+            plugins.disable(config, plugin)
+        self.assertEqual([], config["PLUGINS"])
+        self.assertNotIn("KEY", config)
 
     def test_none_plugins(self) -> None:
         config: Config = {plugins.CONFIG_KEY: None}

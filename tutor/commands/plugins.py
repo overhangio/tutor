@@ -60,12 +60,16 @@ def enable(context: Context, plugin_names: List[str]) -> None:
 @click.pass_obj
 def disable(context: Context, plugin_names: List[str]) -> None:
     config = tutor_config.load_user(context.root)
-    if "all" in plugin_names:
-        plugin_names = [plugin.name for plugin in plugins.iter_enabled(config)]
-    for plugin_name in plugin_names:
-        plugins.disable(config, plugin_name)
-        delete_plugin(context.root, plugin_name)
-
+    disable_all = "all" in plugin_names
+    for plugin in plugins.iter_enabled(config):
+        if disable_all or plugin.name in plugin_names:
+            fmt.echo_info("Disabling plugin {}...".format(plugin.name))
+            for key, value in plugin.config_set.items():
+                value = tutor_env.render_unknown(config, value)
+                fmt.echo_info("    Removing config entry {}={}".format(key, value))
+            plugins.disable(config, plugin)
+            delete_plugin(context.root, plugin.name)
+            fmt.echo_info("    Plugin disabled")
     tutor_config.save_config_file(context.root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
