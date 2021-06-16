@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-export MONGOHQ_URL="mongodb://$MONGODB_AUTH$MONGODB_HOST:$MONGODB_PORT/cs_comments_service"
+export MONGOHQ_URL="mongodb://$MONGODB_AUTH$MONGODB_HOST:$MONGODB_PORT/$MONGODB_DATABASE"
 # the search server variable was renamed after the upgrade to elasticsearch 7
 export SEARCH_SERVER_ES7="$SEARCH_SERVER"
 

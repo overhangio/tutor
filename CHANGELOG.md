@@ -9,6 +9,8 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Bugfix] Fix "upstream sent too big header" error during login of existing users after a Koa to Lilac upgrade.
 - [Feature] Added the ability to skip `config.yml` file modification while running `tutor config save` command with `-e` or `--env-only` flag.
 
+- [Feature] Add new config value `FORUM_MONGODB_DATABASE` to set the forum database name
+
 ## v12.0.0 (2021-06-09)
 
 - 💥[Improvement] Upgrade all services to open-release/lilac.master.

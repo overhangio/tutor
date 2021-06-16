@@ -36,6 +36,7 @@ services:
         MONGODB_AUTH: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
         MONGODB_HOST: "{{ MONGODB_HOST }}"
         MONGODB_PORT: "{{ MONGODB_PORT }}"
+        MONGODB_DATABASE: "{{ FORUM_MONGODB_DATABASE }}"
       depends_on: {{ [("elasticsearch", RUN_ELASTICSEARCH), ("mongodb", RUN_MONGODB)]|list_if }}
 
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}
