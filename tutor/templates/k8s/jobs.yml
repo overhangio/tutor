@@ -101,6 +101,8 @@ spec:
             value: "{{ MONGODB_HOST }}"
           - name: MONGODB_PORT
             value: "{{ MONGODB_PORT }}"
+          - name: MONGODB_DATABASE
+            value: "{{ FORUM_MONGODB_DATABASE }}"
 
 {{ patch("k8s-jobs") }}
 
