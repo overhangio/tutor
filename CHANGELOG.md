@@ -5,6 +5,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## Unreleased
 
 - [Improvement] Tutor is now published on pypi as "tutor".
+- [Improvement] Set the default contact mailing email address
 
 ## v12.0.1 (2021-06-22)
 
