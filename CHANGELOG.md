@@ -3,12 +3,13 @@
 Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
-- [Bugfix] Fix double pulling mongodb image when upgrading from Koa to Lilac.
 
+## v12.0.1 (2021-06-22)
+
+- [Bugfix] Fix double pulling mongodb image when upgrading from Koa to Lilac.
 - [Improvement] Better logging during `plugins disable`.
 - [Bugfix] Fix "upstream sent too big header" error during login of existing users after a Koa to Lilac upgrade.
 - [Feature] Added the ability to skip `config.yml` file modification while running `tutor config save` command with `-e` or `--env-only` flag.
-
 - [Feature] Add new config value `FORUM_MONGODB_DATABASE` to set the forum database name
 
 ## v12.0.0 (2021-06-09)
