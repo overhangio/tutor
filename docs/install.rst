@@ -95,13 +95,13 @@ With Tutor, it is very easy to upgrade to a more recent Open edX or Tutor releas
 Autocomplete
 ------------
 
-Tutor is built on top of `Click <https://click.palletsprojects.com>`_, which is a great library for building command line interface (CLI) tools. As such, Tutor benefits from all Click features, including `auto-completion <https://click.palletsprojects.com/en/7.x/bashcomplete/>`_. After installing Tutor, auto-completion can be enabled by running::
+Tutor is built on top of `Click <https://click.palletsprojects.com>`_, which is a great library for building command line interface (CLI) tools. As such, Tutor benefits from all Click features, including `auto-completion <https://click.palletsprojects.com/en/8.x/bashcomplete/>`_. After installing Tutor, auto-completion can be enabled in bash by running::
 
-    _TUTOR_COMPLETE=source tutor >> ~/.bashrc
+    _TUTOR_COMPLETE=bash_source tutor >> ~/.bashrc
 
 If you are running zsh, run instead::
 
-    _TUTOR_COMPLETE=source_zsh tutor >> ~/.zshrc
+    _TUTOR_COMPLETE=zsh_source tutor >> ~/.zshrc
 
 After opening a new shell, you can test auto-completion by typing::
 
