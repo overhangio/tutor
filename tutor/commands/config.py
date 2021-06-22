@@ -39,9 +39,16 @@ def config_command() -> None:
     multiple=True,
     help="Remove a configuration value (can be used multiple times)",
 )
+@click.option(
+    "-e", "--env-only", "env_only", is_flag=True, help="Skip updating config.yaml"
+)
 @click.pass_obj
 def save(
-    context: Context, interactive: bool, set_vars: Config, unset_vars: List[str]
+    context: Context,
+    interactive: bool,
+    set_vars: Config,
+    unset_vars: List[str],
+    env_only: bool,
 ) -> None:
     config, defaults = interactive_config.load_all(
         context.root, interactive=interactive
@@ -50,7 +57,8 @@ def save(
         tutor_config.merge(config, dict(set_vars), force=True)
     for key in unset_vars:
         config.pop(key, None)
-    tutor_config.save_config_file(context.root, config)
+    if not env_only:
+        tutor_config.save_config_file(context.root, config)
     tutor_config.merge(config, defaults)
     env.save(context.root, config)
 
