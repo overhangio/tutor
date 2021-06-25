@@ -35,6 +35,11 @@ Deploying to Kubernetes
 
 Yes, Tutor comes with Kubernetes deployment support :ref:`out of the box <k8s>`.
 
+Gathering insights and analytics about Open edX
+-----------------------------------------------
+
+Check out `Cairn <https://overhang.io/tutor/plugin/cairn>`__, the next-generation analytics solution for Open edX.
+
 Meeting the community
 ---------------------
 
