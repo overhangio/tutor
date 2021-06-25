@@ -16,7 +16,7 @@ FROM docker.io/python:3.7-slim-stretch
 COPY --from=library/docker:19.03 /usr/local/bin/docker /usr/bin/docker
 COPY --from=docker/compose:1.24.0 /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-RUN pip install tutor-openedx
+RUN pip install tutor
 RUN mkdir /opt/tutor
 ENV TUTOR_ROOT /opt/tutor
 

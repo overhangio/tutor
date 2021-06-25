@@ -33,7 +33,7 @@ Direct binary download
 
 The latest binaries can be downloaded from https://github.com/overhangio/tutor/releases. From the command line:
 
-.. include:: cli_download.rst
+.. include:: download/binary.rst
 
 This is the simplest and recommended installation method for most people. Note however that you will not be able to use custom plugins with this pre-compiled binary. The only plugins you can use with this approach are those that are already bundled with the binary: see the :ref:`existing plugins <existing_plugins>`.
 
@@ -42,16 +42,14 @@ This is the simplest and recommended installation method for most people. Note h
 Alternative installation methods
 --------------------------------
 
-If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor-openedx/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.6 with pip and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
+If you would like to inspect the Tutor source code, you are most welcome to install Tutor from `Pypi <https://pypi.org/project/tutor/>`_ or directly from `the Github repository <https://github.com/overhangio/tutor>`_. You will need python >= 3.6 with pip and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
 
     sudo apt install python3 python3-pip libyaml-dev
 
 Installing from pypi
 ~~~~~~~~~~~~~~~~~~~~
 
-::
-
-    pip install tutor-openedx
+.. include:: download/pip.rst
 
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -129,7 +127,7 @@ Then, delete all data associated to your Open edX platform::
 Finally, uninstall Tutor itself::
 
     # If you installed tutor from source
-    pip uninstall tutor-openedx
+    pip uninstall tutor
 
     # If you downloaded the tutor binary
     sudo rm /usr/local/bin/tutor

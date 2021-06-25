@@ -20,8 +20,10 @@ upgrade-requirements: ## Upgrade requirements files
 
 build-pythonpackage: ## Build a python package ready to upload to pypi
 	python setup.py sdist
+	python setup-obsolete.py sdist
 
 push-pythonpackage: ## Push python package to pypi
+	twine upload --skip-existing dist/tutor-$(shell make version).tar.gz
 	twine upload --skip-existing dist/tutor-openedx-$(shell make version).tar.gz
 
 test: test-lint test-unit test-types test-format test-pythonpackage ## Run all tests by decreasing order or priority
@@ -39,7 +41,7 @@ test-types: ## Check type definitions
 	mypy --exclude=templates --ignore-missing-imports --strict tutor/ tests/
 
 test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
-	twine check dist/tutor-openedx-$(shell make version).tar.gz
+	twine check dist/tutor-$(shell make version).tar.gz
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)

@@ -1,15 +1,18 @@
 import io
 import os
-from setuptools import find_packages, setup
+import sys
+
+from setuptools import setup
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def load_readme():
-    with io.open(os.path.join(HERE, "README.rst"), "rt", encoding="utf8") as f:
-        readme = f.read()
-    # Replace img src for publication on pypi
-    return readme.replace("./docs/img/", "https://github.com/overhangio/tutor/raw/master/docs/img/")
+    return """
+WARNING: This project has moved to https://pypi.org/project/tutor/. You should now install Tutor with::
+
+    pip install tutor
+    """
 
 
 def load_about():
@@ -21,21 +24,10 @@ def load_about():
     return about
 
 
-def load_requirements():
-    with io.open(
-        os.path.join(HERE, "requirements", "base.in"), "rt", encoding="utf-8"
-    ) as f:
-        return [line.strip() for line in f if is_requirement(line)]
-
-
-def is_requirement(line):
-    return not (line.strip() == "" or line.startswith("#"))
-
-
 ABOUT = load_about()
 
 setup(
-    name="tutor",
+    name="tutor-openedx",
     version=ABOUT["__version__"],
     url="https://docs.tutor.overhang.io/",
     project_urls={
@@ -50,11 +42,9 @@ setup(
     description="The Docker-based Open edX distribution designed for peace of mind",
     long_description=load_readme(),
     long_description_content_type="text/x-rst",
-    packages=find_packages(exclude=["tests*"]),
-    include_package_data=True,
+    packages=[],
     python_requires=">=3.5",
-    install_requires=load_requirements(),
-    entry_points={"console_scripts": ["tutor=tutor.commands.cli:main"]},
+    install_requires=["tutor=={}".format(ABOUT["__version__"])],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -69,3 +59,8 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
 )
+sys.stderr.write("""
+Installing Tutor from tutor-openedx is deprecated. You should instead install the "tutor" package with:
+
+    pip install tutor
+""")
