@@ -7,7 +7,9 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 def load_readme():
     with io.open(os.path.join(HERE, "README.rst"), "rt", encoding="utf8") as f:
-        return f.read()
+        readme = f.read()
+    # Replace img src for publication on pypi
+    return readme.replace("./docs/img/", "https://github.com/overhangio/tutor/raw/master/docs/img/")
 
 
 def load_about():

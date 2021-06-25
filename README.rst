@@ -32,7 +32,15 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
     :alt: AGPL License
     :target: https://www.gnu.org/licenses/agpl-3.0.en.html
 
-**Tutor** is a docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used by hundreds of Open edX platforms around the world.
+.. image:: https://img.shields.io/twitter/follow/overhangio
+    :alt: Follow us on Twitter
+    :target: https://twitter.com/overhangio/
+
+.. image:: https://img.shields.io/youtube/channel/views/UCe_p_Axq3PjRnbTqFZDY_iQ?label=Overhang.IO%20on%20Youtube
+    :alt: Follow us on Youtube
+    :target: https://www.youtube.com/c/OverhangIO
+
+**Tutor** is the Docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used by hundreds of Open edX platforms around the world.
 
 Do you need professional assistance setting up or managing your Open edX platform? Overhang.IO provides online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/pricing>`__.
 
@@ -45,8 +53,8 @@ Features
 * Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.overhang.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/tutor/tutor-android>`__, `custom translations <https://docs.tutor.overhang.io/configuration.html#adding-custom-translations>`__...
 * Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins.html>`__
 * Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`__
+* Amazing premium plugins available in the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__, including `Cairn <https://overhang.io/tutor/plugin/cairn>`__ the next-generation analytics solution for Open edX.
 * No technical skill required with the `1-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#cloud-deployment>`__
-* Amazing premium plugins available in the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__
 
 .. _readme_intro_end:
 
