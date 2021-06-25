@@ -5,7 +5,11 @@ Quickstart (1-click install)
 
 1. `Download <https://github.com/overhangio/tutor/releases>`_ the latest stable release of Tutor and place the ``tutor`` executable in your path. From the command line:
 
-.. include:: cli_download.rst
+.. include:: download/binary.rst
+
+Or:
+
+.. include:: download/pip.rst
 
 2. Run ``tutor local quickstart``
 3. You're done!
