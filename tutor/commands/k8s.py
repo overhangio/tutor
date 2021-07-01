@@ -114,16 +114,13 @@ class K8sJobRunner(jobs.BaseJobRunner):
         job["metadata"]["name"] = job_name
         job["metadata"].setdefault("labels", {})
         job["metadata"]["labels"]["app.kubernetes.io/name"] = job_name
-        # Define k8s entrypoint/args
-        shell_command = ["sh", "-e", "-c"]
-        if job["spec"]["template"]["spec"]["containers"][0].get("command") == []:
-            # Empty "command" (aka: entrypoint) might not be taken into account by jobs, so we need to manually
-            # override the entrypoint. We do not do this for every job, because some entrypoints are actually useful.
-            job["spec"]["template"]["spec"]["containers"][0]["command"] = shell_command
-            container_args = [command]
-        else:
-            container_args = shell_command + [command]
-        job["spec"]["template"]["spec"]["containers"][0]["args"] = container_args
+        # Define k8s args (aka: CMD)
+        job["spec"]["template"]["spec"]["containers"][0]["args"] = [
+            "sh",
+            "-e",
+            "-c",
+            command,
+        ]
         job["spec"]["backoffLimit"] = 1
         job["spec"]["ttlSecondsAfterFinished"] = 3600
         # Save patched job to "jobs.yml" file

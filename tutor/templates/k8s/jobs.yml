@@ -77,7 +77,6 @@ spec:
       containers:
       - name: mysql
         image: {{ DOCKER_IMAGE_MYSQL }}
-        command: []
 ---
 apiVersion: batch/v1
 kind: Job
@@ -105,4 +104,3 @@ spec:
             value: "{{ FORUM_MONGODB_DATABASE }}"
 
 {{ patch("k8s-jobs") }}
-
