@@ -4,3 +4,7 @@ pip-tools
 pylint
 pyinstaller
 twine
+
+# Types packages
+types-PyYAML
+types-setuptools
