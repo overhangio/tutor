@@ -3,8 +3,6 @@ services:
 
     mysql-job:
       image: {{ DOCKER_IMAGE_MYSQL }}
-      entrypoint: []
-      command: ["echo", "done"]
       depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
 
     lms-job:
