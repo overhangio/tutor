@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Add remote
         run: git remote add overhangio https://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_PASSWORD }}@git.overhang.io/core/tutor.git
-      - name: Rebase
-        run: git pull --rebase overhangio master
       - name: Push
         run: git push overhangio master
