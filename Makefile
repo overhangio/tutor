@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 .PHONY: docs
-SRC_DIRS = ./tutor ./tests ./bin
+SRC_DIRS = ./tutor ./tests ./bin ./tutor-openedx
 BLACK_OPTS = --exclude templates ${SRC_DIRS}
 
 ###### Development
@@ -18,9 +18,14 @@ upgrade-requirements: ## Upgrade requirements files
 	pip-compile --upgrade requirements/dev.in
 	pip-compile --upgrade requirements/docs.in
 
-build-pythonpackage: ## Build a python package ready to upload to pypi
+build-pythonpackage: build-pythonpackage-tutor build-pythonpackage-tutor-openedx ## Build python packages ready to upload to pypi
+
+build-pythonpackage-tutor: ## Build the "tutor" python package for upload to pypi
 	python setup.py sdist
-	python setup-obsolete.py sdist
+
+build-pythonpackage-tutor-openedx: ## Build the obsolete "tutor-openedx" python package for upload to pypi
+	cp tutor/__about__.py tutor-openedx/tutoropenedx/
+	cd tutor-openedx && python setup.py sdist --dist-dir ../dist
 
 push-pythonpackage: ## Push python package to pypi
 	twine upload --skip-existing dist/tutor-$(shell make version).tar.gz
@@ -42,6 +47,7 @@ test-types: ## Check type definitions
 
 test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
 	twine check dist/tutor-$(shell make version).tar.gz
+	twine check dist/tutor-openedx-$(shell make version).tar.gz
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)

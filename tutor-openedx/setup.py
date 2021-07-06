@@ -1,24 +1,20 @@
 import io
 import os
 import sys
-
 from setuptools import setup
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def load_readme():
-    return """
-WARNING: This project has moved to https://pypi.org/project/tutor/. You should now install Tutor with::
-
-    pip install tutor
-    """
+    with io.open(os.path.join(HERE, "README.rst"), "rt", encoding="utf8") as f:
+        return f.read()
 
 
 def load_about():
     about = {}
     with io.open(
-        os.path.join(HERE, "tutor", "__about__.py"), "rt", encoding="utf-8"
+        os.path.join(HERE, "tutoropenedx", "__about__.py"), "rt", encoding="utf-8"
     ) as f:
         exec(f.read(), about)  # pylint: disable=exec-used
     return about
@@ -42,7 +38,7 @@ setup(
     description="The Docker-based Open edX distribution designed for peace of mind",
     long_description=load_readme(),
     long_description_content_type="text/x-rst",
-    packages=[],
+    packages=["tutoropenedx"],
     python_requires=">=3.5",
     install_requires=["tutor=={}".format(ABOUT["__version__"])],
     classifiers=[
@@ -59,8 +55,10 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
 )
-sys.stderr.write("""
+sys.stderr.write(
+    """
 Installing Tutor from tutor-openedx is deprecated. You should instead install the "tutor" package with:
 
     pip install tutor
-""")
+"""
+)
