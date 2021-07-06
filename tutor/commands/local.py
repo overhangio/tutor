@@ -137,9 +137,9 @@ def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
         )
         return
 
-    upgrade_mongodb(context, config, "3.4")
+    upgrade_mongodb(context, config, "3.4", "3.4")
     context.invoke(compose.stop)
-    upgrade_mongodb(context, config, "3.6")
+    upgrade_mongodb(context, config, "3.6", "3.6")
     context.invoke(compose.stop)
 
 
@@ -183,14 +183,19 @@ def upgrade_from_koa(context: click.Context, config: Config) -> None:
             "nothing left to do to upgrade from Koa to Lilac."
         )
         return
-    upgrade_mongodb(context, config, "4.0.25")
+    upgrade_mongodb(context, config, "4.0.25", "4.0")
 
 
-def upgrade_mongodb(context: click.Context, config: Config, to_version: str) -> None:
-    click.echo(fmt.title("Upgrading MongoDb to v{}".format(to_version)))
+def upgrade_mongodb(
+    context: click.Context,
+    config: Config,
+    to_docker_version: str,
+    to_compatibility_version: str,
+) -> None:
+    click.echo(fmt.title("Upgrading MongoDb to v{}".format(to_docker_version)))
     # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
     # environment, not the configuration.
-    config["DOCKER_IMAGE_MONGODB"] = "mongo:{}".format(to_version)
+    config["DOCKER_IMAGE_MONGODB"] = "mongo:{}".format(to_docker_version)
     tutor_env.save(context.obj.root, config)
     context.invoke(compose.start, detach=True, services=["mongodb"])
     context.invoke(
@@ -199,7 +204,8 @@ def upgrade_mongodb(context: click.Context, config: Config, to_version: str) -> 
             "mongodb",
             "mongo",
             "--eval",
-            'db.adminCommand({ setFeatureCompatibilityVersion: "%s" })' % to_version,
+            'db.adminCommand({ setFeatureCompatibilityVersion: "%s" })'
+            % to_compatibility_version,
         ],
     )
     context.invoke(compose.stop)

@@ -475,7 +475,7 @@ def upgrade_from_koa(config: Config) -> None:
 your MongoDb cluster from v3.6 to v4.0. You should run something similar to:
 
     tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:4.0
+    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:4.0.25
     tutor k8s start
     tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "4.0" })'
     tutor config save --unset DOCKER_IMAGE_MONGODB

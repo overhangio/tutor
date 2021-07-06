@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "Invalid command argument" during upgrade from Koa to Lilac.
 - [Bugfix] Fix mysql initialisation in docker-compose==2.0.0beta4.
 - [Improvement] Tutor is now published on pypi as "tutor".
 
