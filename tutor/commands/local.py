@@ -137,9 +137,9 @@ def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
         )
         return
 
-    upgrade_mongodb(context, config, "3.4")
+    upgrade_mongodb(context, config, "3.4", "3.4")
     context.invoke(compose.stop)
-    upgrade_mongodb(context, config, "3.6")
+    upgrade_mongodb(context, config, "3.6", "3.6")
     context.invoke(compose.stop)
 
 
@@ -183,10 +183,10 @@ def upgrade_from_koa(context: click.Context, config: Config) -> None:
             "nothing left to do to upgrade from Koa to Lilac."
         )
         return
-    upgrade_mongodb(context, config, "4.0.25")
+    upgrade_mongodb(context, config, "4.0.25", "4.0")
 
 
-def upgrade_mongodb(context: click.Context, config: Config, to_version: str) -> None:
+def upgrade_mongodb(context: click.Context, config: Config, to_version: str, mongo_setFeatureCompatibilityVersion: str) -> None:
     click.echo(fmt.title("Upgrading MongoDb to v{}".format(to_version)))
     # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
     # environment, not the configuration.
@@ -199,7 +199,7 @@ def upgrade_mongodb(context: click.Context, config: Config, to_version: str) -> 
             "mongodb",
             "mongo",
             "--eval",
-            'db.adminCommand({ setFeatureCompatibilityVersion: "%s" })' % to_version,
+            'db.adminCommand({ setFeatureCompatibilityVersion: "%s" })' % mongo_setFeatureCompatibilityVersion,
         ],
     )
     context.invoke(compose.stop)
