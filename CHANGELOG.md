@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "`sh` is not a recognized command" in some plugins, including minio.
+
 ## v12.0.2 (2021-07-06)
 
 - [Bugfix] Fix "Invalid command argument" during upgrade from Koa to Lilac.
