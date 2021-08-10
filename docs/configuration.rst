@@ -79,7 +79,7 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/lilac.1"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/lilac.2"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -220,7 +220,7 @@ openedx Docker Image build arguments
 When building the "openedx" Docker image, it is possible to specify a few `arguments <https://docs.docker.com/engine/reference/builder/#arg>`__:
 
 - ``EDX_PLATFORM_REPOSITORY`` (default: ``"https://github.com/edx/edx-platform.git"``)
-- ``EDX_PLATFORM_VERSION`` (default: ``"open-release/lilac.1"``)
+- ``EDX_PLATFORM_VERSION`` (default: ``"{{ OPENEDX_COMMON_VERSION }}"``)
 - ``NPM_REGISTRY`` (default: ``"https://registry.npmjs.org/"``)
 
 These arguments can be specified from the command line, `very much like Docker <https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg>`__. For instance::
