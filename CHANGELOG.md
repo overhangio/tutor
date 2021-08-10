@@ -4,15 +4,18 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v12.0.3 (2021-08-10)
+
 - [Improvement] Upgrade all services to open-release/lilac.2.
 - [Bugfix] Fix "`sh` is not a recognized command" in some plugins, including minio.
+- [Improvement] Set the default contact mailing email address
+- [Bugfix] Fix minio initialisation in Kubernetes.
 
 ## v12.0.2 (2021-07-06)
 
 - [Bugfix] Fix "Invalid command argument" during upgrade from Koa to Lilac.
 - [Bugfix] Fix mysql initialisation in docker-compose==2.0.0beta4.
 - [Improvement] Tutor is now published on pypi as "tutor".
-- [Improvement] Set the default contact mailing email address
 
 ## v12.0.1 (2021-06-22)
 
