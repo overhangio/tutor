@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Upgrade all services to open-release/lilac.2.
 - [Bugfix] Fix "`sh` is not a recognized command" in some plugins, including minio.
 
 ## v12.0.2 (2021-07-06)

@@ -137,7 +137,7 @@ Prepare the edx-platform repo
 
 If you choose any but the first solution above, you will have to make sure that your fork works with Tutor.
 
-First of all, you should make sure that you are working off the ``open-release/lilac.1`` tag. See the :ref:`fork edx-platform section <edx_platform_fork>` for more information.
+First of all, you should make sure that you are working off the ``open-release/lilac.2`` tag. See the :ref:`fork edx-platform section <edx_platform_fork>` for more information.
 
 Then, you should run the following commands::
 
