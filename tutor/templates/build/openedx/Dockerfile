@@ -40,7 +40,8 @@ WORKDIR /openedx/edx-platform
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# RUN curl https://github.com/overhangio/edx-platform/commit/<sha1>.patch | git apply -
+# RUN curl --silent https://github.com/overhangio/edx-platform/commit/<sha1>.patch | git apply -
+RUN curl --silent https://github.com/overhangio/edx-platform/commit/8ecc1903ca9170a719c0e63e99fb231822eb26d8.patch | git apply -
 {% endif %}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
