@@ -48,12 +48,12 @@ Enable SAML authentication
     name: saml
     version: 0.1.0
     patches:
-     common-env-features: |
-        "ENABLE_THIRD_PARTY_AUTH" : true
+      common-env-features: |
+        "ENABLE_THIRD_PARTY_AUTH": true
 
-     openedx-lms-common-settings: |
+      openedx-lms-common-settings: |
         # saml special settings
-        THIRD_PARTY_AUTH_BACKENDS = "third_party_auth.saml.SAMLAuthBackend"
+        AUTHENTICATION_BACKENDS += ["third_party_auth.saml.SAMLAuthBackend", "django.contrib.auth.backends.ModelBackend"]
 
       openedx-auth: |
         "SOCIAL_AUTH_SAML_SP_PRIVATE_KEY": "yoursecretkey",
