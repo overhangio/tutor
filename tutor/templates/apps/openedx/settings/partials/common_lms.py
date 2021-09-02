@@ -18,6 +18,21 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = "see_about_page"
 # Allow insecure oauth2 for local interaction with local containers
 OAUTH_ENFORCE_SECURE = False
 
+# Email settings
+class LazyStaticAbsoluteUrl:
+    """
+    Evaluates a static asset path lazily at runtime
+    """
+    def __init__(self, path):
+        self.path = path
+
+    def __str__(self):
+        from django.conf import settings
+        from django.contrib.staticfiles.storage import staticfiles_storage
+        return settings.LMS_ROOT_URL + staticfiles_storage.url(self.path)
+# We need a lazily-computed logo url to capture the url of the theme-specific logo.
+DEFAULT_EMAIL_LOGO_URL = LazyStaticAbsoluteUrl("images/logo.png")
+
 # Create folders if necessary
 for folder in [DATA_DIR, LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):
