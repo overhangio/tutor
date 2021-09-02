@@ -4,11 +4,11 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Make sure that the logo included in email notifications (including discussion responses) is the same as the site logo.
+- [Bugfix] Install IPython directly from pypi instead of installing it from source (the reason it was installed from source is no longer relevant). The effect of this shall speed up the process of building the openedx-dev Docker image.
 - [Feature] Add "openedx-dockerfile-post-git-checkout" patch.
 - [Improvement] In the "openedx" Docker images, convert git patches to cherry-picks for a cleaner source tree.
 - 💥[Feature] Make it possible to override local job configuration. This deprecates the older model for running jobs which dates back from a long time ago.
-
-- [Bugfix] Install Ipython directly from pypy instead of installing it from source (the reason it was installed from source is no longer relevant). The effect of this shall speed up the process of openedx-dev Docker image. 
 
 ## v12.0.4 (2021-08-12)
 
