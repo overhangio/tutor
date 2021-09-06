@@ -58,7 +58,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
                 )
             if job_name == name:
                 return job
-        raise ValueError("Could not find job '{}'".format(name))
+        raise exceptions.TutorError("Could not find job '{}'".format(name))
 
     def active_job_names(self) -> List[str]:
         """
@@ -75,27 +75,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
 
     def run_job(self, service: str, command: str) -> int:
         job_name = "{}-job".format(service)
-        try:
-            job = self.load_job(job_name)
-        except ValueError:
-            message = (
-                "The '{job_name}' kubernetes job does not exist in the list of job "
-                "runners. This might be caused by an older plugin. Tutor switched to a"
-                " job runner model for running one-time commands, such as database"
-                " initialisation. For the record, this is the command that we are "
-                "running:\n"
-                "\n"
-                "    {command}\n"
-                "\n"
-                "Old-style job running will be deprecated soon. Please inform "
-                "your plugin maintainer!"
-            ).format(
-                job_name=job_name,
-                command=command.replace("\n", "\n    "),
-            )
-            fmt.echo_alert(message)
-            wait_for_pod_ready(self.config, service)
-            return kubectl_exec(self.config, service, command)
+        job = self.load_job(job_name)
         # Create a unique job name to make it deduplicate jobs and make it easier to
         # find later. Logs of older jobs will remain available for some time.
         job_name += "-" + datetime.now().strftime("%Y%m%d%H%M%S")

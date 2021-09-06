@@ -280,3 +280,5 @@ You might want to customize the docker-compose services listed in ``$(tutor conf
     vim $(tutor config printroot)/env/local/docker-compose.override.yml
 
 The values in this file will override the values from ``docker-compose.yml`` and ``docker-compose.prod.yml``, as explained in the `docker-compose documentation <https://docs.docker.com/compose/extends/#adding-and-overriding-configuration>`__.
+
+Similarly, the job service configuration can be overridden by creating a ``docker-compose.jobs.override.yml`` file in that same folder.
