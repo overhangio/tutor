@@ -10,7 +10,6 @@ from .. import env as tutor_env
 from ..exceptions import TutorError
 from .. import fmt
 from .. import jobs
-from .. import serialize
 from ..types import Config
 from .. import utils
 from .context import Context
@@ -33,49 +32,24 @@ class ComposeJobRunner(jobs.BaseJobRunner):
         service does not exist, run the service from good old regular
         docker-compose.yml.
         """
-        jobs_path = tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml")
-        job_service_name = "{}-job".format(service)
-        opts = [] if utils.is_a_tty() else ["-T"]
-        if job_service_name in serialize.load(open(jobs_path).read())["services"]:
-            return self.docker_compose_func(
-                self.root,
-                self.config,
-                "-f",
-                jobs_path,
-                "run",
-                *opts,
-                "--rm",
-                job_service_name,
-                "sh",
-                "-e",
-                "-c",
-                command,
-            )
-        fmt.echo_alert(
-            (
-                "The '{job_service_name}' service does not exist in {jobs_path}. "
-                "This might be caused by an older plugin. Tutor switched to a job "
-                "runner model for running one-time commands, such as database"
-                " initialisation. For the record, this is the command that we are "
-                "running:\n"
-                "\n"
-                "    {command}\n"
-                "\n"
-                "Old-style job running will be deprecated soon. Please inform "
-                "your plugin maintainer!"
-            ).format(
-                job_service_name=job_service_name,
-                jobs_path=jobs_path,
-                command=command.replace("\n", "\n    "),
-            )
+        run_command = [
+            "-f",
+            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
+        ]
+        override_path = tutor_env.pathjoin(
+            self.root, "local", "docker-compose.jobs.override.yml"
         )
+        if os.path.exists(override_path):
+            run_command += ["-f", override_path]
+        run_command += ["run", "--rm"]
+        if not utils.is_a_tty():
+            run_command += ["-T"]
+        job_service_name = "{}-job".format(service)
         return self.docker_compose_func(
             self.root,
             self.config,
-            "run",
-            *opts,
-            "--rm",
-            service,
+            *run_command,
+            job_service_name,
             "sh",
             "-e",
             "-c",
