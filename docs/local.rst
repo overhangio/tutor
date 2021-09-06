@@ -271,3 +271,12 @@ To dump all data from the MySQL and Mongodb databases used on the platform, run 
     tutor local exec mongodb mongodump --out=/data/db/dump.mongodb
 
 The ``dump.sql`` and ``dump.mongodb`` files will be located in ``$(tutor config printroot)/data/mysql`` and ``$(tutor config printroot)/data/mongodb``.
+
+Customizing the deployed services
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You might want to customize the docker-compose services listed in ``$(tutor config printroot)/env/local/docker-compose.yml``. To do so, you should create a ``docker-compose.override.yml`` file in that same folder::
+
+    vim $(tutor config printroot)/env/local/docker-compose.override.yml
+
+The values in this file will override the values from ``docker-compose.yml`` and ``docker-compose.prod.yml``, as explained in the `docker-compose documentation <https://docs.docker.com/compose/extends/#adding-and-overriding-configuration>`__.
