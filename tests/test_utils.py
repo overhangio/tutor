@@ -36,3 +36,12 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual(
             b"\x00", base64.urlsafe_b64decode(utils.long_to_base64(0) + "==")
         )
+
+    def test_rsa_key(self) -> None:
+        key = utils.rsa_private_key(1024)
+        imported = utils.rsa_import_key(key)
+        self.assertIsNotNone(imported.e)
+        self.assertIsNotNone(imported.d)
+        self.assertIsNotNone(imported.n)
+        self.assertIsNotNone(imported.p)
+        self.assertIsNotNone(imported.q)
