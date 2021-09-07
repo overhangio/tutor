@@ -10,6 +10,31 @@ import sys
 from typing import List, Tuple
 
 import click
+
+# We monkey-patch the pycryptodome library to address a segmentation fault issue
+# that affects a specific architecture
+# We can get rid of this ugly patch when the following issue is resolved:
+# https://github.com/Legrandin/pycryptodome/issues/506
+
+# When running Mac OS ...
+if sys.platform == "darwin":
+    import platform
+
+    # ... with ARM processor (M1)...
+    if platform.machine() == "arm64":
+        # ... if the GMP module is installed...
+        try:
+            import Crypto.Math._IntegerGMP
+
+            # ... monkey-patch the library to not use GMP
+            import Crypto.Math.Numbers
+            import Crypto.Math._IntegerNative
+
+            Crypto.Math.Numbers.Integer = Crypto.Math._IntegerNative.IntegerNative
+            Crypto.Math.Numbers._implementation = {}
+        except (ImportError, OSError, AttributeError):
+            pass
+
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
 from Crypto.PublicKey import RSA
 from Crypto.PublicKey.RSA import RsaKey
