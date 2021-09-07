@@ -44,8 +44,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# Security patch: https://github.com/edx/edx-platform/pull/28442
-RUN git fetch https://github.com/edx/edx-platform 8ecc1903ca9170a719c0e63e99fb231822eb26d8 && git cherry-pick 8ecc1903ca9170a719c0e63e99fb231822eb26d8
 {% endif %}
 
 {# Example: RUN git fetch https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
@@ -75,7 +73,7 @@ COPY --from=code /openedx/edx-platform /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
 # Install the right version of pip/setuptools
-RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
+RUN pip install setuptools==44.1.0 pip==20.3.4 wheel==0.37.0
 
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
@@ -84,7 +82,7 @@ RUN pip install -r ./requirements/edx/base.txt
 RUN pip install "openedx-scorm-xblock<13.0.0,>=12.0.0"
 
 # Install django-redis for using redis as a django cache
-RUN pip install django-redis==4.12.1
+RUN pip install django-redis==5.0.0
 
 # Install uwsgi
 RUN pip install uwsgi==2.0.19.1
