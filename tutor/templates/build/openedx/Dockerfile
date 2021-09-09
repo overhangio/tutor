@@ -48,6 +48,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 RUN git fetch https://github.com/edx/edx-platform 8ecc1903ca9170a719c0e63e99fb231822eb26d8 && git cherry-pick 8ecc1903ca9170a719c0e63e99fb231822eb26d8
 {% endif %}
 
+{# Example: RUN git fetch https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
+{{ patch("openedx-dockerfile-post-git-checkout") }}
+
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
 ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
