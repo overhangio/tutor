@@ -35,13 +35,17 @@ RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
+# Identify tutor user to cherry-pick commits
+RUN git config --global user.email "tutor@overhang.io" \
+  && git config --global user.name "Tutor"
+
 {% if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# RUN curl --silent https://github.com/overhangio/edx-platform/commit/<sha1>.patch | git apply -
-RUN curl --silent https://github.com/overhangio/edx-platform/commit/8ecc1903ca9170a719c0e63e99fb231822eb26d8.patch | git apply -
+# Security patch: https://github.com/edx/edx-platform/pull/28442
+RUN git fetch https://github.com/edx/edx-platform 8ecc1903ca9170a719c0e63e99fb231822eb26d8 && git cherry-pick 8ecc1903ca9170a719c0e63e99fb231822eb26d8
 {% endif %}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
