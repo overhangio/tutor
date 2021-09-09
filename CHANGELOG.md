@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Make it easier to run edx-platform unit tests.
 - [Bugfix] Fix segmentation fault during `tutor config save` on Mac OS M1 (#473). Thanks @ghassanmas!
 - [Bugfix] Fix a bug that prevented connecting to external MongoDB instances.
 - [Improvement] Make sure that the logo included in email notifications (including discussion responses) is the same as the site logo.
