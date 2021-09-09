@@ -240,20 +240,15 @@ From then on, all ``dev`` commands will use the ``mysettings`` module. For insta
 Running edx-platform unit tests
 -------------------------------
 
-It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/edx/edx-platform/>`__. To do so, you should first build the "test" target of the "openedx-dev" Docker image::
+It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/edx/edx-platform/>`__. To do so, run a shell in the LMS development container::
 
-    tutor images build --target=test openedx-dev
-
-.. warning::
-    Don't forget to re-build the development image afterwards if you'd like to run ``dev`` commands again! To do so, run ``tutor images build openedx-dev`` after you are done testing.
+    tutor dev run lms bash
 
 Then, run unit tests with ``pytest`` commands::
 
-    # Run a test container
-    tutor dev run lms bash
-
     # Run tests on common apps
     unset DJANGO_SETTINGS_MODULE
+    unset SERVICE_VARIANT
     export EDXAPP_TEST_MONGO_HOST=mongodb
     pytest common
     pytest openedx

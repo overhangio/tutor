@@ -27,13 +27,6 @@ RUN chmod a+x /openedx/bin/*
 ARG USERID=1000
 RUN create-user.sh $USERID
 
-######## Test image
-FROM base as test
-
-# Run all tests by default
-ENTRYPOINT ["docker-entrypoint-test.sh"]
-CMD pytest
-
 ######## Development image
 FROM base as dev
 
