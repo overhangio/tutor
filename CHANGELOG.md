@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add "openedx-dockerfile-post-git-checkout" patch.
 - [Improvement] In the "openedx" Docker images, convert git patches to cherry-picks for a cleaner source tree.
 - 💥[Feature] Make it possible to override local job configuration. This deprecates the older model for running jobs which dates back from a long time ago.
 
