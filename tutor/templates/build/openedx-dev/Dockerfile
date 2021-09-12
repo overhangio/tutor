@@ -8,10 +8,7 @@ RUN apt update && \
 
 # Install dev python requirements
 RUN pip install -r requirements/edx/development.txt
-# We install ipython from source to avoid too many deprecation warnings
-# https://github.com/ipython/ipython/issues/12206
-# We might be able to avoid this once they make a release later than 7.19.0.
-RUN pip install ipdb==0.13.4 git+https://github.com/ipython/ipython.git@d0649a54a8936a8019d54549779dc92bcbde4e68#egg=ipython
+RUN pip install ipdb==0.13.4 ipython==7.27.0
 
 {{ patch("openedx-dev-dockerfile-post-python-requirements") }}
 

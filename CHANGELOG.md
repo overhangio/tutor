@@ -6,6 +6,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - 💥[Feature] Make it possible to override local job configuration. This deprecates the older model for running jobs which dates back from a long time ago.
 
+- [Bugfix] Install Ipython directly from pypy instead of installing it from source (the reason it was installed from source is no longer relevant). The effect of this shall speed up the process of openedx-dev Docker image. 
+
 ## v12.0.4 (2021-08-12)
 
 - [Security] Apply security patch [28442](https://github.com/edx/edx-platform/pull/28442).
