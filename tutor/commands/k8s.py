@@ -322,16 +322,25 @@ def importdemocourse(context: Context) -> None:
 
 
 @click.command(
-    help="Set a theme for a given domain name. To reset to the default theme , use 'default' as the theme name."
+    help="Assign a theme to the LMS and the CMS. To reset to the default theme , use 'default' as the theme name."
+)
+@click.option(
+    "-d",
+    "--domain",
+    "domains",
+    multiple=True,
+    help=(
+        "Limit the theme to these domain names. By default, the theme is "
+        "applied to the LMS and the CMS, both in development and production mode"
+    ),
 )
 @click.argument("theme_name")
-@click.argument("domain_names", metavar="domain_name", nargs=-1)
 @click.pass_obj
-def settheme(context: Context, theme_name: str, domain_names: List[str]) -> None:
+def settheme(context: Context, domains: List[str], theme_name: str) -> None:
     config = tutor_config.load(context.root)
     runner = K8sJobRunner(context.root, config)
-    for domain_name in domain_names:
-        jobs.set_theme(theme_name, domain_name, runner)
+    domains = domains or jobs.get_all_openedx_domains(config)
+    jobs.set_theme(theme_name, domains, runner)
 
 
 @click.command(name="exec", help="Execute a command in a pod of the given application")
