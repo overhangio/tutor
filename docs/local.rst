@@ -127,9 +127,7 @@ Setting a new theme
 
 The default Open edX theme is rather bland, so Tutor makes it easy to switch to a different theme::
 
-    tutor local settheme mytheme $(tutor config printvalue LMS_HOST) $(tutor config printvalue CMS_HOST)
-
-Notice that we pass the hostnames of the LMS and the CMS to the ``settheme`` command: this is because in Open edX, themes are assigned per domain name.
+    tutor local settheme mytheme
 
 Out of the box, only the default "open-edx" theme is available. We also developed `Indigo, a beautiful, customizable theme <https://github.com/overhangio/indigo>`__ which is easy to install with Tutor.
 

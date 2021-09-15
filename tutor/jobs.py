@@ -1,7 +1,7 @@
 from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 from . import env, fmt, plugins
-from .types import Config
+from .types import Config, get_typed
 
 BASE_OPENEDX_COMMAND = """
 export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
@@ -102,18 +102,35 @@ def import_demo_course(runner: BaseJobRunner) -> None:
     runner.run_job_from_template("cms", "hooks", "cms", "importdemocourse")
 
 
-def set_theme(theme_name: str, domain_name: str, runner: BaseJobRunner) -> None:
-    command = BASE_OPENEDX_COMMAND
-    command += """
-echo "Assigning theme {theme_name} to {domain_name}..."
-./manage.py lms shell -c "
-from django.contrib.sites.models import Site
+def set_theme(theme_name: str, domain_names: List[str], runner: BaseJobRunner) -> None:
+    """
+    For each domain, get or create a Site object and assign the selected theme.
+    """
+    if not domain_names:
+        return
+    python_code = "from django.contrib.sites.models import Site"
+    for domain_name in domain_names:
+        python_code += """
+print('Assigning theme {theme_name} to {domain_name}...')
 site, _ = Site.objects.get_or_create(domain='{domain_name}')
 if not site.name:
     site.name = '{domain_name}'
     site.save()
 site.themes.all().delete()
-site.themes.create(theme_dir_name='{theme_name}')"
-"""
-    command = command.format(theme_name=theme_name, domain_name=domain_name)
+site.themes.create(theme_dir_name='{theme_name}')
+""".format(
+            theme_name=theme_name, domain_name=domain_name
+        )
+    command = BASE_OPENEDX_COMMAND + './manage.py lms shell -c "{python_code}"'.format(
+        python_code=python_code
+    )
     runner.run_job("lms", command)
+
+
+def get_all_openedx_domains(config: Config) -> List[str]:
+    return [
+        get_typed(config, "LMS_HOST", str),
+        get_typed(config, "LMS_HOST", str) + ":8000",
+        get_typed(config, "CMS_HOST", str),
+        get_typed(config, "CMS_HOST", str) + ":8001",
+    ]
