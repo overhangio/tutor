@@ -7,6 +7,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Feature] Add "openedx-dockerfile-post-git-checkout" patch.
 - [Improvement] In the "openedx" Docker images, convert git patches to cherry-picks for a cleaner source tree.
 - 💥[Feature] Make it possible to override local job configuration. This deprecates the older model for running jobs which dates back from a long time ago.
+- [Bugfix] Fix a bug that prevented connecting to external MongoDB instances.
 
 - [Bugfix] Install Ipython directly from pypy instead of installing it from source (the reason it was installed from source is no longer relevant). The effect of this shall speed up the process of openedx-dev Docker image. 
 
