@@ -5,6 +5,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## Unreleased
 
 - 💥[Feature] Make it possible to override local job configuration. This deprecates the older model for running jobs which dates back from a long time ago.
+- [Bugfix] Fix a bug that prevented connecting to external MongoDB instances.
 
 ## v12.0.4 (2021-08-12)
 
