@@ -1,5 +1,6 @@
 import io
 import os
+import sys
 
 import docutils
 import docutils.parsers.rst
@@ -25,6 +26,13 @@ language = None
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = None
 
+# -- Sphinx-Click configuration
+# https://sphinx-click.readthedocs.io/
+extensions.append('sphinx_click')
+# This is to avoid the addition of the local username to the docs
+os.environ["HOME"] = "~"
+# Make sure that sphinx-click can find the tutor module
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"

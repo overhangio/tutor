@@ -1,3 +1,4 @@
 -r base.txt
 sphinx
 sphinx-rtd-theme
+sphinx-click
