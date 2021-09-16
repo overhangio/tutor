@@ -2,7 +2,7 @@
 .PHONY: help
 
 html:
-	sphinx-build -b html -a -E "." "_build/html"
+	sphinx-build -b html -a -E -n -W "." "_build/html"
 
 browse:
 	sensible-browser _build/html/index.html
