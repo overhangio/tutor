@@ -29,6 +29,15 @@
    tutor
    faq
 
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Project links
+
+   Source code <https://github.com/overhangio/tutor>
+   Community forums <https://discuss.overhang.io>
+   Pypi releases <https://pypi.org/project/tutor>
+
 Source code
 -----------
 
