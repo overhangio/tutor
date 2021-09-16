@@ -17,7 +17,7 @@ Requirements
 .. warning::
     Do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
 
-* Ports 80 and 443 should be open. If other web services run on these ports, check the section on :ref:`how to setup a web proxy <web_proxy>`.
+* Ports 80 and 443 should be open. If other web services run on these ports, check the tutorial on :ref:`how to setup a web proxy <web_proxy>`.
 * Hardware:
 
     - Minimum configuration: 4 GB RAM, 2 CPU, 8 GB disk space

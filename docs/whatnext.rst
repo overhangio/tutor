@@ -18,7 +18,7 @@ To get a glimpse of the possibilities of Open edX, we recommend you import the `
 Making Open edX look better
 ---------------------------
 
-Tutor makes it easy to :ref:`develop <theming>` and :ref:`install <settheme>` your own themes. We also provide `Indigo <https://github.com/overhangio/indigo>`__: a free, customizable theme that you can install today.
+Tutor makes it easy to :ref:`install <theming>` and :ref:`develop <theme_development>` your own themes. We also provide `Indigo <https://github.com/overhangio/indigo>`__: a free, customizable theme that you can install today.
 
 Adding features
 ---------------

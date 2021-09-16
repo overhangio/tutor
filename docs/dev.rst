@@ -58,8 +58,8 @@ To collect assets, you can use the ``openedx-assets`` command that ships with Tu
 
 .. _bind_mounts:
 
-Bind-mount container directories
---------------------------------
+Sharing directories with containers
+-----------------------------------
 
 It may sometimes be convenient to mount container directories on the host, for instance: for editing and debugging. Tutor provides different solutions to this problem.
 
@@ -117,8 +117,11 @@ This override file will be loaded when running any ``tutor dev ..`` command. The
 .. note::
     The ``tutor local`` commands loads the ``docker-compose.override.yml`` file from the ``$(tutor config printroot)/env/local/docker-compose.override.yml`` directory.
 
-Point to a local edx-platform
------------------------------
+Common tasks
+------------
+
+Setting up a development environment for edx-platform
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Following the instructions :ref:`above <bind_mounts>` on how to bind-mount directories from the host above, you may mount your own `edx-platform <https://github.com/edx/edx-platform/>`__ fork in your containers by running either::
 
@@ -131,9 +134,6 @@ Following the instructions :ref:`above <bind_mounts>` on how to bind-mount direc
 
     # Add your own volumes to $(tutor config printroot)/env/dev/docker-compose.override.yml
     tutor dev runserver lms
-
-Prepare the edx-platform repo
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you choose any but the first solution above, you will have to make sure that your fork works with Tutor.
 
@@ -153,16 +153,12 @@ Then, you should run the following commands::
     # Rebuild static assets
     openedx-assets build --env=dev
 
-
-Debug edx-platform
-~~~~~~~~~~~~~~~~~~
-
 To debug a local edx-platform repository, add a ``import ipdb; ipdb.set_trace()`` breakpoint anywhere in your code and run::
 
     tutor dev runserver [--volume=...] lms
 
 XBlock and edx-platform plugin development
-------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In some cases you will have to develop features for packages that are pip-installed next to edx-platform. This is quite easy with Tutor. Just add your packages to the ``$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
 
@@ -182,38 +178,8 @@ You will have to re-build the openedx Docker image once::
 
 You should then run the development server as usual, with ``runserver``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
 
-.. _theming:
-
-Customised themes
------------------
-
-With Tutor, it's pretty easy to develop your own themes. Start by placing your files inside the ``env/build/openedx/themes`` directory. For instance, you could start from the ``edx.org`` theme present inside the ``edx-platform`` repository::
-
-    cp -r /path/to/edx-platform/themes/edx.org "$(tutor config printroot)/env/build/openedx/themes/"
-
-.. warning::
-    You should not create a soft link here. If you do, it will trigger a ``Theme not found in any of the themes dirs`` error. This is because soft links are not properly resolved from inside docker containers.
-
-Then, run a local webserver::
-
-    tutor dev runserver lms
-
-The LMS can then be accessed at http://local.overhang.io:8000. You will then have to :ref:`enable that theme <settheme>` for the development domain names::
-
-    tutor dev settheme mythemename local.overhang.io:8000 studio.local.overhang.io:8001
-
-Re-build development docker image (and compile assets)::
-
-    tutor images build openedx-dev
-
-Watch the themes folders for changes (in a different terminal)::
-
-    tutor dev run watchthemes
-
-Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://local.overhang.io:8000.
-
-Custom edx-platform settings
-----------------------------
+Loading custom edx-platform settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, tutor settings files are mounted inside the docker images at ``/openedx/edx-platform/lms/envs/tutor/`` and ``/openedx/edx-platform/cms/envs/tutor/``. In the various ``dev`` commands, the default ``edx-platform`` settings module is set to ``tutor.development`` and you don't have to do anything to set up these settings.
 
@@ -238,7 +204,7 @@ From then on, all ``dev`` commands will use the ``mysettings`` module. For insta
     tutor dev runserver lms
 
 Running edx-platform unit tests
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/edx/edx-platform/>`__. To do so, run a shell in the LMS development container::
 
