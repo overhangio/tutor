@@ -97,8 +97,8 @@ In particular, the `tutor k8s start` command restarts and reconfigures all servi
 
 All non-persisting data will be deleted, and then re-created.
 
-Guides
-------
+Common tasks
+------------
 
 Running a custom "openedx" Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
