@@ -68,10 +68,29 @@ You can then browse the documentation with::
 Releasing a new version
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-- Bump the ``__version__`` value in ``tutor/__about__.py``.
+- Bump the ``__version__`` value in ``tutor/__about__.py``. (see :ref:`versioning` below)
 - Replace "Unreleased" by the version name and date in CHANGELOG.md.
 - Create a commit with the version changelog.
 - Run ``make release``: this will push to the default repo/branch for the current branch.
+
+.. _versioning:
+
+Versioning
+----------
+
+The versioning format used in Tutor is the following::
+
+    RELEASE.MAJOR.MINOR(-BRANCH)
+
+When making a new Tutor release, increment the:
+
+- RELEASE version when a new Open edX release comes out. The new value should match the ordinal value of the first letter of the release name: Aspen 🡒 1, Birch 🡒 2, ... Zebra 🡒 26.
+- MAJOR version when making a backward-incompatible change (prefixed by "💥" in the changelog, as explained below).
+- MINOR version when making a backward-compatible change.
+
+An optional BRANCH suffix may be appended to the release name to indicate that extra changes were added on top of the latest release. For instance, "x.y.z-edge" corresponds to release x.y.z on top of which extra changes were added to make it compatible with the Open edX master branches (see the :ref:`tutorial on running Tutor Edge <edge>`).
+
+`Officially-supported plugins <https://overhang.io/tutor/plugins>`__ follow the same versioning pattern. As a third-party plugin developer, you are encouraged to use the same pattern to make it immediately clear to your end-users which Open edX versions are supported.
 
 .. _contributing:
 

@@ -11,7 +11,7 @@ from .images import images_command
 from .k8s import k8s
 from .local import local
 from .plugins import plugins_command, add_plugin_commands
-from ..__about__ import __version__
+from ..__about__ import __version__, __app__
 from .. import exceptions
 from .. import fmt
 from .. import utils
@@ -41,7 +41,7 @@ def main() -> None:
     "-r",
     "--root",
     envvar="TUTOR_ROOT",
-    default=appdirs.user_data_dir(appname="tutor"),
+    default=appdirs.user_data_dir(appname=__app__),
     show_default=True,
     type=click.Path(resolve_path=True),
     help="Root project directory (environment variable: TUTOR_ROOT)",

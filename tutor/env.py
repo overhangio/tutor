@@ -7,7 +7,7 @@ import jinja2
 import pkg_resources
 
 from . import exceptions, fmt, plugins, utils
-from .__about__ import __version__
+from .__about__ import __app__, __version__
 from .types import Config, ConfigValue
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
@@ -59,6 +59,7 @@ class Renderer:
         environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.filters["rsa_private_key"] = utils.rsa_private_key
         environment.filters["walk_templates"] = self.walk_templates
+        environment.globals["TUTOR_APP"] = __app__.replace("-", "_")
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
 
