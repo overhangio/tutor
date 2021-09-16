@@ -10,33 +10,31 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
   :width: 500px
   :align: center
 
-|
+.. image:: https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=brightgreen&message=Source%20code
+  :alt: Source code
+  :target: https://github.com/overhangio/tutor
 
-.. image:: https://github.com/overhangio/tutor/actions/workflows/release.yml/badge.svg
-    :alt: Release build status
-    :target: https://github.com/overhangio/tutor/actions/workflows/release.yml
+.. image:: https://img.shields.io/static/v1?logo=discourse&label=Forums&style=flat-square&color=ff0080&message=discuss.overhang.io
+  :alt: Forums
+  :target: https://discuss.overhang.io
 
-.. image:: https://img.shields.io/badge/docs-current-blue.svg?style=flat-square
-    :alt: Documentation
-    :target: https://docs.tutor.overhang.io
+.. image:: https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.overhang.io
+  :alt: Documentation
+  :target: https://docs.tutor.overhang.io
 
-.. image:: https://img.shields.io/github/issues/overhangio/tutor.svg?style=flat-square
-    :alt: GitHub issues
-    :target: https://github.com/overhangio/tutor/issues
-
-.. image:: https://img.shields.io/github/issues-closed/overhangio/tutor.svg?colorB=brightgreen&style=flat-square
-    :alt: GitHub closed issues
-    :target: https://github.com/overhangio/tutor/issues?q=is%3Aclosed
+.. image:: https://img.shields.io/pypi/v/tutor?logo=python&logoColor=white
+  :alt: PyPI releases
+  :target: https://pypi.org/project/tutor
 
 .. image:: https://img.shields.io/github/license/overhangio/tutor.svg?style=flat-square
-    :alt: AGPL License
-    :target: https://www.gnu.org/licenses/agpl-3.0.en.html
+  :alt: AGPL License
+  :target: https://www.gnu.org/licenses/agpl-3.0.en.html
 
-.. image:: https://img.shields.io/twitter/follow/overhangio
-    :alt: Follow us on Twitter
-    :target: https://twitter.com/overhangio/
+.. image:: https://img.shields.io/static/v1?logo=twitter&label=Twitter&style=flat-square&color=1d9bf0&message=@overhangio
+  :alt: Follow us on Twitter
+  :target: https://twitter.com/overhangio/
 
-.. image:: https://img.shields.io/youtube/channel/views/UCe_p_Axq3PjRnbTqFZDY_iQ?label=Overhang.IO%20on%20Youtube
+.. image:: https://img.shields.io/static/v1?logo=youtube&label=YouTube&style=flat-square&color=ff0000&message=@overhangio
     :alt: Follow us on Youtube
     :target: https://www.youtube.com/c/OverhangIO
 
