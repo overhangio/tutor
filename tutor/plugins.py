@@ -8,6 +8,7 @@ import appdirs
 import click
 import pkg_resources
 
+from .__about__ import __app__
 from . import exceptions, fmt, serialize
 from .types import Config, get_typed
 
@@ -272,7 +273,7 @@ class DictPlugin(BasePlugin):
     ROOT_ENV_VAR_NAME = "TUTOR_PLUGINS_ROOT"
     ROOT = os.path.expanduser(
         os.environ.get(ROOT_ENV_VAR_NAME, "")
-    ) or appdirs.user_data_dir(appname="tutor-plugins")
+    ) or appdirs.user_data_dir(appname=__app__ + "-plugins")
 
     def __init__(self, data: Config):
         name = data["name"]
