@@ -2,7 +2,7 @@ name: Sync with private repo
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, edge ]
 
 jobs:
   sync:
@@ -14,4 +14,4 @@ jobs:
       - name: Add remote
         run: git remote add overhangio https://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_PASSWORD }}@git.overhang.io/core/tutor.git
       - name: Push
-        run: git push overhangio master
+        run: git push overhangio $GITHUB_REF
