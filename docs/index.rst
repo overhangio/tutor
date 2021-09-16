@@ -23,6 +23,7 @@
    run
    configuration
    plugins
+   reference
    tutorials
    troubleshooting
    tutor
