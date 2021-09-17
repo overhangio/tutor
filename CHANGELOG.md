@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix forum starting issue: "NoMethodError: undefined method `encode' for nil:NilClass".
+
 ## v12.1.0 (2021-09-17)
 
 - [Improvement] Make it easier to run edx-platform unit tests.
