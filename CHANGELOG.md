@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v12.1.0 (2021-09-17)
+
 - [Improvement] Make it easier to run edx-platform unit tests.
 - [Bugfix] Fix segmentation fault during `tutor config save` on Mac OS M1 (#473). Thanks @ghassanmas!
 - [Bugfix] Fix a bug that prevented connecting to external MongoDB instances.
