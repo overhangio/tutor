@@ -4,11 +4,13 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
-- [Bugfix] Fix (agin) forum starting issue: "NoMethodError: undefined method `encode' for nil:NilClass".
+## v12.1.2 (2021-09-18)
+
+- [Bugfix] Fix (agin) forum starting issue: "NoMethodError: undefined method 'encode' for nil:NilClass".
 
 ## v12.1.1 (2021-09-17)
 
-- [Bugfix] Fix forum starting issue: "NoMethodError: undefined method `encode' for nil:NilClass".
+- [Bugfix] Fix forum starting issue: "NoMethodError: undefined method 'encode' for nil:NilClass".
 
 ## v12.1.0 (2021-09-17)
 
