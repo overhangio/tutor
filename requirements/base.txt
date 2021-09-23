@@ -12,17 +12,17 @@ certifi==2021.5.30
     # via
     #   kubernetes
     #   requests
-chardet==4.0.0
+charset-normalizer==2.0.6
     # via requests
 click==8.0.1
     # via -r requirements/base.in
-google-auth==1.32.1
+google-auth==2.1.0
     # via kubernetes
-idna==2.10
+idna==3.2
     # via requests
 jinja2==3.0.1
     # via -r requirements/base.in
-kubernetes==17.17.0
+kubernetes==18.20.0
     # via -r requirements/base.in
 markupsafe==2.0.1
     # via jinja2
@@ -40,13 +40,13 @@ pyasn1-modules==0.2.8
     # via google-auth
 pycryptodome==3.10.1
     # via -r requirements/base.in
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via kubernetes
 pyyaml==5.4.1
     # via
     #   -r requirements/base.in
     #   kubernetes
-requests==2.25.1
+requests==2.26.0
     # via
     #   kubernetes
     #   requests-oauthlib
@@ -56,18 +56,17 @@ rsa==4.7.2
     # via google-auth
 six==1.16.0
     # via
-    #   google-auth
     #   kubernetes
     #   python-dateutil
 toml==0.10.2
     # via mypy
-typing-extensions==3.10.0.0
+typing-extensions==3.10.0.2
     # via mypy
-urllib3==1.26.6
+urllib3==1.26.7
     # via
     #   kubernetes
     #   requests
-websocket-client==1.1.0
+websocket-client==1.2.1
     # via kubernetes
 
 # The following packages are considered to be unsafe in a requirements file:

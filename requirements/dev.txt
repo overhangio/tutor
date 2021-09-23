@@ -4,17 +4,15 @@
 #
 #    pip-compile requirements/dev.in
 #
-altgraph==0.17
+altgraph==0.17.2
     # via pyinstaller
 appdirs==1.4.4
-    # via
-    #   -r requirements/base.txt
-    #   black
-astroid==2.6.2
+    # via -r requirements/base.txt
+astroid==2.8.0
     # via pylint
-black==21.6b0
+black==21.9b0
     # via -r requirements/dev.in
-bleach==3.3.0
+bleach==4.1.0
     # via readme-renderer
 cachetools==4.2.2
     # via
@@ -25,9 +23,9 @@ certifi==2021.5.30
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-cffi==1.14.5
+cffi==1.14.6
     # via cryptography
-chardet==4.0.0
+charset-normalizer==2.0.6
     # via
     #   -r requirements/base.txt
     #   requests
@@ -38,33 +36,33 @@ click==8.0.1
     #   pip-tools
 colorama==0.4.4
     # via twine
-cryptography==3.4.7
+cryptography==3.4.8
     # via secretstorage
 docutils==0.17.1
     # via readme-renderer
-google-auth==1.32.1
+google-auth==2.1.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
-idna==2.10
+idna==3.2
     # via
     #   -r requirements/base.txt
     #   requests
-importlib-metadata==4.6.0
+importlib-metadata==4.8.1
     # via
     #   keyring
     #   twine
-isort==5.9.1
+isort==5.9.3
     # via pylint
-jeepney==0.6.0
+jeepney==0.7.1
     # via
     #   keyring
     #   secretstorage
 jinja2==3.0.1
     # via -r requirements/base.txt
-keyring==23.0.1
+keyring==23.2.1
     # via twine
-kubernetes==17.17.0
+kubernetes==18.20.0
     # via -r requirements/base.txt
 lazy-object-proxy==1.6.0
     # via astroid
@@ -85,16 +83,20 @@ oauthlib==3.1.1
     # via
     #   -r requirements/base.txt
     #   requests-oauthlib
-packaging==20.9
+packaging==21.0
     # via bleach
-pathspec==0.8.1
+pathspec==0.9.0
     # via black
-pep517==0.10.0
+pep517==0.11.0
     # via pip-tools
-pip-tools==6.2.0
+pip-tools==6.3.0
     # via -r requirements/dev.in
-pkginfo==1.7.0
+pkginfo==1.7.1
     # via twine
+platformdirs==2.3.0
+    # via
+    #   black
+    #   pylint
 pyasn1==0.4.8
     # via
     #   -r requirements/base.txt
@@ -108,17 +110,17 @@ pycparser==2.20
     # via cffi
 pycryptodome==3.10.1
     # via -r requirements/base.txt
-pygments==2.9.0
+pygments==2.10.0
     # via readme-renderer
-pyinstaller==4.3
+pyinstaller==4.5.1
     # via -r requirements/dev.in
-pyinstaller-hooks-contrib==2021.2
+pyinstaller-hooks-contrib==2021.3
     # via pyinstaller
-pylint==2.9.3
+pylint==2.11.1
     # via -r requirements/dev.in
 pyparsing==2.4.7
     # via packaging
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -128,9 +130,9 @@ pyyaml==5.4.1
     #   kubernetes
 readme-renderer==29.0
     # via twine
-regex==2021.4.4
+regex==2021.8.28
     # via black
-requests==2.25.1
+requests==2.26.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -155,45 +157,49 @@ six==1.16.0
     # via
     #   -r requirements/base.txt
     #   bleach
-    #   google-auth
     #   kubernetes
     #   python-dateutil
     #   readme-renderer
 toml==0.10.2
     # via
     #   -r requirements/base.txt
-    #   black
     #   mypy
-    #   pep517
     #   pylint
-tqdm==4.61.1
+tomli==1.2.1
+    # via
+    #   black
+    #   pep517
+tqdm==4.62.3
     # via twine
-twine==3.4.1
+twine==3.4.2
     # via -r requirements/dev.in
-types-pyyaml==5.4.3
+types-pyyaml==5.4.10
     # via -r requirements/dev.in
-types-setuptools==57.0.0
+types-setuptools==57.4.0
     # via -r requirements/dev.in
-typing-extensions==3.10.0.0
+typing-extensions==3.10.0.2
     # via
     #   -r requirements/base.txt
+    #   astroid
+    #   black
     #   mypy
-urllib3==1.26.6
+    #   pylint
+urllib3==1.26.7
     # via
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
 webencodings==0.5.1
     # via bleach
-websocket-client==1.1.0
+websocket-client==1.2.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
-wheel==0.36.2
+wheel==0.37.0
     # via pip-tools
 wrapt==1.12.1
     # via astroid
-zipp==3.4.1
+zipp==3.5.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
