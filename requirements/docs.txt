@@ -19,21 +19,21 @@ certifi==2021.5.30
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-chardet==4.0.0
+charset-normalizer==2.0.6
     # via
     #   -r requirements/base.txt
     #   requests
 click==8.0.1
     # via -r requirements/base.txt
-docutils==0.16
+docutils==0.17.1
     # via
     #   sphinx
     #   sphinx-rtd-theme
-google-auth==1.32.1
+google-auth==2.1.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
-idna==2.10
+idna==3.2
     # via
     #   -r requirements/base.txt
     #   requests
@@ -43,7 +43,7 @@ jinja2==3.0.1
     # via
     #   -r requirements/base.txt
     #   sphinx
-kubernetes==17.17.0
+kubernetes==18.20.0
     # via -r requirements/base.txt
 markupsafe==2.0.1
     # via
@@ -59,7 +59,7 @@ oauthlib==3.1.1
     # via
     #   -r requirements/base.txt
     #   requests-oauthlib
-packaging==20.9
+packaging==21.0
     # via sphinx
 pyasn1==0.4.8
     # via
@@ -72,11 +72,11 @@ pyasn1-modules==0.2.8
     #   google-auth
 pycryptodome==3.10.1
     # via -r requirements/base.txt
-pygments==2.9.0
+pygments==2.10.0
     # via sphinx
 pyparsing==2.4.7
     # via packaging
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -86,7 +86,7 @@ pyyaml==5.4.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
-requests==2.25.1
+requests==2.26.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -103,16 +103,15 @@ rsa==4.7.2
 six==1.16.0
     # via
     #   -r requirements/base.txt
-    #   google-auth
     #   kubernetes
     #   python-dateutil
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==4.0.2
+sphinx==4.2.0
     # via
     #   -r requirements/docs.in
     #   sphinx-rtd-theme
-sphinx-rtd-theme==0.5.2
+sphinx-rtd-theme==1.0.0
     # via -r requirements/docs.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
@@ -130,16 +129,16 @@ toml==0.10.2
     # via
     #   -r requirements/base.txt
     #   mypy
-typing-extensions==3.10.0.0
+typing-extensions==3.10.0.2
     # via
     #   -r requirements/base.txt
     #   mypy
-urllib3==1.26.6
+urllib3==1.26.7
     # via
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-websocket-client==1.1.0
+websocket-client==1.2.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
