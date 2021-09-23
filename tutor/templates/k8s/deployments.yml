@@ -51,6 +51,9 @@ spec:
       labels:
         app.kubernetes.io/name: cms
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: cms
           image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -69,6 +72,8 @@ spec:
           resources:
             requests:
               memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
       volumes:
         - name: settings-lms
           configMap:
@@ -95,6 +100,9 @@ spec:
       labels:
         app.kubernetes.io/name: cms-worker
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: cms-worker
           image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -102,8 +110,6 @@ spec:
           env:
           - name: SERVICE_VARIANT
             value: cms
-          - name: C_FORCE_ROOT
-            value: "1"
           volumeMounts:
             - mountPath: /openedx/edx-platform/lms/envs/tutor/
               name: settings-lms
@@ -111,6 +117,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+          securityContext:
+            allowPrivilegeEscalation: false
       volumes:
         - name: settings-lms
           configMap:
@@ -139,6 +147,9 @@ spec:
       labels:
         app.kubernetes.io/name: forum
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: forum
           image: {{ DOCKER_IMAGE_FORUM }}
@@ -155,6 +166,8 @@ spec:
               value: "{{ MONGODB_PORT }}"
             - name: MONGODB_DATABASE
               value: "{{ FORUM_MONGODB_DATABASE }}"
+          securityContext:
+            allowPrivilegeEscalation: false
 {% endif %}
 {% if RUN_LMS %}
 ---
@@ -173,6 +186,9 @@ spec:
       labels:
         app.kubernetes.io/name: lms
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: lms
           image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -188,6 +204,8 @@ spec:
           resources:
             requests:
               memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
       volumes:
         - name: settings-lms
           configMap:
@@ -214,6 +232,9 @@ spec:
       labels:
         app.kubernetes.io/name: lms-worker
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: lms-worker
           image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -221,8 +242,6 @@ spec:
           env:
           - name: SERVICE_VARIANT
             value: lms
-          - name: C_FORCE_ROOT
-            value: "1"
           volumeMounts:
             - mountPath: /openedx/edx-platform/lms/envs/tutor/
               name: settings-lms
@@ -230,6 +249,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+          securityContext:
+            allowPrivilegeEscalation: false
       volumes:
         - name: settings-lms
           configMap:
@@ -260,6 +281,11 @@ spec:
       labels:
         app.kubernetes.io/name: elasticsearch
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: elasticsearch
           image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
@@ -276,6 +302,8 @@ spec:
               value: "1"
           ports:
             - containerPort: 9200
+          securityContext:
+            allowPrivilegeEscalation: false
           volumeMounts:
             - mountPath: /usr/share/elasticsearch/data
               name: data
@@ -303,6 +331,11 @@ spec:
       labels:
         app.kubernetes.io/name: mongodb
     spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: mongodb
           image: {{ DOCKER_IMAGE_MONGODB }}
@@ -312,7 +345,8 @@ spec:
           volumeMounts:
             - mountPath: /data/db
               name: data
-
+          securityContext:
+            allowPrivilegeEscalation: false
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -337,6 +371,11 @@ spec:
       labels:
         app.kubernetes.io/name: mysql
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: mysql
           image: {{ DOCKER_IMAGE_MYSQL }}
@@ -351,6 +390,8 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: data
+          securityContext:
+            allowPrivilegeEscalation: false
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -373,11 +414,14 @@ spec:
       labels:
         app.kubernetes.io/name: smtp
     spec:
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 101
       containers:
         - name: smtp
           image: {{ DOCKER_IMAGE_SMTP }}
           ports:
-            - containerPort: 25
+            - containerPort: 8025
 {% endif %}
 {% if RUN_REDIS %}
 ---
@@ -398,6 +442,11 @@ spec:
       labels:
         app.kubernetes.io/name: redis
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: redis
           image: {{ DOCKER_IMAGE_REDIS }}
@@ -410,6 +459,8 @@ spec:
               name: config
             - mountPath: /openedx/redis/data
               name: data
+          securityContext:
+            allowPrivilegeEscalation: false
       volumes:
         - name: config
           configMap:

@@ -9,6 +9,16 @@ services:
     # Use WiredTiger in all environments, just like at edx.org
     command: mongod --nojournal --storageEngine wiredTiger
     restart: unless-stopped
+    user: "999:999"
+    privileged: false
+    volumes:
+      - ../../data/mongodb:/data/db
+    depends_on:
+      - mongodb-permissions
+  mongodb-permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    command: ["999", "/data/db"]
+    restart: on-failure
     volumes:
       - ../../data/mongodb:/data/db
   {% endif %}
@@ -18,10 +28,18 @@ services:
     image: {{ DOCKER_IMAGE_MYSQL }}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     restart: unless-stopped
+    user: "1000:1000"
+    privileged: false
     volumes:
       - ../../data/mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
+  mysql-permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    command: ["1000", "/var/lib/mysql"]
+    restart: on-failure
+    volumes:
+      - ../../data/mysql:/var/lib/mysql
   {% endif %}
 
   {% if RUN_ELASTICSEARCH %}
@@ -32,12 +50,20 @@ services:
       - bootstrap.memory_lock=true
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms{{ ELASTICSEARCH_HEAP_SIZE }} -Xmx{{ ELASTICSEARCH_HEAP_SIZE }}"
-      - TAKE_FILE_OWNERSHIP=1
     ulimits:
       memlock:
         soft: -1
         hard: -1
     restart: unless-stopped
+    user: "1000:1000"
+    volumes:
+      - ../../data/elasticsearch:/usr/share/elasticsearch/data
+    depends_on:
+      - elasticsearch-permissions
+  elasticsearch-permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    command: ["1000", "/usr/share/elasticsearch/data"]
+    restart: on-failure
     volumes:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
   {% endif %}
@@ -46,17 +72,29 @@ services:
   redis:
     image: {{ DOCKER_IMAGE_REDIS }}
     working_dir: /openedx/redis/data
+    user: "1000:1000"
     volumes:
       - ../apps/redis/redis.conf:/openedx/redis/config/redis.conf:ro
       - ../../data/redis:/openedx/redis/data
     command: redis-server /openedx/redis/config/redis.conf
     restart: unless-stopped
+    depends_on:
+      - redis-permissions
+  redis-permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    command: ["1000", "/openedx/redis/data"]
+    restart: on-failure
+    volumes:
+      - ../../data/redis:/openedx/redis/data
   {% endif %}
 
   {% if RUN_SMTP %}
   smtp:
     image: {{ DOCKER_IMAGE_SMTP }}
     restart: unless-stopped
+    user: "100:101"
+    environment:
+      HOSTNAME: "{{ LMS_HOST }}"
   {% endif %}
 
   ############# Forum
@@ -91,6 +129,7 @@ services:
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
+      - lms-permissions
       {% if RUN_MYSQL %}- mysql{% endif %}
       {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if RUN_FORUM %}- forum{% endif %}
@@ -98,6 +137,14 @@ services:
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
       {{ patch("local-docker-compose-lms-dependencies")|indent(6) }}
+  lms-permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    command: ["1000", "/openedx/data", "/openedx/media"]
+    restart: on-failure
+    volumes:
+      - ../../data/redis:/openedx/redis/data
+      - ../../data/lms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
   {% endif %}
 
   {% if RUN_CMS %}
@@ -115,6 +162,7 @@ services:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
+      - cms-permissions
       {% if RUN_MYSQL %}- mysql{% endif %}
       {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if RUN_MONGODB %}- mongodb{% endif %}
@@ -122,6 +170,14 @@ services:
       {% if RUN_SMTP %}- smtp{% endif %}
       {% if RUN_LMS %}- lms{% endif %}
       {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}
+  cms-permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    command: ["1000", "/openedx/data", "/openedx/media"]
+    restart: on-failure
+    volumes:
+      - ../../data/redis:/openedx/redis/data
+      - ../../data/cms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
   {% endif %}
 
   ############# LMS and CMS workers
@@ -132,7 +188,6 @@ services:
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
-      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: celery worker --app=lms.celery --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild=100 --exclude-queues=edx.cms.core.default
     restart: unless-stopped
     volumes:
@@ -151,7 +206,6 @@ services:
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
-      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
     command: celery worker --app=cms.celery --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100 --exclude-queues=edx.lms.core.default
     restart: unless-stopped
     volumes:

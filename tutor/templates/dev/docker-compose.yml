@@ -3,6 +3,11 @@ version: "3.7"
 x-openedx-service:
   &openedx-service
   image: {{ DOCKER_IMAGE_OPENEDX_DEV }}
+  build:
+    context: ../build/openedx/
+    target: development
+    args:
+      APP_USER_ID: "{{ HOST_USER_ID }}"
   environment:
     SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.development}
   volumes:
@@ -16,6 +21,12 @@ x-openedx-service:
     - ../build/openedx/requirements:/openedx/requirements
 
 services:
+  lms-permissions:
+    command: ["{{ HOST_USER_ID }}", "/openedx/data", "/openedx/media"]
+
+  cms-permissions:
+    command: ["{{ HOST_USER_ID }}", "/openedx/data", "/openedx/media"]
+
   lms:
     <<: *openedx-service
     command: ./manage.py lms runserver 0.0.0.0:8000
