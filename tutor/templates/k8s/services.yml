@@ -121,7 +121,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 25
+    - port: 8025
       protocol: TCP
   selector:
     app.kubernetes.io/name: smtp

@@ -1,4 +1,4 @@
-FROM docker.io/ubuntu:20.04
+FROM docker.io/ruby:2.5.7-slim-stretch
 MAINTAINER Overhang.io <contact@overhang.io>
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,32 +12,27 @@ RUN wget -O /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/
     && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
     && rm /tmp/dockerize.tar.gz
 
-RUN mkdir /openedx
+# Create unprivileged "app" user
+RUN useradd --home-dir /app --create-home --shell /bin/bash --uid 1000 app
 
-# Install ruby-build for building specific version of ruby
-# The ruby-build version should be periodically updated to reflect the latest release
-ARG RUBY_BUILD_VERSION=v20200401
-RUN git clone https://github.com/rbenv/ruby-build.git --branch $RUBY_BUILD_VERSION /openedx/ruby-build
-WORKDIR /openedx/ruby-build
-RUN PREFIX=/usr/local ./install.sh
+# Copy custom scripts
+COPY ./bin /app/bin
+RUN chmod a+x /app/bin/*
+ENV PATH :${PATH}
 
-# Install ruby and some specific dependencies
-ARG RUBY_VERSION=2.5.7
-ARG BUNDLER_VERSION=1.17.3
-ARG RAKE_VERSION=13.0.1
-RUN ruby-build $RUBY_VERSION /openedx/ruby
-ENV PATH "/openedx/ruby/bin:$PATH"
-RUN gem install bundler -v $BUNDLER_VERSION
-RUN gem install rake -v $RAKE_VERSION
+# From then on, run as unprivileged app user
+USER app
+
+# Install rake and bundler
+ENV PATH "/app/bin:/app/.gem/ruby/2.5.0/bin:$PATH"
+RUN gem install --user-install bundler --version 1.17.3
+RUN gem install --user-install rake --version 13.0.1
 
 # Install forum
-RUN git clone https://github.com/edx/cs_comments_service.git --branch {{ OPENEDX_COMMON_VERSION }} --depth 1 /openedx/cs_comments_service
-WORKDIR /openedx/cs_comments_service
+RUN git clone https://github.com/edx/cs_comments_service.git --branch {{ OPENEDX_COMMON_VERSION }} --depth 1 /app/cs_comments_service
+WORKDIR /app/cs_comments_service
 RUN bundle install --deployment
 
-COPY ./bin /openedx/bin
-RUN chmod a+x /openedx/bin/*
-ENV PATH /openedx/bin:${PATH}
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 ENV SINATRA_ENV staging
