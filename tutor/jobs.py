@@ -50,6 +50,7 @@ class BaseComposeJobRunner(BaseJobRunner):
 def initialise(runner: BaseJobRunner, limit_to: Optional[str] = None) -> None:
     fmt.echo_info("Initialising all services...")
     if limit_to is None or limit_to == "mysql":
+        fmt.echo_info("Initialising mysql...")
         runner.run_job_from_template("mysql", "hooks", "mysql", "init")
     for plugin_name, hook in runner.iter_plugin_hooks("pre-init"):
         if limit_to is None or limit_to == plugin_name:
