@@ -328,7 +328,7 @@ And djangojs.po::
 
 Then you will have to re-build the openedx Docker image::
 
-    tutor images build openedx openedx-dev
+    tutor images build openedx
 
 Beware that this will take a long time! Unfortunately it's difficult to accelerate this process, as translation files need to be compiled prior to collecting the assets. In development it's possible to accelerate the iteration loop -- but that exercise is left to the reader.
 

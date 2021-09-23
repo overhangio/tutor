@@ -117,14 +117,19 @@ RUN apt update && \
     apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng-dev libsqlite3-dev libxmlsec1-dev lynx ntp pkg-config rdfind && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
-COPY --from=code /openedx/edx-platform /openedx/edx-platform
-COPY --from=locales /openedx/locale/contrib/locale /openedx/locale/contrib/locale
-COPY --from=python /opt/pyenv /opt/pyenv
-COPY --from=python-requirements /openedx/venv /openedx/venv
-COPY --from=python-requirements /openedx/requirements /openedx/requirements
-COPY --from=nodejs-requirements /openedx/nodeenv /openedx/nodeenv
-COPY --from=nodejs-requirements /openedx/edx-platform/node_modules /openedx/edx-platform/node_modules
+# From then on, run as unprivileged "app" user
+ARG APP_USER_ID=1000
+RUN useradd --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER_ID} app
+USER ${APP_USER_ID}
+
+COPY --chown=app:app --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
+COPY --chown=app:app --from=code /openedx/edx-platform /openedx/edx-platform
+COPY --chown=app:app --from=locales /openedx/locale /openedx/locale
+COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv
+COPY --chown=app:app --from=python-requirements /openedx/venv /openedx/venv
+COPY --chown=app:app --from=python-requirements /openedx/requirements /openedx/requirements
+COPY --chown=app:app --from=nodejs-requirements /openedx/nodeenv /openedx/nodeenv
+COPY --chown=app:app --from=nodejs-requirements /openedx/edx-platform/node_modules /openedx/edx-platform/node_modules
 
 ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
@@ -136,16 +141,16 @@ RUN pip install -r requirements/edx/local.in
 # Create folder that will store lms/cms.env.json files, as well as
 # the tutor-specific settings files.
 RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
-COPY revisions.yml /openedx/config/
+COPY --chown=app:app revisions.yml /openedx/config/
 ENV LMS_CFG /openedx/config/lms.env.json
 ENV STUDIO_CFG /openedx/config/cms.env.json
 ENV REVISION_CFG /openedx/config/revisions.yml
-COPY settings/lms/*.py ./lms/envs/tutor/
-COPY settings/cms/*.py ./cms/envs/tutor/
+COPY --chown=app:app settings/lms/*.py ./lms/envs/tutor/
+COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/
 
 # Copy user-specific locales to /openedx/locale/user/locale and compile them
-RUN mkdir -p /openedx/locale/user
-COPY ./locale/ /openedx/locale/user/locale/
+RUN mkdir /openedx/locale/user
+COPY --chown=app:app ./locale/ /openedx/locale/user/locale/
 RUN cd /openedx/locale/user && \
     django-admin.py compilemessages -v1
 
@@ -156,7 +161,7 @@ RUN ./manage.py lms --settings=tutor.i18n compilejsi18n
 RUN ./manage.py cms --settings=tutor.i18n compilejsi18n
 
 # Copy scripts
-COPY ./bin /openedx/bin
+COPY --chown=app:app ./bin /openedx/bin
 RUN chmod a+x /openedx/bin/*
 ENV PATH /openedx/bin:${PATH}
 
@@ -178,7 +183,7 @@ RUN openedx-assets xmodule \
     && openedx-assets npm \
     && openedx-assets webpack --env=prod \
     && openedx-assets common
-COPY ./themes/ /openedx/themes/
+COPY --chown=app:app ./themes/ /openedx/themes/
 RUN openedx-assets themes \
     && openedx-assets collect --settings=tutor.assets \
     # De-duplicate static assets with symlinks
@@ -195,9 +200,40 @@ ENV SETTINGS tutor.production
 
 # Entrypoint will set right environment variables
 ENTRYPOINT ["docker-entrypoint.sh"]
+EXPOSE 8000
+
+###### Intermediate image with dev/test dependencies
+FROM production as development
+
+# Install useful system requirements (as root)
+USER root
+RUN apt update && \
+    apt install -y vim iputils-ping dnsutils telnet \
+    && rm -rf /var/lib/apt/lists/*
+USER app
+
+# Install dev python requirements
+RUN pip install -r requirements/edx/development.txt
+RUN pip install ipdb==0.13.4 ipython==7.27.0
+
+# Recompile static assets: in development mode all static assets are stored in edx-platform,
+# and the location of these files is stored in webpack-stats.json. If we don't recompile
+# static assets, then production assets will be served instead.
+RUN rm -r /openedx/staticfiles && \
+    mkdir /openedx/staticfiles && \
+    openedx-assets webpack --env=dev
+
+{{ patch("openedx-dev-dockerfile-post-python-requirements") }}
+
+# Default django settings
+ENV SETTINGS tutor.development
+
+CMD ./manage.py $SERVICE_VARIANT runserver 0.0.0.0:8000
+
+###### Final image with production cmd
+FROM production as final
 
 # Run server
-EXPOSE 8000
 CMD uwsgi \
     --static-map /static=/openedx/staticfiles/ \
     --static-map /media=/openedx/media/ \

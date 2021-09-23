@@ -19,7 +19,7 @@ Once the local platform has been configured, you should stop it so that it does 
 
 Finally, you should build the ``openedx-dev`` docker image::
 
-    tutor images build openedx-dev
+    tutor dev dc build lms
 
 This ``openedx-dev`` development image differs from the ``openedx`` production image:
 
