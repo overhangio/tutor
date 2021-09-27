@@ -15,6 +15,24 @@ from .context import BaseJobContext
 
 
 class ComposeJobRunner(jobs.BaseComposeJobRunner):
+    def __init__(self, root: str, config: Config):
+        super().__init__(root, config)
+        self.project_name = ""
+        self.docker_compose_files: List[str] = []
+        self.docker_compose_job_files: List[str] = []
+
+    def docker_compose(self, *command: str) -> int:
+        """
+        Run docker-compose with the right yml files.
+        """
+        args = []
+        for docker_compose_path in self.docker_compose_files:
+            if os.path.exists(docker_compose_path):
+                args += ["-f", docker_compose_path]
+        return utils.docker_compose(
+            *args, "--project-name", self.project_name, *command
+        )
+
     def run_job(self, service: str, command: str) -> int:
         """
         Run the "{{ service }}-job" service from local/docker-compose.jobs.yml with the
@@ -22,15 +40,11 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
         service does not exist, run the service from good old regular
         docker-compose.yml.
         """
-        run_command = [
-            "-f",
-            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
-        ]
-        override_path = tutor_env.pathjoin(
-            self.root, "local", "docker-compose.jobs.override.yml"
-        )
-        if os.path.exists(override_path):
-            run_command += ["-f", override_path]
+        run_command = []
+        for docker_compose_path in self.docker_compose_job_files:
+            path = tutor_env.pathjoin(self.root, docker_compose_path)
+            if os.path.exists(path):
+                run_command += ["-f", path]
         run_command += ["run", "--rm"]
         if not utils.is_a_tty():
             run_command += ["-T"]
