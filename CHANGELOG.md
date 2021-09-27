@@ -8,6 +8,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - [Bugfix] Fix 500 error during user registration.
 - [Bugfix] Fix Mongodb compatibility version upgrade when upgrading from Koa to Lilac.
+- [Feature] Ability to pass [docker build options](https://docs.docker.com/engine/reference/commandline/build/#options) via ``--docker-arg`` option in ``tutor images build`` command.
 
 ## v12.1.2 (2021-09-18)
 
