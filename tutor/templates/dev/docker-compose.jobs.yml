@@ -1,0 +1,3 @@
+version: "3.7"
+services: {% if not patch("dev-docker-compose-jobs-services") %}{}{% endif %}
+    {{ patch("dev-docker-compose-jobs-services")|indent(4) }}

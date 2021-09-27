@@ -1,4 +1,3 @@
-import os
 from time import sleep
 
 import click
@@ -6,7 +5,7 @@ import click
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt
-from ..types import get_typed, Config
+from ..types import Config, get_typed
 from .. import utils
 from .. import exceptions
 from . import compose
@@ -14,26 +13,21 @@ from .config import save as config_save_command
 
 
 class LocalJobRunner(compose.ComposeJobRunner):
-    def docker_compose(self, *command: str) -> int:
+    def __init__(self, root: str, config: Config):
         """
-        Run docker-compose with local and production yml files.
+        Load docker-compose files from local/.
         """
-        args = []
-        override_path = tutor_env.pathjoin(
-            self.root, "local", "docker-compose.override.yml"
-        )
-        if os.path.exists(override_path):
-            args += ["-f", override_path]
-        return utils.docker_compose(
-            "-f",
+        super().__init__(root, config)
+        self.project_name = get_typed(self.config, "LOCAL_PROJECT_NAME", str)
+        self.docker_compose_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
-            "-f",
             tutor_env.pathjoin(self.root, "local", "docker-compose.prod.yml"),
-            *args,
-            "--project-name",
-            get_typed(self.config, "LOCAL_PROJECT_NAME", str),
-            *command
-        )
+            tutor_env.pathjoin(self.root, "local", "docker-compose.override.yml"),
+        ]
+        self.docker_compose_job_files += [
+            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.override.yml"),
+        ]
 
 
 class LocalContext(compose.BaseComposeContext):
