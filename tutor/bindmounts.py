@@ -1,22 +1,19 @@
 import os
-from typing import Callable, List, Tuple
+from typing import List, Tuple
 
 import click
-from mypy_extensions import VarArg
 
 from .exceptions import TutorError
-from .types import Config
+from .jobs import BaseComposeJobRunner
 from .utils import get_user_id
 
 
 def create(
-    root: str,
-    config: Config,
-    docker_compose_func: Callable[[str, Config, VarArg(str)], int],
+    runner: BaseComposeJobRunner,
     service: str,
     path: str,
 ) -> str:
-    volumes_root_path = get_root_path(root)
+    volumes_root_path = get_root_path(runner.root)
     volume_name = get_name(path)
     container_volumes_root_path = "/tmp/volumes"
     command = """rm -rf {volumes_path}/{volume_name}
@@ -33,9 +30,7 @@ chown -R {user_id} {volumes_path}/{volume_name}""".format(
     if not os.path.exists(volumes_root_path):
         os.makedirs(volumes_root_path)
 
-    docker_compose_func(
-        root,
-        config,
+    runner.docker_compose(
         "run",
         "--rm",
         "--no-deps",
