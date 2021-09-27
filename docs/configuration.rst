@@ -372,3 +372,17 @@ By default, Tutor runs the `overhangio/openedx <https://hub.docker.com/r/overhan
 (See the relevant :ref:`configuration parameters <docker_images>`.)
 
 The customised Docker image tag value will then be used by Tutor to run the platform, for instance when running ``tutor local quickstart``.
+
+
+Passing custom docker build options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can set a limited set of Docker build options via ``tutor images build`` command. In some situations it might be necessary to tweak the docker build command, ex- setting up build caching using buildkit.
+In these situations, you can set ``--docker-arg`` flag in the ``tutor images build`` command. You can set any `supported options <https://docs.docker.com/engine/reference/commandline/build/#options>`_ in the docker build command, For example::
+
+    tutor images build openedx \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --docker-arg="--cache-from" \
+        --docker-arg="docker.io/myusername/openedx:mytag"
+
+This will result in passing the ``--cache-from`` option with the value ``docker.io/myusername/openedx:mytag`` to the docker build command.

@@ -54,6 +54,13 @@ def images_command() -> None:
     "--target",
     help="Set the target build stage to build.",
 )
+@click.option(
+    "-d",
+    "--docker-arg",
+    "docker_args",
+    multiple=True,
+    help="Set extra options for docker build command.",
+)
 @click.pass_obj
 def build(
     context: Context,
@@ -62,6 +69,7 @@ def build(
     build_args: List[str],
     add_hosts: List[str],
     target: str,
+    docker_args: List[str],
 ) -> None:
     config = tutor_config.load(context.root)
     command_args = []
@@ -73,6 +81,8 @@ def build(
         command_args += ["--add-host", add_host]
     if target:
         command_args += ["--target", target]
+    if docker_args:
+        command_args += docker_args
     for image in image_names:
         build_image(context.root, config, image, *command_args)
 
