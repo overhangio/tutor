@@ -11,33 +11,40 @@ from .. import utils
 from .. import exceptions
 from . import compose
 from .config import save as config_save_command
-from .context import Context
 
 
-def docker_compose(root: str, config: Config, *command: str) -> int:
-    """
-    Run docker-compose with local and production yml files.
-    """
-    args = []
-    override_path = tutor_env.pathjoin(root, "local", "docker-compose.override.yml")
-    if os.path.exists(override_path):
-        args += ["-f", override_path]
-    return utils.docker_compose(
-        "-f",
-        tutor_env.pathjoin(root, "local", "docker-compose.yml"),
-        "-f",
-        tutor_env.pathjoin(root, "local", "docker-compose.prod.yml"),
-        *args,
-        "--project-name",
-        get_typed(config, "LOCAL_PROJECT_NAME", str),
-        *command
-    )
+class LocalJobRunner(compose.ComposeJobRunner):
+    def docker_compose(self, *command: str) -> int:
+        """
+        Run docker-compose with local and production yml files.
+        """
+        args = []
+        override_path = tutor_env.pathjoin(
+            self.root, "local", "docker-compose.override.yml"
+        )
+        if os.path.exists(override_path):
+            args += ["-f", override_path]
+        return utils.docker_compose(
+            "-f",
+            tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
+            "-f",
+            tutor_env.pathjoin(self.root, "local", "docker-compose.prod.yml"),
+            *args,
+            "--project-name",
+            get_typed(self.config, "LOCAL_PROJECT_NAME", str),
+            *command
+        )
+
+
+class LocalContext(compose.BaseComposeContext):
+    def job_runner(self, config: Config) -> LocalJobRunner:
+        return LocalJobRunner(self.root, config)
 
 
 @click.group(help="Run Open edX locally with docker-compose")
-@click.pass_obj
-def local(context: Context) -> None:
-    context.docker_compose_func = docker_compose
+@click.pass_context
+def local(context: click.Context) -> None:
+    context.obj = LocalContext(context.obj.root)
 
 
 @click.command(help="Configure and run Open edX from scratch")
