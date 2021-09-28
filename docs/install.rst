@@ -107,8 +107,6 @@ After opening a new shell, you can test auto-completion by typing::
 
     tutor <tab><tab>
 
-.. include:: podman.rst
-
 Uninstallation
 --------------
 
