@@ -9,7 +9,7 @@ Open edX customization
 
    tutorials/theming
    tutorials/edx-platform-settings
-   tutorials/edge
+   tutorials/nightly
 
 System administration
 ---------------------

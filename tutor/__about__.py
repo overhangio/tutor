@@ -6,8 +6,8 @@ __version__ = "12.1.4"
 
 # The version suffix will be appended to the actual version, separated by a
 # dash. Use this suffix to differentiate between the actual released version and
-# the versions from other branches. For instance: set the suffix to "edge" in
-# the edge branch.
+# the versions from other branches. For instance: set the suffix to "nightly" in
+# the nightly branch.
 # The suffix is cleanly separated from the __version__ in this module to avoid
 # conflicts when merging branches.
 __version_suffix__ = ""
