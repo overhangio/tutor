@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v12.1.3 (2021-09-28)
+
 - [Bugfix] Fix 500 error during user registration.
 - [Bugfix] Fix Mongodb compatibility version upgrade when upgrading from Koa to Lilac.
 
