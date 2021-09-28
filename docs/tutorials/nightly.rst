@@ -55,3 +55,11 @@ When running Tutor Nightly, you usually do not want to override your existing Tu
 - The default Tutor project root is different in Tutor Nightly. By default it is set to ``~/.local/share/tutor-nightly`` on Linux (instead of ``~/.local/share/tutor``). To modify this location check the :ref:`corresponding documentation <tutor_root>`.
 - The plugins root is set to ``~/.local/share/tutor-nightly-plugins`` on Linux (instead of ``~/.local/share/tutor-plugins``). This location may be modified by setting the ``TUTOR_PLUGINS_ROOT`` environment variable.
 - The default docker-compose project name is set to ``tutor_nightly_local`` (instead of ``tutor_local``). This value may be modified by manually setting the ``LOCAL_PROJECT_NAME``.
+
+Making changes to Tutor Nightly
+-------------------------------
+
+In general pull requests should be open on the "master" branch of Tutor: the "master" branch is automatically merged on the "nightly" branch at every commit, such that changes made to Tutor releases find their way to Tutor Nightly as soon as they are merged. However, sometimes you want to make changes to Tutor Nightly exclusively, and not to the Tutor releases. This might be the case for instance when upgrading the running version of a third party service (for instance: Elasticsearch, Mysql), or when the master branch requires specific changes. In that case, you should follow the instructions from the :ref:`contributing` section of the docs, with the following differences:
+
+- Open your pull request on top of the "nightly" branch instead of "master".
+- Add a description of your changes to CHANGELOG-nightly.md instead of CHANGELOG.md
