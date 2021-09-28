@@ -30,6 +30,12 @@ class LazyStaticAbsoluteUrl:
         from django.conf import settings
         from django.contrib.staticfiles.storage import staticfiles_storage
         return settings.LMS_ROOT_URL + staticfiles_storage.url(self.path)
+
+    def to_json(self):
+        # This method is required for json serialization by edx-ace, notably for
+        # serialization of the registration email. See
+        # edx_ace.serialization.MessageEncoder.
+        return str(self)
 # We need a lazily-computed logo url to capture the url of the theme-specific logo.
 DEFAULT_EMAIL_LOGO_URL = LazyStaticAbsoluteUrl("images/logo.png")
 
