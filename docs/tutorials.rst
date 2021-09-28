@@ -17,6 +17,7 @@ System administration
    :maxdepth: 2
 
    tutorials/portainer
+   tutorials/podman
    tutorials/proxy
    tutorials/datamigration
    tutorials/multiplatforms
