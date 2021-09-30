@@ -176,7 +176,7 @@ When saving the environment, template files that are stored in a template root w
 command
 ~~~~~~~
 
-A plugin can provide custom command line commands. Commands are assumed to be `click.Command <https://click.palletsprojects.com/en/8.x/api/#commands>`__ objects.
+A plugin can provide custom command line commands. Commands are assumed to be `click.Command <https://click.palletsprojects.com/en/8.0.x/api/#commands>`__ objects.
 
 Example::
 
@@ -191,7 +191,7 @@ Any user who installs the ``myplugin`` plugin can then run::
     $ tutor myplugin
     Hello from myplugin!
 
-You can even define subcommands by creating `command groups <https://click.palletsprojects.com/en/8.x/api/#click.Group>`__::
+You can even define subcommands by creating `command groups <https://click.palletsprojects.com/en/8.0.x/api/#click.Group>`__::
 
     import click
 
@@ -208,4 +208,4 @@ This would allow any user to run::
     $ tutor myplugin dosomething
     This subcommand is awesome
 
-See the official `click documentation <https://click.palletsprojects.com/en/8.x/>`__ for more information.
+See the official `click documentation <https://click.palletsprojects.com/en/8.0.x/>`__ for more information.
