@@ -19,9 +19,9 @@ class BasePlugin:
     Tutor plugins are defined by a name and an object that implements one or more of the
     following properties:
 
-    `config` (dict str->dict(str->str)): contains "add", "set", "default" keys. Entries
+    `config` (dict str->dict(str->str)): contains "add", "defaults", "set" keys. Entries
     in these dicts will be added or override the global configuration. Keys in "add" and
-    "set" will be prefixed by the plugin name in uppercase.
+    "defaults" will be prefixed by the plugin name in uppercase.
 
     `patches` (dict str->str): entries in this dict will be used to patch the rendered
     Tutor templates. For instance, to add "somecontent" to a template that includes '{{

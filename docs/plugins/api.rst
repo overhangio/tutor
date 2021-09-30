@@ -12,9 +12,9 @@ The ``config`` attribute is used to modify existing and add new configuration pa
 
 * ``config["add"]`` are key/values that should be added to the user-specific ``config.yml`` configuration. Add there passwords, secret keys and other values that do not have a default value.
 * ``config["defaults"]`` are default key/values for this plugin. These values will not be added to the ``config.yml`` user file unless users override them manually with ``tutor config save --set ...``.
-* ``config["set"]`` are existing key/values that should be modified. Be very careful what you add there! Plugins may define conflicting values for some parameters.
+* ``config["set"]`` are existing key/values that should be modified. Be very careful what you add there! Different plugins may define conflicting values for some parameters.
 
- "set" and "default" key names will be automatically prefixed with the plugin name, in upper case.
+ "add" and "defaults" key names will be automatically prefixed with the plugin name, in upper case.
 
 Example::
 
