@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add configuration setting `PREVIEW_LMS_BASE` for custom preview domain.
+
 ## v12.1.3 (2021-09-28)
 
 - [Bugfix] Fix 500 error during user registration.

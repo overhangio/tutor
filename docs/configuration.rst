@@ -188,7 +188,7 @@ When ``ENABLE_HTTPS`` is ``true``, the whole Open edX platform will be reconfigu
 The following DNS records must exist and point to your server::
 
     LMS_HOST (e.g: myopenedx.com)
-    preview.LMS_HOST (e.g: preview.myopenedx.com)
+    PREVIEW_LMS_HOST (e.g: preview.myopenedx.com)
     CMS_HOST (e.g: studio.myopenedx.com)
 
 Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
