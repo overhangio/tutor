@@ -3,7 +3,7 @@
         header_up X-Forwarded-Port {{ 443 if ENABLE_HTTPS else 80 }}
     }
 }
-preview.{{ LMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
+{{ PREVIEW_LMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
     reverse_proxy nginx:80
 }
 {{ CMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {

@@ -188,7 +188,7 @@ By activating this feature, a free SSL/TLS certificate from the `Let's Encrypt <
 The following DNS records must exist and point to your server::
 
     LMS_HOST (e.g: myopenedx.com)
-    preview.LMS_HOST (e.g: preview.myopenedx.com)
+    PREVIEW_LMS_HOST (e.g: preview.myopenedx.com)
     CMS_HOST (e.g: studio.myopenedx.com)
 
 Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
