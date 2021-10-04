@@ -65,13 +65,11 @@ class ComposeJobRunner(jobs.BaseJobRunner):
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def start(context: Context, detach: bool, services: List[str]) -> None:
-    command = ["up", "--remove-orphans"]
+    command = ["up", "--remove-orphans", "--build"]
     if detach:
         command.append("-d")
 
     config = tutor_config.load(context.root)
-    # Rebuild Docker images with a `build: ...` context.
-    context.docker_compose(context.root, config, "build")
     # Start services
     context.docker_compose(context.root, config, *command, *services)
 
