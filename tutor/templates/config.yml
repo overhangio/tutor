@@ -49,6 +49,7 @@ JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}"
 JWT_RSA_PRIVATE_KEY: "{{ 2048|rsa_private_key }}"
 K8S_NAMESPACE: "openedx"
 LANGUAGE_CODE: "en"
+LANGUAGE_COOKIE_NAME: "openedx-language-preference"
 MONGODB_HOST: "mongodb"
 MONGODB_DATABASE: "openedx"
 MONGODB_PORT: 27017
