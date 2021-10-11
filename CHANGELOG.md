@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v12.1.4 (2021-10-11)
+
 - [Feature] Add configuration setting `PREVIEW_LMS_BASE` for custom preview domain.
 - [Improvement] Enable milestones application flag `MILESTONES_APP` and prerequisite courses feature flags `ENABLE_PREREQUISITE_COURSES` by default.
 
