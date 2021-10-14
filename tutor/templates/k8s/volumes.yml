@@ -1,4 +1,4 @@
-{% if RUN_CADDY %}
+{% if ENABLE_WEB_PROXY %}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
