@@ -165,14 +165,14 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
     config = interactive_config.update(
         context.obj.root, interactive=(not non_interactive)
     )
-    if not config["RUN_CADDY"]:
+    if not config["ENABLE_WEB_PROXY"]:
         fmt.echo_alert(
-            "Potentially invalid configuration: RUN_CADDY=false\n"
+            "Potentially invalid configuration: ENABLE_WEB_PROXY=false\n"
             "This setting might have been defined because you previously set WEB_PROXY=true. This is no longer"
             " necessary in order to get Tutor to work on Kubernetes. In Tutor v11+ a Caddy-based load balancer is"
             " provided out of the box to handle SSL/TLS certificate generation at runtime. If you disable this"
             " service, you will have to configure an Ingress resource and a certificate manager yourself to redirect"
-            " traffic to the nginx service. See the Kubernetes section in the Tutor documentation for more"
+            " traffic to the caddy service. See the Kubernetes section in the Tutor documentation for more"
             " information."
         )
     click.echo(fmt.title("Updating the current environment"))

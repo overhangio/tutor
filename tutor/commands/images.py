@@ -18,7 +18,6 @@ VENDOR_IMAGES = [
     "elasticsearch",
     "mongodb",
     "mysql",
-    "nginx",
     "redis",
     "smtp",
 ]
