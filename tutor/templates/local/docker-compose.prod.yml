@@ -1,36 +1,23 @@
 version: "3.7"
 services:
-  {% if RUN_CADDY %}
-  # Web proxy for SSL termination
+  # Web proxy for load balancing and SSL termination
   caddy:
     image: {{ DOCKER_IMAGE_CADDY }}
     restart: unless-stopped
     ports:
-      - "80:80"
-      {% if ENABLE_HTTPS %}- "443:443"{% endif %}
+      - "{{ CADDY_HTTP_PORT }}:80"
+      {% if ENABLE_HTTPS and ENABLE_WEB_PROXY %}- "443:443"{% endif %}
     volumes:
       - ../apps/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      {% if ENABLE_HTTPS %}- ../../data/caddy:/data{% endif %}
-  {% endif %}
-
-  # Web server
-  nginx:
-    image: {{ DOCKER_IMAGE_NGINX }}
-    restart: unless-stopped
-    {% if not RUN_CADDY %}
-    ports:
-      - "{{ NGINX_HTTP_PORT }}:80"
-    {% endif %}
-    {% if RUN_CADDY and not ENABLE_HTTPS %}
+      {% if ENABLE_HTTPS and ENABLE_WEB_PROXY %}- ../../data/caddy:/data{% endif %}
+    {% if not ENABLE_HTTPS %}
     networks:
       default:
-        # These aliases are for internal communication between containers when running locally with *.local.overhang.io hostnames.
+        # These aliases are for internal communication between containers when running locally
+        # with *.local.overhang.io hostnames.
         aliases:
           - "{{ LMS_HOST }}"
-          {{ patch("local-docker-compose-nginx-aliases")|indent(10) }}
+          {{ patch("local-docker-compose-caddy-aliases")|indent(10) }}
     {% endif %}
-    volumes:
-      - ../apps/nginx:/etc/nginx/conf.d/:ro
-    depends_on: {{ [("lms", RUN_LMS), ("cms", RUN_CMS)]|list_if }}
 
   {{ patch("local-docker-compose-prod-services")|indent(2) }}

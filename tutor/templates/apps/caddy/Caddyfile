@@ -1,13 +1,69 @@
-{{ LMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
-    reverse_proxy nginx:80 {
+# Global configuration
+{
+    {{ patch("caddyfile-global")|indent(4) }}
+}
+
+# proxy directive snippet (with logging) to be used as follows:
+#
+#     import proxy "containername:port"
+(proxy) {
+    log {
+        output stdout
+        format filter {
+            wrap json
+            fields {
+                common_log delete
+                request>headers delete
+                resp_headers delete
+                tls delete
+            }
+        }
+    }
+
+    reverse_proxy {args.0} {
         header_up X-Forwarded-Port {{ 443 if ENABLE_HTTPS else 80 }}
     }
 }
-{{ PREVIEW_LMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
-    reverse_proxy nginx:80
+
+{% if ENABLE_HTTPS and ENABLE_WEB_PROXY %}
+{% set port = "" %}
+{# listening to https is disabled and we must only listen to http #}
+{% else %}
+{% set port = ":80" %}
+{% endif %}
+
+{{ LMS_HOST }}{{ port }}, {{ PREVIEW_LMS_HOST }}{{ port }} {
+    @favicon_matcher {
+        path_regexp ^(.*)/favicon.ico$
+    }
+    rewrite @favicon_matcher /static/images/favicon.ico
+
+    # Limit profile image upload size
+    request_body /api/profile_images/*/*/upload {
+        max_size 1MB
+    }
+    request_body {
+        max_size 4MB
+    }
+
+    import proxy "lms:8000"
+
+    {{ patch("caddyfile-lms")|indent(4) }}
 }
-{{ CMS_HOST }}{% if not ENABLE_HTTPS %}:80{% endif %} {
-    reverse_proxy nginx:80
+
+{{ CMS_HOST }}{{ port }} {
+    @favicon_matcher {
+        path_regexp ^(.*)/favicon.ico$
+    }
+    rewrite @favicon_matcher /static/images/favicon.ico
+
+    request_body {
+        max_size 250MB
+    }
+
+    import proxy "cms:8000"
+
+    {{ patch("caddyfile-cms")|indent(4) }}
 }
 
 {{ patch("caddyfile") }}

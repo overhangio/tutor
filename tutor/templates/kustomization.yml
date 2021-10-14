@@ -34,9 +34,6 @@ configMapGenerator:
 - name: openedx-config
   files:{% for file in "apps/openedx/config"|walk_templates %}
   - {{ file }}{% endfor %}
-- name: nginx-config
-  files:{% for file in "apps/nginx"|walk_templates %}
-  - {{ file }}{% endfor %}
 - name: redis-config
   files:
   - apps/redis/redis.conf

@@ -1,4 +1,4 @@
-{% if RUN_CADDY %}
+{% if ENABLE_WEB_PROXY %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -379,36 +379,6 @@ spec:
           ports:
             - containerPort: 25
 {% endif %}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx
-  labels:
-    app.kubernetes.io/name: nginx
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: nginx
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: nginx
-    spec:
-      containers:
-        - name: nginx
-          image: {{ DOCKER_IMAGE_NGINX }}
-          volumeMounts:
-            - mountPath: /etc/nginx/conf.d/
-              name: config
-            {{ patch("k8s-deployments-nginx-volume-mounts")|indent(12) }}
-          ports:
-            - containerPort: 80
-      volumes:
-        - name: config
-          configMap:
-            name: nginx-config
-        {{ patch("k8s-deployments-nginx-volumes")|indent(8) }}
 {% if RUN_REDIS %}
 ---
 apiVersion: apps/v1

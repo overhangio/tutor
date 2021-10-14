@@ -9,16 +9,15 @@ ID: "{{ 24|random_string }}"
 LMS_HOST: "www.myopenedx.com"
 
 # The following are default values
-RUN_CADDY: true
 RUN_LMS: true
 RUN_CMS: true
 RUN_FORUM: true
 RUN_ELASTICSEARCH: true
-ENABLE_HTTPS: false
 RUN_MONGODB: true
 RUN_MYSQL: true
 RUN_REDIS: true
 RUN_SMTP: true
+CADDY_HTTP_PORT: 80
 CMS_HOST: "studio.{{ LMS_HOST }}"
 PREVIEW_LMS_HOST: "preview.{{ LMS_HOST }}"
 CONTACT_EMAIL: "contact@{{ LMS_HOST }}"
@@ -29,6 +28,7 @@ DOCKER_REGISTRY: "docker.io/"
 DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_OPENEDX_DEV: "{{ DOCKER_REGISTRY }}overhangio/openedx-dev:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_CADDY: "{{ DOCKER_REGISTRY }}caddy:2.3.0"
+DOCKER_IMAGE_ELASTICSEARCH: "{{ DOCKER_REGISTRY }}elasticsearch:7.10.1"
 DOCKER_IMAGE_FORUM: "{{ DOCKER_REGISTRY }}overhangio/openedx-forum:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_MONGODB: "{{ DOCKER_REGISTRY }}mongo:4.2.17"
 DOCKER_IMAGE_MYSQL: "{{ DOCKER_REGISTRY }}mysql:5.7.35"
@@ -41,6 +41,8 @@ ELASTICSEARCH_HOST: "elasticsearch"
 ELASTICSEARCH_PORT: 9200
 ELASTICSEARCH_SCHEME: "http"
 ELASTICSEARCH_HEAP_SIZE: 1g
+ENABLE_HTTPS: false
+ENABLE_WEB_PROXY: true
 FORUM_HOST: "forum"
 FORUM_MONGODB_DATABASE: "cs_comments_service"
 JWT_COMMON_AUDIENCE: "openedx"
@@ -65,7 +67,6 @@ OPENEDX_COMMON_VERSION: "master"
 MYSQL_HOST: "mysql"
 MYSQL_PORT: 3306
 MYSQL_ROOT_USERNAME: "root"
-NGINX_HTTP_PORT: 80
 PLATFORM_NAME: "My Open edX"
 PLUGINS: []
 PREVIEW_LMS_HOST: "preview.{{ LMS_HOST }}"
