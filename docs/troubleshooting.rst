@@ -33,7 +33,7 @@ To view the logs from all containers use the ``tutor local logs`` command, which
 
 To view the logs from just one container, for instance the web server::
 
-    tutor local logs --follow nginx
+    tutor local logs --follow caddy
 
 The last commands produce the logs since the creation of the containers, which can be a lot. Similar to a ``tail -f``, you can run::
 
@@ -43,10 +43,10 @@ If you'd rather use a graphical user interface for viewing logs, you are encoura
 
 .. _webserver:
 
-"Cannot start service nginx: driver failed programming external connectivity"
+"Cannot start service caddy: driver failed programming external connectivity"
 -----------------------------------------------------------------------------
 
-The containerized Nginx needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache or Nginx, running on the host, the nginx container will not be able to start. To solve this issue, check the section on :ref:`how to setup a web proxy <web_proxy>`.
+The containerized Caddy needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache, Caddy or Nginx, running on the host, the caddy container will not be able to start. To solve this issue, check the section on :ref:`how to setup a web proxy <web_proxy>`.
 
 "Couldn't connect to docker daemon"
 -----------------------------------
