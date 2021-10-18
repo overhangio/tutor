@@ -1,3 +1,5 @@
+import os
+
 import click
 
 STDOUT = None
@@ -45,4 +47,8 @@ def alert(text: str) -> str:
 
 
 def echo(text: str, err: bool = False) -> None:
+    if os.environ.get("_TUTOR_COMPLETE"):
+        if os.environ.get("COMP_WORDS") or os.environ.get("COMP_CWORD"):
+            # Don't even attempt to log stuff when we are actually auto-completing shell commands.
+            return
     click.echo(text, file=STDOUT, err=err)

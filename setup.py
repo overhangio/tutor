@@ -9,7 +9,9 @@ def load_readme():
     with io.open(os.path.join(HERE, "README.rst"), "rt", encoding="utf8") as f:
         readme = f.read()
     # Replace img src for publication on pypi
-    return readme.replace("./docs/img/", "https://github.com/overhangio/tutor/raw/master/docs/img/")
+    return readme.replace(
+        "./docs/img/", "https://github.com/overhangio/tutor/raw/master/docs/img/"
+    )
 
 
 def load_about():
@@ -21,9 +23,9 @@ def load_about():
     return about
 
 
-def load_requirements():
+def load_requirements(filename: str):
     with io.open(
-        os.path.join(HERE, "requirements", "base.in"), "rt", encoding="utf-8"
+        os.path.join(HERE, "requirements", filename), "rt", encoding="utf-8"
     ) as f:
         return [line.strip() for line in f if is_requirement(line)]
 
@@ -53,7 +55,10 @@ setup(
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
     python_requires=">=3.6",
-    install_requires=load_requirements(),
+    install_requires=load_requirements("base.in"),
+    extras_require={
+        "full": load_requirements("plugins.txt"),
+    },
     entry_points={"console_scripts": ["tutor=tutor.commands.cli:main"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",

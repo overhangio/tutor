@@ -331,9 +331,14 @@ def current_release(root: str) -> str:
     """
     Return the name of the current Open edX release.
     """
-    return {"0": "ironwood", "3": "ironwood", "10": "juniper", "11": "koa"}[
-        current_version(root).split(".")[0]
-    ]
+    return {
+        "0": "ironwood",
+        "3": "ironwood",
+        "10": "juniper",
+        "11": "koa",
+        "12": "lilac",
+        "13": "maple",
+    }[current_version(root).split(".")[0]]
 
 
 def current_version(root: str) -> str:

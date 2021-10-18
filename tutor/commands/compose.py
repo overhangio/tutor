@@ -66,11 +66,16 @@ class BaseComposeContext(BaseJobContext):
     short_help="Run all or a selection of services.",
     help="Run all or a selection of services. Docker images will be rebuilt where necessary.",
 )
+@click.option("--skip-build", is_flag=True, help="Skip image building")
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def start(context: BaseComposeContext, detach: bool, services: List[str]) -> None:
-    command = ["up", "--remove-orphans", "--build"]
+def start(
+    context: BaseComposeContext, skip_build: bool, detach: bool, services: List[str]
+) -> None:
+    command = ["up", "--remove-orphans"]
+    if not skip_build:
+        command.append("--build")
     if detach:
         command.append("-d")
 
