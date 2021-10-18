@@ -99,6 +99,7 @@ def load_required(config: Config, defaults: Config) -> None:
     that are generated once and must be kept after that, such as passwords.
     """
     for key in [
+        "CMS_OAUTH2_SECRET",
         "OPENEDX_SECRET_KEY",
         "MYSQL_ROOT_PASSWORD",
         "OPENEDX_MYSQL_PASSWORD",

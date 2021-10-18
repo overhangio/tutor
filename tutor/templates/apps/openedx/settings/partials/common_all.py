@@ -109,8 +109,10 @@ ACE_CHANNEL_DEFAULT_EMAIL = "django_email"
 ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
 EMAIL_FILE_PATH = "/tmp/openedx/emails"
 
+# Language/locales
 LOCALE_PATHS.append("/openedx/locale/contrib/locale")
 LOCALE_PATHS.append("/openedx/locale/user/locale")
+LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Allow the platform to include itself in an iframe
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -159,12 +161,6 @@ CODE_JAIL = {
     "python_bin": "nonexistingpythonbinary",
     "user": None,
 }
-
-# Custom features
-# LTI 1.3 will be enabled by default after lilac, and it's going to be a big
-# deal, so we enable it early. We should remove this once the feature flag is
-# deprecated.
-FEATURES["LTI_1P3_ENABLED"] = True
 
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS

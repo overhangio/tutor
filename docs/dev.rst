@@ -25,7 +25,7 @@ This ``openedx-dev`` development image differs from the ``openedx`` production i
 
 - The user that runs inside the container has the same UID as the user on the host, in order to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
 - Additional python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
-- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/lilac.master/requirements/edx/development.in>`__ are installed.
+- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/maple.master/requirements/edx/development.in>`__ are installed.
 
 Since the ``openedx-dev`` is based upon the ``openedx`` docker image, it should be re-built every time the ``openedx`` docker image is modified.
 
@@ -137,7 +137,7 @@ Following the instructions :ref:`above <bind_mounts>` on how to bind-mount direc
 
 If you choose any but the first solution above, you will have to make sure that your fork works with Tutor.
 
-First of all, you should make sure that you are working off the ``open-release/lilac.2`` tag. See the :ref:`fork edx-platform section <edx_platform_fork>` for more information.
+First of all, you should make sure that you are working off the ``open-release/maple.rc1`` tag. See the :ref:`fork edx-platform section <edx_platform_fork>` for more information.
 
 Then, you should run the following commands::
 

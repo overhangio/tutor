@@ -23,6 +23,9 @@ CSRF_COOKIE_SECURE = False
 DCS_SESSION_COOKIE_SAMESITE = "Lax"
 {% endif %}
 
+# CMS authentication
+IDA_LOGOUT_URI_LIST.append("{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ CMS_HOST }}/complete/logout")
+
 # Required to display all courses on start page
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 

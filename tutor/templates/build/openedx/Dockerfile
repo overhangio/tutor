@@ -14,9 +14,9 @@ RUN apt update && \
     apt install -y libssl-dev zlib1g-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
     xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-ARG PYTHON_VERSION=3.8.6
+ARG PYTHON_VERSION=3.8.12
 ENV PYENV_ROOT /opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v1.2.21 --depth 1
+RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.1.0 --depth 1
 RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
 RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/python -m venv /openedx/venv
 
@@ -44,8 +44,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# Security patch: https://github.com/edx/edx-platform/pull/28442
-RUN git fetch https://github.com/edx/edx-platform 8ecc1903ca9170a719c0e63e99fb231822eb26d8 && git cherry-pick 8ecc1903ca9170a719c0e63e99fb231822eb26d8
 {% endif %}
 
 {# Example: RUN git fetch https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
@@ -75,19 +73,20 @@ COPY --from=code /openedx/edx-platform /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
 # Install the right version of pip/setuptools
-RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
+RUN pip install setuptools==44.1.0 pip==20.3.4 wheel==0.37.0
 
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
 
 # Install scorm xblock
+# TODO upgrade scorm xblock
 RUN pip install "openedx-scorm-xblock<13.0.0,>=12.0.0"
 
 # Install django-redis for using redis as a django cache
-RUN pip install django-redis==4.12.1
+RUN pip install django-redis==5.0.0
 
 # Install uwsgi
-RUN pip install uwsgi==2.0.19.1
+RUN pip install uwsgi==2.0.20
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
