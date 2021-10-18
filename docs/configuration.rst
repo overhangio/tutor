@@ -79,7 +79,7 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/lilac.2"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/maple.beta2"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -281,16 +281,16 @@ Note that your edx-platform version must be a fork of the latest release **tag**
 
 If you don't create your fork from this tag, you *will* have important compatibility issues with other services. In particular:
 
-- Do not try to run a fork from an older (pre-Lilac) version of edx-platform: this will simply not work.
+- Do not try to run a fork from an older (pre-Maple) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
-- Do not try to run a fork from the open-release/lilac.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/lilac.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/lilac.master branch.
+- Do not try to run a fork from the open-release/maple.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/maple.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/maple.master branch.
 
 .. _i18n:
 
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/lilac.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/maple.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
@@ -311,9 +311,9 @@ Then, add a "django.po" file there that will contain your custom translations::
 .. warning::
     Don't forget to specify the file ``Content-Type`` when adding message strings with non-ASCII characters; otherwise a ``UnicodeDecodeError`` will be raised during compilation.
 
-The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/lilac.master/conf/locale/en/LC_MESSAGES/django.po>`__.
+The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/maple.master/conf/locale/en/LC_MESSAGES/django.po>`__.
 
-If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/lilac.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
+If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/maple.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
 
 To recap, here is an example. To translate a few strings in French, both from django.po and djangojs.po, we would have the following file hierarchy::
 

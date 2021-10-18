@@ -1,3 +1,3 @@
 .. parsed-literal::
 
-    pip install tutor
+    pip install tutor[full]

@@ -320,7 +320,8 @@ def delete(context: Context, yes: bool) -> None:
 def init(context: Context, limit: Optional[str]) -> None:
     config = tutor_config.load(context.root)
     runner = K8sJobRunner(context.root, config)
-    for name in ["caddy", "elasticsearch", "mysql", "mongodb"]:
+    wait_for_pod_ready(config, "caddy")
+    for name in ["elasticsearch", "mysql", "mongodb"]:
         if tutor_config.is_service_activated(config, name):
             wait_for_pod_ready(config, name)
     jobs.initialise(runner, limit_to=limit)
@@ -442,7 +443,7 @@ def wait(context: Context, name: str) -> None:
     "--from",
     "from_version",
     default="koa",
-    type=click.Choice(["ironwood", "juniper", "koa"]),
+    type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
 @click.pass_obj
 def upgrade(context: Context, from_version: str) -> None:
@@ -460,6 +461,10 @@ def upgrade(context: Context, from_version: str) -> None:
     if running_version == "koa":
         upgrade_from_koa(config)
         running_version = "lilac"
+
+    if running_version == "lilac":
+        # Nothing to do here
+        running_version = "maple"
 
 
 def upgrade_from_ironwood(config: Config) -> None:

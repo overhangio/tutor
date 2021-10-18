@@ -33,15 +33,27 @@ configMapGenerator:
 - name: openedx-settings-lms
   files:{% for file in "apps/openedx/settings/lms"|walk_templates %}
   - {{ file }}{% endfor %}
+  options:
+    labels:
+        app.kubernetes.io/name: openedx
 - name: openedx-settings-cms
   files:{% for file in "apps/openedx/settings/cms"|walk_templates %}
   - {{ file }}{% endfor %}
+  options:
+    labels:
+        app.kubernetes.io/name: openedx
 - name: openedx-config
   files:{% for file in "apps/openedx/config"|walk_templates %}
   - {{ file }}{% endfor %}
+  options:
+    labels:
+        app.kubernetes.io/name: openedx
 - name: redis-config
   files:
   - apps/redis/redis.conf
+  options:
+    labels:
+        app.kubernetes.io/name: redis
 {{ patch("kustomization-configmapgenerator") }}
 
 {{ patch("kustomization") }}
