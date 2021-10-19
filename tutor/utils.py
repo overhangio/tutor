@@ -244,3 +244,36 @@ def check_output(*command: str) -> bytes:
         raise exceptions.TutorError(
             "Command failed: {}".format(" ".join(command))
         ) from e
+
+
+def check_macos_memory() -> None:
+    """
+    Try to assert that the RAM allocated to the Docker VM on macOS is at least 4 GB.
+    """
+    if sys.platform != "darwin":
+        return
+
+    try:
+        settings_path = (
+            "{}/Library/Group Containers/group.com.docker/settings.json".format(
+                os.path.expanduser("~")
+            )
+        )
+        with open(settings_path) as fp:
+            data = json.load(fp)
+    except Exception as e:
+        # Ignore any IO and JSON parse errors
+        return
+
+    if "memoryMiB" not in data or not isinstance(data["memoryMiB"], int):
+        # Ignore absent / erratic values (Docker creates the file with the default setting of 2048 explicitly
+        # written in, so we shouldn't need to assume a default value here).
+        return
+
+    if data["memoryMiB"] < 4096:
+        raise exceptions.TutorError(
+            (
+                "Docker must be allocated at least 4 GB of memory on macOS (found {} MB). "
+                + "Please follow instructions from https://docs.tutor.overhang.io/install.html"
+            ).format(data["memoryMiB"])
+        )
