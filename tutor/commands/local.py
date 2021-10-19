@@ -37,6 +37,7 @@ def docker_compose(root: str, config: Config, *command: str) -> int:
 @click.pass_obj
 def local(context: Context) -> None:
     context.docker_compose_func = docker_compose
+    utils.check_macos_memory()
 
 
 @click.command(help="Configure and run Open edX from scratch")

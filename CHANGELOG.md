@@ -7,6 +7,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v12.1.5 (2021-10-25)
 
 - 💥[Improvement] Change the `settheme` command such that, by default, a custom theme is assigned to the LMS and the CMS, both in production and development mode.
+- [Bugfix] Check Docker memory allocation on macOS when running tutor local commands (#463)
 
 ## v12.1.4 (2021-10-11)
 
