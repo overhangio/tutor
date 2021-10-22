@@ -37,7 +37,6 @@ def docker_compose(root: str, config: Config, *command: str) -> int:
 @click.pass_obj
 def local(context: Context) -> None:
     context.docker_compose_func = docker_compose
-    utils.check_macos_memory()
 
 
 @click.command(help="Configure and run Open edX from scratch")
@@ -45,6 +44,8 @@ def local(context: Context) -> None:
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @click.pass_context
 def quickstart(context: click.Context, non_interactive: bool, pullimages: bool) -> None:
+    utils.check_macos_memory()
+
     if tutor_env.needs_major_upgrade(context.obj.root):
         click.echo(fmt.title("Upgrading from an older release"))
         context.invoke(
