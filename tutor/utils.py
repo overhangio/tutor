@@ -253,27 +253,44 @@ def check_macos_memory() -> None:
     if sys.platform != "darwin":
         return
 
-    try:
-        settings_path = (
-            "{}/Library/Group Containers/group.com.docker/settings.json".format(
-                os.path.expanduser("~")
-            )
+    settings_path = "{}/Library/Group Containers/group.com.docker/settings.json".format(
+        os.path.expanduser("~")
+    )
+
+    def warn(msg: str) -> None:
+        t = (
+            "Warning: could not check Docker RAM size from {} ({}). Tutor may not "
+            + "work if Docker is configured with < 4 GB RAM."
         )
+        click.echo(fmt.alert(t.format(settings_path, msg)))
+
+    try:
         with open(settings_path) as fp:
-            data = json.load(fp)
-    except Exception as e:
-        # Ignore any IO and JSON parse errors
+            try:
+                data = json.load(fp)
+                memory_mib = int(data["memoryMiB"])
+            except json.JSONDecodeError as e:
+                warn("invalid JSON: {}:{} {}".format(e.lineno, e.colno, e.msg))
+                return
+            except (TypeError, ValueError, OverflowError) as e:
+                warn("unexpected data: {}".format(str(e)))
+                return
+            except KeyError:
+                # Value is absent (Docker creates the file with the default setting of 2048 explicitly
+                # written in, so we shouldn't need to assume a default value here.)
+                warn("key 'memoryMiB' not found")
+                return
+    except ValueError as e:
+        warn("possible encoding error when opening file: {}".format(str(e)))
+        return
+    except OSError:
+        # File not present or accessible
         return
 
-    if "memoryMiB" not in data or not isinstance(data["memoryMiB"], int):
-        # Ignore absent / erratic values (Docker creates the file with the default setting of 2048 explicitly
-        # written in, so we shouldn't need to assume a default value here).
-        return
-
-    if data["memoryMiB"] < 4096:
+    if memory_mib < 4096:
         raise exceptions.TutorError(
             (
-                "Docker must be allocated at least 4 GB of memory on macOS (found {} MB). "
+                "Docker must be allocated at least 4 GiB of memory on macOS (found {} MiB). "
                 + "Please follow instructions from https://docs.tutor.overhang.io/install.html"
-            ).format(data["memoryMiB"])
+            ).format(memory_mib)
         )
