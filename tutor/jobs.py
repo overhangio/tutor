@@ -63,7 +63,7 @@ def initialise(runner: BaseJobRunner, limit_to: Optional[str] = None) -> None:
                 runner.run_job_from_template(
                     service, plugin_name, "hooks", service, "pre-init"
                 )
-    for service in ["lms", "cms", "forum"]:
+    for service in ["lms", "cms"]:
         if limit_to is None or limit_to == service:
             fmt.echo_info("Initialising {}...".format(service))
             runner.run_job_from_template(service, "hooks", service, "init")

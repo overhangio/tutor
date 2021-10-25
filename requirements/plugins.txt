@@ -2,6 +2,7 @@
 tutor-android>=12.0.0,<13.0.0
 tutor-discovery>=12.0.0,<13.0.0
 tutor-ecommerce>=12.0.0,<13.0.0
+tutor-forum>=12.0.0,<13.0.0
 tutor-license>=12.0.0,<13.0.0
 tutor-mfe>=12.0.0,<13.0.0
 tutor-minio>=12.0.0,<13.0.0

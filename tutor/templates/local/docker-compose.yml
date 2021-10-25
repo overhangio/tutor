@@ -97,21 +97,6 @@ services:
       HOSTNAME: "{{ LMS_HOST }}"
   {% endif %}
 
-  ############# Forum
-
-  {% if RUN_FORUM %}
-  forum:
-    image: {{ DOCKER_IMAGE_FORUM }}
-    environment:
-      SEARCH_SERVER: "{{ ELASTICSEARCH_SCHEME }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
-      MONGODB_AUTH: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
-      MONGODB_HOST: "{{ MONGODB_HOST }}"
-      MONGODB_PORT: "{{ MONGODB_PORT }}"
-      MONGODB_DATABASE: "{{ FORUM_MONGODB_DATABASE }}"
-    restart: unless-stopped
-    depends_on: {{ [("elasticsearch", RUN_ELASTICSEARCH), ("mongodb", RUN_MONGODB)]|list_if }}
-  {% endif %}
-
   ############# LMS and CMS
 
   {% if RUN_LMS %}
@@ -132,7 +117,6 @@ services:
       - lms-permissions
       {% if RUN_MYSQL %}- mysql{% endif %}
       {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
-      {% if RUN_FORUM %}- forum{% endif %}
       {% if RUN_MONGODB %}- mongodb{% endif %}
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
