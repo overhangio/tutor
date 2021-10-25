@@ -306,7 +306,7 @@ spec:
       containers:
         - name: mongodb
           image: {{ DOCKER_IMAGE_MONGODB }}
-          args: ["mongod", "--smallfiles", "--nojournal", "--storageEngine", "wiredTiger"]
+          args: ["mongod", "--nojournal", "--storageEngine", "wiredTiger"]
           ports:
             - containerPort: 27017
           volumeMounts:
