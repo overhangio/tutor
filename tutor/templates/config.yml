@@ -11,7 +11,6 @@ LMS_HOST: "www.myopenedx.com"
 # The following are default values
 RUN_LMS: true
 RUN_CMS: true
-RUN_FORUM: true
 RUN_ELASTICSEARCH: true
 RUN_MONGODB: true
 RUN_MYSQL: true
@@ -29,7 +28,6 @@ DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION 
 DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev"
 DOCKER_IMAGE_CADDY: "{{ DOCKER_REGISTRY }}caddy:2.3.0"
 DOCKER_IMAGE_ELASTICSEARCH: "{{ DOCKER_REGISTRY }}elasticsearch:7.10.1"
-DOCKER_IMAGE_FORUM: "{{ DOCKER_REGISTRY }}overhangio/openedx-forum:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_MONGODB: "{{ DOCKER_REGISTRY }}mongo:4.2.17"
 DOCKER_IMAGE_MYSQL: "{{ DOCKER_REGISTRY }}mysql:5.7.35"
 DOCKER_IMAGE_ELASTICSEARCH: "{{ DOCKER_REGISTRY }}elasticsearch:7.10.1"
@@ -44,8 +42,6 @@ ELASTICSEARCH_SCHEME: "http"
 ELASTICSEARCH_HEAP_SIZE: 1g
 ENABLE_HTTPS: false
 ENABLE_WEB_PROXY: true
-FORUM_HOST: "forum"
-FORUM_MONGODB_DATABASE: "cs_comments_service"
 JWT_COMMON_AUDIENCE: "openedx"
 JWT_COMMON_ISSUER: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"
 JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}"

@@ -27,14 +27,4 @@ services:
         - ../apps/openedx/config:/openedx/config:ro
       depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
 
-    forum-job:
-      image: {{ DOCKER_IMAGE_FORUM }}
-      environment:
-        SEARCH_SERVER: "{{ ELASTICSEARCH_SCHEME }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
-        MONGODB_AUTH: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
-        MONGODB_HOST: "{{ MONGODB_HOST }}"
-        MONGODB_PORT: "{{ MONGODB_PORT }}"
-        MONGODB_DATABASE: "{{ FORUM_MONGODB_DATABASE }}"
-      depends_on: {{ [("elasticsearch", RUN_ELASTICSEARCH), ("mongodb", RUN_MONGODB)]|list_if }}
-
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}
