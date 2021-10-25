@@ -10,7 +10,7 @@ from .. import plugins
 from ..types import Config
 from .context import Context
 
-BASE_IMAGE_NAMES = ["openedx", "forum", "permissions"]
+BASE_IMAGE_NAMES = ["openedx", "permissions"]
 VENDOR_IMAGES = [
     "caddy",
     "elasticsearch",
