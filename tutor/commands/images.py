@@ -8,17 +8,14 @@ from .. import exceptions
 from .. import images
 from .. import plugins
 from ..types import Config
-from .. import utils
 from .context import Context
 
-BASE_IMAGE_NAMES = ["openedx", "forum"]
-DEV_IMAGE_NAMES = ["openedx-dev"]
+BASE_IMAGE_NAMES = ["openedx", "forum", "permissions"]
 VENDOR_IMAGES = [
     "caddy",
     "elasticsearch",
     "mongodb",
     "mysql",
-    "nginx",
     "redis",
     "smtp",
 ]
@@ -127,11 +124,6 @@ def build_image(root: str, config: Config, image: str, *args: str) -> None:
         images.build(
             tutor_env.pathjoin(root, "plugins", plugin, "build", img), tag, *args
         )
-
-    # Build dev images with user id argument
-    dev_build_arg = ["--build-arg", "USERID={}".format(utils.get_user_id())]
-    for img, tag in iter_images(config, image, DEV_IMAGE_NAMES):
-        images.build(tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args)
 
 
 def pull_image(config: Config, image: str) -> None:

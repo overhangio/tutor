@@ -50,10 +50,6 @@ The LMS can then be accessed at http://local.overhang.io:8000. You will then hav
 
     tutor dev settheme mythemename
 
-Re-build development docker image (and compile assets)::
-
-    tutor images build openedx-dev
-
 Watch the themes folders for changes (in a different terminal)::
 
     tutor dev run watchthemes

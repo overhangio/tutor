@@ -59,6 +59,7 @@ class Renderer:
         environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.filters["rsa_private_key"] = utils.rsa_private_key
         environment.filters["walk_templates"] = self.walk_templates
+        environment.globals["HOST_USER_ID"] = utils.get_user_id()
         environment.globals["TUTOR_APP"] = __app__.replace("-", "_")
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
@@ -222,11 +223,9 @@ def save(root: str, config: Config) -> None:
 
 
 def upgrade_obsolete(root: str) -> None:
-    # tutor.conf was renamed to _tutor.conf in order to be the first config file loaded
-    # by nginx
-    nginx_tutor_conf = pathjoin(root, "apps", "nginx", "tutor.conf")
-    if os.path.exists(nginx_tutor_conf):
-        os.remove(nginx_tutor_conf)
+    """
+    Add here ad-hoc commands to upgrade the environment.
+    """
 
 
 def save_plugin_templates(

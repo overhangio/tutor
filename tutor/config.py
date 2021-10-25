@@ -175,6 +175,12 @@ def upgrade_obsolete(config: Config) -> None:
     ]:
         if name in config:
             config[name.replace("ACTIVATE_", "RUN_")] = config.pop(name)
+    # Replace RUN_CADDY by ENABLE_WEB_PROXY
+    if "RUN_CADDY" in config:
+        config["ENABLE_WEB_PROXY"] = config.pop("RUN_CADDY")
+    # Replace RUN_CADDY by ENABLE_WEB_PROXY
+    if "NGINX_HTTP_PORT" in config:
+        config["CADDY_HTTP_PORT"] = config.pop("NGINX_HTTP_PORT")
 
 
 def convert_json2yml(root: str) -> None:

@@ -5,7 +5,7 @@ With Tutor, it is easy to run multiple Open edX instances on a single server. To
 
 - ``TUTOR_ROOT``: so that configuration, environment and data are not mixed up between platforms.
 - ``LOCAL_PROJECT_NAME``: the various docker-compose projects cannot share the same name.
-- ``NGINX_HTTP_PORT``: ports cannot be shared by two different containers.
+- ``CADDY_HTTP_PORT``: exposed ports cannot be shared by two different containers.
 - ``LMS_HOST``, ``CMS_HOST``: the different platforms must be accessible from different domain (or subdomain) names.
 
 In addition, a web proxy must be setup on the host, as described :ref:`in the corresponding tutorial <web_proxy>`.

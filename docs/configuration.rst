@@ -99,16 +99,10 @@ Vendor services
 Caddy
 *****
 
-- ``RUN_CADDY`` (default: ``true``)
+- ``CADDY_HTTP_PORT`` (default: ``80``)
+- ``ENABLE_WEB_PROXY`` (default: ``true``)
 
-`Caddy <https://caddyserver.com>`__ is a web server used in Tutor as a web proxy for the generation of SSL/TLS certificates at runtime. If ``RUN_CADDY`` is set to ``false`` then we assume that SSL termination does not occur in the Caddy container, and thus the ``caddy`` container is not started.
-
-Nginx
-*****
-
-- ``NGINX_HTTP_PORT`` (default: ``80``)
-
-Nginx is used to route web traffic to the various applications and to serve static assets. When ``RUN_CADDY`` is false, the ``NGINX_HTTP_PORT`` is exposed on the host.
+`Caddy <https://caddyserver.com>`__ is a web server used in Tutor both as a web proxy and for the generation of SSL/TLS certificates at runtime. Port indicated by ``CADDY_HTTP_PORT`` is exposed on the host, in addition to port 443. If ``ENABLE_WEB_PROXY`` is set to ``false`` then we assume that SSL termination does not occur in the Caddy container and only ``CADDY_HTTP_PORT`` is exposed on the host.
 
 MySQL
 *****
@@ -193,7 +187,7 @@ The following DNS records must exist and point to your server::
 
 Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
 
-If you would like to perform SSL/TLS termination with your own custom certificates, you will have to keep ``ENABLE_HTTPS=true`` and turn off the Caddy server with ``RUN_CADDY=false``. See the corresponding :ref:`tutorial <web_proxy>` for more information.
+If you would like to perform SSL/TLS termination with your own custom certificates, you will have to keep ``ENABLE_HTTPS=true`` and turn off the Caddy load balancing with ``ENABLE_WEB_PROXY=false``. See the corresponding :ref:`tutorial <web_proxy>` for more information.
 
 .. _customise:
 
@@ -334,7 +328,7 @@ And djangojs.po::
 
 Then you will have to re-build the openedx Docker image::
 
-    tutor images build openedx openedx-dev
+    tutor images build openedx
 
 Beware that this will take a long time! Unfortunately it's difficult to accelerate this process, as translation files need to be compiled prior to collecting the assets. In development it's possible to accelerate the iteration loop -- but that exercise is left to the reader.
 

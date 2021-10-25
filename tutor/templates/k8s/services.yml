@@ -1,4 +1,4 @@
-{% if RUN_CADDY %}
+{% if ENABLE_WEB_PROXY %}
 ---
 apiVersion: v1
 kind: Service
@@ -98,18 +98,6 @@ spec:
   selector:
     app.kubernetes.io/name: mysql
 {% endif %}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx
-spec:
-  type: NodePort
-  ports:
-    - port: 80
-      name: http
-  selector:
-    app.kubernetes.io/name: nginx
 {% if RUN_REDIS %}
 ---
 apiVersion: v1
@@ -133,7 +121,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 25
+    - port: 8025
       protocol: TCP
   selector:
     app.kubernetes.io/name: smtp
