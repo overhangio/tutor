@@ -248,49 +248,46 @@ def check_output(*command: str) -> bytes:
 
 def check_macos_memory() -> None:
     """
-    Try to assert that the RAM allocated to the Docker VM on macOS is at least 4 GB.
+    Try to check that the RAM allocated to the Docker VM on macOS is at least 4 GB.
     """
     if sys.platform != "darwin":
         return
 
-    settings_path = "{}/Library/Group Containers/group.com.docker/settings.json".format(
-        os.path.expanduser("~")
+    settings_path = os.path.expanduser(
+        "~/Library/Group Containers/group.com.docker/settings.json"
     )
-
-    def warn(msg: str) -> None:
-        t = (
-            "Warning: could not check Docker RAM size from {} ({}). Tutor may not "
-            + "work if Docker is configured with < 4 GB RAM."
-        )
-        click.echo(fmt.alert(t.format(settings_path, msg)))
 
     try:
         with open(settings_path) as fp:
-            try:
-                data = json.load(fp)
-                memory_mib = int(data["memoryMiB"])
-            except json.JSONDecodeError as e:
-                warn("invalid JSON: {}:{} {}".format(e.lineno, e.colno, e.msg))
-                return
-            except (TypeError, ValueError, OverflowError) as e:
-                warn("unexpected data: {}".format(str(e)))
-                return
-            except KeyError:
-                # Value is absent (Docker creates the file with the default setting of 2048 explicitly
-                # written in, so we shouldn't need to assume a default value here.)
-                warn("key 'memoryMiB' not found")
-                return
-    except ValueError as e:
-        warn("possible encoding error when opening file: {}".format(str(e)))
-        return
-    except OSError:
-        # File not present or accessible
-        return
+            data = json.load(fp)
+            memory_mib = int(data["memoryMiB"])
+    except OSError as e:
+        raise exceptions.TutorError(
+            "Error accessing {}: [{}] {}".format(settings_path, e.errno, e.strerror)
+        ) from e
+    except json.JSONDecodeError as e:
+        raise exceptions.TutorError(
+            "Error reading {}: invalid JSON: {} [{}:{}]".format(
+                settings_path, e.msg, e.lineno, e.colno
+            )
+        ) from e
+    except (ValueError, TypeError, OverflowError) as e:
+        # ValueError from open() indicates an encoding error
+        raise exceptions.TutorError(
+            "Text encoding error or unexpected JSON data: in {}: {}".format(
+                settings_path, str(e)
+            )
+        ) from e
+    except KeyError as e:
+        # Value is absent (Docker creates the file with the default setting of 2048 explicitly
+        # written in, so we shouldn't need to assume a default value here.)
+        raise exceptions.TutorError(
+            "key 'memoryMiB' not found in {}".format(settings_path)
+        ) from e
 
     if memory_mib < 4096:
         raise exceptions.TutorError(
-            (
-                "Docker must be allocated at least 4 GiB of memory on macOS (found {} MiB). "
-                + "Please follow instructions from https://docs.tutor.overhang.io/install.html"
-            ).format(memory_mib)
+            "Docker is configured to allocate {} MiB RAM, less than the recommended {} MiB".format(
+                memory_mib, 4096
+            )
         )
