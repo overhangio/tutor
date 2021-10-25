@@ -42,7 +42,6 @@ Individual service activation
 
 - ``RUN_LMS`` (default: ``true``)
 - ``RUN_CMS`` (default: ``true``)
-- ``RUN_FORUM`` (default: ``true``)
 - ``RUN_ELASTICSEARCH`` (default: ``true``)
 - ``RUN_MONGODB`` (default: ``true``)
 - ``RUN_MYSQL`` (default: ``true``)
@@ -61,9 +60,8 @@ Custom images
 *************
 
 - ``DOCKER_IMAGE_OPENEDX`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_FORUM`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-forum:{{ TUTOR_VERSION }}"``)
 
-These configuration parameters define which image to run for each service. By default, the docker image tag matches the Tutor version it was built with.
+This configuration parameter defines the name of the Docker image to run for the lms and cms containers. By default, the Docker image tag matches the Tutor version it was built with.
 
 Custom registry
 ***************
@@ -164,13 +162,6 @@ SMTP
 - ``SMTP_USE_SSL`` (default: ``false``)
 
 Note that the SMTP server shipped with Tutor by default does not implement TLS. With external servers, only one of SSL or TLS should be enabled, at most.
-
-Forum
-*****
-
-- ``RUN_FORUM`` (default: ``true``)
-- ``FORUM_HOST`` (default: ``"forum"``)
-- ``FORUM_MONGODB_DATABASE`` (default: ``"cs_comments_service"``)
 
 SSL/TLS certificates for HTTPS access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

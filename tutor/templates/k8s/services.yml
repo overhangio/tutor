@@ -28,20 +28,6 @@ spec:
   selector:
     app.kubernetes.io/name: cms
 {% endif %}
-{% if RUN_FORUM %}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: forum
-spec:
-  type: NodePort
-  ports:
-    - port: 4567
-      protocol: TCP
-  selector:
-    app.kubernetes.io/name: forum
-{% endif %}
 {% if RUN_LMS %}
 ---
 apiVersion: v1

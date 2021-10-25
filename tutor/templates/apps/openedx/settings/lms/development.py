@@ -21,7 +21,6 @@ LOGIN_REDIRECT_WHITELIST.append(CMS_BASE)
 IDA_LOGOUT_URI_LIST.append("http://{{ CMS_HOST }}:8001/complete/logout")
 
 FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] = False
-COMMENTS_SERVICE_URL = "http://{{ FORUM_HOST }}:4567"
 
 LOGGING["loggers"]["oauth2_provider"] = {
     "handlers": ["console"],

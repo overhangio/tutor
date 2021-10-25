@@ -166,7 +166,6 @@ def upgrade_obsolete(config: Config) -> None:
     for name in [
         "ACTIVATE_LMS",
         "ACTIVATE_CMS",
-        "ACTIVATE_FORUM",
         "ACTIVATE_ELASTICSEARCH",
         "ACTIVATE_MONGODB",
         "ACTIVATE_MYSQL",

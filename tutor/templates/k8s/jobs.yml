@@ -77,30 +77,5 @@ spec:
       containers:
       - name: mysql
         image: {{ DOCKER_IMAGE_MYSQL }}
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: forum-job
-  labels:
-    app.kubernetes.io/component: job
-spec:
-  template:
-    spec:
-      restartPolicy: Never
-      containers:
-      - name: forum
-        image: {{ DOCKER_IMAGE_FORUM }}
-        env:
-          - name: SEARCH_SERVER
-            value: "{{ ELASTICSEARCH_SCHEME }}://{{ ELASTICSEARCH_HOST }}:{{ ELASTICSEARCH_PORT }}"
-          - name: MONGODB_AUTH
-            value: "{% if MONGODB_USERNAME and MONGODB_PASSWORD %}{{ MONGODB_USERNAME}}:{{ MONGODB_PASSWORD }}@{% endif %}"
-          - name: MONGODB_HOST
-            value: "{{ MONGODB_HOST }}"
-          - name: MONGODB_PORT
-            value: "{{ MONGODB_PORT }}"
-          - name: MONGODB_DATABASE
-            value: "{{ FORUM_MONGODB_DATABASE }}"
 
 {{ patch("k8s-jobs") }}
