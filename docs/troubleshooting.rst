@@ -64,7 +64,7 @@ If the above command does not work, you should fix your Docker installation. Som
 
 Open edX requires at least 4 GB RAM, in particular to run the SQL migrations. If the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to buy more memory or add swap to your machine.
 
-On macOS, by default, Docker allocates at most 2 GB of RAM to containers. ``quickstart`` refuses to start if it detects an allocation of less than 4 GB. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 Gb to the Docker daemon.
+On macOS, by default, Docker allocates at most 2 GB of RAM to containers. ``quickstart`` tries to check your current allocation and outputs a warning if it can't find a value of at least 4 GB. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 GB to the Docker daemon.
 
 If migrations were killed halfway, there is a good chance that the MySQL database is in a state that is hard to recover from. The easiest way to recover is simply to delete all the MySQL data and restart the quickstart process. After you have allocated more memory to the Docker daemon, run::
 

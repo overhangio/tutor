@@ -8,6 +8,7 @@ from .. import env as tutor_env
 from .. import fmt
 from ..types import get_typed, Config
 from .. import utils
+from .. import exceptions
 from . import compose
 from .config import save as config_save_command
 from .context import Context
@@ -44,7 +45,18 @@ def local(context: Context) -> None:
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @click.pass_context
 def quickstart(context: click.Context, non_interactive: bool, pullimages: bool) -> None:
-    utils.check_macos_memory()
+    try:
+        utils.check_macos_memory()
+    except exceptions.TutorError as e:
+        fmt.echo_alert(
+            """Could not verify sufficient RAM allocation in Docker:
+    {}
+Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
+    https://docs.tutor.overhang.io/install.html
+            """.format(
+                str(e)
+            )
+        )
 
     if tutor_env.needs_major_upgrade(context.obj.root):
         click.echo(fmt.title("Upgrading from an older release"))
