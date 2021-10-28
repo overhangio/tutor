@@ -1,3 +1,3 @@
-.. click:: tutor.commands.k8s:k8s
-   :prog: tutor k8s
+.. click:: tutor.commands.local:local
+   :prog: tutor local
    :nested: full
