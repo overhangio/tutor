@@ -4,7 +4,13 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Make it possible to override job configuration in development: if they exist, `dev/docker-compose.jobs.yml` and `dev/docker-compose.jobs.override.yml` will be loaded when running jobs.
+- [Improvement] Faster `tutor local start` by building only necessary images.
+
+## v12.1.5 (2021-10-25)
+
 - 💥[Improvement] Change the `settheme` command such that, by default, a custom theme is assigned to the LMS and the CMS, both in production and development mode.
+- [Bugfix] Change the `local quickstart` command to check for adequate Docker memory allocation on macOS (#463)
 
 ## v12.1.4 (2021-10-11)
 

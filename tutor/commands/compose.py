@@ -1,8 +1,7 @@
 import os
-from typing import Callable, List
+from typing import List
 
 import click
-from mypy_extensions import VarArg
 
 from .. import bindmounts
 from .. import config as tutor_config
@@ -12,18 +11,27 @@ from .. import fmt
 from .. import jobs
 from ..types import Config
 from .. import utils
-from .context import Context
+from .context import BaseJobContext
 
 
-class ComposeJobRunner(jobs.BaseJobRunner):
-    def __init__(
-        self,
-        root: str,
-        config: Config,
-        docker_compose_func: Callable[[str, Config, VarArg(str)], int],
-    ):
+class ComposeJobRunner(jobs.BaseComposeJobRunner):
+    def __init__(self, root: str, config: Config):
         super().__init__(root, config)
-        self.docker_compose_func = docker_compose_func
+        self.project_name = ""
+        self.docker_compose_files: List[str] = []
+        self.docker_compose_job_files: List[str] = []
+
+    def docker_compose(self, *command: str) -> int:
+        """
+        Run docker-compose with the right yml files.
+        """
+        args = []
+        for docker_compose_path in self.docker_compose_files:
+            if os.path.exists(docker_compose_path):
+                args += ["-f", docker_compose_path]
+        return utils.docker_compose(
+            *args, "--project-name", self.project_name, *command
+        )
 
     def run_job(self, service: str, command: str) -> int:
         """
@@ -32,22 +40,16 @@ class ComposeJobRunner(jobs.BaseJobRunner):
         service does not exist, run the service from good old regular
         docker-compose.yml.
         """
-        run_command = [
-            "-f",
-            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
-        ]
-        override_path = tutor_env.pathjoin(
-            self.root, "local", "docker-compose.jobs.override.yml"
-        )
-        if os.path.exists(override_path):
-            run_command += ["-f", override_path]
+        run_command = []
+        for docker_compose_path in self.docker_compose_job_files:
+            path = tutor_env.pathjoin(self.root, docker_compose_path)
+            if os.path.exists(path):
+                run_command += ["-f", path]
         run_command += ["run", "--rm"]
         if not utils.is_a_tty():
             run_command += ["-T"]
         job_service_name = "{}-job".format(service)
-        return self.docker_compose_func(
-            self.root,
-            self.config,
+        return self.docker_compose(
             *run_command,
             job_service_name,
             "sh",
@@ -57,6 +59,11 @@ class ComposeJobRunner(jobs.BaseJobRunner):
         )
 
 
+class BaseComposeContext(BaseJobContext):
+    def job_runner(self, config: Config) -> ComposeJobRunner:
+        raise NotImplementedError
+
+
 @click.command(
     short_help="Run all or a selection of services.",
     help="Run all or a selection of services. Docker images will be rebuilt where necessary.",
@@ -64,24 +71,22 @@ class ComposeJobRunner(jobs.BaseJobRunner):
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def start(context: Context, detach: bool, services: List[str]) -> None:
-    command = ["up", "--remove-orphans"]
+def start(context: BaseComposeContext, detach: bool, services: List[str]) -> None:
+    command = ["up", "--remove-orphans", "--build"]
     if detach:
         command.append("-d")
 
-    config = tutor_config.load(context.root)
-    # Rebuild Docker images with a `build: ...` context.
-    context.docker_compose(context.root, config, "build")
     # Start services
-    context.docker_compose(context.root, config, *command, *services)
+    config = tutor_config.load(context.root)
+    context.job_runner(config).docker_compose(*command, *services)
 
 
 @click.command(help="Stop a running platform")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def stop(context: Context, services: List[str]) -> None:
+def stop(context: BaseComposeContext, services: List[str]) -> None:
     config = tutor_config.load(context.root)
-    context.docker_compose(context.root, config, "stop", *services)
+    context.job_runner(config).docker_compose("stop", *services)
 
 
 @click.command(
@@ -105,7 +110,7 @@ fully stop the platform, use the 'reboot' command.""",
 )
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def restart(context: Context, services: List[str]) -> None:
+def restart(context: BaseComposeContext, services: List[str]) -> None:
     config = tutor_config.load(context.root)
     command = ["restart"]
     if "all" in services:
@@ -119,15 +124,15 @@ def restart(context: Context, services: List[str]) -> None:
                     command += ["cms", "cms-worker"]
             else:
                 command.append(service)
-    context.docker_compose(context.root, config, *command)
+    context.job_runner(config).docker_compose(*command)
 
 
 @click.command(help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 @click.pass_obj
-def init(context: Context, limit: str) -> None:
+def init(context: BaseComposeContext, limit: str) -> None:
     config = tutor_config.load(context.root)
-    runner = ComposeJobRunner(context.root, config, context.docker_compose)
+    runner = context.job_runner(config)
     jobs.initialise(runner, limit_to=limit)
 
 
@@ -143,10 +148,15 @@ def init(context: Context, limit: str) -> None:
 @click.argument("email")
 @click.pass_obj
 def createuser(
-    context: Context, superuser: str, staff: bool, password: str, name: str, email: str
+    context: BaseComposeContext,
+    superuser: str,
+    staff: bool,
+    password: str,
+    name: str,
+    email: str,
 ) -> None:
     config = tutor_config.load(context.root)
-    runner = ComposeJobRunner(context.root, config, context.docker_compose)
+    runner = context.job_runner(config)
     command = jobs.create_user_command(superuser, staff, name, email, password=password)
     runner.run_job("lms", command)
 
@@ -166,18 +176,18 @@ def createuser(
 )
 @click.argument("theme_name")
 @click.pass_obj
-def settheme(context: Context, domains: List[str], theme_name: str) -> None:
+def settheme(context: BaseComposeContext, domains: List[str], theme_name: str) -> None:
     config = tutor_config.load(context.root)
-    runner = ComposeJobRunner(context.root, config, context.docker_compose)
+    runner = context.job_runner(config)
     domains = domains or jobs.get_all_openedx_domains(config)
     jobs.set_theme(theme_name, domains, runner)
 
 
 @click.command(help="Import the demo course")
 @click.pass_obj
-def importdemocourse(context: Context) -> None:
+def importdemocourse(context: BaseComposeContext) -> None:
     config = tutor_config.load(context.root)
-    runner = ComposeJobRunner(context.root, config, context.docker_compose)
+    runner = context.job_runner(config)
     fmt.echo_info("Importing demo course")
     jobs.import_demo_course(runner)
 
@@ -209,11 +219,9 @@ def run(context: click.Context, args: List[str]) -> None:
 )
 @click.argument("path")
 @click.pass_obj
-def bindmount_command(context: Context, service: str, path: str) -> None:
+def bindmount_command(context: BaseComposeContext, service: str, path: str) -> None:
     config = tutor_config.load(context.root)
-    host_path = bindmounts.create(
-        context.root, config, context.docker_compose, service, path
-    )
+    host_path = bindmounts.create(context.job_runner(config), service, path)
     fmt.echo_info(
         "Bind-mount volume created at {}. You can now use it in all `local` and `dev` commands with the `--volume={}` option.".format(
             host_path, path
@@ -267,7 +275,7 @@ def logs(context: click.Context, follow: bool, tail: bool, service: str) -> None
 @click.argument("command")
 @click.argument("args", nargs=-1)
 @click.pass_obj
-def dc_command(context: Context, command: str, args: List[str]) -> None:
+def dc_command(context: BaseComposeContext, command: str, args: List[str]) -> None:
     config = tutor_config.load(context.root)
     volumes, non_volume_args = bindmounts.parse_volumes(args)
     volume_args = []
@@ -284,9 +292,7 @@ def dc_command(context: Context, command: str, args: List[str]) -> None:
                 )
             volume_arg = "{}:{}".format(host_bind_path, volume_arg)
         volume_args += ["--volume", volume_arg]
-    context.docker_compose(
-        context.root, config, command, *volume_args, *non_volume_args
-    )
+    context.job_runner(config).docker_compose(command, *volume_args, *non_volume_args)
 
 
 def add_commands(command_group: click.Group) -> None:

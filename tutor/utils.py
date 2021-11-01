@@ -11,30 +11,6 @@ from typing import List, Tuple
 
 import click
 
-# We monkey-patch the pycryptodome library to address a segmentation fault issue
-# that affects a specific architecture
-# We can get rid of this ugly patch when the following issue is resolved:
-# https://github.com/Legrandin/pycryptodome/issues/506
-
-# When running Mac OS ...
-if sys.platform == "darwin":
-    import platform
-
-    # ... with ARM processor (M1)...
-    if platform.machine() == "arm64":
-        # ... if the GMP module is installed...
-        try:
-            import Crypto.Math._IntegerGMP
-
-            # ... monkey-patch the library to not use GMP
-            import Crypto.Math.Numbers
-            import Crypto.Math._IntegerNative
-
-            Crypto.Math.Numbers.Integer = Crypto.Math._IntegerNative.IntegerNative
-            Crypto.Math.Numbers._implementation = {}
-        except (ImportError, OSError, AttributeError):
-            pass
-
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
 from Crypto.PublicKey import RSA
 from Crypto.PublicKey.RSA import RsaKey
@@ -244,3 +220,50 @@ def check_output(*command: str) -> bytes:
         raise exceptions.TutorError(
             "Command failed: {}".format(" ".join(command))
         ) from e
+
+
+def check_macos_memory() -> None:
+    """
+    Try to check that the RAM allocated to the Docker VM on macOS is at least 4 GB.
+    """
+    if sys.platform != "darwin":
+        return
+
+    settings_path = os.path.expanduser(
+        "~/Library/Group Containers/group.com.docker/settings.json"
+    )
+
+    try:
+        with open(settings_path) as fp:
+            data = json.load(fp)
+            memory_mib = int(data["memoryMiB"])
+    except OSError as e:
+        raise exceptions.TutorError(
+            "Error accessing {}: [{}] {}".format(settings_path, e.errno, e.strerror)
+        ) from e
+    except json.JSONDecodeError as e:
+        raise exceptions.TutorError(
+            "Error reading {}: invalid JSON: {} [{}:{}]".format(
+                settings_path, e.msg, e.lineno, e.colno
+            )
+        ) from e
+    except (ValueError, TypeError, OverflowError) as e:
+        # ValueError from open() indicates an encoding error
+        raise exceptions.TutorError(
+            "Text encoding error or unexpected JSON data: in {}: {}".format(
+                settings_path, str(e)
+            )
+        ) from e
+    except KeyError as e:
+        # Value is absent (Docker creates the file with the default setting of 2048 explicitly
+        # written in, so we shouldn't need to assume a default value here.)
+        raise exceptions.TutorError(
+            "key 'memoryMiB' not found in {}".format(settings_path)
+        ) from e
+
+    if memory_mib < 4096:
+        raise exceptions.TutorError(
+            "Docker is configured to allocate {} MiB RAM, less than the recommended {} MiB".format(
+                memory_mib, 4096
+            )
+        )
