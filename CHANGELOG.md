@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Ignore Python plugins which cannot be loaded.
 - [Feature] Make it possible to override job configuration in development: if they exist, `dev/docker-compose.jobs.yml` and `dev/docker-compose.jobs.override.yml` will be loaded when running jobs.
 - [Improvement] Faster `tutor local start` by building only necessary images.
 
