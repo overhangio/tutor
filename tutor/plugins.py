@@ -231,14 +231,18 @@ class EntrypointPlugin(BasePlugin):
     def iter_load(cls) -> Iterator["EntrypointPlugin"]:
         for entrypoint in pkg_resources.iter_entry_points(cls.ENTRYPOINT):
             try:
+                error: Optional[str] = None
                 yield cls(entrypoint)
-            except:
+            except pkg_resources.VersionConflict as e:
+                error = e.report()
+            except Exception as e:
+                error = str(e)
+            if error:
                 fmt.echo_error(
-                    "Failed to load entrypoint '{} = {}' from distribution {}".format(
-                        entrypoint.name, entrypoint.module_name, entrypoint.dist
+                    "Failed to load entrypoint '{} = {}' from distribution {}: {}".format(
+                        entrypoint.name, entrypoint.module_name, entrypoint.dist, error
                     )
                 )
-                raise
 
 
 class OfficialPlugin(BasePlugin):
