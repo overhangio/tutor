@@ -1,4 +1,3 @@
-{% if ENABLE_WEB_PROXY %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -21,19 +20,24 @@ spec:
           volumeMounts:
             - mountPath: /etc/caddy/
               name: config
+            {%- if ENABLE_WEB_PROXY %}
             - mountPath: /data/
               name: data
+            {%- endif %}
           ports:
             - containerPort: 80
+            {%- if ENABLE_WEB_PROXY %}
             - containerPort: 443
+            {%- endif %}
       volumes:
         - name: config
           configMap:
             name: caddy-config
+        {%- if ENABLE_WEB_PROXY %}
         - name: data
           persistentVolumeClaim:
             claimName: caddy
-{% endif %}
+        {%- endif %}
 {% if RUN_CMS %}
 ---
 apiVersion: apps/v1
