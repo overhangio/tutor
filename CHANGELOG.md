@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Ignore Python plugins which cannot be loaded.
+
 ## v12.1.6 (2021-11-02)
 
 - [Improvement] Upgrade all services to open-release/lilac.3.
