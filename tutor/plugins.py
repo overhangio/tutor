@@ -363,11 +363,14 @@ class Plugins:
         prevent too many re-computations, which happens a lot.
         """
         installed_plugin_names = set()
+        plugins = []
         for PluginClass in cls.PLUGIN_CLASSES:
             for plugin in PluginClass.iter_installed():
                 if plugin.name not in installed_plugin_names:
                     installed_plugin_names.add(plugin.name)
-                    yield plugin
+                    plugins.append(plugin)
+        plugins = sorted(plugins, key=lambda plugin: plugin.name)
+        yield from plugins
 
     def iter_enabled(self) -> Iterator[BasePlugin]:
         for plugin in self.iter_installed():
