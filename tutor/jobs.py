@@ -10,6 +10,10 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 
 class BaseJobRunner:
+    """
+    A job runner is responsible for getting a certain task to complete.
+    """
+
     def __init__(self, root: str, config: Config):
         self.root = root
         self.config = config
@@ -25,12 +29,22 @@ class BaseJobRunner:
         return rendered
 
     def run_job(self, service: str, command: str) -> int:
+        """
+        Given a (potentially large) string command, run it with the
+        corresponding service. Implementations will differ depending on the
+        deployment strategy.
+        """
         raise NotImplementedError
 
     def iter_plugin_hooks(
         self, hook: str
     ) -> Iterator[Tuple[str, Union[Dict[str, str], List[str]]]]:
         yield from plugins.iter_hooks(self.config, hook)
+
+
+class BaseComposeJobRunner(BaseJobRunner):
+    def docker_compose(self, *command: str) -> int:
+        raise NotImplementedError
 
 
 def initialise(runner: BaseJobRunner, limit_to: Optional[str] = None) -> None:
