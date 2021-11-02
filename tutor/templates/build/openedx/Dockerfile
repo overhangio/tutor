@@ -44,8 +44,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# Security patch: https://github.com/edx/edx-platform/pull/28442
-RUN git fetch https://github.com/edx/edx-platform 8ecc1903ca9170a719c0e63e99fb231822eb26d8 && git cherry-pick 8ecc1903ca9170a719c0e63e99fb231822eb26d8
 {% endif %}
 
 {# Example: RUN git fetch https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
