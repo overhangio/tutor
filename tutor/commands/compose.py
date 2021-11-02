@@ -36,9 +36,7 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
     def run_job(self, service: str, command: str) -> int:
         """
         Run the "{{ service }}-job" service from local/docker-compose.jobs.yml with the
-        specified command. For backward-compatibility reasons, if the corresponding
-        service does not exist, run the service from good old regular
-        docker-compose.yml.
+        specified command.
         """
         run_command = []
         for docker_compose_path in self.docker_compose_job_files:
