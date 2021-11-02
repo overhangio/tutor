@@ -25,7 +25,8 @@ CONTENTSTORE = {
 }
 # Load module store settings from config files
 update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
-DATA_DIR = "/openedx/data/"
+DATA_DIR = "/openedx/data/modulestore"
+
 for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
    store["OPTIONS"]["fs_root"] = DATA_DIR
 
