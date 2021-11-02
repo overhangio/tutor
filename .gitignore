@@ -7,6 +7,3 @@ __pycache__
 /build/
 /dist/
 /release_description.md
-
-# Copied at build-time
-/tutor-openedx/tutoropenedx/__about__.py
