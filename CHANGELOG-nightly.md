@@ -2,6 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+- [Bugfix] Fix frontend failure during login to the LMS.
 - [Bugfix] Fix running Caddy container in k8s, which should always be the case even if `ENABLE_WEB_PROXY` is false.
 - 💥[Improvement] Run all services as unprivileged containers, for better security. This has multiple consequences:
   - The "openedx-dev" image is now built with `tutor dev dc build lms`.

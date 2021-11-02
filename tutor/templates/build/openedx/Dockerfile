@@ -44,6 +44,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
+# Fix lms login failure
+# https://github.com/edx/edx-platform/pull/29192/
+RUN git fetch https://github.com/regisb/edx-platform 29ae263a382dde472ab14bef93fe74813f83f271 && git cherry-pick 29ae263a382dde472ab14bef93fe74813f83f271
 {% endif %}
 
 {# Example: RUN git fetch https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
