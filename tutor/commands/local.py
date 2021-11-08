@@ -109,7 +109,7 @@ Your Open edX platform is ready and can be accessed at the following urls:
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
 def upgrade(context: click.Context, from_version: str, non_interactive: bool) -> None:
-    config = tutor_config.load_no_check(context.obj.root)
+    config = tutor_config.load_full(context.obj.root)
 
     if not non_interactive:
         question = """You are about to upgrade your Open edX platform. It is strongly recommended to make a backup before upgrading. To do so, run:
