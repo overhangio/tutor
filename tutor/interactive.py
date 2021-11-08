@@ -1,34 +1,24 @@
-from typing import List, Tuple
+from typing import List
 
 import click
 
 from . import config as tutor_config
 from . import env, exceptions, fmt
-from .__about__ import __version__
 from .types import Config, get_typed
 
 
-def update(root: str, interactive: bool = True) -> Config:
-    """
-    Load and save the configuration.
-    """
-    config, defaults = load_all(root, interactive=interactive)
-    tutor_config.save_config_file(root, config)
-    tutor_config.merge(config, defaults)
-    return config
-
-
-def load_all(root: str, interactive: bool = True) -> Tuple[Config, Config]:
+def load_user_config(root: str, interactive: bool = True) -> Config:
     """
     Load configuration and interactively ask questions to collect param values from the user.
     """
-    config, defaults = tutor_config.load_all(root)
+    config = tutor_config.load_minimal(root)
     if interactive:
-        ask_questions(config, defaults)
-    return config, defaults
+        ask_questions(config)
+    return config
 
 
-def ask_questions(config: Config, defaults: Config) -> None:
+def ask_questions(config: Config) -> None:
+    defaults = tutor_config.get_defaults(config)
     run_for_prod = config.get("LMS_HOST") != "local.overhang.io"
     run_for_prod = click.confirm(
         fmt.question(

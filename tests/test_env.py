@@ -63,7 +63,10 @@ class EnvTests(unittest.TestCase):
 
     def test_render_file(self) -> None:
         config: Config = {}
-        tutor_config.merge(config, tutor_config.load_defaults())
+        tutor_config.update_with_base(config)
+        tutor_config.update_with_defaults(config)
+        tutor_config.render_full(config)
+
         config["MYSQL_ROOT_PASSWORD"] = "testpassword"
         rendered = env.render_file(config, "hooks", "mysql", "init")
         self.assertIn("testpassword", rendered)
@@ -75,10 +78,8 @@ class EnvTests(unittest.TestCase):
         )
 
     def test_save_full(self) -> None:
-        defaults = tutor_config.load_defaults()
         with tempfile.TemporaryDirectory() as root:
-            config = tutor_config.load_current(root, defaults)
-            tutor_config.merge(config, defaults)
+            config = tutor_config.load_full(root)
             with patch.object(fmt, "STDOUT"):
                 env.save(root, config)
             self.assertTrue(
@@ -86,10 +87,8 @@ class EnvTests(unittest.TestCase):
             )
 
     def test_save_full_with_https(self) -> None:
-        defaults = tutor_config.load_defaults()
         with tempfile.TemporaryDirectory() as root:
-            config = tutor_config.load_current(root, defaults)
-            tutor_config.merge(config, defaults)
+            config = tutor_config.load_full(root)
             config["ENABLE_HTTPS"] = True
             with patch.object(fmt, "STDOUT"):
                 env.save(root, config)

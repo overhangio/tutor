@@ -8,11 +8,11 @@ from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import exceptions
 from .. import fmt
-from .. import interactive as interactive_config
 from .. import jobs
 from .. import serialize
 from ..types import Config, get_typed
 from .. import utils
+from .config import save as config_save_command
 from .context import Context
 
 
@@ -162,9 +162,13 @@ def k8s() -> None:
 @click.pass_context
 def quickstart(context: click.Context, non_interactive: bool) -> None:
     click.echo(fmt.title("Interactive platform configuration"))
-    config = interactive_config.update(
-        context.obj.root, interactive=(not non_interactive)
+    context.invoke(
+        config_save_command,
+        interactive=(not non_interactive),
+        set_vars=[],
+        unset_vars=[],
     )
+    config = tutor_config.load(context.obj.root)
     if not config["ENABLE_WEB_PROXY"]:
         fmt.echo_alert(
             "Potentially invalid configuration: ENABLE_WEB_PROXY=false\n"
