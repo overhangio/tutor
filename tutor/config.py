@@ -1,134 +1,178 @@
 import os
-from typing import Tuple
 
 from . import env, exceptions, fmt, plugins, serialize, utils
 from .types import Config, cast_config
 
 
-def update(root: str) -> Config:
-    """
-    Load and save the configuration.
-    """
-    config, defaults = load_all(root)
-    save_config_file(root, config)
-    merge(config, defaults)
-    return config
-
-
 def load(root: str) -> Config:
     """
-    Load full configuration. This will raise an exception if there is no current
-    configuration in the project root.
+    Load full configuration.
+
+    This will raise an exception if there is no current configuration in the
+    project root. A warning will also be printed if the version from disk
+    differs from the package version.
     """
-    check_existing_config(root)
-    return load_no_check(root)
+    if not os.path.exists(config_path(root)):
+        raise exceptions.TutorError(
+            "Project root does not exist. Make sure to generate the initial "
+            "configuration with `tutor config save --interactive` or `tutor local "
+            "quickstart` prior to running other commands."
+        )
+    env.check_is_up_to_date(root)
+    convert_json2yml(root)
+    return load_full(root)
 
 
-def load_no_check(root: str) -> Config:
-    config, defaults = load_all(root)
-    merge(config, defaults)
+def load_minimal(root: str) -> Config:
+    """
+    Load a minimal configuration composed of the user and the base config.
+
+    This configuration is not suitable for rendering templates, as it is incomplete.
+    """
+    config = get_user(root)
+    update_with_base(config)
+    render_full(config)
     return config
 
 
-def load_all(root: str) -> Tuple[Config, Config]:
+def load_full(root: str) -> Config:
     """
-    Return:
-        current (dict): params currently saved in config.yml
-        defaults (dict): default values of params which might be missing from the
-        current config
+    Load a full configuration, with user, base and defaults.
     """
-    defaults = load_defaults()
-    current = load_current(root, defaults)
-    return current, defaults
+    config = get_user(root)
+    update_with_base(config)
+    update_with_defaults(config)
+    render_full(config)
+    return config
 
 
-def merge(config: Config, defaults: Config, force: bool = False) -> None:
+def update_with_base(config: Config) -> None:
     """
-    Merge default values with user configuration and perform rendering of "{{...}}"
-    values.
+    Add base configuration to the config object.
+
+    Note that configuration entries are unrendered at this point.
     """
-    for key, value in defaults.items():
-        if force or key not in config:
-            config[key] = env.render_unknown(config, value)
+    base = get_base(config)
+    merge(config, base)
 
 
-def load_defaults() -> Config:
-    config = serialize.load(env.read_template_file("config.yml"))
+def update_with_defaults(config: Config) -> None:
+    """
+    Add default configuration to the config object.
+
+    Note that configuration entries are unrendered at this point.
+    """
+    defaults = get_defaults(config)
+    merge(config, defaults)
+
+
+def update_with_env(config: Config) -> None:
+    """
+    Override config values from environment variables.
+    """
+    overrides = {}
+    for k in config.keys():
+        env_var = "TUTOR_" + k
+        if env_var in os.environ:
+            overrides[k] = serialize.parse(os.environ[env_var])
+    config.update(overrides)
+
+
+def get_user(root: str) -> Config:
+    """
+    Get the user configuration from the tutor root.
+
+    Overrides from environment variables are loaded as well.
+    """
+    path = config_path(root)
+    config = {}
+    if os.path.exists(path):
+        config = get_yaml_file(path)
+    upgrade_obsolete(config)
+    update_with_env(config)
+    return config
+
+
+def get_base(config: Config) -> Config:
+    """
+    Load the base configuration.
+
+    Entries in this configuration are unrendered.
+    """
+    base = get_template("base.yml")
+
+    # Load base values from plugins
+    for plugin in plugins.iter_enabled(config):
+        # Add new config key/values
+        for key, value in plugin.config_add.items():
+            new_key = plugin.config_key(key)
+            base[new_key] = value
+
+        # Set existing config key/values
+        for key, value in plugin.config_set.items():
+            base[key] = value
+
+    return base
+
+
+def get_defaults(config: Config) -> Config:
+    """
+    Get default configuration, including from plugins.
+
+    Entries in this configuration are unrendered.
+    """
+    defaults = get_template("defaults.yml")
+
+    for plugin in plugins.iter_enabled(config):
+        # Create new defaults
+        for key, value in plugin.config_defaults.items():
+            defaults[plugin.config_key(key)] = value
+
+    update_with_env(defaults)
+    return defaults
+
+
+def get_template(filename: str) -> Config:
+    """
+    Get one of the configuration templates.
+
+    Entries in this configuration are unrendered.
+    """
+    config = serialize.load(env.read_template_file("config", filename))
     return cast_config(config)
 
 
-def load_config_file(path: str) -> Config:
+def get_yaml_file(path: str) -> Config:
+    """
+    Load config from yaml file.
+    """
     with open(path) as f:
         config = serialize.load(f.read())
     return cast_config(config)
 
 
-def load_current(root: str, defaults: Config) -> Config:
+def merge(config: Config, base: Config) -> None:
     """
-    Load the configuration currently stored on disk.
-    Note: this modifies the defaults with the plugin default values.
+    Merge base values with user configuration. Values are only added if not
+    already present.
+
+    Note that this function does not perform the rendering step of the
+    configuration entries.
     """
-    convert_json2yml(root)
-    config = load_user(root)
-    load_env(config, defaults)
-    load_required(config, defaults)
-    load_plugins(config, defaults)
-    return config
-
-
-def load_user(root: str) -> Config:
-    path = config_path(root)
-    if not os.path.exists(path):
-        return {}
-
-    config = load_config_file(path)
-    upgrade_obsolete(config)
-    return config
-
-
-def load_env(config: Config, defaults: Config) -> None:
-    for k in defaults.keys():
-        env_var = "TUTOR_" + k
-        if env_var in os.environ:
-            config[k] = serialize.parse(os.environ[env_var])
-
-
-def load_required(config: Config, defaults: Config) -> None:
-    """
-    All these keys must be present in the user's config.yml. This includes all values
-    that are generated once and must be kept after that, such as passwords.
-    """
-    for key in [
-        "OPENEDX_SECRET_KEY",
-        "MYSQL_ROOT_PASSWORD",
-        "OPENEDX_MYSQL_PASSWORD",
-        "ID",
-        "JWT_RSA_PRIVATE_KEY",
-    ]:
+    for key, value in base.items():
         if key not in config:
-            config[key] = env.render_unknown(config, defaults[key])
+            config[key] = value
 
 
-def load_plugins(config: Config, defaults: Config) -> None:
+def render_full(config: Config) -> None:
     """
-    Add, override and set new defaults from plugins.
+    Fill and render an existing configuration with defaults.
+
+    It is generally necessary to apply this function before rendering templates,
+    otherwise configuration entries may not be rendered.
     """
-    for plugin in plugins.iter_enabled(config):
-        # Add new config key/values
-        for key, value in plugin.config_add.items():
-            new_key = plugin.config_key(key)
-            if new_key not in config:
-                config[new_key] = env.render_unknown(config, value)
-
-        # Create new defaults
-        for key, value in plugin.config_defaults.items():
-            defaults[plugin.config_key(key)] = value
-
-        # Set existing config key/values: here, we do not override existing values
-        # This must come last, as overridden values may depend on plugin defaults
-        for key, value in plugin.config_set.items():
-            if key not in config:
-                config[key] = env.render_unknown(config, value)
+    for key, value in config.items():
+        config[key] = env.render_unknown(config, value)
 
 
 def is_service_activated(config: Config, service: str) -> bool:
@@ -194,7 +238,7 @@ def convert_json2yml(root: str) -> None:
                 root
             )
         )
-    config = load_config_file(json_path)
+    config = get_yaml_file(json_path)
     save_config_file(root, config)
     os.remove(json_path)
     fmt.echo_info(
@@ -208,19 +252,6 @@ def save_config_file(root: str, config: Config) -> None:
     with open(path, "w") as of:
         serialize.dump(config, of)
     fmt.echo_info("Configuration saved to {}".format(path))
-
-
-def check_existing_config(root: str) -> None:
-    """
-    Check there is a configuration on disk and the current environment is up-to-date.
-    """
-    if not os.path.exists(config_path(root)):
-        raise exceptions.TutorError(
-            "Project root does not exist. Make sure to generate the initial "
-            "configuration with `tutor config save --interactive` or `tutor local "
-            "quickstart` prior to running other commands."
-        )
-    env.check_is_up_to_date(root)
 
 
 def config_path(root: str) -> str:

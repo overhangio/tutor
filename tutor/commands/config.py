@@ -50,16 +50,16 @@ def save(
     unset_vars: List[str],
     env_only: bool,
 ) -> None:
-    config, defaults = interactive_config.load_all(
-        context.root, interactive=interactive
-    )
+    config = interactive_config.load_user_config(context.root, interactive=interactive)
     if set_vars:
-        tutor_config.merge(config, dict(set_vars), force=True)
+        for key, value in dict(set_vars).items():
+            config[key] = env.render_unknown(config, value)
     for key in unset_vars:
         config.pop(key, None)
     if not env_only:
         tutor_config.save_config_file(context.root, config)
-    tutor_config.merge(config, defaults)
+
+    tutor_config.render_full(config)
     env.save(context.root, config)
 
 
@@ -78,8 +78,8 @@ def save(
 def render(context: Context, extra_configs: List[str], src: str, dst: str) -> None:
     config = tutor_config.load(context.root)
     for extra_config in extra_configs:
-        tutor_config.merge(
-            config, tutor_config.load_config_file(extra_config), force=True
+        config.update(
+            env.render_unknown(config, tutor_config.get_yaml_file(extra_config))
         )
 
     renderer = env.Renderer(config, [src])
