@@ -222,7 +222,7 @@ def save(root: str, config: Config) -> None:
     fmt.echo_info("Environment generated in {}".format(base_dir(root)))
 
 
-def upgrade_obsolete(root: str) -> None:
+def upgrade_obsolete(_root: str) -> None:
     """
     Add here ad-hoc commands to upgrade the environment.
     """
