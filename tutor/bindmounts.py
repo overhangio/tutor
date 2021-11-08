@@ -73,8 +73,8 @@ def parse_volumes(docker_compose_args: List[str]) -> Tuple[List[str], List[str]]
     @click.option("-v", "--volume", "volumes", multiple=True)
     @click.argument("args", nargs=-1)
     def custom_docker_compose(
-        volumes: List[str], args: List[str]
-    ) -> None:  # pylint: disable=unused-argument
+        volumes: List[str], args: List[str]  # pylint: disable=unused-argument
+    ) -> None:
         pass
 
     if isinstance(docker_compose_args, tuple):
