@@ -94,7 +94,7 @@ class EnvTests(unittest.TestCase):
             with patch.object(fmt, "STDOUT"):
                 env.save(root, config)
                 with open(os.path.join(root, "env", "apps", "caddy", "Caddyfile")) as f:
-                    self.assertIn("www.myopenedx.com {", f.read())
+                    self.assertIn("www.myopenedx.com{$default_site_port}", f.read())
 
     def test_patch(self) -> None:
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
