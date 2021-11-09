@@ -17,6 +17,9 @@ spec:
       containers:
         - name: caddy
           image: {{ DOCKER_IMAGE_CADDY }}
+          env:
+          - name: default_site_port
+            value: "{% if not ENABLE_HTTPS or not ENABLE_WEB_PROXY %}:80{% endif %}"
           volumeMounts:
             - mountPath: /etc/caddy/
               name: config

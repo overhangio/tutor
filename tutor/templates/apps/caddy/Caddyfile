@@ -25,14 +25,7 @@
     }
 }
 
-{% if ENABLE_HTTPS and ENABLE_WEB_PROXY %}
-{% set port = "" %}
-{# listening to https is disabled and we must only listen to http #}
-{% else %}
-{% set port = ":80" %}
-{% endif %}
-
-{{ LMS_HOST }}{{ port }}, {{ PREVIEW_LMS_HOST }}{{ port }} {
+{{ LMS_HOST }}{$default_site_port}, {{ PREVIEW_LMS_HOST }}{$default_site_port} {
     @favicon_matcher {
         path_regexp ^(.*)/favicon.ico$
     }
@@ -51,7 +44,7 @@
     {{ patch("caddyfile-lms")|indent(4) }}
 }
 
-{{ CMS_HOST }}{{ port }} {
+{{ CMS_HOST }}{$default_site_port} {
     @favicon_matcher {
         path_regexp ^(.*)/favicon.ico$
     }
