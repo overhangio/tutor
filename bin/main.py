@@ -11,6 +11,7 @@ for plugin_name in [
     "mfe",
     "minio",
     "notes",
+    "richie",
     "webui",
     "xqueue",
 ]:
