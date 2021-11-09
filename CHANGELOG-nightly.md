@@ -2,6 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+- [Bugfix] Make it possible for plugins to implement the "caddyfile" patch without relying on the "port" local variable.
 - 💥[Improvement] Move the Open edX forum to a [dedicated plugin](https://github.com/overhangio/tutor-forum/) (#450).
 - [Bugfix] Fix frontend failure during login to the LMS.
 - 💥[Improvement] Get rid of the "tutor-openedx" package, which is no longer supported.
