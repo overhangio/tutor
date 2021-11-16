@@ -126,7 +126,6 @@ services:
     command: ["1000", "/openedx/data", "/openedx/media"]
     restart: on-failure
     volumes:
-      - ../../data/redis:/openedx/redis/data
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
   {% endif %}
@@ -159,7 +158,6 @@ services:
     command: ["1000", "/openedx/data", "/openedx/media"]
     restart: on-failure
     volumes:
-      - ../../data/redis:/openedx/redis/data
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
   {% endif %}
