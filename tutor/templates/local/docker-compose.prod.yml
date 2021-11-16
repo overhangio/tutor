@@ -30,7 +30,7 @@ services:
           {{ patch("local-docker-compose-nginx-aliases")|indent(10) }}
     {% endif %}
     volumes:
-      - ../apps/nginx:/etc/nginx/conf.d/:ro
+      - ../apps/nginx:/etc/nginx/conf.d:ro
     depends_on: {{ [("lms", RUN_LMS), ("cms", RUN_CMS)]|list_if }}
 
   {{ patch("local-docker-compose-prod-services")|indent(2) }}
