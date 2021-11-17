@@ -81,9 +81,6 @@ RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
 
-# Install scorm xblock
-RUN pip install "openedx-scorm-xblock<13.0.0,>=12.0.0"
-
 # Install django-redis for using redis as a django cache
 RUN pip install django-redis==4.12.1
 
@@ -97,6 +94,9 @@ COPY ./requirements/ /openedx/requirements
 RUN cd /openedx/requirements/ \
   && touch ./private.txt \
   && pip install -r ./private.txt
+
+{% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}RUN pip install '{{ extra_requirements }}'
+{% endfor %}
 
 ###### Install nodejs with nodeenv in /openedx/nodeenv
 FROM python as nodejs-requirements
