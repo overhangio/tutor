@@ -7,6 +7,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Feature] Add [tutor-richie](https://github.com/overhangio/tutor-richie) to the plugins that are bundled with the tutor binary.
 - [Improvement] Make `tutor plugins list` print plugins sorted by name.
 - [Improvement] Ignore Python plugins which cannot be loaded.
+- [Bugfix] When configured with `RUN_FORUM: false`, omit forum-related [Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/) from the manifests that `tutor k8s` generates. (#525)
 
 ## v12.1.6 (2021-11-02)
 

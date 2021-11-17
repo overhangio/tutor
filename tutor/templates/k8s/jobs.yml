@@ -77,6 +77,7 @@ spec:
       containers:
       - name: mysql
         image: {{ DOCKER_IMAGE_MYSQL }}
+{% if RUN_FORUM %}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -102,5 +103,6 @@ spec:
             value: "{{ MONGODB_PORT }}"
           - name: MONGODB_DATABASE
             value: "{{ FORUM_MONGODB_DATABASE }}"
+{% endif %}
 
 {{ patch("k8s-jobs") }}
