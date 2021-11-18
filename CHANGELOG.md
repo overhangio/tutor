@@ -4,9 +4,13 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v12.1.7 (2021-11-18)
+
+- [Security] Timed exam security fix [29347](https://github.com/edx/edx-platform/pull/29347).
 - [Feature] Add [tutor-richie](https://github.com/overhangio/tutor-richie) to the plugins that are bundled with the tutor binary.
 - [Improvement] Make `tutor plugins list` print plugins sorted by name.
 - [Improvement] Ignore Python plugins which cannot be loaded.
+- [Bugfix] When configured with `RUN_FORUM: false`, omit forum-related [Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/) from the manifests that `tutor k8s` generates. (#525)
 
 ## v12.1.6 (2021-11-02)
 
