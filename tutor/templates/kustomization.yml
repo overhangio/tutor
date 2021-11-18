@@ -12,11 +12,16 @@ resources:
 # namespace to deploy all Resources to
 namespace: {{ K8S_NAMESPACE }}
 
-# labels added to all Resources
+# annotations added to all Resources
+# https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/commonannotations/
+commonAnnotations:
+  app.kubernetes.io/version: {{ TUTOR_VERSION }}
+
+# labels (and label selectors) added to all Resources
 # https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
+# https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/commonlabels/
 commonLabels:
   app.kubernetes.io/instance: openedx-{{ ID }}
-  app.kubernetes.io/version: {{ TUTOR_VERSION }}
   app.kubernetes.io/part-of: openedx
   app.kubernetes.io/managed-by: tutor
   {{ patch("kustomization-commonlabels")|indent(2) }}
