@@ -44,16 +44,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# edx-proctoring security fix https://github.com/edx/edx-platform/pull/29347/
-RUN git fetch --depth=2 https://github.com/edx/edx-platform d61dcac29d1651956623c150be53a8bbe69e9346 \
-  && git cherry-pick d61dcac29d1651956623c150be53a8bbe69e9346
-# Fix "from" address in course bulk emails
-# https://github.com/edx/edx-platform/pull/29001
-RUN git fetch --depth=4 https://github.com/bitmakerla/edx-platform 6b0e9f50e9425d17cd62d1b3e9d1cab220e3fe7f \
-  && git cherry-pick 01216d9e0637a2260b4c264bda2f22c1e34b38de \
-  && git cherry-pick a057853a85560759d1d922b00db110207252c6a2 \
-  && git cherry-pick 6b0e9f50e9425d17cd62d1b3e9d1cab220e3fe7f
-
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
