@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v12.1.7 (2021-11-18)
+
 - [Security] Timed exam security fix [29347](https://github.com/edx/edx-platform/pull/29347).
 - [Feature] Add [tutor-richie](https://github.com/overhangio/tutor-richie) to the plugins that are bundled with the tutor binary.
 - [Improvement] Make `tutor plugins list` print plugins sorted by name.
