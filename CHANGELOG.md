@@ -8,6 +8,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Improvement] Make `tutor plugins list` print plugins sorted by name.
 - [Improvement] Ignore Python plugins which cannot be loaded.
 - [Bugfix] When configured with `RUN_FORUM: false`, omit forum-related [Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/) from the manifests that `tutor k8s` generates. (#525)
+- [Bugfix] Disable rolling upgrades for the Caddy Kubernetes deployment (which is a [single-instance stateful application](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/), and thus must be replaced on upgrade).
 
 ## v12.1.6 (2021-11-02)
 

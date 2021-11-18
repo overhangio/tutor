@@ -10,6 +10,8 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: caddy
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
