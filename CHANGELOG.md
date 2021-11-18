@@ -7,6 +7,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Feature] Add [tutor-richie](https://github.com/overhangio/tutor-richie) to the plugins that are bundled with the tutor binary.
 - [Improvement] Make `tutor plugins list` print plugins sorted by name.
 - [Improvement] Ignore Python plugins which cannot be loaded.
+- [Improvement] `settheme` now works with preview domain and `NGINX_HTTP_PORT`.
 
 ## v12.1.6 (2021-11-02)
 
