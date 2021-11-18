@@ -44,9 +44,12 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
+# edx-proctoring security fix https://github.com/edx/edx-platform/pull/29347/
+RUN git fetch --depth=2 https://github.com/edx/edx-platform d61dcac29d1651956623c150be53a8bbe69e9346 \
+  && git cherry-pick d61dcac29d1651956623c150be53a8bbe69e9346
 {% endif %}
 
-{# Example: RUN git fetch https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
+{# Example: RUN git fetch --depth=2 https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
 {{ patch("openedx-dockerfile-post-git-checkout") }}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
