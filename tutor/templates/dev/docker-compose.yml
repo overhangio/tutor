@@ -12,9 +12,9 @@ x-openedx-service:
     SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.development}
   volumes:
     # Settings & config
-    - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
-    - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
-    - ../apps/openedx/config/:/openedx/config/:ro
+    - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
+    - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
+    - ../apps/openedx/config:/openedx/config:ro
     # theme files
     - ../build/openedx/themes:/openedx/themes
     # editable requirements
