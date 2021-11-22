@@ -101,16 +101,16 @@ You are then free to bind-mount any directory to any container. For instance, to
     services:
       lms:
         volumes:
-          - /path/to/edx-platform/:/openedx/edx-platform
+          - /path/to/edx-platform:/openedx/edx-platform
       cms:
         volumes:
-          - /path/to/edx-platform/:/openedx/edx-platform
+          - /path/to/edx-platform:/openedx/edx-platform
       lms-worker:
         volumes:
-          - /path/to/edx-platform/:/openedx/edx-platform
+          - /path/to/edx-platform:/openedx/edx-platform
       cms-worker:
         volumes:
-          - /path/to/edx-platform/:/openedx/edx-platform
+          - /path/to/edx-platform:/openedx/edx-platform
 
 This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automatically mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-v/--volume`` option from the command line with the ``run`` or ``runserver`` commands.
 

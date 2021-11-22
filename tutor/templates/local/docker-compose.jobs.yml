@@ -11,9 +11,9 @@ services:
         SERVICE_VARIANT: lms
         SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
       volumes:
-        - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
-        - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
-        - ../apps/openedx/config/:/openedx/config/:ro
+        - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
+        - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
+        - ../apps/openedx/config:/openedx/config:ro
       depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
 
     cms-job:
@@ -22,9 +22,9 @@ services:
         SERVICE_VARIANT: cms
         SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
       volumes:
-        - ../apps/openedx/settings/lms/:/openedx/edx-platform/lms/envs/tutor/:ro
-        - ../apps/openedx/settings/cms/:/openedx/edx-platform/cms/envs/tutor/:ro
-        - ../apps/openedx/config/:/openedx/config/:ro
+        - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
+        - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
+        - ../apps/openedx/config:/openedx/config:ro
       depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
 
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}
