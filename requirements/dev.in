@@ -4,6 +4,7 @@ pip-tools
 pylint
 pyinstaller
 twine
+coverage
 
 # Types packages
 types-PyYAML

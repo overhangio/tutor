@@ -8,8 +8,8 @@ import appdirs
 import click
 import pkg_resources
 
-from .__about__ import __app__
 from . import exceptions, fmt, serialize
+from .__about__ import __app__
 from .types import Config, get_typed
 
 CONFIG_KEY = "PLUGINS"

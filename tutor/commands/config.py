@@ -3,9 +3,7 @@ from typing import List
 import click
 
 from .. import config as tutor_config
-from .. import env
-from .. import exceptions
-from .. import fmt
+from .. import env, exceptions, fmt
 from .. import interactive as interactive_config
 from .. import serialize
 from ..types import Config
