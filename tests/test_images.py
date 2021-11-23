@@ -1,4 +1,5 @@
 import unittest
+
 from tutor import images
 from tutor.types import Config
 

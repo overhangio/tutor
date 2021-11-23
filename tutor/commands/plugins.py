@@ -1,15 +1,13 @@
 import os
 import shutil
-from typing import List
 import urllib.request
+from typing import List
 
 import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
-from .. import exceptions
-from .. import fmt
-from .. import plugins
+from .. import exceptions, fmt, plugins
 from .context import Context
 
 

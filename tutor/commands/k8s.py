@@ -6,12 +6,8 @@ import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
-from .. import exceptions
-from .. import fmt
-from .. import jobs
-from .. import serialize
+from .. import exceptions, fmt, jobs, serialize, utils
 from ..types import Config, get_typed
-from .. import utils
 from .config import save as config_save_command
 from .context import Context
 
