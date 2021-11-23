@@ -137,5 +137,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Copied at build-time
+# Custom configuration
+.tutor
 /tutor-openedx/tutoropenedx/__about__.py
