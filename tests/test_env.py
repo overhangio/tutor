@@ -1,12 +1,10 @@
 import os
 import tempfile
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from tutor import config as tutor_config
-from tutor import env
-from tutor import fmt
-from tutor import exceptions
+from tutor import env, exceptions, fmt
 from tutor.types import Config
 
 
@@ -32,10 +30,10 @@ class EnvTests(unittest.TestCase):
         self.assertTrue(os.path.exists(path))
 
     def test_pathjoin(self) -> None:
-        self.assertEqual(
-            "/tmp/env/target/dummy", env.pathjoin("/tmp", "target", "dummy")
-        )
-        self.assertEqual("/tmp/env/dummy", env.pathjoin("/tmp", "dummy"))
+        with tempfile.TemporaryDirectory() as root:
+            self.assertEqual(
+                os.path.join(root, "env", "dummy"), env.pathjoin(root, "dummy")
+            )
 
     def test_render_str(self) -> None:
         self.assertEqual(

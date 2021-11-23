@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 .PHONY: docs
-SRC_DIRS = ./tutor ./tests ./bin
+SRC_DIRS = ./tutor ./tests ./bin ./docs
 BLACK_OPTS = --exclude templates ${SRC_DIRS}
 
 ###### Development
@@ -18,13 +18,18 @@ upgrade-requirements: ## Upgrade requirements files
 	pip-compile --upgrade requirements/dev.in
 	pip-compile --upgrade requirements/docs.in
 
-build-pythonpackage: build-pythonpackage-tutor ## Build python packages ready to upload to pypi
+build-pythonpackage: build-pythonpackage-tutor build-pythonpackage-tutor-openedx ## Build python packages ready to upload to pypi
 
 build-pythonpackage-tutor: ## Build the "tutor" python package for upload to pypi
 	python setup.py sdist
 
+build-pythonpackage-tutor-openedx: ## Build the obsolete "tutor-openedx" python package for upload to pypi
+	cp tutor/__about__.py tutor-openedx/tutoropenedx/
+	cd tutor-openedx && python setup.py sdist --dist-dir ../dist
+
 push-pythonpackage: ## Push python package to pypi
 	twine upload --skip-existing dist/tutor-$(shell make version).tar.gz
+	twine upload --skip-existing dist/tutor-openedx-$(shell make version).tar.gz
 
 test: test-lint test-unit test-types test-format test-pythonpackage ## Run all tests by decreasing order or priority
 
@@ -32,7 +37,7 @@ test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
 
 test-lint: ## Run code linting tests
-	pylint --errors-only --enable=unused-import,unused-argument --ignore=templates ${SRC_DIRS}
+	pylint --errors-only --enable=unused-import --ignore=templates ${SRC_DIRS}
 
 test-unit: ## Run unit tests
 	python -m unittest discover tests
@@ -42,6 +47,7 @@ test-types: ## Check type definitions
 
 test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
 	twine check dist/tutor-$(shell make version).tar.gz
+	twine check dist/tutor-openedx-$(shell make version).tar.gz
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)
@@ -52,6 +58,23 @@ bootstrap-dev: ## Install dev requirements
 
 bootstrap-dev-plugins: bootstrap-dev ## Install dev requirement and all supported plugins
 	pip install -r requirements/plugins.txt
+
+###### Code coverage
+
+coverage: ## Run unit-tests before analyzing code coverage and generate report
+	$(MAKE) --keep-going coverage-tests coverage-report
+
+coverage-tests: ## Run unit-tests and analyze code coverage
+	coverage run -m unittest discover
+
+coverage-report: ## Generate CLI report for the code coverage
+	coverage report
+
+coverage-html: coverage-report ## Generate HTML report for the code coverage
+	coverage html
+
+coverage-browse-report: coverage-html ## Open the HTML report in the browser
+	sensible-browser htmlcov/index.html
 
 ###### Deployment
 
@@ -92,7 +115,7 @@ ci-test-bundle: ## Run basic tests on bundle
 	yes "" | ./dist/tutor config save --interactive
 	./dist/tutor config save
 	./dist/tutor plugins list
-	./dist/tutor plugins enable android discovery ecommerce forum license mfe minio notes richie webui xqueue
+	./dist/tutor plugins enable android discovery ecommerce license mfe minio notes richie webui xqueue
 	./dist/tutor plugins list
 	./dist/tutor license --help
 

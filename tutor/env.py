@@ -349,7 +349,8 @@ def current_version(root: str) -> str:
     path = pathjoin(root, VERSION_FILENAME)
     if not os.path.exists(path):
         return "0.0.0"
-    return open(path).read().strip()
+    with open(path) as f:
+        return f.read().strip()
 
 
 def read_template_file(*path: str) -> str:

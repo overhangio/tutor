@@ -1,20 +1,17 @@
-#! /usr/bin/env python3
 import sys
 
 import appdirs
 import click
 
+from .. import exceptions, fmt, utils
+from ..__about__ import __app__, __version__
 from .config import config_command
 from .context import Context
 from .dev import dev
 from .images import images_command
 from .k8s import k8s
 from .local import local
-from .plugins import plugins_command, add_plugin_commands
-from ..__about__ import __version__, __app__
-from .. import exceptions
-from .. import fmt
-from .. import utils
+from .plugins import add_plugin_commands, plugins_command
 
 
 def main() -> None:
@@ -35,7 +32,10 @@ def main() -> None:
         sys.exit(1)
 
 
-@click.group(context_settings={"help_option_names": ["-h", "--help", "help"]})
+@click.group(
+    context_settings={"help_option_names": ["-h", "--help", "help"]},
+    help="Tutor is the Docker-based Open edX distribution designed for peace of mind.",
+)
 @click.version_option(version=__version__)
 @click.option(
     "-r",

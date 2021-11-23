@@ -1,11 +1,12 @@
 import io
 import os
 from setuptools import find_packages, setup
+from typing import Dict, List
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
-def load_readme():
+def load_readme() -> str:
     with io.open(os.path.join(HERE, "README.rst"), "rt", encoding="utf8") as f:
         readme = f.read()
     # Replace img src for publication on pypi
@@ -14,8 +15,8 @@ def load_readme():
     )
 
 
-def load_about():
-    about = {}
+def load_about() -> Dict[str, str]:
+    about: Dict[str, str] = {}
     with io.open(
         os.path.join(HERE, "tutor", "__about__.py"), "rt", encoding="utf-8"
     ) as f:
@@ -23,14 +24,13 @@ def load_about():
     return about
 
 
-def load_requirements(filename: str):
+def load_requirements() -> List[str]:
     with io.open(
-        os.path.join(HERE, "requirements", filename), "rt", encoding="utf-8"
+        os.path.join(HERE, "requirements", "base.in"), "rt", encoding="utf-8"
     ) as f:
         return [line.strip() for line in f if is_requirement(line)]
 
-
-def is_requirement(line):
+def is_requirement(line: str) -> bool:
     return not (line.strip() == "" or line.startswith("#"))
 
 
@@ -54,11 +54,8 @@ setup(
     long_description_content_type="text/x-rst",
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
-    python_requires=">=3.6",
-    install_requires=load_requirements("base.in"),
-    extras_require={
-        "full": load_requirements("plugins.txt"),
-    },
+    python_requires=">=3.5",
+    install_requires=load_requirements(),
     entry_points={"console_scripts": ["tutor=tutor.commands.cli:main"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -66,10 +63,12 @@ setup(
         "License :: OSI Approved :: GNU Affero General Public License v3",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
+    test_suite="tests",
 )

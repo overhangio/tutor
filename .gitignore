@@ -7,3 +7,10 @@ __pycache__
 /build/
 /dist/
 /release_description.md
+
+# Unit test/ coverage reports
+.coverage
+/htmlcov/
+
+# Copied at build-time
+/tutor-openedx/tutoropenedx/__about__.py
