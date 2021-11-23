@@ -9,6 +9,7 @@ Open edX customization
 
    tutorials/theming
    tutorials/edx-platform-settings
+   tutorials/google-smtp
    tutorials/nightly
 
 System administration
