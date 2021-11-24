@@ -49,6 +49,11 @@ test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to 
 	twine check dist/tutor-$(shell make version).tar.gz
 	twine check dist/tutor-openedx-$(shell make version).tar.gz
 
+test-coverage:
+	coverage run -m unittest discover
+	coverage report
+	coverage html
+
 format: ## Format code automatically
 	black $(BLACK_OPTS)
 

@@ -47,6 +47,7 @@ def main() -> None:
 )
 @click.pass_context
 def cli(context: click.Context, root: str) -> None:
+    """Tutor is to make it easy to deploy, customize, upgrade and scale Open edX."""
     if utils.is_root():
         fmt.echo_alert(
             "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"

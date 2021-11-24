@@ -1,0 +1,43 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+source =
+    ./tutor 
+    ./bin 
+    ./tutor-openedx
+omit =
+    */templates/*
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+    # Don't complain about abstract methods, they aren't run:
+    @(abc\.)?abstractmethod
+
+ignore_errors = True
+show_missing = True
+skip_empty = True
+precision = 2
+
+[html]
+skip_empty = True
+show_contexts = True
+
+[json]
+pretty_print = True
+show_contexts = True
