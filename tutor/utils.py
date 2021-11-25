@@ -145,10 +145,11 @@ def get_user_id() -> int:
     """
     Portable way to get user ID. Note: I have no idea if it actually works on windows...
     """
-    if sys.platform == "win32":
-        # Don't even try
-        return 0
-    return os.getuid()
+    if sys.platform != "win32":
+        return os.getuid()
+
+    # Don't even try for windows
+    return 0
 
 
 def docker_run(*command: str) -> int:
@@ -187,7 +188,7 @@ def is_a_tty() -> bool:
     Return True if stdin is able to allocate a tty. Tty allocation sometimes cannot be
     enabled, for instance in cron jobs
     """
-    return os.isatty(sys.stdin.fileno())
+    return sys.stdin.isatty()
 
 
 def execute(*command: str) -> int:
