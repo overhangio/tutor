@@ -2,6 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+- [Improvement] Get rid of many Django deprecation warnings that were printed in stdout for every LMS/CMS command.
 - [Bugfix] Fix authentication to LMS when HTTPS is disabled.
 - [Bugfix] Make it possible for plugins to implement the "caddyfile" patch without relying on the "port" local variable.
 - 💥[Improvement] Move the Open edX forum to a [dedicated plugin](https://github.com/overhangio/tutor-forum/) (#450).
