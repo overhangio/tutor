@@ -3,6 +3,8 @@
 Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
+
+- 💥[Improvement] Fail on incorrect image name argument in `images build/pull/push/printtag` commands.
 - [Bugfix] Remove trailing slashes in docker-compose files for [compatibility with docker-compose v2 in WSL](https://github.com/docker/compose/issues/8558).
 
 ## v12.1.7 (2021-11-18)
