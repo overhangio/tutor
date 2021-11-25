@@ -111,40 +111,71 @@ def push(context: Context, image_names: List[str]) -> None:
 def printtag(context: Context, image_names: List[str]) -> None:
     config = tutor_config.load(context.root)
     for image in image_names:
+        to_print = []
         for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
-            print(tag)
+            to_print.append(tag)
         for _plugin, _img, tag in iter_plugin_images(config, image, "build-image"):
+            to_print.append(tag)
+
+        if not to_print:
+            raise ImageNotFoundError(image)
+
+        for tag in to_print:
             print(tag)
 
 
 def build_image(root: str, config: Config, image: str, *args: str) -> None:
+    to_build = []
+
     # Build base images
     for img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
-        images.build(tutor_env.pathjoin(root, "build", img), tag, *args)
+        to_build.append((tutor_env.pathjoin(root, "build", img), tag, args))
 
     # Build plugin images
     for plugin, img, tag in iter_plugin_images(config, image, "build-image"):
-        images.build(
-            tutor_env.pathjoin(root, "plugins", plugin, "build", img), tag, *args
+        to_build.append(
+            (tutor_env.pathjoin(root, "plugins", plugin, "build", img), tag, args)
         )
 
     # Build dev images with user id argument
-    dev_build_arg = ["--build-arg", "USERID={}".format(utils.get_user_id())]
+    dev_build_arg = ("--build-arg", "USERID={}".format(utils.get_user_id()))
     for img, tag in iter_images(config, image, DEV_IMAGE_NAMES):
-        images.build(tutor_env.pathjoin(root, "build", img), tag, *dev_build_arg, *args)
+        to_build.append(
+            (tutor_env.pathjoin(root, "build", img), tag, dev_build_arg + args)
+        )
+
+    if not to_build:
+        raise ImageNotFoundError(image)
+
+    for path, tag, build_args in to_build:
+        images.build(path, tag, *args)
 
 
 def pull_image(config: Config, image: str) -> None:
+    to_pull = []
     for _img, tag in iter_images(config, image, all_image_names(config)):
-        images.pull(tag)
+        to_pull.append(tag)
     for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
+        to_pull.append(tag)
+
+    if not to_pull:
+        raise ImageNotFoundError(image)
+
+    for tag in to_pull:
         images.pull(tag)
 
 
 def push_image(config: Config, image: str) -> None:
+    to_push = []
     for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
-        images.push(tag)
+        to_push.append(tag)
     for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
+        to_push.append(tag)
+
+    if not to_push:
+        raise ImageNotFoundError(image)
+
+    for tag in to_push:
         images.push(tag)
 
 
@@ -183,6 +214,11 @@ def vendor_image_names(config: Config) -> List[str]:
         if not config.get("RUN_" + image.upper(), True):
             vendor_images.remove(image)
     return vendor_images
+
+
+class ImageNotFoundError(exceptions.TutorError):
+    def __init__(self, image_name: str):
+        super().__init__("Image '{}' could not be found".format(image_name))
 
 
 images_command.add_command(build)
