@@ -15,12 +15,12 @@ ALLOWED_HOSTS = [
 # Chrome to support samesite=none cookies.
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-DCS_SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
 {% else %}
 # When we cannot provide secure session/csrf cookies, we must disable samesite=none
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
-DCS_SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 {% endif %}
 
 # CMS authentication
