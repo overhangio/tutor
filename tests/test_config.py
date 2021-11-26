@@ -1,8 +1,8 @@
 import os
 import json
 import unittest
-from unittest.mock import Mock, patch
 import tempfile
+from unittest.mock import Mock, patch
 
 from tutor import config as tutor_config
 from tutor import interactive
