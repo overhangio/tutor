@@ -57,7 +57,7 @@ class ImagesTests(unittest.TestCase):
                 "target",
                 "-d",
                 "docker_args",
-                "plugin"
+                "plugin",
             ],
             obj=CONTEXT,
         )

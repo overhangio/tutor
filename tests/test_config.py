@@ -1,3 +1,5 @@
+import os
+import json
 import unittest
 from unittest.mock import Mock, patch
 import tempfile
@@ -26,8 +28,13 @@ class ConfigTests(unittest.TestCase):
 
         self.assertEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
 
+    def test_update_should_create_config_file(self) -> None:
+        with tempfile.TemporaryDirectory() as root:
+            tutor_config.update(root)
+            self.assertTrue(os.path.exists(os.path.join(root, "config.yml")))
+
     @patch.object(tutor_config.fmt, "echo")
-    def test_update_twice(self, _: Mock) -> None:
+    def test_update_twice_should_return_same_config(self, _: Mock) -> None:
         with tempfile.TemporaryDirectory() as root:
             tutor_config.update(root)
             config1 = tutor_config.load_user(root)
@@ -69,6 +76,33 @@ class ConfigTests(unittest.TestCase):
 
     def test_is_service_activated(self) -> None:
         config: Config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}
-
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
         self.assertFalse(tutor_config.is_service_activated(config, "service2"))
+
+    def test_load_all_yml_config(self) -> None:
+        with tempfile.TemporaryDirectory() as root:
+            configYmlPath = os.path.join(root, "config.yml")
+            tutor_config.update(root)
+
+            default, current = tutor_config.load_all(root)
+            self.assertNotEqual(default, current)
+            self.assertTrue(os.path.exists(configYmlPath))
+
+    def test_load_all_json_config(self) -> None:
+        with tempfile.TemporaryDirectory() as root:
+            # arrange
+            configYmlPath = os.path.join(root, "config.yml")
+            configJsonPath = os.path.join(root, "config.json")
+            tutor_config.update(root)
+            config = tutor_config.load_config_file(configYmlPath)
+            with open(configJsonPath, "w", encoding="utf-8") as f:
+                json.dump(config, f, ensure_ascii=False, indent=4)
+            os.remove(configYmlPath)
+            self.assertFalse(os.path.exists(configYmlPath))
+            self.assertTrue(os.path.exists(configJsonPath))
+
+            default, current = tutor_config.load_all(root)
+            self.assertTrue(os.path.exists(configYmlPath))
+            self.assertFalse(os.path.exists(configJsonPath))
+            self.assertNotEqual(default, current)
+            self.assertEqual(config, default)

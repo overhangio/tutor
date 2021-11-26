@@ -20,6 +20,12 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(0, result.exit_code)
         self.assertFalse(result.exception)
 
+    def test_config_save_interactive(self) -> None:
+        runner = CliRunner()
+        result = runner.invoke(config_command, ["save", "-i"], obj=CONTEXT)
+        self.assertEqual(0, result.exit_code)
+        self.assertFalse(result.exception)
+
     def test_config_save_skip_update(self) -> None:
         runner = CliRunner()
         result = runner.invoke(config_command, ["save", "-e"], obj=CONTEXT)
