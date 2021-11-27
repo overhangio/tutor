@@ -1,0 +1,45 @@
+{
+  // https://code.visualstudio.com/docs/python/debugging
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Tutor only",
+      "type": "python",
+      "request": "launch",
+      "description": "Debug tutor only",
+      "module": "tutor.commands.cli",
+      "args" : [],
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Tutor with plugins",
+      "type": "python",
+      "request": "launch",
+      "description": "Debug tutor with plugins",
+      "program": "${workspaceFolder}/bin/main.py",
+      "args" : [],
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Attach",
+      "type": "python",
+      "request": "attach",
+      "description": "Attach tutor to a debugging process.",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      "autoReload": {
+        "enable": true
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import io
 import os
 from setuptools import find_packages, setup
+from typing import List
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -9,7 +10,9 @@ def load_readme():
     with io.open(os.path.join(HERE, "README.rst"), "rt", encoding="utf8") as f:
         readme = f.read()
     # Replace img src for publication on pypi
-    return readme.replace("./docs/img/", "https://github.com/overhangio/tutor/raw/master/docs/img/")
+    return readme.replace(
+        "./docs/img/", "https://github.com/overhangio/tutor/raw/master/docs/img/"
+    )
 
 
 def load_about():
@@ -21,15 +24,22 @@ def load_about():
     return about
 
 
-def load_requirements():
+def load_requirements() -> List[str]:
     with io.open(
         os.path.join(HERE, "requirements", "base.in"), "rt", encoding="utf-8"
     ) as f:
         return [line.strip() for line in f if is_requirement(line)]
 
 
+def load_dev_requirements() -> List[str]:
+    with io.open(
+        os.path.join(HERE, "requirements", "dev.in"), "rt", encoding="utf-8"
+    ) as f:
+        return [line.strip() for line in f if is_requirement(line)]
+
+
 def is_requirement(line):
-    return not (line.strip() == "" or line.startswith("#"))
+    return not (line.strip() == "" or line.startswith("#") or line.startswith("-"))
 
 
 ABOUT = load_about()
@@ -68,4 +78,6 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
+    tests_require=load_dev_requirements(),
+    test_suite="tests",
 )

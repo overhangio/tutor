@@ -28,7 +28,7 @@ pygments_style = None
 
 # -- Sphinx-Click configuration
 # https://sphinx-click.readthedocs.io/
-extensions.append('sphinx_click')
+extensions.append("sphinx_click")
 # This is to avoid the addition of the local username to the docs
 os.environ["HOME"] = "~"
 # Make sure that sphinx-click can find the tutor module
@@ -87,7 +87,7 @@ def youtube(
     _state,
     _stateMachine,
 ):
-    """ Restructured text extension for inserting youtube embedded videos """
+    """Restructured text extension for inserting youtube embedded videos"""
     if not content:
         return []
     video_id = content[0]

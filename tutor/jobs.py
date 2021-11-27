@@ -1,5 +1,6 @@
-from typing import Dict, Iterator, List, Optional, Tuple, Union
+import os
 
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 from . import env, fmt, plugins
 from .types import Config, get_typed
 
@@ -94,22 +95,21 @@ def create_user_command(
         opts += " --superuser"
     if staff:
         opts += " --staff"
-    command += """
-./manage.py lms manage_user {opts} {username} {email}
-"""
+    command += f"./manage.py lms manage_user {opts} {username} {email}"
     if password:
-        command += """
-./manage.py lms shell -c "from django.contrib.auth import get_user_model
-u = get_user_model().objects.get(username='{username}')
-u.set_password('{password}')
-u.save()"
-"""
+        command = os.linesep.join(
+            [
+                command,
+                './manage.py lms shell -c "from django.contrib.auth import get_user_model',
+                f"u = get_user_model().objects.get(username='{username}')",
+                f"u.set_password('{password}')",
+                "u.save()",
+            ]
+        )
     else:
-        command += """
-./manage.py lms changepassword {username}
-"""
+        command += f"./manage.py lms changepassword {username}"
 
-    return command.format(opts=opts, username=username, email=email, password=password)
+    return command
 
 
 def import_demo_course(runner: BaseJobRunner) -> None:
