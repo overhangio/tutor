@@ -1,10 +1,13 @@
 import os
 import tempfile
-import weakref
-from tutor.jobs import BaseJobRunner
 from tutor.types import Config
-from tutor.commands.context import BaseJobContext
+from tutor.jobs import BaseJobRunner
 from tutor import config as tutor_config
+from tutor.commands.context import Context
+from tutor.commands.context import BaseJobContext
+
+
+CONTEXT = Context(os.path.join(tempfile.gettempdir(), "tutor"))
 
 
 class TestJobRunner(BaseJobRunner):
@@ -20,26 +23,11 @@ class TestJobRunner(BaseJobRunner):
 
 
 class TestContext(BaseJobContext):
-    def __init__(self):
-        self._tempDir = tempfile.TemporaryDirectory()
-        self._finalizer = weakref.finalize(self, self._cleanup, self._tempDir)
-        super().__init__(self._tempDir.name)
-        _, self.config = tutor_config.load_all(self.root)
-        self.runner = self.job_runner(self.config)
+    def __init__(self) -> None:
+        super().__init__(CONTEXT.root)
 
-    @classmethod
-    def _cleanup(cls, tempDir: tempfile.TemporaryDirectory):
-        tempDir.cleanup()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc, value, tb):
-        self.cleanup()
-
-    def cleanup(self):
-        if self._finalizer.detach():
-            self._cleanup(self._tempDir)
+    def load_config(self) -> Config:
+        return tutor_config.load_no_check(CONTEXT.root)
 
     def job_runner(self, config: Config) -> TestJobRunner:
-        return TestJobRunner(self.root, config)
+        return TestJobRunner(CONTEXT.root, config)

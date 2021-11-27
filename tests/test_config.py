@@ -1,11 +1,13 @@
 import os
+import re
 import json
 import unittest
 import tempfile
+from io import StringIO
 from unittest.mock import Mock, patch
-
-from tutor import config as tutor_config
+from tests.test import TestContext
 from tutor import interactive
+from tutor import config as tutor_config
 from tutor.types import get_typed, Config
 
 
@@ -28,10 +30,15 @@ class ConfigTests(unittest.TestCase):
 
         self.assertEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
 
-    def test_update_should_create_config_file(self) -> None:
+    @unittest.mock.patch("sys.stdout", new_callable=StringIO)
+    def test_update_should_create_config_file(self, mock_stdout: StringIO) -> None:
         with tempfile.TemporaryDirectory() as root:
             tutor_config.update(root)
-            self.assertTrue(os.path.exists(os.path.join(root, "config.yml")))
+            config_path = re.search(
+                r"Configuration saved to (.*)", mock_stdout.getvalue()
+            )
+            assert config_path is not None
+            self.assertTrue(os.path.exists(config_path.group(1)))
 
     @patch.object(tutor_config.fmt, "echo")
     def test_update_twice_should_return_same_config(self, _: Mock) -> None:
@@ -79,30 +86,29 @@ class ConfigTests(unittest.TestCase):
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
         self.assertFalse(tutor_config.is_service_activated(config, "service2"))
 
-    def test_load_all_yml_config(self) -> None:
-        with tempfile.TemporaryDirectory() as root:
-            configYmlPath = os.path.join(root, "config.yml")
-            tutor_config.update(root)
+    def test_load_yml_config(self) -> None:
+        context = TestContext()
+        config = context.load_config()
+        current = tutor_config.load(context.root)
+        self.assertEqual(config, current)
 
-            default, current = tutor_config.load_all(root)
-            self.assertNotEqual(default, current)
-            self.assertTrue(os.path.exists(configYmlPath))
-
-    def test_load_all_json_config(self) -> None:
+    @unittest.mock.patch("sys.stdout", new_callable=StringIO)
+    def test_load_all_json_config(self, _: StringIO) -> None:
         with tempfile.TemporaryDirectory() as root:
             # arrange
-            configYmlPath = os.path.join(root, "config.yml")
-            configJsonPath = os.path.join(root, "config.json")
-            tutor_config.update(root)
-            config = tutor_config.load_config_file(configYmlPath)
+            configYmlPath = os.path.join(root, tutor_config._CONFIG_FILE)
+            configJsonPath = os.path.join(
+                root, tutor_config._CONFIG_FILE.replace("yml", "json")
+            )
+            context = TestContext()
+            config = context.load_config()
             with open(configJsonPath, "w", encoding="utf-8") as f:
                 json.dump(config, f, ensure_ascii=False, indent=4)
-            os.remove(configYmlPath)
             self.assertFalse(os.path.exists(configYmlPath))
             self.assertTrue(os.path.exists(configJsonPath))
 
-            default, current = tutor_config.load_all(root)
+            current, default = tutor_config.load_all(root)
             self.assertTrue(os.path.exists(configYmlPath))
             self.assertFalse(os.path.exists(configJsonPath))
             self.assertNotEqual(default, current)
-            self.assertEqual(config, default)
+            self.assertEqual(config, current)

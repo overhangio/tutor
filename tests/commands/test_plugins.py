@@ -2,7 +2,7 @@ import unittest
 
 from click.testing import CliRunner
 from tutor.commands.plugins import *
-from .test_context import CONTEXT
+from tests.test import CONTEXT
 
 
 class PluginsTests(unittest.TestCase):

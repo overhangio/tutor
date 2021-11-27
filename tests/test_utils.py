@@ -1,9 +1,10 @@
 import os
 import sys
-import tempfile
 import base64
+import tempfile
 import unittest
-
+import unittest.mock
+from io import StringIO
 from tutor import exceptions, utils
 
 
@@ -78,6 +79,8 @@ class UtilsTests(unittest.TestCase):
         else:
             self.assertNotEqual(0, result)
 
-    def test_execute(self) -> None:
+    @unittest.mock.patch("sys.stdout", new_callable=StringIO)
+    def test_execute(self, mock_stdout: StringIO) -> None:
         result = utils.execute("echo", "")
         self.assertEqual(0, result)
+        self.assertEqual("echo \n", mock_stdout.getvalue())

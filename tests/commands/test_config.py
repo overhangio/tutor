@@ -4,7 +4,8 @@ import tempfile
 
 from click.testing import CliRunner
 from tutor.commands.config import *
-from .test_context import CONTEXT
+from tests.test import CONTEXT
+from tutor import config as tutor_config
 
 
 class ConfigTests(unittest.TestCase):
@@ -81,7 +82,7 @@ class ConfigTests(unittest.TestCase):
                 [
                     "render",
                     "-x",
-                    os.path.join(CONTEXT.root, "config.yml"),
+                    os.path.join(CONTEXT.root, tutor_config._CONFIG_FILE),
                     CONTEXT.root,
                     dest,
                 ],

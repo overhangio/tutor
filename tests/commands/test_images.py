@@ -2,7 +2,7 @@ import unittest
 
 from click.testing import CliRunner
 from tutor.commands.images import *
-from .test_context import CONTEXT
+from tests.test import CONTEXT
 
 
 class ImagesTests(unittest.TestCase):

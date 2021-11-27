@@ -6,7 +6,9 @@
     "python.linting.pylintArgs": ["--errors-only", "--enable=unused-import"],
     "python.linting.mypyEnabled": true,
     "python.linting.mypyArgs": [
-        "--ignore-missing-imports"
+        "--exclude=templates",
+        "--ignore-missing-imports",
+        "--strict"
     ],
     "python.testing.pytestEnabled": false,
     "python.testing.unittestArgs": [

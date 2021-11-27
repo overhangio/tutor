@@ -1,16 +1,17 @@
 import os
-import tempfile
 import unittest
 from tests.test import TestContext
-from tutor.commands.context import Context
+from tutor import config as tutor_config
 
-CONTEXT = Context(os.path.join(tempfile.gettempdir(), "tutor"))
 
 class TestContextTests(unittest.TestCase):
     def test_create_testcontext(self) -> None:
-        with TestContext() as context:
-            self.assertEqual(context.root, context._tempDir.name)
-            self.assertTrue(context.config)
-            self.assertTrue(context.runner)
-        self.assertFalse(os.path.exists(context._tempDir.name))
-
+        context = TestContext()
+        config = context.load_config()
+        runner = context.job_runner(config)
+        self.assertTrue(os.path.exists(context.root))
+        self.assertTrue(
+            os.path.exists(os.path.join(context.root, tutor_config._CONFIG_FILE))
+        )
+        self.assertTrue(config)
+        self.assertTrue(runner)
