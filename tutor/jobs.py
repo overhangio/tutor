@@ -95,19 +95,19 @@ def create_user_command(
         opts += " --superuser"
     if staff:
         opts += " --staff"
-    command += f"./manage.py lms manage_user {opts} {username} {email}"
+    command += f"\n./manage.py lms manage_user {opts} {username} {email}"
     if password:
         command = os.linesep.join(
             [
                 command,
-                './manage.py lms shell -c "from django.contrib.auth import get_user_model',
+                '\n./manage.py lms shell -c "from django.contrib.auth import get_user_model',
                 f"u = get_user_model().objects.get(username='{username}')",
                 f"u.set_password('{password}')",
-                "u.save()",
+                'u.save()"',
             ]
         )
     else:
-        command += f"./manage.py lms changepassword {username}"
+        command += f"\n./manage.py lms changepassword {username}"
 
     return command
 

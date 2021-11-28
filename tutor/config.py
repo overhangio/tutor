@@ -35,7 +35,7 @@ def load_no_check(root: str) -> Config:
 def load_all(root: str) -> Tuple[Config, Config]:
     """
     Return:
-        current (dict): params currently saved in CONFIG_FILE
+        current (dict): params currently saved in config.yml
         defaults (dict): default values of params which might be missing from the
         current config
     """
