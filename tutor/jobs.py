@@ -148,4 +148,6 @@ def get_all_openedx_domains(config: Config) -> List[str]:
         get_typed(config, "LMS_HOST", str) + ":8000",
         get_typed(config, "CMS_HOST", str),
         get_typed(config, "CMS_HOST", str) + ":8001",
+        get_typed(config, "PREVIEW_LMS_HOST", str),
+        get_typed(config, "PREVIEW_LMS_HOST", str) + ":8000",
     ]
