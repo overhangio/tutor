@@ -198,9 +198,16 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
     )
 
 
-@click.command(help="Run all configured Open edX services")
+@click.command(
+    short_help="Run all configured Open edX resources",
+    help=(
+        "Run all configured Open edX resources. You may limit this command to "
+        "some resources by passing name arguments."
+    ),
+)
+@click.argument("names", metavar="name", nargs=-1)
 @click.pass_obj
-def start(context: Context) -> None:
+def start(context: Context, names: List[str]) -> None:
     config = tutor_config.load(context.root)
     # Create namespace, if necessary
     # Note that this step should not be run for some users, in particular those
@@ -218,34 +225,68 @@ def start(context: Context) -> None:
             "--selector",
             "app.kubernetes.io/component=namespace",
         )
-    # Create volumes
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--wait",
-        "--selector",
-        "app.kubernetes.io/component=volume",
-    )
-    # Create everything else except jobs
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--selector",
-        "app.kubernetes.io/component notin (job,volume,namespace)",
-    )
+
+    names = names or ["all"]
+    for name in names:
+        if name == "all":
+            # Create volumes
+            utils.kubectl(
+                "apply",
+                "--kustomize",
+                tutor_env.pathjoin(context.root),
+                "--wait",
+                "--selector",
+                "app.kubernetes.io/component=volume",
+            )
+            # Create everything else except jobs
+            utils.kubectl(
+                "apply",
+                "--kustomize",
+                tutor_env.pathjoin(context.root),
+                "--selector",
+                "app.kubernetes.io/component notin (job,volume,namespace)",
+            )
+        else:
+            utils.kubectl(
+                "apply",
+                "--kustomize",
+                tutor_env.pathjoin(context.root),
+                "--selector",
+                "app.kubernetes.io/name={}".format(name),
+            )
 
 
-@click.command(help="Stop a running platform")
+@click.command(
+    short_help="Stop a running platform",
+    help=(
+        "Stop a running platform by deleting all resources, except for volumes. "
+        "You may limit this command to some resources by passing name arguments."
+    ),
+)
+@click.argument("names", metavar="name", nargs=-1)
 @click.pass_obj
-def stop(context: Context) -> None:
+def stop(context: Context, names: List[str]) -> None:
     config = tutor_config.load(context.root)
-    utils.kubectl(
-        "delete",
-        *resource_selector(config),
-        "deployments,services,configmaps,jobs",
-    )
+    names = names or ["all"]
+    resource_types = "deployments,services,configmaps,jobs"
+    not_lb_selector = "app.kubernetes.io/component!=loadbalancer"
+    for name in names:
+        if name == "all":
+            utils.kubectl(
+                "delete",
+                *resource_selector(config, not_lb_selector),
+                resource_types,
+            )
+        else:
+            utils.kubectl(
+                "delete",
+                *resource_selector(
+                    config,
+                    not_lb_selector,
+                    "app.kubernetes.io/name={}".format(name),
+                ),
+                resource_types,
+            )
 
 
 @click.command(help="Reboot an existing platform")
@@ -290,9 +331,9 @@ def delete(context: Context, yes: bool) -> None:
 def init(context: Context, limit: Optional[str]) -> None:
     config = tutor_config.load(context.root)
     runner = K8sJobRunner(context.root, config)
-    for service in ["mysql", "elasticsearch", "mongodb"]:
-        if tutor_config.is_service_activated(config, service):
-            wait_for_pod_ready(config, service)
+    for name in ["caddy", "elasticsearch", "mysql", "mongodb"]:
+        if tutor_config.is_service_activated(config, name):
+            wait_for_pod_ready(config, name)
     jobs.initialise(runner, limit_to=limit)
 
 
