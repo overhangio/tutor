@@ -195,7 +195,8 @@ def execute(*command: str) -> int:
     click.echo(fmt.command(" ".join(command)))
     with subprocess.Popen(command) as p:
         try:
-            result = p.wait(timeout=None)
+            p.communicate()
+            result = p.returncode
         except KeyboardInterrupt:
             p.kill()
             p.wait()

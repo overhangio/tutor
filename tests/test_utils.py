@@ -3,7 +3,7 @@ import sys
 import base64
 import tempfile
 import unittest
-import unittest.mock
+from unittest.mock import MagicMock, patch
 from io import StringIO
 from tutor import exceptions, utils
 
@@ -72,6 +72,11 @@ class UtilsTests(unittest.TestCase):
         result = utils.is_root()
         self.assertFalse(result)
 
+    @patch("sys.platform", "win32")
+    def test_is_root_win32(self) -> None:
+        result = utils.is_root()
+        self.assertFalse(result)
+
     def test_get_user_id(self) -> None:
         result = utils.get_user_id()
         if sys.platform == "win32":
@@ -79,8 +84,69 @@ class UtilsTests(unittest.TestCase):
         else:
             self.assertNotEqual(0, result)
 
-    @unittest.mock.patch("sys.stdout", new_callable=StringIO)
-    def test_execute(self, mock_stdout: StringIO) -> None:
+    @patch("sys.platform", "win32")
+    def test_get_user_id_win32(self) -> None:
+        result = utils.get_user_id()
+        self.assertEqual(0, result)
+
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("subprocess.Popen", autospec=True)
+    def test_execute_exit_without_error(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+        process = mock_popen.return_value.__enter__.return_value
+        process.returncode = 0
+        process.communicate.return_value = ("output", "error")
+
         result = utils.execute("echo", "")
         self.assertEqual(0, result)
         self.assertEqual("echo \n", mock_stdout.getvalue())
+        process.communicate.assert_called_once()
+        process.wait.assert_not_called()
+        process.kill.assert_not_called()
+
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("subprocess.Popen", autospec=True)
+    def test_execute_exit_with_error(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+        process = mock_popen.return_value.__enter__.return_value
+        process.returncode = 1
+        process.communicate.return_value = ("output", "error")
+
+        self.assertRaises(exceptions.TutorError, utils.execute, "echo", "")
+        self.assertEqual("echo \n", mock_stdout.getvalue())
+        process.communicate.assert_called_once()
+        process.wait.assert_not_called()
+        process.kill.assert_not_called()
+
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("subprocess.Popen", autospec=True)
+    def test_execute_throw_exception(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+        process = mock_popen.return_value.__enter__.return_value
+        process.returncode = 1
+        process.communicate.side_effect = Exception("Exception occurred.")
+
+        self.assertRaises(exceptions.TutorError, utils.execute, "echo", "")
+        self.assertEqual("echo \n", mock_stdout.getvalue())
+        process.communicate.assert_called_once()
+        process.wait.assert_called_once()
+        process.kill.assert_called_once()
+
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("subprocess.Popen", autospec=True)
+    def test_execute_keyboard_interrupt(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+        process = mock_popen.return_value.__enter__.return_value
+        process.returncode = 1
+        process.communicate.side_effect = KeyboardInterrupt()
+
+        try:
+            utils.execute("echo", "")
+        except KeyboardInterrupt:
+            process.communicate.assert_called_once()
+            process.wait.assert_called_once()
+            process.kill.assert_called_once()
+
+    @patch("sys.platform", "win32")
+    def test_check_macos_memory_win32_should_skip(self) -> None:
+        utils.check_macos_memory()
+
+    @patch("sys.platform", "darwin")
+    def test_check_macos_memory_darwin_filenotfound(self) -> None:
+        self.assertRaises(exceptions.TutorError, utils.check_macos_memory)
