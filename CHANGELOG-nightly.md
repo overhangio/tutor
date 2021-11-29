@@ -2,6 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+- [Bugfix] Fix docker-compose project name in development on nightly branch.
 - 💥[Bugfix] No longer track the Tutor version number in resource labels (and label selectors, which breaks the update of Deployment resources), but instead do so in resource annotations.
 - [Bugfix] Make it possible for plugins to implement the "caddyfile" patch without relying on the "port" local variable.
 - 💥[Improvement] Move the Open edX forum to a [dedicated plugin](https://github.com/overhangio/tutor-forum/) (#450).
