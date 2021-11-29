@@ -2,6 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+- [Security] On Kubernetes, convert all NodePort services to ClusterIP to guarantee network isolation from outside the cluster.
 - 💥[Improvement] Drop Python 3.5 compatibility.
 - [Bugfix] Fix docker-compose project name in development on nightly branch.
 - 💥[Bugfix] No longer track the Tutor version number in resource labels (and label selectors, which breaks the update of Deployment resources), but instead do so in resource annotations.
