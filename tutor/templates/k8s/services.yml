@@ -4,13 +4,33 @@ apiVersion: v1
 kind: Service
 metadata:
   name: caddy
+  labels:
+    app.kubernetes.io/name: caddy
+    app.kubernetes.io/component: loadbalancer
 spec:
   type: LoadBalancer
   ports:
     - port: 80
       name: http
+    {%- if ENABLE_HTTPS %}
     - port: 443
       name: https
+    {%- endif %}
+  selector:
+    app.kubernetes.io/name: caddy
+{% else %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caddy
+  labels:
+    app.kubernetes.io/name: caddy
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ CADDY_HTTP_PORT }}
+      name: http
   selector:
     app.kubernetes.io/name: caddy
 {% endif %}
@@ -20,6 +40,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cms
+  labels:
+    app.kubernetes.io/name: cms
 spec:
   type: ClusterIP
   ports:
@@ -34,6 +56,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: lms
+  labels:
+    app.kubernetes.io/name: lms
 spec:
   type: ClusterIP
   ports:
@@ -48,6 +72,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: elasticsearch
+  labels:
+    app.kubernetes.io/name: elasticsearch
 spec:
   type: ClusterIP
   ports:
@@ -62,6 +88,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb
+  labels:
+    app.kubernetes.io/name: mongodb
 spec:
   type: ClusterIP
   ports:
@@ -76,6 +104,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql
+  labels:
+    app.kubernetes.io/name: mysql
 spec:
   type: ClusterIP
   ports:
@@ -90,6 +120,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis
+  labels:
+    app.kubernetes.io/name: redis
 spec:
   type: ClusterIP
   ports:
@@ -104,6 +136,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: smtp
+  labels:
+    app.kubernetes.io/name: smtp
 spec:
   type: ClusterIP
   ports:

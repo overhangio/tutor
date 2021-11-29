@@ -27,10 +27,22 @@ The Kubernetes cluster should have at least 4Gb of RAM on each node. When runnin
 .. image:: img/virtualbox-minikube-system.png
     :alt: Virtualbox memory settings for Minikube
 
-Ingress controller and SSL/TLS certificates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Load Balancer and SSL/TLS certificates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As of Tutor v11, it is no longer required to setup an Ingress controller to access your platform. Instead Caddy exposes a LoadBalancer service and SSL/TLS certificates are transparently generated at runtime.
+By default, Tutor deploys a `LoadBalancer <https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer>`__ service that exposes the Caddy deployment to the outside world. As in the local installation, this service is responsible for transparently generating SSL/TLS certificates at runtime. You will need to point your DNS records to this LoadBalancer object before the platform can work correctly. Thus, you should first start the Caddy load balancer, with::
+
+    tutor k8s start caddy
+
+Get the external IP of this services::
+
+    kubectl --namespace openedx get services/caddy
+
+Use this external IP to configure your DNS records. Once the DNS records are configured, you should verify that the Caddy container has properly generated the SSL/TLS certificates by checking the container logs::
+
+    tutor k8s logs -f caddy
+
+If, for some reason, you would like to deploy your own load balancer, you should set ``ENABLE_WEB_PROXY=false`` just like in the :ref:`local installation <web_proxy>`. Then, point your load balancer at the "caddy" service, which will be a `ClusterIP <https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types>`__.
 
 S3-like object storage with `MinIO <https://www.minio.io/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
