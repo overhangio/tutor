@@ -74,6 +74,8 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 
 (the trailing ``/`` is important)
 
+.. _openedx_configuration:
+
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
