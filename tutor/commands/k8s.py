@@ -296,17 +296,6 @@ def reboot(context: click.Context) -> None:
     context.invoke(start)
 
 
-def resource_selector(config: Config, *selectors: str) -> List[str]:
-    """
-    Convenient utility for filtering only the resources that belong to this project.
-    """
-    selector = ",".join(
-        ["app.kubernetes.io/instance=openedx-" + get_typed(config, "ID", str)]
-        + list(selectors)
-    )
-    return ["--namespace", k8s_namespace(config), "--selector=" + selector]
-
-
 @click.command(help="Completely delete an existing platform")
 @click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
 @click.pass_obj
@@ -335,6 +324,24 @@ def init(context: Context, limit: Optional[str]) -> None:
         if tutor_config.is_service_activated(config, name):
             wait_for_pod_ready(config, name)
     jobs.initialise(runner, limit_to=limit)
+
+
+@click.command(help="Scale the number of replicas of a given deployment")
+@click.argument("deployment")
+@click.argument("replicas", type=int)
+@click.pass_obj
+def scale(context: Context, deployment: str, replicas: int) -> None:
+    config = tutor_config.load(context.root)
+    utils.kubectl(
+        "scale",
+        # Note that we don't use the full resource selector because selectors
+        # are not compatible with the deployment/<name> argument.
+        *resource_namespace_selector(
+            config,
+        ),
+        "--replicas={}".format(replicas),
+        "deployment/{}".format(deployment),
+    )
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -562,6 +569,24 @@ def wait_for_pod_ready(config: Config, service: str) -> None:
     )
 
 
+def resource_selector(config: Config, *selectors: str) -> List[str]:
+    """
+    Convenient utility to filter the resources that belong to this project.
+    """
+    selector = ",".join(
+        ["app.kubernetes.io/instance=openedx-" + get_typed(config, "ID", str)]
+        + list(selectors)
+    )
+    return resource_namespace_selector(config) + ["--selector=" + selector]
+
+
+def resource_namespace_selector(config: Config) -> List[str]:
+    """
+    Convenient utility to filter the resources that belong to this project namespace.
+    """
+    return ["--namespace", k8s_namespace(config)]
+
+
 def k8s_namespace(config: Config) -> str:
     return get_typed(config, "K8S_NAMESPACE", str)
 
@@ -572,6 +597,7 @@ k8s.add_command(stop)
 k8s.add_command(reboot)
 k8s.add_command(delete)
 k8s.add_command(init)
+k8s.add_command(scale)
 k8s.add_command(createuser)
 k8s.add_command(importdemocourse)
 k8s.add_command(settheme)
