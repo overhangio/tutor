@@ -91,7 +91,9 @@ class UtilsTests(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("subprocess.Popen", autospec=True)
-    def test_execute_exit_without_error(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+    def test_execute_exit_without_error(
+        self, mock_popen: MagicMock, mock_stdout: StringIO
+    ) -> None:
         process = mock_popen.return_value.__enter__.return_value
         process.returncode = 0
         process.communicate.return_value = ("output", "error")
@@ -105,7 +107,9 @@ class UtilsTests(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("subprocess.Popen", autospec=True)
-    def test_execute_exit_with_error(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+    def test_execute_exit_with_error(
+        self, mock_popen: MagicMock, mock_stdout: StringIO
+    ) -> None:
         process = mock_popen.return_value.__enter__.return_value
         process.returncode = 1
         process.communicate.return_value = ("output", "error")
@@ -118,7 +122,9 @@ class UtilsTests(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("subprocess.Popen", autospec=True)
-    def test_execute_throw_exception(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+    def test_execute_throw_exception(
+        self, mock_popen: MagicMock, mock_stdout: StringIO
+    ) -> None:
         process = mock_popen.return_value.__enter__.return_value
         process.returncode = 1
         process.communicate.side_effect = Exception("Exception occurred.")
@@ -131,7 +137,9 @@ class UtilsTests(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("subprocess.Popen", autospec=True)
-    def test_execute_keyboard_interrupt(self, mock_popen : MagicMock, mock_stdout: StringIO) -> None:
+    def test_execute_keyboard_interrupt(
+        self, mock_popen: MagicMock, mock_stdout: StringIO
+    ) -> None:
         process = mock_popen.return_value.__enter__.return_value
         process.returncode = 1
         process.communicate.side_effect = KeyboardInterrupt()
