@@ -18,6 +18,7 @@ System administration
 .. toctree::
    :maxdepth: 2
 
+   tutorials/scale
    tutorials/portainer
    tutorials/podman
    tutorials/proxy
