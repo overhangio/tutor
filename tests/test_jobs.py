@@ -81,4 +81,4 @@ class JobsTests(unittest.TestCase):
         config = context.load_config()
         domains = jobs.get_all_openedx_domains(config)
         self.assertTrue(domains)
-        self.assertEqual(4, len(domains))
+        self.assertEqual(6, len(domains))
