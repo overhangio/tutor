@@ -74,7 +74,7 @@ FROM python as python-requirements
 ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 
-RUN apt update && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev
+RUN apt update && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
 
 # Note that this means that we need to reinstall all requirements whenever there is a
 # change in edx-platform, which sucks. But there is no obvious alternative, as we need
