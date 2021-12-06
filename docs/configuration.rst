@@ -93,6 +93,12 @@ By default there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.i
 
 These two configuration parameters define which redis database to use for Open edX cache and celery task.
 
+.. _openedx_extra_pip_requirements:
+
+- ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``openedx-scorm-xblock<13.0.0,>=12.0.0``)
+
+This defines extra pip packages that are going to be installed for Open edX.
+
 Vendor services
 ~~~~~~~~~~~~~~~
 
@@ -237,13 +243,31 @@ See :ref:`the corresponding tutorial <theming>`.
 Installing extra xblocks and requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``env/build/openedx/requirements/private.txt`` file. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_::
+Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` parameter in the :ref:`config file <configuration>` or to the ``env/build/openedx/requirements/private.txt`` file. The difference between them, is that ``private.txt`` file, even though it could be used for both, :ref:`should be used for installing extra xblocks or requirements from private repositories <extra_private_xblocks>`. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_:
+
+- add the following to the ``config.yml``::
+
+    OPENEDX_EXTRA_PIP_REQUIREMENTS:
+    - "git+https://github.com/open-craft/xblock-poll.git"
+
+.. warning::
+   Specifying extra requirements through ``config.yml`` overwrites :ref:`the default extra requirements<openedx_extra_pip_requirements>`. You might need to add them to the list, if your configuration depends on them.
+
+- or add the dependency to ``private.txt``::
 
     echo "git+https://github.com/open-craft/xblock-poll.git" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
+
 
 Then, the ``openedx`` docker image must be rebuilt::
 
     tutor images build openedx
+
+.. _extra_private_xblocks:
+
+Installing extra requirements from private repositories
+*******************************************************
+
+When installing extra xblock or requirements from private repositories, ``private.txt`` file should be used, because it allows to install dependencies without adding git credentials to the Docker image. By adding your git credentials to the Docker image, you're risking leaking your git credentials, if you were to publish (intentionally or unintentionally) the Docker image in a public place.
 
 To install xblocks from a private repository that requires authentication, you must first clone the repository inside the ``openedx/requirements`` folder on the host::
 
