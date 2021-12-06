@@ -18,11 +18,11 @@ class ImagesTests(unittest.TestCase):
         self.assertEqual(0, result.exit_code)
         self.assertEqual(None, result.exception)
 
-    def test_images_pull_plugin(self) -> None:
+    def test_images_pull_plugin_invalid_plugin_should_throw_error(self) -> None:
         runner = CliRunner()
         result = runner.invoke(images_command, ["pull", "plugin"], obj=CONTEXT)
-        self.assertEqual(0, result.exit_code)
-        self.assertEqual(None, result.exception)
+        self.assertEqual(1, result.exit_code)
+        self.assertEqual(ImageNotFoundError, type(result.exception))
 
     def test_images_printtag_image(self) -> None:
         runner = CliRunner()
@@ -33,14 +33,14 @@ class ImagesTests(unittest.TestCase):
     def test_images_printtag_plugin(self) -> None:
         runner = CliRunner()
         result = runner.invoke(images_command, ["printtag", "plugin"], obj=CONTEXT)
-        self.assertEqual(0, result.exit_code)
-        self.assertEqual(None, result.exception)
+        self.assertEqual(1, result.exit_code)
+        self.assertEqual(ImageNotFoundError, type(result.exception))
 
     def test_images_build_plugin(self) -> None:
         runner = CliRunner()
         result = runner.invoke(images_command, ["build", "plugin"], obj=CONTEXT)
-        self.assertEqual(0, result.exit_code)
-        self.assertEqual(None, result.exception)
+        self.assertEqual(1, result.exit_code)
+        self.assertEqual(ImageNotFoundError, type(result.exception))
 
     def test_images_build_plugin_with_args(self) -> None:
         runner = CliRunner()
@@ -61,8 +61,8 @@ class ImagesTests(unittest.TestCase):
             ],
             obj=CONTEXT,
         )
-        self.assertEqual(0, result.exit_code)
-        self.assertEqual(None, result.exception)
+        self.assertEqual(1, result.exit_code)
+        self.assertEqual(ImageNotFoundError, type(result.exception))
 
     def test_images_push(self) -> None:
         runner = CliRunner()
