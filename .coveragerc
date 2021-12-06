@@ -4,7 +4,6 @@ branch = True
 source =
     ./tutor 
     ./bin 
-    ./tutor-openedx
 omit =
     */templates/*
 

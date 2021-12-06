@@ -1,12 +1,12 @@
 import io
 import os
 from setuptools import find_packages, setup
-from typing import List
+from typing import Dict, List
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
-def load_readme():
+def load_readme() -> str:
     with io.open(os.path.join(HERE, "README.rst"), "rt", encoding="utf8") as f:
         readme = f.read()
     # Replace img src for publication on pypi
@@ -15,8 +15,8 @@ def load_readme():
     )
 
 
-def load_about():
-    about = {}
+def load_about() -> Dict[str, str]:
+    about: Dict[str, str] = {}
     with io.open(
         os.path.join(HERE, "tutor", "__about__.py"), "rt", encoding="utf-8"
     ) as f:
@@ -38,7 +38,7 @@ def load_dev_requirements() -> List[str]:
         return [line.strip() for line in f if is_requirement(line)]
 
 
-def is_requirement(line):
+def is_requirement(line: str) -> bool:
     return not (line.strip() == "" or line.startswith("#") or line.startswith("-"))
 
 

@@ -4,7 +4,7 @@ from typing import Tuple
 from . import env, exceptions, fmt, plugins, serialize, utils
 from .types import Config, cast_config
 
-_CONFIG_FILE = "config.yml"
+CONFIG_FILENAME = "config.yml"
 
 
 def update(root: str) -> Config:
@@ -55,7 +55,7 @@ def merge(config: Config, defaults: Config, force: bool = False) -> None:
 
 
 def load_defaults() -> Config:
-    config = serialize.load(env.read_template_file(_CONFIG_FILE))
+    config = serialize.load(env.read_template_file(CONFIG_FILENAME))
     return cast_config(config)
 
 
@@ -187,13 +187,17 @@ def convert_json2yml(root: str) -> None:
         return
     if os.path.exists(config_path(root)):
         raise exceptions.TutorError(
-            f"Both config.json and {_CONFIG_FILE} exist in {root}: only one of these files must exist to continue"
+            "Both config.json and {} exist in {}: only one of these files must exist to continue".format(
+                CONFIG_FILENAME, root
+            )
         )
     config = load_config_file(json_path)
     save_config_file(root, config)
     os.remove(json_path)
     fmt.echo_info(
-        f"File config.json detected in {root} and converted to {_CONFIG_FILE}"
+        "File config.json detected in {} and converted to {}".format(
+            root, CONFIG_FILENAME
+        )
     )
 
 
@@ -219,4 +223,4 @@ def check_existing_config(root: str) -> None:
 
 
 def config_path(root: str) -> str:
-    return os.path.join(root, _CONFIG_FILE)
+    return os.path.join(root, CONFIG_FILENAME)

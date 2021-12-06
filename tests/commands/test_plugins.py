@@ -1,8 +1,9 @@
 import unittest
-
+from unittest.mock import Mock, patch
 from click.testing import CliRunner
-from tutor.commands.plugins import *
-from tests.test import CONTEXT
+from tutor.commands.plugins import plugins_command
+from tutor import plugins
+from tests.helpers import TestContext
 
 
 class PluginsTests(unittest.TestCase):
@@ -10,36 +11,47 @@ class PluginsTests(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(plugins_command, ["--help"])
         self.assertEqual(0, result.exit_code)
-        self.assertEqual(None, result.exception)
+        self.assertIsNone(result.exception)
 
     def test_plugins_printroot(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(plugins_command, ["printroot"], obj=CONTEXT)
-        self.assertEqual(0, result.exit_code)
-        self.assertEqual(None, result.exception)
-        self.assertTrue(result.output)
+        with TestContext() as context:
+            runner = CliRunner()
+            result = runner.invoke(plugins_command, ["printroot"], obj=context)
+            self.assertEqual(0, result.exit_code)
+            self.assertIsNone(result.exception)
+            self.assertTrue(result.output)
 
-    def test_plugins_list(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(plugins_command, ["list"], obj=CONTEXT)
-        self.assertEqual(0, result.exit_code)
-        self.assertEqual(None, result.exception)
-        self.assertFalse(result.output)
+    @patch.object(plugins.BasePlugin, "iter_installed", return_value=[])
+    def test_plugins_list(self, _iter_installed: Mock) -> None:
+        with TestContext() as context:
+            runner = CliRunner()
+            result = runner.invoke(plugins_command, ["list"], obj=context)
+            self.assertEqual(0, result.exit_code)
+            self.assertIsNone(result.exception)
+            self.assertFalse(result.output)
+            _iter_installed.assert_called()
 
     def test_plugins_install_not_found_plugin(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(plugins_command, ["install", "notFound"], obj=CONTEXT)
-        self.assertEqual(1, result.exit_code)
-        self.assertTrue(result.exception)
+        with TestContext() as context:
+            runner = CliRunner()
+            result = runner.invoke(
+                plugins_command, ["install", "notFound"], obj=context
+            )
+            self.assertEqual(1, result.exit_code)
+            self.assertTrue(result.exception)
 
     def test_plugins_enable_not_installed_plugin(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(plugins_command, ["enable", "notFound"], obj=CONTEXT)
-        self.assertEqual(1, result.exit_code)
-        self.assertTrue(result.exception)
+        with TestContext() as context:
+            runner = CliRunner()
+            result = runner.invoke(plugins_command, ["enable", "notFound"], obj=context)
+            self.assertEqual(1, result.exit_code)
+            self.assertTrue(result.exception)
 
     def test_plugins_disable_not_installed_plugin(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(plugins_command, ["disable", "notFound"], obj=CONTEXT)
-        self.assertEqual(0, result.exit_code)
-        self.assertFalse(result.exception)
+        with TestContext() as context:
+            runner = CliRunner()
+            result = runner.invoke(
+                plugins_command, ["disable", "notFound"], obj=context
+            )
+            self.assertEqual(0, result.exit_code)
+            self.assertFalse(result.exception)

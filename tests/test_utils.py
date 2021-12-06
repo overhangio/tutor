@@ -144,12 +144,11 @@ class UtilsTests(unittest.TestCase):
         process.returncode = 1
         process.communicate.side_effect = KeyboardInterrupt()
 
-        try:
+        with self.assertRaises(KeyboardInterrupt):
             utils.execute("echo", "")
-        except KeyboardInterrupt:
-            process.communicate.assert_called_once()
-            process.wait.assert_called_once()
-            process.kill.assert_called_once()
+        process.communicate.assert_called_once()
+        process.wait.assert_called_once()
+        process.kill.assert_called_once()
 
     @patch("sys.platform", "win32")
     def test_check_macos_memory_win32_should_skip(self) -> None:
