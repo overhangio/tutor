@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import Mock, patch
-
 from tutor import config as tutor_config
 from tutor import exceptions
 from tutor import fmt
@@ -16,6 +15,7 @@ class PluginsTests(unittest.TestCase):
     def test_iter_installed(self, _dict_plugin_iter_installed: Mock) -> None:
         with patch.object(plugins.pkg_resources, "iter_entry_points", return_value=[]):  # type: ignore
             self.assertEqual([], list(plugins.iter_installed()))
+            _dict_plugin_iter_installed.assert_called_once()
 
     def test_is_installed(self) -> None:
         self.assertFalse(plugins.is_installed("dummy"))
@@ -35,6 +35,7 @@ class PluginsTests(unittest.TestCase):
                 [plugin1, plugin2],
                 list(plugins.iter_installed()),
             )
+        _dict_plugin_iter_installed.assert_called_once()
 
     def test_enable(self) -> None:
         config: Config = {plugins.CONFIG_KEY: []}

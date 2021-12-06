@@ -1,6 +1,7 @@
 import io
 import os
 import sys
+from typing import Any, Dict, List
 
 import docutils
 import docutils.parsers.rst
@@ -63,7 +64,7 @@ html_show_copyright = False
 
 # Custom variables
 here = os.path.abspath(os.path.dirname(__file__))
-about = {}
+about: Dict[str, str] = {}
 with io.open(
     os.path.join(here, "..", "tutor", "__about__.py"), "rt", encoding="utf-8"
 ) as f:
@@ -77,16 +78,16 @@ rst_prolog = """
 
 # Custom directives
 def youtube(
-    _name,
-    _args,
-    _options,
-    content,
-    _lineno,
-    _contentOffset,
-    _blockText,
-    _state,
-    _stateMachine,
-):
+    _name: Any,
+    _args: Any,
+    _options: Any,
+    content: List[str],
+    _lineno: Any,
+    _contentOffset: Any,
+    _blockText: Any,
+    _state: Any,
+    _stateMachine: Any,
+) -> Any:
     """Restructured text extension for inserting youtube embedded videos"""
     if not content:
         return []

@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 .PHONY: docs
-SRC_DIRS = ./tutor ./tests ./bin ./tutor-openedx
+SRC_DIRS = ./tutor ./tests ./bin ./docs
 BLACK_OPTS = --exclude templates ${SRC_DIRS}
 
 ###### Development
@@ -49,11 +49,6 @@ test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to 
 	twine check dist/tutor-$(shell make version).tar.gz
 	twine check dist/tutor-openedx-$(shell make version).tar.gz
 
-test-coverage:
-	coverage run -m unittest discover
-	coverage report
-	coverage html
-
 format: ## Format code automatically
 	black $(BLACK_OPTS)
 
@@ -63,6 +58,23 @@ bootstrap-dev: ## Install dev requirements
 
 bootstrap-dev-plugins: bootstrap-dev ## Install dev requirement and all supported plugins
 	pip install -r requirements/plugins.txt
+
+###### Code coverage
+
+coverage: ## Run unit-tests before analyzing code coverage and generate report
+	$(MAKE) --keep-going coverage-tests coverage-report
+
+coverage-tests: ## Run unit-tests and analyze code coverage
+	coverage run -m unittest discover
+
+coverage-report: ## Generate CLI report for the code coverage
+	coverage report
+
+coverage-html: coverage-report ## Generate HTML report for the code coverage
+	coverage html
+
+coverage-browse-report: coverage-html ## Open the HTML report in the browser
+	sensible-browser htmlcov/index.html
 
 ###### Deployment
 
