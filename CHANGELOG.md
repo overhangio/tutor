@@ -2,7 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v12.2.0 (2021-12-08)
 
 - [Bugfix] Fix incorrect "from" address in course bulk emails (see [pull request](https://github.com/edx/edx-platform/pull/29001)).
 - 💥[Improvement] Fail on incorrect image name argument in `images build/pull/push/printtag` commands.
