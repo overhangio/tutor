@@ -42,7 +42,7 @@ def list_command(context: Context) -> None:
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
 @click.pass_obj
 def enable(context: Context, plugin_names: List[str]) -> None:
-    config = tutor_config.load_full(context.root)
+    config = tutor_config.load_minimal(context.root)
     for plugin in plugin_names:
         plugins.enable(config, plugin)
         fmt.echo_info("Plugin {} enabled".format(plugin))
@@ -59,7 +59,7 @@ def enable(context: Context, plugin_names: List[str]) -> None:
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
 @click.pass_obj
 def disable(context: Context, plugin_names: List[str]) -> None:
-    config = tutor_config.load_full(context.root)
+    config = tutor_config.load_minimal(context.root)
     disable_all = "all" in plugin_names
     for plugin in plugins.iter_enabled(config):
         if disable_all or plugin.name in plugin_names:
