@@ -2,8 +2,9 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
-## Unreleased
+## v12.2.0 (2021-12-08)
 
+- [Bugfix] Fix incorrect "from" address in course bulk emails (see [pull request](https://github.com/edx/edx-platform/pull/29001)).
 - 💥[Improvement] Fail on incorrect image name argument in `images build/pull/push/printtag` commands.
 - [Bugfix] Remove trailing slashes in docker-compose files for [compatibility with docker-compose v2 in WSL](https://github.com/docker/compose/issues/8558).
 - [Improvement] `settheme` now works with preview domain.
