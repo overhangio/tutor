@@ -19,7 +19,6 @@ def load(root: str) -> Config:
             "quickstart` prior to running other commands."
         )
     env.check_is_up_to_date(root)
-    convert_json2yml(root)
     return load_full(root)
 
 
@@ -39,6 +38,7 @@ def load_full(root: str) -> Config:
     """
     Load a full configuration, with user, base and defaults.
     """
+    convert_json2yml(root)
     config = get_user(root)
     update_with_base(config)
     update_with_defaults(config)
