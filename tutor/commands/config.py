@@ -59,7 +59,8 @@ def save(
     if not env_only:
         tutor_config.save_config_file(context.root, config)
 
-    tutor_config.render_full(config)
+    # Reload configuration, without version checking
+    config = tutor_config.load_full(context.root)
     env.save(context.root, config)
 
 
