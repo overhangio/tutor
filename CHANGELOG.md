@@ -2,6 +2,10 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+## Unreleased
+
+- [Bugfix] Fix building of the `openedx` image on ARM64 due to missing `libgeos-dev`
+
 ## v12.2.0 (2021-12-08)
 
 - [Bugfix] Fix incorrect "from" address in course bulk emails (see [pull request](https://github.com/edx/edx-platform/pull/29001)).
