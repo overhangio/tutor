@@ -2,6 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+- [Bugfix] Start MongoDB when running migrations, because a new data migration fails if MongoDB is not running
 - [Feature] Better support of Caddy as a load balancer in Kubernetes:
   - Make it possible to start/stop a selection of resources with ``tutor k8s start/stop [names...]``.
   - Make it easy to deploy an independent LoadBalancer by converting the caddy service to a ClusterIP when ``ENABLE_WEB_PROXY=false``.
