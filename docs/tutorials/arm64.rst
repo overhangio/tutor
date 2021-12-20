@@ -1,6 +1,6 @@
 .. _arm64:
 
-Running Tutor on ARM based Systems
+Running Tutor on ARM-based systems
 ==================================
 
 Tutor can be used on ARM64 systems, although support for that platform is currently experimental.
@@ -12,7 +12,7 @@ There are currently no official ARM64 images provided for Tutor, but Tutor makes
 Building the images
 -------------------
 
-Start by :ref:`installing <install>` Tutor and its depdencies (e.g. Docker) onto your system.
+Start by :ref:`installing <install>` Tutor and its dependencies (e.g. Docker) onto your system.
 
 .. note:: For Open edX developers, if you want to use the :ref:`nightly <nightly>` version of Tutor to "run master", install Tutor using git and check out the ``nightly`` branch of Tutor at this point. See the :ref:`nightly documentation <nightly>` for details.
 
@@ -28,9 +28,6 @@ Then, build the Open edX image::
 
 If you want to use Tutor as an Open edX development environment, you should also build the development images::
 
-    # If you are using a regular Tutor release:
-    tutor images build openedx-dev
-    # Or if you are using Tutor nightly:
     tutor dev dc build lms
 
 Change the database server
