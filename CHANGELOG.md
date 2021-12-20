@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.0.1
+
 - [Fix] Missing requirements file in `pip install tutor[full]`.
 
 ## v13.0.0
