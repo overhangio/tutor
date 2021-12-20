@@ -4,6 +4,10 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Fix] Missing requirements file in `pip install tutor[full]`.
+
+## v13.0.0
+
 - 💥[Improvement] Upgrade to Maple
   - Install all official plugins as part of the `tutor[full]` package.
   - Don't print error messages about loading plugins during autocompletion.
