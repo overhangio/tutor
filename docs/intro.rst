@@ -61,7 +61,7 @@ A demo Open edX platform is available at https://demo.openedx.overhang.io. This 
 * Admin user: username=admin email=admin@overhang.io password=admin
 * Student user: username=student email=student@overhang.io password=student
 
-The Android mobile application for this website can be downloaded at this url: http://demo.openedx.overhang.io/static/mobile/app.apk
+The Android mobile application for this demo platform can be downloaded at this url: https://mobile.demo.openedx.overhang.io/app.apk
 
 Urls:
 

@@ -38,7 +38,6 @@ def load_full(root: str) -> Config:
     """
     Load a full configuration, with user, base and defaults.
     """
-    convert_json2yml(root)
     config = get_user(root)
     update_with_base(config)
     update_with_defaults(config)
@@ -84,6 +83,7 @@ def get_user(root: str) -> Config:
 
     Overrides from environment variables are loaded as well.
     """
+    convert_json2yml(root)
     path = config_path(root)
     config = {}
     if os.path.exists(path):

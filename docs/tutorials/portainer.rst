@@ -9,7 +9,7 @@ Portainer is a web UI for managing docker containers. It lets you view your enti
         --volume=/var/run/docker.sock:/var/run/docker.sock \
         --volume=/tmp/portainer:/data \
         -p 9000:9000 \
-        portainer/portainer:latest --bind=:9000
+        portainer/portainer-ce:latest --bind=:9000
 
 You can then view the portainer UI at `http://localhost:9000 <http://localhost:9000>`_. You will be asked to define a password for the admin user. Then, select a "Local environment" to work on; hit "Connect" and select the "local" group to view all running containers.
 

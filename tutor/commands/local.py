@@ -104,7 +104,7 @@ Your Open edX platform is ready and can be accessed at the following urls:
     "--from",
     "from_version",
     default="koa",
-    type=click.Choice(["ironwood", "juniper", "koa"]),
+    type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
@@ -136,6 +136,21 @@ Are you sure you want to continue?"""
     if running_version == "koa":
         upgrade_from_koa(context, config)
         running_version = "lilac"
+
+    if running_version == "lilac":
+        # Nothing to do here
+        running_version = "maple"
+
+    if not non_interactive:
+        question = f"""
+Your platform was successfuly upgraded from {from_version} to {running_version}. Depending on your setup, you might have to rebuild some of your Docker images. You can do this now by running the following command in a different shell:
+
+    tutor images build openedx # add your custom images here
+
+Press enter when you are ready to continue"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
+        )
 
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
