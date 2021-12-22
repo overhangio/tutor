@@ -12,7 +12,7 @@ from .types import Config, ConfigValue
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
-BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf", ".woff", ".woff2"]
+BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".patch", ".png", ".ttf", ".woff", ".woff2"]
 
 
 class JinjaEnvironment(jinja2.Environment):
