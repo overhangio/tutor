@@ -10,19 +10,6 @@ ALLOWED_HOSTS = [
     "lms",
 ]
 
-{% if ENABLE_HTTPS %}
-# Properly set the "secure" attribute on session/csrf cookies. This is required in
-# Chrome to support samesite=none cookies.
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = "None"
-{% else %}
-# When we cannot provide secure session/csrf cookies, we must disable samesite=none
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SAMESITE = "Lax"
-{% endif %}
-
 # CMS authentication
 IDA_LOGOUT_URI_LIST.append("{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ CMS_HOST }}/complete/logout")
 

@@ -46,4 +46,17 @@ for folder in [DATA_DIR, LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_
 
 {{ patch("openedx-lms-common-settings") }}
 
+{% if ENABLE_HTTPS %}
+# Properly set the "secure" attribute on session/csrf cookies. This is required in
+# Chrome to support samesite=none cookies.
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "None"
+{% else %}
+# When we cannot provide secure session/csrf cookies, we must disable samesite=none
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
+{% endif %}
+
 ######## End of common LMS settings
