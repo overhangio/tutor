@@ -1,0 +1,10 @@
+---
+CMS_OAUTH2_SECRET: "{{ 24|random_string }}"
+ID: "{{ 24|random_string }}"
+JWT_RSA_PRIVATE_KEY: "{{ 2048|rsa_private_key }}"
+MYSQL_ROOT_PASSWORD: "{{ 8|random_string }}"
+OPENEDX_MYSQL_PASSWORD: "{{ 8|random_string }}"
+OPENEDX_SECRET_KEY: "{{ 24|random_string }}"
+PLUGINS:
+  # The MFE plugin is required
+  - mfe

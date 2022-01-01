@@ -11,7 +11,7 @@ config
 The ``config`` attribute is used to modify existing and add new configuration parameters:
 
 * ``config["add"]`` are key/values that should be added to the user-specific ``config.yml`` configuration. Add there passwords, secret keys and other values that do not have a default value.
-* ``config["defaults"]`` are default key/values for this plugin. These values will not be added to the ``config.yml`` user file unless users override them manually with ``tutor config save --set ...``.
+* ``config["defaults"]`` are default key/values for this plugin. These values can be accessed even though they are not added to the ``config.yml`` user file. Users can override them manually with ``tutor config save --set ...``.
 * ``config["set"]`` are existing key/values that should be modified. Be very careful what you add there! Different plugins may define conflicting values for some parameters.
 
  "add" and "defaults" key names will be automatically prefixed with the plugin name, in upper case.
@@ -83,7 +83,7 @@ Example::
 
 During initialisation, "myservice1" and "myservice2" will be run in sequence with the commands defined in the templates ``myplugin/hooks/myservice1/init`` and ``myplugin/hooks/myservice2/init``.
 
-To initialise a "foo" service, Tutor runs the "foo-job" service that is found in the ``env/local/docker-compose.jobs.yml`` file. By default, Tutor comes with a few services in this file: mysql-job, lms-job, cms-job, forum-job. If your plugin requires running custom services during initialisation, you will need to add them to the ``docker-compose.jobs.yml`` template. To do so, just use the "local-docker-compose-jobs-services" patch.
+To initialise a "foo" service, Tutor runs the "foo-job" service that is found in the ``env/local/docker-compose.jobs.yml`` file. By default, Tutor comes with a few services in this file: mysql-job, lms-job, cms-job. If your plugin requires running custom services during initialisation, you will need to add them to the ``docker-compose.jobs.yml`` template. To do so, just use the "local-docker-compose-jobs-services" patch.
 
 In Kubernetes, the approach is the same, except that jobs are implemented as actual job objects in the ``k8s/jobs.yml`` template. To add your own services there, your plugin should implement the "k8s-jobs" patch.
 

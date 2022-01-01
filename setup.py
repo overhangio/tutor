@@ -24,22 +24,14 @@ def load_about() -> Dict[str, str]:
     return about
 
 
-def load_requirements() -> List[str]:
+def load_requirements(filename: str) -> List[str]:
     with io.open(
-        os.path.join(HERE, "requirements", "base.in"), "rt", encoding="utf-8"
+        os.path.join(HERE, "requirements", filename), "rt", encoding="utf-8"
     ) as f:
         return [line.strip() for line in f if is_requirement(line)]
-
-
-def load_dev_requirements() -> List[str]:
-    with io.open(
-        os.path.join(HERE, "requirements", "dev.in"), "rt", encoding="utf-8"
-    ) as f:
-        return [line.strip() for line in f if is_requirement(line)]
-
 
 def is_requirement(line: str) -> bool:
-    return not (line.strip() == "" or line.startswith("#") or line.startswith("-"))
+    return not (line.strip() == "" or line.startswith("#"))
 
 
 ABOUT = load_about()
@@ -62,8 +54,11 @@ setup(
     long_description_content_type="text/x-rst",
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
-    python_requires=">=3.5",
-    install_requires=load_requirements(),
+    python_requires=">=3.6",
+    install_requires=load_requirements("base.in"),
+    extras_require={
+        "full": load_requirements("plugins.txt"),
+    },
     entry_points={"console_scripts": ["tutor=tutor.commands.cli:main"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -71,13 +66,11 @@ setup(
         "License :: OSI Approved :: GNU Affero General Public License v3",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
-    tests_require=load_dev_requirements(),
     test_suite="tests",
 )

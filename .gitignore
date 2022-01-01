@@ -11,6 +11,3 @@ __pycache__
 # Unit test/ coverage reports
 .coverage
 /htmlcov/
-
-# Copied at build-time
-/tutor-openedx/tutoropenedx/__about__.py

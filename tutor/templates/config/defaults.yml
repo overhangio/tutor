@@ -1,0 +1,73 @@
+---
+# This file includes all Tutor setting defaults. Settings that do not have a
+# default value, such as passwords, should be stored in base.yml.
+# This must be defined early
+CADDY_HTTP_PORT: 80
+CMS_HOST: "studio.{{ LMS_HOST }}"
+CMS_OAUTH2_KEY_SSO: "cms-sso"
+CMS_OAUTH2_KEY_SSO_DEV: "cms-sso-dev"
+CONTACT_EMAIL: "contact@{{ LMS_HOST }}"
+DEV_PROJECT_NAME: "{{ TUTOR_APP }}_dev"
+DOCKER_REGISTRY: "docker.io/"
+DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"
+DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev"
+DOCKER_IMAGE_CADDY: "docker.io/caddy:2.3.0"
+DOCKER_IMAGE_ELASTICSEARCH: "docker.io/elasticsearch:7.10.1"
+DOCKER_IMAGE_MONGODB: "docker.io/mongo:4.2.17"
+DOCKER_IMAGE_MYSQL: "docker.io/mysql:5.7.35"
+DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"
+DOCKER_IMAGE_REDIS: "docker.io/redis:6.2.6"
+DOCKER_IMAGE_SMTP: "docker.io/devture/exim-relay:4.94.2-r0-4"
+LOCAL_PROJECT_NAME: "{{ TUTOR_APP }}_local"
+ELASTICSEARCH_HOST: "elasticsearch"
+ELASTICSEARCH_PORT: 9200
+ELASTICSEARCH_SCHEME: "http"
+ELASTICSEARCH_HEAP_SIZE: 1g
+ENABLE_HTTPS: false
+ENABLE_WEB_PROXY: true
+JWT_COMMON_AUDIENCE: "openedx"
+JWT_COMMON_ISSUER: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"
+JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}"
+K8S_NAMESPACE: "openedx"
+LANGUAGE_CODE: "en"
+LMS_HOST: "www.myopenedx.com"
+LOCAL_PROJECT_NAME: "{{ TUTOR_APP }}_local"
+MONGODB_HOST: "mongodb"
+MONGODB_DATABASE: "openedx"
+MONGODB_PORT: 27017
+MONGODB_USERNAME: ""
+MONGODB_PASSWORD: ""
+OPENEDX_AWS_ACCESS_KEY: ""
+OPENEDX_AWS_SECRET_ACCESS_KEY: ""
+OPENEDX_CACHE_REDIS_DB: 1
+OPENEDX_CELERY_REDIS_DB: 0
+OPENEDX_CMS_UWSGI_WORKERS: 2
+OPENEDX_LMS_UWSGI_WORKERS: 2
+OPENEDX_MYSQL_DATABASE: "openedx"
+OPENEDX_CSMH_MYSQL_DATABASE: "{{ OPENEDX_MYSQL_DATABASE }}_csmh"
+OPENEDX_MYSQL_USERNAME: "openedx"
+OPENEDX_COMMON_VERSION: "open-release/maple.1"
+OPENEDX_EXTRA_PIP_REQUIREMENTS:
+  - "openedx-scorm-xblock<14.0.0,>=13.0.0"
+MYSQL_HOST: "mysql"
+MYSQL_PORT: 3306
+MYSQL_ROOT_USERNAME: "root"
+PLATFORM_NAME: "My Open edX"
+PREVIEW_LMS_HOST: "preview.{{ LMS_HOST }}"
+REDIS_HOST: "redis"
+REDIS_PORT: 6379
+REDIS_USERNAME: ""
+REDIS_PASSWORD: ""
+RUN_CMS: true
+RUN_ELASTICSEARCH: true
+RUN_LMS: true
+RUN_MONGODB: true
+RUN_MYSQL: true
+RUN_REDIS: true
+RUN_SMTP: true
+SMTP_HOST: "smtp"
+SMTP_PORT: 8025
+SMTP_USERNAME: ""
+SMTP_PASSWORD: ""
+SMTP_USE_TLS: false
+SMTP_USE_SSL: false
