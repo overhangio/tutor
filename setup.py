@@ -30,16 +30,8 @@ def load_requirements(filename: str) -> List[str]:
     ) as f:
         return [line.strip() for line in f if is_requirement(line)]
 
-
-def load_dev_requirements() -> List[str]:
-    with io.open(
-        os.path.join(HERE, "requirements", "dev.in"), "rt", encoding="utf-8"
-    ) as f:
-        return [line.strip() for line in f if is_requirement(line)]
-
-
 def is_requirement(line: str) -> bool:
-    return not (line.strip() == "" or line.startswith("#") or line.startswith("-"))
+    return not (line.strip() == "" or line.startswith("#"))
 
 
 ABOUT = load_about()
@@ -80,6 +72,5 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
-    tests_require=load_dev_requirements(),
     test_suite="tests",
 )
