@@ -259,4 +259,4 @@ def save_config_file(root: str, config: Config) -> None:
 
 
 def config_path(root: str) -> str:
-    return os.path.join(root, "config.yml")
+    return os.path.join(root, CONFIG_FILENAME)

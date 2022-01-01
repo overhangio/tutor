@@ -1,5 +1,4 @@
 import os
-import re
 import json
 import unittest
 import tempfile
@@ -31,16 +30,6 @@ class ConfigTests(unittest.TestCase):
 
         # Check that merge does not perform a rendering
         self.assertNotEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
-
-    @unittest.mock.patch("sys.stdout", new_callable=StringIO)
-    def test_update_should_create_config_file(self, mock_stdout: StringIO) -> None:
-        with tempfile.TemporaryDirectory() as root:
-            tutor_config.update(root)
-            config_path = re.search(
-                r"Configuration saved to (.*)", mock_stdout.getvalue()
-            )
-            assert config_path is not None
-            self.assertTrue(os.path.exists(config_path.group(1)))
 
     @patch.object(tutor_config.fmt, "echo")
     def test_save_load(self, _: Mock) -> None:
@@ -97,7 +86,7 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(config, current)
 
     @unittest.mock.patch("sys.stdout", new_callable=StringIO)
-    def test_load_all_json_config(self, _: StringIO) -> None:
+    def test_load_json_config(self, _: StringIO) -> None:
         with tempfile.TemporaryDirectory() as root:
             # arrange
             configYmlPath = os.path.join(root, tutor_config.CONFIG_FILENAME)
@@ -111,8 +100,8 @@ class ConfigTests(unittest.TestCase):
                 self.assertFalse(os.path.exists(configYmlPath))
                 self.assertTrue(os.path.exists(configJsonPath))
 
-                current, default = tutor_config.load_all(root)
+                current = tutor_config.load_full(root)
                 self.assertTrue(os.path.exists(configYmlPath))
                 self.assertFalse(os.path.exists(configJsonPath))
-                self.assertNotEqual(default, current)
+                # self.assertNotEqual(default, current)
                 self.assertEqual(config, current)

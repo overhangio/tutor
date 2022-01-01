@@ -40,7 +40,7 @@ class TestContext(BaseJobContext):
         shutil.rmtree(CONTEXT.root)
 
     def load_config(self) -> Config:
-        return tutor_config.load_no_check(CONTEXT.root)
+        return tutor_config.load(CONTEXT.root)
 
     def job_runner(self, config: Config) -> TestJobRunner:
         return TestJobRunner(CONTEXT.root, config)

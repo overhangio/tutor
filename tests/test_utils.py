@@ -135,11 +135,8 @@ class UtilsTests(unittest.TestCase):
         process.wait.assert_called_once()
         process.kill.assert_called_once()
 
-    @patch("sys.stdout", new_callable=StringIO)
     @patch("subprocess.Popen", autospec=True)
-    def test_execute_keyboard_interrupt(
-        self, mock_popen: MagicMock, mock_stdout: StringIO
-    ) -> None:
+    def test_execute_keyboard_interrupt(self, mock_popen: MagicMock) -> None:
         process = mock_popen.return_value.__enter__.return_value
         process.returncode = 1
         process.communicate.side_effect = KeyboardInterrupt()
