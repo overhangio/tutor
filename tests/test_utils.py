@@ -94,15 +94,15 @@ class UtilsTests(unittest.TestCase):
     def test_execute_exit_without_error(
         self, mock_popen: MagicMock, mock_stdout: StringIO
     ) -> None:
-        process = mock_popen.return_value.__enter__.return_value
-        process.returncode = 0
+        process = mock_popen.return_value
+        mock_popen.return_value.__enter__.return_value = process
+        process.wait.return_value = 0
         process.communicate.return_value = ("output", "error")
 
         result = utils.execute("echo", "")
         self.assertEqual(0, result)
         self.assertEqual("echo \n", mock_stdout.getvalue())
-        process.communicate.assert_called_once()
-        process.wait.assert_not_called()
+        self.assertEqual(1, process.wait.call_count)
         process.kill.assert_not_called()
 
     @patch("sys.stdout", new_callable=StringIO)
@@ -110,14 +110,14 @@ class UtilsTests(unittest.TestCase):
     def test_execute_exit_with_error(
         self, mock_popen: MagicMock, mock_stdout: StringIO
     ) -> None:
-        process = mock_popen.return_value.__enter__.return_value
-        process.returncode = 1
+        process = mock_popen.return_value
+        mock_popen.return_value.__enter__.return_value = process
+        process.wait.return_value = 1
         process.communicate.return_value = ("output", "error")
 
         self.assertRaises(exceptions.TutorError, utils.execute, "echo", "")
         self.assertEqual("echo \n", mock_stdout.getvalue())
-        process.communicate.assert_called_once()
-        process.wait.assert_not_called()
+        self.assertEqual(1, process.wait.call_count)
         process.kill.assert_not_called()
 
     @patch("sys.stdout", new_callable=StringIO)
@@ -125,26 +125,29 @@ class UtilsTests(unittest.TestCase):
     def test_execute_throw_exception(
         self, mock_popen: MagicMock, mock_stdout: StringIO
     ) -> None:
-        process = mock_popen.return_value.__enter__.return_value
-        process.returncode = 1
-        process.communicate.side_effect = Exception("Exception occurred.")
+        process = mock_popen.return_value
+        mock_popen.return_value.__enter__.return_value = process
+        process.wait.side_effect = Exception("Exception occurred.")
 
-        self.assertRaises(exceptions.TutorError, utils.execute, "echo", "")
+        self.assertRaises(Exception, utils.execute, "echo", "")
         self.assertEqual("echo \n", mock_stdout.getvalue())
-        process.communicate.assert_called_once()
-        process.wait.assert_called_once()
+        self.assertEqual(2, process.wait.call_count)
         process.kill.assert_called_once()
 
+    @patch("sys.stdout", new_callable=StringIO)
     @patch("subprocess.Popen", autospec=True)
-    def test_execute_keyboard_interrupt(self, mock_popen: MagicMock) -> None:
-        process = mock_popen.return_value.__enter__.return_value
-        process.returncode = 1
-        process.communicate.side_effect = KeyboardInterrupt()
+    def test_execute_keyboard_interrupt(
+        self, mock_popen: MagicMock, mock_stdout: StringIO
+    ) -> None:
+        process = mock_popen.return_value
+        mock_popen.return_value.__enter__.return_value = process
+        process.wait.side_effect = KeyboardInterrupt()
 
         with self.assertRaises(KeyboardInterrupt):
             utils.execute("echo", "")
-        process.communicate.assert_called_once()
-        process.wait.assert_called_once()
+        output = mock_stdout.getvalue()
+        self.assertIn("echo", output)
+        self.assertEqual(2, process.wait.call_count)
         process.kill.assert_called_once()
 
     @patch("sys.platform", "win32")
