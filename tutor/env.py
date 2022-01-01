@@ -12,7 +12,7 @@ from .types import Config, ConfigValue
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
-BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".png", ".ttf", ".woff", ".woff2"]
+BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".patch", ".png", ".ttf", ".woff", ".woff2"]
 
 
 class JinjaEnvironment(jinja2.Environment):
@@ -59,6 +59,7 @@ class Renderer:
         environment.globals["rsa_import_key"] = utils.rsa_import_key
         environment.filters["rsa_private_key"] = utils.rsa_private_key
         environment.filters["walk_templates"] = self.walk_templates
+        environment.globals["HOST_USER_ID"] = utils.get_user_id()
         environment.globals["TUTOR_APP"] = __app__.replace("-", "_")
         environment.globals["TUTOR_VERSION"] = __version__
         self.environment = environment
@@ -221,12 +222,10 @@ def save(root: str, config: Config) -> None:
     fmt.echo_info("Environment generated in {}".format(base_dir(root)))
 
 
-def upgrade_obsolete(root: str) -> None:
-    # tutor.conf was renamed to _tutor.conf in order to be the first config file loaded
-    # by nginx
-    nginx_tutor_conf = pathjoin(root, "apps", "nginx", "tutor.conf")
-    if os.path.exists(nginx_tutor_conf):
-        os.remove(nginx_tutor_conf)
+def upgrade_obsolete(_root: str) -> None:
+    """
+    Add here ad-hoc commands to upgrade the environment.
+    """
 
 
 def save_plugin_templates(
@@ -332,9 +331,14 @@ def current_release(root: str) -> str:
     """
     Return the name of the current Open edX release.
     """
-    return {"0": "ironwood", "3": "ironwood", "10": "juniper", "11": "koa"}[
-        current_version(root).split(".")[0]
-    ]
+    return {
+        "0": "ironwood",
+        "3": "ironwood",
+        "10": "juniper",
+        "11": "koa",
+        "12": "lilac",
+        "13": "maple",
+    }[current_version(root).split(".")[0]]
 
 
 def current_version(root: str) -> str:

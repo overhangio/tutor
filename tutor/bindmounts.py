@@ -34,6 +34,7 @@ chown -R {user_id} {volumes_path}/{volume_name}""".format(
         "run",
         "--rm",
         "--no-deps",
+        "--user=0",
         "--volume",
         "{}:{}".format(volumes_root_path, container_volumes_root_path),
         service,
@@ -72,8 +73,8 @@ def parse_volumes(docker_compose_args: List[str]) -> Tuple[List[str], List[str]]
     @click.option("-v", "--volume", "volumes", multiple=True)
     @click.argument("args", nargs=-1)
     def custom_docker_compose(
-        volumes: List[str], args: List[str]
-    ) -> None:  # pylint: disable=unused-argument
+        volumes: List[str], args: List[str]  # pylint: disable=unused-argument
+    ) -> None:
         pass
 
     if isinstance(docker_compose_args, tuple):

@@ -129,9 +129,6 @@ class PluginsTests(unittest.TestCase):
         self.assertEqual([], patches)
 
     def test_configure(self) -> None:
-        config: Config = {"ID": "id"}
-        defaults: Config = {}
-
         class plugin1:
             config: Config = {
                 "add": {"PARAM1": "value1", "PARAM2": "value2"},
@@ -144,37 +141,31 @@ class PluginsTests(unittest.TestCase):
             "iter_enabled",
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
-            tutor_config.load_plugins(config, defaults)
+            base = tutor_config.get_base({})
+            defaults = tutor_config.get_defaults({})
 
-        self.assertEqual(
-            {
-                "ID": "id",
-                "PARAM3": "value3",
-                "PLUGIN1_PARAM1": "value1",
-                "PLUGIN1_PARAM2": "value2",
-            },
-            config,
-        )
-        self.assertEqual({"PLUGIN1_PARAM4": "value4"}, defaults)
+        self.assertEqual(base["PARAM3"], "value3")
+        self.assertEqual(base["PLUGIN1_PARAM1"], "value1")
+        self.assertEqual(base["PLUGIN1_PARAM2"], "value2")
+        self.assertEqual(defaults["PLUGIN1_PARAM4"], "value4")
 
     def test_configure_set_does_not_override(self) -> None:
-        config: Config = {"ID": "oldid"}
+        config: Config = {"ID1": "oldid"}
 
         class plugin1:
-            config: Config = {"set": {"ID": "newid"}}
+            config: Config = {"set": {"ID1": "newid", "ID2": "id2"}}
 
         with patch.object(
             plugins.Plugins,
             "iter_enabled",
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
-            tutor_config.load_plugins(config, {})
+            tutor_config.update_with_base(config)
 
-        self.assertEqual({"ID": "oldid"}, config)
+        self.assertEqual("oldid", config["ID1"])
+        self.assertEqual("id2", config["ID2"])
 
     def test_configure_set_random_string(self) -> None:
-        config: Config = {}
-
         class plugin1:
             config: Config = {"set": {"PARAM1": "{{ 128|random_string }}"}}
 
@@ -183,12 +174,13 @@ class PluginsTests(unittest.TestCase):
             "iter_enabled",
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
-            tutor_config.load_plugins(config, {})
+            config = tutor_config.get_base({})
+        tutor_config.render_full(config)
+
         self.assertEqual(128, len(get_typed(config, "PARAM1", str)))
 
     def test_configure_default_value_with_previous_definition(self) -> None:
-        config: Config = {}
-        defaults: Config = {"PARAM1": "value"}
+        config: Config = {"PARAM1": "value"}
 
         class plugin1:
             config: Config = {"defaults": {"PARAM2": "{{ PARAM1 }}"}}
@@ -198,10 +190,10 @@ class PluginsTests(unittest.TestCase):
             "iter_enabled",
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
-            tutor_config.load_plugins(config, defaults)
-        self.assertEqual("{{ PARAM1 }}", defaults["PLUGIN1_PARAM2"])
+            tutor_config.update_with_defaults(config)
+        self.assertEqual("{{ PARAM1 }}", config["PLUGIN1_PARAM2"])
 
-    def test_configure_add_twice(self) -> None:
+    def test_config_load_from_plugins(self) -> None:
         config: Config = {}
 
         class plugin1:
@@ -212,19 +204,12 @@ class PluginsTests(unittest.TestCase):
             "iter_enabled",
             return_value=[plugins.BasePlugin("plugin1", plugin1)],
         ):
-            tutor_config.load_plugins(config, {})
+            tutor_config.update_with_base(config)
+            tutor_config.update_with_defaults(config)
+        tutor_config.render_full(config)
         value1 = get_typed(config, "PLUGIN1_PARAM1", str)
-        with patch.object(
-            plugins.Plugins,
-            "iter_enabled",
-            return_value=[plugins.BasePlugin("plugin1", plugin1)],
-        ):
-            tutor_config.load_plugins(config, {})
-        value2 = get_typed(config, "PLUGIN1_PARAM1", str)
 
         self.assertEqual(10, len(value1))
-        self.assertEqual(10, len(value2))
-        self.assertEqual(value1, value2)
 
     def test_hooks(self) -> None:
         class plugin1:

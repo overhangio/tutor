@@ -8,11 +8,11 @@ from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import exceptions
 from .. import fmt
-from .. import interactive as interactive_config
 from .. import jobs
 from .. import serialize
 from ..types import Config, get_typed
 from .. import utils
+from .config import save as config_save_command
 from .context import Context
 
 
@@ -162,17 +162,21 @@ def k8s() -> None:
 @click.pass_context
 def quickstart(context: click.Context, non_interactive: bool) -> None:
     click.echo(fmt.title("Interactive platform configuration"))
-    config = interactive_config.update(
-        context.obj.root, interactive=(not non_interactive)
+    context.invoke(
+        config_save_command,
+        interactive=(not non_interactive),
+        set_vars=[],
+        unset_vars=[],
     )
-    if not config["RUN_CADDY"]:
+    config = tutor_config.load(context.obj.root)
+    if not config["ENABLE_WEB_PROXY"]:
         fmt.echo_alert(
-            "Potentially invalid configuration: RUN_CADDY=false\n"
+            "Potentially invalid configuration: ENABLE_WEB_PROXY=false\n"
             "This setting might have been defined because you previously set WEB_PROXY=true. This is no longer"
             " necessary in order to get Tutor to work on Kubernetes. In Tutor v11+ a Caddy-based load balancer is"
             " provided out of the box to handle SSL/TLS certificate generation at runtime. If you disable this"
             " service, you will have to configure an Ingress resource and a certificate manager yourself to redirect"
-            " traffic to the nginx service. See the Kubernetes section in the Tutor documentation for more"
+            " traffic to the caddy service. See the Kubernetes section in the Tutor documentation for more"
             " information."
         )
     click.echo(fmt.title("Updating the current environment"))
@@ -194,9 +198,16 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
     )
 
 
-@click.command(help="Run all configured Open edX services")
+@click.command(
+    short_help="Run all configured Open edX resources",
+    help=(
+        "Run all configured Open edX resources. You may limit this command to "
+        "some resources by passing name arguments."
+    ),
+)
+@click.argument("names", metavar="name", nargs=-1)
 @click.pass_obj
-def start(context: Context) -> None:
+def start(context: Context, names: List[str]) -> None:
     config = tutor_config.load(context.root)
     # Create namespace, if necessary
     # Note that this step should not be run for some users, in particular those
@@ -214,34 +225,68 @@ def start(context: Context) -> None:
             "--selector",
             "app.kubernetes.io/component=namespace",
         )
-    # Create volumes
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--wait",
-        "--selector",
-        "app.kubernetes.io/component=volume",
-    )
-    # Create everything else except jobs
-    utils.kubectl(
-        "apply",
-        "--kustomize",
-        tutor_env.pathjoin(context.root),
-        "--selector",
-        "app.kubernetes.io/component notin (job,volume,namespace)",
-    )
+
+    names = names or ["all"]
+    for name in names:
+        if name == "all":
+            # Create volumes
+            utils.kubectl(
+                "apply",
+                "--kustomize",
+                tutor_env.pathjoin(context.root),
+                "--wait",
+                "--selector",
+                "app.kubernetes.io/component=volume",
+            )
+            # Create everything else except jobs
+            utils.kubectl(
+                "apply",
+                "--kustomize",
+                tutor_env.pathjoin(context.root),
+                "--selector",
+                "app.kubernetes.io/component notin (job,volume,namespace)",
+            )
+        else:
+            utils.kubectl(
+                "apply",
+                "--kustomize",
+                tutor_env.pathjoin(context.root),
+                "--selector",
+                "app.kubernetes.io/name={}".format(name),
+            )
 
 
-@click.command(help="Stop a running platform")
+@click.command(
+    short_help="Stop a running platform",
+    help=(
+        "Stop a running platform by deleting all resources, except for volumes. "
+        "You may limit this command to some resources by passing name arguments."
+    ),
+)
+@click.argument("names", metavar="name", nargs=-1)
 @click.pass_obj
-def stop(context: Context) -> None:
+def stop(context: Context, names: List[str]) -> None:
     config = tutor_config.load(context.root)
-    utils.kubectl(
-        "delete",
-        *resource_selector(config),
-        "deployments,services,configmaps,jobs",
-    )
+    names = names or ["all"]
+    resource_types = "deployments,services,configmaps,jobs"
+    not_lb_selector = "app.kubernetes.io/component!=loadbalancer"
+    for name in names:
+        if name == "all":
+            utils.kubectl(
+                "delete",
+                *resource_selector(config, not_lb_selector),
+                resource_types,
+            )
+        else:
+            utils.kubectl(
+                "delete",
+                *resource_selector(
+                    config,
+                    not_lb_selector,
+                    "app.kubernetes.io/name={}".format(name),
+                ),
+                resource_types,
+            )
 
 
 @click.command(help="Reboot an existing platform")
@@ -249,17 +294,6 @@ def stop(context: Context) -> None:
 def reboot(context: click.Context) -> None:
     context.invoke(stop)
     context.invoke(start)
-
-
-def resource_selector(config: Config, *selectors: str) -> List[str]:
-    """
-    Convenient utility for filtering only the resources that belong to this project.
-    """
-    selector = ",".join(
-        ["app.kubernetes.io/instance=openedx-" + get_typed(config, "ID", str)]
-        + list(selectors)
-    )
-    return ["--namespace", k8s_namespace(config), "--selector=" + selector]
 
 
 @click.command(help="Completely delete an existing platform")
@@ -286,10 +320,29 @@ def delete(context: Context, yes: bool) -> None:
 def init(context: Context, limit: Optional[str]) -> None:
     config = tutor_config.load(context.root)
     runner = K8sJobRunner(context.root, config)
-    for service in ["mysql", "elasticsearch", "mongodb"]:
-        if tutor_config.is_service_activated(config, service):
-            wait_for_pod_ready(config, service)
+    wait_for_pod_ready(config, "caddy")
+    for name in ["elasticsearch", "mysql", "mongodb"]:
+        if tutor_config.is_service_activated(config, name):
+            wait_for_pod_ready(config, name)
     jobs.initialise(runner, limit_to=limit)
+
+
+@click.command(help="Scale the number of replicas of a given deployment")
+@click.argument("deployment")
+@click.argument("replicas", type=int)
+@click.pass_obj
+def scale(context: Context, deployment: str, replicas: int) -> None:
+    config = tutor_config.load(context.root)
+    utils.kubectl(
+        "scale",
+        # Note that we don't use the full resource selector because selectors
+        # are not compatible with the deployment/<name> argument.
+        *resource_namespace_selector(
+            config,
+        ),
+        "--replicas={}".format(replicas),
+        "deployment/{}".format(deployment),
+    )
 
 
 @click.command(help="Create an Open edX user and interactively set their password")
@@ -390,7 +443,7 @@ def wait(context: Context, name: str) -> None:
     "--from",
     "from_version",
     default="koa",
-    type=click.Choice(["ironwood", "juniper", "koa"]),
+    type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
 @click.pass_obj
 def upgrade(context: Context, from_version: str) -> None:
@@ -408,6 +461,10 @@ def upgrade(context: Context, from_version: str) -> None:
     if running_version == "koa":
         upgrade_from_koa(config)
         running_version = "lilac"
+
+    if running_version == "lilac":
+        # Nothing to do here
+        running_version = "maple"
 
 
 def upgrade_from_ironwood(config: Config) -> None:
@@ -517,6 +574,24 @@ def wait_for_pod_ready(config: Config, service: str) -> None:
     )
 
 
+def resource_selector(config: Config, *selectors: str) -> List[str]:
+    """
+    Convenient utility to filter the resources that belong to this project.
+    """
+    selector = ",".join(
+        ["app.kubernetes.io/instance=openedx-" + get_typed(config, "ID", str)]
+        + list(selectors)
+    )
+    return resource_namespace_selector(config) + ["--selector=" + selector]
+
+
+def resource_namespace_selector(config: Config) -> List[str]:
+    """
+    Convenient utility to filter the resources that belong to this project namespace.
+    """
+    return ["--namespace", k8s_namespace(config)]
+
+
 def k8s_namespace(config: Config) -> str:
     return get_typed(config, "K8S_NAMESPACE", str)
 
@@ -527,6 +602,7 @@ k8s.add_command(stop)
 k8s.add_command(reboot)
 k8s.add_command(delete)
 k8s.add_command(init)
+k8s.add_command(scale)
 k8s.add_command(createuser)
 k8s.add_command(importdemocourse)
 k8s.add_command(settheme)

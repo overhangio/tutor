@@ -25,7 +25,8 @@ CONTENTSTORE = {
 }
 # Load module store settings from config files
 update_module_store_settings(MODULESTORE, doc_store_settings=DOC_STORE_CONFIG)
-DATA_DIR = "/openedx/data/"
+DATA_DIR = "/openedx/data/modulestore"
+
 for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
    store["OPTIONS"]["fs_root"] = DATA_DIR
 
@@ -96,8 +97,11 @@ LOGGING["handlers"]["tracking"] = {
 }
 LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
 # Silence some loggers (note: we must attempt to get rid of these when upgrading from one release to the next)
+
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="newrelic.console")
+from django.utils.deprecation import RemovedInDjango40Warning, RemovedInDjango41Warning
+warnings.filterwarnings("ignore", category=RemovedInDjango40Warning)
+warnings.filterwarnings("ignore", category=RemovedInDjango41Warning)
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="lms.djangoapps.course_wiki.plugins.markdownedx.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
 
@@ -109,8 +113,10 @@ ACE_CHANNEL_DEFAULT_EMAIL = "django_email"
 ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
 EMAIL_FILE_PATH = "/tmp/openedx/emails"
 
+# Language/locales
 LOCALE_PATHS.append("/openedx/locale/contrib/locale")
 LOCALE_PATHS.append("/openedx/locale/user/locale")
+LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Allow the platform to include itself in an iframe
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -150,6 +156,10 @@ JWT_AUTH["JWT_ISSUERS"] = [
     }
 ]
 
+# Enable/Disable some features globally
+FEATURES["ENABLE_DISCUSSION_SERVICE"] = False
+FEATURES["PREVENT_CONCURRENT_LOGINS"] = False
+
 # Disable codejail support
 # explicitely configuring python is necessary to prevent unsafe calls
 import codejail.jail_code
@@ -159,12 +169,6 @@ CODE_JAIL = {
     "python_bin": "nonexistingpythonbinary",
     "user": None,
 }
-
-# Custom features
-# LTI 1.3 will be enabled by default after lilac, and it's going to be a big
-# deal, so we enable it early. We should remove this once the feature flag is
-# deprecated.
-FEATURES["LTI_1P3_ENABLED"] = True
 
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS

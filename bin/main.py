@@ -6,6 +6,7 @@ for plugin_name in [
     "android",
     "discovery",
     "ecommerce",
+    "forum",
     "license",
     "mfe",
     "minio",

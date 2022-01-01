@@ -38,7 +38,7 @@ The `devstack <https://github.com/edx/devstack>`_ is meant for development only,
 Is Tutor officially supported by edX?
 -------------------------------------
 
-As of the Open edX Lilac release (June 9th 2021), Tutor is one of the two officially supported installation methods for Open edX: see the `official installation instructions <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-lilac.master/installation/index.html>`__. We expect that by Maple (December 9th 2021) the native installation will be deprecated and Tutor will become the only officially recommended installation method, unless major issues are discovered. However, Tutor remains developed independently from edX, both by its parent company Overhang.IO and the :ref:`project maintainers <maintainers>`.
+Yes: as of the Open edX Maple release (December 9th 2021), Tutor is the only officially supported installation methods for Open edX: see the `official installation instructions <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-maple.master/installation/index.html>`__. 
 
 What features are missing from Tutor?
 -------------------------------------

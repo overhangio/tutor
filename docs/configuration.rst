@@ -42,7 +42,6 @@ Individual service activation
 
 - ``RUN_LMS`` (default: ``true``)
 - ``RUN_CMS`` (default: ``true``)
-- ``RUN_FORUM`` (default: ``true``)
 - ``RUN_ELASTICSEARCH`` (default: ``true``)
 - ``RUN_MONGODB`` (default: ``true``)
 - ``RUN_MYSQL`` (default: ``true``)
@@ -61,9 +60,8 @@ Custom images
 *************
 
 - ``DOCKER_IMAGE_OPENEDX`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"``)
-- ``DOCKER_IMAGE_FORUM`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-forum:{{ TUTOR_VERSION }}"``)
 
-These configuration parameters define which image to run for each service. By default, the docker image tag matches the Tutor version it was built with.
+This configuration parameter defines the name of the Docker image to run for the lms and cms containers. By default, the Docker image tag matches the Tutor version it was built with.
 
 Custom registry
 ***************
@@ -76,10 +74,12 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 
 (the trailing ``/`` is important)
 
+.. _openedx_configuration:
+
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/lilac.2"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/maple.beta2"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -105,16 +105,10 @@ Vendor services
 Caddy
 *****
 
-- ``RUN_CADDY`` (default: ``true``)
+- ``CADDY_HTTP_PORT`` (default: ``80``)
+- ``ENABLE_WEB_PROXY`` (default: ``true``)
 
-`Caddy <https://caddyserver.com>`__ is a web server used in Tutor as a web proxy for the generation of SSL/TLS certificates at runtime. If ``RUN_CADDY`` is set to ``false`` then we assume that SSL termination does not occur in the Caddy container, and thus the ``caddy`` container is not started.
-
-Nginx
-*****
-
-- ``NGINX_HTTP_PORT`` (default: ``80``)
-
-Nginx is used to route web traffic to the various applications and to serve static assets. When ``RUN_CADDY`` is false, the ``NGINX_HTTP_PORT`` is exposed on the host.
+`Caddy <https://caddyserver.com>`__ is a web server used in Tutor both as a web proxy and for the generation of SSL/TLS certificates at runtime. Port indicated by ``CADDY_HTTP_PORT`` is exposed on the host, in addition to port 443. If ``ENABLE_WEB_PROXY`` is set to ``false`` then we assume that SSL termination does not occur in the Caddy container and only ``CADDY_HTTP_PORT`` is exposed on the host.
 
 MySQL
 *****
@@ -177,13 +171,6 @@ SMTP
 
 Note that the SMTP server shipped with Tutor by default does not implement TLS. With external servers, only one of SSL or TLS should be enabled, at most.
 
-Forum
-*****
-
-- ``RUN_FORUM`` (default: ``true``)
-- ``FORUM_HOST`` (default: ``"forum"``)
-- ``FORUM_MONGODB_DATABASE`` (default: ``"cs_comments_service"``)
-
 SSL/TLS certificates for HTTPS access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -199,7 +186,7 @@ The following DNS records must exist and point to your server::
 
 Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
 
-If you would like to perform SSL/TLS termination with your own custom certificates, you will have to keep ``ENABLE_HTTPS=true`` and turn off the Caddy server with ``RUN_CADDY=false``. See the corresponding :ref:`tutorial <web_proxy>` for more information.
+If you would like to perform SSL/TLS termination with your own custom certificates, you will have to keep ``ENABLE_HTTPS=true`` and turn off the Caddy load balancing with ``ENABLE_WEB_PROXY=false``. See the corresponding :ref:`tutorial <web_proxy>` for more information.
 
 .. _customise:
 
@@ -294,16 +281,16 @@ Note that your edx-platform version must be a fork of the latest release **tag**
 
 If you don't create your fork from this tag, you *will* have important compatibility issues with other services. In particular:
 
-- Do not try to run a fork from an older (pre-Lilac) version of edx-platform: this will simply not work.
+- Do not try to run a fork from an older (pre-Maple) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
-- Do not try to run a fork from the open-release/lilac.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/lilac.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/lilac.master branch.
+- Do not try to run a fork from the open-release/maple.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/maple.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/maple.master branch.
 
 .. _i18n:
 
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/lilac.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/edx/edx-platform/tree/open-release/maple.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
@@ -324,9 +311,9 @@ Then, add a "django.po" file there that will contain your custom translations::
 .. warning::
     Don't forget to specify the file ``Content-Type`` when adding message strings with non-ASCII characters; otherwise a ``UnicodeDecodeError`` will be raised during compilation.
 
-The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/lilac.master/conf/locale/en/LC_MESSAGES/django.po>`__.
+The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/edx/edx-platform/blob/open-release/maple.master/conf/locale/en/LC_MESSAGES/django.po>`__.
 
-If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/lilac.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
+If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/edx/edx-platform/blob/open-release/maple.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
 
 To recap, here is an example. To translate a few strings in French, both from django.po and djangojs.po, we would have the following file hierarchy::
 
@@ -358,7 +345,7 @@ And djangojs.po::
 
 Then you will have to re-build the openedx Docker image::
 
-    tutor images build openedx openedx-dev
+    tutor images build openedx
 
 Beware that this will take a long time! Unfortunately it's difficult to accelerate this process, as translation files need to be compiled prior to collecting the assets. In development it's possible to accelerate the iteration loop -- but that exercise is left to the reader.
 
