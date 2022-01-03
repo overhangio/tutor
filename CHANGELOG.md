@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix ownership of mysql data, in particular when upgrading a Kubernetes cluster to Maple.
 - [Bugfix] Ensure that ``tutor k8s upgrade`` is run during ``tutor k8s quickstart``, when necessary.
 - [Bugfix] By default, upgrade from Lilac and not Koa during ``tutor k8s upgrade``.
 - [Bugfix] Fix upgrading from Lilac to Maple on Kubernetes by deleting deployments and services.
