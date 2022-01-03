@@ -1,11 +1,12 @@
 import os
-import unittest
 import tempfile
+import unittest
 
 from click.testing import CliRunner
-from tutor.commands.config import config_command
-from tests.helpers import TestContext
+
+from tests.helpers import TestContext, temporary_root
 from tutor import config as tutor_config
+from tutor.commands.config import config_command
 
 
 class ConfigTests(unittest.TestCase):
@@ -16,28 +17,32 @@ class ConfigTests(unittest.TestCase):
         self.assertFalse(result.exception)
 
     def test_config_save(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(config_command, ["save"], obj=context)
             self.assertEqual(0, result.exit_code)
             self.assertFalse(result.exception)
 
     def test_config_save_interactive(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(config_command, ["save", "-i"], obj=context)
             self.assertEqual(0, result.exit_code)
             self.assertFalse(result.exception)
 
     def test_config_save_skip_update(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(config_command, ["save", "-e"], obj=context)
             self.assertEqual(0, result.exit_code)
             self.assertFalse(result.exception)
 
     def test_config_save_set_value(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(
                 config_command, ["save", "-s", "key=value"], obj=context
@@ -48,7 +53,8 @@ class ConfigTests(unittest.TestCase):
             self.assertIn("value", result.output)
 
     def test_config_save_unset_value(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(config_command, ["save", "-U", "key"], obj=context)
             self.assertEqual(0, result.exit_code)
@@ -57,7 +63,8 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(1, result.exit_code)
 
     def test_config_printroot(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(config_command, ["printroot"], obj=context)
             self.assertEqual(0, result.exit_code)
@@ -65,8 +72,10 @@ class ConfigTests(unittest.TestCase):
             self.assertIn(context.root, result.output)
 
     def test_config_printvalue(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
+            runner.invoke(config_command, ["save"], obj=context)
             result = runner.invoke(
                 config_command, ["printvalue", "MYSQL_ROOT_PASSWORD"], obj=context
             )
@@ -76,8 +85,10 @@ class ConfigTests(unittest.TestCase):
 
     def test_config_render(self) -> None:
         with tempfile.TemporaryDirectory() as dest:
-            with TestContext() as context:
+            with temporary_root() as root:
+                context = TestContext(root)
                 runner = CliRunner()
+                runner.invoke(config_command, ["save"], obj=context)
                 result = runner.invoke(
                     config_command, ["render", context.root, dest], obj=context
                 )
@@ -86,8 +97,10 @@ class ConfigTests(unittest.TestCase):
 
     def test_config_render_with_extra_configs(self) -> None:
         with tempfile.TemporaryDirectory() as dest:
-            with TestContext() as context:
+            with temporary_root() as root:
+                context = TestContext(root)
                 runner = CliRunner()
+                runner.invoke(config_command, ["save"], obj=context)
                 result = runner.invoke(
                     config_command,
                     [

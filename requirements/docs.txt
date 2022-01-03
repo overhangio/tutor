@@ -29,7 +29,6 @@ click==8.0.3
     #   sphinx-click
 docutils==0.17.1
     # via
-    #   -r requirements/docs.in
     #   sphinx
     #   sphinx-click
     #   sphinx-rtd-theme

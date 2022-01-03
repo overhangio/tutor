@@ -1,6 +1,7 @@
 import unittest
 
 from click.testing import CliRunner
+
 from tutor.commands.local import local, quickstart, upgrade
 
 

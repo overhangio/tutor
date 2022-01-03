@@ -1,14 +1,14 @@
-import os
 import json
+import os
 import unittest
-import tempfile
-from io import StringIO
-import click
 from unittest.mock import Mock, patch
-from tests.helpers import TestContext
-from tutor import interactive
+
+import click
+
+from tests.helpers import temporary_root
 from tutor import config as tutor_config
-from tutor.types import get_typed, Config
+from tutor import interactive
+from tutor.types import Config, get_typed
 
 
 class ConfigTests(unittest.TestCase):
@@ -33,7 +33,7 @@ class ConfigTests(unittest.TestCase):
 
     @patch.object(tutor_config.fmt, "echo")
     def test_save_load(self, _: Mock) -> None:
-        with tempfile.TemporaryDirectory() as root:
+        with temporary_root() as root:
             config1 = tutor_config.load_minimal(root)
             tutor_config.save_config_file(root, config1)
             config2 = tutor_config.load_minimal(root)
@@ -42,7 +42,7 @@ class ConfigTests(unittest.TestCase):
 
     @patch.object(tutor_config.fmt, "echo")
     def test_removed_entry_is_added_on_save(self, _: Mock) -> None:
-        with tempfile.TemporaryDirectory() as root:
+        with temporary_root() as root:
             with patch.object(
                 tutor_config.utils, "random_string"
             ) as mock_random_string:
@@ -64,7 +64,7 @@ class ConfigTests(unittest.TestCase):
         def mock_prompt(*_args: None, **kwargs: str) -> str:
             return kwargs["default"]
 
-        with tempfile.TemporaryDirectory() as rootdir:
+        with temporary_root() as rootdir:
             with patch.object(click, "prompt", new=mock_prompt):
                 with patch.object(click, "confirm", new=mock_prompt):
                     config = interactive.load_user_config(rootdir, interactive=True)
@@ -79,29 +79,24 @@ class ConfigTests(unittest.TestCase):
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
         self.assertFalse(tutor_config.is_service_activated(config, "service2"))
 
-    def test_load_yml_config(self) -> None:
-        with TestContext() as context:
-            config = context.load_config()
-            current = tutor_config.load(context.root)
-            self.assertEqual(config, current)
-
-    @unittest.mock.patch("sys.stdout", new_callable=StringIO)
-    def test_load_json_config(self, _: StringIO) -> None:
-        with tempfile.TemporaryDirectory() as root:
-            # arrange
-            configYmlPath = os.path.join(root, tutor_config.CONFIG_FILENAME)
-            configJsonPath = os.path.join(
+    @patch.object(tutor_config.fmt, "echo")
+    def test_json_config_is_overwritten_by_yaml(self, _: Mock) -> None:
+        with temporary_root() as root:
+            # Create config from scratch
+            config_yml_path = os.path.join(root, tutor_config.CONFIG_FILENAME)
+            config_json_path = os.path.join(
                 root, tutor_config.CONFIG_FILENAME.replace("yml", "json")
             )
-            with TestContext() as context:
-                config = context.load_config()
-                with open(configJsonPath, "w", encoding="utf-8") as f:
-                    json.dump(config, f, ensure_ascii=False, indent=4)
-                self.assertFalse(os.path.exists(configYmlPath))
-                self.assertTrue(os.path.exists(configJsonPath))
+            config = tutor_config.load_full(root)
 
-                current = tutor_config.load_full(root)
-                self.assertTrue(os.path.exists(configYmlPath))
-                self.assertFalse(os.path.exists(configJsonPath))
-                # self.assertNotEqual(default, current)
-                self.assertEqual(config, current)
+            # Save config to json
+            with open(config_json_path, "w", encoding="utf-8") as f:
+                json.dump(config, f, ensure_ascii=False, indent=4)
+            self.assertFalse(os.path.exists(config_yml_path))
+            self.assertTrue(os.path.exists(config_json_path))
+
+            # Reload and compare
+            current = tutor_config.load_full(root)
+            self.assertTrue(os.path.exists(config_yml_path))
+            self.assertFalse(os.path.exists(config_json_path))
+            self.assertEqual(config, current)

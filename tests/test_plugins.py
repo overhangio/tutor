@@ -1,10 +1,9 @@
 import unittest
 from unittest.mock import Mock, patch
+
 from tutor import config as tutor_config
-from tutor import exceptions
-from tutor import fmt
-from tutor import plugins
-from tutor.types import get_typed, Config
+from tutor import exceptions, fmt, plugins
+from tutor.types import Config, get_typed
 
 
 class PluginsTests(unittest.TestCase):
@@ -12,16 +11,16 @@ class PluginsTests(unittest.TestCase):
         plugins.Plugins.clear()
 
     @patch.object(plugins.DictPlugin, "iter_installed", return_value=[])
-    def test_iter_installed(self, _dict_plugin_iter_installed: Mock) -> None:
+    def test_iter_installed(self, dict_plugin_iter_installed: Mock) -> None:
         with patch.object(plugins.pkg_resources, "iter_entry_points", return_value=[]):  # type: ignore
             self.assertEqual([], list(plugins.iter_installed()))
-            _dict_plugin_iter_installed.assert_called_once()
+            dict_plugin_iter_installed.assert_called_once()
 
     def test_is_installed(self) -> None:
         self.assertFalse(plugins.is_installed("dummy"))
 
     @patch.object(plugins.DictPlugin, "iter_installed", return_value=[])
-    def test_official_plugins(self, _dict_plugin_iter_installed: Mock) -> None:
+    def test_official_plugins(self, dict_plugin_iter_installed: Mock) -> None:
         with patch.object(plugins.importlib, "import_module", return_value=42):  # type: ignore
             plugin1 = plugins.OfficialPlugin.load("plugin1")
         with patch.object(plugins.importlib, "import_module", return_value=43):  # type: ignore
@@ -35,7 +34,7 @@ class PluginsTests(unittest.TestCase):
                 [plugin1, plugin2],
                 list(plugins.iter_installed()),
             )
-        _dict_plugin_iter_installed.assert_called_once()
+        dict_plugin_iter_installed.assert_called_once()
 
     def test_enable(self) -> None:
         config: Config = {plugins.CONFIG_KEY: []}

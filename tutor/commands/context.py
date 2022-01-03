@@ -9,7 +9,7 @@ class Context:
     The project `root` is passed to all subcommands of `tutor`; that's because
     it is defined as an argument of the top-level command. For instance:
 
-        >>> tutor --root=... local run ...
+        $ tutor --root=... local run ...
     """
 
     def __init__(self, root: str) -> None:
