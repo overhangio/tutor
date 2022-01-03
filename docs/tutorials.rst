@@ -25,5 +25,6 @@ System administration
    tutorials/datamigration
    tutorials/multiplatforms
    tutorials/oldreleases
+   tutorials/arm64
 
 Other tutorials can be found in the official Tutor forums, `in the "Tutorials" category <https://discuss.overhang.io/c/tutor/tutorials/13>`__.
