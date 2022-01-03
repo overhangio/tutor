@@ -236,17 +236,13 @@ def convert_json2yml(root: str) -> None:
         return
     if os.path.exists(config_path(root)):
         raise exceptions.TutorError(
-            "Both config.json and {} exist in {}: only one of these files must exist to continue".format(
-                CONFIG_FILENAME, root
-            )
+            f"Both config.json and {CONFIG_FILENAME} exist in {root}: only one of these files must exist to continue"
         )
     config = get_yaml_file(json_path)
     save_config_file(root, config)
     os.remove(json_path)
     fmt.echo_info(
-        "File config.json detected in {} and converted to {}".format(
-            root, CONFIG_FILENAME
-        )
+        f"File config.json detected in {root} and converted to {CONFIG_FILENAME}"
     )
 
 
@@ -255,7 +251,7 @@ def save_config_file(root: str, config: Config) -> None:
     utils.ensure_file_directory_exists(path)
     with open(path, "w") as of:
         serialize.dump(config, of)
-    fmt.echo_info("Configuration saved to {}".format(path))
+    fmt.echo_info(f"Configuration saved to {path}")
 
 
 def config_path(root: str) -> str:

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from tutor.plugins import OfficialPlugin
 from tutor.commands.cli import main
 

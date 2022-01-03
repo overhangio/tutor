@@ -1,9 +1,12 @@
 import unittest
-from tutor import images, plugins
 from unittest.mock import Mock, patch
+
 from click.testing import CliRunner
-from tutor.commands.images import images_command, ImageNotFoundError
-from tests.helpers import TestContext
+
+from tests.helpers import TestContext, temporary_root
+from tutor import images, plugins
+from tutor.commands.config import config_command
+from tutor.commands.images import ImageNotFoundError, images_command
 
 
 class ImagesTests(unittest.TestCase):
@@ -14,14 +17,16 @@ class ImagesTests(unittest.TestCase):
         self.assertIsNone(result.exception)
 
     def test_images_pull_image(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(images_command, ["pull"], obj=context)
             self.assertEqual(0, result.exit_code)
             self.assertIsNone(result.exception)
 
     def test_images_pull_plugin_invalid_plugin_should_throw_error(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(images_command, ["pull", "plugin"], obj=context)
             self.assertEqual(1, result.exit_code)
@@ -40,19 +45,21 @@ class ImagesTests(unittest.TestCase):
     )
     @patch.object(images, "pull", return_value=None)
     def test_images_pull_plugin(
-        self, _image_pull: Mock, _iter_hooks: Mock, _iter_installed: Mock
+        self, _image_pull: Mock, iter_hooks: Mock, iter_installed: Mock
     ) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(images_command, ["pull", "plugin"], obj=context)
             self.assertEqual(0, result.exit_code)
             self.assertIsNone(result.exception)
-            _iter_hooks.assert_called_once_with("remote-image")
+            iter_hooks.assert_called_once_with("remote-image")
             _image_pull.assert_called_once_with("plugin:dev-1.0.0")
-            _iter_installed.assert_called()
+            iter_installed.assert_called()
 
     def test_images_printtag_image(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(images_command, ["printtag", "openedx"], obj=context)
             self.assertEqual(0, result.exit_code)
@@ -73,15 +80,16 @@ class ImagesTests(unittest.TestCase):
         ],
     )
     def test_images_printtag_plugin(
-        self, _iter_hooks: Mock, _iter_installed: Mock
+        self, iter_hooks: Mock, iter_installed: Mock
     ) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(images_command, ["printtag", "plugin"], obj=context)
             self.assertEqual(0, result.exit_code)
             self.assertIsNone(result.exception)
-            _iter_hooks.assert_called_once_with("build-image")
-            _iter_installed.assert_called()
+            iter_hooks.assert_called_once_with("build-image")
+            iter_installed.assert_called()
             self.assertEqual(result.output, "plugin:dev-1.0.0\n")
 
     @patch.object(plugins.BasePlugin, "iter_installed", return_value=[])
@@ -97,17 +105,19 @@ class ImagesTests(unittest.TestCase):
     )
     @patch.object(images, "build", return_value=None)
     def test_images_build_plugin(
-        self, _image_build: Mock, _iter_hooks: Mock, _iter_installed: Mock
+        self, image_build: Mock, iter_hooks: Mock, iter_installed: Mock
     ) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
+            runner.invoke(config_command, ["save"], obj=context)
             result = runner.invoke(images_command, ["build", "plugin"], obj=context)
-            self.assertEqual(0, result.exit_code)
             self.assertIsNone(result.exception)
-            _iter_hooks.assert_called_once_with("build-image")
-            _iter_installed.assert_called()
-            _image_build.assert_called()
-            self.assertIn("plugin:dev-1.0.0", _image_build.call_args[0])
+            self.assertEqual(0, result.exit_code)
+            image_build.assert_called()
+            iter_hooks.assert_called_once_with("build-image")
+            iter_installed.assert_called()
+            self.assertIn("plugin:dev-1.0.0", image_build.call_args[0])
 
     @patch.object(plugins.BasePlugin, "iter_installed", return_value=[])
     @patch.object(
@@ -122,10 +132,12 @@ class ImagesTests(unittest.TestCase):
     )
     @patch.object(images, "build", return_value=None)
     def test_images_build_plugin_with_args(
-        self, _image_build: Mock, _iter_hooks: Mock, _iter_installed: Mock
+        self, image_build: Mock, iter_hooks: Mock, iter_installed: Mock
     ) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
+            runner.invoke(config_command, ["save"], obj=context)
             args = [
                 "build",
                 "--no-cache",
@@ -146,17 +158,18 @@ class ImagesTests(unittest.TestCase):
             )
             self.assertEqual(0, result.exit_code)
             self.assertIsNone(result.exception)
-            _iter_hooks.assert_called_once_with("build-image")
-            _iter_installed.assert_called()
-            _image_build.assert_called()
-            self.assertIn("plugin:dev-1.0.0", _image_build.call_args[0])
-            for arg in _image_build.call_args[0][2:]:
+            iter_hooks.assert_called_once_with("build-image")
+            iter_installed.assert_called()
+            image_build.assert_called()
+            self.assertIn("plugin:dev-1.0.0", image_build.call_args[0])
+            for arg in image_build.call_args[0][2:]:
                 if arg == "--build-arg":
                     continue
                 self.assertIn(arg, args)
 
     def test_images_push(self) -> None:
-        with TestContext() as context:
+        with temporary_root() as root:
+            context = TestContext(root)
             runner = CliRunner()
             result = runner.invoke(images_command, ["push"], obj=context)
             self.assertEqual(0, result.exit_code)

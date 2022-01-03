@@ -1,6 +1,7 @@
 import unittest
 
 from click.testing import CliRunner
+
 from tutor.commands.cli import cli, print_help
 
 

@@ -1,22 +1,18 @@
 import os
-import shutil
 import tempfile
-from typing import Any
-from click.testing import CliRunner
-from tutor.types import Config
+
+from tutor.commands.context import BaseJobContext
 from tutor.jobs import BaseJobRunner
-from tutor import config as tutor_config
-from tutor.commands.config import config_command
-from tutor.commands.context import Context, BaseJobContext
-
-
-CONTEXT = Context(tempfile.mkdtemp())
+from tutor.types import Config
 
 
 class TestJobRunner(BaseJobRunner):
     def __init__(self, root: str, config: Config):
         """
         Mock job runner for unit testing.
+
+        This runner does nothing except print the service name and command,
+        separated by dashes.
         """
         super().__init__(root, config)
 
@@ -27,20 +23,23 @@ class TestJobRunner(BaseJobRunner):
         return 0
 
 
+def temporary_root() -> "tempfile.TemporaryDirectory[str]":
+    """
+    Context manager to handle temporary test root.
+
+    This function can be used as follows:
+
+        with temporary_root() as root:
+            config = tutor_config.load_full(root)
+            ...
+    """
+    return tempfile.TemporaryDirectory(prefix="tutor-test-root-")
+
+
 class TestContext(BaseJobContext):
-    def __init__(self) -> None:
-        super().__init__(CONTEXT.root)
-        runner = CliRunner()
-        runner.invoke(config_command, ["save"], obj=CONTEXT)
-
-    def __enter__(self) -> Any:
-        return self
-
-    def __exit__(self: Any, exc: Any, value: Any, tb: Any) -> None:
-        shutil.rmtree(CONTEXT.root)
-
-    def load_config(self) -> Config:
-        return tutor_config.load(CONTEXT.root)
+    """
+    Click context that will use only test job runners.
+    """
 
     def job_runner(self, config: Config) -> TestJobRunner:
-        return TestJobRunner(CONTEXT.root, config)
+        return TestJobRunner(self.root, config)

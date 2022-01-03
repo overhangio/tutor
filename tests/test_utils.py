@@ -1,10 +1,11 @@
+import base64
 import os
 import sys
-import base64
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
 from io import StringIO
+from unittest.mock import MagicMock, patch
+
 from tutor import exceptions, utils
 
 
@@ -127,9 +128,9 @@ class UtilsTests(unittest.TestCase):
     ) -> None:
         process = mock_popen.return_value
         mock_popen.return_value.__enter__.return_value = process
-        process.wait.side_effect = Exception("Exception occurred.")
+        process.wait.side_effect = ZeroDivisionError("Exception occurred.")
 
-        self.assertRaises(Exception, utils.execute, "echo", "")
+        self.assertRaises(ZeroDivisionError, utils.execute, "echo", "")
         self.assertEqual("echo \n", mock_stdout.getvalue())
         self.assertEqual(2, process.wait.call_count)
         process.kill.assert_called_once()

@@ -4,10 +4,8 @@ import click
 
 from .. import config as tutor_config
 from .. import env as tutor_env
-from .. import fmt
+from .. import exceptions, fmt, utils
 from ..types import Config, get_typed
-from .. import utils
-from .. import exceptions
 from . import compose
 from .config import save as config_save_command
 

@@ -10,7 +10,6 @@ import sys
 from typing import List, Tuple
 
 import click
-
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
 from Crypto.PublicKey import RSA
 from Crypto.PublicKey.RSA import RsaKey
