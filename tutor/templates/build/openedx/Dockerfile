@@ -55,6 +55,9 @@ RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 03731f19459e
 # https://github.com/overhangio/edx-platform/commit/b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d
 RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 78da3d86b79e808462b88f219efb90bf8253a5d1 && git cherry-pick 78da3d86b79e808462b88f219efb90bf8253a5d1
 RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d && git cherry-pick b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d
+# Upgrade Django to 3.2.11
+# https://github.com/edx/edx-platform/commit/85eb44445b8a6207b967bd4af5666e521a4af9b5
+RUN git fetch --depth=2 https://github.com/edx/edx-platform/ 85eb44445b8a6207b967bd4af5666e521a4af9b5 && git cherry-pick 85eb44445b8a6207b967bd4af5666e521a4af9b5
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}

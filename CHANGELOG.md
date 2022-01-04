@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Security] Upgrade Django to 3.2.11 in edx-platform.
 - [Security] Prevent non-staff users from searching usernames by email by abusing the logout url.
 
 ## v13.0.2 (2021-12-22)
