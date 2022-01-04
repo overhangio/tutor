@@ -50,9 +50,11 @@ RUN git fetch --depth=2 https://github.com/regisb/edx-platform 51e0ec3b97ae5badb
 # Fix forum notification for questions
 # https://github.com/edx/edx-platform/pull/29611
 RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 03731f19459e558f188c06aac5cc9ca1bbc675c2 && git cherry-pick 03731f19459e558f188c06aac5cc9ca1bbc675c2
-# Fix email search
+# Security fixes: user search by email
 # https://github.com/overhangio/edx-platform/commit/78da3d86b79e808462b88f219efb90bf8253a5d1
+# https://github.com/overhangio/edx-platform/commit/b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d
 RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 78da3d86b79e808462b88f219efb90bf8253a5d1 && git cherry-pick 78da3d86b79e808462b88f219efb90bf8253a5d1
+RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d && git cherry-pick b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/edx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}

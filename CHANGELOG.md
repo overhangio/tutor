@@ -4,15 +4,17 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
-## v13.0.2
+- [Security] Prevent non-staff users from searching usernames by email by abusing the logout url.
+
+## v13.0.2 (2021-12-22)
 
 - [Security] Prevent non-staff users from searching usernames by email.
 
-## v13.0.1
+## v13.0.1 (2021-12-20)
 
 - [Fix] Missing requirements file in `pip install tutor[full]`.
 
-## v13.0.0
+## v13.0.0 (2021-12-20)
 
 - 💥[Improvement] Upgrade to Maple
   - Install all official plugins as part of the `tutor[full]` package.
