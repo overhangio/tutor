@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from click.testing import CliRunner
 
 from tests.helpers import TestContext, temporary_root
+from tutor.__about__ import __version__
 from tutor import images, plugins
 from tutor.commands.config import config_command
 from tutor.commands.images import ImageNotFoundError, images_command
@@ -65,7 +66,7 @@ class ImagesTests(unittest.TestCase):
             self.assertEqual(0, result.exit_code)
             self.assertIsNone(result.exception)
             self.assertRegex(
-                result.output, r"docker.io/overhangio/openedx:\d+.\d+.\d+\n"
+                result.output, r"docker.io/overhangio/openedx:{}\n".format(__version__)
             )
 
     @patch.object(plugins.BasePlugin, "iter_installed", return_value=[])

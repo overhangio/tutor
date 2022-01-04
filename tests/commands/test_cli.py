@@ -2,6 +2,7 @@ import unittest
 
 from click.testing import CliRunner
 
+from tutor.__about__ import __version__
 from tutor.commands.cli import cli, print_help
 
 
@@ -23,4 +24,4 @@ class CliTests(unittest.TestCase):
         result = runner.invoke(cli, ["--version"])
         self.assertEqual(0, result.exit_code)
         self.assertIsNone(result.exception)
-        self.assertRegex(result.output, r"cli, version \d+.\d+.\d+\n")
+        self.assertRegex(result.output, r"cli, version {}\n".format(__version__))
