@@ -37,7 +37,7 @@ Python package
 
 .. include:: download/pip.rst
 
-Check the "tutor" package on Pypi: https://pypi.org/project/tutor. You will python >= 3.6 with pip and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
+Check the "tutor" package on Pypi: https://pypi.org/project/tutor. You will need Python >= 3.6 with pip and the libyaml development headers. On Ubuntu, these requirements can be installed by running::
 
     sudo apt install python3 python3-pip libyaml-dev
 
