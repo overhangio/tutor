@@ -36,6 +36,8 @@ click==8.0.3
     #   pip-tools
 colorama==0.4.4
     # via twine
+coverage==6.2
+    # via -r requirements/dev.in
 cryptography==35.0.0
     # via secretstorage
 docutils==0.17.1

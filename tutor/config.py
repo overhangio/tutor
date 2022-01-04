@@ -3,6 +3,8 @@ import os
 from . import env, exceptions, fmt, plugins, serialize, utils
 from .types import Config, cast_config
 
+CONFIG_FILENAME = "config.yml"
+
 
 def load(root: str) -> Config:
     """
@@ -37,6 +39,11 @@ def load_minimal(root: str) -> Config:
 def load_full(root: str) -> Config:
     """
     Load a full configuration, with user, base and defaults.
+
+    Return:
+        current (dict): params currently saved in config.yml
+        defaults (dict): default values of params which might be missing from the
+        current config
     """
     config = get_user(root)
     update_with_base(config)
@@ -234,15 +241,13 @@ def convert_json2yml(root: str) -> None:
         return
     if os.path.exists(config_path(root)):
         raise exceptions.TutorError(
-            "Both config.json and config.yml exist in {}: only one of these files must exist to continue".format(
-                root
-            )
+            f"Both config.json and {CONFIG_FILENAME} exist in {root}: only one of these files must exist to continue"
         )
     config = get_yaml_file(json_path)
     save_config_file(root, config)
     os.remove(json_path)
     fmt.echo_info(
-        "File config.json detected in {} and converted to config.yml".format(root)
+        f"File config.json detected in {root} and converted to {CONFIG_FILENAME}"
     )
 
 
@@ -251,8 +256,8 @@ def save_config_file(root: str, config: Config) -> None:
     utils.ensure_file_directory_exists(path)
     with open(path, "w") as of:
         serialize.dump(config, of)
-    fmt.echo_info("Configuration saved to {}".format(path))
+    fmt.echo_info(f"Configuration saved to {path}")
 
 
 def config_path(root: str) -> str:
-    return os.path.join(root, "config.yml")
+    return os.path.join(root, CONFIG_FILENAME)

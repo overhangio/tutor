@@ -1,12 +1,14 @@
+import json
+import os
 import unittest
 from unittest.mock import Mock, patch
-import tempfile
 
 import click
 
+from tests.helpers import temporary_root
 from tutor import config as tutor_config
 from tutor import interactive
-from tutor.types import get_typed, Config
+from tutor.types import Config, get_typed
 
 
 class ConfigTests(unittest.TestCase):
@@ -30,8 +32,8 @@ class ConfigTests(unittest.TestCase):
         self.assertNotEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
 
     @patch.object(tutor_config.fmt, "echo")
-    def test_save_load(self, _: Mock) -> None:
-        with tempfile.TemporaryDirectory() as root:
+    def test_update_twice_should_return_same_config(self, _: Mock) -> None:
+        with temporary_root() as root:
             config1 = tutor_config.load_minimal(root)
             tutor_config.save_config_file(root, config1)
             config2 = tutor_config.load_minimal(root)
@@ -40,7 +42,7 @@ class ConfigTests(unittest.TestCase):
 
     @patch.object(tutor_config.fmt, "echo")
     def test_removed_entry_is_added_on_save(self, _: Mock) -> None:
-        with tempfile.TemporaryDirectory() as root:
+        with temporary_root() as root:
             with patch.object(
                 tutor_config.utils, "random_string"
             ) as mock_random_string:
@@ -62,7 +64,7 @@ class ConfigTests(unittest.TestCase):
         def mock_prompt(*_args: None, **kwargs: str) -> str:
             return kwargs["default"]
 
-        with tempfile.TemporaryDirectory() as rootdir:
+        with temporary_root() as rootdir:
             with patch.object(click, "prompt", new=mock_prompt):
                 with patch.object(click, "confirm", new=mock_prompt):
                     config = interactive.load_user_config(rootdir, interactive=True)
@@ -74,6 +76,27 @@ class ConfigTests(unittest.TestCase):
 
     def test_is_service_activated(self) -> None:
         config: Config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}
-
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
         self.assertFalse(tutor_config.is_service_activated(config, "service2"))
+
+    @patch.object(tutor_config.fmt, "echo")
+    def test_json_config_is_overwritten_by_yaml(self, _: Mock) -> None:
+        with temporary_root() as root:
+            # Create config from scratch
+            config_yml_path = os.path.join(root, tutor_config.CONFIG_FILENAME)
+            config_json_path = os.path.join(
+                root, tutor_config.CONFIG_FILENAME.replace("yml", "json")
+            )
+            config = tutor_config.load_full(root)
+
+            # Save config to json
+            with open(config_json_path, "w", encoding="utf-8") as f:
+                json.dump(config, f, ensure_ascii=False, indent=4)
+            self.assertFalse(os.path.exists(config_yml_path))
+            self.assertTrue(os.path.exists(config_json_path))
+
+            # Reload and compare
+            current = tutor_config.load_full(root)
+            self.assertTrue(os.path.exists(config_yml_path))
+            self.assertFalse(os.path.exists(config_json_path))
+            self.assertEqual(config, current)

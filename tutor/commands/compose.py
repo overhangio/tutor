@@ -6,11 +6,9 @@ import click
 from .. import bindmounts
 from .. import config as tutor_config
 from .. import env as tutor_env
+from .. import fmt, jobs, utils
 from ..exceptions import TutorError
-from .. import fmt
-from .. import jobs
 from ..types import Config
-from .. import utils
 from .context import BaseJobContext
 
 
