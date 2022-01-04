@@ -162,6 +162,7 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
         context.invoke(
             upgrade,
             from_version=tutor_env.current_release(context.obj.root),
+            non_interactive=non_interactive,
         )
 
     click.echo(fmt.title("Interactive platform configuration"))
@@ -448,8 +449,9 @@ def wait(context: Context, name: str) -> None:
     default="lilac",
     type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_obj
-def upgrade(context: Context, from_version: str) -> None:
+def upgrade(context: Context, from_version: str, non_interactive: bool) -> None:
     config = tutor_config.load(context.root)
 
     running_version = from_version
@@ -468,6 +470,23 @@ def upgrade(context: Context, from_version: str) -> None:
     if running_version == "lilac":
         upgrade_from_lilac(config)
         running_version = "maple"
+
+    # Update env such that the build environment is up-to-date
+    tutor_env.save(context.root, config)
+    if not non_interactive:
+        question = f"""
+Your platform was successfuly upgraded from {from_version} to {running_version}.
+Depending on your setup, you might have to rebuild some of your Docker images
+and push them to your private registry (if any). You can do this now by running
+the following command in a different shell:
+
+    tutor images build openedx # add your custom images here
+    tutor images push openedx
+
+Press enter when you are ready to continue"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
+        )
 
 
 def upgrade_from_ironwood(config: Config) -> None:

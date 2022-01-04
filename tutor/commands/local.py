@@ -105,7 +105,7 @@ Your Open edX platform is ready and can be accessed at the following urls:
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
 def upgrade(context: click.Context, from_version: str, non_interactive: bool) -> None:
-    config = tutor_config.load_full(context.obj.root)
+    config = tutor_config.load(context.obj.root)
 
     if not non_interactive:
         question = """You are about to upgrade your Open edX platform. It is strongly recommended to make a backup before upgrading. To do so, run:
@@ -137,9 +137,13 @@ Are you sure you want to continue?"""
         # Nothing to do here
         running_version = "maple"
 
+    # Update env such that the build environment is up-to-date
+    tutor_env.save(context.obj.root, config)
     if not non_interactive:
         question = f"""
-Your platform was successfuly upgraded from {from_version} to {running_version}. Depending on your setup, you might have to rebuild some of your Docker images. You can do this now by running the following command in a different shell:
+Your platform was successfuly upgraded from {from_version} to {running_version}.
+Depending on your setup, you might have to rebuild some of your Docker images.
+You can do this now by running the following command in a different shell:
 
     tutor images build openedx # add your custom images here
 
