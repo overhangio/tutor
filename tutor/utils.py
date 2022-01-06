@@ -222,9 +222,12 @@ def check_output(*command: str) -> bytes:
         ) from e
 
 
-def check_macos_memory() -> None:
+def check_macos_docker_memory() -> None:
     """
     Try to check that the RAM allocated to the Docker VM on macOS is at least 4 GB.
+
+    Parse macOS Docker settings file from user directory and return the max
+    allocated memory. Will raise TutorError in case of parsing/loading error.
     """
     if sys.platform != "darwin":
         return
@@ -238,27 +241,25 @@ def check_macos_memory() -> None:
             data = json.load(fp)
             memory_mib = int(data["memoryMiB"])
     except OSError as e:
-        raise exceptions.TutorError(
-            "Error accessing {}: [{}] {}".format(settings_path, e.errno, e.strerror)
-        ) from e
+        raise exceptions.TutorError(f"Error accessing Docker settings file: {e}") from e
     except json.JSONDecodeError as e:
         raise exceptions.TutorError(
-            "Error reading {}: invalid JSON: {} [{}:{}]".format(
-                settings_path, e.msg, e.lineno, e.colno
-            )
+            f"Error reading {settings_path}, invalid JSON: {e}"
         ) from e
-    except (ValueError, TypeError, OverflowError) as e:
-        # ValueError from open() indicates an encoding error
+    except ValueError as e:
         raise exceptions.TutorError(
-            "Text encoding error or unexpected JSON data: in {}: {}".format(
-                settings_path, str(e)
-            )
+            f"Unexpected JSON data in {settings_path}: {e}"
         ) from e
     except KeyError as e:
         # Value is absent (Docker creates the file with the default setting of 2048 explicitly
         # written in, so we shouldn't need to assume a default value here.)
         raise exceptions.TutorError(
-            "key 'memoryMiB' not found in {}".format(settings_path)
+            f"key 'memoryMiB' not found in {settings_path}"
+        ) from e
+    except (TypeError, OverflowError) as e:
+        # TypeError from open() indicates an encoding error
+        raise exceptions.TutorError(
+            f"Text encoding error in {settings_path}: {e}"
         ) from e
 
     if memory_mib < 4096:

@@ -4,7 +4,7 @@ import sys
 import tempfile
 import unittest
 from io import StringIO
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 from tutor import exceptions, utils
 
@@ -152,9 +152,59 @@ class UtilsTests(unittest.TestCase):
         process.kill.assert_called_once()
 
     @patch("sys.platform", "win32")
-    def test_check_macos_memory_win32_should_skip(self) -> None:
-        utils.check_macos_memory()
+    def test_check_macos_docker_memory_win32_should_skip(self) -> None:
+        utils.check_macos_docker_memory()
 
     @patch("sys.platform", "darwin")
-    def test_check_macos_memory_darwin_filenotfound(self) -> None:
-        self.assertRaises(exceptions.TutorError, utils.check_macos_memory)
+    def test_check_macos_docker_memory_darwin(self) -> None:
+        with patch("tutor.utils.open", mock_open(read_data='{"memoryMiB": 4096}')):
+            utils.check_macos_docker_memory()
+
+    @patch("sys.platform", "darwin")
+    def test_check_macos_docker_memory_darwin_filenotfound(self) -> None:
+        with patch("tutor.utils.open", mock_open()) as mock_open_settings:
+            mock_open_settings.return_value.__enter__.side_effect = FileNotFoundError
+            with self.assertRaises(exceptions.TutorError) as e:
+                utils.check_macos_docker_memory()
+            self.assertIn("Error accessing Docker settings file", e.exception.args[0])
+
+    @patch("sys.platform", "darwin")
+    def test_check_macos_docker_memory_darwin_json_decode_error(self) -> None:
+        with patch("tutor.utils.open", mock_open(read_data="invalid")):
+            with self.assertRaises(exceptions.TutorError) as e:
+                utils.check_macos_docker_memory()
+            self.assertIn("invalid JSON", e.exception.args[0])
+
+    @patch("sys.platform", "darwin")
+    def test_check_macos_docker_memory_darwin_key_error(self) -> None:
+        with patch("tutor.utils.open", mock_open(read_data="{}")):
+            with self.assertRaises(exceptions.TutorError) as e:
+                utils.check_macos_docker_memory()
+            self.assertIn("key 'memoryMiB' not found", e.exception.args[0])
+
+    @patch("sys.platform", "darwin")
+    def test_check_macos_docker_memory_darwin_type_error(self) -> None:
+        with patch(
+            "tutor.utils.open", mock_open(read_data='{"memoryMiB": "invalidstring"}')
+        ):
+            with self.assertRaises(exceptions.TutorError) as e:
+                utils.check_macos_docker_memory()
+            self.assertIn("Unexpected JSON data", e.exception.args[0])
+
+    @patch("sys.platform", "darwin")
+    def test_check_macos_docker_memory_darwin_insufficient_memory(self) -> None:
+        with patch("tutor.utils.open", mock_open(read_data='{"memoryMiB": 4095}')):
+            with self.assertRaises(exceptions.TutorError) as e:
+                utils.check_macos_docker_memory()
+            self.assertEqual(
+                "Docker is configured to allocate 4095 MiB RAM, less than the recommended 4096 MiB",
+                e.exception.args[0],
+            )
+
+    @patch("sys.platform", "darwin")
+    def test_check_macos_docker_memory_darwin_encoding_error(self) -> None:
+        with patch("tutor.utils.open", mock_open()) as mock_open_settings:
+            mock_open_settings.return_value.__enter__.side_effect = TypeError
+            with self.assertRaises(exceptions.TutorError) as e:
+                utils.check_macos_docker_memory()
+            self.assertIn("Text encoding error", e.exception.args[0])
