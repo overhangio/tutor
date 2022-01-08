@@ -1,51 +1,30 @@
-import click
-
 from tutor import config as tutor_config
-from tutor import env as tutor_env
 from tutor import fmt
 from tutor.commands import k8s
 from tutor.commands.context import Context
 from tutor.types import Config
+from . import common as common_upgrade
 
 
-def upgrade_from(
-    context: Context, from_version: str, interactive: bool = False
-) -> None:
+def upgrade_from(context: Context, from_release: str) -> None:
     config = tutor_config.load(context.root)
 
-    running_version = from_version
-    if running_version == "ironwood":
+    running_release = from_release
+    if running_release == "ironwood":
         upgrade_from_ironwood(config)
-        running_version = "juniper"
+        running_release = "juniper"
 
-    if running_version == "juniper":
+    if running_release == "juniper":
         upgrade_from_juniper(config)
-        running_version = "koa"
+        running_release = "koa"
 
-    if running_version == "koa":
+    if running_release == "koa":
         upgrade_from_koa(config)
-        running_version = "lilac"
+        running_release = "lilac"
 
-    if running_version == "lilac":
+    if running_release == "lilac":
         upgrade_from_lilac(config)
-        running_version = "maple"
-
-    # Update env such that the build environment is up-to-date
-    tutor_env.save(context.root, config)
-    if interactive:
-        question = f"""Your platform was successfuly upgraded from {from_version} to {running_version}.
-
-Depending on your setup, you might have to rebuild some of your Docker images
-and push them to your private registry (if any). You can do this now by running
-the following command in a different shell:
-
-    tutor images build openedx # add your custom images here
-    tutor images push openedx
-
-Press enter when you are ready to continue"""
-        click.confirm(
-            fmt.question(question), default=True, abort=True, prompt_suffix=" "
-        )
+        running_release = "maple"
 
 
 def upgrade_from_ironwood(config: Config) -> None:
@@ -116,6 +95,7 @@ your MongoDb cluster from v3.6 to v4.0. You should run something similar to:
 
 
 def upgrade_from_lilac(config: Config) -> None:
+    common_upgrade.upgrade_from_lilac(config)
     fmt.echo_info(
         "All Kubernetes services and deployments need to be deleted during "
         "upgrade from Lilac to Maple"

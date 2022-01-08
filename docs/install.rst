@@ -87,11 +87,45 @@ Tutor can be launched on Amazon Web Services very quickly with the `official Tut
 Upgrading
 ---------
 
-With Tutor, it is very easy to upgrade to a more recent Open edX or Tutor release. Just install the latest ``tutor`` version (using either methods above) and run the ``quickstart`` command again. If you have :ref:`customised <configuration_customisation>` your docker images, you will have to re-build them prior to running ``quickstart``.
+To upgrade Open edX or benefit from the latest features and bug fixes, you should simply upgrade Tutor. Start by upgrading the "tutor" package and its dependencies::
 
-``quickstart`` should take care of automatically running the upgrade process. If for some reason you need to *manually* upgrade from an Open edX release to the next, you should run ``tutor local upgrade``. For instance, to upgrade from Lilac to Maple, run::
+    pip install --upgrade tutor[full]
 
+Then run the ``quickstart`` command again. Depending on your deployment target, run either::
+
+    tutor local quickstart # for local installations
+    tutor k8s quickstart   # for Kubernetes installation
+
+Upgrading with custom Docker images
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you run :ref:`customised <configuration_customisation>` Docker images, you need to rebuild them prior to running ``quickstart``::
+
+    tutor config save
+    tutor images build all # specify here the images that you need to build
+    tutor local quickstart
+
+Upgrading to a new Open edX release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Major Open edX releases are published twice a year, in June and December, by the Open edX `Build/Test/Release working group <https://discuss.openedx.org/c/working-groups/build-test-release/30>`__. When a new Open edX release comes out, Tutor gets a major version bump (see :ref:`versioning`). Such an upgrade typically includes multiple breaking changes. Any upgrade is final, because downgrading is not supported. Thus, when upgrading your platform from one major version to the next, it is strongly recommended to do the following:
+
+1. Read the changes listed in the `CHANGELOG.md <https://github.com/overhangio/tutor/blob/master/CHANGELOG.md>`__ file. Breaking changes are identified by a "💥".
+2. Perform a backup. On a local installation, this is typically done with::
+
+    tutor local stop
+    sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/
+
+3. If you created custom plugins, make sure that they are compatible with the newer release.
+4. Test the new release in a sandboxed environment.
+5. If you are running edx-platform, or some other repository from a custom branch, then you should rebase (and test) your changes on top of the latest release tag (see :ref:`edx_platform_fork`).
+
+The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``quickstart`` command (see above). The single difference is that if the ``quickstart`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) prior to running ``quickstart``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Lilac to Maple and rebuild some Docker images, run::
+
+    tutor config save
+    tutor images build all # list the images that should be rebuilt here
     tutor local upgrade --from=lilac
+    tutor local quickstart
 
 .. _autocomplete:
 
