@@ -16,7 +16,7 @@ If you get ``Connected to smtp.gmail.com.`` then it means that you can successfu
 
 To exit the ``telnet`` shell, type ``ctrl+]``, then ``ctrl+d``.
 
-Thenm, disable the SMTP server that comes with Tutor::
+Then, disable the SMTP server that comes with Tutor::
 
     $ tutor config save --set RUN_SMTP=false
 
