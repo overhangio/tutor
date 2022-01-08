@@ -79,7 +79,7 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/maple.beta2"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/maple.1"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
