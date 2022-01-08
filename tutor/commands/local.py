@@ -45,16 +45,14 @@ def local(context: click.Context) -> None:
 @click.pass_context
 def quickstart(context: click.Context, non_interactive: bool, pullimages: bool) -> None:
     try:
-        utils.check_macos_memory()
+        utils.check_macos_docker_memory()
     except exceptions.TutorError as e:
         fmt.echo_alert(
-            """Could not verify sufficient RAM allocation in Docker:
-    {}
-Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
+            f"""Could not verify sufficient RAM allocation in Docker:
+    {e}
+Tutor may not work if Docker is configured with < 4 GB RAM. Please follow the instructions from:
     https://docs.tutor.overhang.io/install.html
-            """.format(
-                str(e)
-            )
+            """
         )
 
     if tutor_env.needs_major_upgrade(context.obj.root):
