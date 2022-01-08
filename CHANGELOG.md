@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.0 (2022-01-08)
+
 - [Improvement] Provide much more comprehensive instructions when upgrading.
 - [Bugfix] During upgrade, make sure that environment is up-to-date prior to prompting to rebuild the custom images.
 - [Bugfix] Fix ownership of mysql data, in particular when upgrading a Kubernetes cluster to Maple.
