@@ -1,7 +1,8 @@
 import io
 import os
-from setuptools import find_packages, setup
 from typing import Dict, List
+
+from setuptools import find_packages, setup
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -29,6 +30,7 @@ def load_requirements(filename: str) -> List[str]:
         os.path.join(HERE, "requirements", filename), "rt", encoding="utf-8"
     ) as f:
         return [line.strip() for line in f if is_requirement(line)]
+
 
 def is_requirement(line: str) -> bool:
     return not (line.strip() == "" or line.startswith("#"))

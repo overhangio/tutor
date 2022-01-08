@@ -4,6 +4,15 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.0 (2022-01-08)
+
+- [Improvement] Provide much more comprehensive instructions when upgrading.
+- [Bugfix] During upgrade, make sure that environment is up-to-date prior to prompting to rebuild the custom images.
+- [Bugfix] Fix ownership of mysql data, in particular when upgrading a Kubernetes cluster to Maple.
+- [Bugfix] Ensure that ``tutor k8s upgrade`` is run during ``tutor k8s quickstart``, when necessary.
+- 💥[Bugfix] By default, detect the current version during ``tutor k8s/local upgrade``.
+- [Bugfix] Fix upgrading from Lilac to Maple on Kubernetes by deleting deployments and services.
+
 ## v13.0.3 (2022-01-04)
 
 - [Security] Upgrade Django to 3.2.11 in edx-platform.
@@ -15,7 +24,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v13.0.1 (2021-12-20)
 
-- [Fix] Missing requirements file in `pip install tutor[full]`.
+- [Bugfix] Missing requirements file in `pip install tutor[full]`.
 
 ## v13.0.0 (2021-12-20)
 

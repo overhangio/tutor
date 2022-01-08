@@ -4,12 +4,13 @@ from typing import Any, List, Optional, Type
 
 import click
 
-from .. import config as tutor_config
-from .. import env as tutor_env
-from .. import exceptions, fmt, jobs, serialize, utils
-from ..types import Config, get_typed
-from .config import save as config_save_command
-from .context import Context
+from tutor import config as tutor_config
+from tutor import env as tutor_env
+from tutor import exceptions, fmt, jobs, serialize, utils
+from tutor.commands.config import save as config_save_command
+from tutor.commands.context import Context
+from tutor.commands.upgrade.k8s import upgrade_from
+from tutor.types import Config, get_typed
 
 
 class K8sClients:
@@ -50,11 +51,11 @@ class K8sJobRunner(jobs.BaseJobRunner):
             job_name = job["metadata"]["name"]
             if not isinstance(job_name, str):
                 raise exceptions.TutorError(
-                    "Invalid job name: '{}'. Expected str.".format(job_name)
+                    f"Invalid job name: '{job_name}'. Expected str."
                 )
             if job_name == name:
                 return job
-        raise exceptions.TutorError("Could not find job '{}'".format(name))
+        raise exceptions.TutorError(f"Could not find job '{name}'")
 
     def active_job_names(self) -> List[str]:
         """
@@ -70,7 +71,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
         ]
 
     def run_job(self, service: str, command: str) -> int:
-        job_name = "{}-job".format(service)
+        job_name = f"{service}-job"
         job = self.load_job(job_name)
         # Create a unique job name to make it deduplicate jobs and make it easier to
         # find later. Logs of older jobs will remain available for some time.
@@ -82,7 +83,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             if not active_jobs:
                 break
             fmt.echo_info(
-                "Waiting for active jobs to terminate: {}".format(" ".join(active_jobs))
+                f"Waiting for active jobs to terminate: {' '.join(active_jobs)}"
             )
             sleep(5)
 
@@ -105,7 +106,9 @@ class K8sJobRunner(jobs.BaseJobRunner):
         job["spec"]["backoffLimit"] = 1
         job["spec"]["ttlSecondsAfterFinished"] = 3600
         # Save patched job to "jobs.yml" file
-        with open(tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w") as job_file:
+        with open(
+            tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w", encoding="utf-8"
+        ) as job_file:
             serialize.dump(job, job_file)
         # We cannot use the k8s API to create the job: configMap and volume names need
         # to be found with the right suffixes.
@@ -114,7 +117,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             "--kustomize",
             tutor_env.pathjoin(self.root),
             "--selector",
-            "app.kubernetes.io/name={}".format(job_name),
+            f"app.kubernetes.io/name={job_name}",
         )
 
         message = (
@@ -126,7 +129,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
         fmt.echo_info(message)
 
         # Wait for completion
-        field_selector = "metadata.name={}".format(job_name)
+        field_selector = f"metadata.name={job_name}"
         while True:
             namespaced_jobs = K8sClients.instance().batch_api.list_namespaced_job(
                 k8s_namespace(self.config), field_selector=field_selector
@@ -136,13 +139,11 @@ class K8sJobRunner(jobs.BaseJobRunner):
             job = namespaced_jobs.items[0]
             if not job.status.active:
                 if job.status.succeeded:
-                    fmt.echo_info("Job {} successful.".format(job_name))
+                    fmt.echo_info(f"Job {job_name} successful.")
                     break
                 if job.status.failed:
                     raise exceptions.TutorError(
-                        "Job {} failed. View the job logs to debug this issue.".format(
-                            job_name
-                        )
+                        f"Job {job_name} failed. View the job logs to debug this issue."
                     )
             sleep(5)
         return 0
@@ -157,30 +158,41 @@ def k8s() -> None:
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
 def quickstart(context: click.Context, non_interactive: bool) -> None:
+    run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
+    if run_upgrade_from_release is not None:
+        click.echo(fmt.title("Upgrading from an older release"))
+        context.invoke(
+            upgrade,
+            from_version=tutor_env.get_env_release(context.obj.root),
+        )
+
     click.echo(fmt.title("Interactive platform configuration"))
     context.invoke(
         config_save_command,
         interactive=(not non_interactive),
-        set_vars=[],
-        unset_vars=[],
     )
-    config = tutor_config.load(context.obj.root)
-    if not config["ENABLE_WEB_PROXY"]:
-        fmt.echo_alert(
-            "Potentially invalid configuration: ENABLE_WEB_PROXY=false\n"
-            "This setting might have been defined because you previously set WEB_PROXY=true. This is no longer"
-            " necessary in order to get Tutor to work on Kubernetes. In Tutor v11+ a Caddy-based load balancer is"
-            " provided out of the box to handle SSL/TLS certificate generation at runtime. If you disable this"
-            " service, you will have to configure an Ingress resource and a certificate manager yourself to redirect"
-            " traffic to the caddy service. See the Kubernetes section in the Tutor documentation for more"
-            " information."
+
+    if run_upgrade_from_release and not non_interactive:
+        question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
+
+If you run custom Docker images, you must rebuild and push them to your private repository now by running the following
+commands in a different shell:
+
+    tutor images build all # add your custom images here
+    tutor images push all
+
+Press enter when you are ready to continue"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
         )
-    click.echo(fmt.title("Updating the current environment"))
-    tutor_env.save(context.obj.root, config)
+
     click.echo(fmt.title("Starting the platform"))
     context.invoke(start)
+
     click.echo(fmt.title("Database creation and migrations"))
     context.invoke(init, limit=None)
+
+    config = tutor_config.load(context.obj.root)
     fmt.echo_info(
         """Your Open edX platform is ready and can be accessed at the following urls:
 
@@ -248,7 +260,7 @@ def start(context: Context, names: List[str]) -> None:
                 "--kustomize",
                 tutor_env.pathjoin(context.root),
                 "--selector",
-                "app.kubernetes.io/name={}".format(name),
+                f"app.kubernetes.io/name={name}",
             )
 
 
@@ -264,25 +276,29 @@ def start(context: Context, names: List[str]) -> None:
 def stop(context: Context, names: List[str]) -> None:
     config = tutor_config.load(context.root)
     names = names or ["all"]
-    resource_types = "deployments,services,configmaps,jobs"
-    not_lb_selector = "app.kubernetes.io/component!=loadbalancer"
     for name in names:
         if name == "all":
-            utils.kubectl(
-                "delete",
-                *resource_selector(config, not_lb_selector),
-                resource_types,
-            )
+            delete_resources(config)
         else:
-            utils.kubectl(
-                "delete",
-                *resource_selector(
-                    config,
-                    not_lb_selector,
-                    "app.kubernetes.io/name={}".format(name),
-                ),
-                resource_types,
-            )
+            delete_resources(config, name=name)
+
+
+def delete_resources(
+    config: Config, resources: Optional[List[str]] = None, name: Optional[str] = None
+) -> None:
+    """
+    Delete resources by type and name.
+
+    The load balancer is never deleted.
+    """
+    resources = resources or ["deployments", "services", "configmaps", "jobs"]
+    not_lb_selector = "app.kubernetes.io/component!=loadbalancer"
+    name_selector = [f"app.kubernetes.io/name={name}"] if name else []
+    utils.kubectl(
+        "delete",
+        *resource_selector(config, not_lb_selector, *name_selector),
+        ",".join(resources),
+    )
 
 
 @click.command(help="Reboot an existing platform")
@@ -336,8 +352,8 @@ def scale(context: Context, deployment: str, replicas: int) -> None:
         *resource_namespace_selector(
             config,
         ),
-        "--replicas={}".format(replicas),
-        "deployment/{}".format(deployment),
+        f"--replicas={replicas}",
+        f"deployment/{deployment}",
     )
 
 
@@ -434,112 +450,41 @@ def wait(context: Context, name: str) -> None:
     wait_for_pod_ready(config, name)
 
 
-@click.command(help="Upgrade from a previous Open edX named release")
+@click.command(
+    short_help="Perform release-specific upgrade tasks",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `quickstart`.",
+)
 @click.option(
     "--from",
-    "from_version",
-    default="koa",
+    "from_release",
     type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
-@click.pass_obj
-def upgrade(context: Context, from_version: str) -> None:
-    config = tutor_config.load(context.root)
-
-    running_version = from_version
-    if running_version == "ironwood":
-        upgrade_from_ironwood(config)
-        running_version = "juniper"
-
-    if running_version == "juniper":
-        upgrade_from_juniper(config)
-        running_version = "koa"
-
-    if running_version == "koa":
-        upgrade_from_koa(config)
-        running_version = "lilac"
-
-    if running_version == "lilac":
-        # Nothing to do here
-        running_version = "maple"
-
-
-def upgrade_from_ironwood(config: Config) -> None:
-    if not config["RUN_MONGODB"]:
-        fmt.echo_info(
-            "You are not running MongDB (RUN_MONGODB=false). It is your "
-            "responsibility to upgrade your MongoDb instance to v3.6. There is "
-            "nothing left to do to upgrade from Ironwood."
+@click.pass_context
+def upgrade(context: click.Context, from_release: Optional[str]) -> None:
+    if from_release is None:
+        from_release = tutor_env.get_env_release(context.obj.root)
+    if from_release is None:
+        fmt.echo_info("Your environment is already up-to-date")
+    else:
+        fmt.echo_alert(
+            "This command only performs a partial upgrade of your Open edX platform. "
+            "To perform a full upgrade, you should run `tutor k8s quickstart`."
         )
-        return
-    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Ironwood, you should upgrade
-your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
-
-    # Upgrade from v3.2 to v3.4
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.4.24
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.4" })'
-
-    # Upgrade from v3.4 to v3.6
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.6.18
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })'
-
-    tutor config save --unset DOCKER_IMAGE_MONGODB"""
-    fmt.echo_info(message)
-
-
-def upgrade_from_juniper(config: Config) -> None:
-    if not config["RUN_MYSQL"]:
-        fmt.echo_info(
-            "You are not running MySQL (RUN_MYSQL=false). It is your "
-            "responsibility to upgrade your MySQL instance to v5.7. There is "
-            "nothing left to do to upgrade from Juniper."
-        )
-        return
-
-    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Juniper, you should upgrade
-your MySQL database from v5.6 to v5.7. You should run something similar to:
-
-    tutor k8s start
-    tutor k8s exec mysql bash -e -c "mysql_upgrade \
-        -u $(tutor config printvalue MYSQL_ROOT_USERNAME) \
-        --password='$(tutor config printvalue MYSQL_ROOT_PASSWORD)'
-"""
-    fmt.echo_info(message)
-
-
-def upgrade_from_koa(config: Config) -> None:
-    if not config["RUN_MONGODB"]:
-        fmt.echo_info(
-            "You are not running MongDB (RUN_MONGODB=false). It is your "
-            "responsibility to upgrade your MongoDb instance to v4.0. There is "
-            "nothing left to do to upgrade to Lilac from Koa."
-        )
-        return
-    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Koa to Lilac, you should upgrade
-your MongoDb cluster from v3.6 to v4.0. You should run something similar to:
-
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:4.0.25
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "4.0" })'
-    tutor config save --unset DOCKER_IMAGE_MONGODB
-    """
-    fmt.echo_info(message)
+        upgrade_from(context.obj, from_release)
+    # We update the environment to update the version
+    context.invoke(config_save_command)
 
 
 def kubectl_exec(
     config: Config, service: str, command: str, attach: bool = False
 ) -> int:
-    selector = "app.kubernetes.io/name={}".format(service)
+    selector = f"app.kubernetes.io/name={service}"
     pods = K8sClients.instance().core_api.list_namespaced_pod(
         namespace=k8s_namespace(config), label_selector=selector
     )
     if not pods.items:
         raise exceptions.TutorError(
-            "Could not find an active pod for the {} service".format(service)
+            f"Could not find an active pod for the {service} service"
         )
     pod_name = pods.items[0].metadata.name
 
@@ -560,10 +505,10 @@ def kubectl_exec(
 
 
 def wait_for_pod_ready(config: Config, service: str) -> None:
-    fmt.echo_info("Waiting for a {} pod to be ready...".format(service))
+    fmt.echo_info(f"Waiting for a {service} pod to be ready...")
     utils.kubectl(
         "wait",
-        *resource_selector(config, "app.kubernetes.io/name={}".format(service)),
+        *resource_selector(config, f"app.kubernetes.io/name={service}"),
         "--for=condition=ContainersReady",
         "--timeout=600s",
         "pod",

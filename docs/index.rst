@@ -37,6 +37,7 @@
    Source code <https://github.com/overhangio/tutor>
    Community forums <https://discuss.overhang.io>
    Pypi releases <https://pypi.org/project/tutor>
+   Changelog <https://github.com/overhangio/tutor/blob/master/CHANGELOG.md>
 
 Source code
 -----------

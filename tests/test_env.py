@@ -3,9 +3,11 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
+from tutor.__about__ import __version__
 from tutor import config as tutor_config
 from tutor import env, exceptions, fmt
 from tutor.types import Config
+from tests.helpers import temporary_root
 
 
 class EnvTests(unittest.TestCase):
@@ -30,9 +32,9 @@ class EnvTests(unittest.TestCase):
         self.assertTrue(os.path.exists(path))
 
     def test_pathjoin(self) -> None:
-        with tempfile.TemporaryDirectory() as root:
+        with temporary_root() as root:
             self.assertEqual(
-                os.path.join(root, "env", "dummy"), env.pathjoin(root, "dummy")
+                os.path.join(env.base_dir(root), "dummy"), env.pathjoin(root, "dummy")
             )
 
     def test_render_str(self) -> None:
@@ -76,21 +78,26 @@ class EnvTests(unittest.TestCase):
         )
 
     def test_save_full(self) -> None:
-        with tempfile.TemporaryDirectory() as root:
+        with temporary_root() as root:
             config = tutor_config.load_full(root)
             with patch.object(fmt, "STDOUT"):
                 env.save(root, config)
             self.assertTrue(
-                os.path.exists(os.path.join(root, "env", "local", "docker-compose.yml"))
+                os.path.exists(
+                    os.path.join(env.base_dir(root), "local", "docker-compose.yml")
+                )
             )
 
     def test_save_full_with_https(self) -> None:
-        with tempfile.TemporaryDirectory() as root:
+        with temporary_root() as root:
             config = tutor_config.load_full(root)
             config["ENABLE_HTTPS"] = True
             with patch.object(fmt, "STDOUT"):
                 env.save(root, config)
-                with open(os.path.join(root, "env", "apps", "caddy", "Caddyfile")) as f:
+                with open(
+                    os.path.join(env.base_dir(root), "apps", "caddy", "Caddyfile"),
+                    encoding="utf-8",
+                ) as f:
                     self.assertIn("www.myopenedx.com{$default_site_port}", f.read())
 
     def test_patch(self) -> None:
@@ -120,11 +127,15 @@ class EnvTests(unittest.TestCase):
             # Create two templates
             os.makedirs(os.path.join(plugin_templates, "plugin1", "apps"))
             with open(
-                os.path.join(plugin_templates, "plugin1", "unrendered.txt"), "w"
+                os.path.join(plugin_templates, "plugin1", "unrendered.txt"),
+                "w",
+                encoding="utf-8",
             ) as f:
                 f.write("This file should not be rendered")
             with open(
-                os.path.join(plugin_templates, "plugin1", "apps", "rendered.txt"), "w"
+                os.path.join(plugin_templates, "plugin1", "apps", "rendered.txt"),
+                "w",
+                encoding="utf-8",
             ) as f:
                 f.write("Hello my ID is {{ ID }}")
 
@@ -137,7 +148,7 @@ class EnvTests(unittest.TestCase):
                 "iter_enabled",
                 return_value=[plugin1],
             ):
-                with tempfile.TemporaryDirectory() as root:
+                with temporary_root() as root:
                     # Render plugin templates
                     env.save_plugin_templates(plugin1, root, config)
 
@@ -150,7 +161,7 @@ class EnvTests(unittest.TestCase):
                     )
                     self.assertFalse(os.path.exists(dst_unrendered))
                     self.assertTrue(os.path.exists(dst_rendered))
-                    with open(dst_rendered) as f:
+                    with open(dst_rendered, encoding="utf-8") as f:
                         self.assertEqual("Hello my ID is abcd", f.read())
 
     def test_renderer_is_reset_on_config_change(self) -> None:
@@ -161,7 +172,9 @@ class EnvTests(unittest.TestCase):
             # Create one template
             os.makedirs(os.path.join(plugin_templates, plugin1.name))
             with open(
-                os.path.join(plugin_templates, plugin1.name, "myplugin.txt"), "w"
+                os.path.join(plugin_templates, plugin1.name, "myplugin.txt"),
+                "w",
+                encoding="utf-8",
             ) as f:
                 f.write("some content")
 
@@ -199,3 +212,40 @@ class EnvTests(unittest.TestCase):
                 )
             ),
         )
+
+
+class CurrentVersionTests(unittest.TestCase):
+    def test_current_version_in_empty_env(self) -> None:
+        with temporary_root() as root:
+            self.assertIsNone(env.current_version(root))
+            self.assertIsNone(env.get_env_release(root))
+            self.assertIsNone(env.should_upgrade_from_release(root))
+            self.assertTrue(env.is_up_to_date(root))
+
+    def test_current_version_in_lilac_env(self) -> None:
+        with temporary_root() as root:
+            os.makedirs(env.base_dir(root))
+            with open(
+                os.path.join(env.base_dir(root), env.VERSION_FILENAME),
+                "w",
+                encoding="utf-8",
+            ) as f:
+                f.write("12.0.46")
+            self.assertEqual("12.0.46", env.current_version(root))
+            self.assertEqual("lilac", env.get_env_release(root))
+            self.assertEqual("lilac", env.should_upgrade_from_release(root))
+            self.assertFalse(env.is_up_to_date(root))
+
+    def test_current_version_in_latest_env(self) -> None:
+        with temporary_root() as root:
+            os.makedirs(env.base_dir(root))
+            with open(
+                os.path.join(env.base_dir(root), env.VERSION_FILENAME),
+                "w",
+                encoding="utf-8",
+            ) as f:
+                f.write(__version__)
+            self.assertEqual(__version__, env.current_version(root))
+            self.assertEqual("maple", env.get_env_release(root))
+            self.assertIsNone(env.should_upgrade_from_release(root))
+            self.assertTrue(env.is_up_to_date(root))

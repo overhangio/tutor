@@ -340,9 +340,9 @@ spec:
         app.kubernetes.io/name: mysql
     spec:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: mysql
