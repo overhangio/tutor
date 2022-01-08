@@ -1,3 +1,5 @@
+from typing import Optional
+
 import click
 
 from tutor import config as tutor_config
@@ -27,6 +29,7 @@ class LocalJobRunner(compose.ComposeJobRunner):
         ]
 
 
+# pylint: disable=too-few-public-methods
 class LocalContext(compose.BaseComposeContext):
     def job_runner(self, config: Config) -> LocalJobRunner:
         return LocalJobRunner(self.root, config)
@@ -56,16 +59,49 @@ Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instru
     https://docs.tutor.overhang.io/install.html"""
         )
 
-    if tutor_env.needs_major_upgrade(context.obj.root):
+    run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
+    if run_upgrade_from_release is not None:
         click.echo(fmt.title("Upgrading from an older release"))
+        if not non_interactive:
+            to_release = tutor_env.get_package_release()
+            question = f"""You are about to upgrade your Open edX platform from {run_upgrade_from_release.capitalize()} to {to_release.capitalize()}
+
+It is strongly recommended to make a backup before upgrading. To do so, run:
+
+    tutor local stop
+    sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/
+
+In case of problem, to restore your backup you will then have to run: sudo rsync -avr /tmp/tutor-backup/ "$(tutor config printroot)"/
+
+Are you sure you want to continue?"""
+            click.confirm(
+                fmt.question(question), default=True, abort=True, prompt_suffix=" "
+            )
         context.invoke(
             upgrade,
-            from_version=tutor_env.current_release(context.obj.root),
+            from_version=run_upgrade_from_release,
             non_interactive=non_interactive,
         )
 
     click.echo(fmt.title("Interactive platform configuration"))
     context.invoke(config_save_command, interactive=(not non_interactive))
+
+    if run_upgrade_from_release and not non_interactive:
+        question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
+
+If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
+
+    tutor images build all # list your custom images here
+
+See the documentation for more information:
+
+    https://docs.tutor.overhang.io/install.html#upgrading-to-a-new-open-edx-release
+
+Press enter when you are ready to continue"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
+        )
+
     click.echo(fmt.title("Stopping any existing platform"))
     context.invoke(compose.stop)
     if pullimages:
@@ -91,17 +127,29 @@ Your Open edX platform is ready and can be accessed at the following urls:
     )
 
 
-@click.command(help="Upgrade from a previous Open edX named release")
+@click.command(
+    short_help="Perform release-specific upgrade tasks",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `quickstart`.",
+)
 @click.option(
     "--from",
-    "from_version",
-    default="koa",
+    "from_release",
     type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
-@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
-def upgrade(context: click.Context, from_version: str, non_interactive: bool) -> None:
-    upgrade_from(context, from_version, not non_interactive)
+def upgrade(context: click.Context, from_release: Optional[str]) -> None:
+    fmt.echo_alert(
+        "This command only performs a partial upgrade of your Open edX platform. "
+        "To perform a full upgrade, you should run `tutor local quickstart`."
+    )
+    if from_release is None:
+        from_release = tutor_env.get_env_release(context.obj.root)
+    if from_release is None:
+        fmt.echo_info("Your environment is already up-to-date")
+    else:
+        upgrade_from(context, from_release)
+    # We update the environment to update the version
+    context.invoke(config_save_command)
 
 
 local.add_command(quickstart)

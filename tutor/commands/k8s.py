@@ -51,11 +51,11 @@ class K8sJobRunner(jobs.BaseJobRunner):
             job_name = job["metadata"]["name"]
             if not isinstance(job_name, str):
                 raise exceptions.TutorError(
-                    "Invalid job name: '{}'. Expected str.".format(job_name)
+                    f"Invalid job name: '{job_name}'. Expected str."
                 )
             if job_name == name:
                 return job
-        raise exceptions.TutorError("Could not find job '{}'".format(name))
+        raise exceptions.TutorError(f"Could not find job '{name}'")
 
     def active_job_names(self) -> List[str]:
         """
@@ -71,7 +71,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
         ]
 
     def run_job(self, service: str, command: str) -> int:
-        job_name = "{}-job".format(service)
+        job_name = f"{service}-job"
         job = self.load_job(job_name)
         # Create a unique job name to make it deduplicate jobs and make it easier to
         # find later. Logs of older jobs will remain available for some time.
@@ -83,7 +83,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             if not active_jobs:
                 break
             fmt.echo_info(
-                "Waiting for active jobs to terminate: {}".format(" ".join(active_jobs))
+                f"Waiting for active jobs to terminate: {' '.join(active_jobs)}"
             )
             sleep(5)
 
@@ -106,7 +106,9 @@ class K8sJobRunner(jobs.BaseJobRunner):
         job["spec"]["backoffLimit"] = 1
         job["spec"]["ttlSecondsAfterFinished"] = 3600
         # Save patched job to "jobs.yml" file
-        with open(tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w") as job_file:
+        with open(
+            tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w", encoding="utf-8"
+        ) as job_file:
             serialize.dump(job, job_file)
         # We cannot use the k8s API to create the job: configMap and volume names need
         # to be found with the right suffixes.
@@ -115,7 +117,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             "--kustomize",
             tutor_env.pathjoin(self.root),
             "--selector",
-            "app.kubernetes.io/name={}".format(job_name),
+            f"app.kubernetes.io/name={job_name}",
         )
 
         message = (
@@ -127,7 +129,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
         fmt.echo_info(message)
 
         # Wait for completion
-        field_selector = "metadata.name={}".format(job_name)
+        field_selector = f"metadata.name={job_name}"
         while True:
             namespaced_jobs = K8sClients.instance().batch_api.list_namespaced_job(
                 k8s_namespace(self.config), field_selector=field_selector
@@ -137,13 +139,11 @@ class K8sJobRunner(jobs.BaseJobRunner):
             job = namespaced_jobs.items[0]
             if not job.status.active:
                 if job.status.succeeded:
-                    fmt.echo_info("Job {} successful.".format(job_name))
+                    fmt.echo_info(f"Job {job_name} successful.")
                     break
                 if job.status.failed:
                     raise exceptions.TutorError(
-                        "Job {} failed. View the job logs to debug this issue.".format(
-                            job_name
-                        )
+                        f"Job {job_name} failed. View the job logs to debug this issue."
                     )
             sleep(5)
         return 0
@@ -158,12 +158,12 @@ def k8s() -> None:
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
 def quickstart(context: click.Context, non_interactive: bool) -> None:
-    if tutor_env.needs_major_upgrade(context.obj.root):
+    run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
+    if run_upgrade_from_release is not None:
         click.echo(fmt.title("Upgrading from an older release"))
         context.invoke(
             upgrade,
-            from_version=tutor_env.current_release(context.obj.root),
-            non_interactive=non_interactive,
+            from_version=tutor_env.get_env_release(context.obj.root),
         )
 
     click.echo(fmt.title("Interactive platform configuration"))
@@ -171,21 +171,28 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
         config_save_command,
         interactive=(not non_interactive),
     )
-    config = tutor_config.load(context.obj.root)
-    if not config["ENABLE_WEB_PROXY"]:
-        fmt.echo_alert(
-            "Potentially invalid configuration: ENABLE_WEB_PROXY=false\n"
-            "This setting might have been defined because you previously set WEB_PROXY=true. This is no longer"
-            " necessary in order to get Tutor to work on Kubernetes. In Tutor v11+ a Caddy-based load balancer is"
-            " provided out of the box to handle SSL/TLS certificate generation at runtime. If you disable this"
-            " service, you will have to configure an Ingress resource and a certificate manager yourself to redirect"
-            " traffic to the caddy service. See the Kubernetes section in the Tutor documentation for more"
-            " information."
+
+    if run_upgrade_from_release and not non_interactive:
+        question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
+
+If you run custom Docker images, you must rebuild and push them to your private repository now by running the following
+commands in a different shell:
+
+    tutor images build all # add your custom images here
+    tutor images push all
+
+Press enter when you are ready to continue"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
         )
+
     click.echo(fmt.title("Starting the platform"))
     context.invoke(start)
+
     click.echo(fmt.title("Database creation and migrations"))
     context.invoke(init, limit=None)
+
+    config = tutor_config.load(context.obj.root)
     fmt.echo_info(
         """Your Open edX platform is ready and can be accessed at the following urls:
 
@@ -253,7 +260,7 @@ def start(context: Context, names: List[str]) -> None:
                 "--kustomize",
                 tutor_env.pathjoin(context.root),
                 "--selector",
-                "app.kubernetes.io/name={}".format(name),
+                f"app.kubernetes.io/name={name}",
             )
 
 
@@ -345,8 +352,8 @@ def scale(context: Context, deployment: str, replicas: int) -> None:
         *resource_namespace_selector(
             config,
         ),
-        "--replicas={}".format(replicas),
-        "deployment/{}".format(deployment),
+        f"--replicas={replicas}",
+        f"deployment/{deployment}",
     )
 
 
@@ -443,29 +450,41 @@ def wait(context: Context, name: str) -> None:
     wait_for_pod_ready(config, name)
 
 
-@click.command(help="Upgrade from a previous Open edX named release")
+@click.command(
+    short_help="Perform release-specific upgrade tasks",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `quickstart`.",
+)
 @click.option(
     "--from",
-    "from_version",
-    default="lilac",
+    "from_release",
     type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
-@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
-@click.pass_obj
-def upgrade(context: Context, from_version: str, non_interactive: bool) -> None:
-    upgrade_from(context, from_version, interactive=not non_interactive)
+@click.pass_context
+def upgrade(context: click.Context, from_release: Optional[str]) -> None:
+    if from_release is None:
+        from_release = tutor_env.get_env_release(context.obj.root)
+    if from_release is None:
+        fmt.echo_info("Your environment is already up-to-date")
+    else:
+        fmt.echo_alert(
+            "This command only performs a partial upgrade of your Open edX platform. "
+            "To perform a full upgrade, you should run `tutor k8s quickstart`."
+        )
+        upgrade_from(context.obj, from_release)
+    # We update the environment to update the version
+    context.invoke(config_save_command)
 
 
 def kubectl_exec(
     config: Config, service: str, command: str, attach: bool = False
 ) -> int:
-    selector = "app.kubernetes.io/name={}".format(service)
+    selector = f"app.kubernetes.io/name={service}"
     pods = K8sClients.instance().core_api.list_namespaced_pod(
         namespace=k8s_namespace(config), label_selector=selector
     )
     if not pods.items:
         raise exceptions.TutorError(
-            "Could not find an active pod for the {} service".format(service)
+            f"Could not find an active pod for the {service} service"
         )
     pod_name = pods.items[0].metadata.name
 
@@ -486,10 +505,10 @@ def kubectl_exec(
 
 
 def wait_for_pod_ready(config: Config, service: str) -> None:
-    fmt.echo_info("Waiting for a {} pod to be ready...".format(service))
+    fmt.echo_info(f"Waiting for a {service} pod to be ready...")
     utils.kubectl(
         "wait",
-        *resource_selector(config, "app.kubernetes.io/name={}".format(service)),
+        *resource_selector(config, f"app.kubernetes.io/name={service}"),
         "--for=condition=ContainersReady",
         "--timeout=600s",
         "pod",

@@ -213,11 +213,13 @@ class EnvTests(unittest.TestCase):
             ),
         )
 
+
+class CurrentVersionTests(unittest.TestCase):
     def test_current_version_in_empty_env(self) -> None:
         with temporary_root() as root:
             self.assertIsNone(env.current_version(root))
-            self.assertIsNone(env.current_release(root))
-            self.assertFalse(env.needs_major_upgrade(root))
+            self.assertIsNone(env.get_env_release(root))
+            self.assertIsNone(env.should_upgrade_from_release(root))
             self.assertTrue(env.is_up_to_date(root))
 
     def test_current_version_in_lilac_env(self) -> None:
@@ -230,8 +232,8 @@ class EnvTests(unittest.TestCase):
             ) as f:
                 f.write("12.0.46")
             self.assertEqual("12.0.46", env.current_version(root))
-            self.assertEqual("lilac", env.current_release(root))
-            self.assertTrue(env.needs_major_upgrade(root))
+            self.assertEqual("lilac", env.get_env_release(root))
+            self.assertEqual("lilac", env.should_upgrade_from_release(root))
             self.assertFalse(env.is_up_to_date(root))
 
     def test_current_version_in_latest_env(self) -> None:
@@ -244,6 +246,6 @@ class EnvTests(unittest.TestCase):
             ) as f:
                 f.write(__version__)
             self.assertEqual(__version__, env.current_version(root))
-            self.assertEqual("maple", env.current_release(root))
-            self.assertFalse(env.needs_major_upgrade(root))
+            self.assertEqual("maple", env.get_env_release(root))
+            self.assertIsNone(env.should_upgrade_from_release(root))
             self.assertTrue(env.is_up_to_date(root))

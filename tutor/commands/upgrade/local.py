@@ -7,59 +7,28 @@ from tutor import env as tutor_env
 from tutor import fmt
 from tutor.commands import compose
 from tutor.types import Config
+from . import common as common_upgrade
 
 
-def upgrade_from(
-    context: click.Context, from_version: str, interactive: bool = False
-) -> None:
-    config = tutor_config.load(context.obj.root)
-
-    if interactive:
-        question = """You are about to upgrade your Open edX platform.
-
-It is strongly recommended to make a backup before upgrading. To do so, run:
-
-    tutor local stop
-    sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/
-
-In case of problem, to restore your backup you will then have to run: sudo rsync -avr /tmp/tutor-backup/ "$(tutor config printroot)"/
-
-Are you sure you want to continue?"""
-        click.confirm(
-            fmt.question(question), default=True, abort=True, prompt_suffix=" "
-        )
-
-    running_version = from_version
-    if running_version == "ironwood":
+def upgrade_from(context: click.Context, from_release: str) -> None:
+    # Make sure to bypass current version check
+    config = tutor_config.load_full(context.obj.root)
+    running_release = from_release
+    if running_release == "ironwood":
         upgrade_from_ironwood(context, config)
-        running_version = "juniper"
+        running_release = "juniper"
 
-    if running_version == "juniper":
+    if running_release == "juniper":
         upgrade_from_juniper(context, config)
-        running_version = "koa"
+        running_release = "koa"
 
-    if running_version == "koa":
+    if running_release == "koa":
         upgrade_from_koa(context, config)
-        running_version = "lilac"
+        running_release = "lilac"
 
-    if running_version == "lilac":
-        # Nothing to do here
-        running_version = "maple"
-
-    # Update env such that the build environment is up-to-date
-    tutor_env.save(context.obj.root, config)
-    if interactive:
-        question = f"""Your platform was successfuly upgraded from {from_version} to {running_version}.
-
-Depending on your setup, you might have to rebuild some of your Docker images.
-You can do this now by running the following command in a different shell:
-
-    tutor images build openedx # add your custom images here
-
-Press enter when you are ready to continue"""
-        click.confirm(
-            fmt.question(question), default=True, abort=True, prompt_suffix=" "
-        )
+    if running_release == "lilac":
+        common_upgrade.upgrade_from_lilac(config)
+        running_release = "maple"
 
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
@@ -114,6 +83,7 @@ def upgrade_from_juniper(context: click.Context, config: Config) -> None:
 
 
 def upgrade_from_koa(context: click.Context, config: Config) -> None:
+    click.echo(fmt.title("Upgrading from Koa"))
     if not config["RUN_MONGODB"]:
         fmt.echo_info(
             "You are not running MongDB (RUN_MONGODB=false). It is your "

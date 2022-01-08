@@ -311,25 +311,41 @@ def is_up_to_date(root: str) -> bool:
     return current is None or current == __version__
 
 
-def needs_major_upgrade(root: str) -> bool:
+def should_upgrade_from_release(root: str) -> Optional[str]:
     """
-    Return true if the current version is less than the tutor version.
-    """
-    current = current_version(root)
-    if current is None:
-        return False
-    current_as_int = int(current.split(".")[0])
-    required = int(__version__.split(".", maxsplit=1)[0])
-    return 0 < current_as_int < required
-
-
-def current_release(root: str) -> Optional[str]:
-    """
-    Return the name of the current Open edX release. If the current environment has no version, return None.
+    Return the name of the currently installed release that we should upgrade from. Return None If we already run the
+    latest release.
     """
     current = current_version(root)
     if current is None:
         return None
+    current_as_int = int(current.split(".")[0])
+    required_as_int = int(__version__.split(".", maxsplit=1)[0])
+    if current_as_int >= required_as_int:
+        return None
+    return get_release(current)
+
+
+def get_env_release(root: str) -> Optional[str]:
+    """
+    Return the Open edX release name from the current environment.
+
+    If the current environment has no version, return None.
+    """
+    version = current_version(root)
+    if version is None:
+        return None
+    return get_release(version)
+
+
+def get_package_release() -> str:
+    """
+    Return the release name associated to this package.
+    """
+    return get_release(__version__)
+
+
+def get_release(version: str) -> str:
     return {
         "0": "ironwood",
         "3": "ironwood",
@@ -337,7 +353,7 @@ def current_release(root: str) -> Optional[str]:
         "11": "koa",
         "12": "lilac",
         "13": "maple",
-    }[current.split(".")[0]]
+    }[version.split(".", maxsplit=1)[0]]
 
 
 def current_version(root: str) -> Optional[str]:
