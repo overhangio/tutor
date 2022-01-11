@@ -2,6 +2,7 @@
 
 Note: Breaking changes between versions are indicated by "💥".
 
+- [Improvement] Point CMS at its config file using ``CMS_CFG`` environment variable instead of deprecated ``STUDIO_CFG``.
 - [Bugfix] Start MongoDB when running migrations, because a new data migration fails if MongoDB is not running
 - [Feature] Better support of Caddy as a load balancer in Kubernetes:
   - Make it possible to start/stop a selection of resources with ``tutor k8s start/stop [names...]``.
