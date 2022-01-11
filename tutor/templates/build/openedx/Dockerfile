@@ -143,7 +143,7 @@ RUN pip install -r requirements/edx/local.in
 RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
 COPY --chown=app:app revisions.yml /openedx/config/
 ENV LMS_CFG /openedx/config/lms.env.json
-ENV STUDIO_CFG /openedx/config/cms.env.json
+ENV CMS_CFG /openedx/config/cms.env.json
 ENV REVISION_CFG /openedx/config/revisions.yml
 COPY --chown=app:app settings/lms/*.py ./lms/envs/tutor/
 COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/
