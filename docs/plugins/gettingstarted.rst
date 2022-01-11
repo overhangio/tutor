@@ -14,7 +14,9 @@ YAML files that are stored in the tutor plugins root folder will be automaticall
 
 On Linux, this points to ``~/.local/share/tutor-plugins``. The location of the plugin root folder can be modified by setting the ``TUTOR_PLUGINS_ROOT`` environment variable.
 
-YAML plugins need to define two extra keys: "name" and "version". Custom CLI commands are not supported by YAML plugins.
+YAML plugins must define two special top-level keys: ``name`` and ``version``.
+Then, YAML plugins may use four top-level keys to customize Tutor's behavior: ``config``, ``patches``, ``hooks``, and ``templates``.
+Custom CLI commands are not supported by YAML plugins.
 
 Let's create a simple plugin that adds your own `Google Analytics <https://analytics.google.com/>`__ tracking code to your Open edX platform. We need to add the ``GOOGLE_ANALYTICS_ACCOUNT`` and ``GOOGLE_ANALYTICS_TRACKING_ID`` settings to both the LMS and the CMS settings. To do so, we will only have to create the ``openedx-common-settings`` patch, which is shared by the development and the production settings both for the LMS and the CMS. First, create the plugin directory::
 
@@ -58,17 +60,34 @@ That's it! And it's very easy to share your plugins. Just upload them to your Gi
 Python package
 ~~~~~~~~~~~~~~
 
-Creating a plugin as a Python package allows you to define more complex logic and to store your patches in a more structured way. Python Tutor plugins are regular Python packages that define a specific entrypoint: ``tutor.plugin.v0``.
+Creating a plugin as a Python package allows you to define more complex logic and to store your patches in a more structured way. Python Tutor plugins are regular Python packages that define an entrypoint within the ``tutor.plugin.v0`` group:
 
 Example::
 
     from setuptools import setup
     setup(
         ...
-        entry_points={"tutor.plugin.v0": ["myplugin = myplugin.plugin"]},
+        entry_points={
+          "tutor.plugin.v0": ["myplugin = myplugin.plugin"]
+        },
     )
 
-The ``myplugin.plugin`` python module should then declare the ``config``, ``hooks``, etc. attributes that will define its behaviour.
+The ``myplugin/plugin.py`` Python module can then define the attributes ``config``, ``patches``, ``hooks``, and ``templates`` to specify the plugin's behavior. The attributes may be defined either as dictionaries or as zero-argument callables returning dictionaries; in the latter case, the callable will be evaluated upon plugin load. Finally, the ``command`` attribute can be defined as an instance of ``click.Command`` to define the plugin's command line interface.
+
+Example::
+
+  import click
+
+  templates = pkg_resources.resource_filename(...)
+  config = {...}
+  hooks = {...}
+
+  def patches():
+    ...
+
+  @click.command(...)
+  def command():
+    ...
 
 To get started on the right foot, it is strongly recommended to create your first plugin with the `tutor plugin cookiecutter <https://github.com/overhangio/cookiecutter-tutor-plugin>`__::
 
