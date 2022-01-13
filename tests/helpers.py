@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from tutor.commands.context import BaseJobContext
+from tutor.commands.context import BaseJobContext, Context
 from tutor.jobs import BaseJobRunner
 from tutor.types import Config
 
@@ -36,10 +36,16 @@ def temporary_root() -> "tempfile.TemporaryDirectory[str]":
     return tempfile.TemporaryDirectory(prefix="tutor-test-root-")
 
 
-class TestContext(BaseJobContext):
+class TestContext(Context):
+    """
+    Barebones click test context.
+    """
+
+
+class TestJobContext(TestContext, BaseJobContext):
     """
     Click context that will use only test job runners.
     """
 
-    def job_runner(self, config: Config) -> TestJobRunner:
-        return TestJobRunner(self.root, config)
+    def job_runner(self) -> TestJobRunner:
+        return TestJobRunner(self.root, self.config)

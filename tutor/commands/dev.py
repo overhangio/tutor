@@ -7,6 +7,7 @@ from .. import env as tutor_env
 from .. import fmt
 from ..types import Config, get_typed
 from . import compose
+from .plugins import add_plugin_commands
 
 
 class DevJobRunner(compose.ComposeJobRunner):
@@ -31,14 +32,14 @@ class DevJobRunner(compose.ComposeJobRunner):
 
 
 class DevContext(compose.BaseComposeContext):
-    def job_runner(self, config: Config) -> DevJobRunner:
-        return DevJobRunner(self.root, config)
+    def job_runner(self) -> DevJobRunner:
+        return DevJobRunner(self.root, self.config)
 
 
 @click.group(help="Run Open edX locally with development settings")
 @click.pass_context
 def dev(context: click.Context) -> None:
-    context.obj = DevContext(context.obj.root)
+    context.obj = DevContext(context.obj.root, tutor_config.load(context.obj.root))
 
 
 @click.command(
@@ -49,10 +50,13 @@ def dev(context: click.Context) -> None:
 @click.argument("service")
 @click.pass_context
 def runserver(context: click.Context, options: List[str], service: str) -> None:
-    config = tutor_config.load(context.obj.root)
     if service in ["lms", "cms"]:
         port = 8000 if service == "lms" else 8001
-        host = config["LMS_HOST"] if service == "lms" else config["CMS_HOST"]
+        host = (
+            context.obj.config["LMS_HOST"]
+            if service == "lms"
+            else context.obj.config["CMS_HOST"]
+        )
         fmt.echo_info(
             "The {} service will be available at http://{}:{}".format(
                 service, host, port
@@ -63,4 +67,5 @@ def runserver(context: click.Context, options: List[str], service: str) -> None:
 
 
 dev.add_command(runserver)
+add_plugin_commands(dev)
 compose.add_commands(dev)

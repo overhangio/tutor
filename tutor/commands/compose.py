@@ -4,7 +4,6 @@ from typing import List
 import click
 
 from .. import bindmounts
-from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt, jobs, utils
 from ..exceptions import TutorError
@@ -56,7 +55,7 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
 
 
 class BaseComposeContext(BaseJobContext):
-    def job_runner(self, config: Config) -> ComposeJobRunner:
+    def job_runner(self) -> ComposeJobRunner:
         raise NotImplementedError
 
 
@@ -78,16 +77,14 @@ def start(
         command.append("-d")
 
     # Start services
-    config = tutor_config.load(context.root)
-    context.job_runner(config).docker_compose(*command, *services)
+    context.job_runner().docker_compose(*command, *services)
 
 
 @click.command(help="Stop a running platform")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def stop(context: BaseComposeContext, services: List[str]) -> None:
-    config = tutor_config.load(context.root)
-    context.job_runner(config).docker_compose("stop", *services)
+    context.job_runner().docker_compose("stop", *services)
 
 
 @click.command(
@@ -112,28 +109,26 @@ fully stop the platform, use the 'reboot' command.""",
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def restart(context: BaseComposeContext, services: List[str]) -> None:
-    config = tutor_config.load(context.root)
     command = ["restart"]
     if "all" in services:
         pass
     else:
         for service in services:
             if service == "openedx":
-                if config["RUN_LMS"]:
+                if context.config["RUN_LMS"]:
                     command += ["lms", "lms-worker"]
-                if config["RUN_CMS"]:
+                if context.config["RUN_CMS"]:
                     command += ["cms", "cms-worker"]
             else:
                 command.append(service)
-    context.job_runner(config).docker_compose(*command)
+    context.job_runner().docker_compose(*command)
 
 
 @click.command(help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 @click.pass_obj
 def init(context: BaseComposeContext, limit: str) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
+    runner = context.job_runner()
     jobs.initialise(runner, limit_to=limit)
 
 
@@ -156,8 +151,7 @@ def createuser(
     name: str,
     email: str,
 ) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
+    runner = context.job_runner()
     command = jobs.create_user_command(superuser, staff, name, email, password=password)
     runner.run_job("lms", command)
 
@@ -178,17 +172,15 @@ def createuser(
 @click.argument("theme_name")
 @click.pass_obj
 def settheme(context: BaseComposeContext, domains: List[str], theme_name: str) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    domains = domains or jobs.get_all_openedx_domains(config)
+    runner = context.job_runner()
+    domains = domains or jobs.get_all_openedx_domains(context.config)
     jobs.set_theme(theme_name, domains, runner)
 
 
 @click.command(help="Import the demo course")
 @click.pass_obj
 def importdemocourse(context: BaseComposeContext) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
+    runner = context.job_runner()
     fmt.echo_info("Importing demo course")
     jobs.import_demo_course(runner)
 
@@ -221,8 +213,7 @@ def run(context: click.Context, args: List[str]) -> None:
 @click.argument("path")
 @click.pass_obj
 def bindmount_command(context: BaseComposeContext, service: str, path: str) -> None:
-    config = tutor_config.load(context.root)
-    host_path = bindmounts.create(context.job_runner(config), service, path)
+    host_path = bindmounts.create(context.job_runner(), service, path)
     fmt.echo_info(
         "Bind-mount volume created at {}. You can now use it in all `local` and `dev` commands with the `--volume={}` option.".format(
             host_path, path
@@ -277,7 +268,6 @@ def logs(context: click.Context, follow: bool, tail: bool, service: str) -> None
 @click.argument("args", nargs=-1)
 @click.pass_obj
 def dc_command(context: BaseComposeContext, command: str, args: List[str]) -> None:
-    config = tutor_config.load(context.root)
     volumes, non_volume_args = bindmounts.parse_volumes(args)
     volume_args = []
     for volume_arg in volumes:
@@ -293,7 +283,7 @@ def dc_command(context: BaseComposeContext, command: str, args: List[str]) -> No
                 )
             volume_arg = "{}:{}".format(host_bind_path, volume_arg)
         volume_args += ["--volume", volume_arg]
-    context.job_runner(config).docker_compose(command, *volume_args, *non_volume_args)
+    context.job_runner().docker_compose(command, *volume_args, *non_volume_args)
 
 
 def add_commands(command_group: click.Group) -> None:

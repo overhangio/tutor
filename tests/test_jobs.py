@@ -3,7 +3,7 @@ import unittest
 from io import StringIO
 from unittest.mock import patch
 
-from tests.helpers import TestContext, temporary_root
+from tests.helpers import TestJobContext, temporary_root
 from tutor import config as tutor_config
 from tutor import jobs
 
@@ -12,9 +12,9 @@ class JobsTests(unittest.TestCase):
     @patch("sys.stdout", new_callable=StringIO)
     def test_initialise(self, mock_stdout: StringIO) -> None:
         with temporary_root() as root:
-            context = TestContext(root)
             config = tutor_config.load_full(root)
-            runner = context.job_runner(config)
+            context = TestJobContext(root, config)
+            runner = context.job_runner()
             jobs.initialise(runner)
 
             output = mock_stdout.getvalue().strip()
@@ -44,9 +44,9 @@ class JobsTests(unittest.TestCase):
     @patch("sys.stdout", new_callable=StringIO)
     def test_import_demo_course(self, mock_stdout: StringIO) -> None:
         with temporary_root() as root:
-            context = TestContext(root)
             config = tutor_config.load_full(root)
-            runner = context.job_runner(config)
+            context = TestJobContext(root, config)
+            runner = context.job_runner()
             jobs.import_demo_course(runner)
 
             output = mock_stdout.getvalue()
@@ -64,9 +64,10 @@ class JobsTests(unittest.TestCase):
     @patch("sys.stdout", new_callable=StringIO)
     def test_set_theme(self, mock_stdout: StringIO) -> None:
         with temporary_root() as root:
-            context = TestContext(root)
             config = tutor_config.load_full(root)
-            runner = context.job_runner(config)
+            context = TestJobContext(root, config)
+            config = tutor_config.load_full(root)
+            runner = context.job_runner()
             jobs.set_theme("sample_theme", ["domain1", "domain2"], runner)
 
             output = mock_stdout.getvalue()

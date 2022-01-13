@@ -8,8 +8,9 @@ from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import exceptions, fmt, jobs, serialize, utils
 from tutor.commands.config import save as config_save_command
-from tutor.commands.context import Context
+from tutor.commands.plugins import add_plugin_commands
 from tutor.commands.upgrade.k8s import upgrade_from
+from tutor.commands.context import BaseJobContext
 from tutor.types import Config, get_typed
 
 
@@ -149,9 +150,15 @@ class K8sJobRunner(jobs.BaseJobRunner):
         return 0
 
 
+class K8sContext(BaseJobContext):
+    def job_runner(self) -> K8sJobRunner:
+        return K8sJobRunner(self.root, self.config)
+
+
 @click.group(help="Run Open edX on Kubernetes")
-def k8s() -> None:
-    pass
+@click.pass_context
+def k8s(context: click.Context) -> None:
+    context.obj = K8sContext(context.obj.root, tutor_config.load(context.obj.root))
 
 
 @click.command(help="Configure and run Open edX from scratch")
@@ -192,16 +199,15 @@ Press enter when you are ready to continue"""
     click.echo(fmt.title("Database creation and migrations"))
     context.invoke(init, limit=None)
 
-    config = tutor_config.load(context.obj.root)
     fmt.echo_info(
         """Your Open edX platform is ready and can be accessed at the following urls:
 
     {http}://{lms_host}
     {http}://{cms_host}
     """.format(
-            http="https" if config["ENABLE_HTTPS"] else "http",
-            lms_host=config["LMS_HOST"],
-            cms_host=config["CMS_HOST"],
+            http="https" if context.obj.config["ENABLE_HTTPS"] else "http",
+            lms_host=context.obj.config["LMS_HOST"],
+            cms_host=context.obj.config["CMS_HOST"],
         )
     )
 
@@ -215,13 +221,12 @@ Press enter when you are ready to continue"""
 )
 @click.argument("names", metavar="name", nargs=-1)
 @click.pass_obj
-def start(context: Context, names: List[str]) -> None:
-    config = tutor_config.load(context.root)
+def start(context: K8sContext, names: List[str]) -> None:
     # Create namespace, if necessary
     # Note that this step should not be run for some users, in particular those
     # who do not have permission to edit the namespace.
     try:
-        utils.kubectl("get", "namespaces", k8s_namespace(config))
+        utils.kubectl("get", "namespaces", k8s_namespace(context.config))
         fmt.echo_info("Namespace already exists: skipping creation.")
     except exceptions.TutorError:
         fmt.echo_info("Namespace does not exist: now creating it...")
@@ -273,14 +278,13 @@ def start(context: Context, names: List[str]) -> None:
 )
 @click.argument("names", metavar="name", nargs=-1)
 @click.pass_obj
-def stop(context: Context, names: List[str]) -> None:
-    config = tutor_config.load(context.root)
+def stop(context: K8sContext, names: List[str]) -> None:
     names = names or ["all"]
     for name in names:
         if name == "all":
-            delete_resources(config)
+            delete_resources(context.config)
         else:
-            delete_resources(config, name=name)
+            delete_resources(context.config, name=name)
 
 
 def delete_resources(
@@ -311,7 +315,7 @@ def reboot(context: click.Context) -> None:
 @click.command(help="Completely delete an existing platform")
 @click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
 @click.pass_obj
-def delete(context: Context, yes: bool) -> None:
+def delete(context: K8sContext, yes: bool) -> None:
     if not yes:
         click.confirm(
             "Are you sure you want to delete the platform? All data will be removed.",
@@ -329,13 +333,12 @@ def delete(context: Context, yes: bool) -> None:
 @click.command(help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 @click.pass_obj
-def init(context: Context, limit: Optional[str]) -> None:
-    config = tutor_config.load(context.root)
-    runner = K8sJobRunner(context.root, config)
-    wait_for_pod_ready(config, "caddy")
+def init(context: K8sContext, limit: Optional[str]) -> None:
+    runner = K8sJobRunner(context.root, context.config)
+    wait_for_pod_ready(context.config, "caddy")
     for name in ["elasticsearch", "mysql", "mongodb"]:
-        if tutor_config.is_service_activated(config, name):
-            wait_for_pod_ready(config, name)
+        if tutor_config.is_service_activated(context.config, name):
+            wait_for_pod_ready(context.config, name)
     jobs.initialise(runner, limit_to=limit)
 
 
@@ -343,14 +346,13 @@ def init(context: Context, limit: Optional[str]) -> None:
 @click.argument("deployment")
 @click.argument("replicas", type=int)
 @click.pass_obj
-def scale(context: Context, deployment: str, replicas: int) -> None:
-    config = tutor_config.load(context.root)
+def scale(context: K8sContext, deployment: str, replicas: int) -> None:
     utils.kubectl(
         "scale",
         # Note that we don't use the full resource selector because selectors
         # are not compatible with the deployment/<name> argument.
         *resource_namespace_selector(
-            config,
+            context.config,
         ),
         f"--replicas={replicas}",
         f"deployment/{deployment}",
@@ -369,20 +371,23 @@ def scale(context: Context, deployment: str, replicas: int) -> None:
 @click.argument("email")
 @click.pass_obj
 def createuser(
-    context: Context, superuser: str, staff: bool, password: str, name: str, email: str
+    context: K8sContext,
+    superuser: str,
+    staff: bool,
+    password: str,
+    name: str,
+    email: str,
 ) -> None:
-    config = tutor_config.load(context.root)
     command = jobs.create_user_command(superuser, staff, name, email, password=password)
     # This needs to be interactive in case the user needs to type a password
-    kubectl_exec(config, "lms", command, attach=True)
+    kubectl_exec(context.config, "lms", command, attach=True)
 
 
 @click.command(help="Import the demo course")
 @click.pass_obj
-def importdemocourse(context: Context) -> None:
+def importdemocourse(context: K8sContext) -> None:
     fmt.echo_info("Importing demo course")
-    config = tutor_config.load(context.root)
-    runner = K8sJobRunner(context.root, config)
+    runner = K8sJobRunner(context.root, context.config)
     jobs.import_demo_course(runner)
 
 
@@ -401,10 +406,9 @@ def importdemocourse(context: Context) -> None:
 )
 @click.argument("theme_name")
 @click.pass_obj
-def settheme(context: Context, domains: List[str], theme_name: str) -> None:
-    config = tutor_config.load(context.root)
-    runner = K8sJobRunner(context.root, config)
-    domains = domains or jobs.get_all_openedx_domains(config)
+def settheme(context: K8sContext, domains: List[str], theme_name: str) -> None:
+    runner = K8sJobRunner(context.root, context.config)
+    domains = domains or jobs.get_all_openedx_domains(context.config)
     jobs.set_theme(theme_name, domains, runner)
 
 
@@ -412,9 +416,8 @@ def settheme(context: Context, domains: List[str], theme_name: str) -> None:
 @click.argument("service")
 @click.argument("command")
 @click.pass_obj
-def exec_command(context: Context, service: str, command: str) -> None:
-    config = tutor_config.load(context.root)
-    kubectl_exec(config, service, command, attach=True)
+def exec_command(context: K8sContext, service: str, command: str) -> None:
+    kubectl_exec(context.config, service, command, attach=True)
 
 
 @click.command(help="View output from containers")
@@ -424,13 +427,12 @@ def exec_command(context: Context, service: str, command: str) -> None:
 @click.argument("service")
 @click.pass_obj
 def logs(
-    context: Context, container: str, follow: bool, tail: bool, service: str
+    context: K8sContext, container: str, follow: bool, tail: bool, service: str
 ) -> None:
-    config = tutor_config.load(context.root)
 
     command = ["logs"]
     selectors = ["app.kubernetes.io/name=" + service] if service else []
-    command += resource_selector(config, *selectors)
+    command += resource_selector(context.config, *selectors)
 
     if container:
         command += ["-c", container]
@@ -445,9 +447,8 @@ def logs(
 @click.command(help="Wait for a pod to become ready")
 @click.argument("name")
 @click.pass_obj
-def wait(context: Context, name: str) -> None:
-    config = tutor_config.load(context.root)
-    wait_for_pod_ready(config, name)
+def wait(context: K8sContext, name: str) -> None:
+    wait_for_pod_ready(context.config, name)
 
 
 @click.command(
@@ -551,3 +552,4 @@ k8s.add_command(exec_command)
 k8s.add_command(logs)
 k8s.add_command(wait)
 k8s.add_command(upgrade)
+add_plugin_commands(k8s)

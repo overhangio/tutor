@@ -66,7 +66,7 @@ def build(
     target: str,
     docker_args: List[str],
 ) -> None:
-    config = tutor_config.load(context.root)
+    config = tutor_config.load_full(context.root)
     command_args = []
     if no_cache:
         command_args.append("--no-cache")

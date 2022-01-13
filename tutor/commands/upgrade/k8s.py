@@ -1,14 +1,13 @@
-from tutor import config as tutor_config
 from tutor import fmt
 from tutor.commands import k8s
 from tutor.commands.context import Context
+from tutor import config as tutor_config
 from tutor.types import Config
 from . import common as common_upgrade
 
 
 def upgrade_from(context: Context, from_release: str) -> None:
     config = tutor_config.load(context.root)
-
     running_release = from_release
     if running_release == "ironwood":
         upgrade_from_ironwood(config)
