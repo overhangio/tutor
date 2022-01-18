@@ -1,6 +1,6 @@
 ###### Minimal image with base system requirements for most stages
 FROM docker.io/ubuntu:20.04 as minimal
-MAINTAINER Overhang.io <contact@overhang.io>
+LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
