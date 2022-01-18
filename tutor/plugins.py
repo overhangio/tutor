@@ -74,29 +74,21 @@ class BasePlugin:
         config = get_callable_attr(obj, "config", {})
         if not isinstance(config, dict):
             raise exceptions.TutorError(
-                "Invalid config in plugin {}. Expected dict, got {}.".format(
-                    plugin_name, config.__class__
-                )
+                f"Invalid config in plugin {plugin_name}. Expected dict, got {config.__class__}."
             )
         for name, subconfig in config.items():
             if not isinstance(name, str):
                 raise exceptions.TutorError(
-                    "Invalid config entry '{}' in plugin {}. Expected str, got {}.".format(
-                        name, plugin_name, config.__class__
-                    )
+                    f"Invalid config entry '{name}' in plugin {plugin_name}. Expected str, got {config.__class__}."
                 )
             if not isinstance(subconfig, dict):
                 raise exceptions.TutorError(
-                    "Invalid config entry '{}' in plugin {}. Expected str keys, got {}.".format(
-                        name, plugin_name, config.__class__
-                    )
+                    f"Invalid config entry '{name}' in plugin {plugin_name}. Expected str keys, got {config.__class__}."
                 )
             for key in subconfig.keys():
                 if not isinstance(key, str):
                     raise exceptions.TutorError(
-                        "Invalid config entry '{}.{}' in plugin {}. Expected str, got {}.".format(
-                            name, key, plugin_name, key.__class__
-                        )
+                        f"Invalid config entry '{name}.{key}' in plugin {plugin_name}. Expected str, got {key.__class__}."
                     )
         return config
 
@@ -108,22 +100,16 @@ class BasePlugin:
         patches = get_callable_attr(obj, "patches", {})
         if not isinstance(patches, dict):
             raise exceptions.TutorError(
-                "Invalid patches in plugin {}. Expected dict, got {}.".format(
-                    plugin_name, patches.__class__
-                )
+                f"Invalid patches in plugin {plugin_name}. Expected dict, got {patches.__class__}."
             )
         for patch_name, content in patches.items():
             if not isinstance(patch_name, str):
                 raise exceptions.TutorError(
-                    "Invalid patch name '{}' in plugin {}. Expected str, got {}.".format(
-                        patch_name, plugin_name, patch_name.__class__
-                    )
+                    f"Invalid patch name '{patch_name}' in plugin {plugin_name}. Expected str, got {patch_name.__class__}."
                 )
             if not isinstance(content, str):
                 raise exceptions.TutorError(
-                    "Invalid patch '{}' in plugin {}. Expected str, got {}.".format(
-                        patch_name, plugin_name, content.__class__
-                    )
+                    f"Invalid patch '{patch_name}' in plugin {plugin_name}. Expected str, got {content.__class__}."
                 )
         return patches
 
@@ -137,38 +123,28 @@ class BasePlugin:
         hooks = get_callable_attr(obj, "hooks", default={})
         if not isinstance(hooks, dict):
             raise exceptions.TutorError(
-                "Invalid hooks in plugin {}. Expected dict, got {}.".format(
-                    plugin_name, hooks.__class__
-                )
+                f"Invalid hooks in plugin {plugin_name}. Expected dict, got {hooks.__class__}."
             )
         for hook_name, hook in hooks.items():
             if not isinstance(hook_name, str):
                 raise exceptions.TutorError(
-                    "Invalid hook name '{}' in plugin {}. Expected str, got {}.".format(
-                        hook_name, plugin_name, hook_name.__class__
-                    )
+                    f"Invalid hook name '{hook_name}' in plugin {plugin_name}. Expected str, got {hook_name.__class__}."
                 )
             if isinstance(hook, list):
                 for service in hook:
                     if not isinstance(service, str):
                         raise exceptions.TutorError(
-                            "Invalid service in hook '{}' from plugin {}. Expected str, got {}.".format(
-                                hook_name, plugin_name, service.__class__
-                            )
+                            f"Invalid service in hook '{hook_name}' from plugin {plugin_name}. Expected str, got {service.__class__}."
                         )
             elif isinstance(hook, dict):
                 for name, value in hook.items():
                     if not isinstance(name, str) or not isinstance(value, str):
                         raise exceptions.TutorError(
-                            "Invalid hook '{}' in plugin {}. Only str -> str entries are supported.".format(
-                                hook_name, plugin_name
-                            )
+                            f"Invalid hook '{hook_name}' in plugin {plugin_name}. Only str -> str entries are supported."
                         )
             else:
                 raise exceptions.TutorError(
-                    "Invalid hook '{}' in plugin {}. Expected dict or list, got {}.".format(
-                        hook_name, plugin_name, hook.__class__
-                    )
+                    f"Invalid hook '{hook_name}' in plugin {plugin_name}. Expected dict or list, got {hook.__class__}."
                 )
         return hooks
 
@@ -235,13 +211,11 @@ class EntrypointPlugin(BasePlugin):
                 yield cls(entrypoint)
             except pkg_resources.VersionConflict as e:
                 error = e.report()
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 error = str(e)
             if error:
                 fmt.echo_error(
-                    "Failed to load entrypoint '{} = {}' from distribution {}: {}".format(
-                        entrypoint.name, entrypoint.module_name, entrypoint.dist, error
-                    )
+                    f"Failed to load entrypoint '{entrypoint.name} = {entrypoint.module_name}' from distribution {entrypoint.dist}: {error}"
                 )
 
 
@@ -258,7 +232,7 @@ class OfficialPlugin(BasePlugin):
         return plugin
 
     def __init__(self, name: str):
-        self.module = importlib.import_module("tutor{}.plugin".format(name))
+        self.module = importlib.import_module(f"tutor{name}.plugin")
         super().__init__(name, self.module)
 
     @property
@@ -283,9 +257,7 @@ class DictPlugin(BasePlugin):
         name = data["name"]
         if not isinstance(name, str):
             raise exceptions.TutorError(
-                "Invalid plugin name: '{}'. Expected str, got {}".format(
-                    name, name.__class__
-                )
+                f"Invalid plugin name: '{name}'. Expected str, got {name.__class__}"
             )
 
         # Create a generic object (sort of a named tuple) which will contain all key/values from data
@@ -310,17 +282,17 @@ class DictPlugin(BasePlugin):
     @classmethod
     def iter_load(cls) -> Iterator[BasePlugin]:
         for path in glob(os.path.join(cls.ROOT, "*.yml")):
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 data = serialize.load(f)
                 if not isinstance(data, dict):
                     raise exceptions.TutorError(
-                        "Invalid plugin: {}. Expected dict.".format(path)
+                        f"Invalid plugin: {path}. Expected dict."
                     )
                 try:
                     yield cls(data)
                 except KeyError as e:
                     raise exceptions.TutorError(
-                        "Invalid plugin: {}. Missing key: {}".format(path, e.args[0])
+                        f"Invalid plugin: {path}. Missing key: {e.args[0]}"
                     )
 
 
@@ -411,7 +383,7 @@ def iter_installed() -> Iterator[BasePlugin]:
 
 def enable(config: Config, name: str) -> None:
     if not is_installed(name):
-        raise exceptions.TutorError("plugin '{}' is not installed.".format(name))
+        raise exceptions.TutorError(f"plugin '{name}' is not installed.")
     if is_enabled(config, name):
         return
     enabled = enabled_plugins(config)
@@ -434,7 +406,7 @@ def get_enabled(config: Config, name: str) -> BasePlugin:
     for plugin in iter_enabled(config):
         if plugin.name == name:
             return plugin
-    raise ValueError("Enabled plugin {} could not be found.".format(plugin.name))
+    raise ValueError(f"Enabled plugin {name} could not be found.")
 
 
 def iter_enabled(config: Config) -> Iterator[BasePlugin]:
