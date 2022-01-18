@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix `tutor local importdemocourse` fails when platform is not up.
+
 ## v13.1.0 (2022-01-08)
 
 - [Improvement] Provide much more comprehensive instructions when upgrading.
