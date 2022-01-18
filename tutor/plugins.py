@@ -182,6 +182,11 @@ class BasePlugin:
     def iter_load(cls) -> Iterator["BasePlugin"]:
         raise NotImplementedError
 
+    @classmethod
+    def clear_cache(cls) -> None:
+        cls._IS_LOADED = False
+        cls.INSTALLED.clear()
+
 
 class EntrypointPlugin(BasePlugin):
     """
@@ -324,9 +329,9 @@ class Plugins:
                 self.hooks[hook_name][plugin.name] = services
 
     @classmethod
-    def clear(cls) -> None:
+    def clear_cache(cls) -> None:
         for PluginClass in cls.PLUGIN_CLASSES:
-            PluginClass.INSTALLED.clear()
+            PluginClass.clear_cache()
 
     @classmethod
     def iter_installed(cls) -> Iterator[BasePlugin]:

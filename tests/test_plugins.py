@@ -8,7 +8,7 @@ from tutor.types import Config, get_typed
 
 class PluginsTests(unittest.TestCase):
     def setUp(self) -> None:
-        plugins.Plugins.clear()
+        plugins.Plugins.clear_cache()
 
     @patch.object(plugins.DictPlugin, "iter_installed", return_value=[])
     def test_iter_installed(self, dict_plugin_iter_installed: Mock) -> None:
