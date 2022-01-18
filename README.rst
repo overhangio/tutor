@@ -1,14 +1,14 @@
 .. _readme_intro_start:
 
-Tutor: the docker-based Open edX distribution designed for peace of mind
+Tutor: the Docker-based Open edX distribution designed for peace of mind
 ========================================================================
-
-|
 
 .. image:: https://overhang.io/static/img/tutor-logo.svg
   :alt: Tutor logo
   :width: 500px
   :align: center
+
+|
 
 .. image:: https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=brightgreen&message=Source%20code
   :alt: Source code
@@ -38,7 +38,7 @@ Tutor: the docker-based Open edX distribution designed for peace of mind
     :alt: Follow us on Youtube
     :target: https://www.youtube.com/c/OverhangIO
 
-**Tutor** is the Docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used by hundreds of Open edX platforms around the world.
+**Tutor** is the official Docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customize, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used to deploy hundreds of Open edX platforms around the world.
 
 Do you need professional assistance setting up or managing your Open edX platform? Overhang.IO provides online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/pricing>`__.
 
@@ -52,7 +52,7 @@ Features
 * Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins.html>`__
 * Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`__
 * Amazing premium plugins available in the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__, including `Cairn <https://overhang.io/tutor/plugin/cairn>`__ the next-generation analytics solution for Open edX.
-* No technical skill required with the `1-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#cloud-deployment>`__
+* No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#zero-click-aws-installation>`__
 
 .. _readme_intro_end:
 
