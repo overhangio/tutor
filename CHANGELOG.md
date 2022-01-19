@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "LazyStaticAbsoluteUrl is not JSON serializable" error when sending bulk emails.
 - [Bugfix] Fix `tutor local importdemocourse` fails when platform is not up.
 
 ## v13.1.0 (2022-01-08)
