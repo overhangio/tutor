@@ -154,6 +154,11 @@ First of all, stop any locally-running platform::
     tutor local stop
     tutor dev stop
 
+Remove all containers::
+
+    tutor local dc down --remove-orphans
+    tutor local dc down --remove-orphans
+
 Then, delete all data associated to your Open edX platform::
 
     # WARNING: this step is irreversible
