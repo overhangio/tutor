@@ -27,9 +27,9 @@
 
 {{ LMS_HOST }}{$default_site_port}, {{ PREVIEW_LMS_HOST }}{$default_site_port} {
     @favicon_matcher {
-        path_regexp ^(.*)/favicon.ico$
+        path_regexp ^/favicon.ico$
     }
-    rewrite @favicon_matcher /static/images/favicon.ico
+    rewrite @favicon_matcher /theming/asset/images/favicon.ico
 
     # Limit profile image upload size
     request_body /api/profile_images/*/*/upload {
@@ -46,9 +46,9 @@
 
 {{ CMS_HOST }}{$default_site_port} {
     @favicon_matcher {
-        path_regexp ^(.*)/favicon.ico$
+        path_regexp ^/favicon.ico$
     }
-    rewrite @favicon_matcher /static/images/favicon.ico
+    rewrite @favicon_matcher /theming/asset/images/favicon.ico
 
     request_body {
         max_size 250MB
