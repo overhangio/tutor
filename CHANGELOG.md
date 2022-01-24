@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix authentication in development due to missing SameSite policy on session ID cookie.
 - [Bugfix] Display properly themed favicon.ico image in LMS, Studio and microfrontends.
 - [Bugfix] Fix "LazyStaticAbsoluteUrl is not JSON serializable" error when sending bulk emails.
 - [Bugfix] Fix `tutor local importdemocourse` fails when platform is not up.
