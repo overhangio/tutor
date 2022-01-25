@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.1 (2022-01-25)
+
 - [Bugfix] Fix authentication in development due to missing SameSite policy on session ID cookie.
 - [Bugfix] Display properly themed favicon.ico image in LMS, Studio and microfrontends.
 - [Bugfix] Fix "LazyStaticAbsoluteUrl is not JSON serializable" error when sending bulk emails.
