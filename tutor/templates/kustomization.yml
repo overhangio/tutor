@@ -30,6 +30,9 @@ configMapGenerator:
 - name: caddy-config
   files:
   - apps/caddy/Caddyfile
+  options:
+    labels:
+        app.kubernetes.io/name: caddy
 - name: openedx-settings-lms
   files:{% for file in "apps/openedx/settings/lms"|walk_templates %}
   - {{ file }}{% endfor %}
