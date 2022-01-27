@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix `k8s start caddy` command.
+
 ## v13.1.2 (2022-01-30)
 
 - [Bugfix] Fix auto-renewal of certificates revoked by Let's Encrypt (see [discussion](https://community.letsencrypt.org/t/questions-about-renewing-before-tls-alpn-01-revocations/170449/21)).
