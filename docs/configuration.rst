@@ -163,7 +163,7 @@ SMTP
 
 - ``RUN_SMTP`` (default: ``true``)
 - ``SMTP_HOST`` (default: ``"smtp"``)
-- ``SMTP_PORT`` (default: ``25``)
+- ``SMTP_PORT`` (default: ``8025``)
 - ``SMTP_USERNAME`` (default: ``""``)
 - ``SMTP_PASSWORD`` (default: ``""``)
 - ``SMTP_USE_TLS`` (default: ``false``)
