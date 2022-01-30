@@ -4,6 +4,10 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.2 (2022-01-30)
+
+- [Bugfix] Fix auto-renewal of certificates revoked by Let's Encrypt (see [discussion](https://community.letsencrypt.org/t/questions-about-renewing-before-tls-alpn-01-revocations/170449/21)).
+
 ## v13.1.1 (2022-01-25)
 
 - [Bugfix] Fix authentication in development due to missing SameSite policy on session ID cookie.
