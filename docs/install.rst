@@ -149,15 +149,10 @@ Uninstallation
 
 It is fairly easy to completely uninstall Tutor and to delete the Open edX platforms that is running locally.
 
-First of all, stop any locally-running platform::
-
-    tutor local stop
-    tutor dev stop
-
-Remove all containers::
+First of all, stop any locally-running platform and remove all Tutor containers::
 
     tutor local dc down --remove-orphans
-    tutor local dc down --remove-orphans
+    tutor dev dc down --remove-orphans
 
 Then, delete all data associated to your Open edX platform::
 

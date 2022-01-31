@@ -176,20 +176,28 @@ When saving the environment, template files that are stored in a template root w
 command
 ~~~~~~~
 
-A plugin can provide custom command line commands. Commands are assumed to be `click.Command <https://click.palletsprojects.com/en/8.0.x/api/#commands>`__ objects.
+A plugin can provide custom command line commands. Commands are assumed to be `click.Command <https://click.palletsprojects.com/en/8.0.x/api/#commands>`__ objects, and you typically implement them using the `click.command <https://click.palletsprojects.com/en/8.0.x/api/#click.command>`__ decorator.
+
+You may also use the `click.pass_obj <https://click.palletsprojects.com/en/8.0.x/api/#click.pass_obj>`__ decorator to pass the CLI `context <https://click.palletsprojects.com/en/8.0.x/api/#click.Context>`__, such as when you want to access Tutor configuration settings from your command.
 
 Example::
 
     import click
+    from tutor import config as tutor_config
 
     @click.command(help="I'm a plugin command")
-    def command():
+    @click.pass_obj
+    def command(context):
+        config = tutor_config.load(context.root)
+        lms_host = config["LMS_HOST"]
         click.echo("Hello from myplugin!")
+        click.echo(f"My LMS host is {lms_host}")
 
 Any user who installs the ``myplugin`` plugin can then run::
 
     $ tutor myplugin
     Hello from myplugin!
+    My LMS host is demo.openedx.overhang.io
 
 You can even define subcommands by creating `command groups <https://click.palletsprojects.com/en/8.0.x/api/#click.Group>`__::
 
