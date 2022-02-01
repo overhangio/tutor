@@ -61,6 +61,9 @@ RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ 85eb44445b8a620
 # Fix Internal Server Error/AttributeError in learning MFE
 # https://github.com/openedx/edx-platform/pull/29741
 RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ a76a79f973ca05f3921fa2a3428fa7052868a725 && git cherry-pick a76a79f973ca05f3921fa2a3428fa7052868a725
+# Security fix: invalid enrollment error vulnerability
+# https://github.com/overhangio/edx-platform/commit/e9369cffde92e765117bbd4dfbee7dc29213493a
+RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ e9369cffde92e765117bbd4dfbee7dc29213493a && git cherry-pick e9369cffde92e765117bbd4dfbee7dc29213493a
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
