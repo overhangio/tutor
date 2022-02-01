@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.3 (2022-02-01)
+
 - [Security] Fix vulnerability in call to invalid enrollment API (see [commit](https://github.com/overhangio/edx-platform/commit/e9369cffde92e765117bbd4dfbee7dc29213493a)).
 - [Bugfix] Fix "Internal Server Error / AttributeError / object has no attribute 'get_metadata'" in learning MFE.
 - [Improvement] Replace all links to github.com/edx by github.com/openedx, following the migration of all repositories.
