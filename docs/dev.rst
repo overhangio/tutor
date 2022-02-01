@@ -25,7 +25,7 @@ This ``openedx-dev`` development image differs from the ``openedx`` production i
 
 - The user that runs inside the container has the same UID as the user on the host, in order to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
 - Additional python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
-- The edx-platform `development requirements <https://github.com/edx/edx-platform/blob/open-release/maple.master/requirements/edx/development.in>`__ are installed.
+- The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/maple.master/requirements/edx/development.in>`__ are installed.
 
 Since the ``openedx-dev`` is based upon the ``openedx`` docker image, it should be re-built every time the ``openedx`` docker image is modified.
 
@@ -84,7 +84,7 @@ Notice how the ``--volume=/openedx/venv`` option differs from `Docker syntax <ht
 Manual bind-mount to any directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The above solution may not work for you if you already have an existing directory, outside of the "volumes/" directory, which you would like mounted in one of your containers. For instance, you may want to mount your copy of the `edx-platform <https://github.com/edx/edx-platform/>`__ repository. In such cases, you can simply use the ``-v/--volume`` `Docker option <https://docs.docker.com/storage/volumes/#choose-the--v-or---mount-flag>`__::
+The above solution may not work for you if you already have an existing directory, outside of the "volumes/" directory, which you would like mounted in one of your containers. For instance, you may want to mount your copy of the `edx-platform <https://github.com/openedx/edx-platform/>`__ repository. In such cases, you can simply use the ``-v/--volume`` `Docker option <https://docs.docker.com/storage/volumes/#choose-the--v-or---mount-flag>`__::
 
     tutor dev run --volume=/path/to/edx-platform:/openedx/edx-platform lms bash
 
@@ -123,7 +123,7 @@ Common tasks
 Setting up a development environment for edx-platform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Following the instructions :ref:`above <bind_mounts>` on how to bind-mount directories from the host above, you may mount your own `edx-platform <https://github.com/edx/edx-platform/>`__ fork in your containers by running either::
+Following the instructions :ref:`above <bind_mounts>` on how to bind-mount directories from the host above, you may mount your own `edx-platform <https://github.com/openedx/edx-platform/>`__ fork in your containers by running either::
 
     # Mount from the volumes/ directory
     tutor dev bindmount lms /openedx/edx-platform
@@ -206,7 +206,7 @@ From then on, all ``dev`` commands will use the ``mysettings`` module. For insta
 Running edx-platform unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/edx/edx-platform/>`__. To do so, run a shell in the LMS development container::
+It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/openedx/edx-platform/>`__. To do so, run a shell in the LMS development container::
 
     tutor dev run lms bash
 

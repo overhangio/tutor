@@ -6,7 +6,7 @@ FAQ
 What is Tutor?
 --------------
 
-Tutor is an open source distribution of `Open edX <https://open.edx.org>`_. It uses the original code from the various Open edX repositories, such as `edx-platform <https://github.com/edx/edx-platform/>`_, `cs_comments_service <https://github.com/edx/cs_comments_service>`_, etc. and packages everything in a way that makes it very easy to install, administer and upgrade Open edX. In particular, all services are run inside Docker containers.
+Tutor is an open source distribution of `Open edX <https://open.edx.org>`_. It uses the original code from the various Open edX repositories, such as `edx-platform <https://github.com/openedx/edx-platform/>`_, `cs_comments_service <https://github.com/openedx/cs_comments_service>`_, etc. and packages everything in a way that makes it very easy to install, administer and upgrade Open edX. In particular, all services are run inside Docker containers.
 
 Tutor makes it possible to deploy Open edX locally, with `docker-compose <https://docs.docker.com/compose/overview/>`_ or on an existing `Kubernetes cluster <http://kubernetes.io/>`_. Want to learn more? Take a look at the :ref:`getting started concepts <intro>`.
 
@@ -20,7 +20,7 @@ To make it possible to deploy, administer and upgrade Open edX anywhere, easily.
 What's the difference with the official "native" installation?
 --------------------------------------------------------------
 
-The `native installation <https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/146440579/Native+Open+edX+Ubuntu+16.04+64+bit+Installation>`_ maintained by edX relies on `Ansible scripts <https://github.com/edx/configuration/>`_ to deploy Open edX on one or multiple servers. These scripts suffer from a couple issues that Tutor tries to address:
+The `native installation <https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/146440579/Native+Open+edX+Ubuntu+16.04+64+bit+Installation>`_ maintained by edX relies on `Ansible scripts <https://github.com/openedx/configuration/>`_ to deploy Open edX on one or multiple servers. These scripts suffer from a couple issues that Tutor tries to address:
 
 1. Complexity: the scripts contain close to 35k lines of code spread over 780 files. They are really hard to understand, debug, and modify, and they are extremly slow. As a consequence, Open edX is often wrongly perceived as a project that is overly complex to manage. In contrast, Tutor generates mostly ``Dockerfile`` and ``docker-compose.yml`` files that make it easy to understand what is going on. Also, the whole installation should take about 10 minutes.
 2. Isolation from the OS: Tutor barely needs to touch your server because the entire platform is packaged inside Docker containers. You are thus free to run other services on your server without fear of indirectly crashing your Open edX platform.
@@ -33,7 +33,7 @@ There are also many features that are not included in the native installation, s
 What's the difference with the official devstack?
 -------------------------------------------------
 
-The `devstack <https://github.com/edx/devstack>`_ is meant for development only, not for production deployment. Tutor can be used both for production deployment and :ref:`locally hacking on Open edX <development>`.
+The `devstack <https://github.com/openedx/devstack>`_ is meant for development only, not for production deployment. Tutor can be used both for production deployment and :ref:`locally hacking on Open edX <development>`.
 
 Is Tutor officially supported by edX?
 -------------------------------------
@@ -45,7 +45,7 @@ What features are missing from Tutor?
 
 Tutor tries very hard to support all major Open edX features, notably in the form of :ref:`plugins <existing_plugins>`. If you are interested in sponsoring the development of a new plugin, please `get in touch <mailto:worktogether@overhang.io>`__!
 
-It should be noted that the `Insights <https://github.com/edx/edx-analytics-pipeline>`__ stack is currently unsupported, because of its complexity, lack of support and extensibility. To replace it, Overhang.IO developed `Cairn <https://overhang.io/tutor/plugin/cairn>`__ the next-generation analytics solution for Open edX, part of the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__. You should check it out 😉
+It should be noted that the `Insights <https://github.com/openedx/edx-analytics-pipeline>`__ stack is currently unsupported, because of its complexity, lack of support and extensibility. To replace it, Overhang.IO developed `Cairn <https://overhang.io/tutor/plugin/cairn>`__ the next-generation analytics solution for Open edX, part of the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__. You should check it out 😉
 
 Are there people already running this in production?
 ----------------------------------------------------

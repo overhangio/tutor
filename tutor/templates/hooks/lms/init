@@ -6,7 +6,7 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 ./manage.py lms migrate
 
 # Create oauth2 apps for CMS SSO
-# https://github.com/edx/edx-platform/blob/master/docs/guides/studio_oauth.rst
+# https://github.com/openedx/edx-platform/blob/master/docs/guides/studio_oauth.rst
 ./manage.py lms manage_user cms cms@openedx --unusable-password
 ./manage.py lms create_dot_application \
   --grant-type authorization-code \
