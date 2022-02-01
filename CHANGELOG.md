@@ -4,8 +4,9 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
-- [Bugfix] Fix `k8s start caddy` command.
+- [Bugfix] Fix "Internal Server Error / AttributeError / object has no attribute 'get_metadata'" in learning MFE.
 - [Improvement] Replace all links to github.com/edx by github.com/openedx, following the migration of all repositories.
+- [Bugfix] Fix `k8s start caddy` command.
 
 ## v13.1.2 (2022-01-30)
 

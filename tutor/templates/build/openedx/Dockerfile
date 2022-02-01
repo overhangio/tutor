@@ -58,6 +58,9 @@ RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b63c01fb38a6
 # Upgrade Django to 3.2.11
 # https://github.com/openedx/edx-platform/commit/85eb44445b8a6207b967bd4af5666e521a4af9b5
 RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ 85eb44445b8a6207b967bd4af5666e521a4af9b5 && git cherry-pick 85eb44445b8a6207b967bd4af5666e521a4af9b5
+# Fix Internal Server Error/AttributeError in learning MFE
+# https://github.com/openedx/edx-platform/pull/29741
+RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ a76a79f973ca05f3921fa2a3428fa7052868a725 && git cherry-pick a76a79f973ca05f3921fa2a3428fa7052868a725
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
