@@ -118,7 +118,7 @@ You will asked to set the user password interactively.
 Importing the demo course
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After a fresh installation, your platform will not have a single course. To import the `Open edX demo course <https://github.com/edx/edx-demo-course>`_, run::
+After a fresh installation, your platform will not have a single course. To import the `Open edX demo course <https://github.com/openedx/edx-demo-course>`_, run::
 
     tutor local importdemocourse
 
