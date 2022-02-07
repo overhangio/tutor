@@ -70,6 +70,8 @@ Urls:
 
 The platform is reset every day at 9:00 AM, `Paris (France) time <https://time.is/Paris>`__, so feel free to try and break things as much as you want.
 
+.. _how_does_tutor_work:
+
 How does Tutor work?
 --------------------
 

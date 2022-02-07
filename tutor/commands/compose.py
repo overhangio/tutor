@@ -3,13 +3,13 @@ from typing import List
 
 import click
 
-from .. import bindmounts
-from .. import config as tutor_config
-from .. import env as tutor_env
-from .. import fmt, jobs, utils
-from ..exceptions import TutorError
-from ..types import Config
-from .context import BaseJobContext
+from tutor import bindmounts
+from tutor import config as tutor_config
+from tutor import env as tutor_env
+from tutor import fmt, jobs, utils
+from tutor.commands.context import BaseJobContext
+from tutor.exceptions import TutorError
+from tutor.types import Config
 
 
 class ComposeJobRunner(jobs.BaseComposeJobRunner):

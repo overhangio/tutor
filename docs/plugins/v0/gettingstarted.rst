@@ -1,6 +1,8 @@
 Getting started with plugin development
 =======================================
 
+.. include:: legacy.rst
+
 Plugins can be created in two different ways: either as plain YAML files or installable Python packages. YAML files are great when you need to make minor changes to the default platform, such as modifying settings. For creating more complex applications, it is recommended to create python packages.
 
 .. _plugins_yaml:

@@ -26,7 +26,7 @@ kubernetes==18.20.0
     # via -r requirements/base.in
 markupsafe==2.0.1
     # via jinja2
-mypy==0.931
+mypy==0.942
     # via -r requirements/base.in
 mypy-extensions==0.4.3
     # via mypy

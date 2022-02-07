@@ -1,7 +1,8 @@
 .. _plugins:
 
-Plugins
-=======
+============
+Introduction
+============
 
 Tutor comes with a plugin system that allows anyone to customise the deployment of an Open edX platform very easily. The vision behind this plugin system is that users should not have to fork the Tutor repository to customise their deployments. For instance, if you have created a new application that integrates with Open edX, you should not have to describe how to manually patch the platform settings, ``urls.py`` or ``*.env.json`` files. Instead, you can create a "tutor-myapp" plugin for Tutor. Then, users will start using your application in three simple steps::
 
@@ -12,12 +13,10 @@ Tutor comes with a plugin system that allows anyone to customise the deployment 
     # 3) Reconfigure and restart the platform
     tutor local quickstart
 
-For simple changes, it may be extremely easy to create a Tutor plugin: even non-technical users may get started with :ref:`simple YAML plugins <plugins_yaml>`.
+For simple changes, it may be extremely easy to create a Tutor plugin: even non-technical users may get started with our :ref:`plugin_development_tutorial` tutorial. We also provide a list of :ref:`simple example plugins <plugins_examples>`.
 
-In the following, we learn how to use and create Tutor plugins.
-
-Commands
---------
+Plugin commands cheatsheet
+==========================
 
 List installed plugins::
 
@@ -32,19 +31,11 @@ After enabling or disabling a plugin, the environment should be re-generated wit
 
     tutor config save
 
+The full plugins CLI is described in the :ref:`reference documentation <cli_plugins>`.
+
 .. _existing_plugins:
 
 Existing plugins
-----------------
+================
 
 Officially-supported plugins are listed on the `Overhang.IO <https://overhang.io/tutor/plugins>`__ website.
-
-Plugin development
-------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   plugins/api
-   plugins/gettingstarted
-   plugins/examples

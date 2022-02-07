@@ -11,4 +11,7 @@ browse:
 	sensible-browser _build/html/index.html
 
 watch: build browse
-	while true; do inotifywait -e modify *.rst */*.rst */*/*.rst ../*.rst conf.py; $(MAKE) build || true; done
+	while true; do $(MAKE) wait-for-change build || true; done
+
+wait-for-change:
+	inotifywait -e modify $(shell find . -name "*.rst") ../*.rst ../tutor/hooks/*.py conf.py

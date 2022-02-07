@@ -22,9 +22,9 @@
    gettingstarted
    run
    configuration
-   plugins
-   reference
-   tutorials
+   plugins/index
+   reference/index
+   tutorials/index
    troubleshooting
    tutor
    faq
@@ -59,6 +59,6 @@ This work is licensed under the terms of the `GNU Affero General Public License 
 
 The AGPL license covers the Tutor code, including the Dockerfiles, but not the content of the Docker images which can be downloaded from https://hub.docker.com. Software other than Tutor provided with the docker images retain their original license.
 
-The Tutor plugin system is licensed under the terms of the `Apache License, Version 2.0 <https://opensource.org/licenses/Apache-2.0>`__.
+The Tutor plugin and hooks system is licensed under the terms of the `Apache License, Version 2.0 <https://opensource.org/licenses/Apache-2.0>`__.
 
 © 2021 Tutor is a registered trademark of SASU NULI NULI. All Rights Reserved.

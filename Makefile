@@ -28,17 +28,19 @@ push-pythonpackage: ## Push python package to pypi
 
 test: test-lint test-unit test-types test-format test-pythonpackage ## Run all tests by decreasing order of priority
 
+test-static: test-lint test-types test-format  ## Run only static tests
+
 test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
 
 test-lint: ## Run code linting tests
-	pylint --errors-only --enable=unused-import,unused-argument --ignore=templates ${SRC_DIRS}
+	pylint --errors-only --enable=unused-import,unused-argument --ignore=templates --ignore=docs/_ext ${SRC_DIRS}
 
 test-unit: ## Run unit tests
 	python -m unittest discover tests
 
 test-types: ## Check type definitions
-	mypy --exclude=templates --ignore-missing-imports --strict tutor/ tests/
+	mypy --exclude=templates --ignore-missing-imports --strict ${SRC_DIRS}
 
 test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
 	twine check dist/tutor-$(shell make version).tar.gz
@@ -48,6 +50,9 @@ test-k8s: ## Validate the k8s format with kubectl. Not part of the standard test
 
 format: ## Format code automatically
 	black $(BLACK_OPTS)
+
+isort: ##  Sort imports. This target is not mandatory because the output may be incompatible with black formatting. Provided for convenience purposes.
+	isort --skip=templates ${SRC_DIRS}
 
 bootstrap-dev: ## Install dev requirements
 	pip install .

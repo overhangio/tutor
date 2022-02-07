@@ -3,14 +3,15 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
-from tutor.__about__ import __version__
+from tests.helpers import PluginsTestCase, temporary_root
 from tutor import config as tutor_config
-from tutor import env, exceptions, fmt
+from tutor import env, exceptions, fmt, plugins
+from tutor.__about__ import __version__
+from tutor.plugins.v0 import DictPlugin
 from tutor.types import Config
-from tests.helpers import temporary_root
 
 
-class EnvTests(unittest.TestCase):
+class EnvTests(PluginsTestCase):
     def test_walk_templates(self) -> None:
         renderer = env.Renderer({}, [env.TEMPLATES_ROOT])
         templates = list(renderer.walk_templates("local"))
@@ -103,15 +104,15 @@ class EnvTests(unittest.TestCase):
     def test_patch(self) -> None:
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
         with patch.object(
-            env.plugins, "iter_patches", return_value=patches.items()
+            env.plugins, "iter_patches", return_value=patches.values()
         ) as mock_iter_patches:
             rendered = env.render_str({}, '{{ patch("location") }}')
-            mock_iter_patches.assert_called_once_with({}, "location")
+            mock_iter_patches.assert_called_once_with("location")
         self.assertEqual("abcd\nefgh", rendered)
 
     def test_patch_separator_suffix(self) -> None:
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
-        with patch.object(env.plugins, "iter_patches", return_value=patches.items()):
+        with patch.object(env.plugins, "iter_patches", return_value=patches.values()):
             rendered = env.render_str(
                 {}, '{{ patch("location", separator=",\n", suffix=",") }}'
             )
@@ -119,11 +120,9 @@ class EnvTests(unittest.TestCase):
 
     def test_plugin_templates(self) -> None:
         with tempfile.TemporaryDirectory() as plugin_templates:
-            # Create plugin
-            plugin1 = env.plugins.DictPlugin(
+            DictPlugin(
                 {"name": "plugin1", "version": "0", "templates": plugin_templates}
             )
-
             # Create two templates
             os.makedirs(os.path.join(plugin_templates, "plugin1", "apps"))
             with open(
@@ -139,36 +138,37 @@ class EnvTests(unittest.TestCase):
             ) as f:
                 f.write("Hello my ID is {{ ID }}")
 
-            # Create configuration
-            config: Config = {"ID": "abcd"}
-
             # Render templates
-            with patch.object(
-                env.plugins,
-                "iter_enabled",
-                return_value=[plugin1],
-            ):
-                with temporary_root() as root:
-                    # Render plugin templates
-                    env.save_plugin_templates(plugin1, root, config)
+            with temporary_root() as root:
+                # Create configuration
+                config: Config = tutor_config.load_full(root)
+                config["ID"] = "Hector Rumblethorpe"
+                plugins.load("plugin1")
+                tutor_config.save_enabled_plugins(config)
 
-                    # Check that plugin template was rendered
-                    dst_unrendered = os.path.join(
-                        root, "env", "plugins", "plugin1", "unrendered.txt"
-                    )
-                    dst_rendered = os.path.join(
-                        root, "env", "plugins", "plugin1", "apps", "rendered.txt"
-                    )
-                    self.assertFalse(os.path.exists(dst_unrendered))
-                    self.assertTrue(os.path.exists(dst_rendered))
-                    with open(dst_rendered, encoding="utf-8") as f:
-                        self.assertEqual("Hello my ID is abcd", f.read())
+                # Render environment
+                with patch.object(fmt, "STDOUT"):
+                    env.save(root, config)
+
+                # Check that plugin template was rendered
+                root_env = os.path.join(root, "env")
+                dst_unrendered = os.path.join(
+                    root_env, "plugins", "plugin1", "unrendered.txt"
+                )
+                dst_rendered = os.path.join(
+                    root_env, "plugins", "plugin1", "apps", "rendered.txt"
+                )
+                self.assertFalse(os.path.exists(dst_unrendered))
+                self.assertTrue(os.path.exists(dst_rendered))
+                with open(dst_rendered, encoding="utf-8") as f:
+                    self.assertEqual("Hello my ID is Hector Rumblethorpe", f.read())
 
     def test_renderer_is_reset_on_config_change(self) -> None:
         with tempfile.TemporaryDirectory() as plugin_templates:
-            plugin1 = env.plugins.DictPlugin(
+            plugin1 = DictPlugin(
                 {"name": "plugin1", "version": "0", "templates": plugin_templates}
             )
+
             # Create one template
             os.makedirs(os.path.join(plugin_templates, plugin1.name))
             with open(
@@ -182,14 +182,12 @@ class EnvTests(unittest.TestCase):
             config: Config = {"PLUGINS": []}
             env1 = env.Renderer.instance(config).environment
 
-            with patch.object(
-                env.plugins,
-                "iter_enabled",
-                return_value=[plugin1],
-            ):
-                # Load env a second time
-                config["PLUGINS"] = ["myplugin"]
-                env2 = env.Renderer.instance(config).environment
+            # Enable plugins
+            plugins.load("plugin1")
+
+            # Load env a second time
+            config["PLUGINS"] = ["myplugin"]
+            env2 = env.Renderer.instance(config).environment
 
             self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())
             self.assertIn("plugin1/myplugin.txt", env2.loader.list_templates())

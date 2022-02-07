@@ -7,6 +7,7 @@ from tutor import env as tutor_env
 from tutor import fmt
 from tutor.commands import compose
 from tutor.types import Config
+
 from . import common as common_upgrade
 
 

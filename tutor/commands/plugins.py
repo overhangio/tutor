@@ -1,13 +1,13 @@
 import os
-import shutil
 import urllib.request
-from typing import List
+import typing as t
 
 import click
 
-from .. import config as tutor_config
-from .. import env as tutor_env
-from .. import exceptions, fmt, plugins
+from tutor import config as tutor_config
+from tutor import exceptions, fmt, hooks, plugins
+from tutor.plugins.base import PLUGINS_ROOT, PLUGINS_ROOT_ENV_VAR_NAME
+
 from .context import Context
 
 
@@ -24,26 +24,29 @@ def plugins_command() -> None:
 
 
 @click.command(name="list", help="List installed plugins")
-@click.pass_obj
-def list_command(context: Context) -> None:
-    config = tutor_config.load_full(context.root)
-    for plugin in plugins.iter_installed():
-        status = "" if plugins.is_enabled(config, plugin.name) else " (disabled)"
-        print(
-            "{plugin}=={version}{status}".format(
-                plugin=plugin.name, status=status, version=plugin.version
-            )
-        )
+def list_command() -> None:
+    lines = []
+    first_column_width = 1
+    for plugin, plugin_info in plugins.iter_info():
+        plugin_info = plugin_info or ""
+        plugin_info.replace("\n", " ")
+        status = "" if plugins.is_loaded(plugin) else "(disabled)"
+        lines.append((plugin, status, plugin_info))
+        first_column_width = max([first_column_width, len(plugin) + 2])
+
+    for line in lines:
+        print("{:{width}}\t{:10}\t{}".format(*line, width=first_column_width))
 
 
 @click.command(help="Enable a plugin")
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
 @click.pass_obj
-def enable(context: Context, plugin_names: List[str]) -> None:
+def enable(context: Context, plugin_names: t.List[str]) -> None:
     config = tutor_config.load_minimal(context.root)
     for plugin in plugin_names:
-        plugins.enable(config, plugin)
-        fmt.echo_info("Plugin {} enabled".format(plugin))
+        plugins.load(plugin)
+        fmt.echo_info(f"Plugin {plugin} enabled")
+    tutor_config.save_enabled_plugins(config)
     tutor_config.save_config_file(context.root, config)
     fmt.echo_info(
         "You should now re-generate your environment with `tutor config save`."
@@ -56,61 +59,43 @@ def enable(context: Context, plugin_names: List[str]) -> None:
 )
 @click.argument("plugin_names", metavar="plugin", nargs=-1)
 @click.pass_obj
-def disable(context: Context, plugin_names: List[str]) -> None:
+def disable(context: Context, plugin_names: t.List[str]) -> None:
     config = tutor_config.load_minimal(context.root)
     disable_all = "all" in plugin_names
-    for plugin in plugins.iter_enabled(config):
-        if disable_all or plugin.name in plugin_names:
-            fmt.echo_info("Disabling plugin {}...".format(plugin.name))
-            for key, value in plugin.config_set.items():
-                value = tutor_env.render_unknown(config, value)
-                fmt.echo_info("    Removing config entry {}={}".format(key, value))
-            plugins.disable(config, plugin)
-            delete_plugin(context.root, plugin.name)
-            fmt.echo_info("    Plugin disabled")
-    tutor_config.save_config_file(context.root, config)
-    fmt.echo_info(
-        "You should now re-generate your environment with `tutor config save`."
-    )
-
-
-def delete_plugin(root: str, name: str) -> None:
-    plugin_dir = tutor_env.pathjoin(root, "plugins", name)
-    if os.path.exists(plugin_dir):
-        try:
-            shutil.rmtree(plugin_dir)
-        except PermissionError as e:
-            raise exceptions.TutorError(
-                "Could not delete file {} from plugin {} in folder {}".format(
-                    e.filename, name, plugin_dir
-                )
-            )
+    disabled: t.List[str] = []
+    for plugin in tutor_config.get_enabled_plugins(config):
+        if disable_all or plugin in plugin_names:
+            fmt.echo_info(f"Disabling plugin {plugin}...")
+            hooks.Actions.PLUGIN_UNLOADED.do(plugin, context.root, config)
+            disabled.append(plugin)
+            fmt.echo_info(f"Plugin {plugin} disabled")
+    if disabled:
+        tutor_config.save_config_file(context.root, config)
+        fmt.echo_info(
+            "You should now re-generate your environment with `tutor config save`."
+        )
 
 
 @click.command(
     short_help="Print the location of yaml-based plugins",
-    help="""Print the location of yaml-based plugins. This location can be manually
-defined by setting the {} environment variable""".format(
-        plugins.DictPlugin.ROOT_ENV_VAR_NAME
-    ),
+    help=f"""Print the location of yaml-based plugins. This location can be manually
+defined by setting the {PLUGINS_ROOT_ENV_VAR_NAME} environment variable""",
 )
 def printroot() -> None:
-    fmt.echo(plugins.DictPlugin.ROOT)
+    fmt.echo(PLUGINS_ROOT)
 
 
 @click.command(
     short_help="Install a plugin",
-    help="""Install a plugin, either from a local YAML file or a remote, web-hosted
-location. The plugin will be installed to {}.""".format(
-        plugins.DictPlugin.ROOT_ENV_VAR_NAME
-    ),
+    help=f"""Install a plugin, either from a local Python/YAML file or a remote, web-hosted
+location. The plugin will be installed to {PLUGINS_ROOT_ENV_VAR_NAME}.""",
 )
 @click.argument("location")
 def install(location: str) -> None:
     basename = os.path.basename(location)
-    if not basename.endswith(".yml"):
-        basename += ".yml"
-    plugin_path = os.path.join(plugins.DictPlugin.ROOT, basename)
+    if not basename.endswith(".yml") and not basename.endswith(".py"):
+        basename += ".py"
+    plugin_path = os.path.join(PLUGINS_ROOT, basename)
 
     if location.startswith("http"):
         # Download file
@@ -118,28 +103,17 @@ def install(location: str) -> None:
         content = response.read().decode()
     elif os.path.isfile(location):
         # Read file
-        with open(location) as f:
+        with open(location, encoding="utf-8") as f:
             content = f.read()
     else:
-        raise exceptions.TutorError("No plugin found at {}".format(location))
+        raise exceptions.TutorError(f"No plugin found at {location}")
 
     # Save file
-    if not os.path.exists(plugins.DictPlugin.ROOT):
-        os.makedirs(plugins.DictPlugin.ROOT)
-    with open(plugin_path, "w", newline="\n") as f:
+    if not os.path.exists(PLUGINS_ROOT):
+        os.makedirs(PLUGINS_ROOT)
+    with open(plugin_path, "w", newline="\n", encoding="utf-8") as f:
         f.write(content)
-    fmt.echo_info("Plugin installed at {}".format(plugin_path))
-
-
-def add_plugin_commands(command_group: click.Group) -> None:
-    """
-    Add commands provided by all plugins to the given command group. Each command is
-    added with a name that is equal to the plugin name.
-    """
-    for plugin in plugins.iter_installed():
-        if isinstance(plugin.command, click.Command):
-            plugin.command.name = plugin.name
-            command_group.add_command(plugin.command)
+    fmt.echo_info(f"Plugin installed at {plugin_path}")
 
 
 plugins_command.add_command(list_command)

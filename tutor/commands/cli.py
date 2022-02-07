@@ -1,39 +1,93 @@
 import sys
+import typing as t
 
 import appdirs
 import click
 
-from .. import exceptions, fmt, utils
-from ..__about__ import __app__, __version__
-from .config import config_command
-from .context import Context
-from .dev import dev
-from .images import images_command
-from .k8s import k8s
-from .local import local
-from .plugins import add_plugin_commands, plugins_command
+from tutor import exceptions, fmt, hooks, utils
+from tutor.__about__ import __app__, __version__
+from tutor.commands.config import config_command
+from tutor.commands.context import Context
+from tutor.commands.dev import dev
+from tutor.commands.images import images_command
+from tutor.commands.k8s import k8s
+from tutor.commands.local import local
+from tutor.commands.plugins import plugins_command
+
+# Everyone on board
+hooks.Actions.CORE_READY.do()
 
 
 def main() -> None:
     try:
-        cli.add_command(images_command)
-        cli.add_command(config_command)
-        cli.add_command(local)
-        cli.add_command(dev)
-        cli.add_command(k8s)
-        cli.add_command(print_help)
-        cli.add_command(plugins_command)
-        add_plugin_commands(cli)
         cli()  # pylint: disable=no-value-for-parameter
     except KeyboardInterrupt:
         pass
     except exceptions.TutorError as e:
-        fmt.echo_error("Error: {}".format(e.args[0]))
+        fmt.echo_error(f"Error: {e.args[0]}")
         sys.exit(1)
 
 
+class TutorCli(click.MultiCommand):
+    """
+    Dynamically load subcommands at runtime.
+
+    This is necessary to load plugin subcommands, based on the list of enabled
+    plugins (and thus of config.yml).
+    Docs: https://click.palletsprojects.com/en/latest/commands/#custom-multi-commands
+    """
+
+    IS_ROOT_READY = False
+
+    @classmethod
+    def iter_commands(cls, ctx: click.Context) -> t.Iterator[click.Command]:
+        """
+        Return the list of subcommands (click.Command).
+        """
+        cls.ensure_plugins_enabled(ctx)
+        yield from hooks.Filters.CLI_COMMANDS.iterate()
+
+    @classmethod
+    def ensure_plugins_enabled(cls, ctx: click.Context) -> None:
+        """
+        We enable plugins as soon as possible to have access to commands.
+        """
+        if not isinstance(ctx, click.Context):
+            # When generating docs, this function is incorrectly called with a
+            # multicommand object instead of a Context. That's ok, we just
+            # ignore it.
+            # https://github.com/click-contrib/sphinx-click/issues/70
+            return
+        if not cls.IS_ROOT_READY:
+            hooks.Actions.PROJECT_ROOT_READY.do(root=ctx.params["root"])
+            cls.IS_ROOT_READY = True
+
+    def list_commands(self, ctx: click.Context) -> t.List[str]:
+        """
+        This is run in the following cases:
+        - shell autocompletion: tutor <tab>
+        - print help: tutor, tutor -h
+        """
+        return sorted(
+            [command.name or "<undefined>" for command in self.iter_commands(ctx)]
+        )
+
+    def get_command(
+        self, ctx: click.Context, cmd_name: str
+    ) -> t.Optional[click.Command]:
+        """
+        This is run when passing a command from the CLI. E.g: tutor config ...
+        """
+        for command in self.iter_commands(ctx):
+            if cmd_name == command.name:
+                return command
+        return None
+
+
 @click.group(
-    context_settings={"help_option_names": ["-h", "--help", "help"]},
+    cls=TutorCli,
+    invoke_without_command=True,
+    add_help_option=False,  # Context is incorrectly loaded when help option is automatically added
     help="Tutor is the Docker-based Open edX distribution designed for peace of mind.",
 )
 @click.version_option(version=__version__)
@@ -46,8 +100,15 @@ def main() -> None:
     type=click.Path(resolve_path=True),
     help="Root project directory (environment variable: TUTOR_ROOT)",
 )
+@click.option(
+    "-h",
+    "--help",
+    "show_help",
+    is_flag=True,
+    help="Print this help",
+)
 @click.pass_context
-def cli(context: click.Context, root: str) -> None:
+def cli(context: click.Context, root: str, show_help: bool) -> None:
     if utils.is_root():
         fmt.echo_alert(
             "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
@@ -55,12 +116,28 @@ def cli(context: click.Context, root: str) -> None:
             "/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
         )
     context.obj = Context(root)
+    if context.invoked_subcommand is None or show_help:
+        click.echo(context.get_help())
 
 
 @click.command(help="Print this help", name="help")
-def print_help() -> None:
-    context = click.Context(cli)
-    click.echo(cli.get_help(context))
+@click.pass_context
+def help_command(context: click.Context) -> None:
+    context.invoke(cli, show_help=True)
+
+
+hooks.filters.add_items(
+    "cli:commands",
+    [
+        images_command,
+        config_command,
+        local,
+        dev,
+        k8s,
+        help_command,
+        plugins_command,
+    ],
+)
 
 
 if __name__ == "__main__":
