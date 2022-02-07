@@ -1,7 +1,8 @@
 import os
+import typing as t
 
-from . import env, exceptions, fmt, plugins, serialize, utils
-from .types import Config, cast_config
+from tutor import env, exceptions, fmt, hooks, plugins, serialize, utils
+from tutor.types import Config, ConfigValue, cast_config, get_typed
 
 CONFIG_FILENAME = "config.yml"
 
@@ -58,7 +59,7 @@ def update_with_base(config: Config) -> None:
 
     Note that configuration entries are unrendered at this point.
     """
-    base = get_base(config)
+    base = get_base()
     merge(config, base)
 
 
@@ -68,7 +69,7 @@ def update_with_defaults(config: Config) -> None:
 
     Note that configuration entries are unrendered at this point.
     """
-    defaults = get_defaults(config)
+    defaults = get_defaults()
     merge(config, defaults)
 
 
@@ -100,41 +101,37 @@ def get_user(root: str) -> Config:
     return config
 
 
-def get_base(config: Config) -> Config:
+def get_base() -> Config:
     """
     Load the base configuration.
 
     Entries in this configuration are unrendered.
     """
     base = get_template("base.yml")
-
-    # Load base values from plugins
-    for plugin in plugins.iter_enabled(config):
-        # Add new config key/values
-        for key, value in plugin.config_add.items():
-            new_key = plugin.config_key(key)
-            base[new_key] = value
-
-        # Set existing config key/values
-        for key, value in plugin.config_set.items():
-            base[key] = value
-
+    extra_config: t.List[t.Tuple[str, ConfigValue]] = []
+    extra_config = hooks.Filters.CONFIG_UNIQUE.apply(extra_config)
+    extra_config = hooks.Filters.CONFIG_OVERRIDES.apply(extra_config)
+    for name, value in extra_config:
+        if name in base:
+            fmt.echo_alert(
+                f"Found conflicting values for setting '{name}': '{value}' or '{base[name]}'"
+            )
+        base[name] = value
     return base
 
 
-def get_defaults(config: Config) -> Config:
+def get_defaults() -> Config:
     """
     Get default configuration, including from plugins.
 
     Entries in this configuration are unrendered.
     """
     defaults = get_template("defaults.yml")
-
-    for plugin in plugins.iter_enabled(config):
-        # Create new defaults
-        for key, value in plugin.config_defaults.items():
-            defaults[plugin.config_key(key)] = value
-
+    extra_defaults: t.Iterator[
+        t.Tuple[str, ConfigValue]
+    ] = hooks.Filters.CONFIG_DEFAULTS.iterate()
+    for name, value in extra_defaults:
+        defaults[name] = value
     update_with_env(defaults)
     return defaults
 
@@ -153,7 +150,7 @@ def get_yaml_file(path: str) -> Config:
     """
     Load config from yaml file.
     """
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         config = serialize.load(f.read())
     return cast_config(config)
 
@@ -198,11 +195,13 @@ def upgrade_obsolete(config: Config) -> None:
         config["OPENEDX_MYSQL_USERNAME"] = config.pop("MYSQL_USERNAME")
     if "RUN_NOTES" in config:
         if config["RUN_NOTES"]:
-            plugins.enable(config, "notes")
+            plugins.load("notes")
+            save_enabled_plugins(config)
         config.pop("RUN_NOTES")
     if "RUN_XQUEUE" in config:
         if config["RUN_XQUEUE"]:
-            plugins.enable(config, "xqueue")
+            plugins.load("xqueue")
+            save_enabled_plugins(config)
         config.pop("RUN_XQUEUE")
     if "SECRET_KEY" in config:
         config["OPENEDX_SECRET_KEY"] = config.pop("SECRET_KEY")
@@ -254,10 +253,73 @@ def convert_json2yml(root: str) -> None:
 def save_config_file(root: str, config: Config) -> None:
     path = config_path(root)
     utils.ensure_file_directory_exists(path)
-    with open(path, "w") as of:
+    with open(path, "w", encoding="utf-8") as of:
         serialize.dump(config, of)
     fmt.echo_info(f"Configuration saved to {path}")
 
 
 def config_path(root: str) -> str:
     return os.path.join(root, CONFIG_FILENAME)
+
+
+# Key name under which plugins are listed
+PLUGINS_CONFIG_KEY = "PLUGINS"
+
+
+def enable_plugins(config: Config) -> None:
+    """
+    Enable all plugins listed in the configuration.
+    """
+    plugins.load_all(get_enabled_plugins(config))
+
+
+def get_enabled_plugins(config: Config) -> t.List[str]:
+    """
+    Return the list of plugins that are enabled, as per the configuration. Note that
+    this may differ from the list of loaded plugins. For instance when a plugin is
+    present in the configuration but it's not installed.
+    """
+    return get_typed(config, PLUGINS_CONFIG_KEY, list, [])
+
+
+def save_enabled_plugins(config: Config) -> None:
+    """
+    Save the list of enabled plugins.
+
+    Plugins are deduplicated by name.
+    """
+    config[PLUGINS_CONFIG_KEY] = list(plugins.iter_loaded())
+
+
+@hooks.Actions.PROJECT_ROOT_READY.add()
+def _enable_plugins(root: str) -> None:
+    """
+    Enable plugins that are listed in the user configuration.
+    """
+    config = load_minimal(root)
+    enable_plugins(config)
+
+
+@hooks.Actions.PLUGIN_UNLOADED.add()
+def _remove_plugin_config_overrides_on_unload(
+    plugin: str, _root: str, config: Config
+) -> None:
+    # Find the configuration entries that were overridden by the plugin and
+    # remove them from the current config
+    overriden_config_items: t.Iterator[
+        t.Tuple[str, ConfigValue]
+    ] = hooks.Filters.CONFIG_OVERRIDES.iterate(context=hooks.Contexts.APP(plugin).name)
+    for key, _value in overriden_config_items:
+        value = config.pop(key, None)
+        value = env.render_unknown(config, value)
+        fmt.echo_info(f"    config - removing entry: {key}={value}")
+
+
+@hooks.Actions.PLUGIN_UNLOADED.add(priority=100)
+def _update_enabled_plugins_on_unload(_plugin: str, _root: str, config: Config) -> None:
+    """
+    Update the list of enabled plugins.
+
+    Note that this action must be performed after the plugin has been unloaded, hence the low priority.
+    """
+    save_enabled_plugins(config)

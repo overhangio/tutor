@@ -8,15 +8,15 @@ def get_tag(config: Config, name: str) -> str:
 
 
 def build(path: str, tag: str, *args: str) -> None:
-    fmt.echo_info("Building image {}".format(tag))
+    fmt.echo_info(f"Building image {tag}")
     utils.docker("build", "-t", tag, *args, path)
 
 
 def pull(tag: str) -> None:
-    fmt.echo_info("Pulling image {}".format(tag))
+    fmt.echo_info(f"Pulling image {tag}")
     utils.docker("pull", tag)
 
 
 def push(tag: str) -> None:
-    fmt.echo_info("Pushing image {}".format(tag))
+    fmt.echo_info(f"Pushing image {tag}")
     utils.docker("push", tag)

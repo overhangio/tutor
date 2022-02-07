@@ -80,10 +80,9 @@ def render(context: Context, extra_configs: List[str], src: str, dst: str) -> No
         config.update(
             env.render_unknown(config, tutor_config.get_yaml_file(extra_config))
         )
-
     renderer = env.Renderer(config, [src])
     renderer.render_all_to(dst)
-    fmt.echo_info("Templates rendered to {}".format(dst))
+    fmt.echo_info(f"Templates rendered to {dst}")
 
 
 @click.command(help="Print the project root")
@@ -101,9 +100,7 @@ def printvalue(context: Context, key: str) -> None:
         # Note that this will incorrectly print None values
         fmt.echo(str(config[key]))
     except KeyError as e:
-        raise exceptions.TutorError(
-            "Missing configuration value: {}".format(key)
-        ) from e
+        raise exceptions.TutorError(f"Missing configuration value: {key}") from e
 
 
 config_command.add_command(save)

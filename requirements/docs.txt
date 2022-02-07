@@ -52,7 +52,7 @@ markupsafe==2.0.1
     # via
     #   -r requirements/base.txt
     #   jinja2
-mypy==0.910
+mypy==0.942
     # via -r requirements/base.txt
 mypy-extensions==0.4.3
     # via
@@ -132,7 +132,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-toml==0.10.2
+tomli==2.0.1
     # via
     #   -r requirements/base.txt
     #   mypy

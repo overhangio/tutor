@@ -1,12 +1,12 @@
-from typing import Iterator, List, Tuple
+import typing as t
 
 import click
 
-from .. import config as tutor_config
-from .. import env as tutor_env
-from .. import exceptions, images, plugins
-from ..types import Config
-from .context import Context
+from tutor import config as tutor_config
+from tutor import env as tutor_env
+from tutor import exceptions, hooks, images
+from tutor.commands.context import Context
+from tutor.types import Config
 
 BASE_IMAGE_NAMES = ["openedx", "permissions"]
 VENDOR_IMAGES = [
@@ -17,6 +17,47 @@ VENDOR_IMAGES = [
     "redis",
     "smtp",
 ]
+
+
+@hooks.Filters.IMAGES_BUILD.add()
+def _add_core_images_to_build(
+    build_images: t.List[t.Tuple[str, t.Tuple[str, str], str, t.List[str]]],
+    config: Config,
+) -> t.List[t.Tuple[str, t.Tuple[str, str], str, t.List[str]]]:
+    """
+    Add base images to the list of Docker images to build on `tutor build all`.
+    """
+    for image in BASE_IMAGE_NAMES:
+        tag = images.get_tag(config, image)
+        build_images.append((image, ("build", image), tag, []))
+    return build_images
+
+
+@hooks.Filters.IMAGES_PULL.add()
+def _add_images_to_pull(
+    remote_images: t.List[t.Tuple[str, str]], config: Config
+) -> t.List[t.Tuple[str, str]]:
+    """
+    Add base and vendor images to the list of Docker images to pull on `tutor pull all`.
+    """
+    for image in VENDOR_IMAGES:
+        if config.get(f"RUN_{image.upper()}", True):
+            remote_images.append((image, images.get_tag(config, image)))
+    for image in BASE_IMAGE_NAMES:
+        remote_images.append((image, images.get_tag(config, image)))
+    return remote_images
+
+
+@hooks.Filters.IMAGES_PULL.add()
+def _add_core_images_to_push(
+    remote_images: t.List[t.Tuple[str, str]], config: Config
+) -> t.List[t.Tuple[str, str]]:
+    """
+    Add base images to the list of Docker images to push on `tutor push all`.
+    """
+    for image in BASE_IMAGE_NAMES:
+        remote_images.append((image, images.get_tag(config, image)))
+    return remote_images
 
 
 @click.group(name="images", short_help="Manage docker images")
@@ -59,12 +100,12 @@ def images_command() -> None:
 @click.pass_obj
 def build(
     context: Context,
-    image_names: List[str],
+    image_names: t.List[str],
     no_cache: bool,
-    build_args: List[str],
-    add_hosts: List[str],
+    build_args: t.List[str],
+    add_hosts: t.List[str],
     target: str,
-    docker_args: List[str],
+    docker_args: t.List[str],
 ) -> None:
     config = tutor_config.load(context.root)
     command_args = []
@@ -79,134 +120,92 @@ def build(
     if docker_args:
         command_args += docker_args
     for image in image_names:
-        build_image(context.root, config, image, *command_args)
+        for _name, path, tag, custom_args in find_images_to_build(config, image):
+            images.build(
+                tutor_env.pathjoin(context.root, *path),
+                tag,
+                *command_args,
+                *custom_args,
+            )
 
 
 @click.command(short_help="Pull images from the Docker registry")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def pull(context: Context, image_names: List[str]) -> None:
+def pull(context: Context, image_names: t.List[str]) -> None:
     config = tutor_config.load_full(context.root)
     for image in image_names:
-        pull_image(config, image)
+        for tag in find_remote_image_tags(config, hooks.Filters.IMAGES_PULL, image):
+            images.pull(tag)
 
 
 @click.command(short_help="Push images to the Docker registry")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def push(context: Context, image_names: List[str]) -> None:
+def push(context: Context, image_names: t.List[str]) -> None:
     config = tutor_config.load_full(context.root)
     for image in image_names:
-        push_image(config, image)
+        for tag in find_remote_image_tags(config, hooks.Filters.IMAGES_PUSH, image):
+            images.push(tag)
 
 
 @click.command(short_help="Print tag associated to a Docker image")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def printtag(context: Context, image_names: List[str]) -> None:
+def printtag(context: Context, image_names: t.List[str]) -> None:
     config = tutor_config.load_full(context.root)
     for image in image_names:
-        to_print = []
-        for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
-            to_print.append(tag)
-        for _plugin, _img, tag in iter_plugin_images(config, image, "build-image"):
-            to_print.append(tag)
-
-        if not to_print:
-            raise ImageNotFoundError(image)
-
-        for tag in to_print:
+        for _name, _path, tag, _args in find_images_to_build(config, image):
             print(tag)
 
 
-def build_image(root: str, config: Config, image: str, *args: str) -> None:
-    to_build = []
+def find_images_to_build(
+    config: Config, image: str
+) -> t.Iterator[t.Tuple[str, t.Tuple[str], str, t.List[str]]]:
+    """
+    Iterate over all images to build.
 
-    # Build base images
-    for img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
-        to_build.append((tutor_env.pathjoin(root, "build", img), tag, args))
+    If no corresponding image is found, raise exception.
 
-    # Build plugin images
-    for plugin, img, tag in iter_plugin_images(config, image, "build-image"):
-        to_build.append(
-            (tutor_env.pathjoin(root, "plugins", plugin, "build", img), tag, args)
-        )
+    Yield: (name, path, tag, build args)
+    """
+    all_images_to_build: t.Iterator[
+        t.Tuple[str, t.Tuple[str], str, t.List[str]]
+    ] = hooks.Filters.IMAGES_BUILD.iterate(config)
+    found = False
+    for name, path, tag, args in all_images_to_build:
+        if name == image or image == "all":
+            found = True
+            tag = tutor_env.render_str(config, tag)
+            yield (name, path, tag, args)
 
-    if not to_build:
+    if not found:
         raise ImageNotFoundError(image)
 
-    for path, tag, build_args in to_build:
-        images.build(path, tag, *args)
 
+def find_remote_image_tags(
+    config: Config, filtre: hooks.filters.Filter, image: str
+) -> t.Iterator[str]:
+    """
+    Iterate over all images to push or pull.
 
-def pull_image(config: Config, image: str) -> None:
-    to_pull = []
-    for _img, tag in iter_images(config, image, all_image_names(config)):
-        to_pull.append(tag)
-    for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
-        to_pull.append(tag)
+    If no corresponding image is found, raise exception.
 
-    if not to_pull:
+    Yield: tag
+    """
+    all_remote_images: t.Iterator[t.Tuple[str, str]] = filtre.iterate(config)
+    found = False
+    for name, tag in all_remote_images:
+        if name == image or image == "all":
+            found = True
+            yield tutor_env.render_str(config, tag)
+    if not found:
         raise ImageNotFoundError(image)
-
-    for tag in to_pull:
-        images.pull(tag)
-
-
-def push_image(config: Config, image: str) -> None:
-    to_push = []
-    for _img, tag in iter_images(config, image, BASE_IMAGE_NAMES):
-        to_push.append(tag)
-    for _plugin, _img, tag in iter_plugin_images(config, image, "remote-image"):
-        to_push.append(tag)
-
-    if not to_push:
-        raise ImageNotFoundError(image)
-
-    for tag in to_push:
-        images.push(tag)
-
-
-def iter_images(
-    config: Config, image: str, image_list: List[str]
-) -> Iterator[Tuple[str, str]]:
-    for img in image_list:
-        if image in [img, "all"]:
-            tag = images.get_tag(config, img)
-            yield img, tag
-
-
-def iter_plugin_images(
-    config: Config, image: str, hook_name: str
-) -> Iterator[Tuple[str, str, str]]:
-    for plugin, hook in plugins.iter_hooks(config, hook_name):
-        if not isinstance(hook, dict):
-            raise exceptions.TutorError(
-                "Invalid hook '{}': expected dict, got {}".format(
-                    hook_name, hook.__class__
-                )
-            )
-        for img, tag in hook.items():
-            if image in [img, "all"]:
-                tag = tutor_env.render_str(config, tag)
-                yield plugin, img, tag
-
-
-def all_image_names(config: Config) -> List[str]:
-    return BASE_IMAGE_NAMES + vendor_image_names(config)
-
-
-def vendor_image_names(config: Config) -> List[str]:
-    vendor_images = VENDOR_IMAGES[:]
-    for image in VENDOR_IMAGES:
-        if not config.get("RUN_" + image.upper(), True):
-            vendor_images.remove(image)
-    return vendor_images
 
 
 class ImageNotFoundError(exceptions.TutorError):
     def __init__(self, image_name: str):
-        super().__init__("Image '{}' could not be found".format(image_name))
+        super().__init__(f"Image '{image_name}' could not be found")
 
 
 images_command.add_command(build)

@@ -11,7 +11,11 @@ hidden_imports = []
 # Auto-discover plugins and include patches & templates folders
 for entrypoint in pkg_resources.iter_entry_points("tutor.plugin.v0"):
     plugin_name = entrypoint.name
-    plugin = entrypoint.load()
+    try:
+        plugin = entrypoint.load()
+    except Exception as e:
+        print(f"ERROR Failed to load plugin {plugin_name}: {e}")
+        continue
     plugin_root = os.path.dirname(plugin.__file__)
     plugin_root_module_name = os.path.basename(plugin_root)
     hidden_imports.append(entrypoint.module_name)

@@ -1,91 +1,136 @@
 import os
+import shutil
+import typing as t
 from copy import deepcopy
-from typing import Any, Iterable, List, Optional, Type, Union
 
 import jinja2
 import pkg_resources
 
-from . import exceptions, fmt, plugins, utils
-from .__about__ import __app__, __version__
-from .types import Config, ConfigValue
+from tutor import exceptions, fmt, hooks, plugins, utils
+from tutor.__about__ import __app__, __version__
+from tutor.types import Config, ConfigValue
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
 BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".patch", ".png", ".ttf", ".woff", ".woff2"]
+JinjaFilter = t.Callable[..., t.Any]
+
+
+def _prepare_environment() -> None:
+    """
+    Prepare environment by adding core data to filters.
+    """
+    # Core template targets
+    hooks.Filters.ENV_TEMPLATE_TARGETS.add_items(
+        [
+            ("apps/", ""),
+            ("build/", ""),
+            ("dev/", ""),
+            ("k8s/", ""),
+            ("local/", ""),
+            (VERSION_FILENAME, ""),
+            ("kustomization.yml", ""),
+        ],
+    )
+    # Template filters
+    hooks.Filters.ENV_TEMPLATE_FILTERS.add_items(
+        [
+            ("common_domain", utils.common_domain),
+            ("encrypt", utils.encrypt),
+            ("list_if", utils.list_if),
+            ("long_to_base64", utils.long_to_base64),
+            ("random_string", utils.random_string),
+            ("reverse_host", utils.reverse_host),
+            ("rsa_private_key", utils.rsa_private_key),
+        ],
+    )
+    # Template variables
+    hooks.Filters.ENV_TEMPLATE_VARIABLES.add_items(
+        [
+            ("rsa_import_key", utils.rsa_import_key),
+            ("HOST_USER_ID", utils.get_user_id()),
+            ("TUTOR_APP", __app__.replace("-", "_")),
+            ("TUTOR_VERSION", __version__),
+        ],
+    )
+
+
+_prepare_environment()
 
 
 class JinjaEnvironment(jinja2.Environment):
     loader: jinja2.BaseLoader
 
-    def __init__(self, template_roots: List[str]) -> None:
+    def __init__(self, template_roots: t.List[str]) -> None:
         loader = jinja2.FileSystemLoader(template_roots)
         super().__init__(loader=loader, undefined=jinja2.StrictUndefined)
 
 
 class Renderer:
     @classmethod
-    def instance(cls: Type["Renderer"], config: Config) -> "Renderer":
+    def instance(cls: t.Type["Renderer"], config: Config) -> "Renderer":
         # Load template roots: these are required to be able to use
         # {% include .. %} directives
-        template_roots = [TEMPLATES_ROOT]
-        for plugin in plugins.iter_enabled(config):
-            if plugin.templates_root:
-                template_roots.append(plugin.templates_root)
-
+        template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
         return cls(config, template_roots, ignore_folders=["partials"])
 
     def __init__(
         self,
         config: Config,
-        template_roots: List[str],
-        ignore_folders: Optional[List[str]] = None,
+        template_roots: t.List[str],
+        ignore_folders: t.Optional[t.List[str]] = None,
     ):
         self.config = deepcopy(config)
         self.template_roots = template_roots
         self.ignore_folders = ignore_folders or []
         self.ignore_folders.append(".git")
 
-        # Create environment
-        environment = JinjaEnvironment(template_roots)
-        environment.filters["common_domain"] = utils.common_domain
-        environment.filters["encrypt"] = utils.encrypt
-        environment.filters["list_if"] = utils.list_if
-        environment.filters["long_to_base64"] = utils.long_to_base64
-        environment.globals["iter_values_named"] = self.iter_values_named
-        environment.globals["patch"] = self.patch
-        environment.filters["random_string"] = utils.random_string
-        environment.filters["reverse_host"] = utils.reverse_host
-        environment.globals["rsa_import_key"] = utils.rsa_import_key
-        environment.filters["rsa_private_key"] = utils.rsa_private_key
-        environment.filters["walk_templates"] = self.walk_templates
-        environment.globals["HOST_USER_ID"] = utils.get_user_id()
-        environment.globals["TUTOR_APP"] = __app__.replace("-", "_")
-        environment.globals["TUTOR_VERSION"] = __version__
-        self.environment = environment
+        # Create environment with extra filters and globals
+        self.environment = JinjaEnvironment(template_roots)
 
-    def iter_templates_in(self, *prefix: str) -> Iterable[str]:
+        # Filters
+        plugin_filters: t.Iterator[
+            t.Tuple[str, JinjaFilter]
+        ] = hooks.Filters.ENV_TEMPLATE_FILTERS.iterate()
+        for name, func in plugin_filters:
+            if name in self.environment.filters:
+                fmt.echo_alert(f"Found conflicting template filters named '{name}'")
+            self.environment.filters[name] = func
+        self.environment.filters["walk_templates"] = self.walk_templates
+
+        # Globals
+        plugin_globals: t.Iterator[
+            t.Tuple[str, JinjaFilter]
+        ] = hooks.Filters.ENV_TEMPLATE_VARIABLES.iterate()
+        for name, value in plugin_globals:
+            if name in self.environment.globals:
+                fmt.echo_alert(f"Found conflicting template variables named '{name}'")
+            self.environment.globals[name] = value
+        self.environment.globals["iter_values_named"] = self.iter_values_named
+        self.environment.globals["patch"] = self.patch
+
+    def iter_templates_in(self, *prefix: str) -> t.Iterable[str]:
         """
         The elements of `prefix` must contain only "/", and not os.sep.
         """
         full_prefix = "/".join(prefix)
-        env_templates: List[str] = self.environment.loader.list_templates()
+        env_templates: t.List[str] = self.environment.loader.list_templates()
         for template in env_templates:
             if template.startswith(full_prefix) and self.is_part_of_env(template):
                 yield template
 
     def iter_values_named(
         self,
-        prefix: Optional[str] = None,
-        suffix: Optional[str] = None,
+        prefix: t.Optional[str] = None,
+        suffix: t.Optional[str] = None,
         allow_empty: bool = False,
-    ) -> Iterable[ConfigValue]:
+    ) -> t.Iterable[ConfigValue]:
         """
         Iterate on all config values for which the name match the given pattern.
 
         Note that here we only iterate on the values, not the key names. Empty
         values (those that evaluate to boolean `false`) will not be yielded, unless
         `allow_empty` is True.
-        TODO document this in the plugins API
         """
         for var_name, value in self.config.items():
             if prefix is not None and not var_name.startswith(prefix):
@@ -96,7 +141,7 @@ class Renderer:
                 continue
             yield value
 
-    def walk_templates(self, subdir: str) -> Iterable[str]:
+    def walk_templates(self, subdir: str) -> t.Iterable[str]:
         """
         Iterate on the template files from `templates/<subdir>`.
 
@@ -134,11 +179,11 @@ class Renderer:
         Render calls to {{ patch("...") }} in environment templates from plugin patches.
         """
         patches = []
-        for plugin, patch in plugins.iter_patches(self.config, name):
+        for patch in plugins.iter_patches(name):
             try:
                 patches.append(self.render_str(patch))
             except exceptions.TutorError:
-                fmt.echo_error(f"Error rendering patch '{name}' from plugin {plugin}")
+                fmt.echo_error(f"Error rendering patch '{name}': {patch}")
                 raise
         rendered = separator.join(patches)
         if rendered:
@@ -149,7 +194,7 @@ class Renderer:
         template = self.environment.from_string(text)
         return self.__render(template)
 
-    def render_template(self, template_name: str) -> Union[str, bytes]:
+    def render_template(self, template_name: str) -> t.Union[str, bytes]:
         """
         Render a template file. Return the corresponding string. If it's a binary file
         (as indicated by its path), return bytes.
@@ -177,14 +222,14 @@ class Renderer:
             fmt.echo_error("Unknown error rendering template " + template_name)
             raise
 
-    def render_all_to(self, root: str, *prefix: str) -> None:
+    def render_all_to(self, dst: str, *prefix: str) -> None:
         """
         `prefix` can be used to limit the templates to render.
         """
         for template_name in self.iter_templates_in(*prefix):
             rendered = self.render_template(template_name)
-            dst = os.path.join(root, template_name.replace("/", os.sep))
-            write_to(rendered, dst)
+            template_dst = os.path.join(dst, template_name.replace("/", os.sep))
+            write_to(rendered, template_dst)
 
     def __render(self, template: jinja2.Template) -> str:
         try:
@@ -198,20 +243,11 @@ def save(root: str, config: Config) -> None:
     Save the full environment, including version information.
     """
     root_env = pathjoin(root)
-    for prefix in [
-        "apps/",
-        "build/",
-        "dev/",
-        "k8s/",
-        "local/",
-        VERSION_FILENAME,
-        "kustomization.yml",
-    ]:
-        save_all_from(prefix, root_env, config)
-
-    for plugin in plugins.iter_enabled(config):
-        if plugin.templates_root:
-            save_plugin_templates(plugin, root, config)
+    targets: t.Iterator[
+        t.Tuple[str, str]
+    ] = hooks.Filters.ENV_TEMPLATE_TARGETS.iterate()
+    for src, dst in targets:
+        save_all_from(src, os.path.join(root_env, dst), config)
 
     upgrade_obsolete(root)
     fmt.echo_info(f"Environment generated in {base_dir(root)}")
@@ -223,29 +259,16 @@ def upgrade_obsolete(_root: str) -> None:
     """
 
 
-def save_plugin_templates(
-    plugin: plugins.BasePlugin, root: str, config: Config
-) -> None:
-    """
-    Save plugin templates to plugins/<plugin name>/*.
-    Only the "apps" and "build" subfolders are rendered.
-    """
-    plugins_root = pathjoin(root, "plugins")
-    for subdir in ["apps", "build"]:
-        subdir_path = os.path.join(plugin.name, subdir)
-        save_all_from(subdir_path, plugins_root, config)
-
-
-def save_all_from(prefix: str, root: str, config: Config) -> None:
+def save_all_from(prefix: str, dst: str, config: Config) -> None:
     """
     Render the templates that start with `prefix` and store them with the same
-    hierarchy at `root`. Here, `prefix` can be the result of os.path.join(...).
+    hierarchy at `dst`. Here, `prefix` can be the result of os.path.join(...).
     """
     renderer = Renderer.instance(config)
-    renderer.render_all_to(root, prefix.replace(os.sep, "/"))
+    renderer.render_all_to(dst, prefix.replace(os.sep, "/"))
 
 
-def write_to(content: Union[str, bytes], path: str) -> None:
+def write_to(content: t.Union[str, bytes], path: str) -> None:
     """
     Write some content to a path. Content can be either str or bytes.
     """
@@ -258,7 +281,7 @@ def write_to(content: Union[str, bytes], path: str) -> None:
             of_text.write(content)
 
 
-def render_file(config: Config, *path: str) -> Union[str, bytes]:
+def render_file(config: Config, *path: str) -> t.Union[str, bytes]:
     """
     Return the rendered contents of a template.
     """
@@ -267,7 +290,7 @@ def render_file(config: Config, *path: str) -> Union[str, bytes]:
     return renderer.render_template(template_name)
 
 
-def render_unknown(config: Config, value: Any) -> Any:
+def render_unknown(config: Config, value: t.Any) -> t.Any:
     """
     Render an unknown `value` object with the selected config.
 
@@ -311,7 +334,7 @@ def is_up_to_date(root: str) -> bool:
     return current is None or current == __version__
 
 
-def should_upgrade_from_release(root: str) -> Optional[str]:
+def should_upgrade_from_release(root: str) -> t.Optional[str]:
     """
     Return the name of the currently installed release that we should upgrade from. Return None If we already run the
     latest release.
@@ -326,7 +349,7 @@ def should_upgrade_from_release(root: str) -> Optional[str]:
     return get_release(current)
 
 
-def get_env_release(root: str) -> Optional[str]:
+def get_env_release(root: str) -> t.Optional[str]:
     """
     Return the Open edX release name from the current environment.
 
@@ -356,7 +379,7 @@ def get_release(version: str) -> str:
     }[version.split(".", maxsplit=1)[0]]
 
 
-def current_version(root: str) -> Optional[str]:
+def current_version(root: str) -> t.Optional[str]:
     """
     Return the current environment version. If the current environment has no version,
     return None.
@@ -415,3 +438,23 @@ def root_dir(root: str) -> str:
     Return the project root directory.
     """
     return os.path.abspath(root)
+
+
+@hooks.Actions.PLUGIN_UNLOADED.add()
+def _delete_plugin_templates(plugin: str, root: str, _config: Config) -> None:
+    """
+    Delete plugin env files on unload.
+    """
+    targets: t.Iterator[t.Tuple[str, str]] = hooks.Filters.ENV_TEMPLATE_TARGETS.iterate(
+        context=hooks.Contexts.APP(plugin).name
+    )
+    for src, dst in targets:
+        path = pathjoin(root, dst.replace("/", os.sep), src.replace("/", os.sep))
+        if os.path.exists(path):
+            fmt.echo_info(f"    env - removing folder: {path}")
+            try:
+                shutil.rmtree(path)
+            except PermissionError as e:
+                raise exceptions.TutorError(
+                    f"Could not delete file {e.filename} from plugin {plugin} in folder {path}"
+                )

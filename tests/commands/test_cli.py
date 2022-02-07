@@ -1,27 +1,23 @@
 import unittest
 
-from click.testing import CliRunner
-
 from tutor.__about__ import __version__
-from tutor.commands.cli import cli, print_help
+
+from .base import TestCommandMixin
 
 
-class CliTests(unittest.TestCase):
+class CliTests(unittest.TestCase, TestCommandMixin):
     def test_help(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(print_help)
+        result = self.invoke(["help"])
         self.assertEqual(0, result.exit_code)
         self.assertIsNone(result.exception)
 
     def test_cli_help(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(cli, ["--help"])
+        result = self.invoke(["--help"])
         self.assertEqual(0, result.exit_code)
         self.assertIsNone(result.exception)
 
     def test_cli_version(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(cli, ["--version"])
+        result = self.invoke(["--version"])
         self.assertEqual(0, result.exit_code)
         self.assertIsNone(result.exception)
-        self.assertRegex(result.output, r"cli, version {}\n".format(__version__))
+        self.assertRegex(result.output, rf"cli, version {__version__}\n")

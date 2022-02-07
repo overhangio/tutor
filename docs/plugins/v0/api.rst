@@ -1,22 +1,24 @@
 Plugin API
 ==========
 
+.. include:: legacy.rst
+
 Plugins can affect the behaviour of Tutor at multiple levels. They can:
 
-* Add new settings or modify existing ones in the Tutor configuration (see :ref:`config <plugin_config>`).
-* Add new templates to the Tutor project environment or modify existing ones (see :ref:`patches <plugin_patches>`, :ref:`templates <plugin_templates>` and :ref:`hooks <plugin_hooks>`).
-* Add custom commands to the Tutor CLI (see :ref:`command <plugin_command>`).
+* Add new settings or modify existing ones in the Tutor configuration (see :ref:`config <v0_plugin_config>`).
+* Add new templates to the Tutor project environment or modify existing ones (see :ref:`patches <v0_plugin_patches>`, :ref:`templates <v0_plugin_templates>` and :ref:`hooks <v0_plugin_hooks>`).
+* Add custom commands to the Tutor CLI (see :ref:`command <v0_plugin_command>`).
 
 There exist two different APIs to create Tutor plugins: either with YAML files or Python packages. YAML files are more simple to create but are limited to just configuration and template patches.
 
-.. _plugin_config:
+.. _v0_plugin_config:
 
 config
 ~~~~~~
 
 The ``config`` attribute is used to modify existing and add new configuration parameters:
 
-* ``config["add"]`` are key/values that should be added to the user-specific ``config.yml`` configuration. Add their passwords, secret keys, and other values that do not have a default value.
+* ``config["add"]`` are key/values that should be added to the user-specific ``config.yml`` configuration. Add there the passwords, secret keys, and other values that do not have a reasonable default value for all users.
 * ``config["defaults"]`` are default key/values for this plugin. These values can be accessed even though they are not added to the ``config.yml`` user file. Users can override them manually with ``tutor config save --set ...``.
 * ``config["set"]`` are existing key/values that should be modified. Be very careful what you add there! Different plugins may define conflicting values for some parameters.
 
@@ -42,19 +44,12 @@ This configuration from the "myplugin" plugin will set the following values:
 - ``MYPLUGIN_DOCKER_IMAGE``: this value will by default not be stored in ``config.yml``, but ``tutor config printvalue MYPLUGIN_DOCKER_IMAGE`` will print ``username/imagename:latest``.
 - ``MASTER_PASSWORD`` will be set to ``h4cked``. Needless to say, plugin developers should avoid doing this.
 
-.. _plugin_patches:
+.. _v0_plugin_patches:
 
 patches
 ~~~~~~~
 
-Plugin patches affect the rendered environment templates. In many places the Tutor templates include calls to ``{{ patch("patchname") }}``. This grants plugin developers the possibility to modify the content of rendered templates. Plugins can add content in these places by adding values to the ``patches`` attribute.
-
-.. note::
-    The list of existing patches can be found by searching for `{{ patch(` strings in the Tutor source code::
-
-        git grep "{{ patch"
-
-    The list of patches can also be browsed online `on Github <https://github.com/search?utf8=✓&q={{+patch+repo%3Aoverhangio%2Ftutor+path%3A%2Ftutor%2Ftemplates&type=Code&ref=advsearch&l=&l= 8>`__.
+Plugin patches affect the rendered environment templates. In many places the Tutor templates include calls to ``{{ patch("patchname") }}``. This grants plugin developers the possibility to modify the content of rendered templates. Plugins can add content in these places by adding values to the ``patches`` attribute. See :ref:`patches` for the complete list available patches.
 
 Example::
 
@@ -70,7 +65,7 @@ This will add a Redis instance to the services run with ``tutor local`` commands
     One can use this to dynamically load a list of patch files from a folder.
 
 
-.. _plugin_hooks:
+.. _v0_plugin_hooks:
 
 hooks
 ~~~~~
@@ -141,7 +136,7 @@ or::
     tutor images pull all
     tutor images push all
 
-.. _plugin_templates:
+.. _v0_plugin_templates:
 
 templates
 ~~~~~~~~~
@@ -162,7 +157,7 @@ In Tutor, templates are `Jinja2 <https://jinja.palletsprojects.com/en/2.11.x/>`_
 * ``list_if``: In a list of ``(value, condition)`` tuples, return the list of ``value`` for which the ``condition`` is true.
 * ``long_to_base64``: Base-64 encode a long integer.
 * ``iter_values_named``: Yield the values of the configuration settings that match a certain pattern. Example: ``{% for value in iter_values_named(prefix="KEY", suffix="SUFFIX")%}...{% endfor %}``. By default, only non-empty values are yielded. To iterate also on empty values, pass the ``allow_empty=True`` argument.
-* ``patch``: See :ref:`patches <plugin_patches>`.
+* ``patch``: See :ref:`patches <v0_plugin_patches>`.
 * ``random_string``: Return a random string of the given length composed of ASCII letters and digits. Example: ``{{ 8|random_string }}``.
 * ``reverse_host``: Reverse a domain name (see `reference <https://en.wikipedia.org/wiki/Reverse_domain_name_notation>`__). Example: ``{{ "demo.myopenedx.com"|reverse_host }}`` is equal to "com.myopenedx.demo".
 * ``rsa_import_key``: Import a PEM-formatted RSA key and return the corresponding object.
@@ -178,7 +173,7 @@ When saving the environment, template files that are stored in a template root w
 * Binary files with the following extensions: .ico, .jpg, .png, .ttf
 * Files that are stored in a folder named "partials", or one of its subfolders.
 
-.. _plugin_command:
+.. _v0_plugin_command:
 
 command
 ~~~~~~~
