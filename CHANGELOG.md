@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] Upgrade all services to open-release/maple.2.
+
 ## v13.1.4 (2022-02-08)
 
 - [Security] Fix vulnerability in redirect url during authentication (see [commit](https://github.com/overhangio/edx-platform/commit/06550411e34c04376fa3d757e1f068f464f816e6)).
