@@ -44,29 +44,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {% else %}
 # Patch edx-platform
-# Fix language cookie "samesite" attribute
-# https://github.com/openedx/edx-platform/pull/29621
-RUN git fetch --depth=2 https://github.com/regisb/edx-platform 51e0ec3b97ae5badbf947d53ac07bd5496c10cde && git cherry-pick 51e0ec3b97ae5badbf947d53ac07bd5496c10cde
 # Fix forum notification for questions
 # https://github.com/openedx/edx-platform/pull/29611
 RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 03731f19459e558f188c06aac5cc9ca1bbc675c2 && git cherry-pick 03731f19459e558f188c06aac5cc9ca1bbc675c2
-# Security fixes: user search by email
-# https://github.com/openedx/edx-platform/pull/29675
-# https://github.com/overhangio/edx-platform/commit/b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d
-RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ 479243d9fe6f0765ba06b1b9eb4ad9ed78fcf97c && git cherry-pick 479243d9fe6f0765ba06b1b9eb4ad9ed78fcf97c
-RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d && git cherry-pick b63c01fb38a60f4581bdecbc528fa64cc3d3ef0d
-# Upgrade Django to 3.2.11
-# https://github.com/openedx/edx-platform/commit/85eb44445b8a6207b967bd4af5666e521a4af9b5
-RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ 85eb44445b8a6207b967bd4af5666e521a4af9b5 && git cherry-pick 85eb44445b8a6207b967bd4af5666e521a4af9b5
-# Fix Internal Server Error/AttributeError in learning MFE
-# https://github.com/openedx/edx-platform/pull/29741
-RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ a76a79f973ca05f3921fa2a3428fa7052868a725 && git cherry-pick a76a79f973ca05f3921fa2a3428fa7052868a725
-# Security fix: invalid enrollment error vulnerability
-# https://github.com/openedx/edx-platform/commit/a140c674799c527e961e37c5e46cb7dc1ffef5ac
-RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ a140c674799c527e961e37c5e46cb7dc1ffef5ac && git cherry-pick a140c674799c527e961e37c5e46cb7dc1ffef5ac
-# Security fix: redirect url vulnerability
-# https://github.com/overhangio/edx-platform/commit/06550411e34c04376fa3d757e1f068f464f816e6
-RUN git fetch --depth=2 https://github.com/openedx/edx-platform/ 06550411e34c04376fa3d757e1f068f464f816e6 && git cherry-pick 06550411e34c04376fa3d757e1f068f464f816e6
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
