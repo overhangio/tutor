@@ -64,7 +64,7 @@ class BasePlugin:
         command = getattr(obj, "command", None)
         if command is not None:
             assert isinstance(command, click.Command)
-        self.command: click.Command = command
+        self.command: Optional[click.Command] = command
 
     @staticmethod
     def load_config(obj: Any, plugin_name: str) -> Dict[str, Config]:
