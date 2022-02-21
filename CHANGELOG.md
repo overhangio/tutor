@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add `tutor k8s apply` comand, which is a direct interface with `kubectl apply`.
+
 ## v13.1.5 (2022-02-14)
 
 - [Improvement] Upgrade all services to open-release/maple.2.
