@@ -44,7 +44,7 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
         run_command += ["run", "--rm"]
         if not utils.is_a_tty():
             run_command += ["-T"]
-        job_service_name = "{}-job".format(service)
+        job_service_name = f"{service}-job"
         return self.docker_compose(
             *run_command,
             job_service_name,
@@ -224,9 +224,8 @@ def bindmount_command(context: BaseComposeContext, service: str, path: str) -> N
     config = tutor_config.load(context.root)
     host_path = bindmounts.create(context.job_runner(config), service, path)
     fmt.echo_info(
-        "Bind-mount volume created at {}. You can now use it in all `local` and `dev` commands with the `--volume={}` option.".format(
-            host_path, path
-        )
+        f"Bind-mount volume created at {host_path}. You can now use it in all `local` and `dev` "
+        f"commands with the `--volume={path}` option."
     )
 
 
@@ -286,12 +285,10 @@ def dc_command(context: BaseComposeContext, command: str, args: List[str]) -> No
             host_bind_path = bindmounts.get_path(context.root, volume_arg)
             if not os.path.exists(host_bind_path):
                 raise TutorError(
-                    (
-                        "Bind-mount volume directory {} does not exist. It must first be created"
-                        " with the '{}' command."
-                    ).format(host_bind_path, bindmount_command.name)
+                    f"Bind-mount volume directory {host_bind_path} does not exist. It must first be created "
+                    f"with the '{bindmount_command.name}' command."
                 )
-            volume_arg = "{}:{}".format(host_bind_path, volume_arg)
+            volume_arg = f"{host_bind_path}:{volume_arg}"
         volume_args += ["--volume", volume_arg]
     context.job_runner(config).docker_compose(command, *volume_args, *non_volume_args)
 
