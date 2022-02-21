@@ -112,10 +112,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
             serialize.dump(job, job_file)
         # We cannot use the k8s API to create the job: configMap and volume names need
         # to be found with the right suffixes.
-        utils.kubectl(
-            "apply",
-            "--kustomize",
-            tutor_env.pathjoin(self.root),
+        kubectl_apply(
             "--selector",
             f"app.kubernetes.io/name={job_name}",
         )
@@ -225,10 +222,7 @@ def start(context: Context, names: List[str]) -> None:
         fmt.echo_info("Namespace already exists: skipping creation.")
     except exceptions.TutorError:
         fmt.echo_info("Namespace does not exist: now creating it...")
-        utils.kubectl(
-            "apply",
-            "--kustomize",
-            tutor_env.pathjoin(context.root),
+        kubectl_apply(
             "--wait",
             "--selector",
             "app.kubernetes.io/component=namespace",
@@ -475,6 +469,25 @@ def upgrade(context: click.Context, from_release: Optional[str]) -> None:
     context.invoke(config_save_command)
 
 
+@click.command(
+    short_help="Direct interface to `kubectl apply`.",
+    help=(
+        "Direct interface to `kubnectl-apply`. This is a wrapper around `kubectl apply`. A;; options and"
+        " arguments passed to this command will be forwarded as-is to `kubectl apply`."
+    ),
+    context_settings={"ignore_unknown_options": True},
+    name="apply",
+)
+@click.argument("args", nargs=-1)
+@click.pass_obj
+def apply_command(context: Context, args: List[str]) -> None:
+    kubectl_apply(context.root, *args)
+
+
+def kubectl_apply(root: str, *args: str) -> None:
+    utils.kubectl("apply", "--kustomize", tutor_env.pathjoin(root), *args)
+
+
 def kubectl_exec(
     config: Config, service: str, command: str, attach: bool = False
 ) -> int:
@@ -551,3 +564,4 @@ k8s.add_command(exec_command)
 k8s.add_command(logs)
 k8s.add_command(wait)
 k8s.add_command(upgrade)
+k8s.add_command(apply_command)
