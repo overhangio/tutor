@@ -20,7 +20,7 @@ Tutor was tested with server version 1.14.1 and client 1.14.3.
 Memory
 ~~~~~~
 
-In the following, we assume you have access to a working Kubernetes cluster. `kubectl` should use your cluster configuration by default. To launch a cluster locally, you may try out Minikube. Just follow the `official installation instructions <https://kubernetes.io/docs/setup/minikube/>`_.
+In the following, we assume you have access to a working Kubernetes cluster. ``kubectl`` should use your cluster configuration by default. To launch a cluster locally, you may try out Minikube. Just follow the `official installation instructions <https://kubernetes.io/docs/setup/minikube/>`__.
 
 The Kubernetes cluster should have at least 4Gb of RAM on each node. When running Minikube, the virtual machine should have that much allocated memory. See below for an example with VirtualBox:
 
@@ -102,7 +102,7 @@ As with the :ref:`local installation <local>`, there are multiple commands to ru
 
     tutor k8s -h
 
-In particular, the `tutor k8s start` command restarts and reconfigures all services by running ``kubectl apply``. That means that you can delete containers, deployments or just any other kind of resources, and Tutor will re-create them automatically. You should just beware of not deleting any persistent data stored in persistent volume claims. For instance, to restart from a "blank slate", run::
+In particular, the ``tutor k8s start`` command restarts and reconfigures all services by running ``kubectl apply``. That means that you can delete containers, deployments or just any other kind of resources, and Tutor will re-create them automatically. You should just beware of not deleting any persistent data stored in persistent volume claims. For instance, to restart from a "blank slate", run::
 
     tutor k8s stop
     tutor k8s start
@@ -124,6 +124,6 @@ Some Tutor plugins and customization procedures require that the "openedx" image
 Updating docker images
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Kubernetes does not provide a single command for updating docker images out of the box. A `commonly used trick <https://github.com/kubernetes/kubernetes/issues/33664>`_ is to modify an innocuous label on all resources::
+Kubernetes does not provide a single command for updating docker images out of the box. A `commonly used trick <https://github.com/kubernetes/kubernetes/issues/33664>`__ is to modify an innocuous label on all resources::
 
     kubectl patch -k "$(tutor config printroot)/env" --patch "{\"spec\": {\"template\": {\"metadata\": {\"labels\": {\"date\": \"`date +'%Y%m%d-%H%M%S'`\"}}}}}"
