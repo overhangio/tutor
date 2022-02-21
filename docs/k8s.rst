@@ -44,12 +44,12 @@ Use this external IP to configure your DNS records. Once the DNS records are con
 
 If, for some reason, you would like to deploy your own load balancer, you should set ``ENABLE_WEB_PROXY=false`` just like in the :ref:`local installation <web_proxy>`. Then, point your load balancer at the "caddy" service, which will be a `ClusterIP <https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types>`__.
 
-S3-like object storage with `MinIO <https://www.minio.io/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+S3-like object storage with `MinIO <https://www.minio.io/>`__
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Like many web applications, Open edX needs to persist data. In particular, it needs to persist files uploaded by students and course designers. In the local installation, these files are persisted to disk, on the host filesystem. But on Kubernetes, it is difficult to share a single filesystem between different pods. This would require persistent volume claims with `ReadWriteMany` access mode, and these are difficult to setup.
 
-Luckily, there is another solution: at `edx.org <edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on premises. This is achieved thanks to `MinIO <https://www.minio.io/>`_. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
+Luckily, there is another solution: at `edx.org <edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on premises. This is achieved thanks to `MinIO <https://www.minio.io/>`__. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
 
     tutor plugins enable minio
 
@@ -58,7 +58,7 @@ The "minio.LMS_HOST" domain name will have to point to your Kubernetes cluster. 
 Kubernetes dashboard
 ~~~~~~~~~~~~~~~~~~~~
 
-This is not a requirement per se, but it's very convenient to have a visual interface of the Kubernetes cluster. We suggest the official `Kubernetes dashboard <https://github.com/kubernetes/dashboard/>`_. Depending on your Kubernetes provider, you may need to install a dashboard yourself. There are generic instructions on the `project's README <https://github.com/kubernetes/dashboard/blob/master/README.md>`_. AWS provides `specific instructions <https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html>`_.
+This is not a requirement per se, but it's very convenient to have a visual interface of the Kubernetes cluster. We suggest the official `Kubernetes dashboard <https://github.com/kubernetes/dashboard/>`__. Depending on your Kubernetes provider, you may need to install a dashboard yourself. There are generic instructions on the `project's README <https://github.com/kubernetes/dashboard/blob/master/README.md>`__. AWS provides `specific instructions <https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html>`__.
 
 On Minikube, the dashboard is already installed. To access the dashboard, run::
 
@@ -111,6 +111,15 @@ All non-persisting data will be deleted, and then re-created.
 
 Common tasks
 ------------
+
+Executing commands inside service pods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Tutor and plugin documentation usually often instructions to execute some ``tutor local run ...`` commands. These commands are only valid when running Tutor locally with docker-compose, and will not work on Kubernetes. Instead, you should run ``tutor k8s exec ...`` commands. Arguments and options should be identical.
+
+For instance, to run a Python shell in the lms container, run::
+
+    tutor k8s exec lms ./manage.py lms shell
 
 Running a custom "openedx" Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
