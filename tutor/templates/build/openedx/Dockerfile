@@ -199,8 +199,6 @@ RUN mkdir /openedx/data
 ENV SERVICE_VARIANT lms
 ENV SETTINGS tutor.production
 
-{{ patch("openedx-dockerfile") }}
-
 # Entrypoint will set right environment variables
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8000
@@ -210,6 +208,9 @@ FROM production as development
 
 # Install useful system requirements (as root)
 USER root
+
+{{ patch("openedx-dockerfile") }}
+
 RUN apt update && \
     apt install -y vim iputils-ping dnsutils telnet \
     && rm -rf /var/lib/apt/lists/*
