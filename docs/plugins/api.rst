@@ -1,22 +1,14 @@
 Plugin API
 ==========
 
-A Tutor plugin is defined either by a YAML file or a Python package.
 Plugins can affect the behaviour of Tutor at multiple levels:
-they can define Docker images, introduce new services, modify the settings of existing services, specify intialization processes, and more.
-Plugins can achieve all this using four extension points that Tutor exposes to both YAML and Python plugins:
 
-* :ref:`config <plugin_config>`,
-* :ref:`patches <plugin_patches>`,
-* :ref:`hooks <plugin_hooks>` and
-* :ref:`templates <plugin_templates>`.
+* Add new settings or modify existing ones in the Tutor configuration (see :ref:`config <plugin_config>`).
+* Add new templates to the Tutor project environment or modify existing ones (see :ref:`patches <plugin_patches>`, :ref:`templates <plugin_templates>` and :ref:`hooks <plugin_hooks>`).
+* Add custom commands to the Tutor CLI (see :ref:`command <plugin_command>`).
 
-Additionally, Python plugins can extend Tutor's command line interface using one futher extension point:
+There exists two different APIs to create Tutor plugins: either with YAML files or Python packages. YAML files are more simple to create, but are limited to just configuration and template patches.
 
-* :ref:`command <plugin_command>`.
-
-
-.. _plugin_config:
 
 config
 ~~~~~~
