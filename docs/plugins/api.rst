@@ -1,7 +1,7 @@
 Plugin API
 ==========
 
-Plugins can affect the behaviour of Tutor at multiple levels:
+Plugins can affect the behaviour of Tutor at multiple levels. They can:
 
 * Add new settings or modify existing ones in the Tutor configuration (see :ref:`config <plugin_config>`).
 * Add new templates to the Tutor project environment or modify existing ones (see :ref:`patches <plugin_patches>`, :ref:`templates <plugin_templates>` and :ref:`hooks <plugin_hooks>`).
@@ -9,6 +9,7 @@ Plugins can affect the behaviour of Tutor at multiple levels:
 
 There exists two different APIs to create Tutor plugins: either with YAML files or Python packages. YAML files are more simple to create, but are limited to just configuration and template patches.
 
+.. _plugin_config:
 
 config
 ~~~~~~
@@ -222,7 +223,7 @@ You can even define subcommands by creating `command groups <https://click.palle
 This would allow any user to see your sub-commands::
 
     $ tutor myplugin
-    Usage: tutor dev [OPTIONS] COMMAND [ARGS]...
+    Usage: tutor myplugin [OPTIONS] COMMAND [ARGS]...
 
       I'm a plugin command group
 
