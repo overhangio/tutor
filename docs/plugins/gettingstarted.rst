@@ -14,9 +14,7 @@ YAML files that are stored in the tutor plugins root folder will be automaticall
 
 On Linux, this points to ``~/.local/share/tutor-plugins``. The location of the plugin root folder can be modified by setting the ``TUTOR_PLUGINS_ROOT`` environment variable.
 
-YAML plugins must define two special top-level keys: ``name`` and ``version``.
-Then, YAML plugins may use four top-level keys to customize Tutor's behavior: ``config``, ``patches``, ``hooks``, and ``templates``.
-Custom CLI commands are not supported by YAML plugins.
+YAML plugins must define two special top-level keys: ``name`` and ``version``. Then, YAML plugins may use two more top-level keys to customize Tutor's behavior: ``config`` and ``patches``. Custom CLI commands, templates, and hooks are not supported by YAML plugins.
 
 Let's create a simple plugin that adds your own `Google Analytics <https://analytics.google.com/>`__ tracking code to your Open edX platform. We need to add the ``GOOGLE_ANALYTICS_ACCOUNT`` and ``GOOGLE_ANALYTICS_TRACKING_ID`` settings to both the LMS and the CMS settings. To do so, we will only have to create the ``openedx-common-settings`` patch, which is shared by the development and the production settings both for the LMS and the CMS. First, create the plugin directory::
 
