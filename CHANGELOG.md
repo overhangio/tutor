@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix running the default exim-relay SMTP server on arm64 (#600).
 - [Feature] Add `tutor k8s apply` comand, which is a direct interface with `kubectl apply`.
 
 ## v13.1.5 (2022-02-14)
