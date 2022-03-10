@@ -1,7 +1,13 @@
 Plugin API
 ==========
 
-Plugins can affect the behaviour of Tutor at multiple levels. First, plugins can define new services with their Docker images, settings and the right initialisation commands. To do so you will have to define custom :ref:`config <plugin_config>`, :ref:`patches <plugin_patches>`, :ref:`hooks <plugin_hooks>` and :ref:`templates <plugin_templates>`. Then, plugins can also extend the CLI by defining their own :ref:`commands <plugin_command>`.
+Plugins can affect the behaviour of Tutor at multiple levels. They can:
+
+* Add new settings or modify existing ones in the Tutor configuration (see :ref:`config <plugin_config>`).
+* Add new templates to the Tutor project environment or modify existing ones (see :ref:`patches <plugin_patches>`, :ref:`templates <plugin_templates>` and :ref:`hooks <plugin_hooks>`).
+* Add custom commands to the Tutor CLI (see :ref:`command <plugin_command>`).
+
+There exists two different APIs to create Tutor plugins: either with YAML files or Python packages. YAML files are more simple to create, but are limited to just configuration and template patches.
 
 .. _plugin_config:
 
@@ -60,7 +66,8 @@ Example::
 This will add a Redis instance to the services run with ``tutor local`` commands.
 
 .. note::
-    The ``patches`` attribute can be a callable function instead of a static dict value.
+    In Python plugins, remember that ``patches`` can be a callable function instead of a static dict value.
+    One can use this to dynamically load a list of patch files from a folder.
 
 
 .. _plugin_hooks:
@@ -176,7 +183,9 @@ When saving the environment, template files that are stored in a template root w
 command
 ~~~~~~~
 
-A plugin can provide custom command line commands. Commands are assumed to be `click.Command <https://click.palletsprojects.com/en/8.0.x/api/#commands>`__ objects, and you typically implement them using the `click.command <https://click.palletsprojects.com/en/8.0.x/api/#click.command>`__ decorator.
+Python plugins can provide a custom command line interface.
+The ``command`` attribute is assumed to be a `click.Command <https://click.palletsprojects.com/en/8.0.x/api/#commands>`__ object,
+and you typically implement them using the `click.command <https://click.palletsprojects.com/en/8.0.x/api/#click.command>`__ decorator.
 
 You may also use the `click.pass_obj <https://click.palletsprojects.com/en/8.0.x/api/#click.pass_obj>`__ decorator to pass the CLI `context <https://click.palletsprojects.com/en/8.0.x/api/#click.Context>`__, such as when you want to access Tutor configuration settings from your command.
 
@@ -207,11 +216,21 @@ You can even define subcommands by creating `command groups <https://click.palle
     def command():
         pass
 
-    @click.command(help="I'm a plugin subcommand")
+    @command.command(help="I'm a plugin subcommand")
     def dosomething():
         click.echo("This subcommand is awesome")
 
-This would allow any user to run::
+This would allow any user to see your sub-commands::
+
+    $ tutor myplugin
+    Usage: tutor myplugin [OPTIONS] COMMAND [ARGS]...
+
+      I'm a plugin command group
+
+    Commands:
+      dosomething         I'm a plugin subcommand
+
+and then run them::
 
     $ tutor myplugin dosomething
     This subcommand is awesome

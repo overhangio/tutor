@@ -152,7 +152,7 @@ COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/
 RUN mkdir /openedx/locale/user
 COPY --chown=app:app ./locale/ /openedx/locale/user/locale/
 RUN cd /openedx/locale/user && \
-    django-admin.py compilemessages -v1
+    django-admin compilemessages -v1
 
 # Compile i18n strings: in some cases, js locales are not properly compiled out of the box
 # and we need to do a pass ourselves. Also, we need to compile the djangojs.js files for

@@ -45,15 +45,11 @@ def ensure_file_directory_exists(path: str) -> None:
     directory = os.path.dirname(path)
     if os.path.isfile(directory):
         raise exceptions.TutorError(
-            "Attempting to create a directory, but a file with the same name already exists: {}".format(
-                directory
-            )
+            f"Attempting to create a directory, but a file with the same name already exists: {directory}"
         )
     if os.path.isdir(path):
         raise exceptions.TutorError(
-            "Attempting to write to a file, but a directory with the same name already exists: {}".format(
-                directory
-            )
+            f"Attempting to write to a file, but a directory with the same name already exists: {directory}"
         )
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -123,7 +119,7 @@ def long_to_base64(n: int) -> str:
         return _bytes
 
     bys = long2intarr(n)
-    data = struct.pack("%sB" % len(bys), *bys)
+    data = struct.pack(f"{len(bys)}B", *bys)
     if not data:
         data = b"\x00"
     s = base64.urlsafe_b64encode(data).rstrip(b"=")
@@ -202,24 +198,21 @@ def execute(*command: str) -> int:
         except Exception as e:
             p.kill()
             p.wait()
-            raise exceptions.TutorError(
-                "Command failed: {}".format(" ".join(command))
-            ) from e
+            raise exceptions.TutorError(f"Command failed: {' '.join(command)}") from e
         if result > 0:
             raise exceptions.TutorError(
-                "Command failed with status {}: {}".format(result, " ".join(command))
+                f"Command failed with status {result}: {' '.join(command)}"
             )
     return result
 
 
 def check_output(*command: str) -> bytes:
-    click.echo(fmt.command(" ".join(command)))
+    literal_command = " ".join(command)
+    click.echo(fmt.command(literal_command))
     try:
         return subprocess.check_output(command)
     except Exception as e:
-        raise exceptions.TutorError(
-            "Command failed: {}".format(" ".join(command))
-        ) from e
+        raise exceptions.TutorError(f"Command failed: {literal_command}") from e
 
 
 def check_macos_docker_memory() -> None:
@@ -237,7 +230,7 @@ def check_macos_docker_memory() -> None:
     )
 
     try:
-        with open(settings_path) as fp:
+        with open(settings_path, encoding="utf-8") as fp:
             data = json.load(fp)
             memory_mib = int(data["memoryMiB"])
     except OSError as e:
@@ -264,7 +257,5 @@ def check_macos_docker_memory() -> None:
 
     if memory_mib < 4096:
         raise exceptions.TutorError(
-            "Docker is configured to allocate {} MiB RAM, less than the recommended {} MiB".format(
-                memory_mib, 4096
-            )
+            f"Docker is configured to allocate {memory_mib} MiB RAM, less than the recommended {4096} MiB"
         )
