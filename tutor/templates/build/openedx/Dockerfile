@@ -23,10 +23,12 @@ RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/python -m venv /openedx/venv
 
 ###### Install Dockerize to wait for mysql DB availability
 FROM minimal as dockerize
-ARG DOCKERIZE_VERSION=v0.6.1
-RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
-    && rm /tmp/dockerize.tar.gz
+# https://github.com/powerman/dockerize/releases
+ARG DOCKERIZE_VERSION=v0.16.0
+RUN dockerize_url="https://github.com/powerman/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-$(uname -m | sed 's@aarch@arm@')" \
+    && echo "Downloading dockerize from $dockerize_url" \
+    && curl --fail --location --output /usr/local/bin/dockerize $dockerize_url \
+    && chmod a+x /usr/local/bin/dockerize
 
 ###### Checkout edx-platform code
 FROM minimal as code
@@ -126,7 +128,7 @@ ARG APP_USER_ID=1000
 RUN useradd --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER_ID} app
 USER ${APP_USER_ID}
 
-COPY --chown=app:app --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
+COPY --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
 COPY --chown=app:app --from=code /openedx/edx-platform /openedx/edx-platform
 COPY --chown=app:app --from=locales /openedx/locale /openedx/locale
 COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv
