@@ -79,7 +79,7 @@ Are you sure you want to continue?"""
             )
         context.invoke(
             upgrade,
-            from_version=run_upgrade_from_release,
+            from_release=run_upgrade_from_release,
             non_interactive=non_interactive,
         )
 
