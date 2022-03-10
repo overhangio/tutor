@@ -22,9 +22,9 @@ Next, configure Tutor::
 
 Go through the configuration process, answering each question.
 
-Then, build the Open edX image::
+Then, build the "openedx" and "permissions" images::
 
-    tutor images build openedx
+    tutor images build openedx permissions
 
 If you want to use Tutor as an Open edX development environment, you should also build the development images::
 
@@ -45,18 +45,16 @@ Configure Tutor to use MariaDB::
 Finish setup and start Tutor
 ----------------------------
 
-From this point on, use Tutor as normal.
+From this point on, use Tutor as normal. For example, start Open edX and run migrations with::
 
-For example, to apply migrations and start Open edX::
-
+    tutor local start -d
     tutor local init
-    tutor local start
 
 Or for a development environment::
 
-    tutor local init
     tutor local stop
-    tutor dev start
+    tutor dev start -d
+    tutor dev init
 
 Using with tutor-mfe
 --------------------
