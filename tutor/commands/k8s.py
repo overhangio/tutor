@@ -160,7 +160,7 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
         click.echo(fmt.title("Upgrading from an older release"))
         context.invoke(
             upgrade,
-            from_version=tutor_env.get_env_release(context.obj.root),
+            from_release=tutor_env.get_env_release(context.obj.root),
         )
 
     click.echo(fmt.title("Interactive platform configuration"))

@@ -4,6 +4,9 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.6 (2022-03-15)
+
+- [Bugfix] Fix `local/k8s quickstart` commands when upgrading from an older release (#595).
 - [Bugfix] Fix running the default exim-relay SMTP server on arm64 (#600).
 - [Feature] Add `tutor k8s apply` comand, which is a direct interface with `kubectl apply`.
 - [Feature] Add `openedx-dockerfile-minimal` patch, which you can use to install custom packages and run commands as root in the Docker image.
