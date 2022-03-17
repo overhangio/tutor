@@ -56,24 +56,20 @@ def initialise(runner: BaseJobRunner, limit_to: Optional[str] = None) -> None:
         if limit_to is None or limit_to == plugin_name:
             for service in hook:
                 fmt.echo_info(
-                    "Plugin {}: running pre-init for service {}...".format(
-                        plugin_name, service
-                    )
+                    f"Plugin {plugin_name}: running pre-init for service {service}..."
                 )
                 runner.run_job_from_template(
                     service, plugin_name, "hooks", service, "pre-init"
                 )
     for service in ["lms", "cms"]:
         if limit_to is None or limit_to == service:
-            fmt.echo_info("Initialising {}...".format(service))
+            fmt.echo_info(f"Initialising {service}...")
             runner.run_job_from_template(service, "hooks", service, "init")
     for plugin_name, hook in runner.iter_plugin_hooks("init"):
         if limit_to is None or limit_to == plugin_name:
             for service in hook:
                 fmt.echo_info(
-                    "Plugin {}: running init for service {}...".format(
-                        plugin_name, service
-                    )
+                    f"Plugin {plugin_name}: running init for service {service}..."
                 )
                 runner.run_job_from_template(
                     service, plugin_name, "hooks", service, "init"
@@ -136,9 +132,7 @@ site.themes.create(theme_dir_name='{theme_name}')
 """.format(
             theme_name=theme_name, domain_name=domain_name
         )
-    command = BASE_OPENEDX_COMMAND + './manage.py lms shell -c "{python_code}"'.format(
-        python_code=python_code
-    )
+    command = BASE_OPENEDX_COMMAND + f'./manage.py lms shell -c "{python_code}"'
     runner.run_job("lms", command)
 
 

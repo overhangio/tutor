@@ -53,7 +53,7 @@ Enable SAML authentication
 
       openedx-lms-common-settings: |
         # saml special settings
-        AUTHENTICATION_BACKENDS += ["third_party_auth.saml.SAMLAuthBackend", "django.contrib.auth.backends.ModelBackend"]
+        AUTHENTICATION_BACKENDS += ["common.djangoapps.third_party_auth.saml.SAMLAuthBackend", "django.contrib.auth.backends.ModelBackend"]
 
       openedx-auth: |
         "SOCIAL_AUTH_SAML_SP_PRIVATE_KEY": "yoursecretkey",
