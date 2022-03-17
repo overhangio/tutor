@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "Unexpected args" error during service initialization on Kubernetes (#611).
+
 ## v13.1.6 (2022-03-15)
 
 - [Bugfix] Fix `local/k8s quickstart` commands when upgrading from an older release (#595).

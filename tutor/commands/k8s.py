@@ -113,6 +113,7 @@ class K8sJobRunner(jobs.BaseJobRunner):
         # We cannot use the k8s API to create the job: configMap and volume names need
         # to be found with the right suffixes.
         kubectl_apply(
+            self.root,
             "--selector",
             f"app.kubernetes.io/name={job_name}",
         )
@@ -232,27 +233,21 @@ def start(context: Context, names: List[str]) -> None:
     for name in names:
         if name == "all":
             # Create volumes
-            utils.kubectl(
-                "apply",
-                "--kustomize",
-                tutor_env.pathjoin(context.root),
+            kubectl_apply(
+                context.root,
                 "--wait",
                 "--selector",
                 "app.kubernetes.io/component=volume",
             )
             # Create everything else except jobs
-            utils.kubectl(
-                "apply",
-                "--kustomize",
-                tutor_env.pathjoin(context.root),
+            kubectl_apply(
+                context.root,
                 "--selector",
                 "app.kubernetes.io/component notin (job,volume,namespace)",
             )
         else:
-            utils.kubectl(
-                "apply",
-                "--kustomize",
-                tutor_env.pathjoin(context.root),
+            kubectl_apply(
+                context.root,
                 "--selector",
                 f"app.kubernetes.io/name={name}",
             )
