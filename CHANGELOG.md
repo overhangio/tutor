@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.7 (2022-03-17)
+
 - [Bugfix] Fix dockerize on arm64 by switching to the [powerman/dockerize](https://github.com/powerman/dockerize) fork (#591).
 - [Bugfix] Fix "Unexpected args" error during service initialization on Kubernetes (#611).
 
