@@ -13,7 +13,7 @@ Out of the box, Tutor does not create any user for you. You will want to create 
 Importing a demo course
 -----------------------
 
-To get a glimpse of the possibilities of Open edX, we recommend you import the `official demo test course <https://github.com/openedx/demo-test-course>`__. Tutor provides a :ref:`simple command for that <democourse>`.
+To get a glimpse of the possibilities of Open edX, we recommend you import the `official demo test course <https://github.com/openedx/edx-demo-course>`__. Tutor provides a :ref:`simple command for that <democourse>`.
 
 Making Open edX look better
 ---------------------------
