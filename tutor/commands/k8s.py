@@ -224,6 +224,7 @@ def start(context: Context, names: List[str]) -> None:
     except exceptions.TutorError:
         fmt.echo_info("Namespace does not exist: now creating it...")
         kubectl_apply(
+            context.root,
             "--wait",
             "--selector",
             "app.kubernetes.io/component=namespace",

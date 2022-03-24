@@ -4,6 +4,11 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.8 (2022-03-18)
+
+- [Bugfix] Fix "evalsymlink failure" during `k8s quickstart` (#611).
+- [Bugfix] Fix "TypeError: upgrade() got an unexpected keyword argument 'non_interactive'" during `local upgrade`.
+
 ## v13.1.7 (2022-03-17)
 
 - [Bugfix] Fix dockerize on arm64 by switching to the [powerman/dockerize](https://github.com/powerman/dockerize) fork (#591).
