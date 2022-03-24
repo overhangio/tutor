@@ -47,17 +47,23 @@ jobs:
           description="${description//'%'/'%25'}"
           description="${description//$'\n'/'%0A'}"
           description="${description//$'\r'/'%0D'}"
+          echo "::echo::on"
           echo "::set-output name=text::$description"
+          echo "::echo::off"
         shell: bash
       - name: Get release file name
         id: release-file
-        run: echo "::set-output name=filename::tutor-$(uname -s)_$(uname -m)"
-        shell: bash
-      - name: Debug release variables
         run: |
-          echo "Publish file '${{ steps.release-file.outputs.filename }}' to release ${{ github.ref }}"
-          echo "================"
-          echo "${{ steps.release-description.outputs.text }}"
+          echo "::echo::on"
+          echo "::set-output name=filename::tutor-$(uname -s)_$(uname -m)"
+          echo "::echo::off"
+        shell: bash
+      - name: Get release name
+        id: release-name
+        run: |
+          echo "::echo::on"
+          echo "::set-output name=release::${{ github.ref }}"
+          echo "::echo::off"
       - name: Upload bundle
         # https://github.com/marketplace/actions/upload-files-to-a-github-release
         uses: svenstaro/upload-release-action@v2
@@ -65,6 +71,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./dist/tutor
           asset_name: "${{ steps.release-file.outputs.filename }}"
-          tag: ${{ github.ref }}
+          tag: "${{ steps.release-name.outputs.release }}"
           overwrite: true
           body: "${{ steps.release-description.outputs.text }}"
