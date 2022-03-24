@@ -80,7 +80,6 @@ Are you sure you want to continue?"""
         context.invoke(
             upgrade,
             from_release=run_upgrade_from_release,
-            non_interactive=non_interactive,
         )
 
     click.echo(fmt.title("Interactive platform configuration"))
