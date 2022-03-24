@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Bugfix] Fix "evalsymlink failure" during `k8s quickstart` (#611).
 - [Bugfix] Fix "TypeError: upgrade() got an unexpected keyword argument 'non_interactive'" during `local upgrade`.
 
 
