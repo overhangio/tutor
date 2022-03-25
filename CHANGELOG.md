@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Improvement] In addition to the Docker build arguments `EDX_PLATFORM_REPOSITORY` and `NPM_REGISTRY`, also support two corresponding and identically-named `config.yml` values serving the same purpose.
+
 ## v13.1.10 (2022-04-11)
 
 - [Feature] Upgrade all applications to open-release/maple.3.
