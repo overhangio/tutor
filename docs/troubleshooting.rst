@@ -12,7 +12,7 @@ What should you do if you have a problem?
 2. Check if your problem already has a solution right here in the :ref:`troubleshooting` section.
 3. Search for your problem in the `open and closed Github issues <https://github.com/overhangio/tutor/issues?utf8=%E2%9C%93&q=is%3Aissue>`_.
 4. Search for your problem in the `community forums <https://discuss.overhang.io>`__.
-5. If, despite all your efforts, you can't solve the problem by yourself, you should discuss it in the `community forums <https://discuss.overhang.io>`__. Please give as much details about your problem as possible! As a rule of thumb, **people will not dedicate more time to solving your problem than you took to write your question**.
+5. If despite all your efforts, you can't solve the problem by yourself, you should discuss it in the `community forums <https://discuss.overhang.io>`__. Please give as many details about your problem as possible! As a rule of thumb, **people will not dedicate more time to solving your problem than you took to write your question**.
 6. If you are *absolutely* positive that you are facing a technical issue with Tutor, and not with Open edX, not with your server, not your custom configuration, then, and only then, should you open an issue on `Github <https://github.com/overhangio/tutor/issues/>`__. You *must* follow the instructions from the issue template!!! If you do not follow this procedure, your Github issues will be mercilessly closed 🤯.
 
 Do you need professional assistance with your tutor-managed Open edX platform? Overhang.IO offers online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/pricing>`__.
@@ -31,7 +31,7 @@ To view the logs from all containers use the ``tutor local logs`` command, which
 
     tutor local logs --follow
 
-To view the logs from just one container, for instance the web server::
+To view the logs from just one container, for instance, the webserver::
 
     tutor local logs --follow caddy
 
@@ -46,7 +46,7 @@ If you'd rather use a graphical user interface for viewing logs, you are encoura
 "Cannot start service caddy: driver failed programming external connectivity"
 -----------------------------------------------------------------------------
 
-The containerized Caddy needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache, Caddy or Nginx, running on the host, the caddy container will not be able to start. To solve this issue, check the section on :ref:`how to setup a web proxy <web_proxy>`.
+The containerized Caddy needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache, Caddy, or Nginx, running on the host, the caddy container will not be able to start. To solve this issue, check the section on :ref:`how to setup a web proxy <web_proxy>`.
 
 "Couldn't connect to docker daemon"
 -----------------------------------
@@ -55,14 +55,14 @@ This is not an error with Tutor, but with your Docker installation. This is freq
 
     docker run --rm hello-world
 
-If the above command does not work, you should fix your Docker installation. Some people will suggest to run Docker as root, or with ``sudo``; **do not do this**. Instead, what you should probably do is to add your user to the "docker" group. For more information, check out the `official Docker installation instructions <https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user>`__.
+If the above command does not work, you should fix your Docker installation. Some people will suggest running Docker as root, or with ``sudo``; **do not do this**. Instead, what you should probably do is add your user to the "docker" group. For more information, check out the `official Docker installation instructions <https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user>`__.
 
 .. _migrations_killed:
 
 "Running migrations... Killed!" / "Command failed with status 137: docker-compose"
 ----------------------------------------------------------------------------------
 
-Open edX requires at least 4 GB RAM, in particular to run the SQL migrations. If the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to buy more memory or add swap to your machine.
+Open edX requires at least 4 GB RAM, in particular, to run the SQL migrations. If the ``tutor local quickstart`` command dies after displaying "Running migrations", you most probably need to buy more memory or add swap to your machine.
 
 On macOS, by default, Docker allocates at most 2 GB of RAM to containers. ``quickstart`` tries to check your current allocation and outputs a warning if it can't find a value of at least 4 GB. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 GB to the Docker daemon.
 
@@ -109,7 +109,7 @@ This will occur if you try to run a development environment without patching the
 The chosen default language does not display properly
 -----------------------------------------------------
 
-By default, Open edX comes with a `limited set <https://github.com/openedx/edx-platform/blob/master/conf/locale/config.yaml>` of translation/localization files. To complement these languages, we add locales from the `openedx-i18n project <https://github.com/openedx/openedx-i18n/blob/master/edx-platform/locale/config-extra.yaml>`_. But not all supported locales are downloaded. In some cases, the chosen default language will not display properly because if was not packaged in either edx-platform or openedx-i18n. If you feel like your language should be packaged, please `open an issue on the openedx-i18n project <https://github.com/openedx/openedx-i18n/issues>`_.
+By default, Open edX comes with a `limited set <https://github.com/openedx/edx-platform/blob/master/conf/locale/config.yaml>` of translation/localization files. To complement these languages, we add locales from the `openedx-i18n project <https://github.com/openedx/openedx-i18n/blob/master/edx-platform/locale/config-extra.yaml>`_. But not all supported locales are downloaded. In some cases, the chosen default language will not display properly because it was not packaged in either edx-platform or openedx-i18n. If you feel like your language should be packaged, please `open an issue on the openedx-i18n project <https://github.com/openedx/openedx-i18n/issues>`_.
 
 When I make changes to a course in the CMS, they are not taken into account by the LMS
 --------------------------------------------------------------------------------------

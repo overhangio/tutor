@@ -12,9 +12,9 @@ Tutor comes with a plugin system that allows anyone to customise the deployment 
     # 3) Reconfigure and restart the platform
     tutor local quickstart
 
-For simple changes, it may be extremely easy to create a Tutor plugin: even non-technical users may get started with :ref:`simple yaml plugins <plugins_yaml>`.
+For simple changes, it may be extremely easy to create a Tutor plugin: even non-technical users may get started with :ref:`simple YAML plugins <plugins_yaml>`.
 
-In the following we learn how to use and create Tutor plugins.
+In the following, we learn how to use and create Tutor plugins.
 
 Commands
 --------

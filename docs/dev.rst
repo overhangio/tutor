@@ -9,9 +9,9 @@ The following commands assume you have previously launched a :ref:`local <local>
 
     tutor local quickstart
 
-In order to run the platform in development mode, you **must** answer no ("n") to the question "Are you configuring a production platform".
+To run the platform in development mode, you **must** answer no ("n") to the question "Are you configuring a production platform".
 
-Note that the local.overhang.io `domain <https://dnschecker.org/#A/local.overhang.io>`__ and its `subdomains <https://dnschecker.org/#CNAME/studio.local.overhang.io>`__ all point to 127.0.0.1. This is just a domain name that was setup to conveniently access a locally running Open edX platform.
+Note that the local.overhang.io `domain <https://dnschecker.org/#A/local.overhang.io>`__ and its `subdomains <https://dnschecker.org/#CNAME/studio.local.overhang.io>`__ all point to 127.0.0.1. This is just a domain name that was set up to conveniently access a locally running Open edX platform.
 
 Once the local platform has been configured, you should stop it so that it does not interfere with the development environment::
 
@@ -23,7 +23,7 @@ Finally, you should build the ``openedx-dev`` docker image::
 
 This ``openedx-dev`` development image differs from the ``openedx`` production image:
 
-- The user that runs inside the container has the same UID as the user on the host, in order to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
+- The user that runs inside the container has the same UID as the user on the host, to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
 - Additional python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
 - The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/maple.master/requirements/edx/development.in>`__ are installed.
 
@@ -115,7 +115,7 @@ You are then free to bind-mount any directory to any container. For instance, to
 This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automatically mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-v/--volume`` option from the command line with the ``run`` or ``runserver`` commands.
 
 .. note::
-    The ``tutor local`` commands loads the ``docker-compose.override.yml`` file from the ``$(tutor config printroot)/env/local/docker-compose.override.yml`` directory.
+    The ``tutor local`` commands load the ``docker-compose.override.yml`` file from the ``$(tutor config printroot)/env/local/docker-compose.override.yml`` directory.
 
 Common tasks
 ------------
@@ -160,7 +160,7 @@ To debug a local edx-platform repository, add a ``import ipdb; ipdb.set_trace()`
 XBlock and edx-platform plugin development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In some cases you will have to develop features for packages that are pip-installed next to edx-platform. This is quite easy with Tutor. Just add your packages to the ``$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
+In some cases, you will have to develop features for packages that are pip-installed next to the edx-platform. This is quite easy with Tutor. Just add your packages to the ``$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
 
     echo "-e ./mypackage" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
 
@@ -183,7 +183,7 @@ Loading custom edx-platform settings
 
 By default, tutor settings files are mounted inside the docker images at ``/openedx/edx-platform/lms/envs/tutor/`` and ``/openedx/edx-platform/cms/envs/tutor/``. In the various ``dev`` commands, the default ``edx-platform`` settings module is set to ``tutor.development`` and you don't have to do anything to set up these settings.
 
-If, for some reason, you want to use different settings, you will need to define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
+If for some reason, you want to use different settings, you will need to define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
 
 For instance, let's assume you have created the ``/path/to/edx-platform/lms/envs/mysettings.py`` and ``/path/to/edx-platform/cms/envs/mysettings.py`` modules. These settings should be pretty similar to the following files::
 

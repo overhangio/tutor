@@ -23,14 +23,14 @@ Fortunately, Open edX was designed to run at scale -- most notably at `edX.org <
 Increasing web server capacity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As the server CPU and memory are increased, the request throughput can be increased by adjusting the number of uWSGI workers (see :ref:`configuration docs <openedx_configuration>`). By default, the "lms" and "cms" containers each spawn 2 uWSGI workers. The number of workers should be increased if you observe an increase of the latency of user requests but CPU usage remains below 100%. To increase the number of workers for the LMS and the CMS, run for example::
+As the server CPU and memory are increased, the request throughput can be increased by adjusting the number of uWSGI workers (see :ref:`configuration docs <openedx_configuration>`). By default, the "lms" and "cms" containers each spawn 2 uWSGI workers. The number of workers should be increased if you observe an increase in the latency of user requests but CPU usage remains below 100%. To increase the number of workers for the LMS and the CMS, run for example::
 
     tutor config save \
       --set OPENEDX_LMS_UWSGI_WORKERS=8 \
       --set OPENEDX_CMS_UWSGI_WORKERS=4
     tutor local restart lms cms
 
-The right values will very much depend on your server available memory and CPU performance, as well as the maximum number of simultaneous users who use your platform. As an example data point, it was reported that a large Open edX platform can serve up to 500k unique users per week on a virtual server with 8 vCPU and 16 GB memory.
+The right values will very much depend on your server's available memory and CPU performance, as well as the maximum number of simultaneous users who use your platform. As an example data point, it was reported that a large Open edX platform can serve up to 500k unique users per week on a virtual server with 8 vCPU and 16 GB memory.
 
 Offloading data storage
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,14 +39,14 @@ Aside from web workers, the most resource-intensive services are in the data per
 
 - `Elasticsearch <https://www.elastic.co/elasticsearch/>`__: indexing of course contents and forum topics, mostly for search. Elasticsearch is never a source of truth in Open edX, and the data can thus be trashed and re-created safely.
 - `MySQL <https://www.mysql.com>`__: structured, consistent data storage which is the default destination of all data.
-- `Mongodb <https://www.mongodb.com>`__: structured storage of course data.
+- `MongoDB <https://www.mongodb.com>`__: structured storage of course data.
 - `Redis <https://redis.io/>`__: caching and asynchronous task management.
 - `MinIO <https://min.io>`__: S3-like object storage for user-uploaded files, which is enabled by the `tutor-minio <https://github.com/overhangio/tutor-minio>`__ plugin. It is possible to replace MinIO by direct filesystem storage (the default), but scaling will then become much more difficult down the road.
 
-When attempting to scale a single-server deployment, we recommend to start by offloading some of these stateful data storage components, in the same order of priority. There are multiple benefits:
+When attempting to scale a single-server deployment, we recommend starting by offloading some of these stateful data storage components, in the same order of priority. There are multiple benefits:
 
-1. It will free up some resource both for the web workers and the data storage components.
-2. It is a first step towards horizontal scaling of the web workers.
+1. It will free up some resources both for the web workers and the data storage components.
+2. It is the first step towards horizontal scaling of the web workers.
 3. It becomes possible to either install every component as a separate service or rely on 3rd-party SaaS with high availability.
 
 Moving each of the data storage components is a fairly straightforward process, although details vary for every component. For instance, for the MySQL database, start by disabling the locally running MySQL instance::
@@ -63,7 +63,7 @@ Then, migrate the data located at ``$(tutor config printroot)/data/mysql`` to th
 
 The changes will be taken into account the next time the platform is restarted.
 
-Beware that moving the data components to dedicated servers has the potential of creating new single points of failures (`SPOF <https://en.wikipedia.org/wiki/Single_point_of_failure>`__). To avoid this situation, each component should be installed as a highly available service (or as highly available SaaS).
+Beware that moving the data components to dedicated servers has the potential of creating new single points of failure (`SPOF <https://en.wikipedia.org/wiki/Single_point_of_failure>`__). To avoid this situation, each component should be installed as a highly available service (or as a highly available SaaS).
 
 Scaling with multiple servers
 -----------------------------
@@ -73,7 +73,7 @@ Horizontally scaling web services
 
 As the number of users of a web platform increases, they put increased pressure on the web workers that respond to their requests. Thus, in most cases, web worker performance is the first bottleneck that system administrators have to face when their service becomes more popular. Initially, any given Kubernetes-based Tutor platform ships with one replica for each deployment. To increase (or reduce) the number of replicas for any given service, run ``tutor k8s scale <name> <number of replicas>``. Behind the scenes, this command will trigger a ``kubectl scale --replicas=...`` command that will seamlessly increase the number of pods for that deployment.
 
-In Open edX there are multiple web services that are exposed to the outside world. The ones that usually receive the most traffic are, in decreasing order, the LMS, the CMS and the forum (assuming the `tutor-forum <https://github.com/overhangio/tutor-forum>`__ plugin was enabled). As an example, all three deployment replicas can be scaled by running::
+In Open edX multiple web services are exposed to the outside world. The ones that usually receive the most traffic are, in decreasing order, the LMS, the CMS, and the forum (assuming the `tutor-forum <https://github.com/overhangio/tutor-forum>`__ plugin was enabled). As an example, all three deployment replicas can be scaled by running::
 
     tutor k8s scale lms 8
     tutor k8s scale cms 4

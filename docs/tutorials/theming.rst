@@ -6,7 +6,7 @@ Changing the appearance of Open edX
 Installing a custom theme
 -------------------------
 
-Comprehensive theming is enabled by default, but only the default theme is compiled. `Indigo <https://github.com/overhangio/indigo>`__ is a better, ready-to-run theme which you can start using today.
+Comprehensive theming is enabled by default, but only the default theme is compiled. `Indigo <https://github.com/overhangio/indigo>`__ is a better, ready-to-run theme that you can start using today.
 
 To compile your own theme, add it to the ``env/build/openedx/themes/`` folder::
 

@@ -37,7 +37,7 @@ class BasePlugin:
 
     `hooks` (dict str->list[str]): hooks are commands that will be run at various points
     during the lifetime of the platform. For instance, to run `service1` and `service2`
-    in sequence during initialization, you should define:
+    in sequence during initialisation, you should define:
 
         hooks["init"] = ["service1", "service2"]
 

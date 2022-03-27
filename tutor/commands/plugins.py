@@ -14,7 +14,7 @@ from .context import Context
 @click.group(
     name="plugins",
     short_help="Manage Tutor plugins",
-    help="Manage Tutor plugins to add new features and customize your Open edX platform",
+    help="Manage Tutor plugins to add new features and customise your Open edX platform",
 )
 def plugins_command() -> None:
     """
