@@ -31,7 +31,7 @@ A fully-functional platform can be configured and run in one command::
 
     tutor local quickstart
 
-But you may want to run commands one at a time: it's faster when you need to run only part of the local deployment process, and it helps you understand how your platform works. In the following we decompose the ``quickstart`` command.
+But you may want to run commands one at a time: it's faster when you need to run only part of the local deployment process, and it helps you understand how your platform works. In the following, we decompose the ``quickstart`` command.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -111,7 +111,7 @@ You will most certainly need to create a user to administer the platform. Just r
 
     tutor local createuser --staff --superuser yourusername user@email.com
 
-You will asked to set the user password interactively.
+You will be asked to set the user password interactively.
 
 .. _democourse:
 
@@ -156,7 +156,7 @@ After modifying Open edX settings, for instance when running ``tutor config save
 Customizing the deployed services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You might want to customize the docker-compose services listed in ``$(tutor config printroot)/env/local/docker-compose.yml``. To do so, you should create a ``docker-compose.override.yml`` file in that same folder::
+You might want to customise the docker-compose services listed in ``$(tutor config printroot)/env/local/docker-compose.yml``. To do so, you should create a ``docker-compose.override.yml`` file in that same folder::
 
     vim $(tutor config printroot)/env/local/docker-compose.override.yml
 

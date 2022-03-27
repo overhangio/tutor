@@ -3,12 +3,12 @@
 What next?
 ==========
 
-You have gone through the :ref:`Quickstart installation <quickstart>`: at this point you should have a running Open edX platform. If you don't, please follow the instructions from the :ref:`Troubleshooting <troubleshooting>` section.
+You have gone through the :ref:`Quickstart installation <quickstart>`: at this point, you should have a running Open edX platform. If you don't, please follow the instructions from the :ref:`Troubleshooting <troubleshooting>` section.
 
 Logging-in as administrator
 ---------------------------
 
-Out of the box, Tutor does not create any user for you. You will want to create a user yourself with staff and administrator privileges in order to access the studio. There is a :ref:`simple command for that <createuser>`.
+Out of the box, Tutor does not create any user for you. You will want to create a user yourself with staff and administrator privileges to access the studio. There is a :ref:`simple command for that <createuser>`.
 
 Importing a demo course
 -----------------------

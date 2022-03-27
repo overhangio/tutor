@@ -12,13 +12,13 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v13.1.7 (2022-03-17)
 
 - [Bugfix] Fix dockerize on arm64 by switching to the [powerman/dockerize](https://github.com/powerman/dockerize) fork (#591).
-- [Bugfix] Fix "Unexpected args" error during service initialization on Kubernetes (#611).
+- [Bugfix] Fix "Unexpected args" error during service initialisation on Kubernetes (#611).
 
 ## v13.1.6 (2022-03-15)
 
 - [Bugfix] Fix `local/k8s quickstart` commands when upgrading from an older release (#595).
 - [Bugfix] Fix running the default exim-relay SMTP server on arm64 (#600).
-- [Feature] Add `tutor k8s apply` comand, which is a direct interface with `kubectl apply`.
+- [Feature] Add `tutor k8s apply` command, which is a direct interface with `kubectl apply`.
 - [Feature] Add `openedx-dockerfile-minimal` patch, which you can use to install custom packages and run commands as root in the Docker image.
 
 ## v13.1.5 (2022-02-14)
@@ -27,7 +27,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v13.1.4 (2022-02-08)
 
-- [Security] Fix vulnerability in redirect url during authentication (see [commit](https://github.com/overhangio/edx-platform/commit/06550411e34c04376fa3d757e1f068f464f816e6)).
+- [Security] Fix vulnerability in redirect URL during authentication (see [commit](https://github.com/overhangio/edx-platform/commit/06550411e34c04376fa3d757e1f068f464f816e6)).
 
 ## v13.1.3 (2022-02-01)
 
@@ -43,15 +43,15 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v13.1.1 (2022-01-25)
 
 - [Bugfix] Fix authentication in development due to missing SameSite policy on session ID cookie.
-- [Bugfix] Display properly themed favicon.ico image in LMS, Studio and microfrontends.
+- [Bugfix] Display properly themed favicon.ico image in LMS, Studio, and microfrontends.
 - [Bugfix] Fix "LazyStaticAbsoluteUrl is not JSON serializable" error when sending bulk emails.
-- [Bugfix] Fix `tutor local importdemocourse` fails when platform is not up.
+- [Bugfix] Fix `tutor local importdemocourse` fails when the platform is not up.
 
 ## v13.1.0 (2022-01-08)
 
 - [Improvement] Provide much more comprehensive instructions when upgrading.
-- [Bugfix] During upgrade, make sure that environment is up-to-date prior to prompting to rebuild the custom images.
-- [Bugfix] Fix ownership of mysql data, in particular when upgrading a Kubernetes cluster to Maple.
+- [Bugfix] During the upgrade, make sure that the environment is up-to-date before prompting to rebuild the custom images.
+- [Bugfix] Fix ownership of MySQL data, in particular when upgrading a Kubernetes cluster to Maple.
 - [Bugfix] Ensure that ``tutor k8s upgrade`` is run during ``tutor k8s quickstart``, when necessary.
 - 💥[Bugfix] By default, detect the current version during ``tutor k8s/local upgrade``.
 - [Bugfix] Fix upgrading from Lilac to Maple on Kubernetes by deleting deployments and services.
@@ -59,7 +59,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v13.0.3 (2022-01-04)
 
 - [Security] Upgrade Django to 3.2.11 in edx-platform.
-- [Security] Prevent non-staff users from searching usernames by email by abusing the logout url.
+- [Security] Prevent non-staff users from searching usernames by email by abusing the logout URL.
 
 ## v13.0.2 (2021-12-22)
 
@@ -93,7 +93,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - 💥[Improvement] Run all services as unprivileged containers, for better security. This has multiple consequences:
   - The "openedx-dev" image is now built with `tutor dev dc build lms`.
   - The "smtp" service now runs the "devture/exim-relay" Docker image, which is unprivileged. Also, the default SMTP port is now 8025.
-- 💥[Feature] Get rid of the nginx container and service, which is now replaced by Caddy. this has the following consequences:
+- 💥[Feature] Get rid of the Nginx container and service, which is now replaced by Caddy. this has the following consequences:
     - Patches "nginx-cms", "nginx-lms", "nginx-extra", "local-docker-compose-nginx-aliases" are replaced by "caddyfile-cms", "caddyfile-lms", "caddyfile", " local-docker-compose-caddy-aliases".
     - Patches "k8s-deployments-nginx-volume-mounts", "k8s-deployments-nginx-volumes" were obsolete and are removed.
     - The `NGINX_HTTP_PORT` setting is renamed to `CADDY_HTTP_PORT`.
@@ -104,7 +104,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Bugfix] Fix incorrect "from" address in course bulk emails (see [pull request](https://github.com/openedx/edx-platform/pull/29001)).
 - 💥[Improvement] Fail on incorrect image name argument in `images build/pull/push/printtag` commands.
 - [Bugfix] Remove trailing slashes in docker-compose files for [compatibility with docker-compose v2 in WSL](https://github.com/docker/compose/issues/8558).
-- [Improvement] `settheme` now works with preview domain.
+- [Improvement] `settheme` now works with the preview domain.
 - [Feature] Allow specifying extra pip packages through config.yml.
 
 ## v12.1.7 (2021-11-18)
@@ -112,7 +112,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Security] Timed exam security fix [29347](https://github.com/openedx/edx-platform/pull/29347).
 - [Feature] Add [tutor-richie](https://github.com/overhangio/tutor-richie) to the plugins that are bundled with the tutor binary.
 - [Improvement] Make `tutor plugins list` print plugins sorted by name.
-- [Improvement] Ignore Python plugins which cannot be loaded.
+- [Improvement] Ignore Python plugins that cannot be loaded.
 - [Bugfix] When configured with `RUN_FORUM: false`, omit forum-related [Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/) from the manifests that `tutor k8s` generates. (#525)
 
 ## v12.1.6 (2021-11-02)
@@ -151,7 +151,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Bugfix] Fix segmentation fault during `tutor config save` on Mac OS M1 (#473). Thanks @ghassanmas!
 - [Bugfix] Fix a bug that prevented connecting to external MongoDB instances.
 - [Improvement] Make sure that the logo included in email notifications (including discussion responses) is the same as the site logo.
-- [Bugfix] Install IPython directly from pypi instead of installing it from source (the reason it was installed from source is no longer relevant). The effect of this shall speed up the process of building the openedx-dev Docker image.
+- [Bugfix] Install IPython directly from PyPI instead of installing it from source (the reason it was installed from source is no longer relevant). The effect of this shall speed up the process of building the openedx-dev Docker image.
 - [Feature] Add "openedx-dockerfile-post-git-checkout" patch.
 - [Improvement] In the "openedx" Docker images, convert git patches to cherry-picks for a cleaner source tree.
 - 💥[Feature] Make it possible to override local job configuration. This deprecates the older model for running jobs which dates back from a long time ago.
@@ -170,12 +170,12 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v12.0.2 (2021-07-06)
 
 - [Bugfix] Fix "Invalid command argument" during upgrade from Koa to Lilac.
-- [Bugfix] Fix mysql initialisation in docker-compose==2.0.0beta4.
-- [Improvement] Tutor is now published on pypi as "tutor".
+- [Bugfix] Fix MySQL initialisation in docker-compose==2.0.0beta4.
+- [Improvement] Tutor is now published on PyPI as "tutor".
 
 ## v12.0.1 (2021-06-22)
 
-- [Bugfix] Fix double pulling mongodb image when upgrading from Koa to Lilac.
+- [Bugfix] Fix double pulling MongoDB image when upgrading from Koa to Lilac.
 - [Improvement] Better logging during `plugins disable`.
 - [Bugfix] Fix "upstream sent too big header" error during login of existing users after a Koa to Lilac upgrade.
 - [Feature] Added the ability to skip `config.yml` file modification while running `tutor config save` command with `-e` or `--env-only` flag.
@@ -200,7 +200,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v11.2.11 (2021-05-18)
 
-- [Feature] Add redis database configuration for both cache and celery.
+- [Feature] Add Redis database configuration for both cache and celery.
 
 ## v11.2.10 (2021-05-17)
 
@@ -240,11 +240,11 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Improvement] Annotate types all over the Tutor code base.
 - [Bugfix] Fix parsing of YAML CLI arguments that include equal "=" signs.
 - [Bugfix] Fix minor edge case in `long_to_base64` utility function.
-- [Improvement] Add openedx patches to add settings during build process.
+- [Improvement] Add openedx patches to add settings during the build process.
 
 ## v11.2.3 (2021-02-20)
 
-- [Bugfix] Make LMS celery workers actually process LMS tasks, and not CMS tasks.
+- [Bugfix] Make LMS celery workers actually process LMS tasks and not CMS tasks.
 
 ## v11.2.2 (2021-02-17)
 
@@ -326,12 +326,12 @@ Note: Breaking changes between versions are indicated by "💥".
         - The ``NGINX_HTTPS_PORT`` setting is deprecated.
     - Architectural changes:
         - Use Caddy as a web proxy for automated SSL/TLS certificate generation:
-            - Nginx no longer listens to port 443 for https traffic.
+            - Nginx no longer listens to port 443 for HTTPS traffic.
             - The Caddy configuration file comes with a new ``caddyfile`` patch for much simpler SSL/TLS management.
             - Configuration files for web proxies are no longer provided.
             - Kubernetes deployment no longer requires setting up a custom Ingress resource or custom manager.
-        - Gunicorn and Whitenoise are replaced by uwsgi: this increases boostrap performance and makes it no longer necessary to mount media folders in the Nginx container.
-        - Replace memcached and rabbitmq by redis.
+        - Gunicorn and Whitenoise are replaced with uwsgi: this increases bootstrap performance and makes it no longer necessary to mount media folders in the Nginx container.
+        - Replace Memcached and RabbitMQ with Redis.
     - Additional features:
         - Make it possible to disable all plugins at once with ``plugins disable all``.
         - Add ``tutor k8s wait`` command to wait for a pod to become ready.
@@ -339,7 +339,7 @@ Note: Breaking changes between versions are indicated by "💥".
     - Deprecation: proxy files for Apache and Nginx are no longer provided out of the box.
     - Removed plugin `{{ patch (...) }}` statements:
         - "https-create", "k8s-ingress-rules", "k8s-ingress-tls-hosts": these are no longer necessary. Instead, declare your app in the "caddyfile" patch.
-        - "local-docker-compose-nginx-volumes": this patch was primarily used to serve media assets. The recommended is now to serve assets with uwsgi.
+        - "local-docker-compose-nginx-volumes": this patch was primarily used to serve media assets. The recommended solution is now to serve assets with uwsgi.
 
 ## v10.5.3 (2020-12-09)
 
@@ -352,7 +352,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v10.5.1 (2020-11-30)
 
 - [Bugfix] Fix Dockerfile parsing on Windows.
-- [Improvement] Add option to patch lms and cms nginx server blocks.
+- [Improvement] Add option to patch lms and cms Nginx server blocks.
 
 ## v10.5.0 (2020-11-19)
 
@@ -408,7 +408,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - [Improvement] Add CORS basic configuration to LMS for subdomains of the LMS.
 - [Feature] Add support for `images build --add-host` option (thanks @grinderz!).
-- [Bugfix] Fix podman compatibility by replacing `docker-compose rm` command by `docker-compose stop` when stopping containers.
+- [Bugfix] Fix podman compatibility by replacing `docker-compose rm` command with `docker-compose stop` when stopping containers.
 - [Improvement] Improve plugin data deletion.
 - [Improvement] Introduce the `OPENEDX_COMMON_VERSION` setting.
 - [Bugfix] Make it possible to run init jobs without starting the entire platform.
@@ -426,9 +426,9 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Bugfix] Fix Samesite=None Secure=False cookie error for users accessing the LMS with the latest release of Google Chrome.
 - [Security] Apply javascript security patch ([pull request](https://github.com/openedx/edx-platform/pull/24762)).
 - [Bugfix] Fix "FileError" on Scorm package upload in Scorm XBlock.
-- 💥[Improvement] Serve openedx static assets with [whitenoise](http://whitenoise.evans.io/en/stable/) instead of nginx. This removes the `k8s-deployments-nginx-init-containers` patch. Plugins are encouraged to implement static asset serving with Whitenoise as well.
-- [Bugfix] Fix dependency on mysql service when mysql is not activated.
-- [Improvement] Improve openedx Docker image build time and size with multi-stage build.
+- 💥[Improvement] Serve openedx static assets with [whitenoise](http://whitenoise.evans.io/en/stable/) instead of Nginx. This removes the `k8s-deployments-nginx-init-containers` patch. Plugins are encouraged to implement static asset serving with Whitenoise as well.
+- [Bugfix] Fix dependency on MySQL service when MySQL is not activated.
+- [Improvement] Improve openedx Docker image build time and size with the multi-stage build.
 - 💥[Feature] Get rid of outdated sysadmin dashboard in LMS at /sysadmin.
 
 ## v10.1.0 (2020-07-23)
@@ -445,7 +445,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v10.0.10 (2020-07-01)
 
 - [Bugfix] Fix pycontracts installation error when building openedx Docker image.
-- [Bugfix] Fix access to dicussion forum in development mode.
+- [Bugfix] Fix access to the discussion forum in development mode.
 
 ## v10.0.9 (2020-07-01)
 
@@ -479,7 +479,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v10.0.2 (2020-06-17)
 
-- [Bugfix] Fix crash when viewing problem in LMS.
+- [Bugfix] Fix crash when viewing the problem in LMS.
 - [Bugfix] Fix missing webpack-stats.json in openedx Docker image.
 
 ## v10.0.1 (2020-06-15)
@@ -489,19 +489,19 @@ Note: Breaking changes between versions are indicated by "💥".
 ## v10.0.0 (2020-06-15)
 
 - 💥[Improvement] Upgrade to Juniper 🍾.
-- [Bugfix] Fix nginx resolver address to address container restarts.
-- [Feature] Add `--limit=myplugin` option to `init` commands to limit execution of initialisation to certain services and plugins.
+- [Bugfix] Fix Nginx resolver address to address container restarts.
+- [Feature] Add `--limit=myplugin` option to `init` commands to limit the execution of initialisation to certain services and plugins.
 
 ## v3.12.6 (2020-06-01)
 
 - [Improvement] Add `dig`, `ping` utilities to openedx-dev Docker image.
 - [Bugfix] Resolve "Can't connect to MySQL server" on init.
-- [Improvement] Make it possible to customize the MySQL root username, for connecting to external MySQL databases.
+- [Improvement] Make it possible to customise the MySQL root username, for connecting to external MySQL databases.
 
 ## v3.12.5 (2020-05-20)
 
 - [Improvement] Upgrade Android app to v2.21.1 and enable many features, such as downloading videos to SD card. Thanks for the help @ejklock!.
-- [Bugfix] Fix Android app crash when accessing course.
+- [Bugfix] Fix Android app crash when accessing the course.
 
 ## v3.12.4 (2020-05-18)
 
@@ -524,7 +524,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v3.12.0 (2020-04-26)
 
-- 💥[Improvement] Do not deploy an ingress or SSL/TLS certificate issuer ressource by default in Kubernetes.
+- 💥[Improvement] Do not deploy an ingress or SSL/TLS certificate issuer resource by default in Kubernetes.
 - [Improvement] Fix tls certificate generation in k8s.
 - 💥[Improvement] Radically change the way jobs are run: we no longer "exec", but instead run a dedicated container.
 - 💥[Improvement] Upgrade k8s certificate issuer to cert-manager.io/v1alpha2.
@@ -551,7 +551,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## v3.11.8 (2020-04-06)
 
-- [Feature] Add `encrypt` template filter to conveniently add htpasswd-based authentication to nginx.
+- [Feature] Add `encrypt` template filter to conveniently add htpasswd-based authentication to Nginx.
 - [Bugfix] Fix "missing tty" during init in cron jobs.
 
 ## v3.11.7 (2020-04-01)
@@ -563,20 +563,20 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - [Bugfix] Fix "Unable to resolve dependency" error during forum initialisation.
 - [Feature] Add `settheme` command to easily assign a theme to a domain name.
-- [Improvement] Modify nginx access logs to include request scheme and server name (plugin developers should use the "tutor" log format).
+- [Improvement] Modify Nginx access logs to include request scheme and server name (plugin developers should use the "tutor" log format).
 - [Bugfix] Fix DNS resolution of restarted service.
 - [Feature] Restart multiple services with `local restart`.
-- [Feature] Make it possible to easily reload openedx gunicorn process with `tutor local exec lms reload-gunicorn`.
+- [Feature] Make it possible to easily reload the openedx gunicorn process with `tutor local exec lms reload-gunicorn`.
 - [Improvement] Rename lms/cms_worker to lms/cms-worker in local deployment.
-- [Improvement] Add the management plugin to the rabbitmq container.
-- [Improvement] Make it possible to run an Elasticsearch service on https.
+- [Improvement] Add the management plugin to the RabbitMQ container.
+- [Improvement] Make it possible to run an Elasticsearch service on HTTPS.
 
 ## v3.11.5 (2020-02-27)
 
 - [Improvement] Switch edx-platform from open-release/ironwood.2 tag to the open-release/ironwood.master branch.
 - [Security] Upgrade django to 1.11.28.
-- [Improvement] Make it possible to configure the elasticsearch heap size.
-- [Bugfix] Fix broken elasticsearch environment variables.
+- [Improvement] Make it possible to configure the Elasticsearch heap size.
+- [Bugfix] Fix broken Elasticsearch environment variables.
 - [Improvement] Restore more recent Android app version (#289).
 
 ## v3.11.4 (2020-02-16)
@@ -589,7 +589,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## 3.11.2 (2020-01-17)
 
-- [Bugfix] Make sure `docker-compose.override.yml` are loaded in dev and local contexts.
+- [Bugfix] Make sure `docker-compose.override.yml` is loaded in dev and local contexts.
 
 ## 3.11.1 (2020-01-16)
 
@@ -606,7 +606,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## 3.10.0 (2020-01-10)
 
-- [Bugfix] Fix oauth authentication in dev mode.
+- [Bugfix] Fix OAuth authentication in dev mode.
 - [Improvement] Upgrade to the 3.7 docker-compose syntax.
 - [Improvement] The `dev runserver` command can now be run for just any service.
 - 💥[Feature] `dev run/exec` commands now support generic options which are passed to docker-compose. Consequently, defining the `TUTOR_EDX_PLATFORM_PATH` environment variable no longer works. Instead, users are encouraged to explicitly pass the `-v` option, define a command alias or create a `docker-compose.override.yml` file.
@@ -631,14 +631,14 @@ Note: Breaking changes between versions are indicated by "💥".
 ## 3.8.0 (2019-11-22)
 
 - [Improvement] Add `k8s-deployments-nginx-volume-mounts` patch.
-- [Bugfix] Fix running forum locally when both elasticsearch and mongodb are not activated (#266).
-- [Bugfix] Fix MongoDb url in forum when running separate service (#267).
+- [Bugfix] Fix running forum locally when both Elasticsearch and MongoDB are not activated (#266).
+- [Bugfix] Fix MongoDB URL in the forum when running a separate service (#267).
 - 💥[Improvement] Better `dev` commands, with dedicated development docker image. One of the consequences is that the `dev watchthemes` command is replaced by `dev run lms watchthemes`.
 - [Improvement] `images` commands now accept multiple `image` arguments.
 
 ## 3.7.4 (2019-10-19)
 
-- [Bugfix] Fix missing requirements file in pypi package (#261).
+- [Bugfix] Fix missing requirements file in PyPI package (#261).
 - [Improvement] Add missing cms/lms production/development setting patches.
 - [Improvement] Allow SigV4 authentication for video upload to S3.
 - [Bugfix] Fix cms development settings.
@@ -674,7 +674,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## 3.6.2 (2019-08-07)
 
 - [Bugfix] Fix missing templates in bundled plugins.
-- [Bugfix] Enable html certificate view.
+- [Bugfix] Enable HTML certificate view.
 
 ## 3.6.1 (2019-07-27)
 
@@ -683,7 +683,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## 3.6.0 (2019-07-11)
 
 - [Feature] Modify ``createuser`` commands to define a password from the command line.
-- [Improvement] Better yaml value parsing from command line.
+- [Improvement] Better YAML value parsing from the command line.
 - [Feature] Add `dev exec` command.
 - [Bugfix] Fix incorrect notes settings definition.
 - [Improvement] Make it possible to start/stop/reboot a selection of services.
@@ -719,8 +719,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## 3.4.1 (2019-06-23)
 
-- [Bugfix] Fix install from pypi.
-- [Improvement] Get rid of kubernetes python package dependency.
+- [Bugfix] Fix install from PyPI.
+- [Improvement] Get rid of Kubernetes python package dependency.
 
 ## 3.4.0 (2019-06-17)
 
@@ -728,7 +728,7 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Feature] Kubernetes support out of beta.
 - [Improvement] Switch to pinned image tags for easier upgrades.
 - 💥[Improvement] Remove the `-y/--yes` option: `tutor config save` is now non-interactive by default. Use `-i/--interactive` to force interactive mode.
-- 💥[Improvement] Replace the `databases` command by `init`.
+- 💥[Improvement] Replace the `databases` command with `init`.
 - [Improvement] Upgrade to ironwood.2.
 - [Improvement] Add `-y/--yes` option to `local quickstart` for non-interactive quickstart.
 - [Improvement] Persist LMS/CMS logs to disk by default (with collaboration from @silviot 💪).
@@ -755,13 +755,13 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## 3.3.6 (2019-04-27)
 
-- [Bugfix] Fix KeyError on first quickstart.
-- [Improvement] De-duplication of prod/dev settings. Thanks @silviot! 😺.
+- [Bugfix] Fix KeyError on the first quickstart.
+- [Improvement] De-duplication of prod/dev settings. Thanks, @silviot! 😺.
 
 ## 3.3.5 (2019-04-22)
 
 - [Feature] Pluggable LMS/CMS/forum.
-- [Improvement] Safer environment overwrite. Thanks @silviot! 👐.
+- [Improvement] Safer environment overwrite. Thanks, @silviot! 👐.
 - [Security] Fix Jinja2 vulnerability.
 - [Improvement] Improve CLI cold start performance.
 - [Improvement] Allow uppercase "Y" and "N" as answers to boolean questions.
@@ -769,7 +769,7 @@ Note: Breaking changes between versions are indicated by "💥".
 ## 3.3.4 (2019-04-09)
 
 - [Improvement] Rename `--silent` option to `-y/--yes`.
-- [Bugfix] Fix (again) login from studio when https is activated (#193).
+- [Bugfix] Fix (again) login from studio when HTTPS is activated (#193).
 
 ## 3.3.3 (2019-03-29)
 
@@ -794,8 +794,8 @@ Note: Breaking changes between versions are indicated by "💥".
 - [Feature] Multiple platforms on a single server \o/.
 - [Feature] Easily configure web proxy on the host.
 - [Bugfix] Fix `images pull all` command which failed on "all" image.
-- [Improvement] Add configurable mongodb, SMTP and rabbitmq authentication.
-- [Improvement] Harmonize mysql username/password configuration parameters.
+- [Improvement] Add configurable MongoDB, SMTP and RabbitMQ authentication.
+- [Improvement] Harmonize MySQL username/password configuration parameters.
 - [Feature] Configurable and pluggable data storage backends (#114).
 
 ## 3.2.1 (2019-03-19)
@@ -807,7 +807,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - [Improvement] `images pull` now also pulls vendor images.
 - [Feature] Add convenient `config printvalue` command.
-- [Feature] Customize docker registry.
+- [Feature] Customise docker registry.
 - [Feature] Load configuration parameters from the system environment.
 - [Improvement] Automatic environment re-generation after re-configuration.
 - [Improvement] Error and interrupt handling in UI and web UI.
@@ -839,33 +839,33 @@ Note: Breaking changes between versions are indicated by "💥".
 
 - [Minor] Minimum required `click` version is 7.0 (#171).
 - [Bugfix] Fix `runserver` dev command (#172).
-- [Minor] Fix non-https link to documentation in pypi.
+- [Minor] Fix non-https link to documentation in PyPI.
 - [Minor] Fix `createuser` documentation.
 
 ## 3.0.3 (2019-02-12)
 
-- [Bugfix] Add missing template data to pypi package.
+- [Bugfix] Add missing template data to the PyPI package.
 - [Bugfix] Fix quickstart on Kubernetes (#164).
-- [Improvement] Add datatases task to Kubernetes quickstart (#167).
+- [Improvement] Add databases task to Kubernetes quickstart (#167).
 
 ## 3.0.2 (2019-02-12)
 
 - [Bugfix] Fix import paths -- 🚀 thanks @silviot!.
-- [Bugfix] Properly set docker project name in mysql logs -- 🦊 thanks again @silviot!.
+- [Bugfix] Properly set docker project name in MySQL logs -- 🦊 thanks again @silviot!.
 
 ## 3.0.1 (2019-02-11)
 
-- [Bugfix] fix mysql initialisation (#159, #160).
+- [Bugfix] fix MySQL initialisation (#159, #160).
 - [Improvement] Better handling of continuous integration.
 - [Bugfix] fix `tutor --version` (#156).
 - [Improvement] Absolute settings imports -- 📯 thanks @tonytan4ever!.
 
 ## 3.0.0 (2019-02-09)
 
-- [Improvement] Complete rewrite of Tutor: switch from a make-based project to a single binary which runs all commands.
+- [Improvement] Complete rewrite of Tutor: switch from a make-based project to a single binary that runs all commands.
 - [Feature] An web user interface can be created with `tutor webui start`.
-- [Bugfix] Add missing elasticsearch to Kubernetes deployment (#147).
-- [Improvement] Upload `tutor-openedx` to pypi.
+- [Bugfix] Add missing Elasticsearch to Kubernetes deployment (#147).
+- [Improvement] Upload `tutor-openedx` to PyPI .
 
 ## Older changes
 
@@ -886,10 +886,10 @@ Note: Breaking changes between versions are indicated by "💥".
 - 2018-11-25 [Feature] Use local filesystem for open assessment file upload.
 - 2018-11-23 [Improvement] Faster container bootstrapping without "chmod", as suggested by @silviot.
 - 2018-11-20 [Bugfix] Fix cross-platform theme assets generation.
-- 2018-11-17 [Improvement] Custom nginx port mapping. :crossed_swords: @frob @frohro.
+- 2018-11-17 [Improvement] Custom Nginx port mapping. :crossed_swords: @frob @frohro.
 - 2018-11-17 [Improvement] Add "make restart-openedx" command. :+1: @frob.
 - 2018-11-13 [Improvement] Facilitate install of extra XBlocks. Thanks @frob!.
-- 2018-10-30 [Bugfix] Fix rabbitmq restart policy.
+- 2018-10-30 [Bugfix] Fix RabbitMQ restart policy.
 - 2018-10-03 [Improvement/Bugfix] Fix and accelerate Android application build.
 - 2018-10-02 [Improvement] Bump Open edX version to hawthorn.2.
 - 2018-09-30 [Bugfix] Fix CMS celery worker, including export tasks.
@@ -907,6 +907,6 @@ Note: Breaking changes between versions are indicated by "💥".
 - 2018-09-02 [Bugfix] Get HTTPS to work for CMS. Thanks @flytreeleft!.
 - 2018-08-28 [Bugfix] Fix certbot image updating.
 - 2018-08-27 [Improvement] Add development requirements to openedx image.
-- 2018-08-27 [Bugfix] Upgrade mongodb.
+- 2018-08-27 [Bugfix] Upgrade MongoDB.
 - 2018-08-19 [Improvement] Make Xqueue an optional feature.
 - 2018-08-16 [Feature] Add HTTPS support.
