@@ -22,7 +22,7 @@ Memory
 
 In the following, we assume you have access to a working Kubernetes cluster. ``kubectl`` should use your cluster configuration by default. To launch a cluster locally, you may try out Minikube. Just follow the `official installation instructions <https://kubernetes.io/docs/setup/minikube/>`__.
 
-The Kubernetes cluster should have at least 4Gb of RAM on each node. When running Minikube, the virtual machine should have that much allocated memory. See below for an example with VirtualBox:
+The Kubernetes cluster should have at least 4Gb of RAM on each node. When running Minikube, the virtual machine should have that much-allocated memory. See below for an example with VirtualBox:
 
 .. image:: img/virtualbox-minikube-system.png
     :alt: Virtualbox memory settings for Minikube
@@ -34,7 +34,7 @@ By default, Tutor deploys a `LoadBalancer <https://kubernetes.io/docs/concepts/s
 
     tutor k8s start caddy
 
-Get the external IP of this services::
+Get the external IP of this service::
 
     kubectl --namespace openedx get services/caddy
 
@@ -42,14 +42,14 @@ Use this external IP to configure your DNS records. Once the DNS records are con
 
     tutor k8s logs -f caddy
 
-If, for some reason, you would like to deploy your own load balancer, you should set ``ENABLE_WEB_PROXY=false`` just like in the :ref:`local installation <web_proxy>`. Then, point your load balancer at the "caddy" service, which will be a `ClusterIP <https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types>`__.
+If for some reason, you would like to deploy your own load balancer, you should set ``ENABLE_WEB_PROXY=false`` just like in the :ref:`local installation <web_proxy>`. Then, point your load balancer at the "caddy" service, which will be a `ClusterIP <https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types>`__.
 
 S3-like object storage with `MinIO <https://www.minio.io/>`__
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Like many web applications, Open edX needs to persist data. In particular, it needs to persist files uploaded by students and course designers. In the local installation, these files are persisted to disk, on the host filesystem. But on Kubernetes, it is difficult to share a single filesystem between different pods. This would require persistent volume claims with `ReadWriteMany` access mode, and these are difficult to setup.
+Like many web applications, Open edX needs to persist data. In particular, it needs to persist files uploaded by students and course designers. In the local installation, these files are persisted to disk, on the host filesystem. But on Kubernetes, it is difficult to share a single filesystem between different pods. This would require persistent volume claims with `ReadWriteMany` access mode, and these are difficult to set up.
 
-Luckily, there is another solution: at `edx.org <edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on premises. This is achieved thanks to `MinIO <https://www.minio.io/>`__. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
+Luckily, there is another solution: at `edx.org <edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on-premises. This is achieved thanks to `MinIO <https://www.minio.io/>`__. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
 
     tutor plugins enable minio
 
@@ -58,7 +58,7 @@ The "minio.LMS_HOST" domain name will have to point to your Kubernetes cluster. 
 Kubernetes dashboard
 ~~~~~~~~~~~~~~~~~~~~
 
-This is not a requirement per se, but it's very convenient to have a visual interface of the Kubernetes cluster. We suggest the official `Kubernetes dashboard <https://github.com/kubernetes/dashboard/>`__. Depending on your Kubernetes provider, you may need to install a dashboard yourself. There are generic instructions on the `project's README <https://github.com/kubernetes/dashboard/blob/master/README.md>`__. AWS provides `specific instructions <https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html>`__.
+This is not a requirement per se, but it's very convenient to have a visual interface of the Kubernetes cluster. We suggest the official `Kubernetes dashboard <https://github.com/kubernetes/dashboard/>`__. Depending on your Kubernetes provider, you may need to install a dashboard yourself. There are general instructions on the `project's README <https://github.com/kubernetes/dashboard/blob/master/README.md>`__. AWS provides `specific instructions <https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html>`__.
 
 On Minikube, the dashboard is already installed. To access the dashboard, run::
 
@@ -67,7 +67,7 @@ On Minikube, the dashboard is already installed. To access the dashboard, run::
 Technical details
 -----------------
 
-Under the hood, Tutor wraps ``kubectl`` commands to interact with the cluster. The various commands called by Tutor are printed in the console, so that you can reproduce and modify them yourself.
+Under the hood, Tutor wraps ``kubectl`` commands to interact with the cluster. The various commands called by Tutor are printed in the console so that you can reproduce and modify them yourself.
 
 Basically, the whole platform is described in manifest files stored in ``$(tutor config printroot)/env/k8s``. There is also a ``kustomization.yml`` file at the project root for `declarative application management <https://kubectl.docs.kubernetes.io/guides/config_management/introduction/#declarative-application-management>`__. This allows us to start and update resources with commands similar to ``kubectl apply -k $(tutor config printroot) --selector=...`` (see the ``kubectl apply`` `official documentation <https://kubectl.docs.kubernetes.io/references/kubectl/apply/>`__).
 
@@ -88,7 +88,7 @@ Launch the platform on Kubernetes in one command::
 
     tutor k8s quickstart
 
-All Kubernetes resources are associated to the "openedx" namespace. If you don't see anything in the Kubernetes dashboard, you are probably looking at the wrong namespace... 😉
+All Kubernetes resources are associated with the "openedx" namespace. If you don't see anything in the Kubernetes dashboard, you are probably looking at the wrong namespace... 😉
 
 .. image:: img/k8s-dashboard.png
     :alt: Kubernetes dashboard ("openedx" namespace)
@@ -102,7 +102,7 @@ As with the :ref:`local installation <local>`, there are multiple commands to ru
 
     tutor k8s -h
 
-In particular, the ``tutor k8s start`` command restarts and reconfigures all services by running ``kubectl apply``. That means that you can delete containers, deployments or just any other kind of resources, and Tutor will re-create them automatically. You should just beware of not deleting any persistent data stored in persistent volume claims. For instance, to restart from a "blank slate", run::
+In particular, the ``tutor k8s start`` command restarts and reconfigures all services by running ``kubectl apply``. That means that you can delete containers, deployments, or just any other kind of resources, and Tutor will re-create them automatically. You should just beware of not deleting any persistent data stored in persistent volume claims. For instance, to restart from a "blank slate", run::
 
     tutor k8s stop
     tutor k8s start

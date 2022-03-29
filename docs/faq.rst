@@ -20,15 +20,15 @@ To make it possible to deploy, administer and upgrade Open edX anywhere, easily.
 What's the difference with the official "native" installation?
 --------------------------------------------------------------
 
-The `native installation <https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/146440579/Native+Open+edX+Ubuntu+16.04+64+bit+Installation>`_ maintained by edX relies on `Ansible scripts <https://github.com/openedx/configuration/>`_ to deploy Open edX on one or multiple servers. These scripts suffer from a couple issues that Tutor tries to address:
+The `native installation <https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/146440579/Native+Open+edX+Ubuntu+16.04+64+bit+Installation>`_ maintained by edX relies on `Ansible scripts <https://github.com/openedx/configuration/>`_ to deploy Open edX on one or multiple servers. These scripts suffer from a couple of issues that Tutor tries to address:
 
-1. Complexity: the scripts contain close to 35k lines of code spread over 780 files. They are really hard to understand, debug, and modify, and they are extremly slow. As a consequence, Open edX is often wrongly perceived as a project that is overly complex to manage. In contrast, Tutor generates mostly ``Dockerfile`` and ``docker-compose.yml`` files that make it easy to understand what is going on. Also, the whole installation should take about 10 minutes.
+1. Complexity: the scripts contain close to 35k lines of code spread over 780 files. They are really hard to understand, debug, and modify, and they are extremely slow. As a consequence, Open edX is often wrongly perceived as a project that is overly complex to manage. In contrast, Tutor generates mostly ``Dockerfile`` and ``docker-compose.yml`` files that make it easy to understand what is going on. Also, the whole installation should take about 10 minutes.
 2. Isolation from the OS: Tutor barely needs to touch your server because the entire platform is packaged inside Docker containers. You are thus free to run other services on your server without fear of indirectly crashing your Open edX platform.
 3. Compatibility: Open edX is only compatible with Ubuntu 16.04, but that shouldn't mean you are forced to run this specific OS. With Tutor, you can deploy Open edX on just any server you like: Ubuntu 18.04, Red Hat, Debian... All docker-compatible platforms are supported.
 4. Security: because you are no longer bound to a single OS, with Tutor you are now free to install security-related upgrades as soon as they become available.
 5. Portability: Tutor makes it easy to move your platform from one server to another. Just zip-compress your Tutor project root, send it to another server and you're done.
 
-There are also many features that are not included in the native installation, such as a `web user interface <https://github.com/overhangio/tutor-webui>`__ for remotely installing the platform, :ref:`Kubernetes deployment <k8s>`, additional languages, etc. You'll discover these differences as you explore Tutor :)
+Many features that are not included in the native installation, such as a `web user interface <https://github.com/overhangio/tutor-webui>`__ for remotely installing the platform, :ref:`Kubernetes deployment <k8s>`, additional languages, etc. You'll discover these differences as you explore Tutor :)
 
 What's the difference with the official devstack?
 -------------------------------------------------
@@ -38,21 +38,21 @@ The `devstack <https://github.com/openedx/devstack>`_ is meant for development o
 Is Tutor officially supported by edX?
 -------------------------------------
 
-Yes: as of the Open edX Maple release (December 9th 2021), Tutor is the only officially supported installation methods for Open edX: see the `official installation instructions <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-maple.master/installation/index.html>`__. 
+Yes: as of the Open edX Maple release (December 9th 2021), Tutor is the only officially supported installation method for Open edX: see the `official installation instructions <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-maple.master/installation/index.html>`__. 
 
 What features are missing from Tutor?
 -------------------------------------
 
 Tutor tries very hard to support all major Open edX features, notably in the form of :ref:`plugins <existing_plugins>`. If you are interested in sponsoring the development of a new plugin, please `get in touch <mailto:worktogether@overhang.io>`__!
 
-It should be noted that the `Insights <https://github.com/openedx/edx-analytics-pipeline>`__ stack is currently unsupported, because of its complexity, lack of support and extensibility. To replace it, Overhang.IO developed `Cairn <https://overhang.io/tutor/plugin/cairn>`__ the next-generation analytics solution for Open edX, part of the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__. You should check it out 😉
+It should be noted that the `Insights <https://github.com/openedx/edx-analytics-pipeline>`__ stack is currently unsupported, because of its complexity, lack of support, and extensibility. To replace it, Overhang.IO developed `Cairn <https://overhang.io/tutor/plugin/cairn>`__ the next-generation analytics solution for Open edX, part of the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__. You should check it out 😉
 
 Are there people already running this in production?
 ----------------------------------------------------
 
-Yes: system administrators all around the world use Tutor to run their Open edX platforms, from single-class school teachers to renowned universities, Open edX SaaS providers and nation-wide learning platforms.
+Yes: system administrators all around the world use Tutor to run their Open edX platforms, from single-class school teachers to renowned universities, Open edX SaaS providers, and nation-wide learning platforms.
 
 Why should I trust software written by some random guy on the Internet?
 -----------------------------------------------------------------------
 
-You shouldn't :) Tutor is actively maintained by `Overhang.IO <https://overhang.io>`_, a France-based company founded by `Régis Behmo <https://github.com/regisb/>`_. Régis has been working on Tutor since early 2018; he has been a contributor of the Open edX project since 2015. In particular, he has worked for 2 years at `FUN-MOOC <https://www.fun-mooc.fr/>`_, one of the top 5 largest Open edX platforms in the world. In addition, the Tutor project is a community-led project with many contributions from its :ref:`project maintainers <maintainers>`.
+You shouldn't :) Tutor is actively maintained by `Overhang.IO <https://overhang.io>`_, a France-based company founded by `Régis Behmo <https://github.com/regisb/>`_. Régis has been working on Tutor since early 2018; he has been a contributor to the Open edX project since 2015. In particular, he has worked for 2 years at `FUN-MOOC <https://www.fun-mooc.fr/>`_, one of the top 5 largest Open edX platforms in the world. In addition, the Tutor project is a community-led project with many contributions from its :ref:`project maintainers <maintainers>`.

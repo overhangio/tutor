@@ -66,7 +66,7 @@ To inspect the Tutor source code, install Tutor from `the Github repository <htt
 Configuring DNS records
 -----------------------
 
-When running a server in production, it is necessary to define `DNS records <https://en.wikipedia.org/wiki/Domain_Name_System#Resource_records>`__ which will make it possible to access your Open edX platform by name in your browser. The precise procedure to create DNS records vary from one provider to the next and is beyond the scope of these docs. You should create a record of type A with a name equal to your LMS hostname (given by ``tutor config printvalue LMS_HOST``) and a value that indicates the IP address of your server. Applications other than the LMS, such as the studio, ecommerce, etc. typically reside in subdomains of the LMS. Thus, you should also create a CNAME record to point all subdomains of the LMS to the LMS_HOST.
+When running a server in production, it is necessary to define `DNS records <https://en.wikipedia.org/wiki/Domain_Name_System#Resource_records>`__ which will make it possible to access your Open edX platform by name in your browser. The precise procedure to create DNS records varies from one provider to the next and is beyond the scope of these docs. You should create a record of type A with a name equal to your LMS hostname (given by ``tutor config printvalue LMS_HOST``) and a value that indicates the IP address of your server. Applications other than the LMS, such as the studio, ecommerce, etc. typically reside in subdomains of the LMS. Thus, you should also create a CNAME record to point all subdomains of the LMS to the LMS_HOST.
 
 For instance, the demo Open edX server that runs at https://demo.openedx.overhang.io has the following DNS records::
 
@@ -99,7 +99,7 @@ Then run the ``quickstart`` command again. Depending on your deployment target, 
 Upgrading with custom Docker images
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you run :ref:`customised <configuration_customisation>` Docker images, you need to rebuild them prior to running ``quickstart``::
+If you run :ref:`customised <configuration_customisation>` Docker images, you need to rebuild them before running ``quickstart``::
 
     tutor config save
     tutor images build all # specify here the images that you need to build
@@ -108,7 +108,7 @@ If you run :ref:`customised <configuration_customisation>` Docker images, you ne
 Upgrading to a new Open edX release
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Major Open edX releases are published twice a year, in June and December, by the Open edX `Build/Test/Release working group <https://discuss.openedx.org/c/working-groups/build-test-release/30>`__. When a new Open edX release comes out, Tutor gets a major version bump (see :ref:`versioning`). Such an upgrade typically includes multiple breaking changes. Any upgrade is final, because downgrading is not supported. Thus, when upgrading your platform from one major version to the next, it is strongly recommended to do the following:
+Major Open edX releases are published twice a year, in June and December, by the Open edX `Build/Test/Release working group <https://discuss.openedx.org/c/working-groups/build-test-release/30>`__. When a new Open edX release comes out, Tutor gets a major version bump (see :ref:`versioning`). Such an upgrade typically includes multiple breaking changes. Any upgrade is final because downgrading is not supported. Thus, when upgrading your platform from one major version to the next, it is strongly recommended to do the following:
 
 1. Read the changes listed in the `CHANGELOG.md <https://github.com/overhangio/tutor/blob/master/CHANGELOG.md>`__ file. Breaking changes are identified by a "💥".
 2. Perform a backup. On a local installation, this is typically done with::
@@ -120,7 +120,7 @@ Major Open edX releases are published twice a year, in June and December, by the
 4. Test the new release in a sandboxed environment.
 5. If you are running edx-platform, or some other repository from a custom branch, then you should rebase (and test) your changes on top of the latest release tag (see :ref:`edx_platform_fork`).
 
-The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``quickstart`` command (see above). The single difference is that if the ``quickstart`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) prior to running ``quickstart``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Lilac to Maple and rebuild some Docker images, run::
+The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``quickstart`` command (see above). The single difference is that if the ``quickstart`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) before running ``quickstart``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Lilac to Maple and rebuild some Docker images, run::
 
     tutor config save
     tutor images build all # list the images that should be rebuilt here
@@ -147,14 +147,14 @@ After opening a new shell, you can test auto-completion by typing::
 Uninstallation
 --------------
 
-It is fairly easy to completely uninstall Tutor and to delete the Open edX platforms that is running locally.
+It is fairly easy to completely uninstall Tutor and to delete the Open edX platforms that are running locally.
 
 First of all, stop any locally-running platform and remove all Tutor containers::
 
     tutor local dc down --remove-orphans
     tutor dev dc down --remove-orphans
 
-Then, delete all data associated to your Open edX platform::
+Then, delete all data associated with your Open edX platform::
 
     # WARNING: this step is irreversible
     sudo rm -rf "$(tutor config printroot)"

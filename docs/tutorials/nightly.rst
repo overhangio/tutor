@@ -3,7 +3,7 @@
 Running Open edX on the master branch ("nightly")
 =================================================
 
-Tutor was designed to make it easy for everyone to run the latest release of Open edX. But sometimes, you want to run the latest, bleeding edge version of Open edX. This is what we call "running master", as opposed to running the release branch. Running the master branch in production is strongly **not** recommended, unless you are an Open edX expert and you really know what you are doing. But Open edX developers frequently need to run the master branch locally to implement and test new features. Thus, Tutor makes it easy to run Open edX on the master branch: this is called "Tutor Nightly".
+Tutor was designed to make it easy for everyone to run the latest release of Open edX. But sometimes, you want to run the latest, bleeding-edge version of Open edX. This is what we call "running master", as opposed to running the release branch. Running the master branch in production is strongly **not** recommended unless you are an Open edX expert and you really know what you are doing. But Open edX developers frequently need to run the master branch locally to implement and test new features. Thus, Tutor makes it easy to run Open edX on the master branch: this is called "Tutor Nightly".
 
 Installing Tutor Nightly
 ------------------------
@@ -20,7 +20,7 @@ All Tutor plugins that you wish to use should likewise be installed from the "ni
     git clone --branch=nightly https://github.com/overhangio/tutor-mfe.git
     pip install -e ./tutor-mfe
 
-You can then run the usual ``tutor`` commands ::
+You can then run the usual ``tutor`` commands::
 
     tutor local quickstart
     tutor local stop
@@ -59,7 +59,7 @@ When running Tutor Nightly, you usually do not want to override your existing Tu
 Making changes to Tutor Nightly
 -------------------------------
 
-In general pull requests should be open on the "master" branch of Tutor: the "master" branch is automatically merged on the "nightly" branch at every commit, such that changes made to Tutor releases find their way to Tutor Nightly as soon as they are merged. However, sometimes you want to make changes to Tutor Nightly exclusively, and not to the Tutor releases. This might be the case for instance when upgrading the running version of a third party service (for instance: Elasticsearch, Mysql), or when the master branch requires specific changes. In that case, you should follow the instructions from the :ref:`contributing` section of the docs, with the following differences:
+In general pull requests should be open on the "master" branch of Tutor: the "master" branch is automatically merged on the "nightly" branch at every commit, such that changes made to Tutor releases find their way to Tutor Nightly as soon as they are merged. However, sometimes you want to make changes to Tutor Nightly exclusively, and not to the Tutor releases. This might be the case for instance when upgrading the running version of a third-party service (for instance: Elasticsearch, MySQL), or when the master branch requires specific changes. In that case, you should follow the instructions from the :ref:`contributing` section of the docs, with the following differences:
 
 - Open your pull request on top of the "nightly" branch instead of "master".
 - Add a description of your changes to CHANGELOG-nightly.md instead of CHANGELOG.md

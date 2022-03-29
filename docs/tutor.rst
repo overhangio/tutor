@@ -69,7 +69,7 @@ Releasing a new version
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - Bump the ``__version__`` value in ``tutor/__about__.py``. (see :ref:`versioning` below)
-- Replace "Unreleased" by the version name and date in CHANGELOG.md.
+- Replace "Unreleased" with the version name and date in CHANGELOG.md.
 - Create a commit with the version changelog.
 - Run ``make release``: this will push to the default repo/branch for the current branch.
 

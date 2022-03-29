@@ -5,7 +5,7 @@ Running Tutor on ARM-based systems
 
 Tutor can be used on ARM64 systems, although support for that platform is currently experimental.
 
-There are generally two ways to run Tutor on am ARM system - using qemu to run x86_64 images using emulation or running native ARM images. Since emulation can be quite slow, this Tutorial will focus on using native images where possible.
+There are generally two ways to run Tutor on an ARM system - using qemu to run x86_64 images using emulation or running native ARM images. Since emulation can be quite slow, this Tutorial will focus on using native images where possible.
 
 There are currently no official ARM64 images provided for Tutor, but Tutor makes it easy to build them yourself.
 
@@ -36,7 +36,7 @@ Change the database server
 The version of MySQL that Open edX uses by default does not support the ARM architecture. Our current recommendation is to use MariaDB instead, which should be largely compatible.
 
 .. warning::
-    Note that using MariaDB is experimental and incompatibilites may exist, so this should only be used for local development - not for production instances.
+    Note that using MariaDB is experimental and incompatibilities may exist, so this should only be used for local development - not for production instances.
 
 Configure Tutor to use MariaDB::
 

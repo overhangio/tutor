@@ -3,7 +3,7 @@
 Configuration and customisation
 ===============================
 
-Tutor offers plenty of possibilities for platform customisation out of the box. There are two main ways in which the base Open edX installation can be customized:
+Tutor offers plenty of possibilities for platform customisation out of the box. There are two main ways in which the base Open edX installation can be customised:
 
 a. Modifying the Tutor :ref:`configuration parameters <configuration>`.
 b. Modifying the :ref:`Open edX docker image <customise>` that runs the Open edX platform.
@@ -86,12 +86,12 @@ This defines the default version that will be pulled from all Open edX git repos
 - ``OPENEDX_CMS_UWSGI_WORKERS`` (default: ``2``)
 - ``OPENEDX_LMS_UWSGI_WORKERS`` (default: ``2``)
 
-By default there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.io/en/latest/Options.html#processes>`__ to serve requests for the LMS and the CMS. However, each workers requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
+By default, there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.io/en/latest/Options.html#processes>`__ to serve requests for the LMS and the CMS. However, each worker requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
 
 - ``OPENEDX_CELERY_REDIS_DB`` (default: ``0``)
 - ``OPENEDX_CACHE_REDIS_DB`` (default: ``1``)
 
-These two configuration parameters define which redis database to use for Open edX cache and celery task.
+These two configuration parameters define which Redis database to use for Open edX cache and celery task.
 
 .. _openedx_extra_pip_requirements:
 
@@ -119,7 +119,7 @@ MySQL
 - ``MYSQL_ROOT_USERNAME`` (default: ``"root"``)
 - ``MYSQL_ROOT_PASSWORD`` (default: randomly generated) Note that you are responsible for creating the root user if you are using a managed database.
 
-By default, a running Open edX platform deployed with Tutor includes all necessary 3rd-party services, such as MySQL, MongoDb, etc. But it's also possible to store data on a separate database, such as `Amazon RDS <https://aws.amazon.com/rds/>`_. For instance, to store data on an external MySQL database, set the following configuration::
+By default, a running Open edX platform deployed with Tutor includes all necessary 3rd-party services, such as MySQL, MongoDb, etc. But it's also possible to store data on a separate database, such as `Amazon RDS <https://aws.amazon.com/rds/>`_. For instance, to store data on an external MySQL database set the following configuration::
 
     RUN_MYSQL: false
     MYSQL_HOST: yourhost
@@ -137,7 +137,7 @@ Elasticsearch
 - ``ELASTICSEARCH_PORT`` (default: ``9200``)
 - ``ELASTICSEARCH_HEAP_SIZE`` (default: ``"1g"``)
 
-Mongodb
+MongoDB
 *******
 
 - ``RUN_MONGODB`` (default: ``true``)
@@ -238,7 +238,7 @@ Would you like to include custom xblocks, or extra requirements to your Open edX
     - "git+https://github.com/open-craft/xblock-poll.git"
 
 .. warning::
-   Specifying extra requirements through ``config.yml`` overwrites :ref:`the default extra requirements<openedx_extra_pip_requirements>`. You might need to add them to the list, if your configuration depends on them.
+   Specifying extra requirements through ``config.yml`` overwrites :ref:`the default extra requirements<openedx_extra_pip_requirements>`. You might need to add them to the list if your configuration depends on them.
 
 - or add the dependency to ``private.txt``::
 
@@ -254,7 +254,7 @@ Then, the ``openedx`` docker image must be rebuilt::
 Installing extra requirements from private repositories
 *******************************************************
 
-When installing extra xblock or requirements from private repositories, ``private.txt`` file should be used, because it allows to install dependencies without adding git credentials to the Docker image. By adding your git credentials to the Docker image, you're risking leaking your git credentials, if you were to publish (intentionally or unintentionally) the Docker image in a public place.
+When installing extra xblock or requirements from private repositories, ``private.txt`` file should be used, because it allows installing dependencies without adding git credentials to the Docker image. By adding your git credentials to the Docker image, you're risking leaking your git credentials, if you were to publish (intentionally or unintentionally) the Docker image in a public place.
 
 To install xblocks from a private repository that requires authentication, you must first clone the repository inside the ``openedx/requirements`` folder on the host::
 
@@ -290,7 +290,7 @@ If you don't create your fork from this tag, you *will* have important compatibi
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX in your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/maple.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/maple.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
@@ -347,7 +347,7 @@ Then you will have to re-build the openedx Docker image::
 
     tutor images build openedx
 
-Beware that this will take a long time! Unfortunately it's difficult to accelerate this process, as translation files need to be compiled prior to collecting the assets. In development it's possible to accelerate the iteration loop -- but that exercise is left to the reader.
+Beware that this will take a long time! Unfortunately, it's difficult to accelerate this process, as translation files need to be compiled before collecting the assets. In development it's possible to accelerate the iteration loop -- but that exercise is left to the reader.
 
 
 Running a different ``openedx`` Docker image

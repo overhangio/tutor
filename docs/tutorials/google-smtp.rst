@@ -6,7 +6,7 @@ By default, Tutor comes with a simple SMTP server for sending emails. Such a ser
 .. warning::
   Google Mail SMTP servers come with their own set of limitations. For instance, you are limited to sending 500 emails a day. Reference: https://support.google.com/mail/answer/22839
 
-You should authorize third party to access your Google Mail account. In your Google Mail account, select "Manage Account", "Security", and turn on "Less Secure App Access". Check the Google documentation for more information on "less secure apps": https://support.google.com/accounts/answer/6010255
+You should authorize third-party to access your Google Mail account. In your Google Mail account, select "Manage Account", "Security", and turn on "Less Secure App Access". Check the Google documentation for more information on "less secure apps": https://support.google.com/accounts/answer/6010255
 
 Then, check that you can reach the Google Mail SMTP service from your own server::
 
