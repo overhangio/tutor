@@ -18,6 +18,11 @@ __version_suffix__ = ""
 # name.
 __app__ = os.environ.get("TUTOR_APP", "tutor")
 
+# Package version, as installed by pip, does not include the version suffix.
+# Otherwise, nightly plugins will automatically install non-nightly Tutor
+# version.
+__package_version__ = __version__
+
 if __version_suffix__:
     __version__ += "-" + __version_suffix__
     __app__ += "-" + __version_suffix__

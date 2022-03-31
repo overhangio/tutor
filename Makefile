@@ -123,7 +123,7 @@ ci-bootstrap-images:
 ###### Additional commands
 
 version: ## Print the current tutor version
-	@python -c 'import io, os; about = {}; exec(io.open(os.path.join("tutor", "__about__.py"), "rt", encoding="utf-8").read(), about); print(about["__version__"])'
+	@python -c 'import io, os; about = {}; exec(io.open(os.path.join("tutor", "__about__.py"), "rt", encoding="utf-8").read(), about); print(about["__package_version__"])'
 
 ESCAPE = 
 help: ## Print this help
