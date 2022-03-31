@@ -36,8 +36,8 @@ To learn more about Tutor, watch this 7-minute lightning talk that was made at t
 
 .. youtube:: Oqc7c-3qFc4
 
-How does Tutor work, technically speaking?
-------------------------------------------
+How does Tutor simplify Open edX deployment?
+--------------------------------------------
 
 Tutor simplifies the deployment of Open edX by:
 
@@ -100,6 +100,28 @@ You can now take advantage of the Tutor-powered CLI (item #3) to bootstrap your 
     tutor local quickstart
 
 Under the hood, Tutor simply runs ``docker-compose`` and ``docker`` commands to launch your platform. These commands are printed in the standard output, such that you are free to replicate the same behaviour by simply copying/pasting the same commands.
+
+
+How do I navigate Tutor's command-line interface?
+-------------------------------------------------
+
+Tutor commands are structured in an easy-to-follow hierarchy. At the top level, there are commands for each mode in which Tutor can run::
+
+    tutor local ...  # Commands for managing a local Open edX deployment.
+    tutor k8s ...    # Commands for managing a Kubernetes Open edX deployment.
+    tutor dev ...    # Commands for local Open edX development.
+
+Within each mode, Tutor has subcommands for managing that type of Open edX instance. Many of them are common between modes, such as ``quickstart``, ``start``, ``stop``, ``exec``, and ``logs``. For example::
+
+    tutor local logs lms # View logs of a locally-deployed LMS.
+    tutor k8s logs lms   # View logs of a Kubernetes-managed LMS.
+    tutor dev logs lms   # View logs of a development-mode LMS.
+
+Finally, the ``tutor config ...`` and ``tutor images ...`` commands contain subcommands for configuring your environment and managing Docker images, respectively. These commands are not specific to any mode of Tutor deployment. For example, to pull images suitable for any type of deployment, you would use::
+
+  tutor images pull all
+
+You do not need to understand Tutor's entire command-line interface to get started! Using the ``--help`` option that's availble on every command, it is easy to learn as you go.
 
 I'm ready, where do I start?
 ----------------------------
