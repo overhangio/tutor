@@ -40,7 +40,7 @@ ABOUT = load_about()
 
 setup(
     name="tutor",
-    version=ABOUT["__version__"].split("-")[0],  # drop "-nightly" suffix if present
+    version=ABOUT["__package_version__"],
     url="https://docs.tutor.overhang.io/",
     project_urls={
         "Documentation": "https://docs.tutor.overhang.io/",
