@@ -15,7 +15,7 @@ This section does not cover :ref:`plugin development <plugins>`. For simple chan
 Configuration
 -------------
 
-With Tutor, all Open edX deployment parameters are stored in a single ``config.yml`` file. This is the file that is generated when you run ``tutor local quickstart`` or ``tutor config save``. To view the content of this file, run::
+With Tutor, all Open edX deployment parameters are stored in a single ``config.yml`` file. This is the file that is generated when you run ``tutor ... quickstart`` or ``tutor config save``. To view the content of this file, run::
 
     cat "$(tutor config printroot)/config.yml"
 

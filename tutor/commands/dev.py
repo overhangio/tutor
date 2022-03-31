@@ -34,6 +34,9 @@ class DevContext(compose.BaseComposeContext):
     def job_runner(self, config: Config) -> DevJobRunner:
         return DevJobRunner(self.root, config)
 
+    def is_dev(self) -> bool:
+        return True
+
 
 @click.group(help="Run Open edX locally with development settings")
 @click.pass_context

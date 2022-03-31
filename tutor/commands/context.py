@@ -15,6 +15,12 @@ class Context:
     def __init__(self, root: str) -> None:
         self.root = root
 
+    def is_dev(self) -> bool:
+        """
+        Are we running from a developer (`tutor dev ...`) context?
+        """
+        return False
+
 
 class BaseJobContext(Context):
     """

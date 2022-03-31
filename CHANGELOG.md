@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add `tutor dev quickstart` command, which is equivalent to `tutor local quickstart`, but uses dev containers instead of local production ones. This should remove some friction from the Open edX development setup process, which previously required that users provision using local producation containers (`tutor local quickstart`) but then stop them and switch to dev containers (`tutor local stop && tutor dev start -d`).
+
 ## v13.1.8 (2022-03-18)
 
 - [Bugfix] Fix "evalsymlink failure" during `k8s quickstart` (#611).

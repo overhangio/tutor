@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 import click
 
@@ -7,9 +7,12 @@ from .. import bindmounts
 from .. import config as tutor_config
 from .. import env as tutor_env
 from .. import fmt, jobs, utils
+
 from ..exceptions import TutorError
 from ..types import Config
+from .config import save as config_save_command
 from .context import BaseJobContext
+from .upgrade.compose import upgrade_from
 
 
 class ComposeJobRunner(jobs.BaseComposeJobRunner):
@@ -58,6 +61,91 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
 class BaseComposeContext(BaseJobContext):
     def job_runner(self, config: Config) -> ComposeJobRunner:
         raise NotImplementedError
+
+
+@click.command(help="Configure and run Open edX from scratch")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
+@click.pass_context
+def quickstart(context: click.Context, non_interactive: bool, pullimages: bool) -> None:
+    try:
+        utils.check_macos_docker_memory()
+    except TutorError as e:
+        fmt.echo_alert(
+            f"""Could not verify sufficient RAM allocation in Docker:
+
+    {e}
+
+Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
+
+    https://docs.tutor.overhang.io/install.html"""
+        )
+
+    run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
+    if run_upgrade_from_release is not None:
+        click.echo(fmt.title("Upgrading from an older release"))
+        if not non_interactive:
+            to_release = tutor_env.get_package_release()
+            question = f"""You are about to upgrade your Open edX platform from {run_upgrade_from_release.capitalize()} to {to_release.capitalize()}
+
+It is strongly recommended to make a backup before upgrading. To do so, run:
+
+    tutor local stop
+    sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/
+
+In case of problem, to restore your backup you will then have to run: sudo rsync -avr /tmp/tutor-backup/ "$(tutor config printroot)"/
+
+Are you sure you want to continue?"""
+            click.confirm(
+                fmt.question(question), default=True, abort=True, prompt_suffix=" "
+            )
+        context.invoke(
+            upgrade,
+            from_release=run_upgrade_from_release,
+        )
+
+    click.echo(fmt.title("Interactive platform configuration"))
+    context.invoke(config_save_command, interactive=(not non_interactive))
+
+    if run_upgrade_from_release and not non_interactive:
+        question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
+
+If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
+
+    tutor images build all # list your custom images here
+
+See the documentation for more information:
+
+    https://docs.tutor.overhang.io/install.html#upgrading-to-a-new-open-edx-release
+
+Press enter when you are ready to continue"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
+        )
+
+    click.echo(fmt.title("Stopping any existing platform"))
+    context.invoke(stop)
+    if pullimages:
+        click.echo(fmt.title("Docker image updates"))
+        context.invoke(dc_command, command="pull")
+    click.echo(fmt.title("Starting the platform in detached mode"))
+    context.invoke(start, detach=True)
+    click.echo(fmt.title("Database creation and migrations"))
+    context.invoke(init)
+
+    config = tutor_config.load(context.obj.root)
+    fmt.echo_info(
+        """The Open edX platform is now running in detached mode
+Your Open edX platform is ready and can be accessed at the following urls:
+
+    {http}://{lms_host}
+    {http}://{cms_host}
+    """.format(
+            http="https" if config["ENABLE_HTTPS"] else "http",
+            lms_host=config["LMS_HOST"],
+            cms_host=config["CMS_HOST"],
+        )
+    )
 
 
 @click.command(
@@ -264,6 +352,31 @@ def logs(context: click.Context, follow: bool, tail: bool, service: str) -> None
 
 
 @click.command(
+    short_help="Perform release-specific upgrade tasks",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `quickstart`.",
+)
+@click.option(
+    "--from",
+    "from_release",
+    type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
+)
+@click.pass_context
+def upgrade(context: click.Context, from_release: Optional[str]) -> None:
+    fmt.echo_alert(
+        "This command only performs a partial upgrade of your Open edX platform. "
+        "To perform a full upgrade, you should run `tutor local quickstart`."
+    )
+    if from_release is None:
+        from_release = tutor_env.get_env_release(context.obj.root)
+    if from_release is None:
+        fmt.echo_info("Your environment is already up-to-date")
+    else:
+        upgrade_from(context, from_release)
+    # We update the environment to update the version
+    context.invoke(config_save_command)
+
+
+@click.command(
     short_help="Direct interface to docker-compose.",
     help=(
         "Direct interface to docker-compose. This is a wrapper around `docker-compose`. Most commands, options and"
@@ -294,6 +407,7 @@ def dc_command(context: BaseComposeContext, command: str, args: List[str]) -> No
 
 
 def add_commands(command_group: click.Group) -> None:
+    command_group.add_command(quickstart)
     command_group.add_command(start)
     command_group.add_command(stop)
     command_group.add_command(restart)

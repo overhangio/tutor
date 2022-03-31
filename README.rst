@@ -64,7 +64,9 @@ Quickstart
 ----------
 
 1. Install the `latest stable release <https://github.com/overhangio/tutor/releases>`_ of Tutor
-2. Run ``tutor local quickstart``
+2. Run one of these commands:
+   * ``tutor local quickstart`` (for production deployment)
+   * ``tutor dev quickstart`` (for development)
 3. You're done!
 
 Documentation
