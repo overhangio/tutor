@@ -18,7 +18,6 @@ DOCKER_IMAGE_MYSQL: "docker.io/mysql:5.7.35"
 DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_REDIS: "docker.io/redis:6.2.6"
 DOCKER_IMAGE_SMTP: "docker.io/devture/exim-relay:4.95-r0-2"
-LOCAL_PROJECT_NAME: "{{ TUTOR_APP }}_local"
 ELASTICSEARCH_HOST: "elasticsearch"
 ELASTICSEARCH_PORT: 9200
 ELASTICSEARCH_SCHEME: "http"
