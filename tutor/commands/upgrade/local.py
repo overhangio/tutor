@@ -40,7 +40,7 @@ def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
 
     if not config["RUN_MONGODB"]:
         fmt.echo_info(
-            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "You are not running MongoDB (RUN_MONGODB=false). It is your "
             "responsibility to upgrade your MongoDb instance to v3.6. There is "
             "nothing left to do to upgrade from Ironwood to Juniper."
         )
@@ -86,7 +86,7 @@ def upgrade_from_koa(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Koa"))
     if not config["RUN_MONGODB"]:
         fmt.echo_info(
-            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "You are not running MongoDB (RUN_MONGODB=false). It is your "
             "responsibility to upgrade your MongoDb instance to v4.0. There is "
             "nothing left to do to upgrade from Koa to Lilac."
         )
