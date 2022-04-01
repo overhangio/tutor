@@ -30,7 +30,7 @@ def upgrade_from(context: Context, from_release: str) -> None:
 def upgrade_from_ironwood(config: Config) -> None:
     if not config["RUN_MONGODB"]:
         fmt.echo_info(
-            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "You are not running MongoDB (RUN_MONGODB=false). It is your "
             "responsibility to upgrade your MongoDb instance to v3.6. There is "
             "nothing left to do to upgrade from Ironwood."
         )
@@ -77,7 +77,7 @@ your MySQL database from v5.6 to v5.7. You should run something similar to:
 def upgrade_from_koa(config: Config) -> None:
     if not config["RUN_MONGODB"]:
         fmt.echo_info(
-            "You are not running MongDB (RUN_MONGODB=false). It is your "
+            "You are not running MongoDB (RUN_MONGODB=false). It is your "
             "responsibility to upgrade your MongoDb instance to v4.0. There is "
             "nothing left to do to upgrade to Lilac from Koa."
         )
