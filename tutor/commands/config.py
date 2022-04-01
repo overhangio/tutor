@@ -49,7 +49,7 @@ def save(
     env_only: bool,
 ) -> None:
     config = interactive_config.load_user_config(
-        context.root, interactive=interactive, dev_context=context.is_dev()
+        context.root, interactive=interactive, assume_dev=context.is_dev()
     )
     if set_vars:
         for key, value in dict(set_vars).items():

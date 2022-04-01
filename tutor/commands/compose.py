@@ -133,6 +133,17 @@ Press enter when you are ready to continue"""
     click.echo(fmt.title("Database creation and migrations"))
     context.invoke(init)
 
+    if context.is_dev():
+        context.invoke(
+            createuser,
+            user="admin",
+            password="password",
+            email="admin@local.overhang.io",
+            staff=True,
+            superuser=True,
+        )
+        context.invoke(importdemocourse)
+
     config = tutor_config.load(context.obj.root)
     fmt.echo_info(
         """The Open edX platform is now running in detached mode

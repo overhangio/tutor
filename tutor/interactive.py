@@ -8,27 +8,30 @@ from .types import Config, get_typed
 
 
 def load_user_config(
-    root: str, interactive: bool = True, dev_context: bool = False
+    root: str, interactive: bool = True, assume_dev: bool = False
 ) -> Config:
     """
     Load configuration and interactively ask questions to collect param values from the user.
     """
     config = tutor_config.load_minimal(root)
     if interactive:
-        ask_questions(config, dev_context)
+        ask_questions(config, assume_dev)
     return config
 
 
-def ask_questions(config: Config, dev_context: bool = False) -> None:
-    already_configured_for_dev = config.get("LMS_HOST") == "local.overhang.io"
-    default_to_prod = not (dev_context or already_configured_for_dev)
-    run_for_prod = click.confirm(
-        fmt.question(
-            "Are you configuring a production platform? Type 'n' if you are just testing Tutor on your local computer"
-        ),
-        prompt_suffix=" ",
-        default=default_to_prod,
-    )
+def ask_questions(config: Config, assume_dev: bool = False) -> None:
+    defaults = tutor_config.get_defaults(config)
+    if assume_dev:
+        run_for_prod = False
+    else:
+        already_configured_for_dev = config.get("LMS_HOST") == "local.overhang.io"
+        run_for_prod = click.confirm(
+            fmt.question(
+                "Are you configuring a production platform? Type 'n' if you are just testing Tutor on your local computer"
+            ),
+            prompt_suffix=" ",
+            default=already_configured_for_dev,
+        )
 
     if not run_for_prod:
         dev_values: Config = {
@@ -42,8 +45,6 @@ def ask_questions(config: Config, dev_context: bool = False) -> None:
         for k, v in dev_values.items():
             config[k] = v
             fmt.echo_info("    {} = {}".format(k, v))
-
-    defaults = tutor_config.get_defaults(config)
 
     if run_for_prod:
         ask("Your website domain name for students (LMS)", "LMS_HOST", config, defaults)
