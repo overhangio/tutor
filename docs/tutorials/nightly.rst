@@ -11,16 +11,16 @@ Installing Tutor Nightly
 Running Tutor Nightly requires more than setting a few configuration variables: because there are so many Open edX settings, version numbers, etc. which may change between the latest release and the current master branch, Tutor Nightly is actually maintained as a separate branch of the Tutor repository. To install Tutor Nightly, you should install Tutor from the "nightly" branch of the source repository. To do so, run::
 
     git clone --branch=nightly https://github.com/overhangio/tutor.git
-    pip install -e ./tutor
+    pip install -e "./tutor[full]"
 
 As usual, it is strongly recommended to run the command above in a `Python virtual environment <https://docs.python.org/3/tutorial/venv.html>`__.
 
-All Tutor plugins that you wish to use should likewise be installed from the "nightly branch". For instance, the `MFE plugin <https://github.com/overhangio/tutor-mfe>`__::
+In addition to installing Tutor Nightly itself, this will install automatically the nightly versions of all official Tutor plugins (which are enumerated in `plugins.txt <https://github.com/overhangio/tutor/tree/nightly/requirements/plugins.txt>`_). Alternatively, if you wish to hack on an official plugin or install a custom plugin, you can clone that plugin's repository and install it. For instance::
 
-    git clone --branch=nightly https://github.com/overhangio/tutor-mfe.git
-    pip install -e ./tutor-mfe
+    git clone --branch=nightly https://github.com/myorganization/tutor-contrib-myplugin.git
+    pip install -e ./tutor-contrib-myplugin
 
-You can then run the usual ``tutor`` commands::
+Once Tutor Nightly is installed, you can run the usual ``tutor`` commands::
 
     tutor local quickstart
     tutor local stop
