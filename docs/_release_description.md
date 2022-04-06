@@ -1,6 +1,6 @@
 Install this version from pip with::
 
-    pip install tutor[full]==TUTOR_VERSION
+    pip install "tutor[full]==TUTOR_VERSION"
 
 Or download the compiled binaries::
 
