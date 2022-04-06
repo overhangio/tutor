@@ -36,8 +36,8 @@ To learn more about Tutor, watch this 7-minute lightning talk that was made at t
 
 .. youtube:: Oqc7c-3qFc4
 
-How does Tutor work, technically speaking?
-------------------------------------------
+How does Tutor simplify Open edX deployment?
+--------------------------------------------
 
 Tutor simplifies the deployment of Open edX by:
 
@@ -102,6 +102,34 @@ You can now take advantage of the Tutor-powered CLI (item #3) to bootstrap your 
     tutor local quickstart
 
 Under the hood, Tutor simply runs ``docker-compose`` and ``docker`` commands to launch your platform. These commands are printed in the standard output, such that you are free to replicate the same behaviour by simply copying/pasting the same commands.
+
+How do I navigate Tutor's command-line interface?
+-------------------------------------------------
+
+Tutor commands are structured in an easy-to-follow hierarchy. At the top level, there are command trees for image and configuration management::
+
+    tutor config ...
+    tutor images ...
+
+as well as command trees for each mode in which Tutor can run::
+
+    tutor local ...  # Commands for managing a local Open edX deployment.
+    tutor k8s ...    # Commands for managing a Kubernetes Open edX deployment.
+    tutor dev ...    # Commands for hacking on Open edX in development mode.
+
+Within each mode, Tutor has subcommands for managing that type of Open edX instance. Many of them are common between modes, such as ``quickstart``, ``start``, ``stop``, ``exec``, and ``logs``. For example::
+
+    tutor local logs  # View logs of a local deployment.
+    tutor k8s logs    # View logs of a Kubernetes-managed deployment.
+    tutor dev logs    # View logs of a development platform.
+
+Many commands can be further parameterized to specify their target and options, for example::
+
+  tutor local logs cms          # View logs of the CMS container in a local deployment.
+  tutor k8s logs mysql          # View logs of MySQL in Kubernetes-managed deployment.
+  tutor dev logs lms --tail 10  # View ten lines of logs of the LMS container in development mode.
+
+And that's it! You do not need to understand Tutor's entire command-line interface to get started. Using the ``--help`` option that's availble on every command, it is easy to learn as you go. For an in-depth guide, you can also explore the `CLI Reference <reference/index>`_.
 
 I'm ready, where do I start?
 ----------------------------
