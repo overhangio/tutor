@@ -1,12 +1,13 @@
-# change version ranges when upgrading from maple
-tutor-android>=13.0.0,<14.0.0
-tutor-discovery>=13.0.0,<14.0.0
-tutor-ecommerce>=13.0.0,<14.0.0
-tutor-forum>=13.0.0,<14.0.0
-tutor-license>=13.0.0,<14.0.0
-tutor-mfe>=13.0.0,<14.0.0
-tutor-minio>=13.0.0,<14.0.0
-tutor-notes>=13.0.0,<14.0.0
-tutor-richie>=13.0.0,<14.0.0
-tutor-webui>=13.0.0,<14.0.0
-tutor-xqueue>=13.0.0,<14.0.0
+# For Tutor Nightly, we install plugins from their nightly branches instead of from PyPI
+# (except tutor-license, for which we just want the latest version from PyPI).
+tutor-android @ git+https://github.com/overhangio/tutor-android@nightly
+tutor-discovery @ git+https://github.com/overhangio/tutor-discovery@nightly
+tutor-ecommerce @ git+https://github.com/overhangio/tutor-ecommerce@nightly
+tutor-forum @ git+https://github.com/overhangio/tutor-forum@nightly
+tutor-license
+tutor-mfe @ git+https://github.com/overhangio/tutor-mfe@nightly
+tutor-minio @ git+https://github.com/overhangio/tutor-minio@nightly
+tutor-notes @ git+https://github.com/overhangio/tutor-notes@nightly
+tutor-richie @ git+https://github.com/overhangio/tutor-richie@nightly
+tutor-webui @ git+https://github.com/overhangio/tutor-webui@nightly
+tutor-xqueue @ git+https://github.com/overhangio/tutor-xqueue@nightly
