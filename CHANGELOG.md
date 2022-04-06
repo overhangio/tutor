@@ -4,6 +4,10 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.9 (2022-04-06)
+
+- [Security] Fix open redirect vulnerability in inactive user flow (see [commit](https://github.com/rgraber/edx-platform/commit/fbbcfe71832e700f16aad3636b0ccb35585d1c95))
+
 ## v13.1.8 (2022-03-18)
 
 - [Bugfix] Fix "evalsymlink failure" during `k8s quickstart` (#611).
