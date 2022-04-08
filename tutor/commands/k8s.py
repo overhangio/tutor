@@ -484,6 +484,13 @@ def kubectl_apply(root: str, *args: str) -> None:
     utils.kubectl("apply", "--kustomize", tutor_env.pathjoin(root), *args)
 
 
+@click.command(help="Print status information for all k8s resources")
+@click.pass_obj
+def status(context: Context) -> int:
+    config = tutor_config.load(context.root)
+    return utils.kubectl("get", "all", *resource_namespace_selector(config))
+
+
 def kubectl_exec(
     config: Config, service: str, command: str, attach: bool = False
 ) -> int:
@@ -561,3 +568,4 @@ k8s.add_command(logs)
 k8s.add_command(wait)
 k8s.add_command(upgrade)
 k8s.add_command(apply_command)
+k8s.add_command(status)

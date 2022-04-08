@@ -64,6 +64,10 @@ On Minikube, the dashboard is already installed. To access the dashboard, run::
 
     minikube dashboard
 
+Lastly, Tutor itself provides a rudimentary listing of your cluster's nodes, workloads, and services::
+
+    tutor k8s status
+
 Technical details
 -----------------
 

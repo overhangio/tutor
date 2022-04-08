@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Add `tutor [dev|local|k8s] status` command, which provides basic information about the platform's status.
+
 ## v13.1.11 (2022-04-12)
 
 - [Security] Apply SAML security fix.
