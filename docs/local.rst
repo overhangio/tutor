@@ -98,6 +98,14 @@ Finally, tracking logs that store `user events <https://edx.readthedocs.io/proje
     $(tutor config printroot)/data/lms/logs/tracking.log
     $(tutor config printroot)/data/cms/logs/tracking.log
 
+Status
+~~~~~~
+
+You can view your platform's containers::
+
+    tutor local status
+
+Notice the **State** column in the output. It will tell you whether each container is starting, restarting, running (``Up``), cleanly stopped (``Exit 0``), or stopped on error (``Exit N``, where N ≠ 0).
 
 Common tasks
 ------------
