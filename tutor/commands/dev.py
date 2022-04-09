@@ -42,7 +42,7 @@ def dev(context: click.Context) -> None:
 
 
 @click.command(
-    help="Run a development server",
+    help="DEPRECATED - Use \"tutor dev start -d SERVICE\" instead.",
     context_settings={"ignore_unknown_options": True},
 )
 @click.argument("options", nargs=-1, required=False)
@@ -50,16 +50,7 @@ def dev(context: click.Context) -> None:
 @click.pass_context
 def runserver(context: click.Context, options: List[str], service: str) -> None:
     config = tutor_config.load(context.obj.root)
-    if service in ["lms", "cms"]:
-        port = 8000 if service == "lms" else 8001
-        host = config["LMS_HOST"] if service == "lms" else config["CMS_HOST"]
-        fmt.echo_info(
-            "The {} service will be available at http://{}:{}".format(
-                service, host, port
-            )
-        )
-    args = ["--service-ports", *options, service]
-    context.invoke(compose.run, args=args)
+    context.invoke(compose.start, "--detached", *options, service)
 
 
 dev.add_command(runserver)
