@@ -27,6 +27,9 @@ def upgrade_from(context: Context, from_release: str) -> None:
         upgrade_from_lilac(config)
         running_release = "maple"
 
+    if running_release == "maple":
+        running_release = "nutmeg"
+
 
 def upgrade_from_ironwood(config: Config) -> None:
     if not config["RUN_MONGODB"]:

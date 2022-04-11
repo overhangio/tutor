@@ -20,6 +20,7 @@ OAUTH_ENFORCE_SECURE = False
 
 # Email settings
 DEFAULT_EMAIL_LOGO_URL = LMS_ROOT_URL + "/theming/asset/images/logo.png"
+BULK_EMAIL_SEND_USING_EDX_ACE = True
 
 # Create folders if necessary
 for folder in [DATA_DIR, LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:

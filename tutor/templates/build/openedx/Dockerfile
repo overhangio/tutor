@@ -47,15 +47,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {%- else %}
 # Patch edx-platform
-# Fix forum notification for questions
-# https://github.com/openedx/edx-platform/pull/29611
-RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 03731f19459e558f188c06aac5cc9ca1bbc675c2 && git cherry-pick 03731f19459e558f188c06aac5cc9ca1bbc675c2
-# SAML security fix
-# https://github.com/overhangio/edx-platform/tree/overhangio/sec-fix-saml-vulnerability
-RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 3b985f207853e88090d68a81acd52866b71f5af7 && git cherry-pick 3b985f207853e88090d68a81acd52866b71f5af7
-# Rate limiting security fix
-# https://github.com/overhangio/edx-platform/tree/overhangio/sec-rate-limiting
-RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b5723e416e628cac4fa84392ca13e1b72817674f && git cherry-pick b5723e416e628cac4fa84392ca13e1b72817674f
 # Fix studio-frontend by pinning the installed version
 # https://github.com/openedx/edx-platform/pull/30309
 RUN git fetch --depth=2 https://github.com/uetuluk/edx-platform/ 53ea60eee86e094f35815ac1c4114d6811f4d458 && git cherry-pick 53ea60eee86e094f35815ac1c4114d6811f4d458
@@ -88,15 +79,20 @@ COPY --from=code /openedx/edx-platform /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
 # Install the right version of pip/setuptools
-RUN pip install setuptools==44.1.0 pip==20.0.2 wheel==0.34.2
+# https://pypi.org/project/setuptools/
+# https://pypi.org/project/pip/
+# https://pypi.org/project/wheel/
+RUN pip install setuptools==62.1.0 pip==22.0.4 wheel==0.37.1
 
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
 
 # Install django-redis for using redis as a django cache
-RUN pip install django-redis==4.12.1
+# https://pypi.org/project/django-redis/
+RUN pip install django-redis==5.2.0
 
 # Install uwsgi
+# https://pypi.org/project/uWSGI/
 RUN pip install uwsgi==2.0.20
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
@@ -158,7 +154,7 @@ RUN pip install -r requirements/edx/local.in
 RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
 COPY --chown=app:app revisions.yml /openedx/config/
 ENV LMS_CFG /openedx/config/lms.env.json
-ENV STUDIO_CFG /openedx/config/cms.env.json
+ENV CMS_CFG /openedx/config/cms.env.json
 ENV REVISION_CFG /openedx/config/revisions.yml
 COPY --chown=app:app settings/lms/*.py ./lms/envs/tutor/
 COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/

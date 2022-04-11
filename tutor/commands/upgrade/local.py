@@ -31,6 +31,9 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         common_upgrade.upgrade_from_lilac(config)
         running_release = "maple"
 
+    if running_release == "maple":
+        running_release = "nutmeg"
+
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
