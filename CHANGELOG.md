@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Feature] Upgrade all applications to open-release/maple.3.
+
 ## v13.1.9 (2022-04-06)
 
 - [Security] Fix open redirect vulnerability in inactive user flow (see [commit](https://github.com/rgraber/edx-platform/commit/fbbcfe71832e700f16aad3636b0ccb35585d1c95))

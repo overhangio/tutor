@@ -50,9 +50,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Fix forum notification for questions
 # https://github.com/openedx/edx-platform/pull/29611
 RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 03731f19459e558f188c06aac5cc9ca1bbc675c2 && git cherry-pick 03731f19459e558f188c06aac5cc9ca1bbc675c2
-
-# Security fix: open redirect vulnerability
-RUN git fetch --depth=2 https://github.com/rgraber/edx-platform/ fbbcfe71832e700f16aad3636b0ccb35585d1c95 && git cherry-pick fbbcfe71832e700f16aad3636b0ccb35585d1c95
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
