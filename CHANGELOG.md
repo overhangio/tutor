@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.10 (2022-04-11)
+
 - [Feature] Upgrade all applications to open-release/maple.3.
 
 ## v13.1.9 (2022-04-06)
