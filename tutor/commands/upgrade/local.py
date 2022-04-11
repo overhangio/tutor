@@ -31,6 +31,10 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         common_upgrade.upgrade_from_lilac(config)
         running_release = "maple"
 
+    if running_release == "maple":
+        upgrade_from_maple(context, config)
+        running_release = "nutmeg"
+
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
@@ -93,6 +97,24 @@ def upgrade_from_koa(context: click.Context, config: Config) -> None:
         )
         return
     upgrade_mongodb(context, config, "4.0.25", "4.0")
+
+
+def upgrade_from_maple(context: click.Context, config: Config) -> None:
+    click.echo(fmt.title("Upgrading from Maple"))
+    # The environment needs to be updated because the management commands are from Nutmeg
+    tutor_env.save(context.obj.root, config)
+    context.invoke(
+        compose.run,
+        args=["lms", "sh", "-e", "-c", "./manage.py lms backpopulate_user_tours"],
+    )
+    context.invoke(
+        compose.run,
+        args=["cms", "sh", "-e", "-c", "./manage.py cms backfill_course_tabs"],
+    )
+    context.invoke(
+        compose.run,
+        args=["cms", "sh", "-e", "-c", "./manage.py cms simulate_publish"],
+    )
 
 
 def upgrade_mongodb(

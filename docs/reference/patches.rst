@@ -53,21 +53,21 @@ File: ``apps/caddy/Caddyfile``
 ``cms-env``
 ===========
 
-File: ``apps/openedx/config/cms.env.json``
+File: ``apps/openedx/config/cms.env.yml``
 
 .. patch:: cms-env-features
 
 ``cms-env-features``
 ====================
 
-File: ``apps/openedx/config/cms.env.json``
+File: ``apps/openedx/config/cms.env.yml``
 
 .. patch:: common-env-features
 
 ``common-env-features``
 =======================
 
-Files: ``apps/openedx/config/cms.env.json``, ``apps/openedx/config/lms.env.json``
+Files: ``apps/openedx/config/cms.env.yml``, ``apps/openedx/config/lms.env.yml``
 
 .. patch:: dev-docker-compose-jobs-services
 
@@ -137,14 +137,14 @@ File: ``kustomization.yml``
 ``lms-env``
 ===========
 
-File: ``apps/openedx/config/lms.env.json``
+File: ``apps/openedx/config/lms.env.yml``
 
 .. patch:: lms-env-features
 
 ``lms-env-features``
 ====================
 
-File: ``apps/openedx/config/lms.env.json``
+File: ``apps/openedx/config/lms.env.yml``
 
 .. patch:: local-docker-compose-caddy-aliases
 
@@ -200,7 +200,7 @@ File: ``local/docker-compose.yml``
 ``openedx-auth``
 ================
 
-File: ``apps/openedx/config/partials/auth.json``
+File: ``apps/openedx/config/partials/auth.yml``
 
 .. patch:: openedx-cms-common-settings
 

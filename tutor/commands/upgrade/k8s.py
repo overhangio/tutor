@@ -1,4 +1,5 @@
 from tutor import config as tutor_config
+from tutor import env as tutor_env
 from tutor import fmt
 from tutor.commands import k8s
 from tutor.commands.context import Context
@@ -26,6 +27,10 @@ def upgrade_from(context: Context, from_release: str) -> None:
     if running_release == "lilac":
         upgrade_from_lilac(config)
         running_release = "maple"
+
+    if running_release == "maple":
+        upgrade_from_maple(context, config)
+        running_release = "nutmeg"
 
 
 def upgrade_from_ironwood(config: Config) -> None:
@@ -102,3 +107,42 @@ def upgrade_from_lilac(config: Config) -> None:
         "upgrade from Lilac to Maple"
     )
     k8s.delete_resources(config, resources=["deployments", "services"])
+
+
+def upgrade_from_maple(context: Context, config: Config) -> None:
+    fmt.echo_info("Upgrading from Maple")
+    # The environment needs to be updated because the backpopulate/backfill commands are from Nutmeg
+    tutor_env.save(context.root, config)
+
+    # Start mysql
+    k8s.kubectl_apply(
+        context.root,
+        "--selector",
+        "app.kubernetes.io/name=mysql",
+    )
+    k8s.wait_for_pod_ready(config, "mysql")
+
+    # lms upgrade
+    k8s.kubectl_apply(
+        context.root,
+        "--selector",
+        "app.kubernetes.io/name=lms",
+    )
+    k8s.wait_for_pod_ready(config, "lms")
+    k8s.kubectl_exec(
+        config, "lms", ["sh", "-e", "-c", "./manage.py lms backpopulate_user_tours"]
+    )
+
+    # cms upgrade
+    k8s.kubectl_apply(
+        context.root,
+        "--selector",
+        "app.kubernetes.io/name=cms",
+    )
+    k8s.wait_for_pod_ready(config, "cms")
+    k8s.kubectl_exec(
+        config, "cms", ["sh", "-e", "-c", "./manage.py cms backfill_course_tabs"]
+    )
+    k8s.kubectl_exec(
+        config, "cms", ["sh", "-e", "-c", "./manage.py cms simulate_publish"]
+    )

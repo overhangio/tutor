@@ -1,12 +1,12 @@
-# change version ranges when upgrading from maple
-tutor-android>=13.0.0,<14.0.0
-tutor-discovery>=13.0.0,<14.0.0
-tutor-ecommerce>=13.0.0,<14.0.0
-tutor-forum>=13.0.0,<14.0.0
-tutor-license>=13.0.0,<14.0.0
-tutor-mfe>=13.0.0,<14.0.0
-tutor-minio>=13.0.0,<14.0.0
-tutor-notes>=13.0.0,<14.0.0
-tutor-richie>=13.0.0,<14.0.0
-tutor-webui>=13.0.0,<14.0.0
-tutor-xqueue>=13.0.0,<14.0.0
+# change version ranges when upgrading from nutmeg
+tutor-android>=14.0.0,<15.0.0
+tutor-discovery>=14.0.0,<15.0.0
+tutor-ecommerce>=14.0.0,<15.0.0
+tutor-forum>=14.0.0,<15.0.0
+tutor-license>=14.0.0,<15.0.0
+tutor-mfe>=14.0.0,<15.0.0
+tutor-minio>=14.0.0,<15.0.0
+tutor-notes>=14.0.0,<15.0.0
+tutor-richie>=14.0.0,<15.0.0
+tutor-webui>=14.0.0,<15.0.0
+tutor-xqueue>=14.0.0,<15.0.0

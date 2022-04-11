@@ -14,7 +14,7 @@ services:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
         - ../apps/openedx/config:/openedx/config:ro
-      depends_on: {{ [("mysql", RUN_MYSQL)]|list_if }}
+      depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB)]|list_if }}
 
     cms-job:
       image: {{ DOCKER_IMAGE_OPENEDX }}

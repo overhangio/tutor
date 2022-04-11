@@ -468,7 +468,7 @@ def wait(context: K8sContext, name: str) -> None:
 @click.option(
     "--from",
     "from_release",
-    type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
+    type=click.Choice(["ironwood", "juniper", "koa", "lilac", "maple"]),
 )
 @click.pass_context
 def upgrade(context: click.Context, from_release: Optional[str]) -> None:
