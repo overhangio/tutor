@@ -97,15 +97,6 @@ This might occur when you run a ``paver`` command. ``/dev/null`` eats the actual
 
 The error produced should help you better understand what is happening.
 
-"ValueError: Unable to configure handler 'local'"
----------------------------------------------------
-
-::
-
-    ValueError: Unable to configure handler 'local': [Errno 2] No such file or directory
-
-This will occur if you try to run a development environment without patching the LOGGING configuration, as indicated in the `development_` section. Maybe you correctly patched the development settings, but they are not taken into account? For instance, you might have correctly defined the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable, but ``paver`` uses the ``devstack`` settings (which does not patch the ``LOGGING`` variable). This is because calling ``paver lms --settings=development`` or ``paver cms --settings=development`` ignores the ``--settings`` argument. Yes, it might be considered an edx-platform bug... Instead, you should run the ``update_assets`` and ``runserver`` commands, as explained above.
-
 The chosen default language does not display properly
 -----------------------------------------------------
 
