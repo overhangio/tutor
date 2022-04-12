@@ -32,7 +32,7 @@ RUN dockerize_url="https://github.com/powerman/dockerize/releases/download/$DOCK
 
 ###### Checkout edx-platform code
 FROM minimal as code
-ARG EDX_PLATFORM_REPOSITORY=https://github.com/openedx/edx-platform.git
+ARG EDX_PLATFORM_REPOSITORY={{ EDX_PLATFORM_REPOSITORY }}
 ARG EDX_PLATFORM_VERSION={{ OPENEDX_COMMON_VERSION }}
 RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
@@ -107,7 +107,7 @@ RUN pip install nodeenv==1.6.0
 RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
 
 # Install nodejs requirements
-ARG NPM_REGISTRY=https://registry.npmjs.org/
+ARG NPM_REGISTRY={{ NPM_REGISTRY }}
 COPY --from=code /openedx/edx-platform/package.json /openedx/edx-platform/package.json
 WORKDIR /openedx/edx-platform
 RUN npm install --verbose --registry=$NPM_REGISTRY

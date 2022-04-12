@@ -18,6 +18,7 @@ DOCKER_IMAGE_MYSQL: "docker.io/mysql:5.7.35"
 DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_REDIS: "docker.io/redis:6.2.6"
 DOCKER_IMAGE_SMTP: "docker.io/devture/exim-relay:4.95-r0-2"
+EDX_PLATFORM_REPOSITORY: "https://github.com/openedx/edx-platform.git"
 ELASTICSEARCH_HOST: "elasticsearch"
 ELASTICSEARCH_PORT: 9200
 ELASTICSEARCH_SCHEME: "http"
@@ -51,6 +52,7 @@ OPENEDX_EXTRA_PIP_REQUIREMENTS:
 MYSQL_HOST: "mysql"
 MYSQL_PORT: 3306
 MYSQL_ROOT_USERNAME: "root"
+NPM_REGISTRY: "https://registry.npmjs.org/"
 PLATFORM_NAME: "My Open edX"
 PREVIEW_LMS_HOST: "preview.{{ LMS_HOST }}"
 REDIS_HOST: "redis"

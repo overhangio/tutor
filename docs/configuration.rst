@@ -79,7 +79,11 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/maple.2"``)
+- ``EDX_PLATFORM_REPOSITORY`` (default: ``"https://github.com/openedx/edx-platform.git"``)
+
+This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
+
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/maple.3"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -98,6 +102,11 @@ These two configuration parameters define which Redis database to use for Open e
 - ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``openedx-scorm-xblock<13.0.0,>=12.0.0``)
 
 This defines extra pip packages that are going to be installed for Open edX.
+
+- ``NPM_REGISTRY`` (default: ``"https://registry.npmjs.org/"``)
+
+This defines the registry from which you'll be pulling NPM packages when building Docker images. Like ``EDX_PLATFORM_REPOSITORY``, this can be overridden at build time with a ``--build-arg`` option.
+
 
 Vendor services
 ~~~~~~~~~~~~~~~
@@ -212,9 +221,9 @@ openedx Docker Image build arguments
 
 When building the "openedx" Docker image, it is possible to specify a few `arguments <https://docs.docker.com/engine/reference/builder/#arg>`__:
 
-- ``EDX_PLATFORM_REPOSITORY`` (default: ``"https://github.com/openedx/edx-platform.git"``)
+- ``EDX_PLATFORM_REPOSITORY`` (default: ``"{{ EDX_PLATFORM_REPOSITORY }}"``)
 - ``EDX_PLATFORM_VERSION`` (default: ``"{{ OPENEDX_COMMON_VERSION }}"``)
-- ``NPM_REGISTRY`` (default: ``"https://registry.npmjs.org/"``)
+- ``NPM_REGISTRY`` (default: ``"{{ NPM_REGISTRY }}"``)
 
 These arguments can be specified from the command line, `very much like Docker <https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg>`__. For instance::
 
