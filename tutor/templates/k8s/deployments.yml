@@ -67,6 +67,8 @@ spec:
           env:
           - name: SERVICE_VARIANT
             value: cms
+          - name: DJANGO_SETTINGS_MODULE
+            value: cms.envs.tutor.production
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -117,6 +119,8 @@ spec:
           env:
           - name: SERVICE_VARIANT
             value: cms
+          - name: DJANGO_SETTINGS_MODULE
+            value: cms.envs.tutor.production
           volumeMounts:
             - mountPath: /openedx/edx-platform/lms/envs/tutor/
               name: settings-lms
@@ -160,6 +164,11 @@ spec:
       containers:
         - name: lms
           image: {{ DOCKER_IMAGE_OPENEDX }}
+          env:
+          - name: SERVICE_VARIANT
+            value: lms
+          - name: DJANGO_SETTINGS_MODULE
+            value: lms.envs.tutor.production
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -210,6 +219,8 @@ spec:
           env:
           - name: SERVICE_VARIANT
             value: lms
+          - name: DJANGO_SETTINGS_MODULE
+            value: lms.envs.tutor.production
           volumeMounts:
             - mountPath: /openedx/edx-platform/lms/envs/tutor/
               name: settings-lms
