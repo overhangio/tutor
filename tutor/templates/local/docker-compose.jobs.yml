@@ -9,7 +9,7 @@ services:
       image: {{ DOCKER_IMAGE_OPENEDX }}
       environment:
         SERVICE_VARIANT: lms
-        SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
+        SETTINGS: tutor.production
       volumes:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
@@ -20,7 +20,7 @@ services:
       image: {{ DOCKER_IMAGE_OPENEDX }}
       environment:
         SERVICE_VARIANT: cms
-        SETTINGS: ${TUTOR_EDX_PLATFORM_SETTINGS:-tutor.production}
+        SETTINGS: tutor.production
       volumes:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
