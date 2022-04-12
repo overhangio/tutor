@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.1.11 (2022-04-12)
+
 - [Security] Apply SAML security fix.
 - [Improvement] In addition to the Docker build arguments `EDX_PLATFORM_REPOSITORY` and `NPM_REGISTRY`, also support two corresponding and identically-named `config.yml` values serving the same purpose.
 
