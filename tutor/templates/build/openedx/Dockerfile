@@ -203,12 +203,10 @@ RUN mkdir /openedx/data
 
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
-ENV SETTINGS tutor.production
+ENV DJANGO_SETTINGS_MODULE lms.envs.tutor.production
 
 {{ patch("openedx-dockerfile") }}
 
-# Entrypoint will set right environment variables
-ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8000
 
 ###### Intermediate image with dev/test dependencies
@@ -235,7 +233,7 @@ RUN rm -r /openedx/staticfiles && \
 {{ patch("openedx-dev-dockerfile-post-python-requirements") }}
 
 # Default django settings
-ENV SETTINGS tutor.development
+ENV DJANGO_SETTINGS_MODULE lms.envs.tutor.development
 
 CMD ./manage.py $SERVICE_VARIANT runserver 0.0.0.0:8000
 
@@ -252,4 +250,4 @@ CMD uwsgi \
     --enable-threads \
     --processes=${UWSGI_WORKERS:-2} \
     --buffer-size=8192 \
-    --wsgi-file ${SERVICE_VARIANT}/wsgi.py
+    --wsgi-file $SERVICE_VARIANT/wsgi.py

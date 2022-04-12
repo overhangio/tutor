@@ -4,7 +4,6 @@ from tutor import env, fmt, hooks
 from tutor.types import Config, get_typed
 
 BASE_OPENEDX_COMMAND = """
-export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
 echo "Loading settings $DJANGO_SETTINGS_MODULE"
 """
 
