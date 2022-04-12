@@ -50,6 +50,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Fix forum notification for questions
 # https://github.com/openedx/edx-platform/pull/29611
 RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 03731f19459e558f188c06aac5cc9ca1bbc675c2 && git cherry-pick 03731f19459e558f188c06aac5cc9ca1bbc675c2
+# SAML security fix
+# https://github.com/overhangio/edx-platform/tree/overhangio/sec-fix-saml-vulnerability
+RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 3b985f207853e88090d68a81acd52866b71f5af7 && git cherry-pick 3b985f207853e88090d68a81acd52866b71f5af7
 {% endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
