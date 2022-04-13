@@ -87,6 +87,10 @@ This defines the git repository from which you install Open edX platform code. I
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
+- ``EDX_PLATFORM_VERSION`` (default: the value of ``OPENEDX_COMMON_VERSION``)
+
+This defines the version that will be pulled from just the Open edX platform git repositories. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
+
 - ``OPENEDX_CMS_UWSGI_WORKERS`` (default: ``2``)
 - ``OPENEDX_LMS_UWSGI_WORKERS`` (default: ``2``)
 
@@ -222,7 +226,7 @@ openedx Docker Image build arguments
 When building the "openedx" Docker image, it is possible to specify a few `arguments <https://docs.docker.com/engine/reference/builder/#arg>`__:
 
 - ``EDX_PLATFORM_REPOSITORY`` (default: ``"{{ EDX_PLATFORM_REPOSITORY }}"``)
-- ``EDX_PLATFORM_VERSION`` (default: ``"{{ OPENEDX_COMMON_VERSION }}"``)
+- ``EDX_PLATFORM_VERSION`` (default: ``"{{ EDX_PLATFORM_VERSION }}"``, which if unset defaults to ``{{ OPENEDX_COMMON_VERSION }}``)
 - ``NPM_REGISTRY`` (default: ``"{{ NPM_REGISTRY }}"``)
 
 These arguments can be specified from the command line, `very much like Docker <https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg>`__. For instance::
