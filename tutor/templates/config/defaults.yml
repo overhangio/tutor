@@ -19,6 +19,7 @@ DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{
 DOCKER_IMAGE_REDIS: "docker.io/redis:6.2.6"
 DOCKER_IMAGE_SMTP: "docker.io/devture/exim-relay:4.95-r0-2"
 EDX_PLATFORM_REPOSITORY: "https://github.com/openedx/edx-platform.git"
+EDX_PLATFORM_VERSION: "{{ OPENEDX_COMMON_VERSION }}"
 ELASTICSEARCH_HOST: "elasticsearch"
 ELASTICSEARCH_PORT: 9200
 ELASTICSEARCH_SCHEME: "http"
