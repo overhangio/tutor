@@ -89,7 +89,7 @@ Upgrading
 
 To upgrade Open edX or benefit from the latest features and bug fixes, you should simply upgrade Tutor. Start by upgrading the "tutor" package and its dependencies::
 
-    pip install --upgrade tutor[full]
+    pip install --upgrade "tutor[full]"
 
 Then run the ``quickstart`` command again. Depending on your deployment target, run either::
 

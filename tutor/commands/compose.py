@@ -263,6 +263,12 @@ def logs(context: click.Context, follow: bool, tail: bool, service: str) -> None
     context.invoke(dc_command, command="logs", args=args)
 
 
+@click.command(help="Print status information for containers")
+@click.pass_context
+def status(context: click.Context) -> None:
+    context.invoke(dc_command, command="ps")
+
+
 @click.command(
     short_help="Direct interface to docker-compose.",
     help=(
@@ -307,3 +313,4 @@ def add_commands(command_group: click.Group) -> None:
     command_group.add_command(bindmount_command)
     command_group.add_command(execute)
     command_group.add_command(logs)
+    command_group.add_command(status)
