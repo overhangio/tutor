@@ -178,31 +178,6 @@ You will have to re-build the openedx Docker image once::
 
 You should then run the development server as usual, with ``runserver``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
 
-Loading custom edx-platform settings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default, tutor settings files are mounted inside the docker images at ``/openedx/edx-platform/lms/envs/tutor/`` and ``/openedx/edx-platform/cms/envs/tutor/``. In the various ``dev`` commands, the default ``edx-platform`` settings module is set to ``tutor.development`` and you don't have to do anything to set up these settings.
-
-If for some reason, you want to use different settings, you will need to define the ``TUTOR_EDX_PLATFORM_SETTINGS`` environment variable.
-
-For instance, let's assume you have created the ``/path/to/edx-platform/lms/envs/mysettings.py`` and ``/path/to/edx-platform/cms/envs/mysettings.py`` modules. These settings should be pretty similar to the following files::
-
-    $(tutor config printroot)/env/apps/openedx/tutor/lms/development.py
-    $(tutor config printroot)/env/apps/openedx/tutor/cms/development.py
-
-Alternatively, the ``mysettings.py`` files can import the tutor development settings::
-
-    # Beginning of mysettings.py
-    from .tutor.development import *
-
-You should then specify the settings to use on the host::
-
-    export TUTOR_EDX_PLATFORM_SETTINGS=mysettings
-
-From then on, all ``dev`` commands will use the ``mysettings`` module. For instance::
-
-    tutor dev runserver lms
-
 Running edx-platform unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

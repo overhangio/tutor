@@ -1,10 +1,9 @@
-from typing import Dict, Iterator, List, Optional, Tuple, Union
+import typing as t
 
-from . import env, fmt, plugins
-from .types import Config, get_typed
+from tutor import env, fmt, hooks
+from tutor.types import Config, get_typed
 
 BASE_OPENEDX_COMMAND = """
-export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS
 echo "Loading settings $DJANGO_SETTINGS_MODULE"
 """
 
@@ -36,44 +35,48 @@ class BaseJobRunner:
         """
         raise NotImplementedError
 
-    def iter_plugin_hooks(
-        self, hook: str
-    ) -> Iterator[Tuple[str, Union[Dict[str, str], List[str]]]]:
-        yield from plugins.iter_hooks(self.config, hook)
-
 
 class BaseComposeJobRunner(BaseJobRunner):
     def docker_compose(self, *command: str) -> int:
         raise NotImplementedError
 
 
-def initialise(runner: BaseJobRunner, limit_to: Optional[str] = None) -> None:
+@hooks.Actions.CORE_READY.add()
+def _add_core_init_tasks() -> None:
+    """
+    Declare core init scripts at runtime.
+
+    The context is important, because it allows us to select the init scripts based on
+    the --limit argument.
+    """
+    with hooks.Contexts.APP("mysql").enter():
+        hooks.Filters.COMMANDS_INIT.add_item(("mysql", ("hooks", "mysql", "init")))
+    with hooks.Contexts.APP("lms").enter():
+        hooks.Filters.COMMANDS_INIT.add_item(("lms", ("hooks", "lms", "init")))
+    with hooks.Contexts.APP("cms").enter():
+        hooks.Filters.COMMANDS_INIT.add_item(("cms", ("hooks", "cms", "init")))
+
+
+def initialise(runner: BaseJobRunner, limit_to: t.Optional[str] = None) -> None:
     fmt.echo_info("Initialising all services...")
-    if limit_to is None or limit_to == "mysql":
-        fmt.echo_info("Initialising mysql...")
-        runner.run_job_from_template("mysql", "hooks", "mysql", "init")
-    for plugin_name, hook in runner.iter_plugin_hooks("pre-init"):
-        if limit_to is None or limit_to == plugin_name:
-            for service in hook:
-                fmt.echo_info(
-                    f"Plugin {plugin_name}: running pre-init for service {service}..."
-                )
-                runner.run_job_from_template(
-                    service, plugin_name, "hooks", service, "pre-init"
-                )
-    for service in ["lms", "cms"]:
-        if limit_to is None or limit_to == service:
-            fmt.echo_info(f"Initialising {service}...")
-            runner.run_job_from_template(service, "hooks", service, "init")
-    for plugin_name, hook in runner.iter_plugin_hooks("init"):
-        if limit_to is None or limit_to == plugin_name:
-            for service in hook:
-                fmt.echo_info(
-                    f"Plugin {plugin_name}: running init for service {service}..."
-                )
-                runner.run_job_from_template(
-                    service, plugin_name, "hooks", service, "init"
-                )
+    filter_context = hooks.Contexts.APP(limit_to).name if limit_to else None
+
+    # Pre-init tasks
+    iter_pre_init_tasks: t.Iterator[
+        t.Tuple[str, t.Iterable[str]]
+    ] = hooks.Filters.COMMANDS_PRE_INIT.iterate(context=filter_context)
+    for service, path in iter_pre_init_tasks:
+        fmt.echo_info(f"Running pre-init task: {'/'.join(path)}")
+        runner.run_job_from_template(service, *path)
+
+    # Init tasks
+    iter_init_tasks: t.Iterator[
+        t.Tuple[str, t.Iterable[str]]
+    ] = hooks.Filters.COMMANDS_INIT.iterate(context=filter_context)
+    for service, path in iter_init_tasks:
+        fmt.echo_info(f"Running init task: {'/'.join(path)}")
+        runner.run_job_from_template(service, *path)
+
     fmt.echo_info("All services initialised.")
 
 
@@ -82,7 +85,7 @@ def create_user_command(
     staff: bool,
     username: str,
     email: str,
-    password: Optional[str] = None,
+    password: t.Optional[str] = None,
 ) -> str:
     command = BASE_OPENEDX_COMMAND
 
@@ -113,7 +116,9 @@ def import_demo_course(runner: BaseJobRunner) -> None:
     runner.run_job_from_template("cms", "hooks", "cms", "importdemocourse")
 
 
-def set_theme(theme_name: str, domain_names: List[str], runner: BaseJobRunner) -> None:
+def set_theme(
+    theme_name: str, domain_names: t.List[str], runner: BaseJobRunner
+) -> None:
     """
     For each domain, get or create a Site object and assign the selected theme.
     """
@@ -136,7 +141,7 @@ site.themes.create(theme_dir_name='{theme_name}')
     runner.run_job("lms", command)
 
 
-def get_all_openedx_domains(config: Config) -> List[str]:
+def get_all_openedx_domains(config: Config) -> t.List[str]:
     return [
         get_typed(config, "LMS_HOST", str),
         get_typed(config, "LMS_HOST", str) + ":8000",

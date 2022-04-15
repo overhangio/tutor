@@ -78,9 +78,7 @@ class JobsTests(unittest.TestCase):
             self.assertTrue(
                 commands.group(2)
                 .strip()
-                .startswith(
-                    "export DJANGO_SETTINGS_MODULE=$SERVICE_VARIANT.envs.$SETTINGS"
-                )
+                .startswith('echo "Loading settings $DJANGO_SETTINGS_MODULE"')
             )
 
     def test_get_all_openedx_domains(self) -> None:

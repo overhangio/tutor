@@ -27,6 +27,10 @@ language = None
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = None
 
+# Autodocumentation of modules
+extensions.append("sphinx.ext.autodoc")
+autodoc_typehints = "description"
+
 # -- Sphinx-Click configuration
 # https://sphinx-click.readthedocs.io/
 extensions.append("sphinx_click")
@@ -108,5 +112,10 @@ def youtube(
     ]
 
 
-youtube.content = True
-docutils.parsers.rst.directives.register_directive("youtube", youtube)
+# Tutor's own extension
+sys.path.append(os.path.join(os.path.dirname(__file__), "_ext"))
+extensions.append("tutordocs")
+
+
+setattr(youtube, "content", True)
+docutils.parsers.rst.directives.register_directive("youtube", youtube)  # type: ignore

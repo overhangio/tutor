@@ -4,8 +4,11 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
-- [Feature] Add `tutor [dev|local|k8s] status` command, which provides basic information about the platform's status.
 - 💥[Improvement] Make it possible to run `tutor k8s exec <command with multiple arguments>` (#636). As a consequence, it is no longer possible to run quoted commands: `tutor k8s exec "<some command>"`. Instead, you should remove the quotes: `tutor k8s exec <some command>`.
+- 💥[Deprecation] Drop support for the `TUTOR_EDX_PLATFORM_SETTINGS` environment variable. It is now recommended to create a plugin instead.
+- 💥[Improvement] Complete overhaul of the plugin extension mechanism. Tutor now has a hook-based Python API: actions can be triggered at different points of the application life cycle and data can be modified thanks to custom filters. The v0 plugin API is still supported, for backward compatibility, but plugin developers are encouraged to migrate their plugins to the new API. See the new plugin tutorial for more information.
+- [Improvement] Improved the output of `tutor plugins list`.
+- [Feature] Add `tutor [dev|local|k8s] status` command, which provides basic information about the platform's status.
 
 ## v13.1.11 (2022-04-12)
 

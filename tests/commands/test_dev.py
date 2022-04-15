@@ -1,20 +1,15 @@
 import unittest
 
-from click.testing import CliRunner
-
-from tutor.commands.compose import bindmount_command
-from tutor.commands.dev import dev
+from .base import TestCommandMixin
 
 
-class DevTests(unittest.TestCase):
+class DevTests(unittest.TestCase, TestCommandMixin):
     def test_dev_help(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(dev, ["--help"])
+        result = self.invoke(["dev", "--help"])
         self.assertEqual(0, result.exit_code)
         self.assertIsNone(result.exception)
 
     def test_dev_bindmount(self) -> None:
-        runner = CliRunner()
-        result = runner.invoke(bindmount_command, ["--help"])
+        result = self.invoke(["dev", "bindmount", "--help"])
         self.assertEqual(0, result.exit_code)
         self.assertIsNone(result.exception)
