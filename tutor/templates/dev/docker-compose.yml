@@ -1,4 +1,4 @@
-version: "3.7"
+version: "{{ DOCKER_COMPOSE_VERSION }}"
 
 x-openedx-service:
   &openedx-service

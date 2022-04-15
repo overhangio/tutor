@@ -97,6 +97,55 @@ class Filters:
             return items
     """
 
+    #: List of commands to be executed during initialization. These commands typically
+    #: include database migrations, setting feature flags, etc.
+    #:
+    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks.
+    #:
+    #:     - ``service`` is the name of the container in which the task will be executed.
+    #:     - ``path`` is a tuple that corresponds to a template relative path.
+    #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see:py:data:`IMAGES_BUILD`).
+    #:       The command to execute will be read from that template, after it is rendered.
+    COMMANDS_INIT = filters.get("commands:init")
+
+    #: List of commands to be executed prior to initialization. These commands are run even
+    #: before the mysql databases are created and the migrations are applied.
+    #:
+    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks. (see :py:data:`COMMANDS_INIT`).
+    COMMANDS_PRE_INIT = filters.get("commands:pre-init")
+
+    #: List of folders to bind-mount in docker-compose containers, either in ``tutor local`` or ``tutor dev``.
+    #:
+    #: Many ``tutor local`` and ``tutor dev`` commands support ``--mounts`` options
+    #: that allow plugins to define custom behaviour at runtime. For instance
+    #: ``--mount=/path/to/edx-platform`` would cause this host folder to be
+    #: bind-mounted in different containers (lms, lms-worker, cms, cms-worker) at the
+    #: /openedx/edx-platform location. Plugin developers may implement this filter to
+    #: define custom behaviour when mounting folders that relate to their plugins. For
+    #: instance, the ecommerce plugin may process the ``--mount=/path/to/ecommerce``
+    #: option.
+    #:
+    #: :parameter list[tuple[str, str]] mounts: each item is a ``(service, path)``
+    #:   tuple, where ``service`` is the name of the docker-compose service and ``path`` is
+    #:   the location in the container where the folder should be bind-mounted. Note: the
+    #:   path must be slash-separated ("/"). Thus, do not use ``os.path.join`` to generate
+    #:   the ``path`` because it will fail on Windows.
+    #: :parameter str name: basename of the host-mounted folder. In the example above,
+    #:   this is "edx-platform". When implementing this filter you should check this name to
+    #:   conditionnally add mounts.
+    COMPOSE_MOUNTS = filters.get("compose:mounts")
+
+    #: Contents of the local/docker-compose.tmp.yml file that will be generated at
+    #: runtime. This is used for instance to bind-mount folders from the host (see
+    #: :py:data:`COMPOSE_MOUNTS`)
+    #:
+    #: :parameter dict[str, ...] docker_compose_tmp: values which will be serialized to local/docker-compose.tmp.yml.
+    #:   Keys and values will be rendered before saving, such that you may include ``{{ ... }}`` statements.
+    COMPOSE_LOCAL_TMP = filters.get("compose:local:tmp")
+
+    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for jobs
+    COMPOSE_LOCAL_JOBS_TMP = filters.get("compose:local-jobs:tmp")
+
     #: List of images to be built when we run ``tutor images build ...``.
     #:
     #: :parameter list[tuple[str, tuple[str, ...], str, tuple[str, ...]]] tasks: list of ``(name, path, tag, args)`` tuples.
@@ -124,23 +173,6 @@ class Filters:
     #: List of images to be pulled when we run ``tutor images push ...``.
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
     IMAGES_PUSH = filters.get("images:push")
-
-    #: List of commands to be executed during initialization. These commands typically
-    #: include database migrations, setting feature flags, etc.
-    #:
-    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks.
-    #:
-    #:     - ``service`` is the name of the container in which the task will be executed.
-    #:     - ``path`` is a tuple that corresponds to a template relative path.
-    #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see:py:data:`IMAGES_BUILD`).
-    #:       The command to execute will be read from that template, after it is rendered.
-    COMMANDS_INIT = filters.get("commands:init")
-
-    #: List of commands to be executed prior to initialization. These commands are run even
-    #: before the mysql databases are created and the migrations are applied.
-    #:
-    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks. (see :py:data:`COMMANDS_INIT`).
-    COMMANDS_PRE_INIT = filters.get("commands:pre-init")
 
     #: List of command line interface (CLI) commands.
     #:

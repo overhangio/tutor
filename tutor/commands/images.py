@@ -174,7 +174,7 @@ def find_images_to_build(
     ] = hooks.Filters.IMAGES_BUILD.iterate(config)
     found = False
     for name, path, tag, args in all_images_to_build:
-        if name == image or image == "all":
+        if image in [name, "all"]:
             found = True
             tag = tutor_env.render_str(config, tag)
             yield (name, path, tag, args)
@@ -196,7 +196,7 @@ def find_remote_image_tags(
     all_remote_images: t.Iterator[t.Tuple[str, str]] = filtre.iterate(config)
     found = False
     for name, tag in all_remote_images:
-        if name == image or image == "all":
+        if image in [name, "all"]:
             found = True
             yield tutor_env.render_str(config, tag)
     if not found:

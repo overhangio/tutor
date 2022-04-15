@@ -1,5 +1,6 @@
 import os
-from typing import List
+import re
+import typing as t
 
 import click
 
@@ -7,28 +8,60 @@ from tutor import bindmounts
 from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import fmt, jobs, utils
-from tutor.commands.context import BaseJobContext
+from tutor import serialize
 from tutor.exceptions import TutorError
 from tutor.types import Config
+from tutor.commands.context import BaseJobContext
+from tutor import hooks
 
 
 class ComposeJobRunner(jobs.BaseComposeJobRunner):
     def __init__(self, root: str, config: Config):
         super().__init__(root, config)
         self.project_name = ""
-        self.docker_compose_files: List[str] = []
-        self.docker_compose_job_files: List[str] = []
+        self.docker_compose_files: t.List[str] = []
+        self.docker_compose_job_files: t.List[str] = []
 
     def docker_compose(self, *command: str) -> int:
         """
         Run docker-compose with the right yml files.
         """
+        self.__update_docker_compose_tmp()
         args = []
         for docker_compose_path in self.docker_compose_files:
             if os.path.exists(docker_compose_path):
                 args += ["-f", docker_compose_path]
         return utils.docker_compose(
             *args, "--project-name", self.project_name, *command
+        )
+
+    def __update_docker_compose_tmp(self) -> None:
+        """
+        Update the contents of the docker-compose.tmp.yml file, which is generated at runtime.
+        """
+        docker_compose_tmp = {
+            "version": "{{ DOCKER_COMPOSE_VERSION }}",
+            "services": {},
+        }
+        docker_compose_jobs_tmp = {
+            "version": "{{ DOCKER_COMPOSE_VERSION }}",
+            "services": {},
+        }
+        docker_compose_tmp = hooks.Filters.COMPOSE_LOCAL_TMP.apply(docker_compose_tmp)
+        docker_compose_jobs_tmp = hooks.Filters.COMPOSE_LOCAL_JOBS_TMP.apply(
+            docker_compose_jobs_tmp
+        )
+        docker_compose_tmp = tutor_env.render_unknown(self.config, docker_compose_tmp)
+        docker_compose_jobs_tmp = tutor_env.render_unknown(
+            self.config, docker_compose_jobs_tmp
+        )
+        tutor_env.write_to(
+            serialize.dumps(docker_compose_tmp),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.tmp.yml"),
+        )
+        tutor_env.write_to(
+            serialize.dumps(docker_compose_jobs_tmp),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.tmp.yml"),
         )
 
     def run_job(self, service: str, command: str) -> int:
@@ -60,22 +93,86 @@ class BaseComposeContext(BaseJobContext):
         raise NotImplementedError
 
 
+class MountParam(click.ParamType):
+    """
+    Parser for --mount arguments of the form "service1[,service2,...]:/host/path:/container/path".
+    """
+
+    name = "mount"
+    MountType = t.Tuple[str, str, str]
+    # Note that this syntax does not allow us to include colon ':' characters in paths
+    PARAM_REGEXP = (
+        r"(?P<services>[a-zA-Z0-9_, ]+):(?P<host_path>[^:]+):(?P<container_path>[^:]+)"
+    )
+
+    def convert(
+        self,
+        value: str,
+        param: t.Optional["click.Parameter"],
+        ctx: t.Optional[click.Context],
+    ) -> t.List["MountType"]:
+        mounts: t.List["MountParam.MountType"] = []
+        match = re.match(self.PARAM_REGEXP, value)
+        if match:
+            # Argument is of the form "containers:/host/path:/container/path"
+            services: t.List[str] = [
+                service.strip() for service in match["services"].split(",")
+            ]
+            host_path = os.path.abspath(os.path.expanduser(match["host_path"]))
+            host_path = host_path.replace(os.path.sep, "/")
+            container_path = match["container_path"]
+            for service in services:
+                if not service:
+                    self.fail(
+                        f"incorrect services syntax: '{match['services']}'", param, ctx
+                    )
+                mounts.append((service, host_path, container_path))
+        else:
+            # Argument is of the form "/host/path"
+            host_path = os.path.abspath(os.path.expanduser(value))
+            volumes: t.Iterator[
+                t.Tuple[str, str]
+            ] = hooks.Filters.COMPOSE_MOUNTS.iterate(os.path.basename(host_path))
+            for service, container_path in volumes:
+                mounts.append((service, host_path, container_path))
+        if not mounts:
+            raise self.fail(f"no mount found for {value}", param, ctx)
+        return mounts
+
+
+mount_option = click.option(
+    "-m",
+    "--mount",
+    "mounts",
+    help="""Bind-mount a folder from the host in the right containers. This option can take two different forms. The first one is explicit: 'service1[,service2...]:/host/path:/container/path'. The other is implicit: '/host/path'. Arguments passed in the implicit form will be parsed by plugins to define the right folders to bind-mount from the host.""",
+    type=MountParam(),
+    multiple=True,
+)
+
+
 @click.command(
     short_help="Run all or a selection of services.",
     help="Run all or a selection of services. Docker images will be rebuilt where necessary.",
 )
 @click.option("--skip-build", is_flag=True, help="Skip image building")
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
+@mount_option
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def start(
-    context: BaseComposeContext, skip_build: bool, detach: bool, services: List[str]
+    context: BaseComposeContext,
+    skip_build: bool,
+    detach: bool,
+    mounts: t.Tuple[t.List[MountParam.MountType]],
+    services: t.List[str],
 ) -> None:
     command = ["up", "--remove-orphans"]
     if not skip_build:
         command.append("--build")
     if detach:
         command.append("-d")
+
+    process_mount_arguments(mounts)
 
     # Start services
     config = tutor_config.load(context.root)
@@ -85,7 +182,7 @@ def start(
 @click.command(help="Stop a running platform")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def stop(context: BaseComposeContext, services: List[str]) -> None:
+def stop(context: BaseComposeContext, services: t.List[str]) -> None:
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose("stop", *services)
 
@@ -97,7 +194,7 @@ def stop(context: BaseComposeContext, services: List[str]) -> None:
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_context
-def reboot(context: click.Context, detach: bool, services: List[str]) -> None:
+def reboot(context: click.Context, detach: bool, services: t.List[str]) -> None:
     context.invoke(stop, services=services)
     context.invoke(start, detach=detach, services=services)
 
@@ -111,7 +208,7 @@ fully stop the platform, use the 'reboot' command.""",
 )
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def restart(context: BaseComposeContext, services: List[str]) -> None:
+def restart(context: BaseComposeContext, services: t.List[str]) -> None:
     config = tutor_config.load(context.root)
     command = ["restart"]
     if "all" in services:
@@ -130,8 +227,14 @@ def restart(context: BaseComposeContext, services: List[str]) -> None:
 
 @click.command(help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
+@mount_option
 @click.pass_obj
-def init(context: BaseComposeContext, limit: str) -> None:
+def init(
+    context: BaseComposeContext,
+    limit: str,
+    mounts: t.Tuple[t.List[MountParam.MountType]],
+) -> None:
+    process_mount_arguments(mounts)
     config = tutor_config.load(context.root)
     runner = context.job_runner(config)
     jobs.initialise(runner, limit_to=limit)
@@ -177,7 +280,9 @@ def createuser(
 )
 @click.argument("theme_name")
 @click.pass_obj
-def settheme(context: BaseComposeContext, domains: List[str], theme_name: str) -> None:
+def settheme(
+    context: BaseComposeContext, domains: t.List[str], theme_name: str
+) -> None:
     config = tutor_config.load(context.root)
     runner = context.job_runner(config)
     domains = domains or jobs.get_all_openedx_domains(config)
@@ -202,9 +307,15 @@ def importdemocourse(context: BaseComposeContext) -> None:
     ),
     context_settings={"ignore_unknown_options": True},
 )
+@mount_option
 @click.argument("args", nargs=-1, required=True)
 @click.pass_context
-def run(context: click.Context, args: List[str]) -> None:
+def run(
+    context: click.Context,
+    mounts: t.Tuple[t.List[MountParam.MountType]],
+    args: t.List[str],
+) -> None:
+    process_mount_arguments(mounts)
     extra_args = ["--rm"]
     if not utils.is_a_tty():
         extra_args.append("-T")
@@ -221,6 +332,9 @@ def run(context: click.Context, args: List[str]) -> None:
 @click.argument("path")
 @click.pass_obj
 def bindmount_command(context: BaseComposeContext, service: str, path: str) -> None:
+    """
+    This command is made obsolete by the --mount arguments.
+    """
     config = tutor_config.load(context.root)
     host_path = bindmounts.create(context.job_runner(config), service, path)
     fmt.echo_info(
@@ -241,7 +355,7 @@ def bindmount_command(context: BaseComposeContext, service: str, path: str) -> N
 )
 @click.argument("args", nargs=-1, required=True)
 @click.pass_context
-def execute(context: click.Context, args: List[str]) -> None:
+def execute(context: click.Context, args: t.List[str]) -> None:
     context.invoke(dc_command, command="exec", args=args)
 
 
@@ -281,7 +395,7 @@ def status(context: click.Context) -> None:
 @click.argument("command")
 @click.argument("args", nargs=-1)
 @click.pass_obj
-def dc_command(context: BaseComposeContext, command: str, args: List[str]) -> None:
+def dc_command(context: BaseComposeContext, command: str, args: t.List[str]) -> None:
     config = tutor_config.load(context.root)
     volumes, non_volume_args = bindmounts.parse_volumes(args)
     volume_args = []
@@ -297,6 +411,72 @@ def dc_command(context: BaseComposeContext, command: str, args: List[str]) -> No
             volume_arg = f"{host_bind_path}:{volume_arg}"
         volume_args += ["--volume", volume_arg]
     context.job_runner(config).docker_compose(command, *volume_args, *non_volume_args)
+
+
+def process_mount_arguments(mounts: t.Tuple[t.List[MountParam.MountType]]) -> None:
+    """
+    Process --mount arguments.
+
+    Most docker-compose commands support --mount arguments. This option
+    is used to bind-mount folders from the host. A docker-compose.tmp.yml is
+    generated at runtime and includes the bind-mounted volumes that were passed as CLI
+    arguments.
+
+    Bind-mounts that are associated to "*-job" services will be added to the
+    docker-compose jobs file.
+    """
+    app_mounts: t.List[MountParam.MountType] = []
+    job_mounts: t.List[MountParam.MountType] = []
+    for mount in mounts:
+        for service, host_path, container_path in mount:
+            if service.endswith("-job"):
+                job_mounts.append((service, host_path, container_path))
+            else:
+                app_mounts.append((service, host_path, container_path))
+
+    def _add_mounts(
+        docker_compose: t.Dict[str, t.Any], bind_mounts: t.List[MountParam.MountType]
+    ) -> t.Dict[str, t.Any]:
+        services = docker_compose.setdefault("services", {})
+        for service, host_path, container_path in bind_mounts:
+            fmt.echo_info(f"Bind-mount: {host_path} -> {container_path} in {service}")
+            services.setdefault(service, {"volumes": []})
+            services[service]["volumes"].append(f"{host_path}:{container_path}")
+        return docker_compose
+
+    # Save bind-mounts
+    @hooks.Filters.COMPOSE_LOCAL_TMP.add()
+    def _add_mounts_to_docker_compose_tmp(
+        docker_compose_tmp: t.Dict[str, t.Any]
+    ) -> t.Dict[str, t.Any]:
+        return _add_mounts(docker_compose_tmp, app_mounts)
+
+    @hooks.Filters.COMPOSE_LOCAL_JOBS_TMP.add()
+    def _add_mounts_to_docker_compose_jobs_tmp(
+        docker_compose_tmp: t.Dict[str, t.Any]
+    ) -> t.Dict[str, t.Any]:
+        return _add_mounts(docker_compose_tmp, job_mounts)
+
+
+@hooks.Filters.COMPOSE_MOUNTS.add()
+def _mount_edx_platform(
+    volumes: t.List[t.Tuple[str, str]], name: str
+) -> t.List[t.Tuple[str, str]]:
+    """
+    When mounting edx-platform with `--mount=/path/to/edx-platform`, bind-mount the host
+    repo in the lms/cms containers.
+    """
+    if name == "edx-platform":
+        path = "/openedx/edx-platform"
+        volumes += [
+            ("lms", path),
+            ("cms", path),
+            ("lms-worker", path),
+            ("cms-worker", path),
+            ("lms-job", path),
+            ("cms-job", path),
+        ]
+    return volumes
 
 
 def add_commands(command_group: click.Group) -> None:
