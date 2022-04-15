@@ -48,7 +48,7 @@ def _add_images_to_pull(
     return remote_images
 
 
-@hooks.Filters.IMAGES_PULL.add()
+@hooks.Filters.IMAGES_PUSH.add()
 def _add_core_images_to_push(
     remote_images: t.List[t.Tuple[str, str]], config: Config
 ) -> t.List[t.Tuple[str, str]]:
