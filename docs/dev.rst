@@ -107,8 +107,42 @@ Sharing directories with containers
 
 It may sometimes be convenient to mount container directories on the host, for instance: for editing and debugging. Tutor provides different solutions to this problem.
 
+.. _mount_option:
+
+Bind-mount volumes with ``--mount``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The `quickstart`, ``run``, ``runserver``, ``init`` and ``start`` subcommands of ``tutor dev`` and ``tutor local`` support the ``-m/--mount`` option (see :option:`tutor dev start -m`) which can take two different forms. The first is explicit::
+
+    tutor dev start --mount=lms:/path/to/edx-platform:/openedx/edx-platform lms
+
+And the second is implicit::
+
+    tutor dev start --mount=/path/to/edx-platform lms
+
+With the explicit form, the ``--mount`` option means "bind-mount the host folder /path/to/edx-platform to /openedx/edx-platform in the lms container".
+
+If you use the explicit format, you will quickly realise that you usually want to bind-mount folders in multiple containers at a time. For instance, you will want to bind-mount the edx-platform repository in the "cms" container. To do that, write instead::
+
+    tutor dev start --mount=lms,cms:/path/to/edx-platform:/openedx/edx-platform lms
+
+This command line can become cumbersome and inconvenient to work with. But Tutor can be smart about bind-mounting folders to the right containers in the right place when you use the implicit form of the ``--mount`` option. For instance, the following commands are equivalent::
+
+    # Explicit form
+    tutor dev start --mount=lms,lms-worker,lms-job,cms,cms-worker,cms-job:/path/to/edx-platform:/openedx/edx-platform lms
+    # Implicit form
+    tutor dev start --mount=/path/to/edx-platform lms
+
+So, when should you *not* be using the implicit form? That would be when Tutor does not know where to bind-mount your host folders. For instance, if you wanted to bind-mount your edx-platform virtual environment located in ``~/venvs/edx-platform``, you should not write ``--mount=~/venvs/edx-platform``, because that folder would be mounted in a way that would override the edx-platform repository in the container. Instead, you should write::
+
+    tutor dev start --mount=lms:~/venvs/edx-platform:/openedx/venv lms
+
+.. note:: Remember to setup your edx-platform repository for development! See :ref:`edx_platform_dev_env`.
+
 Bind-mount from the "volumes/" directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. warning:: Bind-mounting volumes with the ``bindmount`` command is no longer the default, recommended way of bind-mounting volumes from the host. Instead, see the :ref:`mount option <mount_option>`.
 
 Tutor makes it easy to create a bind-mount from an existing container. First, copy the contents of a container directory with the ``bindmount`` command. For instance, to copy the virtual environment of the "lms" container::
 
@@ -128,6 +162,8 @@ Notice how the ``--volume=/openedx/venv`` option differs from `Docker syntax <ht
 Manual bind-mount to any directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. warning:: Manually bind-mounting volumes with the ``--volume`` option makes it difficult to simultaneously bind-mount to multiple containers. Also, the ``--volume`` options are not compatible with ``start`` commands. For an alternative, see the :ref:`mount option <mount_option>`.
+
 The above solution may not work for you if you already have an existing directory, outside of the "volumes/" directory, which you would like mounted in one of your containers. For instance, you may want to mount your copy of the `edx-platform <https://github.com/openedx/edx-platform/>`__ repository. In such cases, you can simply use the ``-v/--volume`` `Docker option <https://docs.docker.com/storage/volumes/#choose-the--v-or---mount-flag>`__::
 
     tutor dev run --volume=/path/to/edx-platform:/openedx/edx-platform lms bash
@@ -135,7 +171,7 @@ The above solution may not work for you if you already have an existing director
 Override docker-compose volumes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The above solutions require that you explicitly pass the ``-v/--volume`` to every ``run`` or ``runserver`` command, which may be inconvenient. Also, these solutions are not compatible with the ``start`` command. To address these issues, you can create a ``docker-compose.override.yml`` file that will specify custom volumes to be used with all ``dev`` commands::
+The above solutions require that you explicitly pass the ``-m/--mount`` options to every ``run``, ``runserver``, ``start`` or ``init`` command, which may be inconvenient. To address these issues, you can create a ``docker-compose.override.yml`` file that will specify custom volumes to be used with all ``dev`` commands::
 
     vim "$(tutor config printroot)/env/dev/docker-compose.override.yml"
 
@@ -156,37 +192,31 @@ You are then free to bind-mount any directory to any container. For instance, to
         volumes:
           - /path/to/edx-platform:/openedx/edx-platform
 
-This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automatically mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-v/--volume`` option from the command line with the ``run`` or ``runserver`` commands.
+This override file will be loaded when running any ``tutor dev ..`` command. The edx-platform repo mounted at the specified path will be automatically mounted inside all LMS and CMS containers. With this file, you should no longer specify the ``-m/--mount`` option from the command line.
 
 .. note::
-    The ``tutor local`` commands load the ``docker-compose.override.yml`` file from the ``$(tutor config printroot)/env/local/docker-compose.override.yml`` directory.
+    The ``tutor local`` commands load the ``docker-compose.override.yml`` file from the ``$(tutor config printroot)/env/local/docker-compose.override.yml`` directory. One-time jobs from initialisation commands load the ``local/docker-compose.jobs.override.yml`` and ``dev/docker-compose.jobs.override.yml``.
 
 Common tasks
 ------------
 
+.. _edx_platform_dev_env:
+
 Setting up a development environment for edx-platform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Following the instructions :ref:`above <bind_mounts>` on how to bind-mount directories from the host above, you may mount your own `edx-platform <https://github.com/openedx/edx-platform/>`__ fork in your containers by running either::
+Following the instructions :ref:`above <bind_mounts>` on how to bind-mount directories from the host above, you may mount your own `edx-platform <https://github.com/openedx/edx-platform/>`__ fork in your containers by running::
 
-    # Mount from the volumes/ directory
-    tutor dev bindmount lms /openedx/edx-platform
-    tutor dev runserver --volume=/openedx/edx-platform lms
+    tutor dev start -d --mount=/path/to/edx-platform lms
 
-    # Mount from an arbitrary directory
-    tutor dev runserver --volume=/path/to/edx-platform:/openedx/edx-platform lms
+But to achieve that, you will have to make sure that your fork works with Tutor.
 
-    # Add your own volumes to $(tutor config printroot)/env/dev/docker-compose.override.yml
-    tutor dev runserver lms
-
-If you choose any but the first solution above, you will have to make sure that your fork works with Tutor.
-
-First of all, you should make sure that you are working off the ``open-release/maple.2`` tag. See the :ref:`fork edx-platform section <edx_platform_fork>` for more information.
+First of all, you should make sure that you are working off the latest release tag (unless you are running the Tutor :ref:`nightly <nightly>` branch). See the :ref:`fork edx-platform section <edx_platform_fork>` for more information.
 
 Then, you should run the following commands::
 
     # Run bash in the lms container
-    tutor dev run [--volume=...] lms bash
+    tutor dev run --mount=/path/to/edx-platform lms bash
 
     # Compile local python requirements
     pip install --requirement requirements/edx/development.txt
@@ -197,9 +227,9 @@ Then, you should run the following commands::
     # Rebuild static assets
     openedx-assets build --env=dev
 
-To debug a local edx-platform repository, add a ``import ipdb; ipdb.set_trace()`` breakpoint anywhere in your code and run::
+After running all these commands, your edx-platform repository will be ready for local development. To debug a local edx-platform repository, you can then add a ``import ipdb; ipdb.set_trace()`` breakpoint anywhere in your code and run::
 
-    tutor dev runserver [--volume=...] lms
+    tutor dev runserver --mount=/path/to/edx-platform lms
 
 XBlock and edx-platform plugin development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

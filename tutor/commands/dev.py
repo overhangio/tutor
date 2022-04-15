@@ -1,4 +1,4 @@
-from typing import List
+import typing as t
 
 import click
 
@@ -21,12 +21,14 @@ class DevJobRunner(compose.ComposeJobRunner):
         self.docker_compose_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.yml"),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.tmp.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.override.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.override.yml"),
         ]
         self.docker_compose_job_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.jobs.yml"),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.tmp.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.override.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.jobs.override.yml"),
         ]
@@ -99,21 +101,25 @@ Your Open edX platform is ready and can be accessed at the following urls:
     help="Run a development server",
     context_settings={"ignore_unknown_options": True},
 )
+@compose.mount_option
 @click.argument("options", nargs=-1, required=False)
 @click.argument("service")
 @click.pass_context
-def runserver(context: click.Context, options: List[str], service: str) -> None:
+def runserver(
+    context: click.Context,
+    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
+    options: t.List[str],
+    service: str,
+) -> None:
     config = tutor_config.load(context.obj.root)
     if service in ["lms", "cms"]:
         port = 8000 if service == "lms" else 8001
         host = config["LMS_HOST"] if service == "lms" else config["CMS_HOST"]
         fmt.echo_info(
-            "The {} service will be available at http://{}:{}".format(
-                service, host, port
-            )
+            f"The {service} service will be available at http://{host}:{port}"
         )
     args = ["--service-ports", *options, service]
-    context.invoke(compose.run, args=args)
+    context.invoke(compose.run, mounts=mounts, args=args)
 
 
 dev.add_command(quickstart)

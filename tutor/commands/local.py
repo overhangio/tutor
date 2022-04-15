@@ -1,4 +1,4 @@
-from typing import Optional
+import typing as t
 
 import click
 
@@ -22,10 +22,12 @@ class LocalJobRunner(compose.ComposeJobRunner):
         self.docker_compose_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.prod.yml"),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.tmp.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.override.yml"),
         ]
         self.docker_compose_job_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.tmp.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.override.yml"),
         ]
 
@@ -46,7 +48,12 @@ def local(context: click.Context) -> None:
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @click.pass_context
-def quickstart(context: click.Context, non_interactive: bool, pullimages: bool) -> None:
+def quickstart(
+    context: click.Context,
+    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
+    non_interactive: bool,
+    pullimages: bool,
+) -> None:
     try:
         utils.check_macos_docker_memory()
     except exceptions.TutorError as e:
@@ -113,9 +120,9 @@ Press enter when you are ready to continue"""
         click.echo(fmt.title("Docker image updates"))
         context.invoke(compose.dc_command, command="pull")
     click.echo(fmt.title("Starting the platform in detached mode"))
-    context.invoke(compose.start, detach=True)
+    context.invoke(compose.start, mounts=mounts, detach=True)
     click.echo(fmt.title("Database creation and migrations"))
-    context.invoke(compose.init)
+    context.invoke(compose.init, mounts=mounts)
 
     config = tutor_config.load(context.obj.root)
     fmt.echo_info(
@@ -142,7 +149,7 @@ Your Open edX platform is ready and can be accessed at the following urls:
     type=click.Choice(["ironwood", "juniper", "koa", "lilac"]),
 )
 @click.pass_context
-def upgrade(context: click.Context, from_release: Optional[str]) -> None:
+def upgrade(context: click.Context, from_release: t.Optional[str]) -> None:
     fmt.echo_alert(
         "This command only performs a partial upgrade of your Open edX platform. "
         "To perform a full upgrade, you should run `tutor local quickstart`."
