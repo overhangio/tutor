@@ -5,37 +5,61 @@ Open edX development
 
 In addition to running Open edX in production, Tutor can be used for local development of Open edX. This means that it is possible to hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
-The following commands assume you have previously launched a :ref:`local <local>` Open edX platform. If you have not done so already, you should run::
 
-    tutor local quickstart
+First-time setup
+----------------
 
-To run the platform in development mode, you **must** answer no ("n") to the question "Are you configuring a production platform".
+First, ensure you have already `installed Tutor <install.rst>`_ (for development against the named releases of Open edX) or `Tutor Nightly <nightly.rst>`_ (for development against Open edX's master branches).
 
-Note that the local.overhang.io `domain <https://dnschecker.org/#A/local.overhang.io>`__ and its `subdomains <https://dnschecker.org/#CNAME/studio.local.overhang.io>`__ all point to 127.0.0.1. This is just a domain name that was set up to conveniently access a locally running Open edX platform.
+Then, launch the developer platform setup process::
 
-Once the local platform has been configured, you should stop it so that it does not interfere with the development environment::
+    tutor dev quickstart
 
-    tutor local stop
+This will perform several tasks for you. It will:
 
-Finally, you should build the ``openedx-dev`` docker image::
+* stop any existing locally-running Tutor containers,
 
-    tutor dev dc build lms
+* disable HTTPS,
 
-This ``openedx-dev`` development image differs from the ``openedx`` production image:
+* set your ``LMS_HOST`` to `local.overhang.io <http://local.overhang.io>`_ (a convenience domain that simply `points at 127.0.0.1 <https://dnschecker.org/#A/local.overhang.io>`_),
 
-- The user that runs inside the container has the same UID as the user on the host, to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
-- Additional python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
-- The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/maple.master/requirements/edx/development.in>`__ are installed.
+* prompt for a platform details (with suitable defaults),
 
-Since the ``openedx-dev`` is based upon the ``openedx`` docker image, it should be re-built every time the ``openedx`` docker image is modified.
+* build an ``openedx-dev`` image, which is based ``openedx`` production image but is `specialized for developer usage`_,
 
-Run a local development webserver
----------------------------------
+* start LMS, CMS, supporting services, and any plugged-in services,
 
-::
+* ensure databases are created and migrated, and
 
-    tutor dev runserver lms # Access the lms at http://local.overhang.io:8000
-    tutor dev runserver cms # Access the cms at http://studio.local.overhang.io:8001
+* run service initialization scripts, such as service user creation and Waffle configuration.
+
+Once setup is complete, the platform will be running in the background:
+
+* LMS will be accessible at `http://local.overhang.io:8000 <http://local.overhang.io:8000>`_.
+* CMS will be accessible at `http://studio.local.overhang.io:8001 <http://studio.local.overhang.io:8001>`_.
+* Plugged-in services should be accessible at their documented URLs.
+
+
+Stopping the platform
+---------------------
+
+To bring down your platform's containers, simply run::
+
+  tutor dev stop
+
+
+Starting the platform back up
+-----------------------------
+
+Once you have used ``quickstart`` once, you can start the platform in the future with the lighter-weight ``start`` command, which brings up containers but does not perform any initialization tasks::
+
+  tutor dev start     # Run platform in the same terminal ("attached")
+  tutor dev start -d  # Or, run platform the in the background ("detached")
+
+Nonetheless, ``quickstart`` is idempotent, so it is always safe to run it again in the future without risk to your data. In fact, you may find it useful to use this command as a one-stop-shop for pulling images, running migrations, initializing new plugins you have enabled, and/or executing any new initialization steps that may have been introduced since you set up Tutor::
+
+  tutor dev quickstart --pullimages
+
 
 Running arbitrary commands
 --------------------------
@@ -55,6 +79,26 @@ You can then import edx-platform and django modules and execute python code.
 To collect assets, you can use the ``openedx-assets`` command that ships with Tutor::
 
     tutor dev run lms openedx-assets build --env=dev
+
+
+.. _specialized for developer usage: 
+
+Rebuilding the openedx-dev image
+--------------------------------
+
+The ``openedx-dev`` Docker image is based on the same ``openedx`` image used by ``tutor local ...`` to run LMS and CMS. However, it has a few differences to make it more convenient for developers:
+
+- The user that runs inside the container has the same UID as the user on the host, to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
+
+- Additional Python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
+
+- The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/maple.master/requirements/edx/development.in>`__ are installed.
+
+
+If you are using a custom ``openedx`` image, then you will need to rebuild ``openedx-dev`` every time you modify ``openedx``. To so, run::
+
+    tutor dev dc build lms
+
 
 .. _bind_mounts:
 
