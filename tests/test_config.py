@@ -47,7 +47,8 @@ class ConfigTests(unittest.TestCase):
         with temporary_root() as rootdir:
             with patch.object(click, "prompt", new=mock_prompt):
                 with patch.object(click, "confirm", new=mock_prompt):
-                    config = interactive.load_user_config(rootdir, interactive=True)
+                    config = tutor_config.load_minimal(rootdir)
+                    interactive.ask_questions(config)
 
         self.assertIn("MYSQL_ROOT_PASSWORD", config)
         self.assertEqual(8, len(get_typed(config, "MYSQL_ROOT_PASSWORD", str)))

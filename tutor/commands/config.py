@@ -48,7 +48,9 @@ def save(
     unset_vars: List[str],
     env_only: bool,
 ) -> None:
-    config = interactive_config.load_user_config(context.root, interactive=interactive)
+    config = tutor_config.load_minimal(context.root)
+    if interactive:
+        interactive_config.ask_questions(config)
     if set_vars:
         for key, value in dict(set_vars).items():
             config[key] = env.render_unknown(config, value)
