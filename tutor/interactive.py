@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import click
 
@@ -7,26 +7,26 @@ from . import env, exceptions, fmt
 from .types import Config, get_typed
 
 
-def load_user_config(root: str, interactive: bool = True) -> Config:
+def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
     """
-    Load configuration and interactively ask questions to collect param values from the user.
+    Interactively ask questions to collect configuration values from the user.
+
+    Arguments:
+        config: Existing (or minimal) configuration. Modified in-place.
+        run_for_prod: Whether platform should be configured for production.
+            If None, then ask the user.
     """
-    config = tutor_config.load_minimal(root)
-    if interactive:
-        ask_questions(config)
-    return config
-
-
-def ask_questions(config: Config) -> None:
     defaults = tutor_config.get_defaults()
-    run_for_prod = config.get("LMS_HOST") != "local.overhang.io"
-    run_for_prod = click.confirm(
-        fmt.question(
-            "Are you configuring a production platform? Type 'n' if you are just testing Tutor on your local computer"
-        ),
-        prompt_suffix=" ",
-        default=run_for_prod,
-    )
+    if run_for_prod is None:
+        run_for_prod = config.get("LMS_HOST") != "local.overhang.io"
+        run_for_prod = click.confirm(
+            fmt.question(
+                "Are you configuring a production platform? "
+                "Type 'n' if you are just testing Tutor on your local computer"
+            ),
+            prompt_suffix=" ",
+            default=run_for_prod,
+        )
     if not run_for_prod:
         dev_values: Config = {
             "LMS_HOST": "local.overhang.io",

@@ -91,9 +91,10 @@ To upgrade Open edX or benefit from the latest features and bug fixes, you shoul
 
     pip install --upgrade "tutor[full]"
 
-Then run the ``quickstart`` command again. Depending on your deployment target, run either::
+Then run the ``quickstart`` command again. Depending on your deployment target, run one of::
 
     tutor local quickstart # for local installations
+    tutor dev quickstart   # for local development installations
     tutor k8s quickstart   # for Kubernetes installation
 
 Upgrading with custom Docker images

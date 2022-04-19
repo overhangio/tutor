@@ -6,6 +6,7 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
+from tutor import interactive as interactive_config
 from tutor import exceptions, fmt, jobs, serialize, utils
 from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseJobContext
@@ -171,10 +172,12 @@ def quickstart(context: click.Context, non_interactive: bool) -> None:
         )
 
     click.echo(fmt.title("Interactive platform configuration"))
-    context.invoke(
-        config_save_command,
-        interactive=(not non_interactive),
-    )
+    config = tutor_config.load_minimal(context.obj.root)
+    if not non_interactive:
+        interactive_config.ask_questions(config, run_for_prod=True)
+    tutor_config.save_config_file(context.obj.root, config)
+    config = tutor_config.load_full(context.obj.root)
+    tutor_env.save(context.obj.root, config)
 
     if run_upgrade_from_release and not non_interactive:
         question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
