@@ -45,6 +45,7 @@ def local(context: click.Context) -> None:
 
 
 @click.command(help="Configure and run Open edX from scratch")
+@compose.mount_option
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @click.pass_context
