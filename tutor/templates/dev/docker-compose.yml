@@ -8,6 +8,8 @@ x-openedx-service:
     target: development
     args:
       APP_USER_ID: "{{ HOST_USER_ID }}"
+  stdin_open: true
+  tty: true
   volumes:
     # Settings & config
     - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro

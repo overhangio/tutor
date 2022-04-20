@@ -44,7 +44,7 @@ With Tutor, it's pretty easy to develop your own themes. Start by placing your f
 
 Then, run a local webserver::
 
-    tutor dev runserver lms
+    tutor dev start lms
 
 The LMS can then be accessed at http://local.overhang.io:8000. You will then have to :ref:`enable that theme <settheme>`::
 
