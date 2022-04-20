@@ -42,12 +42,12 @@ WORKDIR /openedx/edx-platform
 RUN git config --global user.email "tutor@overhang.io" \
   && git config --global user.name "Tutor"
 
-{% if patch("openedx-dockerfile-git-patches-default") %}
+{%- if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
-{% else %}
+{%- else %}
 # Patch edx-platform
-{% endif %}
+{%- endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
 {{ patch("openedx-dockerfile-post-git-checkout") }}

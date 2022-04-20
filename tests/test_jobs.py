@@ -16,16 +16,9 @@ class JobsTests(unittest.TestCase):
             config = tutor_config.load_full(root)
             runner = context.job_runner(config)
             jobs.initialise(runner)
-
             output = mock_stdout.getvalue().strip()
-            service = re.search(r"Service: (\w*)", output)
-            commands = re.search(r"(-----)([\S\s]+)(-----)", output)
-            assert service is not None
-            assert commands is not None
             self.assertTrue(output.startswith("Initialising all services..."))
             self.assertTrue(output.endswith("All services initialised."))
-            self.assertEqual(service.group(1), "mysql")
-            self.assertTrue(commands.group(2))
 
     def test_create_user_command_without_staff(self) -> None:
         command = jobs.create_user_command("superuser", False, "username", "email")

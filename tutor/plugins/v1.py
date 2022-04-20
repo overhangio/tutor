@@ -25,8 +25,9 @@ def _discover_entrypoint_plugins() -> None:
     Discover all plugins that declare a "tutor.plugin.v1" entrypoint.
     """
     with hooks.Contexts.PLUGINS.enter():
-        for entrypoint in pkg_resources.iter_entry_points("tutor.plugin.v1"):
-            discover_package(entrypoint)
+        if "TUTOR_IGNORE_ENTRYPOINT_PLUGINS" not in os.environ:
+            for entrypoint in pkg_resources.iter_entry_points("tutor.plugin.v1"):
+                discover_package(entrypoint)
 
 
 def discover_module(path: str) -> None:

@@ -36,7 +36,7 @@ chown -R {user_id} {volumes_path}/{volume_name}""".format(
         "--no-deps",
         "--user=0",
         "--volume",
-        "{}:{}".format(volumes_root_path, container_volumes_root_path),
+        f"{volumes_root_path}:{container_volumes_root_path}",
         service,
         "sh",
         "-e",

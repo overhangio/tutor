@@ -97,6 +97,55 @@ class Filters:
             return items
     """
 
+    #: List of commands to be executed during initialization. These commands typically
+    #: include database migrations, setting feature flags, etc.
+    #:
+    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks.
+    #:
+    #:     - ``service`` is the name of the container in which the task will be executed.
+    #:     - ``path`` is a tuple that corresponds to a template relative path.
+    #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see:py:data:`IMAGES_BUILD`).
+    #:       The command to execute will be read from that template, after it is rendered.
+    COMMANDS_INIT = filters.get("commands:init")
+
+    #: List of commands to be executed prior to initialization. These commands are run even
+    #: before the mysql databases are created and the migrations are applied.
+    #:
+    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks. (see :py:data:`COMMANDS_INIT`).
+    COMMANDS_PRE_INIT = filters.get("commands:pre-init")
+
+    #: List of folders to bind-mount in docker-compose containers, either in ``tutor local`` or ``tutor dev``.
+    #:
+    #: Many ``tutor local`` and ``tutor dev`` commands support ``--mounts`` options
+    #: that allow plugins to define custom behaviour at runtime. For instance
+    #: ``--mount=/path/to/edx-platform`` would cause this host folder to be
+    #: bind-mounted in different containers (lms, lms-worker, cms, cms-worker) at the
+    #: /openedx/edx-platform location. Plugin developers may implement this filter to
+    #: define custom behaviour when mounting folders that relate to their plugins. For
+    #: instance, the ecommerce plugin may process the ``--mount=/path/to/ecommerce``
+    #: option.
+    #:
+    #: :parameter list[tuple[str, str]] mounts: each item is a ``(service, path)``
+    #:   tuple, where ``service`` is the name of the docker-compose service and ``path`` is
+    #:   the location in the container where the folder should be bind-mounted. Note: the
+    #:   path must be slash-separated ("/"). Thus, do not use ``os.path.join`` to generate
+    #:   the ``path`` because it will fail on Windows.
+    #: :parameter str name: basename of the host-mounted folder. In the example above,
+    #:   this is "edx-platform". When implementing this filter you should check this name to
+    #:   conditionnally add mounts.
+    COMPOSE_MOUNTS = filters.get("compose:mounts")
+
+    #: Contents of the local/docker-compose.tmp.yml file that will be generated at
+    #: runtime. This is used for instance to bind-mount folders from the host (see
+    #: :py:data:`COMPOSE_MOUNTS`)
+    #:
+    #: :parameter dict[str, ...] docker_compose_tmp: values which will be serialized to local/docker-compose.tmp.yml.
+    #:   Keys and values will be rendered before saving, such that you may include ``{{ ... }}`` statements.
+    COMPOSE_LOCAL_TMP = filters.get("compose:local:tmp")
+
+    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for jobs
+    COMPOSE_LOCAL_JOBS_TMP = filters.get("compose:local-jobs:tmp")
+
     #: List of images to be built when we run ``tutor images build ...``.
     #:
     #: :parameter list[tuple[str, tuple[str, ...], str, tuple[str, ...]]] tasks: list of ``(name, path, tag, args)`` tuples.
@@ -124,23 +173,6 @@ class Filters:
     #: List of images to be pulled when we run ``tutor images push ...``.
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
     IMAGES_PUSH = filters.get("images:push")
-
-    #: List of commands to be executed during initialization. These commands typically
-    #: include database migrations, setting feature flags, etc.
-    #:
-    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks.
-    #:
-    #:     - ``service`` is the name of the container in which the task will be executed.
-    #:     - ``path`` is a tuple that corresponds to a template relative path.
-    #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see:py:data:`IMAGES_BUILD`).
-    #:       The command to execute will be read from that template, after it is rendered.
-    COMMANDS_INIT = filters.get("commands:init")
-
-    #: List of commands to be executed prior to initialization. These commands are run even
-    #: before the mysql databases are created and the migrations are applied.
-    #:
-    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks. (see :py:data:`COMMANDS_INIT`).
-    COMMANDS_PRE_INIT = filters.get("commands:pre-init")
 
     #: List of command line interface (CLI) commands.
     #:
@@ -208,6 +240,24 @@ class Filters:
     #:
     #: Note that Jinja2 filters are a completely different thing than the Tutor hook
     #: filters, although they share the same name.
+    #:
+    #: Out of the box, Tutor comes with the following filters:
+    #:
+    #: - ``common_domain``: Return the longest common name between two domain names. Example: ``{{ "studio.demo.myopenedx.com"|common_domain("lms.demo.myopenedx.com") }}`` is equal to "demo.myopenedx.com".
+    #: - ``encrypt``: Encrypt an arbitrary string. The encryption process is compatible with `htpasswd <https://httpd.apache.org/docs/2.4/programs/htpasswd.html>`__ verification.
+    #: - ``list_if``: In a list of ``(value, condition)`` tuples, return the list of ``value`` for which the ``condition`` is true.
+    #: - ``long_to_base64``: Base-64 encode a long integer.
+    #: - ``iter_values_named``: Yield the values of the configuration settings that match a certain pattern. Example: ``{% for value in iter_values_named(prefix="KEY", suffix="SUFFIX")%}...{% endfor %}``. By default, only non-empty values are yielded. To iterate also on empty values, pass the ``allow_empty=True`` argument.
+    #: - ``patch``: See :ref:`patches <v0_plugin_patches>`.
+    #: - ``random_string``: Return a random string of the given length composed of ASCII letters and digits. Example: ``{{ 8|random_string }}``.
+    #: - ``reverse_host``: Reverse a domain name (see `reference <https://en.wikipedia.org/wiki/Reverse_domain_name_notation>`__). Example: ``{{ "demo.myopenedx.com"|reverse_host }}`` is equal to "com.myopenedx.demo".
+    #: - ``rsa_import_key``: Import a PEM-formatted RSA key and return the corresponding object.
+    #: - ``rsa_private_key``: Export an RSA private key in PEM format.
+    #: - ``walk_templates``: Iterate recursively over the templates of the given folder. For instance::
+    #:
+    #:     {% for file in "apps/myplugin"|walk_templates %}
+    #:     ...
+    #:     {% endfor %}
     #:
     #: :parameter filters: list of (name, function) tuples. The function signature
     #:   should correspond to its usage in templates.

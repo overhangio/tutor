@@ -14,12 +14,13 @@ from tutor.commands.k8s import k8s
 from tutor.commands.local import local
 from tutor.commands.plugins import plugins_command
 
-# Everyone on board
-hooks.Actions.CORE_READY.do()
-
 
 def main() -> None:
     try:
+        # Everyone on board
+        # Note that this action should not be triggered in the module scope, because it
+        # makes it difficult for tests to rollback changes.
+        hooks.Actions.CORE_READY.do()
         cli()  # pylint: disable=no-value-for-parameter
     except KeyboardInterrupt:
         pass
