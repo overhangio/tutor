@@ -4,8 +4,9 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt, utils
+from tutor import exceptions, fmt
 from tutor import interactive as interactive_config
+from tutor import utils
 from tutor.commands import compose
 from tutor.commands.config import save as config_save_command
 from tutor.commands.upgrade.local import upgrade_from

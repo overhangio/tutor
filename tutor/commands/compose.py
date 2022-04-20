@@ -7,12 +7,10 @@ import click
 from tutor import bindmounts
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import fmt, jobs, utils
-from tutor import serialize
+from tutor import fmt, hooks, jobs, serialize, utils
+from tutor.commands.context import BaseJobContext
 from tutor.exceptions import TutorError
 from tutor.types import Config
-from tutor.commands.context import BaseJobContext
-from tutor import hooks
 
 
 class ComposeJobRunner(jobs.BaseComposeJobRunner):
@@ -326,20 +324,66 @@ def run(
     name="bindmount",
     help="Copy the contents of a container directory to a ready-to-bind-mount host directory",
 )
-@click.argument(
-    "service",
-)
+@click.argument("service")
 @click.argument("path")
 @click.pass_obj
 def bindmount_command(context: BaseComposeContext, service: str, path: str) -> None:
     """
     This command is made obsolete by the --mount arguments.
     """
+    fmt.echo_alert(
+        "The 'bindmount' command is deprecated and will be removed in a later release. Use 'copyfrom' instead."
+    )
     config = tutor_config.load(context.root)
     host_path = bindmounts.create(context.job_runner(config), service, path)
     fmt.echo_info(
         f"Bind-mount volume created at {host_path}. You can now use it in all `local` and `dev` "
         f"commands with the `--volume={path}` option."
+    )
+
+
+@click.command(
+    name="copyfrom",
+    help="Copy files/folders from a container directory to the local filesystem.",
+)
+@click.argument("service")
+@click.argument("container_path")
+@click.argument(
+    "host_path",
+    type=click.Path(dir_okay=True, file_okay=False, resolve_path=True),
+)
+@click.pass_obj
+def copyfrom(
+    context: BaseComposeContext, service: str, container_path: str, host_path: str
+) -> None:
+    # Path management
+    container_root_path = "/tmp/mount"
+    container_dst_path = container_root_path
+    if not os.path.exists(host_path):
+        # Emulate cp semantics, where if the destination path does not exist
+        # then we copy to its parent and rename to the destination folder
+        container_dst_path += "/" + os.path.basename(host_path)
+        host_path = os.path.dirname(host_path)
+    if not os.path.exists(host_path):
+        raise TutorError(
+            f"Cannot create directory {host_path}. No such file or directory."
+        )
+
+    # cp/mv commands
+    command = f"cp --recursive --preserve {container_path} {container_dst_path}"
+    config = tutor_config.load(context.root)
+    runner = context.job_runner(config)
+    runner.docker_compose(
+        "run",
+        "--rm",
+        "--no-deps",
+        "--user=0",
+        f"--volume={host_path}:{container_root_path}",
+        service,
+        "sh",
+        "-e",
+        "-c",
+        command,
     )
 
 
@@ -490,6 +534,7 @@ def add_commands(command_group: click.Group) -> None:
     command_group.add_command(settheme)
     command_group.add_command(dc_command)
     command_group.add_command(run)
+    command_group.add_command(copyfrom)
     command_group.add_command(bindmount_command)
     command_group.add_command(execute)
     command_group.add_command(logs)

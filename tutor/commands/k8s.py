@@ -6,8 +6,9 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
+from tutor import exceptions, fmt
 from tutor import interactive as interactive_config
-from tutor import exceptions, fmt, jobs, serialize, utils
+from tutor import jobs, serialize, utils
 from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseJobContext
 from tutor.commands.upgrade.k8s import upgrade_from

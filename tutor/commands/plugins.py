@@ -1,6 +1,6 @@
 import os
-import urllib.request
 import typing as t
+import urllib.request
 
 import click
 
