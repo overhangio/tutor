@@ -260,6 +260,22 @@ Run this initialisation task with::
     ++++++ done!
     All services initialised.
 
+Tailoring services for development
+----------------------------------
+
+When you add services via :patch:`local-docker-compose-services`, those services will be available both in local production mode (``tutor local start``) and local development mode (``tutor dev start``). Sometimes, you may wish to further customize a service in ways that would not be suitable for production, but could be helpful for developers. To add in such customizations, implement the :patch:`local-docker-compose-dev-services` patch. For example, we can enable breakpoint debugging on the "myservice" development container by enabling the ``stdin_open`` and ``tty`` options::
+
+    hooks.Filters.ENV_PATCHES.add_item(
+        (
+            "local-docker-compose-dev-services",
+            """
+    myservice:
+        stdin_open: true
+        tty: true
+    """,
+        )
+    )
+
 Final result
 ------------
 
@@ -308,6 +324,16 @@ Eventually, our plugin is composed of the following files, all stored within the
             """
     myservice-job:
         image: myservice:latest
+    """,
+        )
+    )
+    hooks.Filters.ENV_PATCHES.add_item(
+        (
+            "local-docker-compose-dev-services",
+            """
+    myservice:
+        stdin_open: true
+        tty: true
     """,
         )
     )

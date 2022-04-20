@@ -98,7 +98,7 @@ Your Open edX platform is ready and can be accessed at the following urls:
 
 
 @click.command(
-    help="Run a development server",
+    help="DEPRECATED: Use 'tutor dev start ...' instead!",
     context_settings={"ignore_unknown_options": True},
 )
 @compose.mount_option
@@ -111,6 +111,11 @@ def runserver(
     options: t.List[str],
     service: str,
 ) -> None:
+    depr_warning = "'runserver' is deprecated and will be removed in a future release. Use 'start' instead."
+    for option in options:
+        if option.startswith("-v") or option.startswith("--volume"):
+            depr_warning += " Bind-mounts can be specified using '-m/--mount'."
+    fmt.echo_alert(depr_warning)
     config = tutor_config.load(context.obj.root)
     if service in ["lms", "cms"]:
         port = 8000 if service == "lms" else 8001
