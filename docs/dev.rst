@@ -139,10 +139,23 @@ So, when should you *not* be using the implicit form? That would be when Tutor d
 
 .. note:: Remember to setup your edx-platform repository for development! See :ref:`edx_platform_dev_env`.
 
+Copy files from containers to the local filesystem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes, you may want to modify some of the files inside a container for which you don't have a copy on the host. A typical example is when you want to troubleshoot a Python dependency that is installed inside the application virtual environment. In such cases, you want to first copy the contents of the virtual environment from the container to the local filesystem. To that end, Tutor provides the ``tutor dev copyfrom`` command. First, copy the contents of the container folder to the local filesystem::
+
+    tutor dev copyfrom lms /openedx/venv ~
+
+Then, bind-mount that folder back in the container with the ``--mount`` option (described :ref:`above <mount_option>`)::
+
+    tutor dev start --mount lms:~/venv:/openedx/venv lms
+
+You can then edit the files in ``~/venv`` on your local filesystem and see the changes live in your container.
+
 Bind-mount from the "volumes/" directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. warning:: Bind-mounting volumes with the ``bindmount`` command is no longer the default, recommended way of bind-mounting volumes from the host. Instead, see the :ref:`mount option <mount_option>`.
+.. warning:: Bind-mounting volumes with the ``bindmount`` command is no longer the default, recommended way of bind-mounting volumes from the host. Instead, see the :ref:`mount option <mount_option>` and the ``tutor dev/local copyfrom`` commands.
 
 Tutor makes it easy to create a bind-mount from an existing container. First, copy the contents of a container directory with the ``bindmount`` command. For instance, to copy the virtual environment of the "lms" container::
 
@@ -230,6 +243,7 @@ After running all these commands, your edx-platform repository will be ready for
     tutor dev start --mount=/path/to/edx-platform lms
 
 If LMS isn't running, this will start it in your terminal. If an LMS container is already running background, this command will stop it, recreate it, and attach your terminal to it. Later, to detach your terminal without stopping the container, just hit ``Ctrl+z``.
+
 
 XBlock and edx-platform plugin development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
