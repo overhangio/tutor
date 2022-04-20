@@ -241,6 +241,24 @@ class Filters:
     #: Note that Jinja2 filters are a completely different thing than the Tutor hook
     #: filters, although they share the same name.
     #:
+    #: Out of the box, Tutor comes with the following filters:
+    #:
+    #: - ``common_domain``: Return the longest common name between two domain names. Example: ``{{ "studio.demo.myopenedx.com"|common_domain("lms.demo.myopenedx.com") }}`` is equal to "demo.myopenedx.com".
+    #: - ``encrypt``: Encrypt an arbitrary string. The encryption process is compatible with `htpasswd <https://httpd.apache.org/docs/2.4/programs/htpasswd.html>`__ verification.
+    #: - ``list_if``: In a list of ``(value, condition)`` tuples, return the list of ``value`` for which the ``condition`` is true.
+    #: - ``long_to_base64``: Base-64 encode a long integer.
+    #: - ``iter_values_named``: Yield the values of the configuration settings that match a certain pattern. Example: ``{% for value in iter_values_named(prefix="KEY", suffix="SUFFIX")%}...{% endfor %}``. By default, only non-empty values are yielded. To iterate also on empty values, pass the ``allow_empty=True`` argument.
+    #: - ``patch``: See :ref:`patches <v0_plugin_patches>`.
+    #: - ``random_string``: Return a random string of the given length composed of ASCII letters and digits. Example: ``{{ 8|random_string }}``.
+    #: - ``reverse_host``: Reverse a domain name (see `reference <https://en.wikipedia.org/wiki/Reverse_domain_name_notation>`__). Example: ``{{ "demo.myopenedx.com"|reverse_host }}`` is equal to "com.myopenedx.demo".
+    #: - ``rsa_import_key``: Import a PEM-formatted RSA key and return the corresponding object.
+    #: - ``rsa_private_key``: Export an RSA private key in PEM format.
+    #: - ``walk_templates``: Iterate recursively over the templates of the given folder. For instance::
+    #:
+    #:     {% for file in "apps/myplugin"|walk_templates %}
+    #:     ...
+    #:     {% endfor %}
+    #:
     #: :parameter filters: list of (name, function) tuples. The function signature
     #:   should correspond to its usage in templates.
     ENV_TEMPLATE_FILTERS = filters.get("env:templates:filters")
