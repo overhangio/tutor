@@ -42,10 +42,10 @@ WORKDIR /openedx/edx-platform
 RUN git config --global user.email "tutor@overhang.io" \
   && git config --global user.name "Tutor"
 
-{% if patch("openedx-dockerfile-git-patches-default") %}
+{%- if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
-{% else %}
+{%- else %}
 # Patch edx-platform
 # Fix forum notification for questions
 # https://github.com/openedx/edx-platform/pull/29611
@@ -53,7 +53,10 @@ RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 03731f19459e
 # SAML security fix
 # https://github.com/overhangio/edx-platform/tree/overhangio/sec-fix-saml-vulnerability
 RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 3b985f207853e88090d68a81acd52866b71f5af7 && git cherry-pick 3b985f207853e88090d68a81acd52866b71f5af7
-{% endif %}
+# Rate limiting security fix
+# https://github.com/overhangio/edx-platform/tree/overhangio/sec-rate-limiting
+RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b5723e416e628cac4fa84392ca13e1b72817674f && git cherry-pick b5723e416e628cac4fa84392ca13e1b72817674f
+{%- endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
 {{ patch("openedx-dockerfile-post-git-checkout") }}
