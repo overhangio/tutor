@@ -112,7 +112,7 @@ It may sometimes be convenient to mount container directories on the host, for i
 Bind-mount volumes with ``--mount``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `quickstart`, ``run``, ``runserver``, ``init`` and ``start`` subcommands of ``tutor dev`` and ``tutor local`` support the ``-m/--mount`` option (see :option:`tutor dev start -m`) which can take two different forms. The first is explicit::
+The ``quickstart``, ``run``, ``init`` and ``start`` subcommands of ``tutor dev`` and ``tutor local`` support the ``-m/--mount`` option (see :option:`tutor dev start -m`) which can take two different forms. The first is explicit::
 
     tutor dev start --mount=lms:/path/to/edx-platform:/openedx/edx-platform lms
 
@@ -150,14 +150,12 @@ Tutor makes it easy to create a bind-mount from an existing container. First, co
 
 This command recursively copies the contents of the ``/opendedx/venv`` directory to ``$(tutor config printroot)/volumes/venv``. The code of any Python dependency can then be edited -- for instance, you can then add a ``import ipdb; ipdb.set_trace()`` statement for step-by-step debugging, or implement a custom feature.
 
-Then, bind-mount the directory back in the container with the ``--volume`` option::
+Then, bind-mount the directory back in the container with the ``--mount`` option::
 
-		tutor dev runserver --volume=/openedx/venv lms
-
-Notice how the ``--volume=/openedx/venv`` option differs from `Docker syntax <https://docs.docker.com/storage/volumes/#choose-the--v-or---mount-flag>`__? Tutor recognizes this syntax and automatically converts this option to ``--volume=/path/to/tutor/root/volumes/venv:/openedx/venv``, which is recognized by Docker.
+		tutor dev start --mount=lms:$(tutor config printroot)/volumes/venv:/openedx/venv lms
 
 .. note::
-    The ``bindmount`` command and the ``--volume=/...`` option syntax are available both for the ``tutor local`` and ``tutor dev`` commands.
+    The ``bindmount`` command and the ``--mount=...`` option syntax are available both for the ``tutor local`` and ``tutor dev`` commands.
 
 Manual bind-mount to any directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -171,7 +169,7 @@ The above solution may not work for you if you already have an existing director
 Override docker-compose volumes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The above solutions require that you explicitly pass the ``-m/--mount`` options to every ``run``, ``runserver``, ``start`` or ``init`` command, which may be inconvenient. To address these issues, you can create a ``docker-compose.override.yml`` file that will specify custom volumes to be used with all ``dev`` commands::
+The above solutions require that you explicitly pass the ``-m/--mount`` options to every ``run``, ``start`` or ``init`` command, which may be inconvenient. To address these issues, you can create a ``docker-compose.override.yml`` file that will specify custom volumes to be used with all ``dev`` commands::
 
     vim "$(tutor config printroot)/env/dev/docker-compose.override.yml"
 
@@ -229,7 +227,9 @@ Then, you should run the following commands::
 
 After running all these commands, your edx-platform repository will be ready for local development. To debug a local edx-platform repository, you can then add a ``import ipdb; ipdb.set_trace()`` breakpoint anywhere in your code and run::
 
-    tutor dev runserver --mount=/path/to/edx-platform lms
+    tutor dev start --mount=/path/to/edx-platform lms
+
+If LMS isn't running, this will start it in your terminal. If an LMS container is already running background, this command will stop it, recreate it, and attach your terminal to it. Later, to detach your terminal without stopping the container, just hit ``Ctrl+z``.
 
 XBlock and edx-platform plugin development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -250,7 +250,7 @@ You will have to re-build the openedx Docker image once::
 
     tutor images build openedx
 
-You should then run the development server as usual, with ``runserver``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
+You should then run the development server as usual, with ``start``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
 
 Running edx-platform unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

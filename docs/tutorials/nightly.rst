@@ -22,10 +22,9 @@ In addition to installing Tutor Nightly itself, this will install automatically 
 
 Once Tutor Nightly is installed, you can run the usual ``tutor`` commands::
 
-    tutor local quickstart
-    tutor local stop
-    tutor dev runserver lms
-    # ...
+    tutor dev quickstart
+    tutor dev run lms bash
+    # ... and so on
 
 Upgrading to the latest version of Open edX
 -------------------------------------------
