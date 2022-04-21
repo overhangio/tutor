@@ -81,7 +81,7 @@ To collect assets, you can use the ``openedx-assets`` command that ships with Tu
     tutor dev run lms openedx-assets build --env=dev
 
 
-.. _specialized for developer usage: 
+.. _specialized for developer usage:
 
 Rebuilding the openedx-dev image
 --------------------------------
@@ -255,26 +255,30 @@ You should then run the development server as usual, with ``start``. Every chang
 Running edx-platform unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/openedx/edx-platform/>`__. To do so, run a shell in the LMS development container::
+It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/openedx/edx-platform/>`__. Some tests are intended to be run in an LMS context, some are intended for the CMS context, and some can be run in both. To run tests for the LMS, start a shell in the LMS container::
 
     tutor dev run lms bash
 
-Then, run unit tests with ``pytest`` commands::
+Then, simply `invoke pytest <https://docs.pytest.org/en/latest/how-to/usage.html>`_. For example::
 
-    # Run tests on common apps
-    unset DJANGO_SETTINGS_MODULE
-    unset SERVICE_VARIANT
-    export EDXAPP_TEST_MONGO_HOST=mongodb
-    pytest common
-    pytest openedx
+    pytest lms                                              # Run tests for the entire LMS source tree.
+    pytest lms/djangoapps/ccx                               # Run tests in a single LMS app.
+    pytest lms/djangoapps/ccx -k '_override or _structure'  # Run tests in a single LMS app with names matching substring(s).
+    pytest openedx common                                   # Run tests for both shared source trees.
+    pytest openedx/core/djangoapps/content/course_overviews # Run tests for a single shared app.
+    # ... etc.
 
-    # Run tests on LMS
-    export DJANGO_SETTINGS_MODULE=lms.envs.tutor.test
-    pytest lms
+To run CMS tests, start a shell in the CMS container::
 
-    # Run tests on CMS
-    export DJANGO_SETTINGS_MODULE=cms.envs.tutor.test
-    pytest cms
+    tutor dev run cms bash
+
+As before, simply invoke pytest. Tests under the cms/ source tree will automatically use CMS settings. For tests under the shared source trees, you will need to tell pytest to look in the cms/ directory for configuration by providing ``--rootdir`` option::
+
+    pytest cms                                                            # Run tests for the entire CMS source tree.
+    pytest cms/djangoapps/coursegraph                                     # Run tests in a single CMS app.
+    pytest --rootdir=cms openedx common                                   # Run tests for both shared source trees.
+    pytest --rootdir=cms openedx/core/djangoapps/content/course_overviews # Run tests for a single shared app.
+    # ... etc.
 
 .. note::
     Getting all edx-platform unit tests to pass on Tutor is currently a work-in-progress. Some unit tests are still failing. If you manage to fix some of these, please report your findings in the `Tutor forums <https://discuss.overhang.io>`__.
