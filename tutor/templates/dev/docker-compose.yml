@@ -32,6 +32,7 @@ services:
     command: ./manage.py lms runserver 0.0.0.0:8000
     environment:
         DJANGO_SETTINGS_MODULE: lms.envs.tutor.development
+        EDXAPP_TEST_MONGO_HOST: mongodb
     ports:
         - "8000:8000"
     networks:
@@ -44,6 +45,7 @@ services:
     command: ./manage.py cms runserver 0.0.0.0:8000
     environment:
         DJANGO_SETTINGS_MODULE: lms.envs.tutor.development
+        EDXAPP_TEST_MONGO_HOST: mongodb
     ports:
         - "8001:8000"
 
