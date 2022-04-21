@@ -25,6 +25,13 @@ class Actions:
             # Do stuff here
     """
 
+    #: Triggered whenever a "docker-compose start", "up" or "restart" command is executed.
+    #:
+    #: :parameter: str root: project root.
+    #: :parameter: dict[str, ...] config: project configuration.
+    #: :parameter: str name: docker-compose project name.
+    COMPOSE_PROJECT_STARTED = actions.get("compose:project:started")
+
     #: Called whenever the core project is ready to run. This action is called as soon
     #: as possible. This is the right time to discover plugins, for instance. In
     #: particular, we auto-discover the following plugins:

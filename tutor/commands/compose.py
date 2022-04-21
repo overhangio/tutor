@@ -24,6 +24,12 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
         """
         Run docker-compose with the right yml files.
         """
+        if "start" in command or "up" in command or "restart" in command:
+            # Note that we don't trigger the action on "run". That's because we
+            # don't want to trigger the action for every initialization script.
+            hooks.Actions.COMPOSE_PROJECT_STARTED.do(
+                self.root, self.config, self.project_name
+            )
         self.__update_docker_compose_tmp()
         args = []
         for docker_compose_path in self.docker_compose_files:
