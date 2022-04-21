@@ -2,13 +2,13 @@ import typing as t
 
 import click
 
-from .. import config as tutor_config
-from .. import env as tutor_env
-from .. import exceptions, fmt
-from .. import interactive as interactive_config
-from .. import utils
-from ..types import Config, get_typed
-from . import compose
+from tutor import config as tutor_config
+from tutor import env as tutor_env
+from tutor import exceptions, fmt, hooks
+from tutor import interactive as interactive_config
+from tutor import utils
+from tutor.commands import compose
+from tutor.types import Config, get_typed
 
 
 class DevJobRunner(compose.ComposeJobRunner):
@@ -126,6 +126,17 @@ def runserver(
         )
     args = ["--service-ports", *options, service]
     context.invoke(compose.run, mounts=mounts, args=args)
+
+
+@hooks.Actions.COMPOSE_PROJECT_STARTED.add()
+def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
+    """
+    Stop the dev platform as soon as a platform with a different project name is
+    started.
+    """
+    runner = DevJobRunner(root, config)
+    if project_name != runner.project_name:
+        runner.docker_compose("stop")
 
 
 dev.add_command(quickstart)
