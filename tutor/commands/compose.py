@@ -102,7 +102,7 @@ class MountParam(click.ParamType):
     MountType = t.Tuple[str, str, str]
     # Note that this syntax does not allow us to include colon ':' characters in paths
     PARAM_REGEXP = (
-        r"(?P<services>[a-zA-Z0-9_, ]+):(?P<host_path>[^:]+):(?P<container_path>[^:]+)"
+        r"(?P<services>[a-zA-Z0-9-_, ]+):(?P<host_path>[^:]+):(?P<container_path>[^:]+)"
     )
 
     def convert(
