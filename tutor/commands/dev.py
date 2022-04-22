@@ -115,6 +115,7 @@ def runserver(
     for option in options:
         if option.startswith("-v") or option.startswith("--volume"):
             depr_warning += " Bind-mounts can be specified using '-m/--mount'."
+            break
     fmt.echo_alert(depr_warning)
     config = tutor_config.load(context.obj.root)
     if service in ["lms", "cms"]:

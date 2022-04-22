@@ -26,5 +26,12 @@ class ComposeTests(unittest.TestCase):
             ],
             param("lms, cms:/path/to/edx-platform:/openedx/edx-platform"),
         )
+        self.assertEqual(
+            [
+                ("lms", "/path/to/edx-platform", "/openedx/edx-platform"),
+                ("lms-worker", "/path/to/edx-platform", "/openedx/edx-platform"),
+            ],
+            param("lms,lms-worker:/path/to/edx-platform:/openedx/edx-platform"),
+        )
         with self.assertRaises(ClickException):
             param("lms,:/path/to/edx-platform:/openedx/edx-platform")
