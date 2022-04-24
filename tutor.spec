@@ -9,20 +9,21 @@ datas = [("./tutor/templates", "./tutor/templates")]
 hidden_imports = []
 
 # Auto-discover plugins and include patches & templates folders
-for entrypoint in pkg_resources.iter_entry_points("tutor.plugin.v0"):
-    plugin_name = entrypoint.name
-    try:
-        plugin = entrypoint.load()
-    except Exception as e:
-        print(f"ERROR Failed to load plugin {plugin_name}: {e}")
-        continue
-    plugin_root = os.path.dirname(plugin.__file__)
-    plugin_root_module_name = os.path.basename(plugin_root)
-    hidden_imports.append(entrypoint.module_name)
-    for folder in ["patches", "templates"]:
-        path = os.path.join(plugin_root, folder)
-        if os.path.exists(path):
-            datas.append((path, os.path.join(plugin_root_module_name, folder)))
+for entrypoint_version in ["tutor.plugin.v0", "tutor.plugin.v1"]:
+    for entrypoint in pkg_resources.iter_entry_points(entrypoint_version):
+        plugin_name = entrypoint.name
+        try:
+            plugin = entrypoint.load()
+        except Exception as e:
+            print(f"ERROR Failed to load plugin {plugin_name}: {e}")
+            continue
+        plugin_root = os.path.dirname(plugin.__file__)
+        plugin_root_module_name = os.path.basename(plugin_root)
+        hidden_imports.append(entrypoint.module_name)
+        for folder in ["patches", "templates"]:
+            path = os.path.join(plugin_root, folder)
+            if os.path.exists(path):
+                datas.append((path, os.path.join(plugin_root_module_name, folder)))
 # Fix license import: if we don't declare some modules, pyinstaller does not find them
 hidden_imports.append("tutorlts.__about__")
 hidden_imports.append("Crypto.Cipher.AES")
