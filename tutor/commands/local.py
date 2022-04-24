@@ -4,8 +4,9 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt, utils
+from tutor import exceptions, fmt, hooks
 from tutor import interactive as interactive_config
+from tutor import utils
 from tutor.commands import compose
 from tutor.commands.config import save as config_save_command
 from tutor.commands.upgrade.local import upgrade_from
@@ -163,6 +164,17 @@ def upgrade(context: click.Context, from_release: t.Optional[str]) -> None:
         upgrade_from(context, from_release)
     # We update the environment to update the version
     context.invoke(config_save_command)
+
+
+@hooks.Actions.COMPOSE_PROJECT_STARTED.add()
+def _stop_on_dev_start(root: str, config: Config, project_name: str) -> None:
+    """
+    Stop the local platform as soon as a platform with a different project name is
+    started.
+    """
+    runner = LocalJobRunner(root, config)
+    if project_name != runner.project_name:
+        runner.docker_compose("stop")
 
 
 local.add_command(quickstart)

@@ -1,6 +1,7 @@
 import unittest
 
 from click.exceptions import ClickException
+
 from tutor.commands import compose
 
 

@@ -52,7 +52,6 @@ From this point on, use Tutor as normal. For example, start Open edX and run mig
 
 Or for a development environment::
 
-    tutor local stop
     tutor dev start -d
     tutor dev init
 
