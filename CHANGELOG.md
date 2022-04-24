@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+## v13.2.0 (2022-04-24)
+
 - [Improvement] Add the `COMPOSE_PROJECT_STARTED` action and run `dev stop` on `local start` (and vice versa).
 - [Feature] Introduce `local/dev copyfrom` command to copy contents from a container.
 - [Bugfix] Fix a race condition that could prevent a newly provisioned LMS container from starting due to a `FileExistsError` when creating data folders.
