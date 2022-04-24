@@ -38,11 +38,11 @@ class LocalTests(unittest.TestCase, TestCommandMixin):
                     self.assertEqual(0, result.exit_code)
                     self.assertIn(
                         f"--volume={directory}:/tmp/mount",
-                        mock_docker_compose.call_args.args,
+                        mock_docker_compose.call_args[0],
                     )
                     self.assertIn(
                         "cp --recursive --preserve /openedx/venv /tmp/mount",
-                        mock_docker_compose.call_args.args,
+                        mock_docker_compose.call_args[0],
                     )
 
                     # Copy to non-existing directory
@@ -60,9 +60,9 @@ class LocalTests(unittest.TestCase, TestCommandMixin):
                     self.assertEqual(0, result.exit_code)
                     self.assertIn(
                         f"--volume={directory}:/tmp/mount",
-                        mock_docker_compose.call_args.args,
+                        mock_docker_compose.call_args[0],
                     )
                     self.assertIn(
                         "cp --recursive --preserve /openedx/venv /tmp/mount/venv2",
-                        mock_docker_compose.call_args.args,
+                        mock_docker_compose.call_args[0],
                     )
