@@ -43,7 +43,7 @@ services:
     <<: *openedx-service
     command: ./manage.py cms runserver 0.0.0.0:8000
     environment:
-        DJANGO_SETTINGS_MODULE: lms.envs.tutor.development
+        DJANGO_SETTINGS_MODULE: cms.envs.tutor.development
     ports:
         - "8001:8000"
 
