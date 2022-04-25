@@ -4,6 +4,8 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Fix] CMS settings in development.
+
 ## v13.2.0 (2022-04-24)
 
 - [Improvement] Add the `COMPOSE_PROJECT_STARTED` action and run `dev stop` on `local start` (and vice versa).
