@@ -19,6 +19,7 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
         self.project_name = ""
         self.docker_compose_files: t.List[str] = []
         self.docker_compose_job_files: t.List[str] = []
+        self.docker_compose_tmp_path = ""
 
     def docker_compose(self, *command: str) -> int:
         """

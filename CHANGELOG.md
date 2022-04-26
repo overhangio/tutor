@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Fix] "The Compose file is invalid" error on mounting dev-only folders.
 - [Fix] CMS settings in development.
 
 ## v13.2.0 (2022-04-24)
