@@ -56,6 +56,9 @@ RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 3b985f207853
 # Rate limiting security fix
 # https://github.com/overhangio/edx-platform/tree/overhangio/sec-rate-limiting
 RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b5723e416e628cac4fa84392ca13e1b72817674f && git cherry-pick b5723e416e628cac4fa84392ca13e1b72817674f
+# Fix studio-frontend by pinning the installed version
+# https://github.com/openedx/edx-platform/pull/30309
+RUN git fetch --depth=2 https://github.com/uetuluk/edx-platform/ 53ea60eee86e094f35815ac1c4114d6811f4d458 && git cherry-pick 53ea60eee86e094f35815ac1c4114d6811f4d458
 {%- endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
