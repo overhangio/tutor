@@ -4,6 +4,7 @@ Note: Breaking changes between versions are indicated by "💥".
 
 ## Unreleased
 
+- [Fix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (thanks @uetuluk!).
 - [Fix] "The Compose file is invalid" error on mounting dev-only folders.
 - [Fix] CMS settings in development.
 
