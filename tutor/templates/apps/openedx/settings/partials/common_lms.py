@@ -26,6 +26,9 @@ for folder in [DATA_DIR, LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
 
+# Resolve the certificate issue on Learning MFE
+FEATURES["PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS"] = True
+
 {{ patch("openedx-lms-common-settings") }}
 
 ######## End of common LMS settings
