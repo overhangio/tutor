@@ -1,27 +1,41 @@
 # Changelog
 
-Note: Breaking changes between versions are indicated by "💥".
+<!--
+Every user-facing change should have an entry in this changelog. Please respect the following instructions:
+- Add your changes right below the "Unreleased" section title. If there are other unreleased changes,
+  add your own on top of them, as the first line in that section.
+- Indicate breaking changes by prepending an explosion 💥 character.
+- You may optionally append "(by <author>)" at the end of the line, where "<author>" is either one (just one)
+  of your GitHub username, real name or affiliated organization. These affiliations will be displayed in
+  he release notes for every release.
+- If you need to create a new release, create a separate commit just for that. It is important to respect these
+  instructions, because git commits are used to generate release notes:
+    - Add a "## vX.Y.Z (year-month-day)" line just below "## Unreleased", such that the new changes are now listed as part of release.
+    - The title of the commit should be the same as the section title: "vX.Y.Z (year-month-day)".
+    - The commit message should be copy-pasted from the release section.
+    - Have a look at other release commits for reference.
+-->
 
 ## Unreleased
 
 - [Fix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (thanks @uetuluk!).
 - [Fix] "The Compose file is invalid" error on mounting dev-only folders.
-- [Fix] CMS settings in development.
+- [Fix] CMS settings in development. (by @regisb)
 
 ## v13.2.0 (2022-04-24)
 
-- [Improvement] Add the `COMPOSE_PROJECT_STARTED` action and run `dev stop` on `local start` (and vice versa).
-- [Feature] Introduce `local/dev copyfrom` command to copy contents from a container.
+- [Improvement] Add the `COMPOSE_PROJECT_STARTED` action and run `dev stop` on `local start` (and vice versa). (by @regisb)
+- [Feature] Introduce `local/dev copyfrom` command to copy contents from a container. (by @regisb)
 - [Bugfix] Fix a race condition that could prevent a newly provisioned LMS container from starting due to a `FileExistsError` when creating data folders.
 - [Deprecation] Mark `tutor dev runserver` as deprecated in favor of `tutor dev start`. Since `start` now supports bind-mounting and breakpoint debugging, `runserver` is redundant and will be removed in a future release.
 - [Improvement] Allow breakpoint debugging when attached to a service via `tutor dev start SERVICE`.
-- [Security] Apply rate limiting security fix (see [commit](https://github.com/overhangio/edx-platform/commit/b5723e416e628cac4fa84392ca13e1b72817674f)).
-- [Feature] Introduce the ``-m/--mount`` option in ``local`` and ``dev`` commands to auto-magically bind-mount folders from the host.
+- [Security] Apply rate limiting security fix (see [commit](https://github.com/overhangio/edx-platform/commit/b5723e416e628cac4fa84392ca13e1b72817674f)). (by @regisb)
+- [Feature] Introduce the ``-m/--mount`` option in ``local`` and ``dev`` commands to auto-magically bind-mount folders from the host. (by @regisb)
 - [Feature] Add `tutor dev quickstart` command, which is similar to `tutor local quickstart`, except that it uses dev containers instead of local production ones and includes some other small differences for the convience of Open edX developers. This should remove some friction from the Open edX development setup process, which previously required that users provision using local producation containers (`tutor local quickstart`) but then stop them and switch to dev containers (`tutor local stop && tutor dev start -d`).
-- 💥[Improvement] Make it possible to run `tutor k8s exec <command with multiple arguments>` (#636). As a consequence, it is no longer possible to run quoted commands: `tutor k8s exec "<some command>"`. Instead, you should remove the quotes: `tutor k8s exec <some command>`.
-- 💥[Deprecation] Drop support for the `TUTOR_EDX_PLATFORM_SETTINGS` environment variable. It is now recommended to create a plugin instead.
-- 💥[Improvement] Complete overhaul of the plugin extension mechanism. Tutor now has a hook-based Python API: actions can be triggered at different points of the application life cycle and data can be modified thanks to custom filters. The v0 plugin API is still supported, for backward compatibility, but plugin developers are encouraged to migrate their plugins to the new API. See the new plugin tutorial for more information.
-- [Improvement] Improved the output of `tutor plugins list`.
+- 💥[Improvement] Make it possible to run `tutor k8s exec <command with multiple arguments>` (#636). As a consequence, it is no longer possible to run quoted commands: `tutor k8s exec "<some command>"`. Instead, you should remove the quotes: `tutor k8s exec <some command>`. (by @regisb)
+- 💥[Deprecation] Drop support for the `TUTOR_EDX_PLATFORM_SETTINGS` environment variable. It is now recommended to create a plugin instead. (by @regisb)
+- 💥[Improvement] Complete overhaul of the plugin extension mechanism. Tutor now has a hook-based Python API: actions can be triggered at different points of the application life cycle and data can be modified thanks to custom filters. The v0 plugin API is still supported, for backward compatibility, but plugin developers are encouraged to migrate their plugins to the new API. See the new plugin tutorial for more information. (by @regisb)
+- [Improvement] Improved the output of `tutor plugins list`. (by @regisb)
 - [Feature] Add `tutor [dev|local|k8s] status` command, which provides basic information about the platform's status.
 
 ## v13.1.11 (2022-04-12)
