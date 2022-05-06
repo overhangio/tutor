@@ -18,6 +18,10 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v13.2.2 (2022-05-06)
+
+- [Fix] Mounts were broken in dev mode. (by @kdmccormick)
+
 ## v13.2.1 (2022-05-06)
 
 - [Fix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (by @regisb. Thanks @uetuluk!).
