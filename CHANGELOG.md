@@ -18,8 +18,10 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
-- [Fix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (thanks @uetuluk!).
-- [Fix] "The Compose file is invalid" error on mounting dev-only folders.
+## v13.2.1 (2022-05-06)
+
+- [Fix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (by @regisb. Thanks @uetuluk!).
+- [Fix] "The Compose file is invalid" error on mounting dev-only folders. (by @regisb)
 - [Fix] CMS settings in development. (by @regisb)
 
 ## v13.2.0 (2022-04-24)
