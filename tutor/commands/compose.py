@@ -20,6 +20,7 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
         self.docker_compose_files: t.List[str] = []
         self.docker_compose_job_files: t.List[str] = []
         self.docker_compose_tmp_path = ""
+        self.docker_compose_jobs_tmp_path = ""
 
     def docker_compose(self, *command: str) -> int:
         """
@@ -62,11 +63,11 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
         )
         tutor_env.write_to(
             serialize.dumps(docker_compose_tmp),
-            tutor_env.pathjoin(self.root, "local", "docker-compose.tmp.yml"),
+            self.docker_compose_tmp_path,
         )
         tutor_env.write_to(
             serialize.dumps(docker_compose_jobs_tmp),
-            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.tmp.yml"),
+            self.docker_compose_jobs_tmp_path,
         )
 
     def run_job(self, service: str, command: str) -> int:

@@ -21,7 +21,10 @@ class LocalJobRunner(compose.ComposeJobRunner):
         super().__init__(root, config)
         self.project_name = get_typed(self.config, "LOCAL_PROJECT_NAME", str)
         self.docker_compose_tmp_path = tutor_env.pathjoin(
-            self.root, "dev", "docker-compose.tmp.yml"
+            self.root, "local", "docker-compose.tmp.yml"
+        )
+        self.docker_compose_jobs_tmp_path = tutor_env.pathjoin(
+            self.root, "local", "docker-compose.jobs.tmp.yml"
         )
         self.docker_compose_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
@@ -31,7 +34,7 @@ class LocalJobRunner(compose.ComposeJobRunner):
         ]
         self.docker_compose_job_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
-            tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.tmp.yml"),
+            self.docker_compose_jobs_tmp_path,
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.override.yml"),
         ]
 

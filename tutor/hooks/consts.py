@@ -142,7 +142,7 @@ class Filters:
     #:   conditionnally add mounts.
     COMPOSE_MOUNTS = filters.get("compose:mounts")
 
-    #: Contents of the local/docker-compose.tmp.yml file that will be generated at
+    #: Contents of the (local|dev)/docker-compose.tmp.yml files that will be generated at
     #: runtime. This is used for instance to bind-mount folders from the host (see
     #: :py:data:`COMPOSE_MOUNTS`)
     #:

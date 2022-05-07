@@ -18,6 +18,10 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v13.2.2 (2022-05-06)
+
+- [Fix] Mounts were broken in dev mode. (by @kdmccormick)
+
 ## v13.2.1 (2022-05-06)
 
 - [Fix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (by @regisb. Thanks @uetuluk!).
@@ -29,16 +33,16 @@ Every user-facing change should have an entry in this changelog. Please respect 
 - [Improvement] Add the `COMPOSE_PROJECT_STARTED` action and run `dev stop` on `local start` (and vice versa). (by @regisb)
 - [Feature] Introduce `local/dev copyfrom` command to copy contents from a container. (by @regisb)
 - [Bugfix] Fix a race condition that could prevent a newly provisioned LMS container from starting due to a `FileExistsError` when creating data folders.
-- [Deprecation] Mark `tutor dev runserver` as deprecated in favor of `tutor dev start`. Since `start` now supports bind-mounting and breakpoint debugging, `runserver` is redundant and will be removed in a future release.
-- [Improvement] Allow breakpoint debugging when attached to a service via `tutor dev start SERVICE`.
+- [Deprecation] Mark `tutor dev runserver` as deprecated in favor of `tutor dev start`. Since `start` now supports bind-mounting and breakpoint debugging, `runserver` is redundant and will be removed in a future release. (by @kdmccormick)
+- [Improvement] Allow breakpoint debugging when attached to a service via `tutor dev start SERVICE`. (by @kdmccormick)
 - [Security] Apply rate limiting security fix (see [commit](https://github.com/overhangio/edx-platform/commit/b5723e416e628cac4fa84392ca13e1b72817674f)). (by @regisb)
 - [Feature] Introduce the ``-m/--mount`` option in ``local`` and ``dev`` commands to auto-magically bind-mount folders from the host. (by @regisb)
-- [Feature] Add `tutor dev quickstart` command, which is similar to `tutor local quickstart`, except that it uses dev containers instead of local production ones and includes some other small differences for the convience of Open edX developers. This should remove some friction from the Open edX development setup process, which previously required that users provision using local producation containers (`tutor local quickstart`) but then stop them and switch to dev containers (`tutor local stop && tutor dev start -d`).
+- [Feature] Add `tutor dev quickstart` command, which is similar to `tutor local quickstart`, except that it uses dev containers instead of local production ones and includes some other small differences for the convience of Open edX developers. This should remove some friction from the Open edX development setup process, which previously required that users provision using local producation containers (`tutor local quickstart`) but then stop them and switch to dev containers (`tutor local stop && tutor dev start -d`). (by @kdmccormick)
 - 💥[Improvement] Make it possible to run `tutor k8s exec <command with multiple arguments>` (#636). As a consequence, it is no longer possible to run quoted commands: `tutor k8s exec "<some command>"`. Instead, you should remove the quotes: `tutor k8s exec <some command>`. (by @regisb)
 - 💥[Deprecation] Drop support for the `TUTOR_EDX_PLATFORM_SETTINGS` environment variable. It is now recommended to create a plugin instead. (by @regisb)
 - 💥[Improvement] Complete overhaul of the plugin extension mechanism. Tutor now has a hook-based Python API: actions can be triggered at different points of the application life cycle and data can be modified thanks to custom filters. The v0 plugin API is still supported, for backward compatibility, but plugin developers are encouraged to migrate their plugins to the new API. See the new plugin tutorial for more information. (by @regisb)
 - [Improvement] Improved the output of `tutor plugins list`. (by @regisb)
-- [Feature] Add `tutor [dev|local|k8s] status` command, which provides basic information about the platform's status.
+- [Feature] Add `tutor [dev|local|k8s] status` command, which provides basic information about the platform's status. (by @kdmccormick)
 
 ## v13.1.11 (2022-04-12)
 
