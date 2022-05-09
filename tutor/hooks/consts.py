@@ -177,7 +177,7 @@ class Filters:
     #: :parameter dict config: user configuration.
     IMAGES_PULL = filters.get("images:pull")
 
-    #: List of images to be pulled when we run ``tutor images push ...``.
+    #: List of images to be pushed when we run ``tutor images push ...``.
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
     IMAGES_PUSH = filters.get("images:push")
 
