@@ -51,6 +51,7 @@ OPENEDX_MYSQL_USERNAME: "openedx"
 OPENEDX_COMMON_VERSION: "open-release/nutmeg.master"
 OPENEDX_EXTRA_PIP_REQUIREMENTS:
   - "openedx-scorm-xblock<14.0.0,>=13.0.0"
+  - "edx-event-routing-backends>=5.2.0,<6.0.0"
 MYSQL_HOST: "mysql"
 MYSQL_PORT: 3306
 MYSQL_ROOT_USERNAME: "root"
