@@ -14,6 +14,22 @@ spec:
       labels:
         app.kubernetes.io/name: caddy
     spec:
+      {%- if ENABLE_WEB_PROXY %}
+      # This Deployment uses a persistent volume claim. This requires
+      # that in order to enable rolling updates (i.e. use a deployment
+      # strategy other than Replace), we schedule the new Pod to the
+      # same node as the original Pod.
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - caddy
+              topologyKey: "kubernetes.io/hostname"
+      {%- endif %}
       containers:
         - name: caddy
           image: {{ DOCKER_IMAGE_CADDY }}
