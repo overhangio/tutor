@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Fix] Allow `--keep-redundant-commits` for `git cherry-pick`s as building the master branch of openedX may contain the referenced commit. (by @gabor-boros)
+
 ## v13.2.2 (2022-05-06)
 
 - [Fix] Mounts were broken in dev mode. (by @kdmccormick)
