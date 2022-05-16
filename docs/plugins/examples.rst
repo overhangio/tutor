@@ -18,7 +18,7 @@ Skip email validation for new users
             "common-env-features",
             """
     "SKIP_EMAIL_VALIDATION": true
-    """"
+    """
         )
     )
 
