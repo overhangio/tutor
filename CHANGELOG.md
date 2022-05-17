@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Fix] Fix 500 error during studio login. (by @regisb)
+
 ## v13.2.2 (2022-05-06)
 
 - [Fix] Mounts were broken in dev mode. (by @kdmccormick)

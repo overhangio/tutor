@@ -8,6 +8,7 @@ STUDIO_NAME = u"{{ PLATFORM_NAME }} - Studio"
 SOCIAL_AUTH_EDX_OAUTH2_SECRET = "{{ CMS_OAUTH2_SECRET }}"
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = "http://lms:8000"
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = False  # scheme is correctly included in redirect_uri
+SESSION_COOKIE_NAME = "studio_session_id"
 
 MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 100
 
