@@ -49,7 +49,7 @@ Features
 * Runs entirely on Docker
 * World-famous 1-click `installation and upgrades <https://docs.tutor.overhang.io/install.html>`__
 * Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.overhang.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/overhangio/tutor-android>`__, `custom translations <https://docs.tutor.overhang.io/configuration.html#adding-custom-translations>`__...
-* Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins.html>`__
+* Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins/index.html>`__
 * Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`__
 * Amazing premium plugins available in the `Tutor Wizard Edition <https://overhang.io/tutor/wizardedition>`__, including `Cairn <https://overhang.io/tutor/plugin/cairn>`__ the next-generation analytics solution for Open edX.
 * No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#zero-click-aws-installation>`__
