@@ -43,4 +43,4 @@ Check out `Cairn <https://overhang.io/tutor/plugin/cairn>`__, the next-generatio
 Meeting the community
 ---------------------
 
-Ask your questions and chat with the Tutor community on the official community forums: https://discuss.overhang.io
+Ask your questions and chat with the Tutor community on the official Open edX community forum: https://discuss.openedx.org

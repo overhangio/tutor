@@ -99,7 +99,7 @@ Contributing to Tutor
 
 Third-party contributions to Tutor and its plugins are more than welcome! Just make sure to follow these guidelines:
 
-- Outside of obvious bugs, contributions should be discussed first in the `official Tutor forums <https://discuss.overhang.io>`__.
+- Outside of obvious bugs, contributions should be discussed first in the `official Open edX forum <https://discuss.openedx.org>`__.
 - Once we agree on a high-level solution, you should open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ or the corresponding plugin.
 - Make sure that all tests pass by running ``make test`` (see above).
 - If your PR is in the Tutor core repository, add an item to the CHANGELOG file, in the "Unreleased" section. Use the same format as the other items::
@@ -117,4 +117,4 @@ Happy hacking! ☘️
 Joining the team of Tutor Maintainers
 -------------------------------------
 
-We have an open team of volunteers who help support the project. You can read all about it `here <https://discuss.overhang.io/t/the-tutor-maintainer-handbook/1375>`__ -- and we hope that you'll consider joining us 😉
+We have an open team of volunteers who help support the project. You can read all about it `here <https://discuss.openedx.org/t/tutor-maintainers/7287>`__ -- and we hope that you'll consider joining us 😉

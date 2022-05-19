@@ -291,4 +291,4 @@ Then, run unit tests with ``pytest`` commands::
     pytest cms
 
 .. note::
-    Getting all edx-platform unit tests to pass on Tutor is currently a work-in-progress. Some unit tests are still failing. If you manage to fix some of these, please report your findings in the `Tutor forums <https://discuss.overhang.io>`__.
+    Getting all edx-platform unit tests to pass on Tutor is currently a work-in-progress. Some unit tests are still failing. If you manage to fix some of these, please report your findings in the `Open edX forum <https://discuss.openedx.org/tag/tutor>`__.
