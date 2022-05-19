@@ -19,6 +19,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 ## Unreleased
 
 - [Fix] Fix 500 error during studio login. (by @regisb)
+- [Fix] Fix updates for the Caddy deployment in multi-node Kubernetes clusters (#660). Previously, Caddy configuration updates might fail if the Kubernetes cluster had more than one worker node. (by @fghaas)
 
 ## v13.2.2 (2022-05-06)
 
