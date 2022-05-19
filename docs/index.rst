@@ -35,7 +35,7 @@
    :caption: Project links
 
    Source code <https://github.com/overhangio/tutor>
-   Community forums <https://discuss.overhang.io>
+   Community forums <https://discuss.openedx.org/tag/tutor>
    Pypi releases <https://pypi.org/project/tutor>
    Changelog <https://github.com/overhangio/tutor/blob/master/CHANGELOG.md>
 
