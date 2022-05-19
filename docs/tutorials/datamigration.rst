@@ -25,8 +25,10 @@ Making database dumps
 
 To dump all data from the MySQL and Mongodb databases used on the platform, run the following commands::
 
-    tutor local exec -e MYSQL_ROOT_PASSWORD="$(tutor config printvalue MYSQL_ROOT_PASSWORD)" mysql \
-        sh -c 'mysqldump --all-databases --password=$MYSQL_ROOT_PASSWORD > /var/lib/mysql/dump.sql'
+    tutor local exec \
+        -e USERNAME="$(tutor config printvalue MYSQL_ROOT_USERNAME)" \
+        -e PASSWORD="$(tutor config printvalue MYSQL_ROOT_PASSWORD)" \
+        mysql sh -c 'mysqldump --all-databases --user=$USERNAME --password=$PASSWORD > /var/lib/mysql/dump.sql'
     tutor local exec mongodb mongodump --out=/data/db/dump.mongodb
 
 The ``dump.sql`` and ``dump.mongodb`` files will be located in ``$(tutor config printroot)/data/mysql`` and ``$(tutor config printroot)/data/mongodb``.
