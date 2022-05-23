@@ -46,7 +46,7 @@ setup(
         "Documentation": "https://docs.tutor.overhang.io/",
         "Code": "https://github.com/overhangio/tutor",
         "Issue tracker": "https://github.com/overhangio/tutor/issues",
-        "Community": "https://discuss.overhang.io",
+        "Community": "https://discuss.openedx.org/tag/tutor",
     },
     license="AGPLv3",
     author="Overhang.io",

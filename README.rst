@@ -14,9 +14,9 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
   :alt: Source code
   :target: https://github.com/overhangio/tutor
 
-.. image:: https://img.shields.io/static/v1?logo=discourse&label=Forums&style=flat-square&color=ff0080&message=discuss.overhang.io
+.. image:: https://img.shields.io/static/v1?logo=discourse&label=Forums&style=flat-square&color=ff0080&message=discuss.openedx.org
   :alt: Forums
-  :target: https://discuss.overhang.io
+  :target: https://discuss.openedx.org/tag/tutor
 
 .. image:: https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.overhang.io
   :alt: Documentation
@@ -82,7 +82,7 @@ Please follow the instructions from the `troubleshooting section <https://docs.t
 Support
 -------
 
-To get community support, go to the official discussion forums: https://discuss.overhang.io. For official support, please subscribe to a Long Term Support (LTS) license at https://overhang.io/tutor/pricing.
+To get community support, go to the official Open edX discussion forum: https://discuss.openedx.org. For official support, please subscribe to a Long Term Support (LTS) license at https://overhang.io/tutor/pricing.
 
 .. _readme_support_end:
 
