@@ -167,3 +167,9 @@ Finally, uninstall Tutor itself::
 
     # If you downloaded the tutor binary
     sudo rm /usr/local/bin/tutor
+
+    # Optionally, you may want to remove Tutor plugins installed.
+    # You can get a list of the installed plugins:
+    pip freeze | grep tutor
+    # You can then remove them using the following command:
+    pip uninstall <plugin-name>
