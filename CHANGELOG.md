@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Fix] Ignore Python plugins that cannot be loaded. (by @regisb)
 - [Improvement] Faster and more reliable builds with `npm clean-install` instead of `npm install`. (by @regisb. Thanks @ghassanmas!)
 - [Fix] Fix 500 error during studio login. (by @regisb)
 - [Fix] Fix updates for the Caddy deployment in multi-node Kubernetes clusters (#660). Previously, Caddy configuration updates might fail if the Kubernetes cluster had more than one worker node. (by @fghaas)
