@@ -233,7 +233,7 @@ Then, you should run the following commands::
     pip install --requirement requirements/edx/development.txt
 
     # Install nodejs packages in node_modules/
-    npm install
+    npm clean-install
 
     # Rebuild static assets
     openedx-assets build --env=dev

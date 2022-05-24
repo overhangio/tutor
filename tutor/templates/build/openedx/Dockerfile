@@ -109,8 +109,9 @@ RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
 COPY --from=code /openedx/edx-platform/package.json /openedx/edx-platform/package.json
+COPY --from=code /openedx/edx-platform/package-lock.json /openedx/edx-platform/package-lock.json
 WORKDIR /openedx/edx-platform
-RUN npm install --verbose --registry=$NPM_REGISTRY
+RUN npm clean-install --verbose --registry=$NPM_REGISTRY
 
 ###### Production image with system and python requirements
 FROM minimal as production

@@ -72,8 +72,8 @@ def load_all(names: t.Iterable[str]) -> None:
     for name in names:
         try:
             load(name)
-        except exceptions.TutorError as e:
-            fmt.echo_alert(f"Failed to enable plugin '{name}': {e.args[0]}")
+        except Exception as e:
+            fmt.echo_alert(f"Failed to enable plugin '{name}': {e}")
     hooks.Actions.PLUGINS_LOADED.do()
 
 
