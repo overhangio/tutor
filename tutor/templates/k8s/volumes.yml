@@ -12,7 +12,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: {{ K8S_CADDY_VOLUME_SIZE }}
 {% endif %}
 {% if RUN_ELASTICSEARCH %}
 ---
@@ -28,7 +28,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: {{ K8S_ELASTICSEARCH_VOLUME_SIZE }}
 {% endif %}
 {% if RUN_MONGODB %}
 ---
@@ -44,7 +44,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: {{ K8S_MONGODB_VOLUME_SIZE }}
 {% endif %}
 {% if RUN_MYSQL %}
 ---
@@ -60,7 +60,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: {{ K8S_MYSQL_VOLUME_SIZE }} 
 {% endif %}
 {% if RUN_REDIS %}
 ---
@@ -76,6 +76,6 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: {{ K8S_REDIS_VOLUME_SIZE }}
 {% endif %}
 {{ patch("k8s-volumes") }}

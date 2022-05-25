@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Improvement] Make it possible to set volume sizes for Caddy, ElasticSearch, MongoDB, MySQL,and Redis services in Kubernetes. (by @foadlind)
 - [Fix] Ignore Python plugins that cannot be loaded. (by @regisb)
 - [Improvement] Faster and more reliable builds with `npm clean-install` instead of `npm install`. (by @regisb. Thanks @ghassanmas!)
 - [Fix] Fix 500 error during studio login. (by @regisb)
