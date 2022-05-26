@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Feature] Add patch to allow overriding final openedx docker image CMD
 - [Fix] Ignore Python plugins that cannot be loaded. (by @regisb)
 - [Improvement] Faster and more reliable builds with `npm clean-install` instead of `npm install`. (by @regisb. Thanks @ghassanmas!)
 - [Fix] Fix 500 error during studio login. (by @regisb)
