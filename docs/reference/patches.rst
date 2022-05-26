@@ -266,6 +266,13 @@ Files: ``apps/openedx/settings/cms/development.py``, ``apps/openedx/settings/lms
 
 File: ``build/openedx/Dockerfile``
 
+.. patch:: openedx-dockerfile-final
+
+``openedx-dockerfile-final``
+============================
+
+File: ``build/openedx/Dockerfile``
+
 .. patch:: openedx-dockerfile-git-patches-default
 
 ``openedx-dockerfile-git-patches-default``
