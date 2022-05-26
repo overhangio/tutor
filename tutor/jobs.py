@@ -126,11 +126,18 @@ def set_theme(
         return
     python_code = "from django.contrib.sites.models import Site"
     for domain_name in domain_names:
+        if len(domain_name) > 50:
+            fmt.echo_alert(
+                "Assigning a theme to a site with a long (> 50 characters) domain name."
+                " The displayed site name will be truncated to 50 characters."
+            )
         python_code += """
 print('Assigning theme {theme_name} to {domain_name}...')
 site, _ = Site.objects.get_or_create(domain='{domain_name}')
 if not site.name:
-    site.name = '{domain_name}'
+    name_max_length = Site._meta.get_field('name').max_length
+    name = '{domain_name}'[:name_max_length]
+    site.name = name
     site.save()
 site.themes.all().delete()
 site.themes.create(theme_dir_name='{theme_name}')
