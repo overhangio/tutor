@@ -96,7 +96,8 @@ spec:
               name: config
           resources:
             requests:
-              memory: 2Gi
+              memory: {{ CMS_MEMORY_REQUEST }}
+            {{ patch("k8s-cms-deployment-resources")|indent(12) }}
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
@@ -144,6 +145,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+          resources: {% if not patch("k8s-cms-worker-deployment-resources") %}{}{% endif %}
+            {{ patch("k8s-cms-worker-deployment-resources")|indent(14) }}
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
@@ -196,7 +199,8 @@ spec:
               name: config
           resources:
             requests:
-              memory: 2Gi
+              memory: {{ LMS_MEMORY_REQUEST }}
+            {{ patch("k8s-lms-deployment-resources")|indent(12) }}
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
@@ -244,6 +248,8 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+          resources: {% if not patch("k8s-lms-worker-deployment-resources") %}{}{% endif %}
+            {{ patch("k8s-lms-worker-deployment-resources")|indent(14) }}
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
