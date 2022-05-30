@@ -223,6 +223,23 @@ class Filters:
     #:   filter to modify the Tutor templates.
     ENV_PATCHES = filters.get("env:patches")
 
+    #: List of template path patterns to be ignored when rendering templates to the project root. By default, we ignore:
+    #:
+    #: - hidden files (``.*``)
+    #: - ``__pycache__`` directories and ``*.pyc`` files
+    #: - "partials" directories.
+    #:
+    #: Ignored patterns are overridden by include patterns; see :py:data:`ENV_PATTERNS_INCLUDE`.
+    #:
+    #: :parameter list[str] patterns: list of regular expression patterns. E.g: ``r"(.*/)?ignored_file_name(/.*)?"``.
+    ENV_PATTERNS_IGNORE = filters.get("env:patterns:ignore")
+
+    #: List of template path patterns to be included when rendering templates to the project root.
+    #: Patterns from this list will take priority over the patterns from :py:data:`ENV_PATTERNS_IGNORE`.
+    #:
+    #: :parameter list[str] patterns: list of regular expression patterns. See :py:data:`ENV_PATTERNS_IGNORE`.
+    ENV_PATTERNS_INCLUDE = filters.get("env:patterns:include")
+
     #: List of all template root folders.
     #:
     #: :parameter list[str] templates_root: absolute paths to folders which contain templates.
