@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Fix] Truncate site display name to 50 characters with a warning, fixing data too long error for long site names. (by @navinkarkera)
 - [Feature] Add patch to allow overriding final openedx docker image CMD
 - [Fix] Ignore Python plugins that cannot be loaded. (by @regisb)
 - [Improvement] Faster and more reliable builds with `npm clean-install` instead of `npm install`. (by @regisb. Thanks @ghassanmas!)
