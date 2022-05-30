@@ -24,6 +24,20 @@ class EnvTests(PluginsTestCase):
         self.assertIn(template_name, renderer.environment.loader.list_templates())
         self.assertNotIn(template_name, templates)
 
+    def test_files_are_rendered(self) -> None:
+        self.assertTrue(env.is_rendered("some/file"))
+        self.assertFalse(env.is_rendered(".git"))
+        self.assertFalse(env.is_rendered(".git/subdir"))
+        self.assertFalse(env.is_rendered("directory/.git"))
+        self.assertFalse(env.is_rendered("directory/.git/somefile"))
+        self.assertFalse(env.is_rendered("directory/somefile.pyc"))
+        self.assertTrue(env.is_rendered("directory/somedir.pyc/somefile"))
+        self.assertFalse(env.is_rendered("directory/__pycache__"))
+        self.assertFalse(env.is_rendered("directory/__pycache__/somefile"))
+        self.assertFalse(env.is_rendered("directory/partials/extra.scss"))
+        self.assertFalse(env.is_rendered("directory/partials"))
+        self.assertFalse(env.is_rendered("partials/somefile"))
+
     def test_is_binary_file(self) -> None:
         self.assertTrue(env.is_binary_file("/home/somefile.ico"))
 
