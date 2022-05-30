@@ -1,9 +1,6 @@
-import os
-import tempfile
 import unittest
 
 from tests.helpers import temporary_root
-from tutor import config as tutor_config
 
 from .base import TestCommandMixin
 
@@ -61,29 +58,3 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
         self.assertTrue(result.output)
-
-    def test_config_render(self) -> None:
-        with tempfile.TemporaryDirectory() as dest:
-            with temporary_root() as root:
-                self.invoke_in_root(root, ["config", "save"])
-                result = self.invoke_in_root(root, ["config", "render", root, dest])
-        self.assertEqual(0, result.exit_code)
-        self.assertFalse(result.exception)
-
-    def test_config_render_with_extra_configs(self) -> None:
-        with tempfile.TemporaryDirectory() as dest:
-            with temporary_root() as root:
-                self.invoke_in_root(root, ["config", "save"])
-                result = self.invoke_in_root(
-                    root,
-                    [
-                        "config",
-                        "render",
-                        "-x",
-                        os.path.join(root, tutor_config.CONFIG_FILENAME),
-                        root,
-                        dest,
-                    ],
-                )
-        self.assertEqual(0, result.exit_code)
-        self.assertFalse(result.exception)

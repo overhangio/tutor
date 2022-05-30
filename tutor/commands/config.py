@@ -64,29 +64,6 @@ def save(
     env.save(context.root, config)
 
 
-@click.command(help="Render a template folder with eventual extra configuration files")
-@click.option(
-    "-x",
-    "--extra-config",
-    "extra_configs",
-    multiple=True,
-    type=click.Path(exists=True, resolve_path=True, dir_okay=False),
-    help="Load extra configuration file (can be used multiple times)",
-)
-@click.argument("src", type=click.Path(exists=True, resolve_path=True))
-@click.argument("dst")
-@click.pass_obj
-def render(context: Context, extra_configs: List[str], src: str, dst: str) -> None:
-    config = tutor_config.load(context.root)
-    for extra_config in extra_configs:
-        config.update(
-            env.render_unknown(config, tutor_config.get_yaml_file(extra_config))
-        )
-    renderer = env.Renderer(config, [src])
-    renderer.render_all_to(dst)
-    fmt.echo_info(f"Templates rendered to {dst}")
-
-
 @click.command(help="Print the project root")
 @click.pass_obj
 def printroot(context: Context) -> None:
@@ -106,6 +83,5 @@ def printvalue(context: Context, key: str) -> None:
 
 
 config_command.add_command(save)
-config_command.add_command(render)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
