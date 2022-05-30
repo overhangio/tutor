@@ -246,3 +246,6 @@ CMD uwsgi \
     --processes=${UWSGI_WORKERS:-2} \
     --buffer-size=8192 \
     --wsgi-file $SERVICE_VARIANT/wsgi.py
+
+{{ patch("openedx-dockerfile-final") }}
+
