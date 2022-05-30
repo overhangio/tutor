@@ -13,13 +13,13 @@ from tutor.types import Config
 
 class EnvTests(PluginsTestCase):
     def test_walk_templates(self) -> None:
-        renderer = env.Renderer({}, [env.TEMPLATES_ROOT])
+        renderer = env.Renderer()
         templates = list(renderer.walk_templates("local"))
         self.assertIn("local/docker-compose.yml", templates)
 
     def test_walk_templates_partials_are_ignored(self) -> None:
         template_name = "apps/openedx/settings/partials/common_all.py"
-        renderer = env.Renderer({}, [env.TEMPLATES_ROOT], ignore_folders=["partials"])
+        renderer = env.Renderer()
         templates = list(renderer.walk_templates("apps"))
         self.assertIn(template_name, renderer.environment.loader.list_templates())
         self.assertNotIn(template_name, templates)
@@ -28,7 +28,7 @@ class EnvTests(PluginsTestCase):
         self.assertTrue(env.is_binary_file("/home/somefile.ico"))
 
     def test_find_os_path(self) -> None:
-        renderer = env.Renderer({}, [env.TEMPLATES_ROOT])
+        renderer = env.Renderer()
         path = renderer.find_os_path("local/docker-compose.yml")
         self.assertTrue(os.path.exists(path))
 
@@ -180,14 +180,14 @@ class EnvTests(PluginsTestCase):
 
             # Load env once
             config: Config = {"PLUGINS": []}
-            env1 = env.Renderer.instance(config).environment
+            env1 = env.Renderer(config).environment
 
             # Enable plugins
             plugins.load("plugin1")
 
             # Load env a second time
             config["PLUGINS"] = ["myplugin"]
-            env2 = env.Renderer.instance(config).environment
+            env2 = env.Renderer(config).environment
 
             self.assertNotIn("plugin1/myplugin.txt", env1.loader.list_templates())
             self.assertIn("plugin1/myplugin.txt", env2.loader.list_templates())
@@ -199,7 +199,7 @@ class EnvTests(PluginsTestCase):
             "notsomething_test_app": 2,
             "something3_test_app": 3,
         }
-        renderer = env.Renderer.instance(config)
+        renderer = env.Renderer(config)
         self.assertEqual([2, 3], list(renderer.iter_values_named(suffix="test_app")))
         self.assertEqual([1, 3], list(renderer.iter_values_named(prefix="something")))
         self.assertEqual(

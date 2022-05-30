@@ -67,26 +67,20 @@ class JinjaEnvironment(jinja2.Environment):
 
 
 class Renderer:
-    @classmethod
-    def instance(cls: t.Type["Renderer"], config: Config) -> "Renderer":
-        # Load template roots: these are required to be able to use
-        # {% include .. %} directives
-        template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
-        return cls(config, template_roots, ignore_folders=["partials"])
-
     def __init__(
         self,
-        config: Config,
-        template_roots: t.List[str],
+        config: t.Optional[Config] = None,
         ignore_folders: t.Optional[t.List[str]] = None,
     ):
+        config = config or {}
         self.config = deepcopy(config)
-        self.template_roots = template_roots
-        self.ignore_folders = ignore_folders or []
-        self.ignore_folders.append(".git")
+        self.template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
+        self.ignore_folders = ["partials", ".git"]
+        if ignore_folders is not None:
+            self.ignore_folders = ignore_folders
 
         # Create environment with extra filters and globals
-        self.environment = JinjaEnvironment(template_roots)
+        self.environment = JinjaEnvironment(self.template_roots)
 
         # Filters
         plugin_filters: t.Iterator[
@@ -264,7 +258,7 @@ def save_all_from(prefix: str, dst: str, config: Config) -> None:
     Render the templates that start with `prefix` and store them with the same
     hierarchy at `dst`. Here, `prefix` can be the result of os.path.join(...).
     """
-    renderer = Renderer.instance(config)
+    renderer = Renderer(config)
     renderer.render_all_to(dst, prefix.replace(os.sep, "/"))
 
 
@@ -285,7 +279,7 @@ def render_file(config: Config, *path: str) -> t.Union[str, bytes]:
     """
     Return the rendered contents of a template.
     """
-    renderer = Renderer.instance(config)
+    renderer = Renderer(config)
     template_name = "/".join(path)
     return renderer.render_template(template_name)
 
@@ -312,7 +306,7 @@ def render_str(config: Config, text: str) -> str:
     Return:
         substituted (str)
     """
-    return Renderer.instance(config).render_str(text)
+    return Renderer(config).render_str(text)
 
 
 def check_is_up_to_date(root: str) -> None:
