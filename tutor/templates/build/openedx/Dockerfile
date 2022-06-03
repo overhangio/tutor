@@ -104,7 +104,7 @@ ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 RUN pip install nodeenv==1.6.0
-RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=16.14.0 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
