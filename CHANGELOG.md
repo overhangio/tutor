@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Fix] Fix studio logout issue. (by @Alec4r) [PR #680](https://github.com/overhangio/tutor/pull/680)
+
 ## v13.3.0 (2022-06-03)
 
 - [Security] Apply logout redirect url security fix. (by @regisb)
