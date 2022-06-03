@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import typing as t
 from copy import deepcopy
@@ -67,26 +68,13 @@ class JinjaEnvironment(jinja2.Environment):
 
 
 class Renderer:
-    @classmethod
-    def instance(cls: t.Type["Renderer"], config: Config) -> "Renderer":
-        # Load template roots: these are required to be able to use
-        # {% include .. %} directives
-        template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
-        return cls(config, template_roots, ignore_folders=["partials"])
-
-    def __init__(
-        self,
-        config: Config,
-        template_roots: t.List[str],
-        ignore_folders: t.Optional[t.List[str]] = None,
-    ):
+    def __init__(self, config: t.Optional[Config] = None):
+        config = config or {}
         self.config = deepcopy(config)
-        self.template_roots = template_roots
-        self.ignore_folders = ignore_folders or []
-        self.ignore_folders.append(".git")
+        self.template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
 
         # Create environment with extra filters and globals
-        self.environment = JinjaEnvironment(template_roots)
+        self.environment = JinjaEnvironment(self.template_roots)
 
         # Filters
         plugin_filters: t.Iterator[
@@ -116,8 +104,11 @@ class Renderer:
         full_prefix = "/".join(prefix)
         env_templates: t.List[str] = self.environment.loader.list_templates()
         for template in env_templates:
-            if template.startswith(full_prefix) and self.is_part_of_env(template):
-                yield template
+            if template.startswith(full_prefix):
+                # Exclude templates that match certain patterns
+                # Note that here we don't rely on the OS separator, as we are handling templates.
+                if is_rendered(template):
+                    yield template
 
     def iter_values_named(
         self,
@@ -148,23 +139,7 @@ class Renderer:
         Yield:
             path: template path relative to the template root
         """
-        yield from self.iter_templates_in(subdir + "/")
-
-    def is_part_of_env(self, path: str) -> bool:
-        """
-        Determines whether a template should be rendered or not. Note that here we don't
-        rely on the OS separator, as we are handling templates
-        """
-        parts = path.split("/")
-        basename = parts[-1]
-        is_excluded = False
-        is_excluded = (
-            is_excluded or basename.startswith(".") or basename.endswith(".pyc")
-        )
-        is_excluded = is_excluded or basename == "__pycache__"
-        for ignore_folder in self.ignore_folders:
-            is_excluded = is_excluded or ignore_folder in parts
-        return not is_excluded
+        yield from self.iter_templates_in(subdir)
 
     def find_os_path(self, template_name: str) -> str:
         path = template_name.replace("/", os.sep)
@@ -238,6 +213,43 @@ class Renderer:
             raise exceptions.TutorError(f"Missing configuration value: {e.args[0]}")
 
 
+def is_rendered(path: str) -> bool:
+    """
+    Return whether the template should be rendered or not.
+
+    If the path matches an include pattern, it is rendered. If not and it matches an
+    ignore pattern, it is not rendered. By default, all files are rendered.
+    """
+    include_patterns: t.Iterator[str] = hooks.Filters.ENV_PATTERNS_INCLUDE.iterate()
+    for include_pattern in include_patterns:
+        if re.match(include_pattern, path):
+            return True
+    ignore_patterns: t.Iterator[str] = hooks.Filters.ENV_PATTERNS_IGNORE.iterate()
+    for ignore_pattern in ignore_patterns:
+        if re.match(ignore_pattern, path):
+            return False
+    return True
+
+
+# Skip rendering some files that follow commonly-ignored patterns:
+#
+#   .*
+#   *.pyc
+#   __pycache__
+#   partials
+hooks.Filters.ENV_PATTERNS_IGNORE.add_items(
+    [
+        # Skip all hidden files
+        r"(.*/)?\.",
+        # Skip compiled python files
+        r"(.*/)?__pycache__(/.*)?$",
+        r".*\.pyc$",
+        # Skip files from "partials" folders
+        r"(.*/)?partials(/.*)?$",
+    ]
+)
+
+
 def save(root: str, config: Config) -> None:
     """
     Save the full environment, including version information.
@@ -264,7 +276,7 @@ def save_all_from(prefix: str, dst: str, config: Config) -> None:
     Render the templates that start with `prefix` and store them with the same
     hierarchy at `dst`. Here, `prefix` can be the result of os.path.join(...).
     """
-    renderer = Renderer.instance(config)
+    renderer = Renderer(config)
     renderer.render_all_to(dst, prefix.replace(os.sep, "/"))
 
 
@@ -285,7 +297,7 @@ def render_file(config: Config, *path: str) -> t.Union[str, bytes]:
     """
     Return the rendered contents of a template.
     """
-    renderer = Renderer.instance(config)
+    renderer = Renderer(config)
     template_name = "/".join(path)
     return renderer.render_template(template_name)
 
@@ -312,7 +324,7 @@ def render_str(config: Config, text: str) -> str:
     Return:
         substituted (str)
     """
-    return Renderer.instance(config).render_str(text)
+    return Renderer(config).render_str(text)
 
 
 def check_is_up_to_date(root: str) -> None:
