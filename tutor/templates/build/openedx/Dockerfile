@@ -56,6 +56,9 @@ RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 3b985f207853
 # Rate limiting security fix
 # https://github.com/overhangio/edx-platform/tree/overhangio/sec-rate-limiting
 RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ b5723e416e628cac4fa84392ca13e1b72817674f && git cherry-pick b5723e416e628cac4fa84392ca13e1b72817674f
+# Logout redirect security fix
+# https://github.com/overhangio/edx-platform/tree/overhangio/sec-fix-logout-redirect-vulnerability
+RUN git fetch --depth=2 https://github.com/overhangio/edx-platform/ 08d8504224e3a3e728a0f264749e1b585e21b871 && git cherry-pick 08d8504224e3a3e728a0f264749e1b585e21b871
 {%- endif %}
 
 {# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}

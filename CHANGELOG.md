@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Security] Apply logout redirect url security fix. (by @regisb)
 - [Feature] Make it possible to force the rendering of a given template, even when the template path matches an ignore pattern. (by @regisb)
 - 💥[Fix] Get rid of the `tutor config render` command, which is useless now that themes can be implemented as plugins. (by @regisb)
 
