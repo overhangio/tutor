@@ -13,7 +13,6 @@ SESSION_COOKIE_NAME = "studio_session_id"
 MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 100
 
 FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
-FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 
 # Create folders if necessary
