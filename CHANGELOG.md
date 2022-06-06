@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v13.3.1 (2022-06-06)
+
 - [Fix] Crashing celery workers in development (#681). (by @regisb)
 - [Fix] Fix studio logout issue. (by @Alec4r)
 
