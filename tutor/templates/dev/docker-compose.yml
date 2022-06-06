@@ -49,9 +49,13 @@ services:
 
   lms-worker:
     <<: *openedx-service
+    # Note: we should get rid of this once celery is upgraded to 5.0.0+ after maple
+    # (same below in cms-worker)
+    tty: false
 
   cms-worker:
     <<: *openedx-service
+    tty: false
 
   # Additional service for watching theme changes
   watchthemes:
