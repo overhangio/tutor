@@ -18,7 +18,10 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
-- [Fix] Fix studio logout issue. (by @Alec4r) [PR #680](https://github.com/overhangio/tutor/pull/680)
+## v13.3.1 (2022-06-06)
+
+- [Fix] Crashing celery workers in development (#681). (by @regisb)
+- [Fix] Fix studio logout issue. (by @Alec4r)
 
 ## v13.3.0 (2022-06-03)
 
