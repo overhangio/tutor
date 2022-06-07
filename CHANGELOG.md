@@ -17,6 +17,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 -->
 
 ## Unreleased
+- [Improvement] Make it possible to override k8s resources in plugins using `k8s-override` patch. (by @foadlind)
 
 ## v14.0.2 (2022-06-27)
 
