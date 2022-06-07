@@ -21,6 +21,11 @@ OAUTH_ENFORCE_SECURE = False
 # Email settings
 DEFAULT_EMAIL_LOGO_URL = LMS_ROOT_URL + "/theming/asset/images/logo.png"
 
+# This override make it possible to hide courses in /courses page
+# when the course discovery feature is enabled (its enabled by default with tutor)
+# Note: don't confuse this with "discovery service" which has a dedicated plugin.
+SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = False
+
 # Create folders if necessary
 for folder in [DATA_DIR, LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):
