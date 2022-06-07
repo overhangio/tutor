@@ -69,7 +69,7 @@ Enable SAML authentication
             '"ENABLE_THIRD_PARTY_AUTH": true',
         ),
         (
-            "openedx-lms-common-settings:",
+            "openedx-lms-common-settings",
             """
     # saml special settings
     AUTHENTICATION_BACKENDS += ["common.djangoapps.third_party_auth.saml.SAMLAuthBackend", "django.contrib.auth.backends.ModelBackend"]
