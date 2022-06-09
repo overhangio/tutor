@@ -17,6 +17,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 -->
 
 ## Unreleased
+- [Feature] Add PYTHONBREAKPOINT as an exposed config variable for custom debugging.(by @Carlos-Muniz)
 
 ## v14.0.0 (2022-06-09)
 
