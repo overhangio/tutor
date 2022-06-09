@@ -18,6 +18,16 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v14.0.0 (2022-06-09)
+
+- 💥[Feature] Upgrade to Nutmeg: (by @regisb)
+  - 💥[Feature] Hide a course from the `/course` search page in the LMS when the course visibility is set to "none" in the Studio. (thanks @ghassanmas!)
+  - 💥[Improvement] The `lms.env.json` and `cms.env.json` files are moved to `lms.env.yml` and `cms.env.yml`. As a consequence, plugin developers must reformat the following patches to use YAML format, and not JSON: "common-env-features", "lms-env-features", "cms-env-features", "lms-env", "cms-env", "openedx-auth".
+  - 💥[Feature] Persistent grades are now enabled by default.
+  - [Bugfix] Remove edX references from bulk emails ([issue](https://github.com/openedx/build-test-release-wg/issues/100)).
+  - [Improvement] For Tutor Nightly (and only Nightly), official plugins are now installed from their nightly branches on GitHub instead of a version range on PyPI. This will allow Nightly users to install all official plugins by running ``pip install -e ".[full]"``.
+  - [Bugfix] Start MongoDB when running migrations, because a new data migration fails if MongoDB is not running
+
 ## v13.3.1 (2022-06-06)
 
 - [Fix] Crashing celery workers in development (#681). (by @regisb)

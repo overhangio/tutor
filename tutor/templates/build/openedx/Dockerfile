@@ -54,7 +54,11 @@ RUN git config --global user.email "tutor@overhang.io" \
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
-ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
+# TODO Due to a bug in the transifex generation process, we cannot pull the translation
+# strings from nutmeg.1. We'll be able to pull them once they have been pushed to
+# Transifex.
+# ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
+ARG OPENEDX_I18N_VERSION=open-release/nutmeg.master
 RUN cd /tmp \
     && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/$OPENEDX_I18N_VERSION.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
@@ -76,15 +80,20 @@ COPY --from=code /openedx/edx-platform /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
 # Install the right version of pip/setuptools
-RUN pip install setuptools==44.1.0 pip==20.3.4 wheel==0.37.0
+# https://pypi.org/project/setuptools/
+# https://pypi.org/project/pip/
+# https://pypi.org/project/wheel/
+RUN pip install setuptools==62.1.0 pip==22.0.4 wheel==0.37.1
 
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
 
 # Install django-redis for using redis as a django cache
-RUN pip install django-redis==5.0.0
+# https://pypi.org/project/django-redis/
+RUN pip install django-redis==5.2.0
 
 # Install uwsgi
+# https://pypi.org/project/uWSGI/
 RUN pip install uwsgi==2.0.20
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
@@ -142,12 +151,12 @@ WORKDIR /openedx/edx-platform
 # Re-install local requirements, otherwise egg-info folders are missing
 RUN pip install -r requirements/edx/local.in
 
-# Create folder that will store lms/cms.env.json files, as well as
+# Create folder that will store lms/cms.env.yml files, as well as
 # the tutor-specific settings files.
 RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
 COPY --chown=app:app revisions.yml /openedx/config/
-ENV LMS_CFG /openedx/config/lms.env.json
-ENV CMS_CFG /openedx/config/cms.env.json
+ENV LMS_CFG /openedx/config/lms.env.yml
+ENV CMS_CFG /openedx/config/cms.env.yml
 ENV REVISION_CFG /openedx/config/revisions.yml
 COPY --chown=app:app settings/lms/*.py ./lms/envs/tutor/
 COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/

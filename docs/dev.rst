@@ -92,7 +92,7 @@ The ``openedx-dev`` Docker image is based on the same ``openedx`` image used by 
 
 - Additional Python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
 
-- The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/maple.master/requirements/edx/development.in>`__ are installed.
+- The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/nutmeg.master/requirements/edx/development.in>`__ are installed.
 
 
 If you are using a custom ``openedx`` image, then you will need to rebuild ``openedx-dev`` every time you modify ``openedx``. To so, run::

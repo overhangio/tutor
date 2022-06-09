@@ -121,11 +121,11 @@ Major Open edX releases are published twice a year, in June and December, by the
 4. Test the new release in a sandboxed environment.
 5. If you are running edx-platform, or some other repository from a custom branch, then you should rebase (and test) your changes on top of the latest release tag (see :ref:`edx_platform_fork`).
 
-The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``quickstart`` command (see above). The single difference is that if the ``quickstart`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) before running ``quickstart``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Lilac to Maple and rebuild some Docker images, run::
+The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``quickstart`` command (see above). The single difference is that if the ``quickstart`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) before running ``quickstart``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Maple to Nutmeg and rebuild some Docker images, run::
 
     tutor config save
     tutor images build all # list the images that should be rebuilt here
-    tutor local upgrade --from=lilac
+    tutor local upgrade --from=maple
     tutor local quickstart
 
 .. _autocomplete:
