@@ -103,14 +103,29 @@ def upgrade_from_maple(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Maple"))
     # The environment needs to be updated because the management commands are from Nutmeg
     tutor_env.save(context.obj.root, config)
+    
+    context.invoke(
+        compose.run,
+        args=["lms", "sh", "-e", "-c", "./manage.py lms migrate user_tours"],
+    )
     context.invoke(
         compose.run,
         args=["lms", "sh", "-e", "-c", "./manage.py lms backpopulate_user_tours"],
+    )
+    
+    context.invoke(
+        compose.run,
+        args=["cms", "sh", "-e", "-c", "./manage.py cms migrate contentstore"],
+    )
+    context.invoke(
+        compose.run,
+        args=["cms", "sh", "-e", "-c", "./manage.py cms migrate split_modulestore_django"],
     )
     context.invoke(
         compose.run,
         args=["cms", "sh", "-e", "-c", "./manage.py cms backfill_course_tabs"],
     )
+    
     context.invoke(
         compose.run,
         args=["cms", "sh", "-e", "-c", "./manage.py cms simulate_publish"],
