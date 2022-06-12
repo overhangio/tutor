@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Bugfix] Add migration to "upgrade_from_maple" function ([#689](https://github.com/overhangio/tutor/issues/689)). (by @ibrmora)
+
 ## v14.0.0 (2022-06-09)
 
 - 💥[Feature] Upgrade to Nutmeg: (by @regisb)
