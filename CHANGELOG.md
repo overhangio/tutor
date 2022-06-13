@@ -18,7 +18,10 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
-- [Bugfix] Add migration to "upgrade_from_maple" function ([#689](https://github.com/overhangio/tutor/issues/689)). (by @ibrmora)
+## v14.0.1 (2022-06-13)
+
+- [Bugfix] Fix missing tables on migration from maple ([#689](https://github.com/overhangio/tutor/issues/689)). (by @ibrmora)
+- [Bugfix] Fix plugin patches in cms.env.yml template.
 
 ## v14.0.0 (2022-06-09)
 
