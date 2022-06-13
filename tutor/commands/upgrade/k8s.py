@@ -129,6 +129,11 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "app.kubernetes.io/name=lms",
     )
     k8s.wait_for_pod_ready(config, "lms")
+
+    # Command backpopulate_user_tours
+    k8s.kubectl_exec(
+        config, "lms", ["sh", "-e", "-c", "./manage.py lms migrate user_tours"]
+    )
     k8s.kubectl_exec(
         config, "lms", ["sh", "-e", "-c", "./manage.py lms backpopulate_user_tours"]
     )
@@ -140,8 +145,23 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "app.kubernetes.io/name=cms",
     )
     k8s.wait_for_pod_ready(config, "cms")
+
+    # Command backfill_course_tabs
+    k8s.kubectl_exec(
+        config, "cms", ["sh", "-e", "-c", "./manage.py cms migrate contentstore"]
+    )
+    k8s.kubectl_exec(
+        config,
+        "cms",
+        ["sh", "-e", "-c", "./manage.py cms migrate split_modulestore_django"],
+    )
     k8s.kubectl_exec(
         config, "cms", ["sh", "-e", "-c", "./manage.py cms backfill_course_tabs"]
+    )
+
+    # Command simulate_publish
+    k8s.kubectl_exec(
+        config, "cms", ["sh", "-e", "-c", "./manage.py cms migrate course_overviews"]
     )
     k8s.kubectl_exec(
         config, "cms", ["sh", "-e", "-c", "./manage.py cms simulate_publish"]
