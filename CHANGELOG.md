@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Improvement] Use `git am` instead of `cherry-pick` to simplify patching process.
+
 ## v14.0.1 (2022-06-13)
 
 - [Bugfix] Fix missing tables on migration from maple ([#689](https://github.com/overhangio/tutor/issues/689)). (by @ibrmora)
