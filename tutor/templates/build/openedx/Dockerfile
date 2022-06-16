@@ -38,7 +38,7 @@ RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
-# Identify tutor user to cherry-pick commits
+# Identify tutor user to apply patches using git
 RUN git config --global user.email "tutor@overhang.io" \
   && git config --global user.name "Tutor"
 
@@ -49,10 +49,10 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patch edx-platform
 # Fix broken "Pages" view in Studio
 # https://github.com/openedx/edx-platform/pull/30550
-RUN git fetch --depth=2 https://github.com/open-craft/edx-platform/ 3d54f284f82b61e693ad652d8d6e46a226fcb36d && git cherry-pick 3d54f284f82b61e693ad652d8d6e46a226fcb36d
+RUN curl -fsSL https://github.com/open-craft/edx-platform/commit/3d54f284f82b61e693ad652d8d6e46a226fcb36d.patch | git am
 {%- endif %}
 
-{# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
+{# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
 {{ patch("openedx-dockerfile-post-git-checkout") }}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
