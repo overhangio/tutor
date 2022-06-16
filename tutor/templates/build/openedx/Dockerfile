@@ -38,7 +38,7 @@ RUN mkdir -p /openedx/edx-platform && \
     git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
-# Identify tutor user to cherry-pick commits
+# Identify tutor user to apply patches using git
 RUN git config --global user.email "tutor@overhang.io" \
   && git config --global user.name "Tutor"
 
@@ -49,7 +49,7 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patch edx-platform
 {%- endif %}
 
-{# Example: RUN git fetch --depth=2 https://github.com/openedx/edx-platform <GITSHA1> && git cherry-pick <GITSHA1> #}
+{# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
 {{ patch("openedx-dockerfile-post-git-checkout") }}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
