@@ -9,7 +9,7 @@ In addition to running Open edX in production, Tutor can be used for local devel
 First-time setup
 ----------------
 
-First, ensure you have already `installed Tutor <install.rst>`_ (for development against the named releases of Open edX) or `Tutor Nightly <nightly.rst>`_ (for development against Open edX's master branches).
+First, ensure you have already :ref:`installed Tutor <install>` (for development against the named releases of Open edX) or :ref:`Tutor Nightly <nightly>` (for development against Open edX's master branches).
 
 Then, launch the developer platform setup process::
 
