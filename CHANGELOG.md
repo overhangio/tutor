@@ -19,6 +19,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 ## Unreleased
 
 - [Improvement] Use `git am` instead of `cherry-pick` to simplify patching process.
+- [Improvement] Update main commands in `local.rst`.
 
 ## v14.0.1 (2022-06-13)
 

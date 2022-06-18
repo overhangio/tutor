@@ -22,7 +22,7 @@ Main commands
 
 All available commands can be listed by running::
 
-    tutor local help
+    tutor local --help
 
 All-in-one command
 ~~~~~~~~~~~~~~~~~~
