@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Bugfix] Fix smtp server port in `cms.yml` which was causing email sending failures in the Studio. (by @regisb)
 - [Improvement] Use `git am` instead of `cherry-pick` to simplify patching process.
 
 ## v14.0.1 (2022-06-13)
