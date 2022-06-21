@@ -20,6 +20,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 - [Bugfix] Fix smtp server port in `cms.yml` which was causing email sending failures in the Studio. (by @regisb)
 - [Improvement] Use `git am` instead of `cherry-pick` to simplify patching process.
+- [Improvement] Tutor is now compatible with Docker Compose subcommand.
 
 ## v14.0.1 (2022-06-13)
 
