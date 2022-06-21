@@ -57,7 +57,6 @@ MYSQL_ROOT_USERNAME: "root"
 NPM_REGISTRY: "https://registry.npmjs.org/"
 PLATFORM_NAME: "My Open edX"
 PREVIEW_LMS_HOST: "preview.{{ LMS_HOST }}"
-PYTHONBREAKPOINT:
 REDIS_HOST: "redis"
 REDIS_PORT: 6379
 REDIS_USERNAME: ""
