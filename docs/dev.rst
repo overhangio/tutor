@@ -242,7 +242,7 @@ After running all these commands, your edx-platform repository will be ready for
 
     tutor dev start --mount=/path/to/edx-platform lms
 
-``PYTHONBREAKPOINT`` can be modified in the `config.yml` in order to use a custom debugger. The default debugger is ``pdb.set_trace``.
+The default debugger is ``ipdb.set_trace``. ``PYTHONBREAKPOINT`` can be modified by setting an environment variable in the Docker imamge.
 
 If LMS isn't running, this will start it in your terminal. If an LMS container is already running background, this command will stop it, recreate it, and attach your terminal to it. Later, to detach your terminal without stopping the container, just hit ``Ctrl+z``.
 
