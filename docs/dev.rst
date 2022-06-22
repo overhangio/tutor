@@ -161,7 +161,7 @@ Tutor makes it easy to create a bind-mount from an existing container. First, co
 
     tutor dev bindmount lms /openedx/venv
 
-This command recursively copies the contents of the ``/opendedx/venv`` directory to ``$(tutor config printroot)/volumes/venv``. The code of any Python dependency can then be edited -- for instance, you can then add a ``import ipdb; ipdb.set_trace()`` statement for step-by-step debugging, or implement a custom feature.
+This command recursively copies the contents of the ``/opendedx/venv`` directory to ``$(tutor config printroot)/volumes/venv``. The code of any Python dependency can then be edited -- for instance, you can then add a ``breakpoint()`` statement for step-by-step debugging, or implement a custom feature.
 
 Then, bind-mount the directory back in the container with the ``--mount`` option::
 
@@ -238,9 +238,11 @@ Then, you should run the following commands::
     # Rebuild static assets
     openedx-assets build --env=dev
 
-After running all these commands, your edx-platform repository will be ready for local development. To debug a local edx-platform repository, you can then add a ``import ipdb; ipdb.set_trace()`` breakpoint anywhere in your code and run::
+After running all these commands, your edx-platform repository will be ready for local development. To debug a local edx-platform repository, you can then add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in your code and run::
 
     tutor dev start --mount=/path/to/edx-platform lms
+
+The default debugger is ``ipdb.set_trace``. ``PYTHONBREAKPOINT`` can be modified by setting an environment variable in the Docker imamge.
 
 If LMS isn't running, this will start it in your terminal. If an LMS container is already running background, this command will stop it, recreate it, and attach your terminal to it. Later, to detach your terminal without stopping the container, just hit ``Ctrl+z``.
 
