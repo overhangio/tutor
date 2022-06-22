@@ -163,7 +163,7 @@ def docker(*command: str) -> int:
     return execute("docker", *command)
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def _docker_compose_command() -> Tuple[str, ...]:
     """
     A helper function to determine which program to call when running docker compose
