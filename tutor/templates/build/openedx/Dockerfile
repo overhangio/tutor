@@ -227,6 +227,9 @@ USER app
 RUN pip install -r requirements/edx/development.txt
 RUN pip install ipdb==0.13.4 ipython==7.27.0
 
+# Add ipdb as default PYTHONBREAKPOINT
+ENV PYTHONBREAKPOINT=ipdb.set_trace
+
 # Recompile static assets: in development mode all static assets are stored in edx-platform,
 # and the location of these files is stored in webpack-stats.json. If we don't recompile
 # static assets, then production assets will be served instead.
