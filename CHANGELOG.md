@@ -20,6 +20,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 - [Feature] Add default PYTHONBREAKPOINT to openedx/Dockerfile (by @Carlos-Muniz)
 
 - [Bugfix] Fix smtp server port in `cms.yml` which was causing email sending failures in the Studio. (by @regisb)
+- [Bugfix] Skip waiting for MongoDB if it is served using SRV records. (by @gabor-boros)
 - [Improvement] Use `git am` instead of `cherry-pick` to simplify patching process.
 - [Improvement] Tutor is now compatible with Docker Compose subcommand.
 
