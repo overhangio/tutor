@@ -43,4 +43,3 @@ fi
 # Create waffle switches to enable some features, if they have not been explicitly defined before
 # Completion tracking: add green ticks to every completed unit
 (./manage.py lms waffle_switch --list | grep completion.enable_completion_tracking) || ./manage.py lms waffle_switch --create completion.enable_completion_tracking on
-
