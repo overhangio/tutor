@@ -50,6 +50,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Fix broken "Pages" view in Studio
 # https://github.com/openedx/edx-platform/pull/30550
 RUN curl -fsSL https://github.com/open-craft/edx-platform/commit/3d54f284f82b61e693ad652d8d6e46a226fcb36d.patch | git am
+# fix: add () to print statement so problem with hint template works in newer versions
+# https://github.com/openedx/edx-platform/pull/30585
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/468036b3085adbe77a2dbb4a1c3bd88ab831f7b0.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
