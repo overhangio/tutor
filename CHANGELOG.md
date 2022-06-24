@@ -17,6 +17,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 -->
 
 ## Unreleased
+- [Fix] Update problem with hint template so it works with newer python versions. (by @mariajgrimaldi)
 - [Feature] Add default PYTHONBREAKPOINT to openedx/Dockerfile (by @Carlos-Muniz)
 
 - [Bugfix] Fix smtp server port in `cms.yml` which was causing email sending failures in the Studio. (by @regisb)
