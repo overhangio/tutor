@@ -17,9 +17,11 @@ Every user-facing change should have an entry in this changelog. Please respect 
 -->
 
 ## Unreleased
-- [Fix] Update problem with hint template so it works with newer python versions. (by @mariajgrimaldi)
-- [Feature] Add default PYTHONBREAKPOINT to openedx/Dockerfile (by @Carlos-Muniz)
 
+## v14.0.2 (2022-06-27)
+
+- [Bugfix] Update problem with hint template so it works with newer python versions. (by @mariajgrimaldi)
+- [Feature] Add default PYTHONBREAKPOINT to openedx/Dockerfile (by @Carlos-Muniz)
 - [Bugfix] Fix smtp server port in `cms.yml` which was causing email sending failures in the Studio. (by @regisb)
 - [Bugfix] Skip waiting for MongoDB if it is served using SRV records. (by @gabor-boros)
 - [Improvement] Use `git am` instead of `cherry-pick` to simplify patching process.
@@ -42,33 +44,33 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## v13.3.1 (2022-06-06)
 
-- [Fix] Crashing celery workers in development (#681). (by @regisb)
-- [Fix] Fix studio logout issue. (by @Alec4r)
+- [Bugfix] Crashing celery workers in development (#681). (by @regisb)
+- [Bugfix] Fix studio logout issue. (by @Alec4r)
 
 ## v13.3.0 (2022-06-03)
 
 - [Security] Apply logout redirect url security fix. (by @regisb)
 - [Feature] Make it possible to force the rendering of a given template, even when the template path matches an ignore pattern. (by @regisb)
-- 💥[Fix] Get rid of the `tutor config render` command, which is useless now that themes can be implemented as plugins. (by @regisb)
+- 💥[Bugfix] Get rid of the `tutor config render` command, which is useless now that themes can be implemented as plugins. (by @regisb)
 
 ## v13.2.3 (2022-05-30)
 
-- [Fix] Truncate site display name to 50 characters with a warning, fixing data too long error for long site names. (by @navinkarkera)
+- [Bugfix] Truncate site display name to 50 characters with a warning, fixing data too long error for long site names. (by @navinkarkera)
 - [Feature] Add patch to allow overriding final openedx docker image CMD.
-- [Fix] Ignore Python plugins that cannot be loaded. (by @regisb)
+- [Bugfix] Ignore Python plugins that cannot be loaded. (by @regisb)
 - [Improvement] Faster and more reliable builds with `npm clean-install` instead of `npm install`. (by @regisb. Thanks @ghassanmas!)
-- [Fix] Fix 500 error during studio login. (by @regisb)
-- [Fix] Fix updates for the Caddy deployment in multi-node Kubernetes clusters (#660). Previously, Caddy configuration updates might fail if the Kubernetes cluster had more than one worker node. (by @fghaas)
+- [Bugfix] Fix 500 error during studio login. (by @regisb)
+- [Bugfix] Fix updates for the Caddy deployment in multi-node Kubernetes clusters (#660). Previously, Caddy configuration updates might fail if the Kubernetes cluster had more than one worker node. (by @fghaas)
 
 ## v13.2.2 (2022-05-06)
 
-- [Fix] Mounts were broken in dev mode. (by @kdmccormick)
+- [Bugfix] Mounts were broken in dev mode. (by @kdmccormick)
 
 ## v13.2.1 (2022-05-06)
 
-- [Fix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (by @regisb. Thanks @uetuluk!).
-- [Fix] "The Compose file is invalid" error on mounting dev-only folders. (by @regisb)
-- [Fix] CMS settings in development. (by @regisb)
+- [Bugfix] Fix broken file upload in studio because of unpinned studio-frontend requirement (see [discussion](https://discuss.overhang.io/t/missing-js-css-files-missing-from-openedx-docker-image-in-studio/2629) and [pull request](https://github.com/openedx/edx-platform/pull/30309)) (by @regisb. Thanks @uetuluk!).
+- [Bugfix] "The Compose file is invalid" error on mounting dev-only folders. (by @regisb)
+- [Bugfix] CMS settings in development. (by @regisb)
 
 ## v13.2.0 (2022-04-24)
 
