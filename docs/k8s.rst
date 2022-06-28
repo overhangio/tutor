@@ -140,3 +140,30 @@ Updating docker images
 Kubernetes does not provide a single command for updating docker images out of the box. A `commonly used trick <https://github.com/kubernetes/kubernetes/issues/33664>`__ is to modify an innocuous label on all resources::
 
     kubectl patch -k "$(tutor config printroot)/env" --patch "{\"spec\": {\"template\": {\"metadata\": {\"labels\": {\"date\": \"`date +'%Y%m%d-%H%M%S'`\"}}}}}"
+
+
+.. _customizing_kubernetes_sources:
+
+Customizing Kubernetes resources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Plugins can customize any Kubernetes resource in Tutor by overriding the definition of the resource with a :patch:`k8s-override` patch. For example, to change the volume size for MongoDB from ``5Gi`` to ``10Gi``, add the following to the plugin:
+
+::
+
+    # myplugin/tutormyplugin/patches/k8s-override
+    
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: mongodb
+      labels:
+        app.kubernetes.io/component: volume
+        app.kubernetes.io/name: mongodb
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+

@@ -90,6 +90,15 @@ File: ``k8s/deployments.yml``
 
 File: ``k8s/jobs.yml``
 
+.. patch:: k8s-override
+
+``k8s-override``
+================
+
+File: ``k8s/override.yml``
+
+Any Kubernetes resource definition in this patch will override the resource defined by Tutor, provided that their names match. See :ref:`Customizing Kubernetes resources <customizing_kubernetes_sources>` for an example.
+
 .. patch:: k8s-services
 
 ``k8s-services``
@@ -124,6 +133,15 @@ File: ``kustomization.yml``
 ====================================
 
 File: ``kustomization.yml``
+
+.. patch:: kustomization-patches-strategic-merge
+
+``kustomization-patches-strategic-merge``
+=========================================
+
+File: ``kustomization.yml``
+
+This can be used to add more Kustomization patches that make use of the `strategic merge mechanism <https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#customizing>`__. 
 
 .. patch:: kustomization-resources
 

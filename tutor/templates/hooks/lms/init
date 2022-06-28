@@ -1,5 +1,10 @@
 dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
+
+{%- if MONGODB_HOST.startswith("mongodb+srv://") %}
+echo "MongoDB is using SRV records, so we cannot wait for it to be ready"
+{%- else %}
 dockerize -wait tcp://{{ MONGODB_HOST }}:{{ MONGODB_PORT }} -timeout 20s
+{%- endif %}
 
 echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
