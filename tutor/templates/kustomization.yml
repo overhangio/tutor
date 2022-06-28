@@ -59,4 +59,8 @@ configMapGenerator:
         app.kubernetes.io/name: redis
 {{ patch("kustomization-configmapgenerator") }}
 
+patchesStrategicMerge:
+- k8s/override.yml
+{{ patch("kustomization-patches-strategic-merge") }}
+
 {{ patch("kustomization") }}
