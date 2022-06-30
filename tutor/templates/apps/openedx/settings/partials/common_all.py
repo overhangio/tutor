@@ -16,6 +16,7 @@ mongodb_parameters = {
     "password": None,
     {% endif %}
     "db": "{{ MONGODB_DATABASE }}",
+    "replicaSet": None,
 }
 DOC_STORE_CONFIG = mongodb_parameters
 CONTENTSTORE = {
