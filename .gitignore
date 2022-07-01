@@ -11,3 +11,6 @@ __pycache__
 # Unit test/ coverage reports
 .coverage
 /htmlcov/
+
+# Development
+.vscode
