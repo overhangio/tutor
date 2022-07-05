@@ -4,8 +4,8 @@
 # This must be defined early
 CADDY_HTTP_PORT: 80
 CMS_HOST: "studio.{{ LMS_HOST }}"
-CMS_OAUTH2_KEY_SSO: "cms-sso" # no docs
-CMS_OAUTH2_KEY_SSO_DEV: "cms-sso-dev" # no docs
+CMS_OAUTH2_KEY_SSO: "cms-sso"
+CMS_OAUTH2_KEY_SSO_DEV: "cms-sso-dev"
 CONTACT_EMAIL: "contact@{{ LMS_HOST }}" # no docs
 DEV_PROJECT_NAME: "{{ TUTOR_APP }}_dev"  # no docs
 DOCKER_COMPOSE_VERSION: "3.7" # no docs

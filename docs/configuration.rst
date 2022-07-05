@@ -111,6 +111,18 @@ This defines extra pip packages that are going to be installed for Open edX.
 
 This defines the registry from which you'll be pulling NPM packages when building Docker images. Like ``EDX_PLATFORM_REPOSITORY``, this can be overridden at build time with a ``--build-arg`` option.
 
+CMS OAUTH2 SSO
+~~~~~~~~~~~~~~
+
+- ``CMS_OAUTH2_KEY_SSO`` (default: ``"cms-sso"``)
+
+This defines the Studio's (CMS) OAUTH 2.0 Login (Key or Client ID) for SSO in the production environment.
+
+- ``CMS_OAUTH2_KEY_SSO_DEV`` (default: ``"cms-sso-dev"``)
+
+This defines the Studio's (CMS) OAUTH 2.0 Login (Key or Client ID) for SSO in the development environment.
+
+For more information, see `Enabling OAuth for Studio login <https://github.com/openedx/edx-platform/blob/master/docs/guides/studio_oauth.rst>`__.
 
 Vendor services
 ~~~~~~~~~~~~~~~
