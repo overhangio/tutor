@@ -448,3 +448,21 @@ Kubernetes
 
 This configuration parameter sets the Kubernetes Namespace.
 
+Miscellaneous Project Settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``CONTACT_EMAIL`` (default: ``"contact@{{ LMS_HOST }}"``)
+
+This configuration parameter sets the Contact Email.
+
+- ``DEV_PROJECT_NAME`` (default: ``"{{ TUTOR_APP }}_dev"``)
+
+This configuration parameter sets the Development version of the project name.
+
+- ``LOCAL_PROJECT_NAME`` (default: ``"{{ TUTOR_APP }}_local"``)
+
+This configuration parameter sets the Local version of the project name.
+
+- ``PLATFORM_NAME`` (default: ``"My Open edX"``)
+
+This configuration parameter sets the Platform Name.
