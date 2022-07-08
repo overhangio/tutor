@@ -108,6 +108,13 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 
 .. _openedx_configuration:
 
+Compose
+*******
+
+- ``DOCKER_COMPOSE_VERSION`` (default: ``"3.7"``)
+
+This configuration parameter sets the version of Docker Compose to be used to build all containers.
+
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
 
