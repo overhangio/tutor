@@ -31,7 +31,7 @@ JWT_COMMON_AUDIENCE: "openedx" # no docs
 JWT_COMMON_ISSUER: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2" # no docs
 JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}" # no docs
 K8S_NAMESPACE: "openedx" # no docs
-LANGUAGE_CODE: "en" # no docs
+LANGUAGE_CODE: "en"
 LMS_HOST: "www.myopenedx.com"
 LOCAL_PROJECT_NAME: "{{ TUTOR_APP }}_local" # no docs in configurations.rst
 MONGODB_HOST: "mongodb"

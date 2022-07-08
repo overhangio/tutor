@@ -354,7 +354,7 @@ If you don't create your fork from this tag, you *will* have important compatibi
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/nutmeg.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English (``LANGUAGE_CODE`` default: ``"en"``), chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/nutmeg.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
