@@ -63,6 +63,38 @@ Custom images
 
 This configuration parameter defines the name of the Docker image to run for the lms and cms containers. By default, the Docker image tag matches the Tutor version it was built with.
 
+- ``DOCKER_IMAGE_OPENEDX_DEV`` (default: ``"openedx-dev"``)
+
+This configuration paramater defines the name of the Docker image to run the development version of the lms and cms containers.  By default, the Docker image tag matches the Tutor version it was built with.
+
+- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.4.6"``)
+
+This configuration paramater defines which Caddy Docker image to build.
+
+- ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"docker.io/elasticsearch:7.10.1"``)
+
+This configuration parameter defines which Elasticsearch Docker image to build.
+
+- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:4.2.17"``)
+
+This configuration parameter defines which MongoDB Docker image to build.
+
+- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:5.7.35"``)
+
+This configuration parameter defines which MySQL Docker image to build.
+
+- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:6.2.6"``)
+
+This configuration parameter defines which Redis Docker image to build.
+
+- ``DOCKER_IMAGE_SMTP`` (default: ``"docker.io/devture/exim-relay:4.95-r0-2``)
+
+This configuration parameter defines which Simple Mail Transfer Protocol (SMTP) Docker image to build.
+
+- ``DOCKER_IMAGE_PERMISSIONS`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"``)
+
+This configuration parameter defines the Docker image permissions so that all containers are run as unpriveleged users.
+
 Custom registry
 ***************
 
