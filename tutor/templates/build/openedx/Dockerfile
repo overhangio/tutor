@@ -53,6 +53,9 @@ RUN curl -fsSL https://github.com/open-craft/edx-platform/commit/3d54f284f82b61e
 # fix: add () to print statement so problem with hint template works in newer versions
 # https://github.com/openedx/edx-platform/pull/30585
 RUN curl -fsSL https://github.com/openedx/edx-platform/commit/468036b3085adbe77a2dbb4a1c3bd88ab831f7b0.patch | git am
+# Fix LTI 1.3 Names & Roles and Grades conflict with DarkLangMiddleware
+# https://github.com/openedx/edx-platform/pull/30716
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/531bc54833dc97244b408f9f443d2b036f474f0d.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
