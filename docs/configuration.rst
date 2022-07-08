@@ -440,3 +440,11 @@ In these situations, you can set ``--docker-arg`` flag in the ``tutor images bui
         --docker-arg="docker.io/myusername/openedx:mytag"
 
 This will result in passing the ``--cache-from`` option with the value ``docker.io/myusername/openedx:mytag`` to the docker build command.
+
+Kubernetes
+~~~~~~~~~~
+
+- ``K8S_NAMESPACE`` (default: ``"openedx"``)
+
+This configuration parameter sets the Kubernetes Namespace.
+
