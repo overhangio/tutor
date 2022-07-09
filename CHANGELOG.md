@@ -18,6 +18,9 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+
+## v14.0.3 (2022-07-09)
+
 - [Bugfix] Build openedx-dev Docker image even when the host user is root, for instance on Windows. (by @regisb)
 - [Bugfix] Patch nutmeg.1 release with [LTI 1.3 fix](https://github.com/openedx/edx-platform/pull/30716). (by @ormsbee)
 - [Improvement] Make it possible to override k8s resources in plugins using `k8s-override` patch. (by @foadlind)
