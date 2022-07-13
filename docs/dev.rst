@@ -283,6 +283,7 @@ Then, run unit tests with ``pytest`` commands::
     export EDXAPP_TEST_MONGO_HOST=mongodb
     pytest common
     pytest openedx
+    pytest xmodule
 
     # Run tests on LMS
     export DJANGO_SETTINGS_MODULE=lms.envs.tutor.test
