@@ -150,6 +150,26 @@ This defines extra pip packages that are going to be installed for Open edX.
 
 This defines the registry from which you'll be pulling NPM packages when building Docker images. Like ``EDX_PLATFORM_REPOSITORY``, this can be overridden at build time with a ``--build-arg`` option.
 
+- ``OPENEDX_AWS_ACCESS_KEY`` (default: ``""``)
+
+This configuration parameter sets the Django setting ``AWS_ACCESS_KEY_ID`` in edx-platform's LMS, CMS, envs, and production.py for use by the library django-storages with Amazon S3.
+
+- ``OPENEDX_AWS_SECRET_ACCESS_KEY`` (default: ``""``)
+
+This configuration parameter sets the Django setting ``AWS_SECRET_ACCESS_KEY`` in edx-platform's LMS, CMS, envs, and production.py for use by the library django-storages with Amazon S3.
+
+- ``OPENEDX_MYSQL_DATABASE`` (default: ``"openedx"``)
+
+This configuration parameter sets the name of the MySQL Database to be used by the Open edX Instance.
+
+- ``OPENEDX_CSMH_MYSQL_DATABASE`` (default: ``"{{ OPENEDX_MYSQL_DATABASE }}_csmh"``)
+
+This configuration parameter allows you to configure the name of the separate Courseware Student-Module History (CSMH) database.
+
+- ``OPENEDX_MYSQL_USERNAME`` (default: ``"openedx"``)
+
+This configuration parameter sets the username associated with the MySQL Database.
+
 CMS OAUTH2 SSO
 ~~~~~~~~~~~~~~
 
