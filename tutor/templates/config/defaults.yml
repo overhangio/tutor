@@ -27,9 +27,9 @@ ELASTICSEARCH_SCHEME: "http"
 ELASTICSEARCH_HEAP_SIZE: 1g
 ENABLE_HTTPS: false
 ENABLE_WEB_PROXY: true
-JWT_COMMON_AUDIENCE: "openedx" # no docs
-JWT_COMMON_ISSUER: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2" # no docs
-JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}" # no docs
+JWT_COMMON_AUDIENCE: "openedx"
+JWT_COMMON_ISSUER: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"
+JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}"
 K8S_NAMESPACE: "openedx"
 LANGUAGE_CODE: "en"
 LMS_HOST: "www.myopenedx.com"
