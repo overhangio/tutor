@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Bugfix] The `tutor k8s start` command will succeed even when `k8s-override` and `kustomization-patches-strategic-merge` are not specified. (by @edazzocaisser)
 
 ## v14.0.3 (2022-07-09)
 
