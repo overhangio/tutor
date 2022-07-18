@@ -93,7 +93,7 @@ This configuration parameter defines which Simple Mail Transfer Protocol (SMTP) 
 
 - ``DOCKER_IMAGE_PERMISSIONS`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"``)
 
-This configuration parameter defines the Docker image permissions so that all containers are run as unpriveleged users.
+This configuration parameter defines the Docker image to be used for setting file permissions. The default image sets all containers to be run as unpriveleged users.
 
 Custom registry
 ***************
