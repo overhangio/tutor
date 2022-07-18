@@ -191,8 +191,8 @@ This defines the Studio's (CMS) OAUTH 2.0 Login (Key or Client ID) for SSO in th
 
 For more information, see `Enabling OAuth for Studio login <https://github.com/openedx/edx-platform/blob/master/docs/guides/studio_oauth.rst>`__.
 
-JWT Common
-~~~~~~~~~~
+JWTs
+~~~~
 
 - ``JWT_COMMON_AUDIENCE`` (default: ``"openedx"``)
 - ``JWT_COMMON_ISSUER`` (default: ``"{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"``)
