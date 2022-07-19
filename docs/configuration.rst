@@ -198,7 +198,7 @@ JWTs
 - ``JWT_COMMON_ISSUER`` (default: ``"{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"``)
 - ``JWT_COMMON_SECRET_KEY`` (default: ``"{{ OPENEDX_SECRET_KEY }}"``)
 
-These configuration parameters are rendered into the ``JWT_AUTH`` dictionary with keys ``JWT_AUDIENCE``, ``JWT_ISSUER``, and ``JWT_SECRET_KEY``, respectively. The dictionary entries are used as Django settings within the LMS/CMS in conjunction with Django REST framework JWT Auth for JSON Web Token Authentication.
+These configuration parameters are rendered into the ``JWT_AUTH`` dictionary with keys ``JWT_AUDIENCE``, ``JWT_ISSUER``, and ``JWT_SECRET_KEY``, respectively. These parameters may be changed in order to create a custom user login for testing purposes.
 
 Vendor services
 ~~~~~~~~~~~~~~~
