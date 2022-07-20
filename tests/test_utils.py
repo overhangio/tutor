@@ -102,7 +102,23 @@ class UtilsTests(unittest.TestCase):
 
         result = utils.execute("echo", "")
         self.assertEqual(0, result)
-        self.assertEqual("echo \n", mock_stdout.getvalue())
+        self.assertEqual("echo ''\n", mock_stdout.getvalue())
+        self.assertEqual(1, process.wait.call_count)
+        process.kill.assert_not_called()
+
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("subprocess.Popen", autospec=True)
+    def test_execute_nested_command(
+        self, mock_popen: MagicMock, mock_stdout: StringIO
+    ) -> None:
+        process = mock_popen.return_value
+        mock_popen.return_value.__enter__.return_value = process
+        process.wait.return_value = 0
+        process.communicate.return_value = ("output", "error")
+
+        result = utils.execute("bash", "-c", "echo -n hi")
+        self.assertEqual(0, result)
+        self.assertEqual("bash -c 'echo -n hi'\n", mock_stdout.getvalue())
         self.assertEqual(1, process.wait.call_count)
         process.kill.assert_not_called()
 
@@ -117,7 +133,7 @@ class UtilsTests(unittest.TestCase):
         process.communicate.return_value = ("output", "error")
 
         self.assertRaises(exceptions.TutorError, utils.execute, "echo", "")
-        self.assertEqual("echo \n", mock_stdout.getvalue())
+        self.assertEqual("echo ''\n", mock_stdout.getvalue())
         self.assertEqual(1, process.wait.call_count)
         process.kill.assert_not_called()
 
@@ -131,7 +147,7 @@ class UtilsTests(unittest.TestCase):
         process.wait.side_effect = ZeroDivisionError("Exception occurred.")
 
         self.assertRaises(ZeroDivisionError, utils.execute, "echo", "")
-        self.assertEqual("echo \n", mock_stdout.getvalue())
+        self.assertEqual("echo ''\n", mock_stdout.getvalue())
         self.assertEqual(2, process.wait.call_count)
         process.kill.assert_called_once()
 

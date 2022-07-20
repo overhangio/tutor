@@ -3,6 +3,7 @@ from functools import lru_cache
 import json
 import os
 import random
+import shlex
 import shutil
 import string
 import struct
@@ -201,7 +202,7 @@ def is_a_tty() -> bool:
 
 
 def execute(*command: str) -> int:
-    click.echo(fmt.command(" ".join(command)))
+    click.echo(fmt.command(shlex.join(command)))
     with subprocess.Popen(command) as p:
         try:
             result = p.wait(timeout=None)
