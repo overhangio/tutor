@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Bugfix] Log the shell commands that Tutor executes more accurately. (by @kdmccormick)
 - [Fix] `tutor dev quickstart` would fail under certain versions of docker-compose due to a bug in the logic that handled volume mounting. (by @kdmccormick)
 - [Bugfix] The `tutor k8s start` command will succeed even when `k8s-override` and `kustomization-patches-strategic-merge` are not specified. (by @edazzocaisser)
 
