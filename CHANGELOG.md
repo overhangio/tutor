@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- 💥[Improvement] Remove the implementation of tutor dev runserver. (by @Carlos-Muniz)
 
 ## v14.0.3 (2022-07-09)
 
