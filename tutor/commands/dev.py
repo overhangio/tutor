@@ -103,37 +103,6 @@ Your Open edX platform is ready and can be accessed at the following urls:
     )
 
 
-@click.command(
-    help="DEPRECATED: Use 'tutor dev start ...' instead!",
-    context_settings={"ignore_unknown_options": True},
-)
-@compose.mount_option
-@click.argument("options", nargs=-1, required=False)
-@click.argument("service")
-@click.pass_context
-def runserver(
-    context: click.Context,
-    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
-    options: t.List[str],
-    service: str,
-) -> None:
-    depr_warning = "'runserver' is deprecated and will be removed in a future release. Use 'start' instead."
-    for option in options:
-        if option.startswith("-v") or option.startswith("--volume"):
-            depr_warning += " Bind-mounts can be specified using '-m/--mount'."
-            break
-    fmt.echo_alert(depr_warning)
-    config = tutor_config.load(context.obj.root)
-    if service in ["lms", "cms"]:
-        port = 8000 if service == "lms" else 8001
-        host = config["LMS_HOST"] if service == "lms" else config["CMS_HOST"]
-        fmt.echo_info(
-            f"The {service} service will be available at http://{host}:{port}"
-        )
-    args = ["--service-ports", *options, service]
-    context.invoke(compose.run, mounts=mounts, args=args)
-
-
 @hooks.Actions.COMPOSE_PROJECT_STARTED.add()
 def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
     """
@@ -146,5 +115,4 @@ def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
 
 
 dev.add_command(quickstart)
-dev.add_command(runserver)
 compose.add_commands(dev)
