@@ -20,6 +20,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 - [Fix] `tutor dev quickstart` would fail under certain versions of docker-compose due to a bug in the logic that handled volume mounting. (by @kdmccormick)
 - [Bugfix] The `tutor k8s start` command will succeed even when `k8s-override` and `kustomization-patches-strategic-merge` are not specified. (by @edazzocaisser)
+- [Fix] `kubectl wait` checks deployments instead of pods as it could hang indefinitely if there are extra pods in a broken state. (by @keithgg)
 
 ## v14.0.3 (2022-07-09)
 
