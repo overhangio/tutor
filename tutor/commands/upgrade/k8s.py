@@ -120,7 +120,7 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=mysql",
     )
-    k8s.wait_for_pod_ready(config, "mysql")
+    k8s.wait_for_deployment_ready(config, "mysql")
 
     # lms upgrade
     k8s.kubectl_apply(
@@ -128,7 +128,7 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=lms",
     )
-    k8s.wait_for_pod_ready(config, "lms")
+    k8s.wait_for_deployment_ready(config, "lms")
 
     # Command backpopulate_user_tours
     k8s.kubectl_exec(
@@ -144,7 +144,7 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=cms",
     )
-    k8s.wait_for_pod_ready(config, "cms")
+    k8s.wait_for_deployment_ready(config, "cms")
 
     # Command backfill_course_tabs
     k8s.kubectl_exec(
