@@ -1,5 +1,3 @@
-import typing as t
-
 import click
 
 from tutor import config as tutor_config
