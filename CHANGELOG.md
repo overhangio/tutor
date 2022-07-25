@@ -17,6 +17,14 @@ Every user-facing change should have an entry in this changelog. Please respect 
 -->
 
 ## Unreleased
+
+- [Fix] `tutor dev quickstart` would fail under certain versions of docker-compose due to a bug in the logic that handled volume mounting. (by @kdmccormick)
+- [Bugfix] The `tutor k8s start` command will succeed even when `k8s-override` and `kustomization-patches-strategic-merge` are not specified. (by @edazzocaisser)
+
+## v14.0.3 (2022-07-09)
+
+- [Bugfix] Build openedx-dev Docker image even when the host user is root, for instance on Windows. (by @regisb)
+- [Bugfix] Patch nutmeg.1 release with [LTI 1.3 fix](https://github.com/openedx/edx-platform/pull/30716). (by @ormsbee)
 - [Improvement] Make it possible to override k8s resources in plugins using `k8s-override` patch. (by @foadlind)
 
 ## v14.0.2 (2022-06-27)
