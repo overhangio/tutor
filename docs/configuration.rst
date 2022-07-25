@@ -63,6 +63,38 @@ Custom images
 
 This configuration parameter defines the name of the Docker image to run for the lms and cms containers. By default, the Docker image tag matches the Tutor version it was built with.
 
+- ``DOCKER_IMAGE_OPENEDX_DEV`` (default: ``"openedx-dev"``)
+
+This configuration paramater defines the name of the Docker image to run the development version of the lms and cms containers.  By default, the Docker image tag matches the Tutor version it was built with.
+
+- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.4.6"``)
+
+This configuration paramater defines which Caddy Docker image to use.
+
+- ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"docker.io/elasticsearch:7.10.1"``)
+
+This configuration parameter defines which Elasticsearch Docker image to use.
+
+- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:4.2.17"``)
+
+This configuration parameter defines which MongoDB Docker image to use.
+
+- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:5.7.35"``)
+
+This configuration parameter defines which MySQL Docker image to use.
+
+- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:6.2.6"``)
+
+This configuration parameter defines which Redis Docker image to use.
+
+- ``DOCKER_IMAGE_SMTP`` (default: ``"docker.io/devture/exim-relay:4.95-r0-2``)
+
+This configuration parameter defines which Simple Mail Transfer Protocol (SMTP) Docker image to use.
+
+- ``DOCKER_IMAGE_PERMISSIONS`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"``)
+
+This configuration parameter defines the Docker image to be used for setting file permissions. The default image sets all containers to be run as unpriveleged users.
+
 Custom registry
 ***************
 
@@ -75,6 +107,21 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 (the trailing ``/`` is important)
 
 .. _openedx_configuration:
+
+Compose
+*******
+
+- ``DOCKER_COMPOSE_VERSION`` (default: ``"3.7"``)
+
+This configuration parameter sets the version of Docker Compose to be used to build all containers.
+
+- ``DEV_PROJECT_NAME`` (default: ``"{{ TUTOR_APP }}_dev"``)
+
+This configuration parameter sets the Development version of the Docker Compose project name.
+
+- ``LOCAL_PROJECT_NAME`` (default: ``"{{ TUTOR_APP }}_local"``)
+
+This configuration parameter sets the Local version of the Docker Compose project name.
 
 Open edX customisation
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -111,6 +158,47 @@ This defines extra pip packages that are going to be installed for Open edX.
 
 This defines the registry from which you'll be pulling NPM packages when building Docker images. Like ``EDX_PLATFORM_REPOSITORY``, this can be overridden at build time with a ``--build-arg`` option.
 
+- ``OPENEDX_AWS_ACCESS_KEY`` (default: ``""``)
+
+This configuration parameter sets the Django setting ``AWS_ACCESS_KEY_ID`` in edx-platform's LMS, CMS, envs, and production.py for use by the library django-storages with Amazon S3.
+
+- ``OPENEDX_AWS_SECRET_ACCESS_KEY`` (default: ``""``)
+
+This configuration parameter sets the Django setting ``AWS_SECRET_ACCESS_KEY`` in edx-platform's LMS, CMS, envs, and production.py for use by the library django-storages with Amazon S3.
+
+- ``OPENEDX_MYSQL_DATABASE`` (default: ``"openedx"``)
+
+This configuration parameter sets the name of the MySQL Database to be used by the Open edX Instance.
+
+- ``OPENEDX_CSMH_MYSQL_DATABASE`` (default: ``"{{ OPENEDX_MYSQL_DATABASE }}_csmh"``)
+
+This configuration parameter allows you to configure the name of the separate Courseware Student-Module History (CSMH) database.
+
+- ``OPENEDX_MYSQL_USERNAME`` (default: ``"openedx"``)
+
+This configuration parameter sets the username associated with the MySQL Database.
+
+CMS OAUTH2 SSO
+~~~~~~~~~~~~~~
+
+- ``CMS_OAUTH2_KEY_SSO`` (default: ``"cms-sso"``)
+
+This defines the Studio's (CMS) OAUTH 2.0 Login (Key or Client ID) for SSO in the production environment.
+
+- ``CMS_OAUTH2_KEY_SSO_DEV`` (default: ``"cms-sso-dev"``)
+
+This defines the Studio's (CMS) OAUTH 2.0 Login (Key or Client ID) for SSO in the development environment.
+
+For more information, see `Enabling OAuth for Studio login <https://github.com/openedx/edx-platform/blob/master/docs/guides/studio_oauth.rst>`__.
+
+JWTs
+~~~~
+
+- ``JWT_COMMON_AUDIENCE`` (default: ``"openedx"``)
+- ``JWT_COMMON_ISSUER`` (default: ``"{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"``)
+- ``JWT_COMMON_SECRET_KEY`` (default: ``"{{ OPENEDX_SECRET_KEY }}"``)
+
+These configuration parameters are rendered into the ``JWT_AUTH`` dictionary with keys ``JWT_AUDIENCE``, ``JWT_ISSUER``, and ``JWT_SECRET_KEY``, respectively. These parameters may be changed in order to create a custom user login for testing purposes.
 
 Vendor services
 ~~~~~~~~~~~~~~~
@@ -204,6 +292,24 @@ If you would like to perform SSL/TLS termination with your own custom certificat
 .. _customise:
 
 .. _custom_openedx_docker_image:
+
+Kubernetes
+~~~~~~~~~~
+
+- ``K8S_NAMESPACE`` (default: ``"openedx"``)
+
+This configuration parameter sets the Kubernetes Namespace.
+
+Miscellaneous Project Settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``CONTACT_EMAIL`` (default: ``"contact@{{ LMS_HOST }}"``)
+
+This configuration parameter sets the Contact Email.
+
+- ``PLATFORM_NAME`` (default: ``"My Open edX"``)
+
+This configuration parameter sets the Platform Name.
 
 Custom Open edX docker image
 ----------------------------
@@ -303,7 +409,7 @@ If you don't create your fork from this tag, you *will* have important compatibi
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English, chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/nutmeg.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English (``LANGUAGE_CODE`` default: ``"en"``), chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/nutmeg.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
