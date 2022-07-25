@@ -465,7 +465,7 @@ def dc_command(context: BaseComposeContext, command: str, args: t.List[str]) -> 
     context.job_runner(config).docker_compose(command, *volume_args, *non_volume_args)
 
 
-def process_mount_arguments(mounts: t.Tuple[t.List[MountParam.MountType]]) -> None:
+def process_mount_arguments(mounts: t.Tuple[t.List[MountParam.MountType], ...]) -> None:
     """
     Process --mount arguments.
 
@@ -496,18 +496,31 @@ def process_mount_arguments(mounts: t.Tuple[t.List[MountParam.MountType]]) -> No
             services[service]["volumes"].append(f"{host_path}:{container_path}")
         return docker_compose
 
-    # Save bind-mounts
-    @hooks.Filters.COMPOSE_LOCAL_TMP.add()
-    def _add_mounts_to_docker_compose_tmp(
-        docker_compose_tmp: t.Dict[str, t.Any]
-    ) -> t.Dict[str, t.Any]:
-        return _add_mounts(docker_compose_tmp, app_mounts)
+    # Clear filter callbacks already created within the COMPOSE_CLI_MOUNTS context.
+    # This prevents us from redundantly specifying these volume mounts in cases
+    # where process_mount_arguments is called more than once.
+    hooks.Filters.COMPOSE_LOCAL_TMP.clear(
+        context=hooks.Contexts.COMPOSE_CLI_MOUNTS.name
+    )
+    hooks.Filters.COMPOSE_LOCAL_JOBS_TMP.clear(
+        context=hooks.Contexts.COMPOSE_CLI_MOUNTS.name
+    )
 
-    @hooks.Filters.COMPOSE_LOCAL_JOBS_TMP.add()
-    def _add_mounts_to_docker_compose_jobs_tmp(
-        docker_compose_tmp: t.Dict[str, t.Any]
-    ) -> t.Dict[str, t.Any]:
-        return _add_mounts(docker_compose_tmp, job_mounts)
+    # Now, within that COMPOSE_CLI_MOUNTS context, (re-)create filter callbacks to
+    # specify these volume mounts within the docker-compose[.jobs].tmp.yml files.
+    with hooks.Contexts.COMPOSE_CLI_MOUNTS.enter():
+
+        @hooks.Filters.COMPOSE_LOCAL_TMP.add()
+        def _add_mounts_to_docker_compose_tmp(
+            docker_compose_tmp: t.Dict[str, t.Any]
+        ) -> t.Dict[str, t.Any]:
+            return _add_mounts(docker_compose_tmp, app_mounts)
+
+        @hooks.Filters.COMPOSE_LOCAL_JOBS_TMP.add()
+        def _add_mounts_to_docker_compose_jobs_tmp(
+            docker_compose_jobs_tmp: t.Dict[str, t.Any]
+        ) -> t.Dict[str, t.Any]:
+            return _add_mounts(docker_compose_jobs_tmp, job_mounts)
 
 
 @hooks.Filters.COMPOSE_MOUNTS.add()

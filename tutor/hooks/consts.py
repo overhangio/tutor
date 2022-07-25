@@ -354,8 +354,12 @@ class Contexts:
     #: Plugins will be installed and enabled within this context.
     PLUGINS = contexts.Context("plugins")
 
-    #: YAML-formatted v0 plugins will be installed within that context.
+    #: YAML-formatted v0 plugins will be installed within this context.
     PLUGINS_V0_YAML = contexts.Context("plugins:v0:yaml")
 
-    #: Python entrypoint plugins will be installed within that context.
+    #: Python entrypoint plugins will be installed within this context.
     PLUGINS_V0_ENTRYPOINT = contexts.Context("plugins:v0:entrypoint")
+
+    #: Docker Compose volumes added via the CLI's ``--mount`` option will
+    #: be installed within this context.
+    COMPOSE_CLI_MOUNTS = contexts.Context("compose:cli:mounts")
