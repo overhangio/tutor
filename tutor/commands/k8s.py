@@ -332,10 +332,10 @@ def delete(context: K8sContext, yes: bool) -> None:
 def init(context: K8sContext, limit: Optional[str]) -> None:
     config = tutor_config.load(context.root)
     runner = context.job_runner(config)
-    wait_for_pod_ready(config, "caddy")
+    wait_for_deployment_ready(config, "caddy")
     for name in ["elasticsearch", "mysql", "mongodb"]:
         if tutor_config.is_service_activated(config, name):
-            wait_for_pod_ready(config, name)
+            wait_for_deployment_ready(config, name)
     jobs.initialise(runner, limit_to=limit)
 
 
@@ -458,7 +458,7 @@ def logs(
 @click.pass_obj
 def wait(context: K8sContext, name: str) -> None:
     config = tutor_config.load(context.root)
-    wait_for_pod_ready(config, name)
+    wait_for_deployment_ready(config, name)
 
 
 @click.command(
@@ -536,14 +536,14 @@ def kubectl_exec(config: Config, service: str, command: List[str]) -> int:
     )
 
 
-def wait_for_pod_ready(config: Config, service: str) -> None:
-    fmt.echo_info(f"Waiting for a {service} pod to be ready...")
+def wait_for_deployment_ready(config: Config, service: str) -> None:
+    fmt.echo_info(f"Waiting for a {service} deployment to be ready...")
     utils.kubectl(
         "wait",
         *resource_selector(config, f"app.kubernetes.io/name={service}"),
-        "--for=condition=ContainersReady",
+        "--for=condition=Available=True",
         "--timeout=600s",
-        "pod",
+        "deployment",
     )
 
 
