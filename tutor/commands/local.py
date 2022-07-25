@@ -20,27 +20,38 @@ class LocalJobRunner(compose.ComposeJobRunner):
         """
         super().__init__(root, config)
         self.project_name = get_typed(self.config, "LOCAL_PROJECT_NAME", str)
-        self.docker_compose_tmp_path = tutor_env.pathjoin(
+        docker_compose_tmp_path = tutor_env.pathjoin(
             self.root, "local", "docker-compose.tmp.yml"
         )
-        self.docker_compose_jobs_tmp_path = tutor_env.pathjoin(
+        docker_compose_jobs_tmp_path = tutor_env.pathjoin(
             self.root, "local", "docker-compose.jobs.tmp.yml"
         )
         self.docker_compose_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.prod.yml"),
-            self.docker_compose_tmp_path,
+            docker_compose_tmp_path,
             tutor_env.pathjoin(self.root, "local", "docker-compose.override.yml"),
         ]
         self.docker_compose_job_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
-            self.docker_compose_jobs_tmp_path,
+            docker_compose_jobs_tmp_path,
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.override.yml"),
         ]
+
+        # Update docker-compose.tmp files
+        self.update_docker_compose_tmp(
+            hooks.Filters.COMPOSE_LOCAL_TMP,
+            hooks.Filters.COMPOSE_LOCAL_JOBS_TMP,
+            docker_compose_tmp_path,
+            docker_compose_jobs_tmp_path,
+        )
 
 
 # pylint: disable=too-few-public-methods
 class LocalContext(compose.BaseComposeContext):
+    COMPOSE_TMP_FILTER = hooks.Filters.COMPOSE_LOCAL_TMP
+    COMPOSE_JOBS_TMP_FILTER = hooks.Filters.COMPOSE_LOCAL_JOBS_TMP
+
     def job_runner(self, config: Config) -> LocalJobRunner:
         return LocalJobRunner(self.root, config)
 
@@ -62,6 +73,7 @@ def quickstart(
     non_interactive: bool,
     pullimages: bool,
 ) -> None:
+    compose.mount_tmp_volumes(mounts, context.obj)
     try:
         utils.check_macos_docker_memory()
     except exceptions.TutorError as e:
@@ -128,9 +140,9 @@ Press enter when you are ready to continue"""
         click.echo(fmt.title("Docker image updates"))
         context.invoke(compose.dc_command, command="pull")
     click.echo(fmt.title("Starting the platform in detached mode"))
-    context.invoke(compose.start, mounts=mounts, detach=True)
+    context.invoke(compose.start, detach=True)
     click.echo(fmt.title("Database creation and migrations"))
-    context.invoke(compose.init, mounts=mounts)
+    context.invoke(compose.init)
 
     config = tutor_config.load(context.obj.root)
     fmt.echo_info(
