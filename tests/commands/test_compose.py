@@ -1,10 +1,13 @@
 import typing as t
 import unittest
+from io import StringIO
+from unittest.mock import patch
 
 from click.exceptions import ClickException
 
 from tutor import hooks
 from tutor.commands import compose
+from tutor.commands.local import LocalContext
 
 
 class ComposeTests(unittest.TestCase):
@@ -42,25 +45,22 @@ class ComposeTests(unittest.TestCase):
         with self.assertRaises(ClickException):
             param("lms,:/path/to/edx-platform:/openedx/edx-platform")
 
-    def test_compose_local_tmp_generation(self) -> None:
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_compose_local_tmp_generation(self, _mock_stdout: StringIO) -> None:
         """
-        Ensure that docker-compose.tmp.yml is correctly generated, even when
-        mounts are processed more than once.
+        Ensure that docker-compose.tmp.yml is correctly generated.
         """
         param = compose.MountParam()
-        mount_args: t.Tuple[t.List[compose.MountParam.MountType], ...] = (
+        mount_args = (
             # Auto-mounting of edx-platform to lms* and cms*
-            param("/path/to/edx-platform"),
+            param.convert_implicit_form("/path/to/edx-platform"),
             # Manual mounting of some other folder to mfe and lms
-            param("mfe,lms:/path/to/something-else:/openedx/something-else"),
+            param.convert_explicit_form(
+                "mfe,lms:/path/to/something-else:/openedx/something-else"
+            ),
         )
-
-        # In some cases, process_mount_arguments ends up being called more
-        # than once. To ensure that we can handle that situation, we call it
-        # multiple times here.
-        compose.process_mount_arguments(mount_args)
-        compose.process_mount_arguments(mount_args)
-        compose.process_mount_arguments(mount_args)
+        # Mount volumes
+        compose.mount_tmp_volumes(mount_args, LocalContext(""))
 
         compose_file: t.Dict[str, t.Any] = hooks.Filters.COMPOSE_LOCAL_TMP.apply({})
         actual_services: t.Dict[str, t.Any] = compose_file["services"]

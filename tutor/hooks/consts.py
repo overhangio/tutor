@@ -121,6 +121,12 @@ class Filters:
     #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks. (see :py:data:`COMMANDS_INIT`).
     COMMANDS_PRE_INIT = filters.get("commands:pre-init")
 
+    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for the development environment.
+    COMPOSE_DEV_TMP = filters.get("compose:dev:tmp")
+
+    #: Same as :py:data:`COMPOSE_LOCAL_JOBS_TMP` but for the development environment.
+    COMPOSE_DEV_JOBS_TMP = filters.get("compose:dev-jobs:tmp")
+
     #: List of folders to bind-mount in docker-compose containers, either in ``tutor local`` or ``tutor dev``.
     #:
     #: Many ``tutor local`` and ``tutor dev`` commands support ``--mounts`` options
@@ -359,7 +365,3 @@ class Contexts:
 
     #: Python entrypoint plugins will be installed within this context.
     PLUGINS_V0_ENTRYPOINT = contexts.Context("plugins:v0:entrypoint")
-
-    #: Docker Compose volumes added via the CLI's ``--mount`` option will
-    #: be installed within this context.
-    COMPOSE_CLI_MOUNTS = contexts.Context("compose:cli:mounts")
