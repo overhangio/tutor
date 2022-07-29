@@ -64,8 +64,15 @@ def dev(context: click.Context) -> None:
 @click.command(help="Configure and run Open edX from scratch, for development")
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
+@compose.mount_option
 @click.pass_context
-def quickstart(context: click.Context, non_interactive: bool, pullimages: bool) -> None:
+def quickstart(
+    context: click.Context,
+    non_interactive: bool,
+    pullimages: bool,
+    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
+) -> None:
+    compose.mount_tmp_volumes(mounts, context.obj)
     try:
         utils.check_macos_docker_memory()
     except exceptions.TutorError as e:
