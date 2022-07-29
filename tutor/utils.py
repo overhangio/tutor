@@ -1,5 +1,4 @@
 import base64
-from functools import lru_cache
 import json
 import os
 import random
@@ -9,6 +8,7 @@ import string
 import struct
 import subprocess
 import sys
+from functools import lru_cache
 from typing import List, Tuple
 
 import click

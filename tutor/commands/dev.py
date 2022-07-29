@@ -18,29 +18,39 @@ class DevJobRunner(compose.ComposeJobRunner):
         """
         super().__init__(root, config)
         self.project_name = get_typed(self.config, "DEV_PROJECT_NAME", str)
-        self.docker_compose_tmp_path = tutor_env.pathjoin(
+        docker_compose_tmp_path = tutor_env.pathjoin(
             self.root, "dev", "docker-compose.tmp.yml"
         )
-        self.docker_compose_jobs_tmp_path = tutor_env.pathjoin(
+        docker_compose_jobs_tmp_path = tutor_env.pathjoin(
             self.root, "dev", "docker-compose.jobs.tmp.yml"
         )
         self.docker_compose_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.yml"),
-            self.docker_compose_tmp_path,
+            docker_compose_tmp_path,
             tutor_env.pathjoin(self.root, "local", "docker-compose.override.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.override.yml"),
         ]
         self.docker_compose_job_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.jobs.yml"),
-            self.docker_compose_jobs_tmp_path,
+            docker_compose_jobs_tmp_path,
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.override.yml"),
             tutor_env.pathjoin(self.root, "dev", "docker-compose.jobs.override.yml"),
         ]
+        # Update docker-compose.tmp files
+        self.update_docker_compose_tmp(
+            hooks.Filters.COMPOSE_DEV_TMP,
+            hooks.Filters.COMPOSE_DEV_JOBS_TMP,
+            docker_compose_tmp_path,
+            docker_compose_jobs_tmp_path,
+        )
 
 
 class DevContext(compose.BaseComposeContext):
+    COMPOSE_TMP_FILTER = hooks.Filters.COMPOSE_DEV_TMP
+    COMPOSE_JOBS_TMP_FILTER = hooks.Filters.COMPOSE_DEV_JOBS_TMP
+
     def job_runner(self, config: Config) -> DevJobRunner:
         return DevJobRunner(self.root, config)
 
@@ -54,8 +64,15 @@ def dev(context: click.Context) -> None:
 @click.command(help="Configure and run Open edX from scratch, for development")
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
+@compose.mount_option
 @click.pass_context
-def quickstart(context: click.Context, non_interactive: bool, pullimages: bool) -> None:
+def quickstart(
+    context: click.Context,
+    non_interactive: bool,
+    pullimages: bool,
+    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
+) -> None:
+    compose.mount_tmp_volumes(mounts, context.obj)
     try:
         utils.check_macos_docker_memory()
     except exceptions.TutorError as e:
