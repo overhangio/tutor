@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v14.0.4 (2022-07-29)
+
 - [Feature] Add the `-m/--mount` option to `tutor dev quickstart`.
 - [Bugfix] Fix `tutor dev start -m /path/to/frontend-app-learning` by introducing dev-specific `COMPOSE_DEV_TMP` and `COMPOSE_DEV_JOBS_TMP` filters (by @regisb).
 - [Bugfix] Log the shell commands that Tutor executes more accurately. (by @kdmccormick)
