@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Feature] Upgrade all applications to open-release/nutmeg.2.
+
 ## v14.0.4 (2022-07-29)
 
 - [Feature] Add the `-m/--mount` option to `tutor dev quickstart`.
