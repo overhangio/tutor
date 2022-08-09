@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v14.0.5 (2022-08-09)
+
 - [Bugfix] Fix MongoDB replica set connection error resulting from edx-platform's pymongo (3.10.1 -> 3.12.3) upgrade ([edx-platform#30569](https://github.com/openedx/edx-platform/pull/30569)). (by @ormsbee)
 - [Feature] Upgrade all applications to open-release/nutmeg.2 (@BbrSofiane).
 
@@ -57,7 +59,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
   - 💥[Improvement] The `lms.env.json` and `cms.env.json` files are moved to `lms.env.yml` and `cms.env.yml`. As a consequence, plugin developers must reformat the following patches to use YAML format, and not JSON: "common-env-features", "lms-env-features", "cms-env-features", "lms-env", "cms-env", "openedx-auth".
   - 💥[Feature] Persistent grades are now enabled by default.
   - [Bugfix] Remove edX references from bulk emails ([issue](https://github.com/openedx/build-test-release-wg/issues/100)).
-  - [Improvement] For Tutor Nightly (and only Nightly), official plugins are now installed from their nightly branches on GitHub instead of a version range on PyPI. This will allow Nightly users to install all official plugins by running `pip install -e ".[full]"`.
+  - [Improvement] For Tutor Nightly (and only Nightly), official plugins are now installed from their nightly branches on GitHub instead of a version range on PyPI. This will allow Nightly users to install all official plugins by running ``pip install -e ".[full]"``.
   - [Bugfix] Start MongoDB when running migrations, because a new data migration fails if MongoDB is not running
 
 ## v13.3.1 (2022-06-06)
@@ -98,7 +100,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 - [Deprecation] Mark `tutor dev runserver` as deprecated in favor of `tutor dev start`. Since `start` now supports bind-mounting and breakpoint debugging, `runserver` is redundant and will be removed in a future release. (by @kdmccormick)
 - [Improvement] Allow breakpoint debugging when attached to a service via `tutor dev start SERVICE`. (by @kdmccormick)
 - [Security] Apply rate limiting security fix (see [commit](https://github.com/overhangio/edx-platform/commit/b5723e416e628cac4fa84392ca13e1b72817674f)). (by @regisb)
-- [Feature] Introduce the `-m/--mount` option in `local` and `dev` commands to auto-magically bind-mount folders from the host. (by @regisb)
+- [Feature] Introduce the ``-m/--mount`` option in ``local`` and ``dev`` commands to auto-magically bind-mount folders from the host. (by @regisb)
 - [Feature] Add `tutor dev quickstart` command, which is similar to `tutor local quickstart`, except that it uses dev containers instead of local production ones and includes some other small differences for the convience of Open edX developers. This should remove some friction from the Open edX development setup process, which previously required that users provision using local producation containers (`tutor local quickstart`) but then stop them and switch to dev containers (`tutor local stop && tutor dev start -d`). (by @kdmccormick)
 - 💥[Improvement] Make it possible to run `tutor k8s exec <command with multiple arguments>` (#636). As a consequence, it is no longer possible to run quoted commands: `tutor k8s exec "<some command>"`. Instead, you should remove the quotes: `tutor k8s exec <some command>`. (by @regisb)
 - 💥[Deprecation] Drop support for the `TUTOR_EDX_PLATFORM_SETTINGS` environment variable. It is now recommended to create a plugin instead. (by @regisb)
@@ -167,8 +169,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 - [Improvement] Provide much more comprehensive instructions when upgrading.
 - [Bugfix] During the upgrade, make sure that the environment is up-to-date before prompting to rebuild the custom images.
 - [Bugfix] Fix ownership of MySQL data, in particular when upgrading a Kubernetes cluster to Maple.
-- [Bugfix] Ensure that `tutor k8s upgrade` is run during `tutor k8s quickstart`, when necessary.
-- 💥[Bugfix] By default, detect the current version during `tutor k8s/local upgrade`.
+- [Bugfix] Ensure that ``tutor k8s upgrade`` is run during ``tutor k8s quickstart``, when necessary.
+- 💥[Bugfix] By default, detect the current version during ``tutor k8s/local upgrade``.
 - [Bugfix] Fix upgrading from Lilac to Maple on Kubernetes by deleting deployments and services.
 
 ## v13.0.3 (2022-01-04)
@@ -193,11 +195,11 @@ Every user-facing change should have an entry in this changelog. Please respect 
   - 💥 Allow concurrent logins to the LMS and the CMS.
   - Add `tutor local start --skip-build` option to skip building Docker images.
 - [Feature] Better support of Caddy as a load balancer in Kubernetes:
-  - Make it possible to start/stop a selection of resources with `tutor k8s start/stop [names...]`.
-  - Make it easy to deploy an independent LoadBalancer by converting the caddy service to a ClusterIP when `ENABLE_WEB_PROXY=false`.
-  - Add a `app.kubernetes.io/component: loadbalancer` label to the LoadBalancer service.
-  - Add `app.kubernetes.io/name` labels to all services.
-  - Preserve the LoadBalancer service in `tutor k8s stop` commands.
+  - Make it possible to start/stop a selection of resources with ``tutor k8s start/stop [names...]``.
+  - Make it easy to deploy an independent LoadBalancer by converting the caddy service to a ClusterIP when ``ENABLE_WEB_PROXY=false``.
+  - Add a ``app.kubernetes.io/component: loadbalancer`` label to the LoadBalancer service.
+  - Add ``app.kubernetes.io/name`` labels to all services.
+  - Preserve the LoadBalancer service in ``tutor k8s stop`` commands.
   - Wait for the caddy deployment to be ready before running initialisation jobs.
   - Fix running Caddy container in k8s, which should always be the case even if `ENABLE_WEB_PROXY` is false.
 - [Security] On Kubernetes, convert all NodePort services to ClusterIP to guarantee network isolation from outside the cluster.
@@ -209,9 +211,9 @@ Every user-facing change should have an entry in this changelog. Please respect 
   - The "openedx-dev" image is now built with `tutor dev dc build lms`.
   - The "smtp" service now runs the "devture/exim-relay" Docker image, which is unprivileged. Also, the default SMTP port is now 8025.
 - 💥[Feature] Get rid of the Nginx container and service, which is now replaced by Caddy. this has the following consequences:
-  - Patches "nginx-cms", "nginx-lms", "nginx-extra", "local-docker-compose-nginx-aliases" are replaced by "caddyfile-cms", "caddyfile-lms", "caddyfile", " local-docker-compose-caddy-aliases".
-  - Patches "k8s-deployments-nginx-volume-mounts", "k8s-deployments-nginx-volumes" were obsolete and are removed.
-  - The `NGINX_HTTP_PORT` setting is renamed to `CADDY_HTTP_PORT`.
+    - Patches "nginx-cms", "nginx-lms", "nginx-extra", "local-docker-compose-nginx-aliases" are replaced by "caddyfile-cms", "caddyfile-lms", "caddyfile", " local-docker-compose-caddy-aliases".
+    - Patches "k8s-deployments-nginx-volume-mounts", "k8s-deployments-nginx-volumes" were obsolete and are removed.
+    - The `NGINX_HTTP_PORT` setting is renamed to `CADDY_HTTP_PORT`.
 - [Bugfix] Fix building of the `openedx` image on ARM64 due to missing `libgeos-dev`
 
 ## v12.2.0 (2021-12-08)
@@ -250,7 +252,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 - [Bugfix] Fix 500 error during user registration.
 - [Bugfix] Fix Mongodb compatibility version upgrade when upgrading from Koa to Lilac.
-- [Feature] Ability to pass [docker build options](https://docs.docker.com/engine/reference/commandline/build/#options) via `--docker-arg` option in `tutor images build` command.
+- [Feature] Ability to pass [docker build options](https://docs.docker.com/engine/reference/commandline/build/#options) via ``--docker-arg`` option in ``tutor images build`` command.
 
 ## v12.1.2 (2021-09-18)
 
@@ -330,7 +332,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## v11.2.8 (2021-04-27)
 
-- [Bugfix] Fix parsing of YAML-formatted values in `config save --set KEY=VALUE` commands, in use for instance with Ecommerce.
+- [Bugfix] Fix parsing of YAML-formatted values in ``config save --set KEY=VALUE`` commands, in use for instance with Ecommerce.
 
 ## v11.2.7 (2021-04-23)
 
@@ -341,7 +343,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 ## v11.2.6 (2021-04-09)
 
 - [Improvement] Upgrade all services to open-release/koa.3.
-- [Feature] Make it possible to build the openedx Docker image with a custom openedx-i18n version with the `--build-arg OPENEDX_I18N_VERSION=custom` command line argument.
+- [Feature] Make it possible to build the openedx Docker image with a custom openedx-i18n version with the ``--build-arg OPENEDX_I18N_VERSION=custom`` command line argument.
 
 ## v11.2.5 (2021-03-30)
 
@@ -434,27 +436,27 @@ Every user-facing change should have an entry in this changelog. Please respect 
 ## v11.0.0 (2020-12-09)
 
 - 💥[Improvement] Upgrade Open edX to Koa.
-  - 💥 Setting changes:
-    - The `ACTIVATE_HTTPS` setting was renamed to `ENABLE_HTTPS`.
-    - Other `ACTIVATE_*` variables were all renamed to `RUN_*`.
-    - The `WEB_PROXY` setting was removed and `RUN_CADDY` was added.
-    - The `NGINX_HTTPS_PORT` setting is deprecated.
-  - Architectural changes:
-    - Use Caddy as a web proxy for automated SSL/TLS certificate generation:
-      - Nginx no longer listens to port 443 for HTTPS traffic.
-      - The Caddy configuration file comes with a new `caddyfile` patch for much simpler SSL/TLS management.
-      - Configuration files for web proxies are no longer provided.
-      - Kubernetes deployment no longer requires setting up a custom Ingress resource or custom manager.
-    - Gunicorn and Whitenoise are replaced with uwsgi: this increases bootstrap performance and makes it no longer necessary to mount media folders in the Nginx container.
-    - Replace Memcached and RabbitMQ with Redis.
-  - Additional features:
-    - Make it possible to disable all plugins at once with `plugins disable all`.
-    - Add `tutor k8s wait` command to wait for a pod to become ready.
-    - Faster, more reliable static assets with local memory caching.
-  - Deprecation: proxy files for Apache and Nginx are no longer provided out of the box.
-  - Removed plugin `{{ patch (...) }}` statements:
-    - "https-create", "k8s-ingress-rules", "k8s-ingress-tls-hosts": these are no longer necessary. Instead, declare your app in the "caddyfile" patch.
-    - "local-docker-compose-nginx-volumes": this patch was primarily used to serve media assets. The recommended solution is now to serve assets with uwsgi.
+    - 💥 Setting changes:
+        - The ``ACTIVATE_HTTPS`` setting was renamed to ``ENABLE_HTTPS``.
+        - Other ``ACTIVATE_*`` variables were all renamed to ``RUN_*``.
+        - The ``WEB_PROXY`` setting was removed and ``RUN_CADDY`` was added.
+        - The ``NGINX_HTTPS_PORT`` setting is deprecated.
+    - Architectural changes:
+        - Use Caddy as a web proxy for automated SSL/TLS certificate generation:
+            - Nginx no longer listens to port 443 for HTTPS traffic.
+            - The Caddy configuration file comes with a new ``caddyfile`` patch for much simpler SSL/TLS management.
+            - Configuration files for web proxies are no longer provided.
+            - Kubernetes deployment no longer requires setting up a custom Ingress resource or custom manager.
+        - Gunicorn and Whitenoise are replaced with uwsgi: this increases bootstrap performance and makes it no longer necessary to mount media folders in the Nginx container.
+        - Replace Memcached and RabbitMQ with Redis.
+    - Additional features:
+        - Make it possible to disable all plugins at once with ``plugins disable all``.
+        - Add ``tutor k8s wait`` command to wait for a pod to become ready.
+        - Faster, more reliable static assets with local memory caching.
+    - Deprecation: proxy files for Apache and Nginx are no longer provided out of the box.
+    - Removed plugin `{{ patch (...) }}` statements:
+        - "https-create", "k8s-ingress-rules", "k8s-ingress-tls-hosts": these are no longer necessary. Instead, declare your app in the "caddyfile" patch.
+        - "local-docker-compose-nginx-volumes": this patch was primarily used to serve media assets. The recommended solution is now to serve assets with uwsgi.
 
 ## v10.5.3 (2020-12-09)
 
@@ -512,7 +514,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## v10.2.3 (2020-10-02)
 
-- [Feature] Add `images printtag` command.
+- [Feature] Add ``images printtag`` command.
 - [Improvement] Make it possible to override individual contact email addresses with plugins.
 - [Bugfix] Replace "no-reply@LMS_BASE" email address by regular contact email address.
 - [Bugfix] Disable learner records globally by default.
@@ -599,7 +601,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## v10.0.1 (2020-06-15)
 
-- [Bugfix] Fix KeyError when running `local quickstart` for the first time.
+- [Bugfix] Fix KeyError when running ``local quickstart`` for the first time.
 
 ## v10.0.0 (2020-06-15)
 
@@ -738,7 +740,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 - [Bugfix] Fix running dev image with `sudo`.
 - [Improvement] Add `cms/lms-env-features` patches (#276).
 - [Feature] Add plugin subcommands.
-- 💥[Improvement] Move `-r/--root` option to parent command level.
+- 💥[Improvement] Move ``-r/--root`` option to parent command level.
 - [Bugfix] Fix course about page visibility.
 - [Improvement] Print gunicorn access logs in the console.
 - 💥[Improvement] Get rid of the `indexcourses` and `portainer` command (#269).
@@ -797,7 +799,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## 3.6.0 (2019-07-11)
 
-- [Feature] Modify `createuser` commands to define a password from the command line.
+- [Feature] Modify ``createuser`` commands to define a password from the command line.
 - [Improvement] Better YAML value parsing from the command line.
 - [Feature] Add `dev exec` command.
 - [Bugfix] Fix incorrect notes settings definition.
@@ -857,7 +859,6 @@ Every user-facing change should have an entry in this changelog. Please respect 
 - [Bugfix] Fix boolean configuration choices.
 
 ## 3.3.9 (2019-05-13)
-
 - [Improvement] Add `local exec` command for running commands inside existing containers.
 - [Bugfix] Fix triple display of courses in LMS search (upstream patch, #189).
 
