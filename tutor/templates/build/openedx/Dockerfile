@@ -74,8 +74,9 @@ ENV VIRTUAL_ENV /openedx/venv/
 RUN apt update && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
 
 # Note that this means that we need to reinstall all requirements whenever there is a
-# change in edx-platform, which sucks. But there is no obvious alternative, as we need
-# to install some packages from edx-platform.
+# change in edx-platform, which sucks. Yet, we must do it, because edx-platform installs some
+# Python projects from within the edx-platform repo itself. This is being fixed upstream.
+# TODO: https://github.com/overhangio/2u-tutor-adoption/issues/86
 COPY --from=code /openedx/edx-platform /openedx/edx-platform
 WORKDIR /openedx/edx-platform
 
@@ -87,6 +88,7 @@ RUN pip install setuptools==62.1.0 pip==22.0.4 wheel==0.37.1
 
 # Install base requirements
 RUN pip install -r ./requirements/edx/base.txt
+RUN pip install -e .
 
 # Install django-redis for using redis as a django cache
 # https://pypi.org/project/django-redis/
