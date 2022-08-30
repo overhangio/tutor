@@ -18,9 +18,11 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Feature] Upgrade edx-platform i18n strings to nutmeg.2 (by @regisb).
+
 ## v14.0.5 (2022-08-29)
 
-- [Bugfix] Fix MongoDB replica set connection error resulting from edx-platform's pymongo (3.10.1 -> 3.12.3) upgrade ([edx-platform#30569](https://github.com/openedx/edx-platform/pull/30569)). (by @ormsbee)
+- [Bugfix] Fix MongoDB replica set connection error resulting from edx-platform's pymongo (3.10.1 -> 3.12.3) upgrade ([edx-platform#30569](https://github.com/openedx/edx-platform/pull/30569)) (by @ormsbee).
 - [Feature] Upgrade all applications to open-release/nutmeg.2 (@BbrSofiane).
 
 ## v14.0.4 (2022-07-29)
