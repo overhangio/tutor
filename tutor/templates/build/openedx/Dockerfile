@@ -54,11 +54,7 @@ RUN git config --global user.email "tutor@overhang.io" \
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
-# TODO Due to a bug in the transifex generation process, we cannot pull the translation
-# strings from nutmeg.1. We'll be able to pull them once they have been pushed to
-# Transifex.
-# ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
-ARG OPENEDX_I18N_VERSION=open-release/nutmeg.master
+ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
 RUN cd /tmp \
     && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/$OPENEDX_I18N_VERSION.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
