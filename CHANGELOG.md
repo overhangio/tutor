@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- 💥[Improvement] The Richie plugin was transferred to the Openfun organization; thus, it is no longer officially supported and it is removed from the default set of plugins that ships with `pip install tutor[full]` or the Tutor pre-compiled binary. Users are encouraged to uninstall the `tutor-richie` Python package and install the `tutor-contrib-richie` package instead.
 - [Feature] Upgrade edx-platform i18n strings to nutmeg.2 (by @regisb).
 
 ## v14.0.5 (2022-08-29)

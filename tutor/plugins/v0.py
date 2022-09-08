@@ -281,7 +281,6 @@ class OfficialPlugin(BasePlugin):
         "mfe",
         "minio",
         "notes",
-        "richie",
         "webui",
         "xqueue",
     ]

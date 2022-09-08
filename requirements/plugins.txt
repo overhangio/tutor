@@ -7,6 +7,5 @@ tutor-license>=14.0.0,<15.0.0
 tutor-mfe>=14.0.0,<15.0.0
 tutor-minio>=14.0.0,<15.0.0
 tutor-notes>=14.0.0,<15.0.0
-tutor-richie>=14.0.0,<15.0.0
 tutor-webui>=14.0.0,<15.0.0
 tutor-xqueue>=14.0.0,<15.0.0
