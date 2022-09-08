@@ -18,17 +18,18 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Improvement] Upgrade Scorm XBlock to v14.0.0. (by @regisb)
 - 💥[Improvement] The Richie plugin was transferred to the Openfun organization; thus, it is no longer officially supported and it is removed from the default set of plugins that ships with `pip install tutor[full]` or the Tutor pre-compiled binary. Users are encouraged to uninstall the `tutor-richie` Python package and install the `tutor-contrib-richie` package instead.
-- [Feature] Upgrade edx-platform i18n strings to nutmeg.2 (by @regisb).
+- [Feature] Upgrade edx-platform i18n strings to nutmeg.2. (by @regisb)
 
 ## v14.0.5 (2022-08-29)
 
-- [Bugfix] Fix MongoDB replica set connection error resulting from edx-platform's pymongo (3.10.1 -> 3.12.3) upgrade ([edx-platform#30569](https://github.com/openedx/edx-platform/pull/30569)) (by @ormsbee).
-- [Feature] Upgrade all applications to open-release/nutmeg.2 (@BbrSofiane).
+- [Bugfix] Fix MongoDB replica set connection error resulting from edx-platform's pymongo (3.10.1 -> 3.12.3) upgrade ([edx-platform#30569](https://github.com/openedx/edx-platform/pull/30569)). (by @ormsbee)
+- [Feature] Upgrade all applications to open-release/nutmeg.2. (by @BbrSofiane)
 
 ## v14.0.4 (2022-07-29)
 
-- [Feature] Add the `-m/--mount` option to `tutor dev quickstart`.
+- [Feature] Add the `-m/--mount` option to `tutor dev quickstart`. (by @regisb)
 - [Bugfix] Fix `tutor dev start -m /path/to/frontend-app-learning` by introducing dev-specific `COMPOSE_DEV_TMP` and `COMPOSE_DEV_JOBS_TMP` filters (by @regisb).
 - [Bugfix] Log the shell commands that Tutor executes more accurately. (by @kdmccormick)
 - [Bugfix] `tutor dev quickstart` would fail under certain versions of docker-compose due to a bug in the logic that handled volume mounting. (by @kdmccormick)

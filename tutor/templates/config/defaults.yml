@@ -50,7 +50,7 @@ OPENEDX_CSMH_MYSQL_DATABASE: "{{ OPENEDX_MYSQL_DATABASE }}_csmh"
 OPENEDX_MYSQL_USERNAME: "openedx"
 OPENEDX_COMMON_VERSION: "open-release/nutmeg.2"
 OPENEDX_EXTRA_PIP_REQUIREMENTS:
-  - "openedx-scorm-xblock<14.0.0,>=13.0.0"
+  - "openedx-scorm-xblock<15.0.0,>=14.0.0"
 MYSQL_HOST: "mysql"
 MYSQL_PORT: 3306
 MYSQL_ROOT_USERNAME: "root"
