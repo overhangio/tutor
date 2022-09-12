@@ -76,6 +76,35 @@ If migrations were killed halfway, there is a good chance that the MySQL databas
 .. warning::
     THIS WILL ERASE ALL YOUR DATA! Do not run this on a production instance. This solution is only viable for new Open edX installations.
 
+"Can't connect to MySQL server on 'mysql:3306' (111)"
+-----------------------------------------------------
+
+The most common reason this happens is that you are running two different instances of Tutor simultaneously, causing a port conflict between MySQL containers. Tutor will try to prevent you from doing that (for example, it will stop ``local`` containers if you start ``dev`` ones, and vice versa), but it cannot prevent all edge cases. So, as a first step, stop all possible Tutor platform variants::
+
+    tutor dev stop
+    tutor local stop
+    tutor k8s stop
+    
+And then run your command(s) again, ensuring you're consistently using the correct Tutor variant (``tutor dev``, ``tutor local``, or ``tutor k8s``).
+
+If that doesn't work, then check if you have any other Docker containers running that may using port 3306::
+
+    docker ps -a
+   
+For example, if you have ever used `Tutor Nightly <https://docs.tutor.overhang.io/tutorials/nightly.html>`_, check whether you still have ``tutor_nightly_`` containers running. Conversely, if you're trying to run Tutor Nightly now, check whether you have non-Nightly ``tutor_`` containers running. If so, switch to that other version of Tutor, run ``tutor (dev|local|k8s) stop``, and then switch back to your preferred version of Tutor.
+
+Alternatively, if there are any other non-Tutor containers using port 3306, then stop and remove them::
+
+    docker stop <container_name>
+    docker rm <container_name>
+
+Finally, if you've ensured that containers or other programs are making use of port 3306, check the logs of the MySQL container itself::
+
+    tutor (dev|local|k8s) logs mysql
+  
+Check whether the MySQL container is crashing upon startup, and if so, what is causing it to crash.
+
+
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------
 
