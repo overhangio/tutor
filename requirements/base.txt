@@ -5,7 +5,7 @@
 #    pip-compile requirements/base.in
 #
 appdirs==1.4.4
-    # via -r requirements/base.in
+    # via -r base.in
 cachetools==4.2.4
     # via google-auth
 certifi==2021.10.8
@@ -15,22 +15,22 @@ certifi==2021.10.8
 charset-normalizer==2.0.7
     # via requests
 click==8.0.3
-    # via -r requirements/base.in
+    # via -r base.in
 google-auth==2.3.1
     # via kubernetes
 idna==3.3
     # via requests
 jinja2==3.0.2
-    # via -r requirements/base.in
+    # via -r base.in
 kubernetes==18.20.0
-    # via -r requirements/base.in
+    # via -r base.in
 markupsafe==2.0.1
     # via jinja2
 mypy==0.942
-    # via -r requirements/base.in
+    # via -r base.in
 mypy-extensions==0.4.3
     # via mypy
-oauthlib==3.1.1
+oauthlib==3.2.1
     # via requests-oauthlib
 pyasn1==0.4.8
     # via
@@ -39,12 +39,12 @@ pyasn1==0.4.8
 pyasn1-modules==0.2.8
     # via google-auth
 pycryptodome==3.11.0
-    # via -r requirements/base.in
+    # via -r base.in
 python-dateutil==2.8.2
     # via kubernetes
 pyyaml==6.0
     # via
-    #   -r requirements/base.in
+    #   -r base.in
     #   kubernetes
 requests==2.26.0
     # via
