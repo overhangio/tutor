@@ -163,7 +163,7 @@ def k8s(context: click.Context) -> None:
 @click.command(help="Configure and run Open edX from scratch")
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
-def quickstart(context: click.Context, non_interactive: bool) -> None:
+def launch(context: click.Context, non_interactive: bool) -> None:
     run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
     if run_upgrade_from_release is not None:
         click.echo(fmt.title("Upgrading from an older release"))
@@ -212,6 +212,19 @@ Press enter when you are ready to continue"""
             cms_host=config["CMS_HOST"],
         )
     )
+
+
+@click.command(help="Configure and run Open edX from scratch")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.pass_context
+def quickstart(context: click.Context, non_interactive: bool) -> None:
+    """
+    This command has been renamed to 'launch'.
+    """
+    fmt.echo_alert(
+        "The 'quickstart' command is deprecated and will be removed in a later release. Use 'launch' instead."
+    )
+    context.invoke(launch, non_interactive=non_interactive)
 
 
 @click.command(
@@ -463,7 +476,7 @@ def wait(context: K8sContext, name: str) -> None:
 
 @click.command(
     short_help="Perform release-specific upgrade tasks",
-    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `quickstart`.",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `launch`.",
 )
 @click.option(
     "--from",
@@ -479,7 +492,7 @@ def upgrade(context: click.Context, from_release: Optional[str]) -> None:
     else:
         fmt.echo_alert(
             "This command only performs a partial upgrade of your Open edX platform. "
-            "To perform a full upgrade, you should run `tutor k8s quickstart`."
+            "To perform a full upgrade, you should run `tutor k8s launch`."
         )
         upgrade_from(context.obj, from_release)
     # We update the environment to update the version
@@ -569,6 +582,7 @@ def k8s_namespace(config: Config) -> str:
     return get_typed(config, "K8S_NAMESPACE", str)
 
 
+k8s.add_command(launch)
 k8s.add_command(quickstart)
 k8s.add_command(start)
 k8s.add_command(stop)

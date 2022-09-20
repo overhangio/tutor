@@ -19,7 +19,7 @@ def load(root: str) -> Config:
         raise exceptions.TutorError(
             "Project root does not exist. Make sure to generate the initial "
             "configuration with `tutor config save --interactive` or `tutor local "
-            "quickstart` prior to running other commands."
+            "launch` prior to running other commands."
         )
     env.check_is_up_to_date(root)
     return load_full(root)

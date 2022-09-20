@@ -22,7 +22,7 @@ In addition to installing Tutor Nightly itself, this will install automatically 
 
 Once Tutor Nightly is installed, you can run the usual ``tutor`` commands::
 
-    tutor dev quickstart
+    tutor dev launch
     tutor dev run lms bash
     # ... and so on
 

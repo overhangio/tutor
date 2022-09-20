@@ -85,19 +85,19 @@ The other benefit of ``kubectl apply`` is that it allows you to customise the Ku
 
 To learn more about "kustomizations", refer to the `official documentation <https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/>`__.
 
-Quickstart
+Launch
 ----------
 
 Launch the platform on Kubernetes in one command::
 
-    tutor k8s quickstart
+    tutor k8s launch
 
 All Kubernetes resources are associated with the "openedx" namespace. If you don't see anything in the Kubernetes dashboard, you are probably looking at the wrong namespace... 😉
 
 .. image:: img/k8s-dashboard.png
     :alt: Kubernetes dashboard ("openedx" namespace)
 
-The same ``tutor k8s quickstart`` command can be used to upgrade the cluster to the latest version.
+The same ``tutor k8s launch`` command can be used to upgrade the cluster to the latest version.
 
 Other commands
 --------------
