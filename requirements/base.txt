@@ -30,7 +30,7 @@ mypy==0.942
     # via -r requirements/base.in
 mypy-extensions==0.4.3
     # via mypy
-oauthlib==3.1.1
+oauthlib==3.2.1
     # via requests-oauthlib
 pyasn1==0.4.8
     # via

@@ -14,6 +14,8 @@ black==22.1.0
     # via -r requirements/dev.in
 bleach==4.1.0
     # via readme-renderer
+build==0.8.0
+    # via pip-tools
 cachetools==4.2.4
     # via
     #   -r requirements/base.txt
@@ -81,17 +83,19 @@ mypy-extensions==0.4.3
     #   -r requirements/base.txt
     #   black
     #   mypy
-oauthlib==3.1.1
+oauthlib==3.2.1
     # via
     #   -r requirements/base.txt
     #   requests-oauthlib
 packaging==21.0
-    # via bleach
+    # via
+    #   bleach
+    #   build
 pathspec==0.9.0
     # via black
 pep517==0.12.0
-    # via pip-tools
-pip-tools==6.4.0
+    # via build
+pip-tools==6.8.0
     # via -r requirements/dev.in
 pkginfo==1.7.1
     # via twine
@@ -166,6 +170,7 @@ tomli==2.0.1
     # via
     #   -r requirements/base.txt
     #   black
+    #   build
     #   mypy
     #   pep517
 tqdm==4.62.3
