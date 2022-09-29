@@ -148,9 +148,6 @@ ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 WORKDIR /openedx/edx-platform
 
-# Re-install local requirements, otherwise egg-info folders are missing
-RUN pip install -r requirements/edx/local.in
-
 # Create folder that will store lms/cms.env.yml files, as well as
 # the tutor-specific settings files.
 RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
