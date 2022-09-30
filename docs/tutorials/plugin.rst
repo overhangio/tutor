@@ -218,7 +218,7 @@ You can now run the "myservice" container which will execute the ``CMD`` stateme
 Declaring initialisation tasks
 ------------------------------
 
-Services often need to run specific tasks before they can be started. For instance, the LMS and the CMS need to apply database migrations. These commands are written in shell scripts that are executed whenever we run ``quickstart``. We call these scripts "init tasks". To add a new local init task, we must first add the corresponding service to the ``docker-compose-jobs.yml`` file by implementing the :patch:`local-docker-compose-jobs-services` patch::
+Services often need to run specific tasks before they can be started. For instance, the LMS and the CMS need to apply database migrations. These commands are written in shell scripts that are executed whenever we run ``launch``. We call these scripts "init tasks". To add a new local init task, we must first add the corresponding service to the ``docker-compose-jobs.yml`` file by implementing the :patch:`local-docker-compose-jobs-services` patch::
 
     hooks.Filters.ENV_PATCHES.add_item(
         (

@@ -34,7 +34,7 @@ Don't forget to replace your email address and password in the prompt above. If 
 
 Then, restart your platform::
 
-    $ tutor local quickstart
+    $ tutor local launch
 
 That's it! You can send a test email with the following command::
 

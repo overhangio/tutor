@@ -8,7 +8,7 @@ will be backported to the master branch at every major release.
 When backporting changes to master, we should keep only the entries that correspond to user-
 facing changes.
 -->
-
+- 💥[Improvement] Rename the implementation of tutor <mode> quickstart to tutor <mode> launch. (by @Carlos-Muniz)
 - 💥[Improvement] Remove the implementation of tutor dev runserver. (by @Carlos-Muniz)
 - [Bugfix] Fix MongoDB replica set connection error resulting from edx-platform's pymongo (3.10.1 -> 3.12.3) upgrade ([edx-platform#30569](https://github.com/openedx/edx-platform/pull/30569)). (by @ormsbee)
 - [Improvement] For Tutor Nightly (and only Nightly), official plugins are now installed from their nightly branches on GitHub instead of a version range on PyPI. This will allow Nightly users to install all official plugins by running ``pip install -e ".[full]"``.

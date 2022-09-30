@@ -14,8 +14,8 @@ class LocalTests(unittest.TestCase, TestCommandMixin):
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
 
-    def test_local_quickstart_help(self) -> None:
-        result = self.invoke(["local", "quickstart", "--help"])
+    def test_local_launch_help(self) -> None:
+        result = self.invoke(["local", "launch", "--help"])
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
 

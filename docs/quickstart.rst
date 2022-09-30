@@ -1,4 +1,4 @@
-.. _quickstart:
+.. _launch:
 
 Quickstart (1-click install)
 ----------------------------
@@ -11,12 +11,12 @@ Or `download <https://github.com/overhangio/tutor/releases>`_ the pre-compiled b
 
 .. include:: download/binary.rst
 
-2. Run ``tutor local quickstart``
+2. Run ``tutor local launch``
 3. You're done!
 
 **That's it?**
 
-Yes :) This is what happens when you run ``tutor local quickstart``:
+Yes :) This is what happens when you run ``tutor local launch``:
 
 1. You answer a few questions about the :ref:`configuration` of your Open edX platform.
 2. Configuration files are generated from templates.
@@ -26,4 +26,4 @@ Yes :) This is what happens when you run ``tutor local quickstart``:
 
 The whole procedure should require less than 10 minutes, on a server with good bandwidth. Note that your host environment will not be affected in any way, since everything runs inside docker containers. Root access is not even necessary.
 
-There's a lot more to Tutor than that! To learn more about what you can do with Tutor and Open edX, check out the :ref:`whatnext` section. If the quickstart installation method above somehow didn't work for you, check out the :ref:`troubleshooting` guide.
+There's a lot more to Tutor than that! To learn more about what you can do with Tutor and Open edX, check out the :ref:`whatnext` section. If the launch installation method above somehow didn't work for you, check out the :ref:`troubleshooting` guide.

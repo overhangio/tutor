@@ -99,7 +99,7 @@ Because the Tutor environment is generated entirely from the values in ``config.
 
 You can now take advantage of the Tutor-powered CLI (item #3) to bootstrap your Open edX platform::
 
-    tutor local quickstart
+    tutor local launch
 
 Under the hood, Tutor simply runs ``docker-compose`` and ``docker`` commands to launch your platform. These commands are printed in the standard output, such that you are free to replicate the same behaviour by simply copying/pasting the same commands.
 
@@ -117,7 +117,7 @@ as well as command trees for each mode in which Tutor can run::
     tutor k8s ...    # Commands for managing a Kubernetes Open edX deployment.
     tutor dev ...    # Commands for hacking on Open edX in development mode.
 
-Within each mode, Tutor has subcommands for managing that type of Open edX instance. Many of them are common between modes, such as ``quickstart``, ``start``, ``stop``, ``exec``, and ``logs``. For example::
+Within each mode, Tutor has subcommands for managing that type of Open edX instance. Many of them are common between modes, such as ``launch``, ``start``, ``stop``, ``exec``, and ``logs``. For example::
 
     tutor local logs  # View logs of a local deployment.
     tutor k8s logs    # View logs of a Kubernetes-managed deployment.

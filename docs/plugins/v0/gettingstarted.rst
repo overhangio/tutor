@@ -51,7 +51,7 @@ You should be able to view your changes in every LMS and CMS settings file::
 
 Now just restart your platform to start sending tracking events to Google Analytics::
 
-    tutor local quickstart
+    tutor local launch
 
 That's it! And it's very easy to share your plugins. Just upload them to your Github repo and share the url with other users. They will be able to install your plugin by running::
 

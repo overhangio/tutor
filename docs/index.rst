@@ -1,7 +1,8 @@
 .. include:: ../README.rst
     :start-after: _readme_intro_start:
     :end-before: _readme_intro_end:
-
+..
+    TODO replace quickstart.gif + alt with 'launch'
 .. image:: ./img/quickstart.gif
     :alt: Tutor local quickstart
     :target: https://terminalizer.com/view/91b0bfdd557
