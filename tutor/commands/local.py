@@ -159,7 +159,7 @@ Your Open edX platform is ready and can be accessed at the following urls:
     )
 
 
-@click.command(help="Configure and run Open edX from scratch")
+@click.command(help="Deprecated alias to 'launch'")
 @compose.mount_option
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
