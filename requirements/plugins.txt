@@ -8,7 +8,6 @@ tutor-license
 tutor-mfe @ git+https://github.com/overhangio/tutor-mfe@nightly
 tutor-minio @ git+https://github.com/overhangio/tutor-minio@nightly
 tutor-notes @ git+https://github.com/overhangio/tutor-notes@nightly
-tutor-richie @ git+https://github.com/overhangio/tutor-richie@nightly
 tutor-webui @ git+https://github.com/overhangio/tutor-webui@nightly
 tutor-xqueue @ git+https://github.com/overhangio/tutor-xqueue@nightly
 
