@@ -69,13 +69,6 @@ ENV VIRTUAL_ENV /openedx/venv/
 
 RUN apt update && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
 
-# Note that this means that we need to reinstall all requirements whenever there is a
-# change in edx-platform, which sucks. Yet, we must do it, because edx-platform installs some
-# Python projects from within the edx-platform repo itself. This is being fixed upstream.
-# TODO: https://github.com/overhangio/2u-tutor-adoption/issues/86
-COPY --from=code /openedx/edx-platform /openedx/edx-platform
-WORKDIR /openedx/edx-platform
-
 # Install the right version of pip/setuptools
 # https://pypi.org/project/setuptools/
 # https://pypi.org/project/pip/
@@ -83,8 +76,8 @@ WORKDIR /openedx/edx-platform
 RUN pip install setuptools==62.1.0 pip==22.0.4 wheel==0.37.1
 
 # Install base requirements
-RUN pip install -r ./requirements/edx/base.txt
-RUN pip install -e .
+COPY --from=code /openedx/edx-platform/requirements/edx/base.txt /tmp/base.txt
+RUN pip install -r /tmp/base.txt
 
 # Install django-redis for using redis as a django cache
 # https://pypi.org/project/django-redis/
@@ -147,6 +140,10 @@ COPY --chown=app:app --from=nodejs-requirements /openedx/edx-platform/node_modul
 ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 WORKDIR /openedx/edx-platform
+
+# We install edx-platform here because it creates an egg-info folder in the current
+# repo. We need both the source code and the virtualenv to run this command.
+RUN pip install -e .
 
 # Create folder that will store lms/cms.env.yml files, as well as
 # the tutor-specific settings files.
