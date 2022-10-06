@@ -16,7 +16,7 @@ P = ParamSpec("P")
 DEFAULT_PRIORITY = 10
 
 
-class ActionCallback(Contextualized):
+class ActionCallback(Contextualized, t.Generic[P]):
     def __init__(
         self,
         func: t.Callable[P, None],
@@ -26,31 +26,34 @@ class ActionCallback(Contextualized):
         self.func = func
         self.priority = priority or DEFAULT_PRIORITY
 
+    # TODO IMPORTANT reinstance context argument
     def do(
-        self, *args: t.Any, context: t.Optional[str] = None, **kwargs: t.Any
+        self,
+        *args: P.args,
+        # context: t.Optional[str] = None,
+        **kwargs: P.kwargs,
     ) -> None:
-        if self.is_in_context(context):
-            self.func(*args, **kwargs)
+        # if self.is_in_context(context):
+        self.func(*args, **kwargs)
 
 
-
-class Action:
+class Action(t.Generic[P]):
     """
     Each action is associated to a name and a list of callbacks, sorted by
     priority.
     """
 
-    INDEX: t.Dict[str, "Action"] = {}
+    INDEX: t.Dict[str, "Action[t.Any]"] = {}
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self.callbacks: t.List[ActionCallback] = []
+        self.callbacks: t.List[ActionCallback[P]] = []
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.name}')"
 
     @classmethod
-    def get(cls, name: str) -> "Action":
+    def get(cls, name: str) -> "Action[t.Any]":
         """
         Get an existing action with the given name from the index, or create one.
         """
@@ -75,11 +78,16 @@ class Action:
         return inner
 
     def do(
-        self, *args: t.Any, context: t.Optional[str] = None, **kwargs: t.Any
+        self,
+        *args: P.args,
+        # TODO IMPORTANT reinstate context argument, one way or another
+        # context: t.Optional[str] = None,
+        **kwargs: P.kwargs,
     ) -> None:
         for callback in self.callbacks:
             try:
-                callback.do(*args, context=context, **kwargs)
+                # callback.do(*args, context=context, **kwargs)
+                callback.do(*args, **kwargs)
             except:
                 sys.stderr.write(
                     f"Error applying action '{self.name}': func={callback.func} contexts={callback.contexts}'\n"
@@ -94,7 +102,7 @@ class Action:
         ]
 
 
-class ActionTemplate:
+class ActionTemplate(t.Generic[P]):
     """
     Action templates are for actions for which the name needs to be formatted
     before the action can be applied.
@@ -106,7 +114,7 @@ class ActionTemplate:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.template}')"
 
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Action:
+    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Action[P]:
         return get(self.template.format(*args, **kwargs))
 
 
@@ -114,7 +122,7 @@ class ActionTemplate:
 get = Action.get
 
 
-def get_template(name: str) -> ActionTemplate:
+def get_template(name: str) -> ActionTemplate[P]:
     """
     Create an action with a template name.
 

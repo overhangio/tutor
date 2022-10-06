@@ -5,6 +5,9 @@ to generate part of the reference documentation.
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
+
+from tutor.types import Config
+
 from . import actions, contexts, filters
 
 __all__ = ["Actions", "Filters", "Contexts"]
@@ -30,7 +33,11 @@ class Actions:
     #: :parameter: str root: project root.
     #: :parameter: dict[str, ...] config: project configuration.
     #: :parameter: str name: docker-compose project name.
-    COMPOSE_PROJECT_STARTED = actions.get("compose:project:started")
+
+    # TODO Unfortunately, this fails at runtime on python 3.8/3.9:
+    # TypeError: Parameters to generic types must be types. Got [<class 'str'>, typing.Dict[str, typing.Union[str, float, NoneType, bool, typing.List[str], typing.L.
+    # See: https://stackoverflow.com/questions/73974069/generic-paramspec-on-python-3-9
+    COMPOSE_PROJECT_STARTED: actions.Action[[str, Config, str]] = actions.get("compose:project:started")
 
     #: Called whenever the core project is ready to run. This action is called as soon
     #: as possible. This is the right time to discover plugins, for instance. In
@@ -45,14 +52,12 @@ class Actions:
     #: developers probably don't have to implement this action themselves.
     #:
     #: This action does not have any parameter.
-    CORE_READY = actions.get("core:ready")
-
-    CORE_READY.do("pouac")
+    CORE_READY: actions.Action[[]] = actions.get("core:ready")
 
     #: Called as soon as we have access to the Tutor project root.
     #:
     #: :parameter str root: absolute path to the project root.
-    PROJECT_ROOT_READY: actions.Action = actions.create("project:root:ready")
+    PROJECT_ROOT_READY: actions.Action[[str]] = actions.get("project:root:ready")
 
     #: Triggered when a single plugin needs to be loaded. Only plugins that have previously been
     #: discovered can be loaded (see :py:data:`CORE_READY`).
@@ -65,13 +70,13 @@ class Actions:
     #: they want to perform a specific action at the moment the plugin is enabled.
     #:
     #: This action does not have any parameter.
-    PLUGIN_LOADED = actions.get_template("plugins:loaded:{0}")
+    PLUGIN_LOADED: actions.ActionTemplate[[]] = actions.get_template("plugins:loaded:{0}")
 
     #: Triggered after all plugins have been loaded. At this point the list of loaded
     #: plugins may be obtained from the :py:data:``Filters.PLUGINS_LOADED`` filter.
     #:
     #: This action does not have any parameter.
-    PLUGINS_LOADED = actions.get("plugins:loaded")
+    PLUGINS_LOADED: actions.Action[[]] = actions.get("plugins:loaded")
 
     #: Triggered when a single plugin is unloaded. Only plugins that have previously been
     #: loaded can be unloaded (see :py:data:`PLUGIN_LOADED`).
@@ -84,7 +89,7 @@ class Actions:
     #: :parameter str plugin: plugin name.
     #: :parameter str root: absolute path to the project root.
     #: :parameter dict config: full project configuration
-    PLUGIN_UNLOADED = actions.get("plugins:unloaded")
+    PLUGIN_UNLOADED: actions.Action[[str, str, Config]] = actions.get("plugins:unloaded")
 
 
 class Filters:

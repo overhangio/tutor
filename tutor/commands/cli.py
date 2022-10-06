@@ -60,7 +60,7 @@ class TutorCli(click.MultiCommand):
             # https://github.com/click-contrib/sphinx-click/issues/70
             return
         if not cls.IS_ROOT_READY:
-            hooks.Actions.PROJECT_ROOT_READY.do(root=ctx.params["root"])
+            hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
             cls.IS_ROOT_READY = True
 
     def list_commands(self, ctx: click.Context) -> t.List[str]:

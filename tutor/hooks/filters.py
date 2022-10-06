@@ -146,10 +146,10 @@ def get_template(name: str) -> FilterTemplate:
         named_filter = filter_template("name")
 
         @named_filter.add()
-        def my_callback():
+        def my_callback(x: int) -> int:
             ...
 
-        named_filter.do()
+        named_filter.apply(42)
     """
     return FilterTemplate(name)
 
