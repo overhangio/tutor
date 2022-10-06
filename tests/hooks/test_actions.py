@@ -16,16 +16,18 @@ class PluginActionsTests(unittest.TestCase):
         with hooks.contexts.enter("tests"):
             return super().run(result=result)
 
-    def test_on(self) -> None:
-        @hooks.actions.add("test-action")
+    def test_do(self) -> None:
+        action: hooks.actions.Action[int] = hooks.actions.get("test-action")
+
+        @action.add()
         def _test_action_1(increment: int) -> None:
             self.side_effect_int += increment
 
-        @hooks.actions.add("test-action")
+        @action.add()
         def _test_action_2(increment: int) -> None:
             self.side_effect_int += increment * 2
 
-        hooks.actions.do("test-action", 1)
+        action.do(1)
         self.assertEqual(3, self.side_effect_int)
 
     def test_priority(self) -> None:

@@ -12,7 +12,9 @@ Filters are one of the two types of hooks (the other being :ref:`actions`) that 
 .. autofunction:: tutor.hooks.filters::add_item
 .. autofunction:: tutor.hooks.filters::add_items
 .. autofunction:: tutor.hooks.filters::apply
+.. autofunction:: tutor.hooks.filters::apply_from_context
 .. autofunction:: tutor.hooks.filters::iterate
+.. autofunction:: tutor.hooks.filters::iterate_from_context
 .. autofunction:: tutor.hooks.filters::clear
 .. autofunction:: tutor.hooks.filters::clear_all
 

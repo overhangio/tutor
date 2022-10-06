@@ -10,6 +10,7 @@ Actions are one of the two types of hooks (the other being :ref:`filters`) that 
 .. autofunction:: tutor.hooks.actions::get_template
 .. autofunction:: tutor.hooks.actions::add
 .. autofunction:: tutor.hooks.actions::do
+.. autofunction:: tutor.hooks.actions::do_from_context
 .. autofunction:: tutor.hooks.actions::clear
 .. autofunction:: tutor.hooks.actions::clear_all
 

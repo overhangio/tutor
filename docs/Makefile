@@ -5,7 +5,7 @@ build:
 	sphinx-build -b html -a -E -n $(BUILD_ARGS) "." "_build/html"
 
 html:
-	$(MAKE) build BUILD_ARGS="-W"
+	$(MAKE) build BUILD_ARGS="-W --keep-going"
 
 browse:
 	sensible-browser _build/html/index.html

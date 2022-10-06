@@ -42,13 +42,13 @@ def _prepare_environment() -> None:
             ("long_to_base64", utils.long_to_base64),
             ("random_string", utils.random_string),
             ("reverse_host", utils.reverse_host),
+            ("rsa_import_key", utils.rsa_import_key),
             ("rsa_private_key", utils.rsa_private_key),
         ],
     )
     # Template variables
     hooks.Filters.ENV_TEMPLATE_VARIABLES.add_items(
         [
-            ("rsa_import_key", utils.rsa_import_key),
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
@@ -77,9 +77,7 @@ class Renderer:
         self.environment = JinjaEnvironment(self.template_roots)
 
         # Filters
-        plugin_filters: t.Iterator[
-            t.Tuple[str, JinjaFilter]
-        ] = hooks.Filters.ENV_TEMPLATE_FILTERS.iterate()
+        plugin_filters = hooks.Filters.ENV_TEMPLATE_FILTERS.iterate()
         for name, func in plugin_filters:
             if name in self.environment.filters:
                 fmt.echo_alert(f"Found conflicting template filters named '{name}'")
@@ -87,10 +85,7 @@ class Renderer:
         self.environment.filters["walk_templates"] = self.walk_templates
 
         # Globals
-        plugin_globals: t.Iterator[
-            t.Tuple[str, JinjaFilter]
-        ] = hooks.Filters.ENV_TEMPLATE_VARIABLES.iterate()
-        for name, value in plugin_globals:
+        for name, value in hooks.Filters.ENV_TEMPLATE_VARIABLES.iterate():
             if name in self.environment.globals:
                 fmt.echo_alert(f"Found conflicting template variables named '{name}'")
             self.environment.globals[name] = value
@@ -220,12 +215,10 @@ def is_rendered(path: str) -> bool:
     If the path matches an include pattern, it is rendered. If not and it matches an
     ignore pattern, it is not rendered. By default, all files are rendered.
     """
-    include_patterns: t.Iterator[str] = hooks.Filters.ENV_PATTERNS_INCLUDE.iterate()
-    for include_pattern in include_patterns:
+    for include_pattern in hooks.Filters.ENV_PATTERNS_INCLUDE.iterate():
         if re.match(include_pattern, path):
             return True
-    ignore_patterns: t.Iterator[str] = hooks.Filters.ENV_PATTERNS_IGNORE.iterate()
-    for ignore_pattern in ignore_patterns:
+    for ignore_pattern in hooks.Filters.ENV_PATTERNS_IGNORE.iterate():
         if re.match(ignore_pattern, path):
             return False
     return True
@@ -255,10 +248,7 @@ def save(root: str, config: Config) -> None:
     Save the full environment, including version information.
     """
     root_env = pathjoin(root)
-    targets: t.Iterator[
-        t.Tuple[str, str]
-    ] = hooks.Filters.ENV_TEMPLATE_TARGETS.iterate()
-    for src, dst in targets:
+    for src, dst in hooks.Filters.ENV_TEMPLATE_TARGETS.iterate():
         save_all_from(src, os.path.join(root_env, dst), config)
 
     upgrade_obsolete(root)
@@ -458,8 +448,8 @@ def _delete_plugin_templates(plugin: str, root: str, _config: Config) -> None:
     """
     Delete plugin env files on unload.
     """
-    targets: t.Iterator[t.Tuple[str, str]] = hooks.Filters.ENV_TEMPLATE_TARGETS.iterate(
-        context=hooks.Contexts.APP(plugin).name
+    targets = hooks.Filters.ENV_TEMPLATE_TARGETS.iterate_from_context(
+        hooks.Contexts.APP(plugin).name
     )
     for src, dst in targets:
         path = pathjoin(root, dst.replace("/", os.sep), src.replace("/", os.sep))

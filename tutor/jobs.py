@@ -62,18 +62,16 @@ def initialise(runner: BaseJobRunner, limit_to: t.Optional[str] = None) -> None:
     filter_context = hooks.Contexts.APP(limit_to).name if limit_to else None
 
     # Pre-init tasks
-    iter_pre_init_tasks: t.Iterator[
-        t.Tuple[str, t.Iterable[str]]
-    ] = hooks.Filters.COMMANDS_PRE_INIT.iterate(context=filter_context)
-    for service, path in iter_pre_init_tasks:
+    for service, path in hooks.Filters.COMMANDS_PRE_INIT.iterate_from_context(
+        filter_context
+    ):
         fmt.echo_info(f"Running pre-init task: {'/'.join(path)}")
         runner.run_job_from_template(service, *path)
 
     # Init tasks
-    iter_init_tasks: t.Iterator[
-        t.Tuple[str, t.Iterable[str]]
-    ] = hooks.Filters.COMMANDS_INIT.iterate(context=filter_context)
-    for service, path in iter_init_tasks:
+    for service, path in hooks.Filters.COMMANDS_INIT.iterate_from_context(
+        filter_context
+    ):
         fmt.echo_info(f"Running init task: {'/'.join(path)}")
         runner.run_job_from_template(service, *path)
 

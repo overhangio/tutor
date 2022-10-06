@@ -23,13 +23,22 @@ extensions = []
 templates_path = ["_templates"]
 source_suffix = ".rst"
 master_doc = "index"
-language = None
+language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = None
 
 # Autodocumentation of modules
 extensions.append("sphinx.ext.autodoc")
 autodoc_typehints = "description"
+# For the life of me I can't get the docs to compile in nitpicky mode without these
+# ignore statements. You are most welcome to try and remove them.
+nitpick_ignore = [
+    ("py:class", "Config"),
+    ("py:class", "click.Command"),
+    ("py:class", "tutor.hooks.filters.P"),
+    ("py:class", "tutor.hooks.filters.T"),
+    ("py:class", "tutor.hooks.actions.P"),
+]
 
 # -- Sphinx-Click configuration
 # https://sphinx-click.readthedocs.io/

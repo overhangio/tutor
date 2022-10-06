@@ -6,6 +6,10 @@ pyinstaller
 twine
 coverage
 
+# doc requirement is lagging behind
+# https://github.com/readthedocs/sphinx_rtd_theme/issues/1323
+docutils<0.18
+
 # Types packages
 types-docutils
 types-PyYAML
