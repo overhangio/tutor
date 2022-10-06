@@ -47,10 +47,12 @@ class Actions:
     #: This action does not have any parameter.
     CORE_READY = actions.get("core:ready")
 
+    CORE_READY.do("pouac")
+
     #: Called as soon as we have access to the Tutor project root.
     #:
     #: :parameter str root: absolute path to the project root.
-    PROJECT_ROOT_READY = actions.get("project:root:ready")
+    PROJECT_ROOT_READY: actions.Action = actions.create("project:root:ready")
 
     #: Triggered when a single plugin needs to be loaded. Only plugins that have previously been
     #: discovered can be loaded (see :py:data:`CORE_READY`).

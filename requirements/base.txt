@@ -26,7 +26,7 @@ kubernetes==18.20.0
     # via -r requirements/base.in
 markupsafe==2.0.1
     # via jinja2
-mypy==0.942
+mypy==0.982
     # via -r requirements/base.in
 mypy-extensions==0.4.3
     # via mypy
@@ -61,7 +61,7 @@ six==1.16.0
     #   python-dateutil
 tomli==2.0.1
     # via mypy
-typing-extensions==3.10.0.2
+typing-extensions==4.3.0
     # via mypy
 urllib3==1.26.7
     # via

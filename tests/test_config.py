@@ -7,7 +7,7 @@ import click
 
 from tests.helpers import PluginsTestCase, temporary_root
 from tutor import config as tutor_config
-from tutor import hooks, interactive
+from tutor import fmt, hooks, interactive, utils
 from tutor.types import Config, get_typed
 
 
@@ -25,13 +25,13 @@ class ConfigTests(unittest.TestCase):
     def test_merge_not_render(self) -> None:
         config: Config = {}
         base = tutor_config.get_base()
-        with patch.object(tutor_config.utils, "random_string", return_value="abcd"):
+        with patch.object(utils, "random_string", return_value="abcd"):
             tutor_config.merge(config, base)
 
         # Check that merge does not perform a rendering
         self.assertNotEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
 
-    @patch.object(tutor_config.fmt, "echo")
+    @patch.object(fmt, "echo")
     def test_update_twice_should_return_same_config(self, _: Mock) -> None:
         with temporary_root() as root:
             config1 = tutor_config.load_minimal(root)
@@ -60,7 +60,7 @@ class ConfigTests(unittest.TestCase):
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
         self.assertFalse(tutor_config.is_service_activated(config, "service2"))
 
-    @patch.object(tutor_config.fmt, "echo")
+    @patch.object(fmt, "echo")
     def test_json_config_is_overwritten_by_yaml(self, _: Mock) -> None:
         with temporary_root() as root:
             # Create config from scratch
@@ -84,7 +84,7 @@ class ConfigTests(unittest.TestCase):
 
 
 class ConfigPluginTestCase(PluginsTestCase):
-    @patch.object(tutor_config.fmt, "echo")
+    @patch.object(fmt, "echo")
     def test_removed_entry_is_added_on_save(self, _: Mock) -> None:
         with temporary_root() as root:
             mock_random_string = Mock()

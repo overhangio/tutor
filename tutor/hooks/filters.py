@@ -4,25 +4,20 @@ __license__ = "Apache 2.0"
 import sys
 import typing as t
 
+from typing_extensions import Concatenate, ParamSpec
+
 from . import contexts
 
-# For now, this signature is not very restrictive. In the future, we could improve it by writing:
-#
-# P = ParamSpec("P")
-# CallableFilter = t.Callable[Concatenate[T, P], T]
-#
-# See PEP-612: https://www.python.org/dev/peps/pep-0612/
-# Unfortunately, this piece of code fails because of a bug in mypy:
-# https://github.com/python/mypy/issues/11833
-# https://github.com/python/mypy/issues/8645
-# https://github.com/python/mypy/issues/5876
-# https://github.com/python/typing/issues/696
+P = ParamSpec("P")
 T = t.TypeVar("T")
-CallableFilter = t.Callable[..., t.Any]
+# I wish we could create such an alias, which would greatly simply the definitions
+# below. Unfortunately this does not work, yet:
+# https://github.com/python/mypy/issues/11855
+# CallableFilter = t.Callable[Concatenate[T, P], T]
 
 
 class FilterCallback(contexts.Contextualized):
-    def __init__(self, func: CallableFilter):
+    def __init__(self, func: t.Callable[Concatenate[T, P], T]):
         super().__init__()
         self.func = func
 
@@ -55,8 +50,14 @@ class Filter:
         """
         return cls.INDEX.setdefault(name, cls(name))
 
-    def add(self) -> t.Callable[[CallableFilter], CallableFilter]:
-        def inner(func: CallableFilter) -> CallableFilter:
+    def add(
+        self,
+    ) -> t.Callable[
+        [t.Callable[Concatenate[T, P], T]], t.Callable[Concatenate[T, P], T]
+    ]:
+        def inner(
+            func: t.Callable[Concatenate[T, P], T]
+        ) -> t.Callable[Concatenate[T, P], T]:
             self.callbacks.append(FilterCallback(func))
             return func
 
@@ -67,8 +68,8 @@ class Filter:
 
     def add_items(self, items: t.List[T]) -> None:
         @self.add()
-        def callback(value: t.List[T], *_args: t.Any, **_kwargs: t.Any) -> t.List[T]:
-            return value + items
+        def callback(values: t.List[T], *_args: t.Any) -> t.List[T]:
+            return values + items
 
     def iterate(
         self, *args: t.Any, context: t.Optional[str] = None, **kwargs: t.Any
@@ -153,7 +154,9 @@ def get_template(name: str) -> FilterTemplate:
     return FilterTemplate(name)
 
 
-def add(name: str) -> t.Callable[[CallableFilter], CallableFilter]:
+def add(
+    name: str,
+) -> t.Callable[[t.Callable[Concatenate[T, P], T]], t.Callable[Concatenate[T, P], T]]:
     """
     Decorator for functions that will be applied to a single named filter.
 

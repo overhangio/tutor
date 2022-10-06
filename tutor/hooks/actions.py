@@ -4,11 +4,14 @@ __license__ = "Apache 2.0"
 import sys
 import typing as t
 
+from typing_extensions import ParamSpec
+
 from .contexts import Contextualized
 
-# Similarly to CallableFilter, it should be possible to refine the definition of
-# CallableAction in the future.
-CallableAction = t.Callable[..., None]
+P = ParamSpec("P")
+# Similarly to CallableFilter, it should be possible to create a CallableAction alias in
+# the future.
+# CallableAction = t.Callable[P, None]
 
 DEFAULT_PRIORITY = 10
 
@@ -16,7 +19,7 @@ DEFAULT_PRIORITY = 10
 class ActionCallback(Contextualized):
     def __init__(
         self,
-        func: CallableAction,
+        func: t.Callable[P, None],
         priority: t.Optional[int] = None,
     ):
         super().__init__()
@@ -28,6 +31,7 @@ class ActionCallback(Contextualized):
     ) -> None:
         if self.is_in_context(context):
             self.func(*args, **kwargs)
+
 
 
 class Action:
@@ -54,8 +58,8 @@ class Action:
 
     def add(
         self, priority: t.Optional[int] = None
-    ) -> t.Callable[[CallableAction], CallableAction]:
-        def inner(func: CallableAction) -> CallableAction:
+    ) -> t.Callable[[t.Callable[P, None]], t.Callable[P, None]]:
+        def inner(func: t.Callable[P, None]) -> t.Callable[P, None]:
             callback = ActionCallback(func, priority=priority)
             # I wish we could use bisect.insort_right here but the `key=` parameter
             # is unsupported in Python 3.9
@@ -130,7 +134,7 @@ def get_template(name: str) -> ActionTemplate:
 def add(
     name: str,
     priority: t.Optional[int] = None,
-) -> t.Callable[[CallableAction], CallableAction]:
+) -> t.Callable[[t.Callable[P, None]], t.Callable[P, None]]:
     """
     Decorator to add a callback action associated to a name.
 

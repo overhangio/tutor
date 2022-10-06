@@ -76,7 +76,7 @@ markupsafe==2.0.1
     #   jinja2
 mccabe==0.6.1
     # via pylint
-mypy==0.942
+mypy==0.982
     # via -r requirements/base.txt
 mypy-extensions==0.4.3
     # via
@@ -183,7 +183,7 @@ types-pyyaml==6.0.0
     # via -r requirements/dev.in
 types-setuptools==57.4.2
     # via -r requirements/dev.in
-typing-extensions==3.10.0.2
+typing-extensions==4.3.0
     # via
     #   -r requirements/base.txt
     #   astroid
