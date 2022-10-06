@@ -21,15 +21,15 @@ VENDOR_IMAGES = [
 
 @hooks.Filters.IMAGES_BUILD.add()
 def _add_core_images_to_build(
-    build_images: t.List[t.Tuple[str, t.Tuple[str, str], str, t.List[str]]],
+    build_images: t.List[t.Tuple[str, t.Tuple[str, ...], str, t.Tuple[str, ...]]],
     config: Config,
-) -> t.List[t.Tuple[str, t.Tuple[str, str], str, t.List[str]]]:
+) -> t.List[t.Tuple[str, t.Tuple[str, ...], str, t.Tuple[str, ...]]]:
     """
     Add base images to the list of Docker images to build on `tutor build all`.
     """
     for image in BASE_IMAGE_NAMES:
         tag = images.get_tag(config, image)
-        build_images.append((image, ("build", image), tag, []))
+        build_images.append((image, ("build", image), tag, ()))
     return build_images
 
 
@@ -161,7 +161,7 @@ def printtag(context: Context, image_names: t.List[str]) -> None:
 
 def find_images_to_build(
     config: Config, image: str
-) -> t.Iterator[t.Tuple[str, t.Tuple[str], str, t.List[str]]]:
+) -> t.Iterator[t.Tuple[str, t.Tuple[str, ...], str, t.Tuple[str, ...]]]:
     """
     Iterate over all images to build.
 
@@ -169,11 +169,8 @@ def find_images_to_build(
 
     Yield: (name, path, tag, build args)
     """
-    all_images_to_build: t.Iterator[
-        t.Tuple[str, t.Tuple[str], str, t.List[str]]
-    ] = hooks.Filters.IMAGES_BUILD.iterate(config)
     found = False
-    for name, path, tag, args in all_images_to_build:
+    for name, path, tag, args in hooks.Filters.IMAGES_BUILD.iterate(config):
         if image in [name, "all"]:
             found = True
             tag = tutor_env.render_str(config, tag)
@@ -184,7 +181,9 @@ def find_images_to_build(
 
 
 def find_remote_image_tags(
-    config: Config, filtre: hooks.filters.Filter, image: str
+    config: Config,
+    filtre: "hooks.filters.Filter[t.List[t.Tuple[str, str]], [Config]]",
+    image: str,
 ) -> t.Iterator[str]:
     """
     Iterate over all images to push or pull.
@@ -193,7 +192,7 @@ def find_remote_image_tags(
 
     Yield: tag
     """
-    all_remote_images: t.Iterator[t.Tuple[str, str]] = filtre.iterate(config)
+    all_remote_images = filtre.iterate(config)
     found = False
     for name, tag in all_remote_images:
         if image in [name, "all"]:

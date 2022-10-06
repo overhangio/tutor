@@ -41,8 +41,7 @@ def iter_installed() -> t.Iterator[str]:
     The CORE_READY action must have been triggered prior to calling this function,
     otherwise no installed plugin will be detected.
     """
-    plugins: t.Iterator[str] = hooks.Filters.PLUGINS_INSTALLED.iterate()
-    yield from sorted(plugins)
+    yield from sorted(hooks.Filters.PLUGINS_INSTALLED.iterate())
 
 
 def iter_info() -> t.Iterator[t.Tuple[str, t.Optional[str]]]:
@@ -51,10 +50,11 @@ def iter_info() -> t.Iterator[t.Tuple[str, t.Optional[str]]]:
 
     Yields (<plugin name>, <info>) tuples.
     """
-    versions: t.Iterator[
-        t.Tuple[str, t.Optional[str]]
-    ] = hooks.Filters.PLUGINS_INFO.iterate()
-    yield from sorted(versions, key=lambda v: v[0])
+
+    def plugin_info_name(info: t.Tuple[str, t.Optional[str]]) -> str:
+        return info[0]
+
+    yield from sorted(hooks.Filters.PLUGINS_INFO.iterate(), key=plugin_info_name)
 
 
 def is_loaded(name: str) -> bool:
@@ -72,7 +72,7 @@ def load_all(names: t.Iterable[str]) -> None:
     for name in names:
         try:
             load(name)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             fmt.echo_alert(f"Failed to enable plugin '{name}': {e}")
     hooks.Actions.PLUGINS_LOADED.do()
 

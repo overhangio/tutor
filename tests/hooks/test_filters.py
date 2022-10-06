@@ -38,7 +38,6 @@ class PluginFiltersTests(unittest.TestCase):
         self.assertTrue(callback.is_in_context(None))
         self.assertFalse(callback.is_in_context("customcontext"))
         self.assertEqual(1, callback.apply(0))
-        self.assertEqual(0, callback.apply(0, context="customcontext"))
 
     def test_filter_context(self) -> None:
         with hooks.contexts.enter("testcontext"):
@@ -47,7 +46,7 @@ class PluginFiltersTests(unittest.TestCase):
 
         self.assertEqual([1, 2], hooks.filters.apply("test:sheeps", []))
         self.assertEqual(
-            [1], hooks.filters.apply("test:sheeps", [], context="testcontext")
+            [1], hooks.filters.apply_from_context("testcontext", "test:sheeps", [])
         )
 
     def test_clear_context(self) -> None:
