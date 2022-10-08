@@ -13,3 +13,8 @@ In this example, the caddy container port would be mapped to 81 instead of 80. Y
     In this setup, the Caddy HTTP port will be exposed to the world. Make sure to configure your server firewall to block unwanted connections to your server's ``CADDY_HTTP_PORT``. Alternatively, you can configure the Caddy container to accept only local connections::
 
         tutor config save --set CADDY_HTTP_PORT=127.0.0.1:81
+
+If your external proxy will handle TLS/SSL, appropriate headers (namely ``X-Forwarded-Proto`` and ``X-Forwarded-Port``) must be set by the proxy and forwarded by Caddy.
+
+.. note::
+    The ``ENABLE_HTTPS`` flag (which is controlled by the last question of the quickstart dialogue) must be set to true, otherwise Caddy will overwrite ``X-Forwarded-Port`` to 80. Therefore, make sure to continue answering ``y`` to the quickstart dialogue question "Activate SSL/TLS certificates for HTTPS access?".
