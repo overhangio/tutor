@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v14.1.0 (2022-10-10)
+
 - [Improvement] Upgrade Scorm XBlock to v14.0.0. (by @regisb)
 - 💥[Improvement] The Richie plugin was transferred to the Openfun organization; thus, it is no longer officially supported and it is removed from the default set of plugins that ships with `pip install tutor[full]` or the Tutor pre-compiled binary. Users are encouraged to uninstall the `tutor-richie` Python package and install the `tutor-contrib-richie` package instead.
 - [Feature] Upgrade edx-platform i18n strings to nutmeg.2. (by @regisb)
