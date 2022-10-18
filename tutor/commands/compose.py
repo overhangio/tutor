@@ -5,7 +5,6 @@ from copy import deepcopy
 
 import click
 
-from tutor import bindmounts
 from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import fmt, hooks, jobs, serialize, utils
@@ -393,28 +392,6 @@ def run(
 
 
 @click.command(
-    name="bindmount",
-    help="Copy the contents of a container directory to a ready-to-bind-mount host directory",
-)
-@click.argument("service")
-@click.argument("path")
-@click.pass_obj
-def bindmount_command(context: BaseComposeContext, service: str, path: str) -> None:
-    """
-    This command is made obsolete by the --mount arguments.
-    """
-    fmt.echo_alert(
-        "The 'bindmount' command is deprecated and will be removed in a later release. Use 'copyfrom' instead."
-    )
-    config = tutor_config.load(context.root)
-    host_path = bindmounts.create(context.job_runner(config), service, path)
-    fmt.echo_info(
-        f"Bind-mount volume created at {host_path}. You can now use it in all `local` and `dev` "
-        f"commands with the `--volume={path}` option."
-    )
-
-
-@click.command(
     name="copyfrom",
     help="Copy files/folders from a container directory to the local filesystem.",
 )
@@ -520,20 +497,7 @@ def dc_command(
 ) -> None:
     mount_tmp_volumes(mounts, context)
     config = tutor_config.load(context.root)
-    volumes, non_volume_args = bindmounts.parse_volumes(args)
-    volume_args = []
-    for volume_arg in volumes:
-        if ":" not in volume_arg:
-            # This is a bind-mounted volume from the "volumes/" folder.
-            host_bind_path = bindmounts.get_path(context.root, volume_arg)
-            if not os.path.exists(host_bind_path):
-                raise TutorError(
-                    f"Bind-mount volume directory {host_bind_path} does not exist. It must first be created "
-                    f"with the '{bindmount_command.name}' command."
-                )
-            volume_arg = f"{host_bind_path}:{volume_arg}"
-        volume_args += ["--volume", volume_arg]
-    context.job_runner(config).docker_compose(command, *volume_args, *non_volume_args)
+    context.job_runner(config).docker_compose(command, *args)
 
 
 @hooks.Filters.COMPOSE_MOUNTS.add()
@@ -569,7 +533,6 @@ def add_commands(command_group: click.Group) -> None:
     command_group.add_command(dc_command)
     command_group.add_command(run)
     command_group.add_command(copyfrom)
-    command_group.add_command(bindmount_command)
     command_group.add_command(execute)
     command_group.add_command(logs)
     command_group.add_command(status)
