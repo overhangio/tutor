@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Improvement] use caddy `encode gzip` directive to optimize transfer size (by @ghassanmas)
+
 ## v14.1.0 (2022-10-10)
 
 - [Improvement] Upgrade Scorm XBlock to v14.0.0. (by @regisb)
