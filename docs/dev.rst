@@ -152,24 +152,6 @@ Then, bind-mount that folder back in the container with the ``--mount`` option (
 
 You can then edit the files in ``~/venv`` on your local filesystem and see the changes live in your container.
 
-Bind-mount from the "volumes/" directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. warning:: Bind-mounting volumes with the ``bindmount`` command is no longer the default, recommended way of bind-mounting volumes from the host. Instead, see the :ref:`mount option <mount_option>` and the ``tutor dev/local copyfrom`` commands.
-
-Tutor makes it easy to create a bind-mount from an existing container. First, copy the contents of a container directory with the ``bindmount`` command. For instance, to copy the virtual environment of the "lms" container::
-
-    tutor dev bindmount lms /openedx/venv
-
-This command recursively copies the contents of the ``/opendedx/venv`` directory to ``$(tutor config printroot)/volumes/venv``. The code of any Python dependency can then be edited -- for instance, you can then add a ``breakpoint()`` statement for step-by-step debugging, or implement a custom feature.
-
-Then, bind-mount the directory back in the container with the ``--mount`` option::
-
-		tutor dev start --mount=lms:$(tutor config printroot)/volumes/venv:/openedx/venv lms
-
-.. note::
-    The ``bindmount`` command and the ``--mount=...`` option syntax are available both for the ``tutor local`` and ``tutor dev`` commands.
-
 Manual bind-mount to any directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
