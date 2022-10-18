@@ -8,10 +8,12 @@ from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import exceptions, fmt
 from tutor import interactive as interactive_config
-from tutor import jobs, serialize, utils
+from tutor import serialize, utils
+from tutor.commands import jobs
 from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseJobContext
 from tutor.commands.upgrade.k8s import upgrade_from
+from tutor.jobs import BaseJobRunner
 from tutor.types import Config, get_typed
 
 
@@ -46,7 +48,7 @@ class K8sClients:
         return self._core_api
 
 
-class K8sJobRunner(jobs.BaseJobRunner):
+class K8sJobRunner(BaseJobRunner):
     def load_job(self, name: str) -> Any:
         all_jobs = self.render("k8s", "jobs.yml")
         for job in serialize.load_all(all_jobs):
@@ -370,64 +372,6 @@ def scale(context: K8sContext, deployment: str, replicas: int) -> None:
     )
 
 
-@click.command(help="Create an Open edX user and interactively set their password")
-@click.option("--superuser", is_flag=True, help="Make superuser")
-@click.option("--staff", is_flag=True, help="Make staff user")
-@click.option(
-    "-p",
-    "--password",
-    help="Specify password from the command line. If undefined, you will be prompted to input a password",
-    prompt=True,
-    hide_input=True,
-)
-@click.argument("name")
-@click.argument("email")
-@click.pass_obj
-def createuser(
-    context: K8sContext,
-    superuser: str,
-    staff: bool,
-    password: str,
-    name: str,
-    email: str,
-) -> None:
-    config = tutor_config.load(context.root)
-    command = jobs.create_user_command(superuser, staff, name, email, password=password)
-    runner = context.job_runner(config)
-    runner.run_job("lms", command)
-
-
-@click.command(help="Import the demo course")
-@click.pass_obj
-def importdemocourse(context: K8sContext) -> None:
-    fmt.echo_info("Importing demo course")
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    jobs.import_demo_course(runner)
-
-
-@click.command(
-    help="Assign a theme to the LMS and the CMS. To reset to the default theme , use 'default' as the theme name."
-)
-@click.option(
-    "-d",
-    "--domain",
-    "domains",
-    multiple=True,
-    help=(
-        "Limit the theme to these domain names. By default, the theme is "
-        "applied to the LMS and the CMS, both in development and production mode"
-    ),
-)
-@click.argument("theme_name")
-@click.pass_obj
-def settheme(context: K8sContext, domains: List[str], theme_name: str) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    domains = domains or jobs.get_all_openedx_domains(config)
-    jobs.set_theme(theme_name, domains, runner)
-
-
 @click.command(
     name="exec",
     help="Execute a command in a pod of the given application",
@@ -590,12 +534,10 @@ k8s.add_command(reboot)
 k8s.add_command(delete)
 k8s.add_command(init)
 k8s.add_command(scale)
-k8s.add_command(createuser)
-k8s.add_command(importdemocourse)
-k8s.add_command(settheme)
 k8s.add_command(exec_command)
 k8s.add_command(logs)
 k8s.add_command(wait)
 k8s.add_command(upgrade)
 k8s.add_command(apply_command)
 k8s.add_command(status)
+jobs.add_commands(k8s)

@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from tests.helpers import TestContext, temporary_root
 from tutor import config as tutor_config
-from tutor import jobs
+from tutor.commands import jobs
 
 
 class JobsTests(unittest.TestCase):
@@ -21,18 +21,13 @@ class JobsTests(unittest.TestCase):
             self.assertTrue(output.endswith("All services initialised."))
 
     def test_create_user_command_without_staff(self) -> None:
-        command = jobs.create_user_command("superuser", False, "username", "email")
+        command = jobs.create_user_template("superuser", False, "username", "email", "p4ssw0rd")
         self.assertNotIn("--staff", command)
+        self.assertIn("set_password", command)
 
     def test_create_user_command_with_staff(self) -> None:
-        command = jobs.create_user_command("superuser", True, "username", "email")
+        command = jobs.create_user_template("superuser", True, "username", "email", "p4ssw0rd")
         self.assertIn("--staff", command)
-
-    def test_create_user_command_with_staff_with_password(self) -> None:
-        command = jobs.create_user_command(
-            "superuser", True, "username", "email", "command"
-        )
-        self.assertIn("set_password", command)
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_import_demo_course(self, mock_stdout: StringIO) -> None:
@@ -40,7 +35,7 @@ class JobsTests(unittest.TestCase):
             context = TestContext(root)
             config = tutor_config.load_full(root)
             runner = context.job_runner(config)
-            jobs.import_demo_course(runner)
+            runner.run_job_from_str("cms", jobs.import_demo_course_template())
 
             output = mock_stdout.getvalue()
             service = re.search(r"Service: (\w*)", output)
@@ -60,7 +55,8 @@ class JobsTests(unittest.TestCase):
             context = TestContext(root)
             config = tutor_config.load_full(root)
             runner = context.job_runner(config)
-            jobs.set_theme("sample_theme", ["domain1", "domain2"], runner)
+            command = jobs.set_theme_template("sample_theme", ["domain1", "domain2"])
+            runner.run_job_from_str("lms", command)
 
             output = mock_stdout.getvalue()
             service = re.search(r"Service: (\w*)", output)
@@ -73,10 +69,3 @@ class JobsTests(unittest.TestCase):
                 .strip()
                 .startswith('echo "Loading settings $DJANGO_SETTINGS_MODULE"')
             )
-
-    def test_get_all_openedx_domains(self) -> None:
-        with temporary_root() as root:
-            config = tutor_config.load_full(root)
-            domains = jobs.get_all_openedx_domains(config)
-            self.assertTrue(domains)
-            self.assertEqual(6, len(domains))

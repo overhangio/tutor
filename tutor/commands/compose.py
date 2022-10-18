@@ -7,13 +7,15 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import fmt, hooks, jobs, serialize, utils
+from tutor import fmt, hooks, serialize, utils
+from tutor.commands import jobs
 from tutor.commands.context import BaseJobContext
 from tutor.exceptions import TutorError
+from tutor.jobs import BaseComposeJobRunner
 from tutor.types import Config
 
 
-class ComposeJobRunner(jobs.BaseComposeJobRunner):
+class ComposeJobRunner(BaseComposeJobRunner):
     def __init__(self, root: str, config: Config):
         super().__init__(root, config)
         self.project_name = ""
@@ -310,64 +312,6 @@ def init(
     jobs.initialise(runner, limit_to=limit)
 
 
-@click.command(help="Create an Open edX user and interactively set their password")
-@click.option("--superuser", is_flag=True, help="Make superuser")
-@click.option("--staff", is_flag=True, help="Make staff user")
-@click.option(
-    "-p",
-    "--password",
-    help="Specify password from the command line. If undefined, you will be prompted to input a password",
-)
-@click.argument("name")
-@click.argument("email")
-@click.pass_obj
-def createuser(
-    context: BaseComposeContext,
-    superuser: str,
-    staff: bool,
-    password: str,
-    name: str,
-    email: str,
-) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    command = jobs.create_user_command(superuser, staff, name, email, password=password)
-    runner.run_job("lms", command)
-
-
-@click.command(
-    help="Assign a theme to the LMS and the CMS. To reset to the default theme , use 'default' as the theme name."
-)
-@click.option(
-    "-d",
-    "--domain",
-    "domains",
-    multiple=True,
-    help=(
-        "Limit the theme to these domain names. By default, the theme is "
-        "applied to the LMS and the CMS, both in development and production mode"
-    ),
-)
-@click.argument("theme_name")
-@click.pass_obj
-def settheme(
-    context: BaseComposeContext, domains: t.List[str], theme_name: str
-) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    domains = domains or jobs.get_all_openedx_domains(config)
-    jobs.set_theme(theme_name, domains, runner)
-
-
-@click.command(help="Import the demo course")
-@click.pass_obj
-def importdemocourse(context: BaseComposeContext) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    fmt.echo_info("Importing demo course")
-    jobs.import_demo_course(runner)
-
-
 @click.command(
     short_help="Run a command in a new container",
     help=(
@@ -527,12 +471,10 @@ def add_commands(command_group: click.Group) -> None:
     command_group.add_command(restart)
     command_group.add_command(reboot)
     command_group.add_command(init)
-    command_group.add_command(createuser)
-    command_group.add_command(importdemocourse)
-    command_group.add_command(settheme)
     command_group.add_command(dc_command)
     command_group.add_command(run)
     command_group.add_command(copyfrom)
     command_group.add_command(execute)
     command_group.add_command(logs)
     command_group.add_command(status)
+    jobs.add_commands(command_group)

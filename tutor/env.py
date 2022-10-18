@@ -69,8 +69,7 @@ class JinjaEnvironment(jinja2.Environment):
 
 class Renderer:
     def __init__(self, config: t.Optional[Config] = None):
-        config = config or {}
-        self.config = deepcopy(config)
+        self.config = deepcopy(config or {})
         self.template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
 
         # Create environment with extra filters and globals
