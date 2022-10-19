@@ -1,12 +1,12 @@
 import os
 
-from .exceptions import TutorError
-from .jobs import BaseComposeJobRunner
-from .utils import get_user_id
+from tutor.exceptions import TutorError
+from tutor.tasks import BaseComposeTaskRunner
+from tutor.utils import get_user_id
 
 
 def create(
-    runner: BaseComposeJobRunner,
+    runner: BaseComposeTaskRunner,
     service: str,
     path: str,
 ) -> str:

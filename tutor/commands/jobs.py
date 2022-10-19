@@ -1,19 +1,38 @@
 """
 Common jobs that must be added both to local, dev and k8s commands.
 """
-
+import functools
 import typing as t
 
 import click
+from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import fmt, hooks, jobs
+from tutor import env, fmt, hooks
 
-from .context import BaseJobContext
 
-BASE_OPENEDX_COMMAND = """
-echo "Loading settings $DJANGO_SETTINGS_MODULE"
-"""
+class DoGroup(click.Group):
+    """
+    A Click group that prints subcommands under 'Jobs' instead of 'Commands' when we run
+    `.. do --help`. Hackish but it works.
+    """
+
+    def get_help(self, ctx: click.Context) -> str:
+        return super().get_help(ctx).replace("Commands:\n", "Jobs:\n")
+
+
+# A convenient easy-to-use decorator for creating `do` commands.
+do_group = click.group(cls=DoGroup, subcommand_metavar="JOB [ARGS]...")
+
+
+def add_job_commands(do_command_group: click.Group) -> None:
+    """
+    This is meant to be called with the `local/dev/k8s do` group commands, to add the
+    different `do` subcommands.
+    """
+    subcommands: t.Iterator[click.Command] = hooks.Filters.CLI_DO_COMMANDS.iterate()
+    for subcommand in subcommands:
+        do_command_group.add_command(subcommand)
 
 
 @hooks.Actions.CORE_READY.add()
@@ -25,32 +44,52 @@ def _add_core_init_tasks() -> None:
     the --limit argument.
     """
     with hooks.Contexts.APP("mysql").enter():
-        hooks.Filters.COMMANDS_INIT.add_item(("mysql", ("hooks", "mysql", "init")))
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+            ("mysql", env.read_template_file("jobs", "init", "mysql.sh"))
+        )
     with hooks.Contexts.APP("lms").enter():
-        hooks.Filters.COMMANDS_INIT.add_item(("lms", ("hooks", "lms", "init")))
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+            ("lms", env.read_template_file("jobs", "init", "lms.sh"))
+        )
     with hooks.Contexts.APP("cms").enter():
-        hooks.Filters.COMMANDS_INIT.add_item(("cms", ("hooks", "cms", "init")))
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+            ("cms", env.read_template_file("jobs", "init", "cms.sh"))
+        )
 
 
-def initialise(runner: jobs.BaseJobRunner, limit_to: t.Optional[str] = None) -> None:
+@click.command("init", help="Initialise all applications")
+@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
+def initialise(limit: t.Optional[str]) -> t.Iterator[t.Tuple[str, str]]:
     fmt.echo_info("Initialising all services...")
-    filter_context = hooks.Contexts.APP(limit_to).name if limit_to else None
+    filter_context = hooks.Contexts.APP(limit).name if limit else None
 
-    # Pre-init tasks
-    iter_pre_init_tasks: t.Iterator[
+    # Deprecated pre-init tasks
+    depr_iter_pre_init_tasks: t.Iterator[
         t.Tuple[str, t.Iterable[str]]
     ] = hooks.Filters.COMMANDS_PRE_INIT.iterate(context=filter_context)
-    for service, path in iter_pre_init_tasks:
-        fmt.echo_info(f"Running pre-init task: {'/'.join(path)}")
-        runner.run_job_from_template(service, *path)
+    for service, path in depr_iter_pre_init_tasks:
+        fmt.echo_alert(
+            f"Running deprecated pre-init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_PRE_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead, with a high priority."
+        )
+        yield service, env.read_template_file(*path)
 
     # Init tasks
     iter_init_tasks: t.Iterator[
+        t.Tuple[str, str]
+    ] = hooks.Filters.CLI_DO_INIT_TASKS.iterate(context=filter_context)
+    for service, task in iter_init_tasks:
+        fmt.echo_info(f"Running init task in {service}")
+        yield service, task
+
+    # Deprecated init tasks
+    depr_iter_init_tasks: t.Iterator[
         t.Tuple[str, t.Iterable[str]]
     ] = hooks.Filters.COMMANDS_INIT.iterate(context=filter_context)
-    for service, path in iter_init_tasks:
-        fmt.echo_info(f"Running init task: {'/'.join(path)}")
-        runner.run_job_from_template(service, *path)
+    for service, path in depr_iter_init_tasks:
+        fmt.echo_alert(
+            f"Running deprecated init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead."
+        )
+        yield service, env.read_template_file(*path)
 
     fmt.echo_info("All services initialised.")
 
@@ -67,29 +106,52 @@ def initialise(runner: jobs.BaseJobRunner, limit_to: t.Optional[str] = None) -> 
 )
 @click.argument("name")
 @click.argument("email")
-@click.pass_obj
 def createuser(
-    context: BaseJobContext,
     superuser: str,
     staff: bool,
     password: str,
     name: str,
     email: str,
-) -> None:
-    run_job(
-        context, "lms", create_user_template(superuser, staff, name, email, password)
-    )
+) -> t.Iterable[t.Tuple[str, str]]:
+    """
+    Create an Open edX user
+
+    Password can be passed as an option or will be set interactively.
+    """
+    yield ("lms", create_user_template(superuser, staff, name, email, password))
+
+
+def create_user_template(
+    superuser: str, staff: bool, username: str, email: str, password: str
+) -> str:
+    opts = ""
+    if superuser:
+        opts += " --superuser"
+    if staff:
+        opts += " --staff"
+    return f"""
+./manage.py lms manage_user {opts} {username} {email}
+./manage.py lms shell -c "
+from django.contrib.auth import get_user_model
+u = get_user_model().objects.get(username='{username}')
+u.set_password('{password}')
+u.save()"
+"""
 
 
 @click.command(help="Import the demo course")
-@click.pass_obj
-def importdemocourse(context: BaseJobContext) -> None:
-    run_job(context, "cms", import_demo_course_template())
+def importdemocourse() -> t.Iterable[t.Tuple[str, str]]:
+    template = """
+# Import demo course
+git clone https://github.com/openedx/edx-demo-course --branch {{ OPENEDX_COMMON_VERSION }} --depth 1 ../edx-demo-course
+python ./manage.py cms import ../data ../edx-demo-course
+
+# Re-index courses
+./manage.py cms reindex_course --all --setup"""
+    yield ("cms", template)
 
 
-@click.command(
-    help="Assign a theme to the LMS and the CMS. To reset to the default theme , use 'default' as the theme name."
-)
+@click.command()
 @click.option(
     "-d",
     "--domain",
@@ -101,49 +163,13 @@ def importdemocourse(context: BaseJobContext) -> None:
     ),
 )
 @click.argument("theme_name")
-@click.pass_obj
-def settheme(context: BaseJobContext, domains: t.List[str], theme_name: str) -> None:
-    run_job(context, "lms", set_theme_template(theme_name, domains))
+def settheme(domains: t.List[str], theme_name: str) -> t.Iterable[t.Tuple[str, str]]:
+    """
+    Assign a theme to the LMS and the CMS.
 
-
-def run_job(context: BaseJobContext, service: str, command: str) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    runner.run_job_from_str(service, command)
-
-
-def create_user_template(
-    superuser: str, staff: bool, username: str, email: str, password: str
-) -> str:
-    opts = ""
-    if superuser:
-        opts += " --superuser"
-    if staff:
-        opts += " --staff"
-    return (
-        BASE_OPENEDX_COMMAND
-        + f"""
-./manage.py lms manage_user {opts} {username} {email}
-./manage.py lms shell -c "
-from django.contrib.auth import get_user_model
-u = get_user_model().objects.get(username='{username}')
-u.set_password('{password}')
-u.save()"
-"""
-    )
-
-
-def import_demo_course_template() -> str:
-    return (
-        BASE_OPENEDX_COMMAND
-        + """
-# Import demo course
-git clone https://github.com/openedx/edx-demo-course --branch {{ OPENEDX_COMMON_VERSION }} --depth 1 ../edx-demo-course
-python ./manage.py cms import ../data ../edx-demo-course
-
-# Re-index courses
-./manage.py cms reindex_course --all --setup"""
-    )
+    To reset to the default theme , use 'default' as the theme name.
+    """
+    yield ("lms", set_theme_template(theme_name, domains))
 
 
 def set_theme_template(theme_name: str, domain_names: t.List[str]) -> str:
@@ -179,9 +205,76 @@ def assign_theme(name, domain):
     ]
     for domain_name in domain_names:
         python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
-    return BASE_OPENEDX_COMMAND + f'./manage.py lms shell -c "{python_command}"'
+    return f'./manage.py lms shell -c "{python_command}"'
 
 
-def add_commands(command_group: click.Group) -> None:
-    for job_command in [createuser, importdemocourse, settheme]:
-        command_group.add_command(job_command)
+hooks.Filters.CLI_DO_COMMANDS.add_items(
+    [
+        createuser,
+        importdemocourse,
+        initialise,
+        settheme,
+    ]
+)
+
+
+def do_callback(service_commands: t.Iterable[t.Tuple[str, str]]) -> None:
+    """
+    This function must be added as a callback to all `do` subcommands.
+
+    `do` subcommands don't actually run any task. They just yield tuples of (service
+    name, unrendered script string). This function is responsible for actually running
+    the scripts. It does the following:
+
+    - Prefix the script with a base command
+    - Render the script string
+    - Run a job in the right container
+
+    In order to be added as a callback to the do subcommands, the
+    `_patch_do_commands_callbacks` must be called.
+    """
+    context = click.get_current_context().obj
+    config = tutor_config.load(context.root)
+    runner = context.job_runner(config)
+    base_openedx_command = """
+echo "Loading settings $DJANGO_SETTINGS_MODULE"
+"""
+    for service, command in service_commands:
+        runner.run_task_from_str(service, base_openedx_command + command)
+
+
+@hooks.Actions.PLUGINS_LOADED.add()
+def _patch_do_commands_callbacks() -> None:
+    """
+    After plugins have been loaded, patch `do` subcommands such that their output is
+    forwarded to `do_callback`.
+    """
+    subcommands: t.Iterator[click.Command] = hooks.Filters.CLI_DO_COMMANDS.iterate()
+    for subcommand in subcommands:
+        # Modify the subcommand callback such that job results are processed by do_callback
+        if subcommand.callback is None:
+            raise ValueError("Cannot patch None callback")
+        if subcommand.name is None:
+            raise ValueError("Defined job with None name")
+        subcommand.callback = _patch_callback(subcommand.name, subcommand.callback)
+
+
+P = ParamSpec("P")
+
+
+def _patch_callback(
+    job_name: str,
+    func: t.Callable[P, t.Iterable[t.Tuple[str, str]]]
+) -> t.Callable[P, None]:
+    """
+    Modify a subcommand callback function such that its results are processed by `do_callback`.
+    """
+
+    def new_callback(*args: P.args, **kwargs: P.kwargs) -> None:
+        hooks.Actions.DO_JOB.do(job_name, *args, context=None, **kwargs)
+        do_callback(func(*args, **kwargs))
+
+    # Make the new callback behave like the old one
+    functools.update_wrapper(new_callback, func)
+
+    return new_callback

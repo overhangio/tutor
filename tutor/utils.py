@@ -203,6 +203,10 @@ def is_a_tty() -> bool:
 
 def execute(*command: str) -> int:
     click.echo(fmt.command(_shlex_join(*command)))
+    return execute_silent(*command)
+
+
+def execute_silent(*command: str) -> int:
     with subprocess.Popen(command) as p:
         try:
             result = p.wait(timeout=None)

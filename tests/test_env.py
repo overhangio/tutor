@@ -83,7 +83,7 @@ class EnvTests(PluginsTestCase):
         tutor_config.render_full(config)
 
         config["MYSQL_ROOT_PASSWORD"] = "testpassword"
-        rendered = env.render_file(config, "hooks", "mysql", "init")
+        rendered = env.render_file(config, "jobs", "init", "mysql.sh")
         self.assertIn("testpassword", rendered)
 
     @patch.object(tutor_config.fmt, "echo")

@@ -8,6 +8,9 @@ will be backported to the master branch at every major release.
 When backporting changes to master, we should keep only the entries that correspond to user-
 facing changes.
 -->
+- 💥[Feature] Add an extensible `local/dev/k8s do ...` command to trigger custom job commands. These commands are used to run a series of bash scripts in designated containers. Any plugin can add custom jobs thanks to the `CLI_DO_COMMANDS` filter. This causes the following breaking changes:
+    - The "init", "createuser", "settheme", "importdemocourse" commands were all migrated to this new interface. For instance,  `tutor local init` was replaced by `tutor local do init`.
+    - Plugin developers are encouraged to replace calls to the `COMMANDS_INIT` and `COMMANDS_PRE_INIT` filters by `CLI_DO_INIT_TASKS`.
 - [Feature] Implement hook filter priorities, which work like action priorities. (by @regisb)
 - 💥[Improvement] Remove the `local/dev bindmount` commands, which have been marked as deprecated for some time. The `--mount` option should be used instead.
 - 💥[Bugfix] Fix local installation requirements. Plugins that implemented the "openedx-dockerfile-post-python-requirements" patch and that needed access to the edx-platform repo will no longer work. Instead, these plugins should implement the "openedx-dockerfile-pre-assets" patch. This scenario should be very rare, though. (by @regisb)

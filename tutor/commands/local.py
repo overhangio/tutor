@@ -13,7 +13,7 @@ from tutor.commands.upgrade.local import upgrade_from
 from tutor.types import Config, get_typed
 
 
-class LocalJobRunner(compose.ComposeJobRunner):
+class LocalTaskRunner(compose.ComposeTaskRunner):
     def __init__(self, root: str, config: Config):
         """
         Load docker-compose files from local/.
@@ -52,8 +52,8 @@ class LocalContext(compose.BaseComposeContext):
     COMPOSE_TMP_FILTER = hooks.Filters.COMPOSE_LOCAL_TMP
     COMPOSE_JOBS_TMP_FILTER = hooks.Filters.COMPOSE_LOCAL_JOBS_TMP
 
-    def job_runner(self, config: Config) -> LocalJobRunner:
-        return LocalJobRunner(self.root, config)
+    def job_runner(self, config: Config) -> LocalTaskRunner:
+        return LocalTaskRunner(self.root, config)
 
 
 @click.group(help="Run Open edX locally with docker-compose")
@@ -142,7 +142,7 @@ Press enter when you are ready to continue"""
     click.echo(fmt.title("Starting the platform in detached mode"))
     context.invoke(compose.start, detach=True)
     click.echo(fmt.title("Database creation and migrations"))
-    context.invoke(compose.init)
+    context.invoke(compose.do.commands["init"])
 
     config = tutor_config.load(context.obj.root)
     fmt.echo_info(
@@ -212,7 +212,7 @@ def _stop_on_dev_start(root: str, config: Config, project_name: str) -> None:
     Stop the local platform as soon as a platform with a different project name is
     started.
     """
-    runner = LocalJobRunner(root, config)
+    runner = LocalTaskRunner(root, config)
     if project_name != runner.project_name:
         runner.docker_compose("stop")
 

@@ -80,7 +80,7 @@ Service initialisation
 
 ::
 
-    tutor local init
+    tutor local do init
 
 This command should be run just once. It will initialise all applications in a running platform. In particular, this will create the required databases tables and apply database migrations for all applications.
 
@@ -120,7 +120,7 @@ Creating a new user with staff and admin rights
 
 You will most certainly need to create a user to administer the platform. Just run::
 
-    tutor local createuser --staff --superuser yourusername user@email.com
+    tutor local do createuser --staff --superuser yourusername user@email.com
 
 You will be asked to set the user password interactively.
 
@@ -131,7 +131,7 @@ Importing the demo course
 
 After a fresh installation, your platform will not have a single course. To import the `Open edX demo course <https://github.com/openedx/edx-demo-course>`_, run::
 
-    tutor local importdemocourse
+    tutor local do importdemocourse
 
 .. _settheme:
 
@@ -140,7 +140,7 @@ Setting a new theme
 
 The default Open edX theme is rather bland, so Tutor makes it easy to switch to a different theme::
 
-    tutor local settheme mytheme
+    tutor local do settheme mytheme
 
 Out of the box, only the default "open-edx" theme is available. We also developed `Indigo, a beautiful, customizable theme <https://github.com/overhangio/indigo>`__ which is easy to install with Tutor.
 

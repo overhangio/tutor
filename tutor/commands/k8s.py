@@ -6,14 +6,14 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt
+from tutor import exceptions, fmt, hooks
 from tutor import interactive as interactive_config
 from tutor import serialize, utils
 from tutor.commands import jobs
 from tutor.commands.config import save as config_save_command
-from tutor.commands.context import BaseJobContext
+from tutor.commands.context import BaseTaskContext
 from tutor.commands.upgrade.k8s import upgrade_from
-from tutor.jobs import BaseJobRunner
+from tutor.tasks import BaseTaskRunner
 from tutor.types import Config, get_typed
 
 
@@ -22,7 +22,8 @@ class K8sClients:
 
     def __init__(self) -> None:
         # Loading the kubernetes module here to avoid import overhead
-        from kubernetes import client, config  # pylint: disable=import-outside-toplevel
+        # pylint: disable=import-outside-toplevel
+        from kubernetes import client, config
 
         config.load_kube_config()
         self._batch_api = None
@@ -48,33 +49,20 @@ class K8sClients:
         return self._core_api
 
 
-class K8sJobRunner(BaseJobRunner):
-    def load_job(self, name: str) -> Any:
-        all_jobs = self.render("k8s", "jobs.yml")
-        for job in serialize.load_all(all_jobs):
-            job_name = job["metadata"]["name"]
-            if not isinstance(job_name, str):
-                raise exceptions.TutorError(
-                    f"Invalid job name: '{job_name}'. Expected str."
-                )
-            if job_name == name:
-                return job
-        raise exceptions.TutorError(f"Could not find job '{name}'")
+class K8sTaskRunner(BaseTaskRunner):
+    """
+    Run tasks (bash commands) in Kubernetes-managed services.
 
-    def active_job_names(self) -> List[str]:
-        """
-        Return a list of active job names
-        Docs:
-        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-job-v1-batch
-        """
-        api = K8sClients.instance().batch_api
-        return [
-            job.metadata.name
-            for job in api.list_namespaced_job(k8s_namespace(self.config)).items
-            if job.status.active
-        ]
+    Note: a single Tutor "task" correspond to a Kubernetes "job":
+    https://kubernetes.io/docs/concepts/workloads/controllers/job/
+    A Tutor "job" is composed of multiple Tutor tasks run in different services.
 
-    def run_job(self, service: str, command: str) -> int:
+    In Kubernetes, each task that is expected to run in a "myservice" container will
+    trigger the "myservice-job" Kubernetes job. This job definition must be present in
+    the "k8s/jobs.yml" template.
+    """
+
+    def run_task(self, service: str, command: str) -> int:
         job_name = f"{service}-job"
         job = self.load_job(job_name)
         # Create a unique job name to make it deduplicate jobs and make it easier to
@@ -150,10 +138,41 @@ class K8sJobRunner(BaseJobRunner):
             sleep(5)
         return 0
 
+    def load_job(self, name: str) -> Any:
+        """
+        Find a given job definition in the rendered k8s/jobs.yml template.
+        """
+        all_jobs = self.render("k8s", "jobs.yml")
+        for job in serialize.load_all(all_jobs):
+            job_name = job["metadata"]["name"]
+            if not isinstance(job_name, str):
+                raise exceptions.TutorError(
+                    f"Invalid job name: '{job_name}'. Expected str."
+                )
+            if job_name == name:
+                return job
+        raise exceptions.TutorError(f"Could not find job '{name}'")
 
-class K8sContext(BaseJobContext):
-    def job_runner(self, config: Config) -> K8sJobRunner:
-        return K8sJobRunner(self.root, config)
+    def active_job_names(self) -> List[str]:
+        """
+        Return a list of active job names
+        Docs:
+        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-job-v1-batch
+
+        This is necessary to make sure that we don't run the same job multiple times at
+        the same time.
+        """
+        api = K8sClients.instance().batch_api
+        return [
+            job.metadata.name
+            for job in api.list_namespaced_job(k8s_namespace(self.config)).items
+            if job.status.active
+        ]
+
+
+class K8sContext(BaseTaskContext):
+    def job_runner(self, config: Config) -> K8sTaskRunner:
+        return K8sTaskRunner(self.root, config)
 
 
 @click.group(help="Run Open edX on Kubernetes")
@@ -341,17 +360,33 @@ def delete(context: K8sContext, yes: bool) -> None:
     )
 
 
+@jobs.do_group
+@click.pass_obj
+def do(context: K8sContext) -> None:
+    """
+    Run a custom job in the right container(s).
+
+    We make sure that some essential containers (databases, proxy) are up before we
+    launch the jobs.
+    """
+    @hooks.Actions.DO_JOB.add()
+    def _start_base_deployments(_job_name: str, *_args: Any, **_kwargs: Any) -> None:
+        """
+        We add this logic to an action callback because we do not want to trigger it
+        whenever we run `tutor k8s do <job> --help`.
+        """
+        config = tutor_config.load(context.root)
+        wait_for_deployment_ready(config, "caddy")
+        for name in ["elasticsearch", "mysql", "mongodb"]:
+            if tutor_config.is_service_activated(config, name):
+                wait_for_deployment_ready(config, name)
+
+
 @click.command(help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
-@click.pass_obj
-def init(context: K8sContext, limit: Optional[str]) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    wait_for_deployment_ready(config, "caddy")
-    for name in ["elasticsearch", "mysql", "mongodb"]:
-        if tutor_config.is_service_activated(config, name):
-            wait_for_deployment_ready(config, name)
-    jobs.initialise(runner, limit_to=limit)
+@click.pass_context
+def init(context: click.Context, limit: Optional[str]) -> None:
+    context.invoke(do.commands["init"], limit=limit)
 
 
 @click.command(help="Scale the number of replicas of a given deployment")
@@ -540,4 +575,9 @@ k8s.add_command(wait)
 k8s.add_command(upgrade)
 k8s.add_command(apply_command)
 k8s.add_command(status)
-jobs.add_commands(k8s)
+
+
+@hooks.Actions.PLUGINS_LOADED.add()
+def _add_k8s_do_commands() -> None:
+    jobs.add_job_commands(do)
+    k8s.add_command(do)
