@@ -11,7 +11,7 @@ from tutor.commands import compose
 from tutor.types import Config, get_typed
 
 
-class DevJobRunner(compose.ComposeJobRunner):
+class DevTaskRunner(compose.ComposeTaskRunner):
     def __init__(self, root: str, config: Config):
         """
         Load docker-compose files from dev/ and local/
@@ -51,8 +51,8 @@ class DevContext(compose.BaseComposeContext):
     COMPOSE_TMP_FILTER = hooks.Filters.COMPOSE_DEV_TMP
     COMPOSE_JOBS_TMP_FILTER = hooks.Filters.COMPOSE_DEV_JOBS_TMP
 
-    def job_runner(self, config: Config) -> DevJobRunner:
-        return DevJobRunner(self.root, config)
+    def job_runner(self, config: Config) -> DevTaskRunner:
+        return DevTaskRunner(self.root, config)
 
 
 @click.group(help="Run Open edX locally with development settings")
@@ -105,7 +105,7 @@ Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instru
     context.invoke(compose.start, detach=True)
 
     click.echo(fmt.title("Database creation and migrations"))
-    context.invoke(compose.init)
+    context.invoke(compose.do.commands["init"])
 
     fmt.echo_info(
         """The Open edX platform is now running in detached mode
@@ -148,7 +148,7 @@ def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
     Stop the dev platform as soon as a platform with a different project name is
     started.
     """
-    runner = DevJobRunner(root, config)
+    runner = DevTaskRunner(root, config)
     if project_name != runner.project_name:
         runner.docker_compose("stop")
 

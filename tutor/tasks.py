@@ -2,11 +2,11 @@ from tutor import env
 from tutor.types import Config
 
 
-class BaseJobRunner:
+class BaseTaskRunner:
     """
-    A job runner is responsible for running bash commands in the right context.
+    A task runner is responsible for running bash commands in the right context.
 
-    Commands may be loaded from string or template files. The `run_job` method must be
+    Commands may be loaded from string or template files. The `run_task` method must be
     implemented by child classes.
     """
 
@@ -14,13 +14,13 @@ class BaseJobRunner:
         self.root = root
         self.config = config
 
-    def run_job_from_template(self, service: str, *path: str) -> None:
+    def run_task_from_template(self, service: str, *path: str) -> None:
         command = self.render(*path)
-        self.run_job(service, command)
+        self.run_task(service, command)
 
-    def run_job_from_str(self, service: str, command: str) -> None:
+    def run_task_from_str(self, service: str, command: str) -> None:
         rendered = env.render_str(self.config, command).strip()
-        self.run_job(service, rendered)
+        self.run_task(service, rendered)
 
     def render(self, *path: str) -> str:
         rendered = env.render_file(self.config, *path).strip()
@@ -28,7 +28,7 @@ class BaseJobRunner:
             raise TypeError("Cannot load job from binary file")
         return rendered
 
-    def run_job(self, service: str, command: str) -> int:
+    def run_task(self, service: str, command: str) -> int:
         """
         Given a (potentially large) string command, run it with the
         corresponding service. Implementations will differ depending on the
@@ -37,6 +37,6 @@ class BaseJobRunner:
         raise NotImplementedError
 
 
-class BaseComposeJobRunner(BaseJobRunner):
+class BaseComposeTaskRunner(BaseTaskRunner):
     def docker_compose(self, *command: str) -> int:
         raise NotImplementedError

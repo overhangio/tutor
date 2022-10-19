@@ -7,7 +7,7 @@ from glob import glob
 import click
 import pkg_resources
 
-from tutor import exceptions, fmt, hooks, serialize
+from tutor import env, exceptions, fmt, hooks, serialize
 from tutor.__about__ import __app__
 from tutor.types import Config
 
@@ -179,12 +179,18 @@ class BasePlugin:
             )
         # Pre-init scripts: hooks = {"pre-init": ["myservice1", "myservice2"]}
         for service in pre_init_tasks:
-            path = (self.name, "hooks", service, "pre-init")
-            hooks.Filters.COMMANDS_PRE_INIT.add_item((service, path))
+            hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+                (
+                    service,
+                    env.read_template_file(self.name, "hooks", service, "pre-init"),
+                ),
+                priority=hooks.priorities.HIGH,
+            )
         # Init scripts: hooks = {"init": ["myservice1", "myservice2"]}
         for service in init_tasks:
-            path = (self.name, "hooks", service, "init")
-            hooks.Filters.COMMANDS_INIT.add_item((service, path))
+            hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+                (service, env.read_template_file(self.name, "hooks", service, "init"))
+            )
 
     def _load_templates_root(self) -> None:
         templates_root = get_callable_attr(self.obj, "templates", default=None)

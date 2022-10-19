@@ -218,7 +218,7 @@ You can now run the "myservice" container which will execute the ``CMD`` stateme
 Declaring initialisation tasks
 ------------------------------
 
-Services often need to run specific tasks before they can be started. For instance, the LMS and the CMS need to apply database migrations. These commands are written in shell scripts that are executed whenever we run ``launch``. We call these scripts "init tasks". To add a new local init task, we must first add the corresponding service to the ``docker-compose-jobs.yml`` file by implementing the :patch:`local-docker-compose-jobs-services` patch::
+Services often need to run specific tasks before they can be started. For instance, the LMS and the CMS need to apply database migrations. These commands are written in shell scripts that are executed whenever we run ``launch``. We call these scripts "init tasks". To add a new local initialisation task, we must first add the corresponding service to the ``docker-compose-jobs.yml`` file by implementing the :patch:`local-docker-compose-jobs-services` patch::
 
     hooks.Filters.ENV_PATCHES.add_item(
         (
@@ -234,24 +234,22 @@ The patch above defined the "myservice-job" container which will run our initial
 
     $ tutor config save
 
-Next, we create the folder which will contain our init task script::
+Next, we create an initialisation task by adding an item to the :py:data:`tutor.hooks.Filters.CLI_DO_INIT_TASKS` filter::
 
-    $ mkdir "$(tutor plugins printroot)/templates/myplugin/tasks"
 
-Edit ``$(tutor plugins printroot)/templates/myplugin/tasks/init.sh``::
-
+    hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+        (
+            "myservice",
+            """
     echo "++++++ initialising my plugin..."
     echo "++++++ done!"
-
-Add our init task script to the :py:data:`tutor.hooks.Filters.COMMANDS_INIT` filter::
-
-    hooks.Filters.COMMANDS_INIT.add_item(
-        ("myservice", ("myplugin", "tasks", "init.sh")),
+    """
+        )
     )
 
 Run this initialisation task with::
 
-    $ tutor local init --limit=myplugin
+    $ tutor local do init --limit=myplugin
     ...
     Running init task: myplugin/tasks/init.sh
     ...
@@ -354,8 +352,14 @@ Eventually, our plugin is composed of the following files, all stored within the
     )
     hooks.Filters.IMAGES_PUSH.add_item(("myservice", "myservice:latest"))
     hooks.Filters.IMAGES_PULL.add_item(("myservice", "myservice:latest"))
-    hooks.Filters.COMMANDS_INIT.add_item(
-        ("myservice", ("myplugin", "tasks", "init.sh")),
+    hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+        (
+            "myservice",
+            """
+    echo "++++++ initialising my plugin..."
+    echo "++++++ done!"
+    """
+        )
     )
 
 ``templates/myplugin/build/myservice/Dockerfile``

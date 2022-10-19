@@ -9,13 +9,13 @@ from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import fmt, hooks, serialize, utils
 from tutor.commands import jobs
-from tutor.commands.context import BaseJobContext
+from tutor.commands.context import BaseTaskContext
 from tutor.exceptions import TutorError
-from tutor.jobs import BaseComposeJobRunner
+from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
 
 
-class ComposeJobRunner(BaseComposeJobRunner):
+class ComposeTaskRunner(BaseComposeTaskRunner):
     def __init__(self, root: str, config: Config):
         super().__init__(root, config)
         self.project_name = ""
@@ -81,7 +81,7 @@ class ComposeJobRunner(BaseComposeJobRunner):
             docker_compose_jobs_tmp_path,
         )
 
-    def run_job(self, service: str, command: str) -> int:
+    def run_task(self, service: str, command: str) -> int:
         """
         Run the "{{ service }}-job" service from local/docker-compose.jobs.yml with the
         specified command.
@@ -105,11 +105,11 @@ class ComposeJobRunner(BaseComposeJobRunner):
         )
 
 
-class BaseComposeContext(BaseJobContext):
+class BaseComposeContext(BaseTaskContext):
     COMPOSE_TMP_FILTER: hooks.filters.Filter = NotImplemented
     COMPOSE_JOBS_TMP_FILTER: hooks.filters.Filter = NotImplemented
 
-    def job_runner(self, config: Config) -> ComposeJobRunner:
+    def job_runner(self, config: Config) -> ComposeTaskRunner:
         raise NotImplementedError
 
 
@@ -297,19 +297,22 @@ def restart(context: BaseComposeContext, services: t.List[str]) -> None:
     context.job_runner(config).docker_compose(*command)
 
 
-@click.command(help="Initialise all applications")
-@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
+@jobs.do_group
 @mount_option
 @click.pass_obj
-def init(
-    context: BaseComposeContext,
-    limit: str,
-    mounts: t.Tuple[t.List[MountParam.MountType]],
+def do(
+    context: BaseComposeContext, mounts: t.Tuple[t.List[MountParam.MountType]]
 ) -> None:
-    mount_tmp_volumes(mounts, context)
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    jobs.initialise(runner, limit_to=limit)
+    """
+    Run a custom job in the right container(s).
+    """
+    @hooks.Actions.DO_JOB.add()
+    def _mount_tmp_volumes(_job_name: str, *_args: t.Any, **_kwargs: t.Any) -> None:
+        """
+        We add this logic to an action callback because we do not want to trigger it
+        whenever we run `tutor local do <job> --help`.
+        """
+        mount_tmp_volumes(mounts, context)
 
 
 @click.command(
@@ -470,11 +473,14 @@ def add_commands(command_group: click.Group) -> None:
     command_group.add_command(stop)
     command_group.add_command(restart)
     command_group.add_command(reboot)
-    command_group.add_command(init)
     command_group.add_command(dc_command)
     command_group.add_command(run)
     command_group.add_command(copyfrom)
     command_group.add_command(execute)
     command_group.add_command(logs)
     command_group.add_command(status)
-    jobs.add_commands(command_group)
+
+    @hooks.Actions.PLUGINS_LOADED.add()
+    def _add_do_commands() -> None:
+        jobs.add_job_commands(do)
+        command_group.add_command(do)

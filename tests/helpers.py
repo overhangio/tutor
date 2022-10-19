@@ -5,12 +5,12 @@ import unittest
 import unittest.result
 
 from tutor import hooks
-from tutor.commands.context import BaseJobContext
-from tutor.jobs import BaseJobRunner
+from tutor.commands.context import BaseTaskContext
+from tutor.tasks import BaseTaskRunner
 from tutor.types import Config
 
 
-class TestJobRunner(BaseJobRunner):
+class TestTaskRunner(BaseTaskRunner):
     """
     Mock job runner for unit testing.
 
@@ -18,7 +18,7 @@ class TestJobRunner(BaseJobRunner):
     separated by dashes.
     """
 
-    def run_job(self, service: str, command: str) -> int:
+    def run_task(self, service: str, command: str) -> int:
         print(os.linesep.join([f"Service: {service}", "-----", command, "----- "]))
         return 0
 
@@ -36,13 +36,13 @@ def temporary_root() -> "tempfile.TemporaryDirectory[str]":
     return tempfile.TemporaryDirectory(prefix="tutor-test-root-")
 
 
-class TestContext(BaseJobContext):
+class TestContext(BaseTaskContext):
     """
     Click context that will use only test job runners.
     """
 
-    def job_runner(self, config: Config) -> TestJobRunner:
-        return TestJobRunner(self.root, config)
+    def job_runner(self, config: Config) -> TestTaskRunner:
+        return TestTaskRunner(self.root, config)
 
 
 class PluginsTestCase(unittest.TestCase):
