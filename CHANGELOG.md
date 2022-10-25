@@ -18,7 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
-- [Improvement] use caddy `encode gzip` directive to optimize transfer size (by @ghassanmas)
+- [Security] Fix xblock ajax handler vulnerability. (by @regisb)
+- [Improvement] Use web proxy gzip encoding to improve bandwidth. We observe a 75% size reduction on the LMS dashboard. (by @ghassanmas)
 
 ## v14.1.0 (2022-10-10)
 
