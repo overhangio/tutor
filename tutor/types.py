@@ -35,7 +35,10 @@ T = t.TypeVar("T")
 
 
 def get_typed(
-    config: Config, key: str, expected_type: t.Type[T], default: t.Optional[T] = None
+    config: t.Dict[str, t.Any],
+    key: str,
+    expected_type: t.Type[T],
+    default: t.Optional[T] = None,
 ) -> T:
     value = config.get(key, default)
     if not isinstance(value, expected_type):
