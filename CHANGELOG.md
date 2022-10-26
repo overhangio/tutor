@@ -18,6 +18,7 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Deprecation] Tutor is no longer compatible with Python 3.6. (by @regisb)
 - [Security] Fix xblock ajax handler vulnerability. (by @regisb)
 - [Improvement] Use web proxy gzip encoding to improve bandwidth. We observe a 75% size reduction on the LMS dashboard. (by @ghassanmas)
 
