@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v14.1.2 (2022-11-02)
+
 - [Security] Fix edx-platform XSS vulnerability on "next" parameter. (by @regisb)
 
 ## v14.1.1 (2022-10-25)
