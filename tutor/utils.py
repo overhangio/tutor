@@ -235,7 +235,7 @@ def _shlex_join(*split_command: str) -> str:
 
 
 def check_output(*command: str) -> bytes:
-    literal_command = " ".join(command)
+    literal_command = _shlex_join(*command)
     click.echo(fmt.command(literal_command))
     try:
         return subprocess.check_output(command)
