@@ -8,6 +8,7 @@ from __future__ import annotations
 __license__ = "Apache 2.0"
 
 from typing import Any, Callable
+
 import click
 
 from tutor.types import Config
