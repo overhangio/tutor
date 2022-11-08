@@ -4,6 +4,7 @@ import typing as t
 from copy import deepcopy
 
 import click
+from click.shell_completion import CompletionItem
 from typing_extensions import TypeAlias
 
 from tutor import bindmounts
@@ -170,6 +171,18 @@ class MountParam(click.ParamType):
         if not mounts:
             raise self.fail(f"no mount found for {value}")
         return mounts
+
+    def shell_complete(
+        self, ctx: click.Context, param: click.Parameter, incomplete: str
+    ) -> t.List[CompletionItem]:
+        """
+        Mount argument completion works only for the single path (implicit) form. The
+        reason is that colons break words in bash completion:
+        http://tiswww.case.edu/php/chet/bash/FAQ (E13)
+        Thus, we do not even attempt to auto-complete mount arguments that include
+        colons: such arguments will not even reach this method.
+        """
+        return [CompletionItem(incomplete, type="file")]
 
 
 mount_option = click.option(
