@@ -8,6 +8,7 @@ will be backported to the master branch at every major release.
 When backporting changes to master, we should keep only the entries that correspond to user-
 facing changes.
 -->
+- [Feature] Implement hook filter priorities, which work like action priorities. (by @regisb)
 - 💥[Improvement] Remove the `local/dev bindmount` commands, which have been marked as deprecated for some time. The `--mount` option should be used instead.
 - 💥[Bugfix] Fix local installation requirements. Plugins that implemented the "openedx-dockerfile-post-python-requirements" patch and that needed access to the edx-platform repo will no longer work. Instead, these plugins should implement the "openedx-dockerfile-pre-assets" patch. This scenario should be very rare, though. (by @regisb)
 - 💥[Improvement] Rename the implementation of tutor <mode> quickstart to tutor <mode> launch. (by @Carlos-Muniz)

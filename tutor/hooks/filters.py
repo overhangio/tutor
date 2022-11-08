@@ -4,7 +4,7 @@ __license__ = "Apache 2.0"
 import sys
 import typing as t
 
-from . import contexts
+from . import contexts, priorities
 
 # For now, this signature is not very restrictive. In the future, we could improve it by writing:
 #
@@ -22,9 +22,10 @@ CallableFilter = t.Callable[..., t.Any]
 
 
 class FilterCallback(contexts.Contextualized):
-    def __init__(self, func: CallableFilter):
+    def __init__(self, func: CallableFilter, priority: t.Optional[int] = None):
         super().__init__()
         self.func = func
+        self.priority = priority or priorities.DEFAULT
 
     def apply(
         self, value: T, *args: t.Any, context: t.Optional[str] = None, **kwargs: t.Any
@@ -36,7 +37,7 @@ class FilterCallback(contexts.Contextualized):
 
 class Filter:
     """
-    Each filter is associated to a name and a list of callbacks.
+    Each filter is associated to a name and a list of callbacks, sorted by priority.
     """
 
     INDEX: t.Dict[str, "Filter"] = {}
@@ -55,18 +56,21 @@ class Filter:
         """
         return cls.INDEX.setdefault(name, cls(name))
 
-    def add(self) -> t.Callable[[CallableFilter], CallableFilter]:
+    def add(
+        self, priority: t.Optional[int] = None
+    ) -> t.Callable[[CallableFilter], CallableFilter]:
         def inner(func: CallableFilter) -> CallableFilter:
-            self.callbacks.append(FilterCallback(func))
+            callback = FilterCallback(func, priority=priority)
+            priorities.insert_callback(callback, self.callbacks)
             return func
 
         return inner
 
-    def add_item(self, item: T) -> None:
-        self.add_items([item])
+    def add_item(self, item: T, priority: t.Optional[int] = None) -> None:
+        self.add_items([item], priority=priority)
 
-    def add_items(self, items: t.List[T]) -> None:
-        @self.add()
+    def add_items(self, items: t.List[T], priority: t.Optional[int] = None) -> None:
+        @self.add(priority=priority)
         def callback(value: t.List[T], *_args: t.Any, **_kwargs: t.Any) -> t.List[T]:
             return value + items
 
@@ -153,11 +157,17 @@ def get_template(name: str) -> FilterTemplate:
     return FilterTemplate(name)
 
 
-def add(name: str) -> t.Callable[[CallableFilter], CallableFilter]:
+def add(
+    name: str, priority: t.Optional[int] = None
+) -> t.Callable[[CallableFilter], CallableFilter]:
     """
     Decorator for functions that will be applied to a single named filter.
 
-    :param name: name of the filter to which the decorated function should be added.
+    :param str name: name of the filter to which the decorated function should be added.
+    :param int priority: optional order in which the filter callbacks are called. Higher
+        values mean that they will be performed later. The default value is
+        ``priorities.DEFAULT`` (10). Filters that should be called last should have a
+        priority of 100.
 
     The return value of each filter function callback will be passed as the first argument to the next one.
 
@@ -174,15 +184,16 @@ def add(name: str) -> t.Callable[[CallableFilter], CallableFilter]:
         # After filters have been created, the result of calling all filter callbacks is obtained by running:
         hooks.filters.apply("my-filter", initial_value, some_other_argument_value)
     """
-    return Filter.get(name).add()
+    return Filter.get(name).add(priority=priority)
 
 
-def add_item(name: str, item: T) -> None:
+def add_item(name: str, item: T, priority: t.Optional[int] = None) -> None:
     """
     Convenience function to add a single item to a filter that returns a list of items.
 
     :param name: filter name.
     :param object item: item that will be appended to the resulting list.
+    :param int priority: see :py:data:`add`.
 
     Usage::
 
@@ -193,10 +204,10 @@ def add_item(name: str, item: T) -> None:
 
         assert ["item1", "item2"] == hooks.filters.apply("my-filter", [])
     """
-    get(name).add_item(item)
+    get(name).add_item(item, priority=priority)
 
 
-def add_items(name: str, items: t.List[T]) -> None:
+def add_items(name: str, items: t.List[T], priority: t.Optional[int] = None) -> None:
     """
     Convenience function to add multiple item to a filter that returns a list of items.
 
@@ -211,7 +222,7 @@ def add_items(name: str, items: t.List[T]) -> None:
 
         assert ["item1", "item2"] == hooks.filters.apply("my-filter", [])
     """
-    get(name).add_items(items)
+    get(name).add_items(items, priority=priority)
 
 
 def iterate(
