@@ -8,6 +8,7 @@ will be backported to the master branch at every major release.
 When backporting changes to master, we should keep only the entries that correspond to user-
 facing changes.
 -->
+- [Improvement] Add the `-h` help option to all commands and subcommands. Previously, we could only use `--help`, which is quite long for lazy fingers. (by @regisb)
 - 💥[Feature] Add an extensible `local/dev/k8s do ...` command to trigger custom job commands. These commands are used to run a series of bash scripts in designated containers. Any plugin can add custom jobs thanks to the `CLI_DO_COMMANDS` filter. This causes the following breaking changes:
     - The "init", "createuser", "settheme", "importdemocourse" commands were all migrated to this new interface. For instance,  `tutor local init` was replaced by `tutor local do init`.
     - Plugin developers are encouraged to replace calls to the `COMMANDS_INIT` and `COMMANDS_PRE_INIT` filters by `CLI_DO_INIT_TASKS`.
