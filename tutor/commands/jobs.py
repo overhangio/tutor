@@ -263,8 +263,7 @@ P = ParamSpec("P")
 
 
 def _patch_callback(
-    job_name: str,
-    func: t.Callable[P, t.Iterable[t.Tuple[str, str]]]
+    job_name: str, func: t.Callable[P, t.Iterable[t.Tuple[str, str]]]
 ) -> t.Callable[P, None]:
     """
     Modify a subcommand callback function such that its results are processed by `do_callback`.

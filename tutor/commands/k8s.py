@@ -369,6 +369,7 @@ def do(context: K8sContext) -> None:
     We make sure that some essential containers (databases, proxy) are up before we
     launch the jobs.
     """
+
     @hooks.Actions.DO_JOB.add()
     def _start_base_deployments(_job_name: str, *_args: Any, **_kwargs: Any) -> None:
         """

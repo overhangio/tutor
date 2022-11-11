@@ -117,6 +117,7 @@ def cli(context: click.Context, root: str, show_help: bool) -> None:
             "/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
         )
     context.obj = Context(root)
+    context.help_option_names = ["-h", "--help"]
     if context.invoked_subcommand is None or show_help:
         click.echo(context.get_help())
 
