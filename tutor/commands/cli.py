@@ -127,17 +127,8 @@ def help_command(context: click.Context) -> None:
     context.invoke(cli, show_help=True)
 
 
-hooks.filters.add_items(
-    "cli:commands",
-    [
-        images_command,
-        config_command,
-        local,
-        dev,
-        k8s,
-        help_command,
-        plugins_command,
-    ],
+hooks.Filters.CLI_COMMANDS.add_items(
+    [images_command, config_command, local, dev, k8s, help_command, plugins_command]
 )
 
 
