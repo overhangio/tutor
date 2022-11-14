@@ -198,8 +198,7 @@ class BasePlugin:
         hooks.Filters.ENV_TEMPLATE_ROOTS.add_item(templates_root)
         # We only add the "apps" and "build" folders and we render them in the
         # "plugins/<plugin name>" folder.
-        hooks.filters.add_items(
-            "env:templates:targets",
+        hooks.Filters.ENV_TEMPLATE_TARGETS.add_items(
             [
                 (
                     os.path.join(self.name, "apps"),
@@ -209,7 +208,7 @@ class BasePlugin:
                     os.path.join(self.name, "build"),
                     "plugins",
                 ),
-            ],
+            ]
         )
 
     def _load_command(self) -> None:
