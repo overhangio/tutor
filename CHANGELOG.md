@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- 💥[Feature] Strong typing of action and filter hooks: this allows us to detect incorrect calls to `actions.add` or `filters.add` early. Strong typing forces us to break the `do` and `apply` API by removing the `context` named argument. Developers should replace `do(context=...)` by `do_from_context(..., )` (and similar for `apply`).
+
 ## v14.1.2 (2022-11-02)
 
 - [Security] Fix edx-platform XSS vulnerability on "next" parameter. (by @regisb)

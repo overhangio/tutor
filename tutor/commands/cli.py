@@ -53,14 +53,12 @@ class TutorCli(click.MultiCommand):
         """
         We enable plugins as soon as possible to have access to commands.
         """
-        if not isinstance(ctx, click.Context):
-            # When generating docs, this function is incorrectly called with a
-            # multicommand object instead of a Context. That's ok, we just
-            # ignore it.
-            # https://github.com/click-contrib/sphinx-click/issues/70
+        if not "root" in ctx.params:
+            # When generating docs, this function is called with empty args.
+            # That's ok, we just ignore it.
             return
         if not cls.IS_ROOT_READY:
-            hooks.Actions.PROJECT_ROOT_READY.do(root=ctx.params["root"])
+            hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
             cls.IS_ROOT_READY = True
 
     def list_commands(self, ctx: click.Context) -> t.List[str]:

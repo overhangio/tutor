@@ -86,7 +86,7 @@ class EnvTests(PluginsTestCase):
         rendered = env.render_file(config, "jobs", "init", "mysql.sh")
         self.assertIn("testpassword", rendered)
 
-    @patch.object(tutor_config.fmt, "echo")
+    @patch.object(fmt, "echo")
     def test_render_file_missing_configuration(self, _: Mock) -> None:
         self.assertRaises(
             exceptions.TutorError, env.render_file, {}, "local", "docker-compose.yml"
@@ -118,7 +118,7 @@ class EnvTests(PluginsTestCase):
     def test_patch(self) -> None:
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
         with patch.object(
-            env.plugins, "iter_patches", return_value=patches.values()
+            plugins, "iter_patches", return_value=patches.values()
         ) as mock_iter_patches:
             rendered = env.render_str({}, '{{ patch("location") }}')
             mock_iter_patches.assert_called_once_with("location")
@@ -126,7 +126,7 @@ class EnvTests(PluginsTestCase):
 
     def test_patch_separator_suffix(self) -> None:
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
-        with patch.object(env.plugins, "iter_patches", return_value=patches.values()):
+        with patch.object(plugins, "iter_patches", return_value=patches.values()):
             rendered = env.render_str(
                 {}, '{{ patch("location", separator=",\n", suffix=",") }}'
             )

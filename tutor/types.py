@@ -1,6 +1,8 @@
+# The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
+__license__ = "Apache 2.0"
+
 import typing as t
 
-# https://mypy.readthedocs.io/en/latest/kinds_of_types.html#type-aliases
 from typing_extensions import TypeAlias
 
 from . import exceptions
@@ -15,6 +17,7 @@ ConfigValue: TypeAlias = t.Union[
     t.Dict[str, t.Any],
     t.Dict[t.Any, t.Any],
 ]
+
 Config: TypeAlias = t.Dict[str, ConfigValue]
 
 

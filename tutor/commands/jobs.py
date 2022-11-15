@@ -64,28 +64,25 @@ def initialise(limit: t.Optional[str]) -> t.Iterator[t.Tuple[str, str]]:
     filter_context = hooks.Contexts.APP(limit).name if limit else None
 
     # Deprecated pre-init tasks
-    depr_iter_pre_init_tasks: t.Iterator[
-        t.Tuple[str, t.Iterable[str]]
-    ] = hooks.Filters.COMMANDS_PRE_INIT.iterate(context=filter_context)
-    for service, path in depr_iter_pre_init_tasks:
+    for service, path in hooks.Filters.COMMANDS_PRE_INIT.iterate_from_context(
+        filter_context
+    ):
         fmt.echo_alert(
             f"Running deprecated pre-init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_PRE_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead, with a high priority."
         )
         yield service, env.read_template_file(*path)
 
     # Init tasks
-    iter_init_tasks: t.Iterator[
-        t.Tuple[str, str]
-    ] = hooks.Filters.CLI_DO_INIT_TASKS.iterate(context=filter_context)
-    for service, task in iter_init_tasks:
+    for service, task in hooks.Filters.CLI_DO_INIT_TASKS.iterate_from_context(
+        filter_context
+    ):
         fmt.echo_info(f"Running init task in {service}")
         yield service, task
 
     # Deprecated init tasks
-    depr_iter_init_tasks: t.Iterator[
-        t.Tuple[str, t.Iterable[str]]
-    ] = hooks.Filters.COMMANDS_INIT.iterate(context=filter_context)
-    for service, path in depr_iter_init_tasks:
+    for service, path in hooks.Filters.COMMANDS_INIT.iterate_from_context(
+        filter_context
+    ):
         fmt.echo_alert(
             f"Running deprecated init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead."
         )
@@ -270,7 +267,7 @@ def _patch_callback(
     """
 
     def new_callback(*args: P.args, **kwargs: P.kwargs) -> None:
-        hooks.Actions.DO_JOB.do(job_name, *args, context=None, **kwargs)
+        hooks.Actions.DO_JOB.do(job_name, *args, **kwargs)
         do_callback(func(*args, **kwargs))
 
     # Make the new callback behave like the old one

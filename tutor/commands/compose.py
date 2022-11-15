@@ -4,6 +4,7 @@ import typing as t
 from copy import deepcopy
 
 import click
+from typing_extensions import TypeAlias
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
@@ -13,6 +14,8 @@ from tutor.commands.context import BaseTaskContext
 from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
+
+COMPOSE_FILTER_TYPE: TypeAlias = "hooks.filters.Filter[t.Dict[str, t.Any], []]"
 
 
 class ComposeTaskRunner(BaseComposeTaskRunner):
@@ -42,8 +45,8 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
 
     def update_docker_compose_tmp(
         self,
-        compose_tmp_filter: hooks.filters.Filter,
-        compose_jobs_tmp_filter: hooks.filters.Filter,
+        compose_tmp_filter: COMPOSE_FILTER_TYPE,
+        compose_jobs_tmp_filter: COMPOSE_FILTER_TYPE,
         docker_compose_tmp_path: str,
         docker_compose_jobs_tmp_path: str,
     ) -> None:
@@ -51,7 +54,7 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
         Update the contents of the docker-compose.tmp.yml and
         docker-compose.jobs.tmp.yml files, which are generated at runtime.
         """
-        compose_base = {
+        compose_base: t.Dict[str, t.Any] = {
             "version": "{{ DOCKER_COMPOSE_VERSION }}",
             "services": {},
         }
@@ -106,8 +109,8 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
 
 
 class BaseComposeContext(BaseTaskContext):
-    COMPOSE_TMP_FILTER: hooks.filters.Filter = NotImplemented
-    COMPOSE_JOBS_TMP_FILTER: hooks.filters.Filter = NotImplemented
+    COMPOSE_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
+    COMPOSE_JOBS_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
 
     def job_runner(self, config: Config) -> ComposeTaskRunner:
         raise NotImplementedError
@@ -161,10 +164,9 @@ class MountParam(click.ParamType):
         """
         mounts: t.List["MountParam.MountType"] = []
         host_path = os.path.abspath(os.path.expanduser(value))
-        volumes: t.Iterator[t.Tuple[str, str]] = hooks.Filters.COMPOSE_MOUNTS.iterate(
+        for service, container_path in hooks.Filters.COMPOSE_MOUNTS.iterate(
             os.path.basename(host_path)
-        )
-        for service, container_path in volumes:
+        ):
             mounts.append((service, host_path, container_path))
         if not mounts:
             raise self.fail(f"no mount found for {value}")
@@ -207,7 +209,7 @@ def mount_tmp_volume(
     docker-compose jobs file.
     """
     fmt.echo_info(f"Bind-mount: {host_path} -> {container_path} in {service}")
-    compose_tmp_filter: hooks.filters.Filter = (
+    compose_tmp_filter: COMPOSE_FILTER_TYPE = (
         context.COMPOSE_JOBS_TMP_FILTER
         if service.endswith("-job")
         else context.COMPOSE_TMP_FILTER

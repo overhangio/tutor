@@ -127,10 +127,7 @@ def get_defaults() -> Config:
     Entries in this configuration are unrendered.
     """
     defaults = get_template("defaults.yml")
-    extra_defaults: t.Iterator[
-        t.Tuple[str, ConfigValue]
-    ] = hooks.Filters.CONFIG_DEFAULTS.iterate()
-    for name, value in extra_defaults:
+    for name, value in hooks.Filters.CONFIG_DEFAULTS.iterate():
         defaults[name] = value
     update_with_env(defaults)
     return defaults
@@ -305,10 +302,9 @@ def _remove_plugin_config_overrides_on_unload(
 ) -> None:
     # Find the configuration entries that were overridden by the plugin and
     # remove them from the current config
-    overriden_config_items: t.Iterator[
-        t.Tuple[str, ConfigValue]
-    ] = hooks.Filters.CONFIG_OVERRIDES.iterate(context=hooks.Contexts.APP(plugin).name)
-    for key, _value in overriden_config_items:
+    for key, _value in hooks.Filters.CONFIG_OVERRIDES.iterate_from_context(
+        hooks.Contexts.APP(plugin).name
+    ):
         value = config.pop(key, None)
         value = env.render_unknown(config, value)
         fmt.echo_info(f"    config - removing entry: {key}={value}")
