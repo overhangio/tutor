@@ -3,12 +3,38 @@ import typing as t
 import urllib.request
 
 import click
+import click.shell_completion
 
 from tutor import config as tutor_config
 from tutor import exceptions, fmt, hooks, plugins
 from tutor.plugins.base import PLUGINS_ROOT, PLUGINS_ROOT_ENV_VAR_NAME
 
 from .context import Context
+
+
+class PluginName(click.ParamType):
+    """
+    Convenient param type that supports plugin name autocompletion.
+    """
+
+    def __init__(self, allow_all: bool = False):
+        self.allow_all = allow_all
+
+    def shell_complete(
+        self, ctx: click.Context, param: click.Parameter, incomplete: str
+    ) -> t.List[click.shell_completion.CompletionItem]:
+        return [
+            click.shell_completion.CompletionItem(name)
+            for name in self.get_names(incomplete)
+        ]
+
+    def get_names(self, incomplete: str) -> t.List[str]:
+        candidates = []
+        if self.allow_all:
+            candidates.append("all")
+        candidates += [name for name, _ in plugins.iter_info()]
+
+        return [name for name in candidates if name.startswith(incomplete)]
 
 
 @click.group(
@@ -34,12 +60,12 @@ def list_command() -> None:
         lines.append((plugin, status, plugin_info))
         first_column_width = max([first_column_width, len(plugin) + 2])
 
-    for line in lines:
-        print("{:{width}}\t{:10}\t{}".format(*line, width=first_column_width))
+    for plugin, status, plugin_info in lines:
+        print(f"{plugin:{first_column_width}}\t{status:10}\t{plugin_info}")
 
 
 @click.command(help="Enable a plugin")
-@click.argument("plugin_names", metavar="plugin", nargs=-1)
+@click.argument("plugin_names", metavar="plugin", nargs=-1, type=PluginName())
 @click.pass_obj
 def enable(context: Context, plugin_names: t.List[str]) -> None:
     config = tutor_config.load_minimal(context.root)
@@ -57,7 +83,9 @@ def enable(context: Context, plugin_names: t.List[str]) -> None:
     short_help="Disable a plugin",
     help="Disable one or more plugins. Specify 'all' to disable all enabled plugins at once.",
 )
-@click.argument("plugin_names", metavar="plugin", nargs=-1)
+@click.argument(
+    "plugin_names", metavar="plugin", nargs=-1, type=PluginName(allow_all=True)
+)
 @click.pass_obj
 def disable(context: Context, plugin_names: t.List[str]) -> None:
     config = tutor_config.load_minimal(context.root)
@@ -90,7 +118,7 @@ def printroot() -> None:
     help=f"""Install a plugin, either from a local Python/YAML file or a remote, web-hosted
 location. The plugin will be installed to {PLUGINS_ROOT_ENV_VAR_NAME}.""",
 )
-@click.argument("location")
+@click.argument("location", type=click.Path(dir_okay=False))
 def install(location: str) -> None:
     basename = os.path.basename(location)
     if not basename.endswith(".yml") and not basename.endswith(".py"):
