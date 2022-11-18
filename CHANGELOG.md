@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+- [Improvement] Enable CORS by default for both LMS and CMS by moving those settings to the `common_all` partial. (by @arbrandes)
+
 ## v14.2.0 (2022-11-21)
 
 - [Improvement] Auto-complete implicit `local/dev --mount /path/to/...` options. (by @regisb)

@@ -65,9 +65,6 @@ DATABASE_ROUTERS.remove(
 # Set uploaded media file path
 MEDIA_ROOT = "/openedx/media/"
 
-# Add your MFE and third-party app domains here
-CORS_ORIGIN_WHITELIST = []
-
 # Video settings
 VIDEO_IMAGE_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
 VIDEO_TRANSCRIPTS_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
@@ -160,6 +157,16 @@ JWT_AUTH["JWT_ISSUERS"] = [
 # Enable/Disable some features globally
 FEATURES["ENABLE_DISCUSSION_SERVICE"] = False
 FEATURES["PREVENT_CONCURRENT_LOGINS"] = False
+FEATURES["ENABLE_CORS_HEADERS"] = True
+
+# CORS
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_INSECURE = {% if ENABLE_HTTPS %}False{% else %}True{% endif %}
+CORS_ALLOW_HEADERS = corsheaders_default_headers + ('use-jwt-cookie',)
+
+# Add your MFE and third-party app domains here
+CORS_ORIGIN_WHITELIST = []
 
 # Disable codejail support
 # explicitely configuring python is necessary to prevent unsafe calls
