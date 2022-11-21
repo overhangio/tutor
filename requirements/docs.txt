@@ -54,7 +54,7 @@ markupsafe==2.1.1
     # via
     #   -r requirements/base.txt
     #   jinja2
-mypy==0.990
+mypy==0.991
     # via -r requirements/base.txt
 mypy-extensions==0.4.3
     # via
