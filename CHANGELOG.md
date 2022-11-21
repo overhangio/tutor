@@ -18,6 +18,8 @@ Every user-facing change should have an entry in this changelog. Please respect 
 
 ## Unreleased
 
+## v14.2.0 (2022-11-21)
+
 - [Improvement] Auto-complete implicit `local/dev --mount /path/to/...` options. (by @regisb)
 - 💥[Feature] Strong typing of action and filter hooks: this allows us to detect incorrect calls to `actions.add` or `filters.add` early. Strong typing forces us to break the `do` and `apply` API by removing the `context` named argument. Developers should replace `do(context=...)` by `do_from_context(..., )` (and similar for `apply`).
 
