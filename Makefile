@@ -83,6 +83,13 @@ coverage-browse-report: coverage-html ## Open the HTML report in the browser
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller tutor.spec
 
+
+changelog-entry: ## Create a new changelog entry
+	scriv create
+
+changelog: ## Collect changelog entries in the CHANGELOG.md file
+	scriv collect
+
 release: test release-unsafe ## Create a release tag and push it to origin
 release-unsafe:
 	$(MAKE) release-tag release-push TAG=v$(shell make version)
