@@ -139,7 +139,7 @@ def get_template(filename: str) -> Config:
 
     Entries in this configuration are unrendered.
     """
-    config = serialize.load(env.read_template_file("config", filename))
+    config = serialize.load(env.read_core_template_file("config", filename))
     return cast_config(config)
 
 

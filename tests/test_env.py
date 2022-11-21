@@ -42,8 +42,8 @@ class EnvTests(PluginsTestCase):
         self.assertTrue(env.is_binary_file("/home/somefile.ico"))
 
     def test_find_os_path(self) -> None:
-        renderer = env.Renderer()
-        path = renderer.find_os_path("local/docker-compose.yml")
+        environment = env.JinjaEnvironment()
+        path = environment.find_os_path("local/docker-compose.yml")
         self.assertTrue(os.path.exists(path))
 
     def test_pathjoin(self) -> None:

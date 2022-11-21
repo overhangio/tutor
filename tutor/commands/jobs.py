@@ -45,15 +45,15 @@ def _add_core_init_tasks() -> None:
     """
     with hooks.Contexts.APP("mysql").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
-            ("mysql", env.read_template_file("jobs", "init", "mysql.sh"))
+            ("mysql", env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
     with hooks.Contexts.APP("lms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
-            ("lms", env.read_template_file("jobs", "init", "lms.sh"))
+            ("lms", env.read_core_template_file("jobs", "init", "lms.sh"))
         )
     with hooks.Contexts.APP("cms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
-            ("cms", env.read_template_file("jobs", "init", "cms.sh"))
+            ("cms", env.read_core_template_file("jobs", "init", "cms.sh"))
         )
 
 

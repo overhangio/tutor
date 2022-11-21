@@ -60,20 +60,35 @@ _prepare_environment()
 
 
 class JinjaEnvironment(jinja2.Environment):
-    loader: jinja2.BaseLoader
+    loader: jinja2.FileSystemLoader
 
-    def __init__(self, template_roots: t.List[str]) -> None:
+    def __init__(self) -> None:
+        template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
         loader = jinja2.FileSystemLoader(template_roots)
         super().__init__(loader=loader, undefined=jinja2.StrictUndefined)
+
+    def read_str(self, template_name: str) -> str:
+        return self.read_bytes(template_name).decode()
+
+    def read_bytes(self, template_name: str) -> bytes:
+        with open(self.find_os_path(template_name), "rb") as f:
+            return f.read()
+
+    def find_os_path(self, template_name: str) -> str:
+        path = template_name.replace("/", os.sep)
+        for templates_root in self.loader.searchpath:
+            full_path = os.path.join(templates_root, path)
+            if os.path.exists(full_path):
+                return full_path
+        raise ValueError("Template path does not exist")
 
 
 class Renderer:
     def __init__(self, config: t.Optional[Config] = None):
         self.config = deepcopy(config or {})
-        self.template_roots = hooks.Filters.ENV_TEMPLATE_ROOTS.apply([TEMPLATES_ROOT])
 
         # Create environment with extra filters and globals
-        self.environment = JinjaEnvironment(self.template_roots)
+        self.environment = JinjaEnvironment()
 
         # Filters
         plugin_filters = hooks.Filters.ENV_TEMPLATE_FILTERS.iterate()
@@ -135,14 +150,6 @@ class Renderer:
         """
         yield from self.iter_templates_in(subdir)
 
-    def find_os_path(self, template_name: str) -> str:
-        path = template_name.replace("/", os.sep)
-        for templates_root in self.template_roots:
-            full_path = os.path.join(templates_root, path)
-            if os.path.exists(full_path):
-                return full_path
-        raise ValueError("Template path does not exist")
-
     def patch(self, name: str, separator: str = "\n", suffix: str = "") -> str:
         """
         Render calls to {{ patch("...") }} in environment templates from plugin patches.
@@ -173,8 +180,7 @@ class Renderer:
         """
         if is_binary_file(template_name):
             # Don't try to render binary files
-            with open(self.find_os_path(template_name), "rb") as f:
-                return f.read()
+            return self.environment.read_bytes(template_name)
 
         try:
             template = self.environment.get_template(template_name)
@@ -396,22 +402,23 @@ def current_version(root: str) -> t.Optional[str]:
 def read_template_file(*path: str) -> str:
     """
     Read raw content of template located at `path`.
+
+    The template may be located inside any of the template root folders.
     """
-    src = template_path(*path)
-    with open(src, encoding="utf-8") as fi:
+    return JinjaEnvironment().read_str("/".join(path))
+
+
+def read_core_template_file(*path: str) -> str:
+    """
+    Read raw content of template located in tutor core template directory.
+    """
+    with open(os.path.join(TEMPLATES_ROOT, *path), encoding="utf-8") as fi:
         return fi.read()
 
 
 def is_binary_file(path: str) -> bool:
     ext = os.path.splitext(path)[1]
     return ext in BIN_FILE_EXTENSIONS
-
-
-def template_path(*path: str, templates_root: str = TEMPLATES_ROOT) -> str:
-    """
-    Return the template file's absolute path.
-    """
-    return os.path.join(templates_root, *path)
 
 
 def data_path(root: str, *path: str) -> str:
