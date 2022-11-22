@@ -1,8 +1,13 @@
 {% include "apps/openedx/settings/partials/common_all.py" %}
 
 ######## Common CMS settings
+STUDIO_NAME = "{{ PLATFORM_NAME }} - Studio"
 
-STUDIO_NAME = u"{{ PLATFORM_NAME }} - Studio"
+CACHES["staticfiles"] = {
+    "KEY_PREFIX": "staticfiles_cms",
+    "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    "LOCATION": "staticfiles_cms",
+}
 
 # Authentication
 SOCIAL_AUTH_EDX_OAUTH2_SECRET = "{{ CMS_OAUTH2_SECRET }}"

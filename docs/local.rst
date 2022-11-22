@@ -17,9 +17,6 @@ In the following, environment and data files will be generated in a user-specifi
     export TUTOR_ROOT=/path/to/tutorroot
     tutor run ...
 
-.. note::
-    As of v10.0.0, a locally-running Open edX platform can no longer be accessed from http://localhost or http://studio.localhost. Instead, when running ``tutor local launch``, you must now decide whether you are running a platform that will be used in production. If not, the platform will be automatically be bound to http://local.overhang.io and http://studio.local.overhang.io, which are domain names that point to 127.0.0.1 (localhost). This change was made to facilitate internal communication between Docker containers.
-
 Main commands
 -------------
 
