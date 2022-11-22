@@ -85,7 +85,7 @@ The other benefit of ``kubectl apply`` is that it allows you to customise the Ku
 
 To learn more about "kustomizations", refer to the `official documentation <https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/>`__.
 
-Launch
+Quickstart
 ----------
 
 Launch the platform on Kubernetes in one command::

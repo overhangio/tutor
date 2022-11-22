@@ -55,13 +55,12 @@ Features
 * No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#zero-click-aws-installation>`__
 
 .. _readme_intro_end:
-..
-  TODO: replace image + alt with tutor local launch
-.. image:: ./docs/img/quickstart.gif
-    :alt: Tutor local quickstart
-    :target: https://terminalizer.com/view/91b0bfdd557
 
-Launch
+.. image:: ./docs/img/launch.webp
+    :alt: Tutor local launch
+    :target: https://www.terminalizer.com/view/3a8d55835686
+
+Quickstart
 ----------
 
 1. Install the `latest stable release <https://github.com/overhangio/tutor/releases>`_ of Tutor
@@ -71,7 +70,8 @@ Launch
 Documentation
 -------------
 
-Extensive documentation is available online: https://docs.tutor.overhang.io/
+Extensive documentation is available: https://docs.tutor.overhang.io/
+Extensive documentation is available: https://docs.tutor.overhang.io/
 
 Is there a problem?
 -------------------

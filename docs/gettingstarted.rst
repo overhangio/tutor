@@ -8,5 +8,5 @@ Getting started
 
    install
    intro
-   quickstart 
+   quickstart
    whatnext

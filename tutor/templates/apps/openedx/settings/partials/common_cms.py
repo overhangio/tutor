@@ -4,6 +4,12 @@
 
 STUDIO_NAME = u"{{ PLATFORM_NAME }} - Studio"
 
+CACHES["staticfiles"] = {
+    "KEY_PREFIX": "staticfiles_cms",
+    "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    "LOCATION": "staticfiles_cms",
+}
+
 # Authentication
 SOCIAL_AUTH_EDX_OAUTH2_SECRET = "{{ CMS_OAUTH2_SECRET }}"
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = "http://lms:8000"
@@ -14,6 +20,12 @@ MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 100
 
 FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
+
+# Disable blockstore-related xblocks
+LIBRARY_BLOCK_TYPES = filter(
+    lambda b: b["component"] != "library_sourced",
+    LIBRARY_BLOCK_TYPES
+)
 
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:

@@ -40,8 +40,46 @@ ELASTIC_SEARCH_CONFIG = [{
   "port": {{ ELASTICSEARCH_PORT }},
 }]
 
-CONTACT_MAILING_ADDRESS = "{{ PLATFORM_NAME }} - {% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}"
+# Common cache config
+CACHES = {
+    "default": {
+        "KEY_PREFIX": "default",
+        "VERSION": "1",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+    },
+    "general": {
+        "KEY_PREFIX": "general",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+    },
+    "mongo_metadata_inheritance": {
+        "KEY_PREFIX": "mongo_metadata_inheritance",
+        "TIMEOUT": 300,
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+    },
+    "configuration": {
+        "KEY_PREFIX": "configuration",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+    },
+    "celery": {
+        "KEY_PREFIX": "celery",
+        "TIMEOUT": 7200,
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+    },
+    "course_structure_cache": {
+        "KEY_PREFIX": "course_structure",
+        "TIMEOUT": 7200,
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+    },
+}
 
+# Contact addresses
+CONTACT_MAILING_ADDRESS = "{{ PLATFORM_NAME }} - {% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}"
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get("DEFAULT_FROM_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get("DEFAULT_FEEDBACK_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
 SERVER_EMAIL = ENV_TOKENS.get("SERVER_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])

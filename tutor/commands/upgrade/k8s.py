@@ -32,6 +32,10 @@ def upgrade_from(context: Context, from_release: str) -> None:
         upgrade_from_maple(context, config)
         running_release = "nutmeg"
 
+    if running_release == "nutmeg":
+        # Upgrade is a no-op
+        running_release = "olive"
+
 
 def upgrade_from_ironwood(config: Config) -> None:
     if not config["RUN_MONGODB"]:

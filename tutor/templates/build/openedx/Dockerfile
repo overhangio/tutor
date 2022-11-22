@@ -73,7 +73,7 @@ RUN apt update && apt install -y software-properties-common libmysqlclient-dev l
 # https://pypi.org/project/setuptools/
 # https://pypi.org/project/pip/
 # https://pypi.org/project/wheel/
-RUN pip install setuptools==62.1.0 pip==22.0.4 wheel==0.37.1
+RUN pip install setuptools==65.5.1 pip==22.3.1. wheel==0.38.4
 
 # Install base requirements
 COPY --from=code /openedx/edx-platform/requirements/edx/base.txt /tmp/base.txt
@@ -85,7 +85,7 @@ RUN pip install django-redis==5.2.0
 
 # Install uwsgi
 # https://pypi.org/project/uWSGI/
-RUN pip install uwsgi==2.0.20
+RUN pip install uwsgi==2.0.21
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
@@ -103,7 +103,8 @@ FROM python as nodejs-requirements
 ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
-RUN pip install nodeenv==1.6.0
+# https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
+RUN pip install nodeenv==1.7.0
 RUN nodeenv /openedx/nodeenv --node=16.14.0 --prebuilt
 
 # Install nodejs requirements
