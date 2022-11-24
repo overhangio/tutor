@@ -7,7 +7,7 @@ from __future__ import annotations
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 import click
 
@@ -64,7 +64,7 @@ class Actions:
     #: :parameter: str job: job name.
     #: :parameter: args: job positional arguments.
     #: :parameter: kwargs: job named arguments.
-    DO_JOB = actions.get("do:job")
+    DO_JOB: Action[[str, Any]] = actions.get("do:job")
 
     #: Called as soon as we have access to the Tutor project root.
     #:
@@ -135,7 +135,9 @@ class Filters:
     #:   added as subcommands to the `local/dev/k8s do` commands. They must return a list of
     #:   ("service name", "service command") tuples. Each "service command" will be executed
     #:   in the "service" container, both in local, dev and k8s mode.
-    CLI_DO_COMMANDS = filters.get("cli:commands:do")
+    CLI_DO_COMMANDS: Filter[
+        list[Callable[[Any], Iterable[tuple[str, str]]]], []
+    ] = filters.get("cli:commands:do")
 
     #: List of initialization tasks (scripts) to be run in the `init` job. This job
     #: includes all database migrations, setting up, etc. To run some tasks before or
@@ -144,7 +146,9 @@ class Filters:
     #: :parameter list[tuple[str, str]] tasks: list of ``(service, task)`` tuples. Each
     #:   task is essentially a bash script to be run in the "service" container. Scripts
     #:   may contain Jinja markup, similar to templates.
-    CLI_DO_INIT_TASKS = filters.get("cli:commands:do:init")
+    CLI_DO_INIT_TASKS: Filter[list[tuple[str, str]], []] = filters.get(
+        "cli:commands:do:init"
+    )
 
     #: DEPRECATED use :py:data:`CLI_DO_INIT_TASKS` instead.
     #:

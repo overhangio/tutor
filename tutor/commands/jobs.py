@@ -25,16 +25,6 @@ class DoGroup(click.Group):
 do_group = click.group(cls=DoGroup, subcommand_metavar="JOB [ARGS]...")
 
 
-def add_job_commands(do_command_group: click.Group) -> None:
-    """
-    This is meant to be called with the `local/dev/k8s do` group commands, to add the
-    different `do` subcommands.
-    """
-    subcommands: t.Iterator[click.Command] = hooks.Filters.CLI_DO_COMMANDS.iterate()
-    for subcommand in subcommands:
-        do_command_group.add_command(subcommand)
-
-
 @hooks.Actions.CORE_READY.add()
 def _add_core_init_tasks() -> None:
     """
@@ -205,39 +195,14 @@ def assign_theme(name, domain):
     return f'./manage.py lms shell -c "{python_command}"'
 
 
-hooks.Filters.CLI_DO_COMMANDS.add_items(
-    [
-        createuser,
-        importdemocourse,
-        initialise,
-        settheme,
-    ]
-)
-
-
-def do_callback(service_commands: t.Iterable[t.Tuple[str, str]]) -> None:
+def add_job_commands(do_command_group: click.Group) -> None:
     """
-    This function must be added as a callback to all `do` subcommands.
-
-    `do` subcommands don't actually run any task. They just yield tuples of (service
-    name, unrendered script string). This function is responsible for actually running
-    the scripts. It does the following:
-
-    - Prefix the script with a base command
-    - Render the script string
-    - Run a job in the right container
-
-    In order to be added as a callback to the do subcommands, the
-    `_patch_do_commands_callbacks` must be called.
+    This is meant to be called with the `local/dev/k8s do` group commands, to add the
+    different `do` subcommands.
     """
-    context = click.get_current_context().obj
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    base_openedx_command = """
-echo "Loading settings $DJANGO_SETTINGS_MODULE"
-"""
-    for service, command in service_commands:
-        runner.run_task_from_str(service, base_openedx_command + command)
+    for subcommand in hooks.Filters.CLI_DO_COMMANDS.iterate():
+        assert isinstance(subcommand, click.Command)
+        do_command_group.add_command(subcommand)
 
 
 @hooks.Actions.PLUGINS_LOADED.add()
@@ -245,9 +210,15 @@ def _patch_do_commands_callbacks() -> None:
     """
     After plugins have been loaded, patch `do` subcommands such that their output is
     forwarded to `do_callback`.
+
+    This function is not called as part of add_job_commands because subcommands must be
+    patched just once.
     """
-    subcommands: t.Iterator[click.Command] = hooks.Filters.CLI_DO_COMMANDS.iterate()
-    for subcommand in subcommands:
+    for subcommand in hooks.Filters.CLI_DO_COMMANDS.iterate():
+        if not isinstance(subcommand, click.Command):
+            raise ValueError(
+                f"Command {subcommand} which was added to the CLI_DO_COMMANDS filter must be an instance of click.Command"
+            )
         # Modify the subcommand callback such that job results are processed by do_callback
         if subcommand.callback is None:
             raise ValueError("Cannot patch None callback")
@@ -274,3 +245,37 @@ def _patch_callback(
     functools.update_wrapper(new_callback, func)
 
     return new_callback
+
+
+def do_callback(service_commands: t.Iterable[t.Tuple[str, str]]) -> None:
+    """
+    This function must be added as a callback to all `do` subcommands.
+
+    `do` subcommands don't actually run any task. They just yield tuples of (service
+    name, unrendered script string). This function is responsible for actually running
+    the scripts. It does the following:
+
+    - Prefix the script with a base command
+    - Render the script string
+    - Run a job in the right container
+
+    This callback is added to the "do" subcommands by the `add_job_commands` function.
+    """
+    context = click.get_current_context().obj
+    config = tutor_config.load(context.root)
+    runner = context.job_runner(config)
+    base_openedx_command = """
+echo "Loading settings $DJANGO_SETTINGS_MODULE"
+"""
+    for service, command in service_commands:
+        runner.run_task_from_str(service, base_openedx_command + command)
+
+
+hooks.Filters.CLI_DO_COMMANDS.add_items(
+    [
+        createuser,
+        importdemocourse,
+        initialise,
+        settheme,
+    ]
+)
