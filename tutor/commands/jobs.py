@@ -264,11 +264,8 @@ def do_callback(service_commands: t.Iterable[t.Tuple[str, str]]) -> None:
     context = click.get_current_context().obj
     config = tutor_config.load(context.root)
     runner = context.job_runner(config)
-    base_openedx_command = """
-echo "Loading settings $DJANGO_SETTINGS_MODULE"
-"""
     for service, command in service_commands:
-        runner.run_task_from_str(service, base_openedx_command + command)
+        runner.run_task_from_str(service, command)
 
 
 hooks.Filters.CLI_DO_COMMANDS.add_items(

@@ -37,10 +37,8 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
         self.assertIn("cms-job", dc_args)
-        self.assertTrue(
-            dc_args[-1]
-            .strip()
-            .startswith('echo "Loading settings $DJANGO_SETTINGS_MODULE"')
+        self.assertIn(
+            "git clone https://github.com/openedx/edx-demo-course", dc_args[-1]
         )
 
     def test_set_theme(self) -> None:
@@ -65,10 +63,5 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIsNone(result.exception)
             self.assertEqual(0, result.exit_code)
             self.assertIn("lms-job", dc_args)
-            self.assertTrue(
-                dc_args[-1]
-                .strip()
-                .startswith('echo "Loading settings $DJANGO_SETTINGS_MODULE"')
-            )
             self.assertIn("assign_theme('beautiful', 'domain1')", dc_args[-1])
             self.assertIn("assign_theme('beautiful', 'domain2')", dc_args[-1])
