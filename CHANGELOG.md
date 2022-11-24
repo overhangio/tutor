@@ -20,8 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
-## Unreleased
+<a id='changelog-14.2.0'></a>
+## v14.2.1 (2022-11-24)
 
+- [Improvement] Auto-completion of `plugins` and `config` arguments: `plugins enable/disable NAME`, `plugins install PATH`, `config save --set KEY=VAL`, `config save --unset KEY`, `config printvalue KEY`. (by @regisb)
+- [Bugfix] Fix minimum click version (>= 8.0.0) when installing tutor from pip.
 - [Improvement] Enable CORS by default for both LMS and CMS by moving those settings to the `common_all` partial. (by @arbrandes)
 
 ## v14.2.0 (2022-11-21)
