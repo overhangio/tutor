@@ -69,9 +69,9 @@ Releasing a new version
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - Bump the ``__version__`` value in ``tutor/__about__.py``. (see :ref:`versioning` below)
-- Replace "Unreleased" with the version name and date in CHANGELOG.md.
+- Collect changelog entries with ``make changelog``.
 - Create a commit with the version changelog.
-- Run ``make release``: this will push to the default repo/branch for the current branch.
+- Run ``make release``: this will create a tag and push to the default repo/branch for the current branch.
 
 .. _versioning:
 
@@ -102,12 +102,7 @@ Third-party contributions to Tutor and its plugins are more than welcome! Just m
 - Outside of obvious bugs, contributions should be discussed first in the `official Open edX forum <https://discuss.openedx.org>`__.
 - Once we agree on a high-level solution, you should open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ or the corresponding plugin.
 - Make sure that all tests pass by running ``make test`` (see above).
-- If your PR is in the Tutor core repository, add an item to the CHANGELOG file, in the "Unreleased" section. Use the same format as the other items::
-
-    - [TYPE] DESCRIPTION
-
-Where "TYPE" is either "Bugfix", "Improvement", "Feature" or "Security". You should add an explosion emoji ("💥") before "[TYPE]" if you are making a breaking change.
-
+- If your PR is in the Tutor core repository, add a changelog entry by running ``make changelog-entry``. Edit the new file and follow the formatting instructions that it contains.
 - Write a good Git commit title and message: explain why you are making this change, what problem you are solving and which solution you adopted. Link to the relevant conversation topics in the forums and describe your use case. We *love* long, verbose descriptions :) As for the title, `conventional commits <https://www.conventionalcommits.org>`__ are preferred. Check the repo history!
 
 Happy hacking! ☘️

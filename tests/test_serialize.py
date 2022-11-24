@@ -1,7 +1,5 @@
 import unittest
 
-import click
-
 from tutor import serialize
 
 
@@ -31,17 +29,15 @@ class SerializeTests(unittest.TestCase):
     def test_parse_empty_string(self) -> None:
         self.assertEqual("", serialize.parse("''"))
 
-    def test_yaml_param_type(self) -> None:
-        param = serialize.YamlParamType()
-        self.assertEqual(("name", True), param.convert("name=true", "param", {}))
-        self.assertEqual(("name", "abcd"), param.convert("name=abcd", "param", {}))
-        self.assertEqual(("name", ""), param.convert("name=", "param", {}))
-        with self.assertRaises(click.exceptions.BadParameter):
-            param.convert("name", "param", {})
-        self.assertEqual(("x", "a=bcd"), param.convert("x=a=bcd", "param", {}))
+    def test_parse_key_value(self) -> None:
+        self.assertEqual(("name", True), serialize.parse_key_value("name=true"))
+        self.assertEqual(("name", "abcd"), serialize.parse_key_value("name=abcd"))
+        self.assertEqual(("name", ""), serialize.parse_key_value("name="))
+        self.assertIsNone(serialize.parse_key_value("name"))
+        self.assertEqual(("x", "a=bcd"), serialize.parse_key_value("x=a=bcd"))
         self.assertEqual(
             ("x", {"key1": {"subkey": "value"}, "key2": {"subkey": "value"}}),
-            param.convert(
-                "x=key1:\n  subkey: value\nkey2:\n  subkey: value", "param", {}
+            serialize.parse_key_value(
+                "x=key1:\n  subkey: value\nkey2:\n  subkey: value"
             ),
         )
