@@ -121,7 +121,7 @@ def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
             "sq",
             "sr",
             "sv",
-            "sw",
+            "sw-ke",
             "ta",
             "te",
             "th",
