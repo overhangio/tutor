@@ -242,11 +242,17 @@ MongoDB
 *******
 
 - ``RUN_MONGODB`` (default: ``true``)
-- ``MONGODB_HOST`` (default: ``"mongodb"``)
 - ``MONGODB_DATABASE`` (default: ``"openedx"``)
+- ``MONGODB_HOST`` (default: ``"mongodb"``)
+- ``MONGODB_PASSWORD`` (default: ``""``)
 - ``MONGODB_PORT`` (default: ``27017``)
 - ``MONGODB_USERNAME`` (default: ``""``)
-- ``MONGODB_PASSWORD`` (default: ``""``)
+- ``MONGODB_USE_SSL`` (default: ``false``)
+- ``MONGODB_REPLICA_SET`` (default: ``""``)
+- ``MONGODB_AUTH_MECHANISM`` (default: ``""``)
+- ``MONGODB_AUTH_SOURCE`` (default: ``"admin"``)
+
+Note that most of these settings will have to be modified to connect to a MongoDB cluster that runs separately of Tutor, such as `Atlas <https://www.mongodb.com/atlas>`__. In particular, the authentication source, mechanism and the SSL connection parameters should not be specified as part of the `host URI <https://www.mongodb.com/docs/manual/reference/connection-string/>`__ but as separate Tutor settings. Supported values for ``MONGODB_AUTH_MECHANISM`` are the same as for pymongo (see the `pymongo documentation <https://pymongo.readthedocs.io/en/stable/examples/authentication.html>`__).
 
 Redis
 *****
