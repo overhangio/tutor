@@ -20,13 +20,16 @@ jobs:
           # https://github.com/actions/runner-images#available-images
           - os: ubuntu-latest
             locale: C.UTF-8
+            gh_os: linux
           # https://endoflife.date/macos
           - os: macos-latest
             locale: en_US.UTF-8
+            gh_os: macOs
     env:
       LC_ALL: ${{ matrix.locale }}
       LANG: ${{ matrix.locale }}
     steps:
+      ##### Setup environment
       # https://github.com/actions/checkout
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -42,26 +45,26 @@ jobs:
         run: make ci-info
       - name: Install requirements
         run: make bootstrap-dev-plugins
+
+      ##### Run tests, generate bundle
       - name: Run tests
         run: make test
       - name: Create bundle
         run: make bundle
       - name: Test bundle
         run: make ci-test-bundle
+
+      ##### Download gh utility: https://github.com/cli/cli/releases
       - name: Check for presence of "gh" CLI utility
         run: echo "gh_bin=$(which gh)" >> $GITHUB_ENV
-      - name: Download gh utility (linux)
+      - name: Download gh utility
         run: |
-          curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_linux_amd64.tar.gz
+          curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_${{ matrix.gh_os }}_amd64.tar.gz
           tar xzf gh.tar.gz
-          echo "gh_bin=./gh_2.20.2_linux_amd64/bin/gh" >> $GITHUB_ENV
-        if: ${{ env.gh_bin == '' && !contains(matrix.os, 'macos') }}
-      - name: Download gh utility (macos)
-        run: |
-          curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_macOS_amd64.tar.gz
-          tar xzf gh.tar.gz
-          echo "gh_bin=./gh_2.20.2_macOS_amd64/bin/gh" >> $GITHUB_ENV
-        if: ${{ env.gh_bin == '' && contains(matrix.os, 'macos') }}
+          echo "gh_bin=./gh_2.20.2_${{ matrix.gh_os }}_amd64/bin/gh" >> $GITHUB_ENV
+        if: ${{ env.gh_bin == '' }}
+
+      ##### Create release on GitHub
       - name: Create or update GitHub release
         # I wish there was an `--update` option to the `gh release create` command, but
         # there isn't.
@@ -71,8 +74,12 @@ jobs:
           export GH_ARGS="${{ github.ref }} --notes-file=release_description.md"
           echo "gh args: '$GH_ARGS"
           ${{ env.gh_bin }} release create $GH_ARGS || ${{ env.gh_bin }} release edit $GH_ARGS
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Upload release asset to GitHub
         run: |
           export FILENAME="tutor-$(uname -s)_$(uname -m)"
           mv ./dist/tutor $FILENAME
           ${{ env.gh_bin }} release upload --clobber ${{ github.ref }} $FILENAME
+        env:
+          GH_TOKEN: ${{ github.token }}
