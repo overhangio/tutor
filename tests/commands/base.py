@@ -30,6 +30,7 @@ class TestCommandMixin:
                 "TUTOR_ROOT": root,
                 "TUTOR_IGNORE_ENTRYPOINT_PLUGINS": "1",
                 "TUTOR_IGNORE_DICT_PLUGINS": "1",
-            }
+            },
+            mix_stderr=False,
         )
         return runner.invoke(cli, args, obj=TestContext(root))

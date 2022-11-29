@@ -70,8 +70,17 @@ class UtilsTests(unittest.TestCase):
         self.assertIsNotNone(imported.q)
 
     def test_is_root(self) -> None:
-        result = utils.is_root()
-        self.assertFalse(result)
+        with patch("sys.platform", "win32"):
+            with patch.object(utils, "get_user_id", return_value=42):
+                self.assertFalse(utils.is_root())
+            with patch.object(utils, "get_user_id", return_value=0):
+                self.assertFalse(utils.is_root())
+
+        with patch("sys.platform", "linux"):
+            with patch.object(utils, "get_user_id", return_value=42):
+                self.assertFalse(utils.is_root())
+            with patch.object(utils, "get_user_id", return_value=0):
+                self.assertTrue(utils.is_root())
 
     @patch("sys.platform", "win32")
     def test_is_root_win32(self) -> None:
@@ -79,11 +88,11 @@ class UtilsTests(unittest.TestCase):
         self.assertFalse(result)
 
     def test_get_user_id(self) -> None:
-        result = utils.get_user_id()
-        if sys.platform == "win32":
-            self.assertEqual(0, result)
-        else:
-            self.assertNotEqual(0, result)
+        with patch("os.getuid", return_value=42):
+            self.assertEqual(42, utils.get_user_id())
+
+            with patch("sys.platform", new="win32"):
+                self.assertEqual(0, utils.get_user_id())
 
     @patch("sys.platform", "win32")
     def test_get_user_id_win32(self) -> None:
