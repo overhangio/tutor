@@ -71,7 +71,8 @@ Releasing a new version
 - Bump the ``__version__`` value in ``tutor/__about__.py``. (see :ref:`versioning` below)
 - Collect changelog entries with ``make changelog``.
 - Create a commit with the version changelog.
-- Run ``make release``: this will create a tag and push to the default repo/branch for the current branch.
+- Run tests with ``make test``.
+- Push your changes to the upstream repository.
 
 .. _versioning:
 
