@@ -6,7 +6,6 @@ __pycache__
 
 /build/
 /dist/
-/release_description.md
 
 # Unit test/ coverage reports
 .coverage

@@ -1,3 +1,9 @@
+# This script can be tested locally with act:
+#
+#    act --secret GITHUB_TOKEN=... --job release
+#
+# https://github.com/nektos/act/
+# To generate a token: https://github.com/settings/tokens
 name: Release
 
 on:
@@ -11,21 +17,27 @@ jobs:
     strategy:
       matrix:
         include:
+          # https://github.com/actions/runner-images#available-images
           - os: ubuntu-latest
             locale: C.UTF-8
-          - os: macos-10.15
+          # https://endoflife.date/macos
+          - os: macos-latest
             locale: en_US.UTF-8
     env:
       LC_ALL: ${{ matrix.locale }}
       LANG: ${{ matrix.locale }}
     steps:
-      - uses: actions/checkout@v2
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        # https://github.com/actions/setup-python
+        uses: actions/setup-python@v3
         with:
           python-version: 3.7
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip setuptools==44.0.0
+      - name: Upgrade pip and setuptools
+        # https://pypi.org/project/pip/
+        # https://pypi.org/project/setuptools/
+        run: python -m pip install --upgrade pip setuptools==65.6.3
       - name: Print info about the current python installation
         run: make ci-info
       - name: Install requirements
@@ -36,41 +48,31 @@ jobs:
         run: make bundle
       - name: Test bundle
         run: make ci-test-bundle
-      - name: Get release description
-        id: release-description
-        # We must escape multi-line string, as per:
-        # https://medium.com/agorapulse-stories/how-to-work-with-multiline-string-variables-in-github-actions-23f56447d209
+      - name: Check for presence of "gh" CLI utility
+        run: echo "gh_bin=$(which gh)" >> $GITHUB_ENV
+      - name: Download gh utility (linux)
         run: |
-          make release-description
-          cat release_description.md
-          description="$(cat release_description.md)"
-          description="${description//'%'/'%25'}"
-          description="${description//$'\n'/'%0A'}"
-          description="${description//$'\r'/'%0D'}"
-          echo "::echo::on"
-          echo "::set-output name=text::$description"
-          echo "::echo::off"
-        shell: bash
-      - name: Get release file name
-        id: release-file
+          curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_linux_amd64.tar.gz
+          tar xzf gh.tar.gz
+          echo "gh_bin=./gh_2.20.2_linux_amd64/bin/gh" >> $GITHUB_ENV
+        if: ${{ env.gh_bin == '' && !contains(matrix.os, 'macos') }}
+      - name: Download gh utility (macos)
         run: |
-          echo "::echo::on"
-          echo "::set-output name=filename::tutor-$(uname -s)_$(uname -m)"
-          echo "::echo::off"
-        shell: bash
-      - name: Get release name
-        id: release-name
+          curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_macOS_amd64.tar.gz
+          tar xzf gh.tar.gz
+          echo "gh_bin=./gh_2.20.2_macOS_amd64/bin/gh" >> $GITHUB_ENV
+        if: ${{ env.gh_bin == '' && contains(matrix.os, 'macos') }}
+      - name: Create or update GitHub release
+        # I wish there was an `--update` option to the `gh release create` command, but
+        # there isn't.
+        # https://cli.github.com/manual/gh_release_create
         run: |
-          echo "::echo::on"
-          echo "::set-output name=release::${{ github.ref }}"
-          echo "::echo::off"
-      - name: Upload bundle
-        # https://github.com/marketplace/actions/upload-files-to-a-github-release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./dist/tutor
-          asset_name: "${{ steps.release-file.outputs.filename }}"
-          tag: "${{ steps.release-name.outputs.release }}"
-          overwrite: true
-          body: "${{ steps.release-description.outputs.text }}"
+          make release-description | tee release_description.md
+          export GH_ARGS="${{ github.ref }} --notes-file=release_description.md"
+          echo "gh args: '$GH_ARGS"
+          ${{ env.gh_bin }} release create $GH_ARGS || ${{ env.gh_bin }} release edit $GH_ARGS
+      - name: Upload release asset to GitHub
+        run: |
+          export FILENAME="tutor-$(uname -s)_$(uname -m)"
+          mv ./dist/tutor $FILENAME
+          ${{ env.gh_bin }} release upload --clobber ${{ github.ref }} $FILENAME
