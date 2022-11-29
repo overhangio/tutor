@@ -56,6 +56,9 @@ RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/3f0f9eed42.patc
 # Fix XSS vulnerability on "next" parameter
 # https://github.com/overhangio/edx-platform/tree/overhangio/sec-redirect-xss
 RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/e16f8c0986.patch | git am
+# Fix drag-n-drop v2 xblock vulnerability
+# https://github.com/openedx/edx-platform/pull/31354
+RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/527b4993ae.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
