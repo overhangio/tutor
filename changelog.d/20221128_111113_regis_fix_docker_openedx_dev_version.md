@@ -1,1 +1,0 @@
-- [Bugfix] Fix tag of "openedx" development Docker image. Previously, this Docker tag did not include the Tutor version. As a consequence, a different cached image could be used in some cases. For instance: when running `tutor dev run` commands. Now, the image tag is "openedx-dev:TUTOR_VERSION".

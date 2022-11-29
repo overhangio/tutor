@@ -20,6 +20,19 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-14.2.2'></a>
+## v14.2.2 (2022-11-29)
+
+- [Bugfix] Fix `jinja2.exceptions.TemplateSyntaxError: expected token 'end of statement block', got '|'` error by bumping the minimum required version of the Jinja2 package.
+
+- [Feature] Add support for MongoDB SSL, authentication source, mechanism and replica set via the `MONGODB_USE_SSL`, `MONGODB_AUTH_MECHANISM`, `MONGODB_AUTH_SOURCE`, `MONGODB_REPLICA_SET` settings. (by @zakum1 and @regisb)
+
+- [Bugfix] Fix tag of "openedx" development Docker image. Previously, this Docker tag did not include the Tutor version. As a consequence, a different cached image could be used in some cases. For instance: when running `tutor dev run` commands. Now, the image tag is "openedx-dev:TUTOR_VERSION".
+
+- [Bugfix] Fix name of Swahili locale: it is "sw-ke" and not "sw" (by @regisb).
+
+- [Security] Apply drag-n-drop v2 xblock [security patch](https://discuss.openedx.org/t/upcoming-security-release-xblock-drag-and-drop-v2/8768/7). (by @regisb)
+
 <a id='changelog-14.2.0'></a>
 ## v14.2.1 (2022-11-24)
 
