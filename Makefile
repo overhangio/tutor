@@ -104,8 +104,8 @@ release-push:
 	git push origin $(TAG)
 
 release-description:  ## Write the current release description to a file
-	sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md > release_description.md
-	git log -1 --pretty=format:%b >> release_description.md
+	@sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md
+	@git log -1 --pretty=format:%b
 
 ###### Continuous integration tasks
 

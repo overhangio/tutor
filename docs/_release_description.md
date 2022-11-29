@@ -10,3 +10,4 @@ Or download the compiled binaries:
 See the [installation docs](https://docs.tutor.overhang.io/install.html) for more installation options and instructions.
 
 ## Changes
+
