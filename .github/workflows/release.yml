@@ -43,7 +43,7 @@ jobs:
       - name: Install requirements
         run: make bootstrap-dev-plugins
       - name: Run tests
-        run: make tests
+        run: make test
       - name: Create bundle
         run: make bundle
       - name: Test bundle
