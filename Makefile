@@ -90,19 +90,6 @@ changelog-entry: ## Create a new changelog entry
 changelog: ## Collect changelog entries in the CHANGELOG.md file
 	scriv collect
 
-release: test release-unsafe ## Create a release tag and push it to origin
-release-unsafe:
-	$(MAKE) release-tag release-push TAG=v$(shell make version)
-release-tag:
-	@echo "=== Creating tag $(TAG)"
-	git tag -d $(TAG) || true
-	git tag $(TAG)
-release-push:
-	@echo "=== Pushing tag $(TAG) to origin"
-	git push origin
-	git push origin :$(TAG) || true
-	git push origin $(TAG)
-
 release-description:  ## Write the current release description to a file
 	@sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md
 	@git log -1 --pretty=format:%b
