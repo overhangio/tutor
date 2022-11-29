@@ -63,7 +63,7 @@ Custom images
 
 This configuration parameter defines the name of the Docker image to run for the lms and cms containers. By default, the Docker image tag matches the Tutor version it was built with.
 
-- ``DOCKER_IMAGE_OPENEDX_DEV`` (default: ``"openedx-dev"``)
+- ``DOCKER_IMAGE_OPENEDX_DEV`` (default: ``"openedx-dev:{{ TUTOR_VERSION }}"``)
 
 This configuration paramater defines the name of the Docker image to run the development version of the lms and cms containers.  By default, the Docker image tag matches the Tutor version it was built with.
 
