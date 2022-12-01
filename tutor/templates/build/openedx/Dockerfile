@@ -59,6 +59,9 @@ RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/e16f8c0986.patc
 # Fix drag-n-drop v2 xblock vulnerability
 # https://github.com/openedx/edx-platform/pull/31354
 RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/527b4993ae.patch | git am
+# Fix refresh of JWT tokens for disabled users
+# https://github.com/overhangio/edx-platform/tree/overhangio/sec-fix-user-retiring
+RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/4df942b32b.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
