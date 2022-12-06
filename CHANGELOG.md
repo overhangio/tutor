@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-14.2.3'></a>
+## v14.2.3 (2022-12-06)
+
+- [Security] Fix rotation of JWT tokens for disabled users. (by @regisb)
+
 <a id='changelog-14.2.2'></a>
 ## v14.2.2 (2022-11-29)
 

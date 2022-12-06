@@ -1,1 +1,0 @@
-- [Security] Fix rotation of JWT tokens for disabled users. (by @regisb)
