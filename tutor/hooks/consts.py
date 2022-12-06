@@ -7,7 +7,7 @@ from __future__ import annotations
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 import click
 
@@ -58,6 +58,13 @@ class Actions:
     #:
     #: This action does not have any parameter.
     CORE_READY: Action[[]] = actions.get("core:ready")
+
+    #: Called just before triggering the job tasks of any `... do <job>` command.
+    #:
+    #: :parameter: str job: job name.
+    #: :parameter: args: job positional arguments.
+    #: :parameter: kwargs: job named arguments.
+    DO_JOB: Action[[str, Any]] = actions.get("do:job")
 
     #: Called as soon as we have access to the Tutor project root.
     #:
@@ -116,6 +123,35 @@ class Filters:
             return items
     """
 
+    #: List of command line interface (CLI) commands.
+    #:
+    #: :parameter list commands: commands are instances of ``click.Command``. They will
+    #:   all be added as subcommands of the main ``tutor`` command.
+    CLI_COMMANDS: Filter[list[click.Command], []] = filters.get("cli:commands")
+
+    #: List of `do ...` commands.
+    #:
+    #: :parameter list commands: see :py:data:`CLI_COMMANDS`. These commands will be
+    #:   added as subcommands to the `local/dev/k8s do` commands. They must return a list of
+    #:   ("service name", "service command") tuples. Each "service command" will be executed
+    #:   in the "service" container, both in local, dev and k8s mode.
+    CLI_DO_COMMANDS: Filter[
+        list[Callable[[Any], Iterable[tuple[str, str]]]], []
+    ] = filters.get("cli:commands:do")
+
+    #: List of initialization tasks (scripts) to be run in the `init` job. This job
+    #: includes all database migrations, setting up, etc. To run some tasks before or
+    #: after others, they should be assigned a different priority.
+    #:
+    #: :parameter list[tuple[str, str]] tasks: list of ``(service, task)`` tuples. Each
+    #:   task is essentially a bash script to be run in the "service" container. Scripts
+    #:   may contain Jinja markup, similar to templates.
+    CLI_DO_INIT_TASKS: Filter[list[tuple[str, str]], []] = filters.get(
+        "cli:commands:do:init"
+    )
+
+    #: DEPRECATED use :py:data:`CLI_DO_INIT_TASKS` instead.
+    #:
     #: List of commands to be executed during initialization. These commands typically
     #: include database migrations, setting feature flags, etc.
     #:
@@ -123,16 +159,19 @@ class Filters:
     #:
     #:     - ``service`` is the name of the container in which the task will be executed.
     #:     - ``path`` is a tuple that corresponds to a template relative path.
-    #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see:py:data:`IMAGES_BUILD`).
+    #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see :py:data:`IMAGES_BUILD`).
     #:       The command to execute will be read from that template, after it is rendered.
     COMMANDS_INIT: Filter[list[tuple[str, tuple[str, ...]]], str] = filters.get(
         "commands:init"
     )
 
+    #: DEPRECATED use :py:data:`CLI_DO_INIT_TASKS` instead with a lower priority score.
+    #:
     #: List of commands to be executed prior to initialization. These commands are run even
     #: before the mysql databases are created and the migrations are applied.
     #:
-    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks. (see :py:data:`COMMANDS_INIT`).
+    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)``
+    #:   tasks. (see :py:data:`COMMANDS_INIT`).
     COMMANDS_PRE_INIT: Filter[list[tuple[str, tuple[str, ...]]], []] = filters.get(
         "commands:pre-init"
     )
@@ -204,12 +243,6 @@ class Filters:
     #: List of images to be pushed when we run ``tutor images push ...``.
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
     IMAGES_PUSH: Filter[list[tuple[str, str]], [Config]] = filters.get("images:push")
-
-    #: List of command line interface (CLI) commands.
-    #:
-    #: :parameter list commands: commands are instances of ``click.Command``. They will
-    #:   all be added as subcommands of the main ``tutor`` command.
-    CLI_COMMANDS: Filter[list[click.Command], []] = filters.get("cli:commands")
 
     #: Declare new default configuration settings that don't necessarily have to be saved in the user
     #: ``config.yml`` file. Default settings may be overridden with ``tutor config save --set=...``, in which
@@ -323,6 +356,34 @@ class Filters:
     ENV_TEMPLATE_VARIABLES: Filter[list[tuple[str, Any]], []] = filters.get(
         "env:templates:variables"
     )
+
+    #: List of images to be built when we run ``tutor images build ...``.
+    #:
+    #: :parameter list[tuple[str, tuple[str, ...], str, tuple[str, ...]]] tasks: list of ``(name, path, tag, args)`` tuples.
+    #:
+    #:    - ``name`` is the name of the image, as in ``tutor images build myimage``.
+    #:    - ``path`` is the relative path to the folder that contains the Dockerfile.
+    #:      For instance ``("myplugin", "build", "myservice")`` indicates that the template will be read from
+    #:      ``myplugin/build/myservice/Dockerfile``
+    #:    - ``tag`` is the Docker tag that will be applied to the image. It will be
+    #:      rendered at runtime with the user configuration. Thus, the image tag could
+    #:      be ``"{{ DOCKER_REGISTRY }}/myimage:{{ TUTOR_VERSION }}"``.
+    #:    - ``args`` is a list of arguments that will be passed to ``docker build ...``.
+    #: :parameter dict config: user configuration.
+    IMAGES_BUILD = filters.get("images:build")
+
+    #: List of images to be pulled when we run ``tutor images pull ...``.
+    #:
+    #: :parameter list[tuple[str, str]] tasks: list of ``(name, tag)`` tuples.
+    #:
+    #:    - ``name`` is the name of the image, as in ``tutor images pull myimage``.
+    #:    - ``tag`` is the Docker tag that will be applied to the image. (see :py:data:`IMAGES_BUILD`).
+    #: :parameter dict config: user configuration.
+    IMAGES_PULL = filters.get("images:pull")
+
+    #: List of images to be pushed when we run ``tutor images push ...``.
+    #: Parameters are the same as for :py:data:`IMAGES_PULL`.
+    IMAGES_PUSH = filters.get("images:push")
 
     #: List of installed plugins. In order to be added to this list, a plugin must first
     #: be discovered (see :py:data:`Actions.CORE_READY`).

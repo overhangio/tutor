@@ -7,18 +7,19 @@ import click
 from click.shell_completion import CompletionItem
 from typing_extensions import TypeAlias
 
-from tutor import bindmounts
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import fmt, hooks, jobs, serialize, utils
-from tutor.commands.context import BaseJobContext
+from tutor import fmt, hooks, serialize, utils
+from tutor.commands import jobs
+from tutor.commands.context import BaseTaskContext
 from tutor.exceptions import TutorError
+from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
 
 COMPOSE_FILTER_TYPE: TypeAlias = "hooks.filters.Filter[t.Dict[str, t.Any], []]"
 
 
-class ComposeJobRunner(jobs.BaseComposeJobRunner):
+class ComposeTaskRunner(BaseComposeTaskRunner):
     def __init__(self, root: str, config: Config):
         super().__init__(root, config)
         self.project_name = ""
@@ -84,7 +85,7 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
             docker_compose_jobs_tmp_path,
         )
 
-    def run_job(self, service: str, command: str) -> int:
+    def run_task(self, service: str, command: str) -> int:
         """
         Run the "{{ service }}-job" service from local/docker-compose.jobs.yml with the
         specified command.
@@ -108,11 +109,11 @@ class ComposeJobRunner(jobs.BaseComposeJobRunner):
         )
 
 
-class BaseComposeContext(BaseJobContext):
+class BaseComposeContext(BaseTaskContext):
     COMPOSE_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
     COMPOSE_JOBS_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
 
-    def job_runner(self, config: Config) -> ComposeJobRunner:
+    def job_runner(self, config: Config) -> ComposeTaskRunner:
         raise NotImplementedError
 
 
@@ -311,77 +312,23 @@ def restart(context: BaseComposeContext, services: t.List[str]) -> None:
     context.job_runner(config).docker_compose(*command)
 
 
-@click.command(help="Initialise all applications")
-@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
+@jobs.do_group
 @mount_option
 @click.pass_obj
-def init(
-    context: BaseComposeContext,
-    limit: str,
-    mounts: t.Tuple[t.List[MountParam.MountType]],
+def do(
+    context: BaseComposeContext, mounts: t.Tuple[t.List[MountParam.MountType]]
 ) -> None:
-    mount_tmp_volumes(mounts, context)
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    jobs.initialise(runner, limit_to=limit)
+    """
+    Run a custom job in the right container(s).
+    """
 
-
-@click.command(help="Create an Open edX user and interactively set their password")
-@click.option("--superuser", is_flag=True, help="Make superuser")
-@click.option("--staff", is_flag=True, help="Make staff user")
-@click.option(
-    "-p",
-    "--password",
-    help="Specify password from the command line. If undefined, you will be prompted to input a password",
-)
-@click.argument("name")
-@click.argument("email")
-@click.pass_obj
-def createuser(
-    context: BaseComposeContext,
-    superuser: str,
-    staff: bool,
-    password: str,
-    name: str,
-    email: str,
-) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    command = jobs.create_user_command(superuser, staff, name, email, password=password)
-    runner.run_job("lms", command)
-
-
-@click.command(
-    help="Assign a theme to the LMS and the CMS. To reset to the default theme , use 'default' as the theme name."
-)
-@click.option(
-    "-d",
-    "--domain",
-    "domains",
-    multiple=True,
-    help=(
-        "Limit the theme to these domain names. By default, the theme is "
-        "applied to the LMS and the CMS, both in development and production mode"
-    ),
-)
-@click.argument("theme_name")
-@click.pass_obj
-def settheme(
-    context: BaseComposeContext, domains: t.List[str], theme_name: str
-) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    domains = domains or jobs.get_all_openedx_domains(config)
-    jobs.set_theme(theme_name, domains, runner)
-
-
-@click.command(help="Import the demo course")
-@click.pass_obj
-def importdemocourse(context: BaseComposeContext) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    fmt.echo_info("Importing demo course")
-    jobs.import_demo_course(runner)
+    @hooks.Actions.DO_JOB.add()
+    def _mount_tmp_volumes(_job_name: str, *_args: t.Any, **_kwargs: t.Any) -> None:
+        """
+        We add this logic to an action callback because we do not want to trigger it
+        whenever we run `tutor local do <job> --help`.
+        """
+        mount_tmp_volumes(mounts, context)
 
 
 @click.command(
@@ -405,28 +352,6 @@ def run(
     if not utils.is_a_tty():
         extra_args.append("-T")
     context.invoke(dc_command, mounts=mounts, command="run", args=[*extra_args, *args])
-
-
-@click.command(
-    name="bindmount",
-    help="Copy the contents of a container directory to a ready-to-bind-mount host directory",
-)
-@click.argument("service")
-@click.argument("path")
-@click.pass_obj
-def bindmount_command(context: BaseComposeContext, service: str, path: str) -> None:
-    """
-    This command is made obsolete by the --mount arguments.
-    """
-    fmt.echo_alert(
-        "The 'bindmount' command is deprecated and will be removed in a later release. Use 'copyfrom' instead."
-    )
-    config = tutor_config.load(context.root)
-    host_path = bindmounts.create(context.job_runner(config), service, path)
-    fmt.echo_info(
-        f"Bind-mount volume created at {host_path}. You can now use it in all `local` and `dev` "
-        f"commands with the `--volume={path}` option."
-    )
 
 
 @click.command(
@@ -535,20 +460,7 @@ def dc_command(
 ) -> None:
     mount_tmp_volumes(mounts, context)
     config = tutor_config.load(context.root)
-    volumes, non_volume_args = bindmounts.parse_volumes(args)
-    volume_args = []
-    for volume_arg in volumes:
-        if ":" not in volume_arg:
-            # This is a bind-mounted volume from the "volumes/" folder.
-            host_bind_path = bindmounts.get_path(context.root, volume_arg)
-            if not os.path.exists(host_bind_path):
-                raise TutorError(
-                    f"Bind-mount volume directory {host_bind_path} does not exist. It must first be created "
-                    f"with the '{bindmount_command.name}' command."
-                )
-            volume_arg = f"{host_bind_path}:{volume_arg}"
-        volume_args += ["--volume", volume_arg]
-    context.job_runner(config).docker_compose(command, *volume_args, *non_volume_args)
+    context.job_runner(config).docker_compose(command, *args)
 
 
 @hooks.Filters.COMPOSE_MOUNTS.add()
@@ -577,14 +489,14 @@ def add_commands(command_group: click.Group) -> None:
     command_group.add_command(stop)
     command_group.add_command(restart)
     command_group.add_command(reboot)
-    command_group.add_command(init)
-    command_group.add_command(createuser)
-    command_group.add_command(importdemocourse)
-    command_group.add_command(settheme)
     command_group.add_command(dc_command)
     command_group.add_command(run)
     command_group.add_command(copyfrom)
-    command_group.add_command(bindmount_command)
     command_group.add_command(execute)
     command_group.add_command(logs)
     command_group.add_command(status)
+
+    @hooks.Actions.PLUGINS_LOADED.add()
+    def _add_do_commands() -> None:
+        jobs.add_job_commands(do)
+        command_group.add_command(do)

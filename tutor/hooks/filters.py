@@ -6,7 +6,7 @@ import typing as t
 
 from typing_extensions import Concatenate, ParamSpec
 
-from . import contexts
+from . import contexts, priorities
 
 T = t.TypeVar("T")
 P = ParamSpec("P")
@@ -19,9 +19,12 @@ E = t.TypeVar("E")
 
 
 class FilterCallback(contexts.Contextualized, t.Generic[T, P]):
-    def __init__(self, func: t.Callable[Concatenate[T, P], T]):
+    def __init__(
+        self, func: t.Callable[Concatenate[T, P], T], priority: t.Optional[int] = None
+    ):
         super().__init__()
         self.func = func
+        self.priority = priority or priorities.DEFAULT
 
     def apply(self, value: T, *args: P.args, **kwargs: P.kwargs) -> T:
         return self.func(value, *args, **kwargs)
@@ -72,14 +75,15 @@ class Filter(t.Generic[T, P]):
         return cls.INDEX.setdefault(name, cls(name))
 
     def add(
-        self,
+        self, priority: t.Optional[int] = None
     ) -> t.Callable[
         [t.Callable[Concatenate[T, P], T]], t.Callable[Concatenate[T, P], T]
     ]:
         def inner(
             func: t.Callable[Concatenate[T, P], T]
         ) -> t.Callable[Concatenate[T, P], T]:
-            self.callbacks.append(FilterCallback[T, P](func))
+            callback = FilterCallback(func, priority=priority)
+            priorities.insert_callback(callback, self.callbacks)
             return func
 
         return inner
@@ -138,10 +142,14 @@ class Filter(t.Generic[T, P]):
         ]
 
     # The methods below are specific to filters which take lists as first arguments
-    def add_item(self: "Filter[t.List[E], P]", item: E) -> None:
-        self.add_items([item])
+    def add_item(
+        self: "Filter[t.List[E], P]", item: E, priority: t.Optional[int] = None
+    ) -> None:
+        self.add_items([item], priority=priority)
 
-    def add_items(self: "Filter[t.List[E], P]", items: t.List[E]) -> None:
+    def add_items(
+        self: "Filter[t.List[E], P]", items: t.List[E], priority: t.Optional[int] = None
+    ) -> None:
         # Unfortunately we have to type-ignore this line. If not, mypy complains with:
         #
         #   Argument 1 has incompatible type "Callable[[Arg(List[E], 'values'), **P], List[E]]"; expected "Callable[[List[E], **P], List[E]]"
@@ -149,7 +157,7 @@ class Filter(t.Generic[T, P]):
         #
         # But we are unable to mark arguments positional-only (by adding / after values arg) in Python 3.7.
         # Get rid of this statement after Python 3.7 EOL.
-        @self.add()  # type: ignore
+        @self.add(priority=priority)  # type: ignore
         def callback(
             values: t.List[E], *_args: P.args, **_kwargs: P.kwargs
         ) -> t.List[E]:
@@ -211,12 +219,16 @@ def get_template(name: str) -> FilterTemplate[t.Any, t.Any]:
 
 
 def add(
-    name: str,
+    name: str, priority: t.Optional[int] = None
 ) -> t.Callable[[t.Callable[Concatenate[T, P], T]], t.Callable[Concatenate[T, P], T]]:
     """
     Decorator for functions that will be applied to a single named filter.
 
-    :param name: name of the filter to which the decorated function should be added.
+    :param str name: name of the filter to which the decorated function should be added.
+    :param int priority: optional order in which the filter callbacks are called. Higher
+        values mean that they will be performed later. The default value is
+        ``priorities.DEFAULT`` (10). Filters that should be called last should have a
+        priority of 100.
 
     The return value of each filter function callback will be passed as the first argument to the next one.
 
@@ -233,15 +245,16 @@ def add(
         # After filters have been created, the result of calling all filter callbacks is obtained by running:
         hooks.filters.apply("my-filter", initial_value, some_other_argument_value)
     """
-    return Filter.get(name).add()
+    return Filter.get(name).add(priority=priority)
 
 
-def add_item(name: str, item: T) -> None:
+def add_item(name: str, item: T, priority: t.Optional[int] = None) -> None:
     """
     Convenience function to add a single item to a filter that returns a list of items.
 
     :param name: filter name.
     :param object item: item that will be appended to the resulting list.
+    :param int priority: see :py:data:`add`.
 
     Usage::
 
@@ -252,10 +265,10 @@ def add_item(name: str, item: T) -> None:
 
         assert ["item1", "item2"] == hooks.filters.apply("my-filter", [])
     """
-    get(name).add_item(item)
+    get(name).add_item(item, priority=priority)
 
 
-def add_items(name: str, items: t.List[T]) -> None:
+def add_items(name: str, items: t.List[T], priority: t.Optional[int] = None) -> None:
     """
     Convenience function to add multiple item to a filter that returns a list of items.
 
@@ -270,7 +283,7 @@ def add_items(name: str, items: t.List[T]) -> None:
 
         assert ["item1", "item2"] == hooks.filters.apply("my-filter", [])
     """
-    get(name).add_items(items)
+    get(name).add_items(items, priority=priority)
 
 
 def iterate(name: str, *args: t.Any, **kwargs: t.Any) -> t.Iterator[T]:

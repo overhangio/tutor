@@ -42,8 +42,8 @@ class EnvTests(PluginsTestCase):
         self.assertTrue(env.is_binary_file("/home/somefile.ico"))
 
     def test_find_os_path(self) -> None:
-        renderer = env.Renderer()
-        path = renderer.find_os_path("local/docker-compose.yml")
+        environment = env.JinjaEnvironment()
+        path = environment.find_os_path("local/docker-compose.yml")
         self.assertTrue(os.path.exists(path))
 
     def test_pathjoin(self) -> None:
@@ -83,7 +83,7 @@ class EnvTests(PluginsTestCase):
         tutor_config.render_full(config)
 
         config["MYSQL_ROOT_PASSWORD"] = "testpassword"
-        rendered = env.render_file(config, "hooks", "mysql", "init")
+        rendered = env.render_file(config, "jobs", "init", "mysql.sh")
         self.assertIn("testpassword", rendered)
 
     @patch.object(fmt, "echo")

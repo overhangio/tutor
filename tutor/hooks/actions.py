@@ -6,14 +6,13 @@ import typing as t
 
 from typing_extensions import ParamSpec
 
+from . import priorities
 from .contexts import Contextualized
 
 P = ParamSpec("P")
 # Similarly to CallableFilter, it should be possible to create a CallableAction alias in
 # the future.
 # CallableAction = t.Callable[P, None]
-
-DEFAULT_PRIORITY = 10
 
 
 class ActionCallback(Contextualized, t.Generic[P]):
@@ -24,7 +23,7 @@ class ActionCallback(Contextualized, t.Generic[P]):
     ):
         super().__init__()
         self.func = func
-        self.priority = priority or DEFAULT_PRIORITY
+        self.priority = priority or priorities.DEFAULT
 
     def do(
         self,
@@ -81,15 +80,7 @@ class Action(t.Generic[P]):
 
         def inner(func: t.Callable[P, None]) -> t.Callable[P, None]:
             callback = ActionCallback(func, priority=priority)
-            # I wish we could use bisect.insort_right here but the `key=` parameter
-            # is unsupported in Python 3.9
-            position = 0
-            while (
-                position < len(self.callbacks)
-                and self.callbacks[position].priority <= callback.priority
-            ):
-                position += 1
-            self.callbacks.insert(position, callback)
+            priorities.insert_callback(callback, self.callbacks)
             return func
 
         return inner
@@ -182,8 +173,7 @@ def get_template(name: str) -> ActionTemplate[t.Any]:
 
 
 def add(
-    name: str,
-    priority: t.Optional[int] = None,
+    name: str, priority: t.Optional[int] = None
 ) -> t.Callable[[t.Callable[P, None]], t.Callable[P, None]]:
     """
     Decorator to add a callback action associated to a name.
@@ -193,8 +183,8 @@ def add(
         :py:class:`tutor.hooks.Actions` instead.
     :param priority: optional order in which the action callbacks are performed. Higher
         values mean that they will be performed later. The default value is
-        ``DEFAULT_PRIORITY`` (10). Actions that should be performed last should
-        have a priority of 100.
+        ``priorities.DEFAULT`` (10). Actions that should be performed last should have a
+        priority of 100.
 
     Usage::
 

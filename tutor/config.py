@@ -19,7 +19,7 @@ def load(root: str) -> Config:
         raise exceptions.TutorError(
             "Project root does not exist. Make sure to generate the initial "
             "configuration with `tutor config save --interactive` or `tutor local "
-            "quickstart` prior to running other commands."
+            "launch` prior to running other commands."
         )
     env.check_is_up_to_date(root)
     return load_full(root)
@@ -139,7 +139,7 @@ def get_template(filename: str) -> Config:
 
     Entries in this configuration are unrendered.
     """
-    config = serialize.load(env.read_template_file("config", filename))
+    config = serialize.load(env.read_core_template_file("config", filename))
     return cast_config(config)
 
 
@@ -220,10 +220,9 @@ def upgrade_obsolete(config: Config) -> None:
     ]:
         if name in config:
             config[name.replace("ACTIVATE_", "RUN_")] = config.pop(name)
-    # Replace RUN_CADDY by ENABLE_WEB_PROXY
+    # Replace nginx by caddy
     if "RUN_CADDY" in config:
         config["ENABLE_WEB_PROXY"] = config.pop("RUN_CADDY")
-    # Replace RUN_CADDY by ENABLE_WEB_PROXY
     if "NGINX_HTTP_PORT" in config:
         config["CADDY_HTTP_PORT"] = config.pop("NGINX_HTTP_PORT")
 

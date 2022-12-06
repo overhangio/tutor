@@ -6,12 +6,14 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt
+from tutor import exceptions, fmt, hooks
 from tutor import interactive as interactive_config
-from tutor import jobs, serialize, utils
+from tutor import serialize, utils
+from tutor.commands import jobs
 from tutor.commands.config import save as config_save_command
-from tutor.commands.context import BaseJobContext
+from tutor.commands.context import BaseTaskContext
 from tutor.commands.upgrade.k8s import upgrade_from
+from tutor.tasks import BaseTaskRunner
 from tutor.types import Config, get_typed
 
 
@@ -20,7 +22,8 @@ class K8sClients:
 
     def __init__(self) -> None:
         # Loading the kubernetes module here to avoid import overhead
-        from kubernetes import client, config  # pylint: disable=import-outside-toplevel
+        # pylint: disable=import-outside-toplevel
+        from kubernetes import client, config
 
         config.load_kube_config()
         self._batch_api = None
@@ -46,33 +49,20 @@ class K8sClients:
         return self._core_api
 
 
-class K8sJobRunner(jobs.BaseJobRunner):
-    def load_job(self, name: str) -> Any:
-        all_jobs = self.render("k8s", "jobs.yml")
-        for job in serialize.load_all(all_jobs):
-            job_name = job["metadata"]["name"]
-            if not isinstance(job_name, str):
-                raise exceptions.TutorError(
-                    f"Invalid job name: '{job_name}'. Expected str."
-                )
-            if job_name == name:
-                return job
-        raise exceptions.TutorError(f"Could not find job '{name}'")
+class K8sTaskRunner(BaseTaskRunner):
+    """
+    Run tasks (bash commands) in Kubernetes-managed services.
 
-    def active_job_names(self) -> List[str]:
-        """
-        Return a list of active job names
-        Docs:
-        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-job-v1-batch
-        """
-        api = K8sClients.instance().batch_api
-        return [
-            job.metadata.name
-            for job in api.list_namespaced_job(k8s_namespace(self.config)).items
-            if job.status.active
-        ]
+    Note: a single Tutor "task" correspond to a Kubernetes "job":
+    https://kubernetes.io/docs/concepts/workloads/controllers/job/
+    A Tutor "job" is composed of multiple Tutor tasks run in different services.
 
-    def run_job(self, service: str, command: str) -> int:
+    In Kubernetes, each task that is expected to run in a "myservice" container will
+    trigger the "myservice-job" Kubernetes job. This job definition must be present in
+    the "k8s/jobs.yml" template.
+    """
+
+    def run_task(self, service: str, command: str) -> int:
         job_name = f"{service}-job"
         job = self.load_job(job_name)
         # Create a unique job name to make it deduplicate jobs and make it easier to
@@ -148,10 +138,41 @@ class K8sJobRunner(jobs.BaseJobRunner):
             sleep(5)
         return 0
 
+    def load_job(self, name: str) -> Any:
+        """
+        Find a given job definition in the rendered k8s/jobs.yml template.
+        """
+        all_jobs = self.render("k8s", "jobs.yml")
+        for job in serialize.load_all(all_jobs):
+            job_name = job["metadata"]["name"]
+            if not isinstance(job_name, str):
+                raise exceptions.TutorError(
+                    f"Invalid job name: '{job_name}'. Expected str."
+                )
+            if job_name == name:
+                return job
+        raise exceptions.TutorError(f"Could not find job '{name}'")
 
-class K8sContext(BaseJobContext):
-    def job_runner(self, config: Config) -> K8sJobRunner:
-        return K8sJobRunner(self.root, config)
+    def active_job_names(self) -> List[str]:
+        """
+        Return a list of active job names
+        Docs:
+        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-job-v1-batch
+
+        This is necessary to make sure that we don't run the same job multiple times at
+        the same time.
+        """
+        api = K8sClients.instance().batch_api
+        return [
+            job.metadata.name
+            for job in api.list_namespaced_job(k8s_namespace(self.config)).items
+            if job.status.active
+        ]
+
+
+class K8sContext(BaseTaskContext):
+    def job_runner(self, config: Config) -> K8sTaskRunner:
+        return K8sTaskRunner(self.root, config)
 
 
 @click.group(help="Run Open edX on Kubernetes")
@@ -163,7 +184,7 @@ def k8s(context: click.Context) -> None:
 @click.command(help="Configure and run Open edX from scratch")
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_context
-def quickstart(context: click.Context, non_interactive: bool) -> None:
+def launch(context: click.Context, non_interactive: bool) -> None:
     run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
     if run_upgrade_from_release is not None:
         click.echo(fmt.title("Upgrading from an older release"))
@@ -212,6 +233,19 @@ Press enter when you are ready to continue"""
             cms_host=config["CMS_HOST"],
         )
     )
+
+
+@click.command(help="Configure and run Open edX from scratch")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.pass_context
+def quickstart(context: click.Context, non_interactive: bool) -> None:
+    """
+    This command has been renamed to 'launch'.
+    """
+    fmt.echo_alert(
+        "The 'quickstart' command is deprecated and will be removed in a later release. Use 'launch' instead."
+    )
+    context.invoke(launch, non_interactive=non_interactive)
 
 
 @click.command(
@@ -326,17 +360,34 @@ def delete(context: K8sContext, yes: bool) -> None:
     )
 
 
+@jobs.do_group
+@click.pass_obj
+def do(context: K8sContext) -> None:
+    """
+    Run a custom job in the right container(s).
+
+    We make sure that some essential containers (databases, proxy) are up before we
+    launch the jobs.
+    """
+
+    @hooks.Actions.DO_JOB.add()
+    def _start_base_deployments(_job_name: str, *_args: Any, **_kwargs: Any) -> None:
+        """
+        We add this logic to an action callback because we do not want to trigger it
+        whenever we run `tutor k8s do <job> --help`.
+        """
+        config = tutor_config.load(context.root)
+        wait_for_deployment_ready(config, "caddy")
+        for name in ["elasticsearch", "mysql", "mongodb"]:
+            if tutor_config.is_service_activated(config, name):
+                wait_for_deployment_ready(config, name)
+
+
 @click.command(help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
-@click.pass_obj
-def init(context: K8sContext, limit: Optional[str]) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    wait_for_deployment_ready(config, "caddy")
-    for name in ["elasticsearch", "mysql", "mongodb"]:
-        if tutor_config.is_service_activated(config, name):
-            wait_for_deployment_ready(config, name)
-    jobs.initialise(runner, limit_to=limit)
+@click.pass_context
+def init(context: click.Context, limit: Optional[str]) -> None:
+    context.invoke(do.commands["init"], limit=limit)
 
 
 @click.command(help="Scale the number of replicas of a given deployment")
@@ -355,64 +406,6 @@ def scale(context: K8sContext, deployment: str, replicas: int) -> None:
         f"--replicas={replicas}",
         f"deployment/{deployment}",
     )
-
-
-@click.command(help="Create an Open edX user and interactively set their password")
-@click.option("--superuser", is_flag=True, help="Make superuser")
-@click.option("--staff", is_flag=True, help="Make staff user")
-@click.option(
-    "-p",
-    "--password",
-    help="Specify password from the command line. If undefined, you will be prompted to input a password",
-    prompt=True,
-    hide_input=True,
-)
-@click.argument("name")
-@click.argument("email")
-@click.pass_obj
-def createuser(
-    context: K8sContext,
-    superuser: str,
-    staff: bool,
-    password: str,
-    name: str,
-    email: str,
-) -> None:
-    config = tutor_config.load(context.root)
-    command = jobs.create_user_command(superuser, staff, name, email, password=password)
-    runner = context.job_runner(config)
-    runner.run_job("lms", command)
-
-
-@click.command(help="Import the demo course")
-@click.pass_obj
-def importdemocourse(context: K8sContext) -> None:
-    fmt.echo_info("Importing demo course")
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    jobs.import_demo_course(runner)
-
-
-@click.command(
-    help="Assign a theme to the LMS and the CMS. To reset to the default theme , use 'default' as the theme name."
-)
-@click.option(
-    "-d",
-    "--domain",
-    "domains",
-    multiple=True,
-    help=(
-        "Limit the theme to these domain names. By default, the theme is "
-        "applied to the LMS and the CMS, both in development and production mode"
-    ),
-)
-@click.argument("theme_name")
-@click.pass_obj
-def settheme(context: K8sContext, domains: List[str], theme_name: str) -> None:
-    config = tutor_config.load(context.root)
-    runner = context.job_runner(config)
-    domains = domains or jobs.get_all_openedx_domains(config)
-    jobs.set_theme(theme_name, domains, runner)
 
 
 @click.command(
@@ -463,7 +456,7 @@ def wait(context: K8sContext, name: str) -> None:
 
 @click.command(
     short_help="Perform release-specific upgrade tasks",
-    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `quickstart`.",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `launch`.",
 )
 @click.option(
     "--from",
@@ -479,7 +472,7 @@ def upgrade(context: click.Context, from_release: Optional[str]) -> None:
     else:
         fmt.echo_alert(
             "This command only performs a partial upgrade of your Open edX platform. "
-            "To perform a full upgrade, you should run `tutor k8s quickstart`."
+            "To perform a full upgrade, you should run `tutor k8s launch`."
         )
         upgrade_from(context.obj, from_release)
     # We update the environment to update the version
@@ -569,6 +562,7 @@ def k8s_namespace(config: Config) -> str:
     return get_typed(config, "K8S_NAMESPACE", str)
 
 
+k8s.add_command(launch)
 k8s.add_command(quickstart)
 k8s.add_command(start)
 k8s.add_command(stop)
@@ -576,12 +570,15 @@ k8s.add_command(reboot)
 k8s.add_command(delete)
 k8s.add_command(init)
 k8s.add_command(scale)
-k8s.add_command(createuser)
-k8s.add_command(importdemocourse)
-k8s.add_command(settheme)
 k8s.add_command(exec_command)
 k8s.add_command(logs)
 k8s.add_command(wait)
 k8s.add_command(upgrade)
 k8s.add_command(apply_command)
 k8s.add_command(status)
+
+
+@hooks.Actions.PLUGINS_LOADED.add()
+def _add_k8s_do_commands() -> None:
+    jobs.add_job_commands(do)
+    k8s.add_command(do)

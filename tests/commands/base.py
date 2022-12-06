@@ -17,7 +17,9 @@ class TestCommandMixin:
             return TestCommandMixin.invoke_in_root(root, args)
 
     @staticmethod
-    def invoke_in_root(root: str, args: t.List[str]) -> click.testing.Result:
+    def invoke_in_root(
+        root: str, args: t.List[str], catch_exceptions: bool = True
+    ) -> click.testing.Result:
         """
         Use this method for commands that all need to run in the same root:
 
@@ -33,4 +35,6 @@ class TestCommandMixin:
             },
             mix_stderr=False,
         )
-        return runner.invoke(cli, args, obj=TestContext(root))
+        return runner.invoke(
+            cli, args, obj=TestContext(root), catch_exceptions=catch_exceptions
+        )

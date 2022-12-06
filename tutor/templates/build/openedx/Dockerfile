@@ -47,21 +47,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {%- else %}
 # Patch edx-platform
-# Fix broken "Pages" view in Studio
-# https://github.com/openedx/edx-platform/pull/30550
-RUN curl -fsSL https://github.com/open-craft/edx-platform/commit/3d54f284f82b61e693ad652d8d6e46a226fcb36d.patch | git am
-# Fix xblock ajax handler vulnerability
-# https://github.com/overhangio/edx-platform/tree/overhangio/sec-xblock-ajax
-RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/3f0f9eed42.patch | git am
-# Fix XSS vulnerability on "next" parameter
-# https://github.com/overhangio/edx-platform/tree/overhangio/sec-redirect-xss
-RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/e16f8c0986.patch | git am
-# Fix drag-n-drop v2 xblock vulnerability
-# https://github.com/openedx/edx-platform/pull/31354
-RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/527b4993ae.patch | git am
-# Fix refresh of JWT tokens for disabled users
-# https://github.com/overhangio/edx-platform/tree/overhangio/sec-fix-user-retiring
-RUN curl -fsSL https://github.com/overhangio/edx-platform/commit/4df942b32b.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
@@ -84,12 +69,6 @@ ENV VIRTUAL_ENV /openedx/venv/
 
 RUN apt update && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
 
-# Note that this means that we need to reinstall all requirements whenever there is a
-# change in edx-platform, which sucks. But there is no obvious alternative, as we need
-# to install some packages from edx-platform.
-COPY --from=code /openedx/edx-platform /openedx/edx-platform
-WORKDIR /openedx/edx-platform
-
 # Install the right version of pip/setuptools
 # https://pypi.org/project/setuptools/
 # https://pypi.org/project/pip/
@@ -97,7 +76,8 @@ WORKDIR /openedx/edx-platform
 RUN pip install setuptools==62.1.0 pip==22.0.4 wheel==0.37.1
 
 # Install base requirements
-RUN pip install -r ./requirements/edx/base.txt
+COPY --from=code /openedx/edx-platform/requirements/edx/base.txt /tmp/base.txt
+RUN pip install -r /tmp/base.txt
 
 # Install django-redis for using redis as a django cache
 # https://pypi.org/project/django-redis/
@@ -124,14 +104,14 @@ ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 RUN pip install nodeenv==1.6.0
-RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=16.14.0 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
 COPY --from=code /openedx/edx-platform/package.json /openedx/edx-platform/package.json
 COPY --from=code /openedx/edx-platform/package-lock.json /openedx/edx-platform/package-lock.json
 WORKDIR /openedx/edx-platform
-RUN npm clean-install --verbose --registry=$NPM_REGISTRY
+RUN npm install --verbose --registry=$NPM_REGISTRY
 
 ###### Production image with system and python requirements
 FROM minimal as production
@@ -161,8 +141,9 @@ ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 WORKDIR /openedx/edx-platform
 
-# Re-install local requirements, otherwise egg-info folders are missing
-RUN pip install -r requirements/edx/local.in
+# We install edx-platform here because it creates an egg-info folder in the current
+# repo. We need both the source code and the virtualenv to run this command.
+RUN pip install -e .
 
 # Create folder that will store lms/cms.env.yml files, as well as
 # the tutor-specific settings files.

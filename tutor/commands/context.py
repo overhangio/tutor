@@ -1,5 +1,5 @@
-from ..jobs import BaseJobRunner
-from ..types import Config
+from tutor.tasks import BaseTaskRunner
+from tutor.types import Config
 
 
 class Context:
@@ -16,14 +16,14 @@ class Context:
         self.root = root
 
 
-class BaseJobContext(Context):
+class BaseTaskContext(Context):
     """
     Specialized context that subcommands may use.
 
     For instance `dev`, `local` and `k8s` define custom runners to run jobs.
     """
 
-    def job_runner(self, config: Config) -> BaseJobRunner:
+    def job_runner(self, config: Config) -> BaseTaskRunner:
         """
         Return a runner capable of running docker-compose/kubectl commands.
         """

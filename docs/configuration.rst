@@ -15,7 +15,7 @@ This section does not cover :ref:`plugin development <plugins>`. For simple chan
 Configuration
 -------------
 
-With Tutor, all Open edX deployment parameters are stored in a single ``config.yml`` file. This is the file that is generated when you run ``tutor local quickstart`` or ``tutor config save``. To view the content of this file, run::
+With Tutor, all Open edX deployment parameters are stored in a single ``config.yml`` file. This is the file that is generated when you run ``tutor local launch`` or ``tutor config save``. To view the content of this file, run::
 
     cat "$(tutor config printroot)/config.yml"
 
@@ -330,7 +330,7 @@ The following sections describe how to modify various aspects of the docker imag
 
     tutor local stop
 
-The custom image will be used the next time you run ``tutor local quickstart`` or ``tutor local start``. Do not attempt to run ``tutor local restart``! Restarting will not pick up the new image and will continue to use the old image.
+The custom image will be used the next time you run ``tutor local launch`` or ``tutor local start``. Do not attempt to run ``tutor local restart``! Restarting will not pick up the new image and will continue to use the old image.
 
 openedx Docker Image build arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -486,7 +486,7 @@ By default, Tutor runs the `overhangio/openedx <https://hub.docker.com/r/overhan
 
 (See the relevant :ref:`configuration parameters <docker_images>`.)
 
-The customised Docker image tag value will then be used by Tutor to run the platform, for instance when running ``tutor local quickstart``.
+The customised Docker image tag value will then be used by Tutor to run the platform, for instance when running ``tutor local launch``.
 
 
 Passing custom docker build options

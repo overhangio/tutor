@@ -4,9 +4,9 @@ Upgrading from older releases
 Upgrading from v3+
 ~~~~~~~~~~~~~~~~~~
 
-Just upgrade Tutor using your :ref:`favorite installation method <install>` and run quickstart again::
+Just upgrade Tutor using your :ref:`favorite installation method <install>` and run launch again::
 
-    tutor local quickstart
+    tutor local launch
 
 Upgrading from v1 or v2
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -22,4 +22,4 @@ Then, install Tutor using one of the :ref:`installation methods <install>`. Then
 
 Finally, launch your platform with::
 
-    tutor local quickstart
+    tutor local launch

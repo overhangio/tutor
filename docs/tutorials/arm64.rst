@@ -48,9 +48,9 @@ Finish setup and start Tutor
 From this point on, use Tutor as normal. For example, start Open edX and run migrations with::
 
     tutor local start -d
-    tutor local init
+    tutor local do init
 
 Or for a development environment::
 
     tutor dev start -d
-    tutor dev init
+    tutor dev do init

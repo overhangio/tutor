@@ -48,7 +48,7 @@ Then, run a local webserver::
 
 The LMS can then be accessed at http://local.overhang.io:8000. You will then have to :ref:`enable that theme <settheme>`::
 
-    tutor dev settheme mythemename
+    tutor dev do settheme mythemename
 
 Watch the themes folders for changes (in a different terminal)::
 

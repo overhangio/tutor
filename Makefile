@@ -40,7 +40,7 @@ test-unit: ## Run unit tests
 	python -m unittest discover tests
 
 test-types: ## Check type definitions
-	mypy --exclude=templates --ignore-missing-imports --strict ${SRC_DIRS}
+	mypy --exclude=templates --ignore-missing-imports --implicit-reexport --strict ${SRC_DIRS}
 
 test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
 	twine check dist/tutor-$(shell make version).tar.gz

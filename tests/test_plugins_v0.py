@@ -167,10 +167,17 @@ class PluginsTests(PluginsTestCase):
 
     def test_init_tasks(self) -> None:
         plugins_v0.DictPlugin({"name": "plugin1", "hooks": {"init": ["myclient"]}})
-        plugins.load("plugin1")
+        with patch.object(
+            plugins_v0.env, "read_template_file", return_value="echo hello"
+        ) as mock_read_template:
+            plugins.load("plugin1")
+            mock_read_template.assert_called_once_with(
+                "plugin1", "hooks", "myclient", "init"
+            )
+
         self.assertIn(
-            ("myclient", ("plugin1", "hooks", "myclient", "init")),
-            list(hooks.Filters.COMMANDS_INIT.iterate()),
+            ("myclient", "echo hello"),
+            list(hooks.Filters.CLI_DO_INIT_TASKS.iterate()),
         )
 
     def test_plugins_are_updated_on_config_change(self) -> None:

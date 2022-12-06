@@ -18,7 +18,7 @@ In the following, environment and data files will be generated in a user-specifi
     tutor run ...
 
 .. note::
-    As of v10.0.0, a locally-running Open edX platform can no longer be accessed from http://localhost or http://studio.localhost. Instead, when running ``tutor local quickstart``, you must now decide whether you are running a platform that will be used in production. If not, the platform will be automatically be bound to http://local.overhang.io and http://studio.local.overhang.io, which are domain names that point to 127.0.0.1 (localhost). This change was made to facilitate internal communication between Docker containers.
+    As of v10.0.0, a locally-running Open edX platform can no longer be accessed from http://localhost or http://studio.localhost. Instead, when running ``tutor local launch``, you must now decide whether you are running a platform that will be used in production. If not, the platform will be automatically be bound to http://local.overhang.io and http://studio.local.overhang.io, which are domain names that point to 127.0.0.1 (localhost). This change was made to facilitate internal communication between Docker containers.
 
 Main commands
 -------------
@@ -32,9 +32,9 @@ All-in-one command
 
 A fully-functional platform can be configured and run in one command::
 
-    tutor local quickstart
+    tutor local launch
 
-But you may want to run commands one at a time: it's faster when you need to run only part of the local deployment process, and it helps you understand how your platform works. In the following, we decompose the ``quickstart`` command.
+But you may want to run commands one at a time: it's faster when you need to run only part of the local deployment process, and it helps you understand how your platform works. In the following, we decompose the ``launch`` command.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -80,7 +80,7 @@ Service initialisation
 
 ::
 
-    tutor local init
+    tutor local do init
 
 This command should be run just once. It will initialise all applications in a running platform. In particular, this will create the required databases tables and apply database migrations for all applications.
 
@@ -120,7 +120,7 @@ Creating a new user with staff and admin rights
 
 You will most certainly need to create a user to administer the platform. Just run::
 
-    tutor local createuser --staff --superuser yourusername user@email.com
+    tutor local do createuser --staff --superuser yourusername user@email.com
 
 You will be asked to set the user password interactively.
 
@@ -131,7 +131,7 @@ Importing the demo course
 
 After a fresh installation, your platform will not have a single course. To import the `Open edX demo course <https://github.com/openedx/edx-demo-course>`_, run::
 
-    tutor local importdemocourse
+    tutor local do importdemocourse
 
 .. _settheme:
 
@@ -140,7 +140,7 @@ Setting a new theme
 
 The default Open edX theme is rather bland, so Tutor makes it easy to switch to a different theme::
 
-    tutor local settheme mytheme
+    tutor local do settheme mytheme
 
 Out of the box, only the default "open-edx" theme is available. We also developed `Indigo, a beautiful, customizable theme <https://github.com/overhangio/indigo>`__ which is easy to install with Tutor.
 

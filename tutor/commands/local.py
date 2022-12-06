@@ -13,7 +13,7 @@ from tutor.commands.upgrade.local import upgrade_from
 from tutor.types import Config, get_typed
 
 
-class LocalJobRunner(compose.ComposeJobRunner):
+class LocalTaskRunner(compose.ComposeTaskRunner):
     def __init__(self, root: str, config: Config):
         """
         Load docker-compose files from local/.
@@ -52,8 +52,8 @@ class LocalContext(compose.BaseComposeContext):
     COMPOSE_TMP_FILTER = hooks.Filters.COMPOSE_LOCAL_TMP
     COMPOSE_JOBS_TMP_FILTER = hooks.Filters.COMPOSE_LOCAL_JOBS_TMP
 
-    def job_runner(self, config: Config) -> LocalJobRunner:
-        return LocalJobRunner(self.root, config)
+    def job_runner(self, config: Config) -> LocalTaskRunner:
+        return LocalTaskRunner(self.root, config)
 
 
 @click.group(help="Run Open edX locally with docker-compose")
@@ -67,7 +67,7 @@ def local(context: click.Context) -> None:
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @click.pass_context
-def quickstart(
+def launch(
     context: click.Context,
     mounts: t.Tuple[t.List[compose.MountParam.MountType]],
     non_interactive: bool,
@@ -142,7 +142,7 @@ Press enter when you are ready to continue"""
     click.echo(fmt.title("Starting the platform in detached mode"))
     context.invoke(compose.start, detach=True)
     click.echo(fmt.title("Database creation and migrations"))
-    context.invoke(compose.init)
+    context.invoke(compose.do.commands["init"])
 
     config = tutor_config.load(context.obj.root)
     fmt.echo_info(
@@ -159,9 +159,31 @@ Your Open edX platform is ready and can be accessed at the following urls:
     )
 
 
+@click.command(help="Deprecated alias to 'launch'")
+@compose.mount_option
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
+@click.pass_context
+def quickstart(
+    context: click.Context,
+    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
+    non_interactive: bool,
+    pullimages: bool,
+) -> None:
+    """
+    This command has been renamed to 'launch'.
+    """
+    fmt.echo_alert(
+        "The 'quickstart' command is deprecated and will be removed in a later release. Use 'launch' instead."
+    )
+    context.invoke(
+        launch, non_interactive=non_interactive, pullimages=pullimages, mounts=mounts
+    )
+
+
 @click.command(
     short_help="Perform release-specific upgrade tasks",
-    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `quickstart`.",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `launch`.",
 )
 @click.option(
     "--from",
@@ -172,7 +194,7 @@ Your Open edX platform is ready and can be accessed at the following urls:
 def upgrade(context: click.Context, from_release: t.Optional[str]) -> None:
     fmt.echo_alert(
         "This command only performs a partial upgrade of your Open edX platform. "
-        "To perform a full upgrade, you should run `tutor local quickstart`."
+        "To perform a full upgrade, you should run `tutor local launch`."
     )
     if from_release is None:
         from_release = tutor_env.get_env_release(context.obj.root)
@@ -190,11 +212,12 @@ def _stop_on_dev_start(root: str, config: Config, project_name: str) -> None:
     Stop the local platform as soon as a platform with a different project name is
     started.
     """
-    runner = LocalJobRunner(root, config)
+    runner = LocalTaskRunner(root, config)
     if project_name != runner.project_name:
         runner.docker_compose("stop")
 
 
+local.add_command(launch)
 local.add_command(quickstart)
 local.add_command(upgrade)
 compose.add_commands(local)

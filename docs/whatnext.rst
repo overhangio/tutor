@@ -3,7 +3,7 @@
 What next?
 ==========
 
-You have gone through the :ref:`Quickstart installation <quickstart>`: at this point, you should have a running Open edX platform. If you don't, please follow the instructions from the :ref:`Troubleshooting <troubleshooting>` section.
+You have gone through the :ref:`Launch installation <launch>`: at this point, you should have a running Open edX platform. If you don't, please follow the instructions from the :ref:`Troubleshooting <troubleshooting>` section.
 
 Logging-in as administrator
 ---------------------------

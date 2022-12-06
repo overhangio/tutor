@@ -4,7 +4,7 @@ __license__ = "Apache 2.0"
 import typing as t
 
 # These imports are the hooks API
-from . import actions, contexts, filters
+from . import actions, contexts, filters, priorities
 from .consts import *
 
 

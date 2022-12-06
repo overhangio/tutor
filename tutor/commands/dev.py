@@ -11,7 +11,7 @@ from tutor.commands import compose
 from tutor.types import Config, get_typed
 
 
-class DevJobRunner(compose.ComposeJobRunner):
+class DevTaskRunner(compose.ComposeTaskRunner):
     def __init__(self, root: str, config: Config):
         """
         Load docker-compose files from dev/ and local/
@@ -51,8 +51,8 @@ class DevContext(compose.BaseComposeContext):
     COMPOSE_TMP_FILTER = hooks.Filters.COMPOSE_DEV_TMP
     COMPOSE_JOBS_TMP_FILTER = hooks.Filters.COMPOSE_DEV_JOBS_TMP
 
-    def job_runner(self, config: Config) -> DevJobRunner:
-        return DevJobRunner(self.root, config)
+    def job_runner(self, config: Config) -> DevTaskRunner:
+        return DevTaskRunner(self.root, config)
 
 
 @click.group(help="Run Open edX locally with development settings")
@@ -66,7 +66,7 @@ def dev(context: click.Context) -> None:
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @compose.mount_option
 @click.pass_context
-def quickstart(
+def launch(
     context: click.Context,
     non_interactive: bool,
     pullimages: bool,
@@ -105,7 +105,7 @@ Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instru
     context.invoke(compose.start, detach=True)
 
     click.echo(fmt.title("Database creation and migrations"))
-    context.invoke(compose.init)
+    context.invoke(compose.do.commands["init"])
 
     fmt.echo_info(
         """The Open edX platform is now running in detached mode
@@ -120,35 +120,26 @@ Your Open edX platform is ready and can be accessed at the following urls:
     )
 
 
-@click.command(
-    help="DEPRECATED: Use 'tutor dev start ...' instead!",
-    context_settings={"ignore_unknown_options": True},
-)
+@click.command(help="Deprecated alias to 'launch'")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @compose.mount_option
-@click.argument("options", nargs=-1, required=False)
-@click.argument("service")
 @click.pass_context
-def runserver(
+def quickstart(
     context: click.Context,
+    non_interactive: bool,
+    pullimages: bool,
     mounts: t.Tuple[t.List[compose.MountParam.MountType]],
-    options: t.List[str],
-    service: str,
 ) -> None:
-    depr_warning = "'runserver' is deprecated and will be removed in a future release. Use 'start' instead."
-    for option in options:
-        if option.startswith("-v") or option.startswith("--volume"):
-            depr_warning += " Bind-mounts can be specified using '-m/--mount'."
-            break
-    fmt.echo_alert(depr_warning)
-    config = tutor_config.load(context.obj.root)
-    if service in ["lms", "cms"]:
-        port = 8000 if service == "lms" else 8001
-        host = config["LMS_HOST"] if service == "lms" else config["CMS_HOST"]
-        fmt.echo_info(
-            f"The {service} service will be available at http://{host}:{port}"
-        )
-    args = ["--service-ports", *options, service]
-    context.invoke(compose.run, mounts=mounts, args=args)
+    """
+    This command has been renamed to 'launch'.
+    """
+    fmt.echo_alert(
+        "The 'quickstart' command is deprecated and will be removed in a later release. Use 'launch' instead."
+    )
+    context.invoke(
+        launch, non_interactive=non_interactive, pullimages=pullimages, mounts=mounts
+    )
 
 
 @hooks.Actions.COMPOSE_PROJECT_STARTED.add()
@@ -157,11 +148,11 @@ def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
     Stop the dev platform as soon as a platform with a different project name is
     started.
     """
-    runner = DevJobRunner(root, config)
+    runner = DevTaskRunner(root, config)
     if project_name != runner.project_name:
         runner.docker_compose("stop")
 
 
+dev.add_command(launch)
 dev.add_command(quickstart)
-dev.add_command(runserver)
 compose.add_commands(dev)
