@@ -40,7 +40,8 @@ jobs:
       - name: Upgrade pip and setuptools
         # https://pypi.org/project/pip/
         # https://pypi.org/project/setuptools/
-        run: python -m pip install --upgrade pip setuptools==65.6.3
+        # https://pypi.org/project/wheel/
+        run: python -m pip install --upgrade pip setuptools==65.6.3 wheel
       - name: Print info about the current python installation
         run: make ci-info
       - name: Install requirements
