@@ -1,0 +1,1 @@
+- [Bugfix] Fix "Invalid value for ‘--from’" when running `tutor local upgrade --from=nutmeg`. If you are facing this error, just run `tutor local launch` and your platform should be automatically upgraded.
