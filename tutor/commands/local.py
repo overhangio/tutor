@@ -10,6 +10,7 @@ from tutor import utils
 from tutor.commands import compose
 from tutor.commands.config import save as config_save_command
 from tutor.commands.upgrade.local import upgrade_from
+from tutor.commands.upgrade import OPENEDX_RELEASE_NAMES
 from tutor.types import Config, get_typed
 
 
@@ -188,7 +189,7 @@ def quickstart(
 @click.option(
     "--from",
     "from_release",
-    type=click.Choice(["ironwood", "juniper", "koa", "lilac", "maple"]),
+    type=click.Choice(OPENEDX_RELEASE_NAMES),
 )
 @click.pass_context
 def upgrade(context: click.Context, from_release: t.Optional[str]) -> None:
