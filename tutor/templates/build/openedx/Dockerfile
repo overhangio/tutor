@@ -223,7 +223,9 @@ USER app
 
 # Install dev python requirements
 RUN pip install -r requirements/edx/development.txt
-RUN pip install ipdb==0.13.4 ipython==7.27.0
+# https://pypi.org/project/ipdb/
+# https://pypi.org/project/ipython
+RUN pip install ipdb==0.13.9 ipython==8.7.0
 
 # Add ipdb as default PYTHONBREAKPOINT
 ENV PYTHONBREAKPOINT=ipdb.set_trace
