@@ -23,7 +23,6 @@ instructions, because git commits are used to generate release notes:
 <a id='changelog-15.0.0'></a>
 ## v15.0.0 (2022-12-06)
 
-
 - 💥[Feature] Upgrade to Olive (by @regisb):
   - Mypy type checking options were modified: developers are encouraged to add the `--implicit-reexport` option to their IDE.
 - [Bugfix] Update problem templates according newer python versions. (by @mariajgrimaldi)
@@ -37,11 +36,8 @@ instructions, because git commits are used to generate release notes:
 - 💥[Improvement] Rename the implementation of tutor <mode> quickstart to tutor <mode> launch. (by @Carlos-Muniz)
 - 💥[Improvement] Remove the implementation of tutor dev runserver. (by @Carlos-Muniz)
 - [Bugfix] Fix MongoDB replica set connection error resulting from edx-platform's pymongo (3.10.1 -> 3.12.3) upgrade ([edx-platform#30569](https://github.com/openedx/edx-platform/pull/30569)). (by @ormsbee)
-- [Improvement] For Tutor Nightly (and only Nightly), official plugins are now installed from their nightly branches on GitHub instead of a version range on PyPI. This will allow Nightly users to install all official plugins by running ``pip install -e ".[full]"``.
-- [Bugfix] Remove edX references from bulk emails ([issue](https://github.com/openedx/build-test-release-wg/issues/100)).
 - [Bugfix] Update ``celery`` invocations for lms-worker and cms-worker to be compatible with Celery 5 CLI.
 - [Improvement] Point CMS at its config file using ``CMS_CFG`` environment variable instead of deprecated ``STUDIO_CFG``.
-- [Bugfix] Start MongoDB when running migrations, because a new data migration fails if MongoDB is not running.
 
 <a id='changelog-14.2.3'></a>
 ## v14.2.3 (2022-12-06)
