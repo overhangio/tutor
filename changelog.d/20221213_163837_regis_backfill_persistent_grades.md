@@ -1,0 +1,1 @@
+- [Improvement] Backfill persistent grades during upgrade from Nutmeg. If you observe missing grades after the upgrade from Nutmeg, run `tutor local upgrade --from=nutmeg`. (by @regisb)

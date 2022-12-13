@@ -36,7 +36,7 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         running_release = "nutmeg"
 
     if running_release == "nutmeg":
-        # Upgrade is a no-op
+        common_upgrade.upgrade_from_nutmeg(context, config)
         running_release = "olive"
 
 
