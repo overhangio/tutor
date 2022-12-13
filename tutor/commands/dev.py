@@ -98,9 +98,6 @@ Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instru
         click.echo(fmt.title("Docker image updates"))
         context.invoke(compose.dc_command, command="pull")
 
-    click.echo(fmt.title("Building Docker image for LMS and CMS development"))
-    context.invoke(compose.dc_command, command="build", args=["lms"])
-
     click.echo(fmt.title("Starting the platform in detached mode"))
     context.invoke(compose.start, detach=True)
 
