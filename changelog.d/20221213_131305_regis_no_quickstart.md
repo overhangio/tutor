@@ -1,1 +1,0 @@
-- 💥[Deprecation] Get rid of the `quickstart` command. v15.0.0 introduced a deprecation warning, but we actually want users to stop using this command. Instead, use `launch` (by @regisb).

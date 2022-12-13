@@ -1,1 +1,0 @@
-- [Bugfix] Fix "TypeError: Parameters to Generic[...] must all be type variables" error. This error may occur when upgrading from a very old installation of Tutor. It is due to an old version of the typing-extensions package.

@@ -20,6 +20,17 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.1.0'></a>
+## v15.1.0 (2022-12-13)
+
+- [Improvement] Upgrade ipdb and ipython packages in the openedx development image. (by @regisb)
+- [Improvement] Skip unnecessary image building in development. This should make `tutor dev launch` slightly faster. (by @regisb)
+- [Bugfix] Fix Authn MFE login in development by disabling enterprise integration. (by @regisb)
+- [Bugfix] Fix "Invalid value for ‘--from’" when running `tutor local upgrade --from=nutmeg`. If you are facing this error, just run `tutor local launch` and your platform should be automatically upgraded.
+- [Bugfix] Fix "TypeError: Parameters to Generic[...] must all be type variables" error. This error may occur when upgrading from a very old installation of Tutor. It is due to an old version of the typing-extensions package.
+- 💥[Deprecation] Get rid of the `quickstart` command. v15.0.0 introduced a deprecation warning, but we actually want users to stop using this command. Instead, use `launch` (by @regisb).
+- [Improvement] Backfill persistent grades during upgrade from Nutmeg. If you observe missing grades after the upgrade from Nutmeg, run `tutor local upgrade --from=nutmeg`. (by @regisb)
+
 <a id='changelog-15.0.0'></a>
 ## v15.0.0 (2022-12-06)
 
