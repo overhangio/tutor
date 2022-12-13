@@ -236,19 +236,6 @@ Press enter when you are ready to continue"""
     )
 
 
-@click.command(help="Configure and run Open edX from scratch")
-@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
-@click.pass_context
-def quickstart(context: click.Context, non_interactive: bool) -> None:
-    """
-    This command has been renamed to 'launch'.
-    """
-    fmt.echo_alert(
-        "The 'quickstart' command is deprecated and will be removed in a later release. Use 'launch' instead."
-    )
-    context.invoke(launch, non_interactive=non_interactive)
-
-
 @click.command(
     short_help="Run all configured Open edX resources",
     help=(
@@ -564,7 +551,6 @@ def k8s_namespace(config: Config) -> str:
 
 
 k8s.add_command(launch)
-k8s.add_command(quickstart)
 k8s.add_command(start)
 k8s.add_command(stop)
 k8s.add_command(reboot)

@@ -120,28 +120,6 @@ Your Open edX platform is ready and can be accessed at the following urls:
     )
 
 
-@click.command(help="Deprecated alias to 'launch'")
-@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
-@click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
-@compose.mount_option
-@click.pass_context
-def quickstart(
-    context: click.Context,
-    non_interactive: bool,
-    pullimages: bool,
-    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
-) -> None:
-    """
-    This command has been renamed to 'launch'.
-    """
-    fmt.echo_alert(
-        "The 'quickstart' command is deprecated and will be removed in a later release. Use 'launch' instead."
-    )
-    context.invoke(
-        launch, non_interactive=non_interactive, pullimages=pullimages, mounts=mounts
-    )
-
-
 @hooks.Actions.COMPOSE_PROJECT_STARTED.add()
 def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
     """
@@ -154,5 +132,4 @@ def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
 
 
 dev.add_command(launch)
-dev.add_command(quickstart)
 compose.add_commands(dev)
