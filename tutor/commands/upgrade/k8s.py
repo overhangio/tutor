@@ -1,3 +1,5 @@
+import click
+
 from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import fmt
@@ -8,8 +10,8 @@ from tutor.types import Config
 from . import common as common_upgrade
 
 
-def upgrade_from(context: Context, from_release: str) -> None:
-    config = tutor_config.load(context.root)
+def upgrade_from(context: click.Context, from_release: str) -> None:
+    config = tutor_config.load(context.obj.root)
 
     running_release = from_release
     if running_release == "ironwood":
@@ -29,11 +31,11 @@ def upgrade_from(context: Context, from_release: str) -> None:
         running_release = "maple"
 
     if running_release == "maple":
-        upgrade_from_maple(context, config)
+        upgrade_from_maple(context.obj, config)
         running_release = "nutmeg"
 
     if running_release == "nutmeg":
-        # Upgrade is a no-op
+        common_upgrade.upgrade_from_nutmeg(context, config)
         running_release = "olive"
 
 

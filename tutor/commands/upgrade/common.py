@@ -1,3 +1,5 @@
+import click
+
 from tutor import config as tutor_config
 from tutor import fmt, plugins
 from tutor.types import Config
@@ -31,3 +33,9 @@ def upgrade_from_lilac(config: Config) -> None:
         )
         plugins.load("mfe")
         tutor_config.save_enabled_plugins(config)
+
+
+def upgrade_from_nutmeg(context: click.Context, config: Config) -> None:
+    context.obj.job_runner(config).run_task(
+        "lms", "./manage.py lms compute_grades -v1 --all_courses"
+    )

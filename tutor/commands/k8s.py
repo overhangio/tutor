@@ -475,7 +475,7 @@ def upgrade(context: click.Context, from_release: Optional[str]) -> None:
             "This command only performs a partial upgrade of your Open edX platform. "
             "To perform a full upgrade, you should run `tutor k8s launch`."
         )
-        upgrade_from(context.obj, from_release)
+        upgrade_from(context, from_release)
     # We update the environment to update the version
     context.invoke(config_save_command)
 
