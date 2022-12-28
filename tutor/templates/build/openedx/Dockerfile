@@ -42,15 +42,8 @@ WORKDIR /openedx/edx-platform
 RUN git config --global user.email "tutor@overhang.io" \
   && git config --global user.name "Tutor"
 
-{%- if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
-{%- else %}
-# Patch edx-platform
-# Fix broken Circuit Schematic Builder problem template
-# https://github.com/openedx/edx-platform/pull/31365
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/20b93b8b01276edadddfbbb67f15714fddd81c31.patch | git am
-{%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
 {{ patch("openedx-dockerfile-post-git-checkout") }}
