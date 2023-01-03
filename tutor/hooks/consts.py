@@ -176,11 +176,22 @@ class Filters:
         "commands:pre-init"
     )
 
+    #: Same as :py:data:`COMPOSE_LOCAL_JOBS_TMP` but for the development environment.
+    COMPOSE_DEV_JOBS_TMP: Filter[Config, []] = filters.get("compose:dev-jobs:tmp")
+
     #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for the development environment.
     COMPOSE_DEV_TMP: Filter[Config, []] = filters.get("compose:dev:tmp")
 
-    #: Same as :py:data:`COMPOSE_LOCAL_JOBS_TMP` but for the development environment.
-    COMPOSE_DEV_JOBS_TMP: Filter[Config, []] = filters.get("compose:dev-jobs:tmp")
+    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for jobs
+    COMPOSE_LOCAL_JOBS_TMP: Filter[Config, []] = filters.get("compose:local-jobs:tmp")
+
+    #: Contents of the (local|dev)/docker-compose.tmp.yml files that will be generated at
+    #: runtime. This is used for instance to bind-mount folders from the host (see
+    #: :py:data:`COMPOSE_MOUNTS`)
+    #:
+    #: :parameter dict[str, ...] docker_compose_tmp: values which will be serialized to local/docker-compose.tmp.yml.
+    #:   Keys and values will be rendered before saving, such that you may include ``{{ ... }}`` statements.
+    COMPOSE_LOCAL_TMP: Filter[Config, []] = filters.get("compose:local:tmp")
 
     #: List of folders to bind-mount in docker-compose containers, either in ``tutor local`` or ``tutor dev``.
     #:
@@ -202,47 +213,6 @@ class Filters:
     #:   this is "edx-platform". When implementing this filter you should check this name to
     #:   conditionnally add mounts.
     COMPOSE_MOUNTS: Filter[list[tuple[str, str]], [str]] = filters.get("compose:mounts")
-
-    #: Contents of the (local|dev)/docker-compose.tmp.yml files that will be generated at
-    #: runtime. This is used for instance to bind-mount folders from the host (see
-    #: :py:data:`COMPOSE_MOUNTS`)
-    #:
-    #: :parameter dict[str, ...] docker_compose_tmp: values which will be serialized to local/docker-compose.tmp.yml.
-    #:   Keys and values will be rendered before saving, such that you may include ``{{ ... }}`` statements.
-    COMPOSE_LOCAL_TMP: Filter[Config, []] = filters.get("compose:local:tmp")
-
-    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for jobs
-    COMPOSE_LOCAL_JOBS_TMP: Filter[Config, []] = filters.get("compose:local-jobs:tmp")
-
-    #: List of images to be built when we run ``tutor images build ...``.
-    #:
-    #: :parameter list[tuple[str, tuple[str, ...], str, tuple[str, ...]]] tasks: list of ``(name, path, tag, args)`` tuples.
-    #:
-    #:    - ``name`` is the name of the image, as in ``tutor images build myimage``.
-    #:    - ``path`` is the relative path to the folder that contains the Dockerfile.
-    #:      For instance ``("myplugin", "build", "myservice")`` indicates that the template will be read from
-    #:      ``myplugin/build/myservice/Dockerfile``
-    #:    - ``tag`` is the Docker tag that will be applied to the image. It will be
-    #:      rendered at runtime with the user configuration. Thus, the image tag could
-    #:      be ``"{{ DOCKER_REGISTRY }}/myimage:{{ TUTOR_VERSION }}"``.
-    #:    - ``args`` is a list of arguments that will be passed to ``docker build ...``.
-    #: :parameter Config config: user configuration.
-    IMAGES_BUILD: Filter[
-        list[tuple[str, tuple[str, ...], str, tuple[str, ...]]], [Config]
-    ] = filters.get("images:build")
-
-    #: List of images to be pulled when we run ``tutor images pull ...``.
-    #:
-    #: :parameter list[tuple[str, str]] tasks: list of ``(name, tag)`` tuples.
-    #:
-    #:    - ``name`` is the name of the image, as in ``tutor images pull myimage``.
-    #:    - ``tag`` is the Docker tag that will be applied to the image. (see :py:data:`IMAGES_BUILD`).
-    #: :parameter Config config: user configuration.
-    IMAGES_PULL: Filter[list[tuple[str, str]], [Config]] = filters.get("images:pull")
-
-    #: List of images to be pushed when we run ``tutor images push ...``.
-    #: Parameters are the same as for :py:data:`IMAGES_PULL`.
-    IMAGES_PUSH: Filter[list[tuple[str, str]], [Config]] = filters.get("images:push")
 
     #: Declare new default configuration settings that don't necessarily have to be saved in the user
     #: ``config.yml`` file. Default settings may be overridden with ``tutor config save --set=...``, in which
@@ -299,24 +269,6 @@ class Filters:
     #: :parameter list[str] patterns: list of regular expression patterns. See :py:data:`ENV_PATTERNS_IGNORE`.
     ENV_PATTERNS_INCLUDE: Filter[list[str], []] = filters.get("env:patterns:include")
 
-    #: List of all template root folders.
-    #:
-    #: :parameter list[str] templates_root: absolute paths to folders which contain templates.
-    #:   The templates in these folders will then be accessible by the environment
-    #:   renderer using paths that are relative to their template root.
-    ENV_TEMPLATE_ROOTS: Filter[list[str], []] = filters.get("env:templates:roots")
-
-    #: List of template source/destination targets.
-    #:
-    #: :parameter list[tuple[str, str]] targets: list of (source, destination) pairs.
-    #:   Each source is a path relative to one of the template roots, and each destination
-    #:   is a path relative to the environment root. For instance: adding ``("c/d",
-    #:   "a/b")`` to the filter will cause all files from "c/d" to be rendered to the ``a/b/c/d``
-    #:   subfolder.
-    ENV_TEMPLATE_TARGETS: Filter[list[tuple[str, str]], []] = filters.get(
-        "env:templates:targets"
-    )
-
     #: List of `Jinja2 filters <https://jinja.palletsprojects.com/en/latest/templates/#filters>`__ that will be
     #: available in templates. Jinja2 filters are basically functions that can be used
     #: as follows within templates::
@@ -350,6 +302,24 @@ class Filters:
         list[tuple[str, Callable[..., Any]]], []
     ] = filters.get("env:templates:filters")
 
+    #: List of all template root folders.
+    #:
+    #: :parameter list[str] templates_root: absolute paths to folders which contain templates.
+    #:   The templates in these folders will then be accessible by the environment
+    #:   renderer using paths that are relative to their template root.
+    ENV_TEMPLATE_ROOTS: Filter[list[str], []] = filters.get("env:templates:roots")
+
+    #: List of template source/destination targets.
+    #:
+    #: :parameter list[tuple[str, str]] targets: list of (source, destination) pairs.
+    #:   Each source is a path relative to one of the template roots, and each destination
+    #:   is a path relative to the environment root. For instance: adding ``("c/d",
+    #:   "a/b")`` to the filter will cause all files from "c/d" to be rendered to the ``a/b/c/d``
+    #:   subfolder.
+    ENV_TEMPLATE_TARGETS: Filter[list[tuple[str, str]], []] = filters.get(
+        "env:templates:targets"
+    )
+
     #: List of extra variables to be included in all templates.
     #:
     #: :parameter filters: list of (name, value) tuples.
@@ -369,8 +339,10 @@ class Filters:
     #:      rendered at runtime with the user configuration. Thus, the image tag could
     #:      be ``"{{ DOCKER_REGISTRY }}/myimage:{{ TUTOR_VERSION }}"``.
     #:    - ``args`` is a list of arguments that will be passed to ``docker build ...``.
-    #: :parameter dict config: user configuration.
-    IMAGES_BUILD = filters.get("images:build")
+    #: :parameter Config config: user configuration.
+    IMAGES_BUILD: Filter[
+        list[tuple[str, tuple[str, ...], str, tuple[str, ...]]], [Config]
+    ] = filters.get("images:build")
 
     #: List of images to be pulled when we run ``tutor images pull ...``.
     #:
@@ -378,20 +350,12 @@ class Filters:
     #:
     #:    - ``name`` is the name of the image, as in ``tutor images pull myimage``.
     #:    - ``tag`` is the Docker tag that will be applied to the image. (see :py:data:`IMAGES_BUILD`).
-    #: :parameter dict config: user configuration.
-    IMAGES_PULL = filters.get("images:pull")
+    #: :parameter Config config: user configuration.
+    IMAGES_PULL: Filter[list[tuple[str, str]], [Config]] = filters.get("images:pull")
 
     #: List of images to be pushed when we run ``tutor images push ...``.
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
-    IMAGES_PUSH = filters.get("images:push")
-
-    #: List of installed plugins. In order to be added to this list, a plugin must first
-    #: be discovered (see :py:data:`Actions.CORE_READY`).
-    #:
-    #: :param list[str] plugins: plugin developers probably don't have to implement this
-    #:   filter themselves, but they can apply it to check for the presence of other
-    #:   plugins.
-    PLUGINS_INSTALLED: Filter[list[str], []] = filters.get("plugins:installed")
+    IMAGES_PUSH: Filter[list[tuple[str, str]], [Config]] = filters.get("images:push")
 
     #: Information about each installed plugin, including its version.
     #: Keep this information to a single line for easier parsing by 3rd-party scripts.
@@ -400,6 +364,14 @@ class Filters:
     PLUGINS_INFO: Filter[list[tuple[str, str]], []] = filters.get(
         "plugins:installed:versions"
     )
+
+    #: List of installed plugins. In order to be added to this list, a plugin must first
+    #: be discovered (see :py:data:`Actions.CORE_READY`).
+    #:
+    #: :param list[str] plugins: plugin developers probably don't have to implement this
+    #:   filter themselves, but they can apply it to check for the presence of other
+    #:   plugins.
+    PLUGINS_INSTALLED: Filter[list[str], []] = filters.get("plugins:installed")
 
     #: List of loaded plugins.
     #:
