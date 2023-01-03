@@ -1,3 +1,4 @@
+import typing as t
 import unittest
 from unittest.mock import Mock, patch
 
@@ -24,7 +25,7 @@ class PluginsTests(unittest.TestCase, TestCommandMixin):
         result = self.invoke(["plugins", "list"])
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
-        self.assertFalse(result.output)
+        self.assertEqual("NAME\tSTATUS\tVERSION\n", result.output)
         _iter_info.assert_called()
 
     def test_plugins_install_not_found_plugin(self) -> None:
@@ -54,4 +55,18 @@ class PluginsTests(unittest.TestCase, TestCommandMixin):
         )
         self.assertEqual(
             ["all", "alba"], plugins_commands.PluginName(allow_all=True).get_names("al")
+        )
+
+    def test_format_table(self) -> None:
+        rows: t.List[t.Tuple[str, ...]] = [
+            ("a", "xyz", "value 1"),
+            ("abc", "x", "value 12345"),
+        ]
+        formatted = plugins_commands.format_table(rows, separator="  ")
+        self.assertEqual(
+            """
+a    xyz  value 1
+abc  x    value 12345
+""".strip(),
+            formatted,
         )

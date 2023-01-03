@@ -8,3 +8,4 @@ Reference
    api/hooks/catalog
    patches
    cli/index
+   indexes

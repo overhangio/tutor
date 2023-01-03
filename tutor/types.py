@@ -49,6 +49,6 @@ def get_typed(
     value = config.get(key, default)
     if not isinstance(value, expected_type):
         raise exceptions.TutorError(
-            "Invalid config entry: expected {expected_type.__name__}, got {value.__class__} for key '{key}'"
+            f"Invalid config entry: expected {expected_type.__name__}, got {value.__class__} for key '{key}'"
         )
     return value
