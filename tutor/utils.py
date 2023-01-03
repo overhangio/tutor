@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import random
+import re
 import shlex
 import shutil
 import string
@@ -10,6 +11,8 @@ import subprocess
 import sys
 from functools import lru_cache
 from typing import List, Tuple
+from urllib.error import URLError
+from urllib.request import urlopen
 
 import click
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
@@ -44,17 +47,23 @@ def ensure_file_directory_exists(path: str) -> None:
     """
     Create file's base directory if it does not exist.
     """
-    directory = os.path.dirname(path)
-    if os.path.isfile(directory):
-        raise exceptions.TutorError(
-            f"Attempting to create a directory, but a file with the same name already exists: {directory}"
-        )
     if os.path.isdir(path):
         raise exceptions.TutorError(
-            f"Attempting to write to a file, but a directory with the same name already exists: {directory}"
+            f"Attempting to write to a file, but a directory with the same name already exists: {path}"
         )
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    ensure_directory_exists(os.path.dirname(path))
+
+
+def ensure_directory_exists(path: str) -> None:
+    """
+    Create directory if it does not exist.
+    """
+    if os.path.isfile(path):
+        raise exceptions.TutorError(
+            f"Attempting to create a directory, but a file with the same name already exists: {path}"
+        )
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def random_string(length: int) -> str:
@@ -174,7 +183,12 @@ def _docker_compose_command() -> Tuple[str, ...]:
     if shutil.which("docker-compose") is not None:
         return ("docker-compose",)
     if shutil.which("docker") is not None:
-        if subprocess.run(["docker", "compose"], capture_output=True).returncode == 0:
+        if (
+            subprocess.run(
+                ["docker", "compose"], capture_output=True, check=False
+            ).returncode
+            == 0
+        ):
             return ("docker", "compose")
     raise exceptions.TutorError(
         "docker-compose is not installed. Please follow instructions from https://docs.docker.com/compose/install/"
@@ -291,3 +305,43 @@ def check_macos_docker_memory() -> None:
         raise exceptions.TutorError(
             f"Docker is configured to allocate {memory_mib} MiB RAM, less than the recommended {4096} MiB"
         )
+
+
+def read_url(url: str) -> str:
+    """
+    Read an index url, either remote (http/https) or local.
+    """
+    if is_http(url):
+        # web index
+        try:
+            response = urlopen(url)
+            content: str = response.read().decode()
+            return content
+        except URLError as e:
+            raise exceptions.TutorError(f"Request error: {e}") from e
+        except UnicodeDecodeError as e:
+            raise exceptions.TutorError(
+                f"Remote response must be encoded as utf8: {e}"
+            ) from e
+    try:
+        with open(url, encoding="utf8") as f:
+            # local file index
+            return f.read()
+    except FileNotFoundError as e:
+        raise exceptions.TutorError(f"File could not be found: {e}") from e
+    except UnicodeDecodeError as e:
+        raise exceptions.TutorError(f"File must be encoded as utf8: {e}") from e
+
+
+def is_url(text: str) -> bool:
+    """
+    Return true if the string points to a file on disk or a web URL.
+    """
+    return os.path.isfile(text) or is_http(text)
+
+
+def is_http(url: str) -> bool:
+    """
+    Basic test to check whether a string is a web URL. Use only for basic use cases.
+    """
+    return re.match(r"^https?://", url) is not None

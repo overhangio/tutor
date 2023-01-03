@@ -8,3 +8,7 @@ OPENEDX_SECRET_KEY: "{{ 24|random_string }}"
 PLUGINS:
   # The MFE plugin is required
   - mfe
+PLUGIN_INDEXES:
+  # Indexes in this list will be suffixed with the Open edX named version and
+  # "plugins.yml". E.g: https://overhang.io/tutor/main/olive/plugins.yml
+  - https://overhang.io/tutor/main

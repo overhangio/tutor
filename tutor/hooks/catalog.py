@@ -408,6 +408,31 @@ class Filters:
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
     IMAGES_PUSH: Filter[list[tuple[str, str]], [Config]] = filters.get("images:push")
 
+    #: List of plugin indexes that are loaded when we run `tutor plugins update`. By
+    #: default, the plugin indexes are stored in the user configuration. This filter makes
+    #: it possible to extend and modify this list with plugins.
+    #:
+    #: :parameter list[str] indexes: list of index URLs. Remember that entries further
+    #:   in the list have priority.
+    PLUGIN_INDEXES: Filter[list[str], []] = filters.get("plugins:indexes:entries")
+
+    #: Filter to modify the url of a plugin index url. This is convenient to alias
+    #: plugin indexes with a simple name, such as "main" or "contrib".
+    #:
+    #: :parameter str url: value passed to the `index add/remove` commands.
+    PLUGIN_INDEX_URL: Filter[str, []] = filters.get("plugins:indexes:url")
+
+    #: When installing an entry from a plugin index, the plugin data from the index will
+    #: go through this filter before it is passed along to `pip install`. Thus, this is a
+    #: good place to add custom authentication when you need to install from a private
+    #: index.
+    #:
+    #: :parameter dict[str, str] plugin: the dict entry from the plugin index. It
+    #:   includes an additional "index" key which contains the plugin index URL.
+    PLUGIN_INDEX_ENTRY_TO_INSTALL: Filter[dict[str, str], []] = filters.get(
+        "plugins:indexes:entries:install"
+    )
+
     #: Information about each installed plugin, including its version.
     #: Keep this information to a single line for easier parsing by 3rd-party scripts.
     #:
