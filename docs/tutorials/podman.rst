@@ -1,12 +1,13 @@
 Running Tutor with Podman
 -------------------------
 
-You have the option of running Tutor with `Podman <https://podman.io/>`__, instead of the native Docker tools. This has some practical advantages: it does not require a running Docker daemon, and it enables you to run and build Docker images without depending on any system component running ``root``. As such, it is particularly useful for building Tutor images from CI pipelines.
+`Podman <https://podman.io/>`_ is a fully featured container engine that is daemonless. It provides a Docker CLI comparable command line that makes it pretty easy for people transitioning over from Docker.
 
-The ``podman`` CLI aims to be fully compatible with the ``docker`` CLI and ``podman-compose`` is meant to be a fully-compatible alias of ``docker-compose``. This means that you should be able to use it together with Tutor, without making any changes to Tutor itself.
+Simply put, this means that you can do something like: ``alias docker=podman`` and everything will run and behave pretty much as expected.
 
-.. warning::
-   Since this was written, it was discovered that there are major compatibility issues between ``podman-compose`` and ``docker-compose``. Thus, podman cannot be considered a drop-in replacement of Docker in the context of Tutor -- at least for running Open edX locally.
+As of podman v3.0.0, podman now officially supports ``docker-compose`` via a shim service. This means that you now have the option of running Tutor with Podman, instead of the native Docker tools.
+
+This has some practical advantages: it does not require a running Docker daemon, and it enables you to run and build Docker images without depending on any system component running as ``root``.
 
 .. warning::
    You should not attempt to run Tutor with Podman on a system that already has native ``docker`` installed. If you want to switch to ``podman`` using the aliases described here, you should uninstall (or at least stop) the native Docker daemon first.
@@ -17,36 +18,76 @@ Enabling Podman
 
 Podman is supported on a variety of development platforms, see the `installation instructions <https://podman.io/getting-started/installation>`_ for details.
 
-Once you have installed Podman and its dependencies on the platform of your choice, you'll need to make sure that its ``podman`` binary, usually installed as ``/usr/bin/podman``, is aliased to ``docker``, and is included as such in your system ``$PATH``. On some CentOS and Fedora releases, you can install a package named ``podman-docker`` to do this for you, but on other platforms, you'll need to take of this yourself.
+Once you have installed Podman and its dependencies on the platform of your choice, you'll need to make sure that the ``podman`` binary, usually installed as ``/usr/bin/podman``, is aliased to ``docker``.
 
-- If ``$HOME/bin`` is in your ``$PATH``, you can create a symbolic link there::
+On some CentOS and Fedora releases, you can install a package named ``podman-docker`` to do this for you, but on other platforms, you'll need to take of this yourself.
 
-    ln -s $(which podman) $HOME/bin/docker
+- To alias ``podman`` to ``docker``, you can simply run this command::
 
-- If you want to instead make ``docker`` a system-wide alias for ``podman``, you can create your symlink in ``/usr/local/bin``, an action that normally requires ``root`` privileges::
+    $ alias docker=podman
 
-    sudo ln -s $(which podman) /usr/local/bin/docker
+.. note::
+   Running this command only makes a temporary alias. For a more permanent alias, you should place that command in your ``bashrc`` or equivalent file.
 
+Getting docker-compose to work with Podman
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Enabling podman-compose
-~~~~~~~~~~~~~~~~~~~~~~~
+To allow ``podman`` to work with ``docker-compose``, you'll need to enable a podman socket which pretends to be ``docker``.
 
-``podman-compose`` is available as a package from PyPI, and can thus be installed with ``pip``. See `its README <https://github.com/containers/podman-compose/blob/devel/README.md>`_ for installation instructions. Note that if you have installed Tutor in its virtualenv, you'll need to run ``pip install podman-compose`` in that same virtualenv.
+For rootless containers, this requires you to start the ``podman.service`` as a regular user and set the ``DOCKER_HOST`` environment variable. This can be done as follows::
 
-Once installed, you'll again need to create a symbolic link that aliases ``docker-compose`` to ``podman-compose``.
+  # To start the podman service
+  $ systemctl --user start podman.service
 
-- If you run Tutor and ``podman-compose`` in a virtualenv, create the symlink in that virtualenv's ``bin`` directory: activate the virtualenv, then run::
+  # To set the DOCKER_HOST environment variable
+  $ export DOCKER_HOST="unix://$XDG_RUNTIME_DIR/podman/podman.sock"
 
-    ln -s $(which podman-compose) $(dirname $(which podman-compose))/docker-compose
+.. note::
+   As with the previous ``alias`` command, if you'd like to make the ``DOCKER_HOST`` variable permanent, you should put the entire export command in your ``bashrc`` or equivalent file.
 
-- If you do not, create the symlink in ``/usr/local/bin``, using ``root`` privileges::
+Fixing SELinux Errors
+~~~~~~~~~~~~~~~~~~~~~
 
-    sudo ln -s $(which podman-compose) /usr/local/bin/docker-compose
+.. warning::
+   Disabling ``SELinux`` or setting it to *permissive mode* on your system is **highly discouraged and will render your system vulnerable.**
 
+If your system has ``SELinux`` working in enforcing mode, chances are that the SELinux context of the tutor root directory won't be set correctly. This will cause read issues because containers will not be able read files from volumes due to a context mismatch.
+
+Errors stemming from this will look as follows in the ``sealert`` program::
+
+  "SELinux is preventing caddy from read access on the file Caddyfile."
+  "SELinux is preventing celery from read access on the directory cms."
+  "SELinux is preventing mysqld from add_name access on the directory is_writable."
+
+You can verify the context mismatch by running::
+
+  $ ls -lZ $(tutor config printroot)
+
+You'll most likely see something that looks like this::
+
+  -rw-r--r--. 1 tutor tutor unconfined_u:object_r:data_home_t:s0 2145 Jan  6 20:13 config.yml
+  drwxr-xr-x. 2 tutor tutor unconfined_u:object_r:data_home_t:s0    6 Jan  6 20:14 data
+  drwxr-xr-x. 8 tutor tutor unconfined_u:object_r:data_home_t:s0  121 Jan  6 20:14 env
+
+We're interested in the ``unconfined_u:object_r:data_home_t:s0`` part of that output.
+
+Notice how the third part of that says ``data_home_t``?
+
+That's the context type. For tutor to work, we need that part to be set to ``container_file_t``.
+
+This can be done as follows::
+
+  # Set the SELinux type of the tutor root directory and all of it's subdirectories to `container_file_t`
+  $ sudo semanage fcontext -a -t container_file_t "$(tutor config printroot)(/.*)?"
+
+  # Apply the newly set security context to the directories
+  $ sudo restorecon -RF $(tutor config printroot)
+
+Running these two commands in a sequence should fix the SELinux errors.
 
 Verifying your environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have configured your symbolic links as described, you should be able to run ``docker version`` and ``docker-compose --help`` and their output should agree, respectively, with ``podman version`` and ``podman-compose --help``.
+Once you've set everything up as described, you should be able to run ``docker version`` and ``docker-compose --help`` and get a valid output.
 
-After that, you should be able to use ``tutor local``, ``tutor build``, and other commands as if you had installed the native Docker tools.
+After that, you should be able to use ``tutor local``, and other commands as if you had installed the native Docker tools.
