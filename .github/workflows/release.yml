@@ -3,7 +3,7 @@
 #    act --secret GITHUB_TOKEN=... --job release
 #
 # https://github.com/nektos/act/
-# To generate a token: https://github.com/settings/tokens
+# To generate a token: https://github.com/settings/tokens (add r/w permissions for "Contents")
 name: Release
 
 on:
@@ -18,11 +18,14 @@ jobs:
       matrix:
         include:
           # https://github.com/actions/runner-images#available-images
-          - os: ubuntu-latest
+          # It's important that we build the tutor binaries with the *oldest* possible
+          # OS releases and Python version. See these docs for more information:
+          # https://pyinstaller.org/en/stable/usage.html#making-gnu-linux-apps-forward-compatible
+          - os: ubuntu-20.04
             locale: C.UTF-8
             gh_os: linux
           # https://endoflife.date/macos
-          - os: macos-latest
+          - os: macos-10.15
             locale: en_US.UTF-8
             gh_os: macOs
     env:
