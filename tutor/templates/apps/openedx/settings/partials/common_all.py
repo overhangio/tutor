@@ -78,6 +78,10 @@ CACHES = {
     },
 }
 
+# The default Django contrib site is the one associated to the LMS domain name. 1 is
+# usually "example.com", so it's the next available integer.
+SITE_ID = 2
+
 # Contact addresses
 CONTACT_MAILING_ADDRESS = "{{ PLATFORM_NAME }} - {% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}"
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get("DEFAULT_FROM_EMAIL", ENV_TOKENS["CONTACT_EMAIL"])
