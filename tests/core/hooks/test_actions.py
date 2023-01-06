@@ -1,7 +1,7 @@
 import typing as t
 import unittest
 
-from tutor import hooks
+from tutor.core.hooks import actions, contexts
 
 
 class PluginActionsTests(unittest.TestCase):
@@ -10,14 +10,14 @@ class PluginActionsTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        hooks.actions.clear_all(context="tests")
+        actions.clear_all(context="tests")
 
     def run(self, result: t.Any = None) -> t.Any:
-        with hooks.contexts.enter("tests"):
+        with contexts.enter("tests"):
             return super().run(result=result)
 
     def test_do(self) -> None:
-        action: hooks.actions.Action[int] = hooks.actions.get("test-action")
+        action: actions.Action[int] = actions.get("test-action")
 
         @action.add()
         def _test_action_1(increment: int) -> None:
@@ -31,29 +31,29 @@ class PluginActionsTests(unittest.TestCase):
         self.assertEqual(3, self.side_effect_int)
 
     def test_priority(self) -> None:
-        @hooks.actions.add("test-action", priority=2)
+        @actions.add("test-action", priority=2)
         def _test_action_1() -> None:
             self.side_effect_int += 4
 
-        @hooks.actions.add("test-action", priority=1)
+        @actions.add("test-action", priority=1)
         def _test_action_2() -> None:
             self.side_effect_int = self.side_effect_int // 2
 
         # Action 2 must be performed before action 1
         self.side_effect_int = 4
-        hooks.actions.do("test-action")
+        actions.do("test-action")
         self.assertEqual(6, self.side_effect_int)
 
     def test_equal_priority(self) -> None:
-        @hooks.actions.add("test-action", priority=2)
+        @actions.add("test-action", priority=2)
         def _test_action_1() -> None:
             self.side_effect_int += 4
 
-        @hooks.actions.add("test-action", priority=2)
+        @actions.add("test-action", priority=2)
         def _test_action_2() -> None:
             self.side_effect_int = self.side_effect_int // 2
 
         # Action 2 must be performed after action 1
         self.side_effect_int = 4
-        hooks.actions.do("test-action")
+        actions.do("test-action")
         self.assertEqual(4, self.side_effect_int)

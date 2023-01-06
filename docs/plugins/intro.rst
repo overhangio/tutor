@@ -15,6 +15,8 @@ Tutor comes with a plugin system that allows anyone to customise the deployment 
 
 For simple changes, it may be extremely easy to create a Tutor plugin: even non-technical users may get started with our :ref:`plugin_development_tutorial` tutorial. We also provide a list of :ref:`simple example plugins <plugins_examples>`.
 
+To learn about the different ways in which plugins can extend Tutor, check out the :ref:`hooks catalog <hooks_catalog>`.
+
 Plugin commands cheatsheet
 ==========================
 

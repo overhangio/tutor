@@ -20,6 +20,7 @@ ConfigValue: TypeAlias = t.Union[
     t.Dict[t.Any, t.Any],
 ]
 
+#: Type alias for the user configuration.
 Config: TypeAlias = t.Dict[str, ConfigValue]
 
 

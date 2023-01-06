@@ -10,6 +10,8 @@ You may be thinking that creating a plugin might be overkill for your use case. 
 
 A plugin can be created either as a simple, single Python module (a ``*.py`` file) or as a full-blown Python package. Single Python modules are easier to write, while Python packages can be distributed more easily with ``pip install ...``. We'll start by writing our plugin as a single Python module.
 
+Plugins work by making extensive use of the Tutor hooks API. The list of available hooks is available from the :ref:`hooks catalog <hooks_catalog>`. Developers who want to understand how hooks work should check the :ref:`hooks API <hooks_api>`.
+
 Writing a plugin as a single Python module
 ==========================================
 
@@ -45,7 +47,7 @@ Modifying existing files with patches
 
 We'll start by modifying some of our Open edX settings files. It's a frequent requirement to modify the ``FEATURES`` setting from the LMS or the CMS in edx-platform. In the legacy native installation, this was done by modifying the ``lms.env.yml`` and ``cms.env.yml`` files. Here we'll modify the Python setting files that define the edx-platform configuration. To achieve that we'll make use of two concepts from the Tutor API: :ref:`patches` and :ref:`filters`.
 
-If you have not already read :ref:`how_does_tutor_work` now would be a good time :-) Tutor uses templates to generate various files, such as settings, Dockerfiles, etc. These templates include ``{{ patch("patch-name") }}`` statements that allow plugins to insert arbitrary content in there. These patches are located at strategic locations. See :ref:`patches` for more information.
+If you have not already read :ref:`how_does_tutor_work` now would be a good time ☺️ Tutor uses templates to generate various files, such as settings, Dockerfiles, etc. These templates include ``{{ patch("patch-name") }}`` statements that allow plugins to insert arbitrary content in there. These patches are located at strategic locations. See :ref:`patches` for more information.
 
 Let's say that we would like to limit access to our brand new Open edX platform. It is not ready for prime-time yet, so we want to prevent users from registering new accounts. There is a feature flag for that in the LMS: `FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] <https://edx.readthedocs.io/projects/edx-platform-technical/en/latest/featuretoggles.html#featuretoggle-FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION']>`__. By default this flag is set to a true value, enabling anyone to create an account. In the following we'll set it to false.
 
@@ -73,7 +75,7 @@ This imports the ``hooks`` module from Tutor, which grants us access to ``hooks.
         <content>
     )
 
-This means "add ``<content>`` to the ``{{ patch("<name>") }}`` statement, thanks to the  ENV_PATCHES filter". In our case, we want to modify the LMS settings, both in production and development. The right patch for that is :patch:`openedx-lms-common-settings`. We add one item, which is a single Python-formatted line of code::
+This means "add ``<content>`` to the ``{{ patch("<name>") }}`` statement, thanks to the :py:data:`tutor.hooks.Filters.ENV_PATCHES` filter". In our case, we want to modify the LMS settings, both in production and development. The right patch for that is :patch:`openedx-lms-common-settings`. We add one item, which is a single Python-formatted line of code::
 
     "FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False"
 

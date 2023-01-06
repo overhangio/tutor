@@ -11,16 +11,18 @@ from typing_extensions import ParamSpec
 from . import priorities
 from .contexts import Contextualized
 
-P = ParamSpec("P")
+#: Action generic signature.
+T = ParamSpec("T")
+
 # Similarly to CallableFilter, it should be possible to create a CallableAction alias in
 # the future.
-# CallableAction = t.Callable[P, None]
+# CallableAction = t.Callable[T, None]
 
 
-class ActionCallback(Contextualized, t.Generic[P]):
+class ActionCallback(Contextualized, t.Generic[T]):
     def __init__(
         self,
-        func: t.Callable[P, None],
+        func: t.Callable[T, None],
         priority: t.Optional[int] = None,
     ):
         super().__init__()
@@ -29,13 +31,13 @@ class ActionCallback(Contextualized, t.Generic[P]):
 
     def do(
         self,
-        *args: P.args,
-        **kwargs: P.kwargs,
+        *args: T.args,
+        **kwargs: T.kwargs,
     ) -> None:
         self.func(*args, **kwargs)
 
 
-class Action(t.Generic[P]):
+class Action(t.Generic[T]):
     """
     Action hooks have callbacks that are triggered independently from one another.
 
@@ -44,12 +46,12 @@ class Action(t.Generic[P]):
 
     This is the typical action lifecycle:
 
-    1. Create an action with method :py:meth:`get` (or function :py:func:`get`).
-    2. Add callbacks with method :py:meth:`add` (or function :py:func:`add`).
-    3. Call the action callbacks with method :py:meth:`do` (or function :py:func:`do`).
+    1. Create an action with method :py:meth:`get`.
+    2. Add callbacks with method :py:meth:`add`.
+    3. Call the action callbacks with method :py:meth:`do`.
 
-    The `P` type parameter of the Action class corresponds to the expected signature of
-    the action callbacks. For instance, `Action[[str, int]]` means that the action
+    The ``P`` type parameter of the Action class corresponds to the expected signature of
+    the action callbacks. For instance, ``Action[[str, int]]`` means that the action
     callbacks are expected to take two arguments: one string and one integer.
 
     This strong typing makes it easier for plugin developers to quickly check whether they are adding and calling action callbacks correctly.
@@ -59,7 +61,7 @@ class Action(t.Generic[P]):
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self.callbacks: list[ActionCallback[P]] = []
+        self.callbacks: list[ActionCallback[T]] = []
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.name}')"
@@ -73,14 +75,29 @@ class Action(t.Generic[P]):
 
     def add(
         self, priority: t.Optional[int] = None
-    ) -> t.Callable[[t.Callable[P, None]], t.Callable[P, None]]:
+    ) -> t.Callable[[t.Callable[T, None]], t.Callable[T, None]]:
         """
-        Add a callback to the action
+        Decorator to add a callback to an action.
 
-        This is similar to :py:func:`add`.
+        :param priority: optional order in which the action callbacks are performed. Higher
+            values mean that they will be performed later. The default value is
+            ``priorities.DEFAULT`` (10). Actions that should be performed last should have a
+            priority of 100.
+
+        Usage::
+
+            @my_action.add("my-action")
+            def do_stuff(my_arg):
+                ...
+
+        The ``do_stuff`` callback function will be called on ``my_action.do(some_arg)``.
+
+        The signature of each callback action function must match the signature of the
+        corresponding :py:meth:`do` method. Callback action functions are not supposed
+        to return any value. Returned values will be ignored.
         """
 
-        def inner(func: t.Callable[P, None]) -> t.Callable[P, None]:
+        def inner(func: t.Callable[T, None]) -> t.Callable[T, None]:
             callback = ActionCallback(func, priority=priority)
             priorities.insert_callback(callback, self.callbacks)
             return func
@@ -89,24 +106,36 @@ class Action(t.Generic[P]):
 
     def do(
         self,
-        *args: P.args,
-        **kwargs: P.kwargs,
+        *args: T.args,
+        **kwargs: T.kwargs,
     ) -> None:
         """
-        Run the action callbacks
+        Run the action callbacks in sequence.
 
-        This is similar to :py:func:`do`.
+        :param name: name of the action for which callbacks will be run.
+
+        Extra ``*args`` and ``*kwargs`` arguments will be passed as-is to
+        callback functions.
+
+        Callbacks are executed in order of priority, then FIFO. There is no error
+        management here: a single exception will cause all following callbacks
+        not to be run and the exception will be bubbled up.
         """
         self.do_from_context(None, *args, **kwargs)
 
     def do_from_context(
         self,
         context: t.Optional[str],
-        *args: P.args,
-        **kwargs: P.kwargs,
+        *args: T.args,
+        **kwargs: T.kwargs,
     ) -> None:
         """
-        Same as :py:func:`do` but only run the callbacks from a given context.
+        Same as :py:meth:`do` but only run the callbacks from a given context.
+
+        :param name: name of the action for which callbacks will be run.
+        :param context: limit the set of callback actions to those that
+            were declared within a certain context (see
+            :py:func:`tutor.core.hooks.contexts.enter`).
         """
         for callback in self.callbacks:
             if callback.is_in_context(context):
@@ -125,7 +154,15 @@ class Action(t.Generic[P]):
         """
         Clear all or part of the callbacks associated to an action
 
-        This is similar to :py:func:`clear`.
+        :param name: name of the action callbacks to remove.
+        :param context: when defined, will clear only the actions that were
+            created within that context.
+
+        Actions will be removed from the list of callbacks and will no longer be
+        run in :py:meth:`do` calls.
+
+        This function should almost certainly never be called by plugins. It is
+        mostly useful to disable some plugins at runtime or in unit tests.
         """
         self.callbacks = [
             callback
@@ -134,13 +171,26 @@ class Action(t.Generic[P]):
         ]
 
 
-class ActionTemplate(t.Generic[P]):
+class ActionTemplate(t.Generic[T]):
     """
     Action templates are for actions for which the name needs to be formatted
     before the action can be applied.
 
     Action templates can generate different :py:class:`Action` objects for which the
     name matches a certain template.
+
+    Templated actions must be formatted with ``(*args)`` before being applied. For example::
+
+        action_template = ActionTemplate("namespace:{0}")
+
+        # Return the action named "namespace:name"
+        my_action = action_template("name")
+
+        @my_action.add()
+        def my_callback():
+            ...
+
+        my_action.do()
     """
 
     def __init__(self, name: str):
@@ -149,8 +199,10 @@ class ActionTemplate(t.Generic[P]):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.template}')"
 
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Action[P]:
-        return get(self.template.format(*args, **kwargs))
+    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Action[T]:
+        name = self.template.format(*args, **kwargs)
+        action: Action[T] = Action.get(name)
+        return action
 
 
 # Syntactic sugar
@@ -160,85 +212,41 @@ get = Action.get
 def get_template(name: str) -> ActionTemplate[t.Any]:
     """
     Create an action with a template name.
-
-    Templated actions must be formatted with ``(*args)`` before being applied. For example::
-
-        action_template = actions.get_template("namespace:{0}")
-
-        @action_template("name").add()
-        def my_callback():
-            ...
-
-        action_template("name").do()
     """
     return ActionTemplate(name)
 
 
 def add(
     name: str, priority: t.Optional[int] = None
-) -> t.Callable[[t.Callable[P, None]], t.Callable[P, None]]:
+) -> t.Callable[[t.Callable[T, None]], t.Callable[T, None]]:
     """
     Decorator to add a callback action associated to a name.
-
-    :param name: name of the action. For forward compatibility, it is
-        recommended not to hardcode any string here, but to pick a value from
-        :py:class:`tutor.hooks.Actions` instead.
-    :param priority: optional order in which the action callbacks are performed. Higher
-        values mean that they will be performed later. The default value is
-        ``priorities.DEFAULT`` (10). Actions that should be performed last should have a
-        priority of 100.
-
-    Usage::
-
-        from tutor import hooks
-
-        @hooks.actions.add("my-action")
-        def do_stuff():
-            ...
-
-    The ``do_stuff`` callback function will be called on ``hooks.actions.do("my-action")``. (see :py:func:`do`)
-
-    The signature of each callback action function must match the signature of the corresponding ``hooks.actions.do`` call. Callback action functions are not supposed to return any value. Returned values will be ignored.
     """
     return get(name).add(priority=priority)
 
 
 def do(
     name: str,
-    *args: P.args,
-    **kwargs: P.kwargs,
+    *args: T.args,
+    **kwargs: T.kwargs,
 ) -> None:
     """
     Run action callbacks associated to a name/context.
-
-    :param name: name of the action for which callbacks will be run.
-
-    Extra ``*args`` and ``*kwargs`` arguments will be passed as-is to
-    callback functions.
-
-    Callbacks are executed in order of priority, then FIFO. There is no error
-    management here: a single exception will cause all following callbacks
-    not to be run and the exception to be bubbled up.
     """
-    action: Action[P] = Action.get(name)
+    action: Action[T] = Action.get(name)
     action.do(*args, **kwargs)
 
 
 def do_from_context(
     context: str,
     name: str,
-    *args: P.args,
-    **kwargs: P.kwargs,
+    *args: T.args,
+    **kwargs: T.kwargs,
 ) -> None:
     """
     Same as :py:func:`do` but only run the callbacks that were created in a given context.
-
-    :param name: name of the action for which callbacks will be run.
-    :param context: limit the set of callback actions to those that
-        were declared within a certain context (see
-        :py:func:`tutor.hooks.contexts.enter`).
     """
-    action: Action[P] = Action.get(name)
+    action: Action[T] = Action.get(name)
     action.do_from_context(context, *args, **kwargs)
 
 
@@ -255,15 +263,5 @@ def clear_all(context: t.Optional[str] = None) -> None:
 def clear(name: str, context: t.Optional[str] = None) -> None:
     """
     Clear any previously defined action with the given name and context.
-
-    :param name: name of the action callbacks to remove.
-    :param context: when defined, will clear only the actions that were
-        created within that context.
-
-    Actions will be removed from the list of callbacks and will no longer be
-    run in :py:func:`do` calls.
-
-    This function should almost certainly never be called by plugins. It is
-    mostly useful to disable some plugins at runtime or in unit tests.
     """
     Action.get(name).clear(context=context)

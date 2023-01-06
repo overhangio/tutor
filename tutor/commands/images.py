@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import typing as t
 
 import click
@@ -7,6 +8,7 @@ from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import exceptions, hooks, images
 from tutor.commands.context import Context
+from tutor.core.hooks import Filter
 from tutor.types import Config
 
 BASE_IMAGE_NAMES = ["openedx", "permissions"]
@@ -183,7 +185,7 @@ def find_images_to_build(
 
 def find_remote_image_tags(
     config: Config,
-    filtre: "hooks.filters.Filter[list[tuple[str, str]], [Config]]",
+    filtre: Filter[list[tuple[str, str]], [Config]],
     image: str,
 ) -> t.Iterator[str]:
     """
