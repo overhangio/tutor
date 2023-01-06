@@ -10,29 +10,34 @@ from typing_extensions import Concatenate, ParamSpec
 
 from . import contexts, priorities
 
-T = t.TypeVar("T")
-P = ParamSpec("P")
-# Specialized typevar for list elements
-E = t.TypeVar("E")
+#: Filter generic return value, which is also the type of the first callback argument.
+T1 = t.TypeVar("T1")
+#: Filter generic signature for all arguments after the first one.
+T2 = ParamSpec("T2")
+#: Specialized typevar for list elements
+L = t.TypeVar("L")
+
 # I wish we could create such an alias, which would greatly simply the definitions
 # below. Unfortunately this does not work, yet. It will once the following issue is
 # resolved: https://github.com/python/mypy/issues/11855
-# CallableFilter = t.Callable[Concatenate[T, P], T]
+# CallableFilter = t.Callable[Concatenate[T1, T2], T1]
 
 
-class FilterCallback(contexts.Contextualized, t.Generic[T, P]):
+class FilterCallback(contexts.Contextualized, t.Generic[T1, T2]):
     def __init__(
-        self, func: t.Callable[Concatenate[T, P], T], priority: t.Optional[int] = None
+        self,
+        func: t.Callable[Concatenate[T1, T2], T1],
+        priority: t.Optional[int] = None,
     ):
         super().__init__()
         self.func = func
         self.priority = priority or priorities.DEFAULT
 
-    def apply(self, value: T, *args: P.args, **kwargs: P.kwargs) -> T:
+    def apply(self, value: T1, *args: T2.args, **kwargs: T2.kwargs) -> T1:
         return self.func(value, *args, **kwargs)
 
 
-class Filter(t.Generic[T, P]):
+class Filter(t.Generic[T1, T2]):
     """
     Filter hooks have callbacks that are triggered as a chain.
 
@@ -41,9 +46,9 @@ class Filter(t.Generic[T, P]):
 
     This is the typical filter lifecycle:
 
-    1. Create an action with method :py:meth:`get` (or function :py:func:`get`).
-    2. Add callbacks with method :py:meth:`add` (or function :py:func:`add`).
-    3. Call the filter callbacks with method :py:meth:`apply` (or function :py:func:`apply`).
+    1. Create an action with method :py:meth:`get`.
+    2. Add callbacks with method :py:meth:`add`.
+    3. Call the filter callbacks with method :py:meth:`apply`.
 
     The result of each callback is passed as the first argument to the next one. Thus,
     the type of the first argument must match the callback return type.
@@ -64,7 +69,7 @@ class Filter(t.Generic[T, P]):
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self.callbacks: list[FilterCallback[T, P]] = []
+        self.callbacks: list[FilterCallback[T1, T2]] = []
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.name}')"
@@ -79,11 +84,37 @@ class Filter(t.Generic[T, P]):
     def add(
         self, priority: t.Optional[int] = None
     ) -> t.Callable[
-        [t.Callable[Concatenate[T, P], T]], t.Callable[Concatenate[T, P], T]
+        [t.Callable[Concatenate[T1, T2], T1]], t.Callable[Concatenate[T1, T2], T1]
     ]:
+        """
+        Decorator to add a filter callback.
+
+        Callbacks are added by increasing priority. Highest priority score are called
+        last.
+
+        :param int priority: optional order in which the filter callbacks are called. Higher
+          values mean that they will be performed later. The default value is
+          ``priorities.DEFAULT`` (10). Filters that must be called last should have a
+          priority of 100.
+
+        The return value of each filter function callback will be passed as the first argument to the next one.
+
+        Usage::
+
+            @my_filter.add()
+            def my_func(value, some_other_arg):
+                # Do something with `value`
+                ...
+                return value
+
+        After filters have been created, the result of calling all filter callbacks is obtained by running:
+
+            final_value = my_filter.apply(initial_value, some_other_argument_value)
+        """
+
         def inner(
-            func: t.Callable[Concatenate[T, P], T]
-        ) -> t.Callable[Concatenate[T, P], T]:
+            func: t.Callable[Concatenate[T1, T2], T1]
+        ) -> t.Callable[Concatenate[T1, T2], T1]:
             callback = FilterCallback(func, priority=priority)
             priorities.insert_callback(callback, self.callbacks)
             return func
@@ -92,10 +123,10 @@ class Filter(t.Generic[T, P]):
 
     def apply(
         self,
-        value: T,
-        *args: t.Any,
-        **kwargs: t.Any,
-    ) -> T:
+        value: T1,
+        *args: T2.args,
+        **kwargs: T2.kwargs,
+    ) -> T1:
         """
         Apply all declared filters to a single value, passing along the additional arguments.
 
@@ -113,10 +144,15 @@ class Filter(t.Generic[T, P]):
     def apply_from_context(
         self,
         context: t.Optional[str],
-        value: T,
-        *args: P.args,
-        **kwargs: P.kwargs,
-    ) -> T:
+        value: T1,
+        *args: T2.args,
+        **kwargs: T2.kwargs,
+    ) -> T1:
+        """
+        Same as :py:meth:`apply` but only run the callbacks that were created in a given context.
+
+        If ``context`` is None then it is ignored.
+        """
         for callback in self.callbacks:
             if callback.is_in_context(context):
                 try:
@@ -135,7 +171,7 @@ class Filter(t.Generic[T, P]):
 
     def clear(self, context: t.Optional[str] = None) -> None:
         """
-        Clear any previously defined filter with the given name and context.
+        Clear any previously defined filter with the given context.
         """
         self.callbacks = [
             callback
@@ -145,45 +181,118 @@ class Filter(t.Generic[T, P]):
 
     # The methods below are specific to filters which take lists as first arguments
     def add_item(
-        self: "Filter[list[E], P]", item: E, priority: t.Optional[int] = None
+        self: "Filter[list[L], T2]", item: L, priority: t.Optional[int] = None
     ) -> None:
+        """
+        Convenience decorator to add a single item to a filter that returns a list of items.
+
+        This method is only valid for filters that return list of items.
+
+        :param object item: item that will be appended to the resulting list.
+        :param int priority: see :py:data:`Filter.add`.
+
+        Usage::
+
+            my_filter.add_item("item1")
+            my_filter.add_item("item2")
+
+            assert ["item1", "item2"] == my_filter.apply([])
+        """
         self.add_items([item], priority=priority)
 
     def add_items(
-        self: "Filter[list[E], P]", items: list[E], priority: t.Optional[int] = None
+        self: "Filter[list[L], T2]", items: list[L], priority: t.Optional[int] = None
     ) -> None:
+        """
+        Convenience function to add multiple items to a filter that returns a list of items.
+
+        This method is only valid for filters that return list of items.
+
+        This is a similar method to :py:data:`Filter.add_item` except that it can be
+        used to add multiple items at the same time. If you find yourself calling
+        ``add_item`` multiple times on the same filter, then you probably want to use a
+        single call to ``add_items`` instead.
+
+        :param name: filter name.
+        :param list[object] items: items that will be appended to the resulting list.
+
+        Usage::
+
+            my_filter.add_items(["item1", "item2"])
+            my_filter.add_items(["item3", "item4"])
+
+            assert ["item1", "item2", "item3", "item4"] == my_filter.apply([])
+
+        The following are equivalent::
+
+            # Single call to add_items
+            my_filter.add_items(["item1", "item2"])
+
+            # Multiple calls to add_item
+            my_filter.add_item("item1")
+            my_filter.add_item("item2")
+        """
         # Unfortunately we have to type-ignore this line. If not, mypy complains with:
         #
-        #   Argument 1 has incompatible type "Callable[[Arg(List[E], 'values'), **P], List[E]]"; expected "Callable[[List[E], **P], List[E]]"
+        #   Argument 1 has incompatible type "Callable[[Arg(List[E], 'values'), **T2], List[E]]"; expected "Callable[[List[E], **T2], List[E]]"
         #   This is likely because "callback" has named arguments: "values". Consider marking them positional-only
         #
         # But we are unable to mark arguments positional-only (by adding / after values arg) in Python 3.7.
         # Get rid of this statement after Python 3.7 EOL.
         @self.add(priority=priority)  # type: ignore
-        def callback(values: list[E], *_args: P.args, **_kwargs: P.kwargs) -> list[E]:
+        def callback(values: list[L], *_args: T2.args, **_kwargs: T2.kwargs) -> list[L]:
             return values + items
 
     def iterate(
-        self: "Filter[list[E], P]", *args: P.args, **kwargs: P.kwargs
-    ) -> t.Iterator[E]:
+        self: "Filter[list[L], T2]", *args: T2.args, **kwargs: T2.kwargs
+    ) -> t.Iterator[L]:
+        """
+        Convenient function to iterate over the results of a filter result list.
+
+        This method is only valid for filters that return list of items.
+
+        This pieces of code are equivalent::
+
+            for value in my_filter.apply([], *args, **kwargs):
+                ...
+
+            for value in my_filter.iterate(*args, **kwargs):
+                ...
+
+        :rtype iterator[T]: iterator over the list of items from the filter
+        """
         yield from self.iterate_from_context(None, *args, **kwargs)
 
     def iterate_from_context(
-        self: "Filter[list[E], P]",
+        self: "Filter[list[L], T2]",
         context: t.Optional[str],
-        *args: P.args,
-        **kwargs: P.kwargs,
-    ) -> t.Iterator[E]:
+        *args: T2.args,
+        **kwargs: T2.kwargs,
+    ) -> t.Iterator[L]:
+        """
+        Same as :py:func:`Filter.iterate` but apply only callbacks from a given context.
+        """
         yield from self.apply_from_context(context, [], *args, **kwargs)
 
 
-class FilterTemplate(t.Generic[T, P]):
+class FilterTemplate(t.Generic[T1, T2]):
     """
     Filter templates are for filters for which the name needs to be formatted
     before the filter can be applied.
 
-    Similar to :py:class:`tutor.hooks.actions.ActionTemplate`, filter templates are used to generate
+    Similar to :py:class:`tutor.core.hooks.ActionTemplate`, filter templates are used to generate
     :py:class:`Filter` objects for which the name matches a certain template.
+
+    Templated filters must be formatted with ``(*args)`` before being applied. For example::
+
+        filter_template = FilterTemplate("namespace:{0}")
+        named_filter = filter_template("name")
+
+        @named_filter.add()
+        def my_callback(x: int) -> int:
+            ...
+
+        named_filter.apply(42)
     """
 
     def __init__(self, name: str):
@@ -192,7 +301,7 @@ class FilterTemplate(t.Generic[T, P]):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.template}')"
 
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Filter[T, P]:
+    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Filter[T1, T2]:
         return get(self.template.format(*args, **kwargs))
 
 
@@ -203,144 +312,68 @@ get = Filter.get
 def get_template(name: str) -> FilterTemplate[t.Any, t.Any]:
     """
     Create a filter with a template name.
-
-    Templated filters must be formatted with ``(*args)`` before being applied. For example::
-
-        filter_template = filters.get_template("namespace:{0}")
-        named_filter = filter_template("name")
-
-        @named_filter.add()
-        def my_callback(x: int) -> int:
-            ...
-
-        named_filter.apply(42)
     """
     return FilterTemplate(name)
 
 
 def add(
     name: str, priority: t.Optional[int] = None
-) -> t.Callable[[t.Callable[Concatenate[T, P], T]], t.Callable[Concatenate[T, P], T]]:
+) -> t.Callable[
+    [t.Callable[Concatenate[T1, T2], T1]], t.Callable[Concatenate[T1, T2], T1]
+]:
     """
     Decorator for functions that will be applied to a single named filter.
-
-    :param str name: name of the filter to which the decorated function should be added.
-    :param int priority: optional order in which the filter callbacks are called. Higher
-        values mean that they will be performed later. The default value is
-        ``priorities.DEFAULT`` (10). Filters that should be called last should have a
-        priority of 100.
-
-    The return value of each filter function callback will be passed as the first argument to the next one.
-
-    Usage::
-
-        from tutor import hooks
-
-        @hooks.filters.add("my-filter")
-        def my_func(value, some_other_arg):
-            # Do something with `value`
-            ...
-            return value
-
-        # After filters have been created, the result of calling all filter callbacks is obtained by running:
-        hooks.filters.apply("my-filter", initial_value, some_other_argument_value)
     """
     return Filter.get(name).add(priority=priority)
 
 
-def add_item(name: str, item: T, priority: t.Optional[int] = None) -> None:
+def add_item(name: str, item: T1, priority: t.Optional[int] = None) -> None:
     """
     Convenience function to add a single item to a filter that returns a list of items.
-
-    :param name: filter name.
-    :param object item: item that will be appended to the resulting list.
-    :param int priority: see :py:data:`add`.
-
-    Usage::
-
-        from tutor import hooks
-
-        hooks.filters.add_item("my-filter", "item1")
-        hooks.filters.add_item("my-filter", "item2")
-
-        assert ["item1", "item2"] == hooks.filters.apply("my-filter", [])
     """
     get(name).add_item(item, priority=priority)
 
 
-def add_items(name: str, items: list[T], priority: t.Optional[int] = None) -> None:
+def add_items(name: str, items: list[T1], priority: t.Optional[int] = None) -> None:
     """
-    Convenience function to add multiple item to a filter that returns a list of items.
-
-    :param name: filter name.
-    :param list[object] items: items that will be appended to the resulting list.
-
-    Usage::
-
-        from tutor import hooks
-
-        hooks.filters.add_items("my-filter", ["item1", "item2"])
-
-        assert ["item1", "item2"] == hooks.filters.apply("my-filter", [])
+    Convenience decorator to add multiple item to a filter that returns a list of items.
     """
     get(name).add_items(items, priority=priority)
 
 
-def iterate(name: str, *args: t.Any, **kwargs: t.Any) -> t.Iterator[T]:
+def iterate(name: str, *args: t.Any, **kwargs: t.Any) -> t.Iterator[T1]:
     """
     Convenient function to iterate over the results of a filter result list.
-
-    This pieces of code are equivalent::
-
-        for value in filters.apply("my-filter", [], *args, **kwargs):
-            ...
-
-        for value in filters.iterate("my-filter", *args, **kwargs):
-            ...
-
-    :rtype iterator[T]: iterator over the list items from the filter with the same name.
     """
     yield from iterate_from_context(None, name, *args, **kwargs)
 
 
 def iterate_from_context(
     context: t.Optional[str], name: str, *args: t.Any, **kwargs: t.Any
-) -> t.Iterator[T]:
-    """
-    Same as :py:func:`iterate` but apply only callbacks from a given context.
-    """
+) -> t.Iterator[T1]:
     yield from Filter.get(name).iterate_from_context(context, *args, **kwargs)
 
 
-def apply(name: str, value: T, *args: t.Any, **kwargs: t.Any) -> T:
+def apply(name: str, value: T1, *args: t.Any, **kwargs: t.Any) -> T1:
     """
     Apply all declared filters to a single value, passing along the additional arguments.
-
-    The return value of every filter is passed as the first argument to the next callback.
-
-    Usage::
-
-        results = filters.apply("my-filter", ["item0"])
-
-    :type value: object
-    :rtype: same as the type of ``value``.
     """
     return apply_from_context(None, name, value, *args, **kwargs)
 
 
 def apply_from_context(
-    context: t.Optional[str], name: str, value: T, *args: P.args, **kwargs: P.kwargs
-) -> T:
+    context: t.Optional[str], name: str, value: T1, *args: T2.args, **kwargs: T2.kwargs
+) -> T1:
     """
     Same as :py:func:`apply` but only run the callbacks that were created in a given context.
     """
-    filtre: Filter[T, P] = Filter.get(name)
+    filtre: Filter[T1, T2] = Filter.get(name)
     return filtre.apply_from_context(context, value, *args, **kwargs)
 
 
 def clear_all(context: t.Optional[str] = None) -> None:
     """
-    Clear any previously defined filter with the  given context.
+    Clear any previously defined filter with the given context.
     """
     for name in Filter.INDEX:
         clear(name, context=context)

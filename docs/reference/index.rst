@@ -5,5 +5,6 @@ Reference
    :maxdepth: 2
 
    api/hooks/index
-   cli/index
+   api/hooks/catalog
    patches
+   cli/index

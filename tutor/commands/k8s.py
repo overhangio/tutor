@@ -12,8 +12,8 @@ from tutor import serialize, utils
 from tutor.commands import jobs
 from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseTaskContext
-from tutor.commands.upgrade.k8s import upgrade_from
 from tutor.commands.upgrade import OPENEDX_RELEASE_NAMES
+from tutor.commands.upgrade.k8s import upgrade_from
 from tutor.tasks import BaseTaskRunner
 from tutor.types import Config, get_typed
 

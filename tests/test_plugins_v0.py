@@ -1,5 +1,5 @@
 from __future__ import annotations
-import typing as t
+
 from unittest.mock import patch
 
 from tests.helpers import PluginsTestCase, temporary_root

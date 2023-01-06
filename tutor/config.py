@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import os
 
 from tutor import env, exceptions, fmt, hooks, plugins, serialize, utils
