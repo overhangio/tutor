@@ -11,7 +11,7 @@ assignees: ''
 <!-- If not, please take the time to read them. -->
 
 **Bug description**
-<!-- A clear and concise description of what the bug is. Don't be afraid to include a lot of context and as much background information as possible. If applicable, add screenshots to help explain your problem. -->
+<!-- A clear and concise description of what the bug is. Don't be afraid to include a lot of contexts and as much background information as possible. If applicable, add screenshots to help explain your problem. -->
 <!-- Also include relevant error logs; for instance, to debug the LMS provide the output of `tutor local logs lms --tail=100` -->
 <!-- Is this a bug in Tutor, or in Open edX? Open edX bugs should not be reported here, but in the Open edX bug tracker: https://openedx.atlassian.net/ -->
 
