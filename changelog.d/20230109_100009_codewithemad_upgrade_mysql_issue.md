@@ -1,0 +1,1 @@
+[Bugfix] Running `tutor k8s upgrade --from=maple` won't apply and won't wait for the MySQL deployment to be ready if `RUN_MYSQL: false` (When you host your MySQL somewhere else like RDS) (by @CodeWithEmad)
