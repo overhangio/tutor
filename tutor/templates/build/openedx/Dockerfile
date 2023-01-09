@@ -50,6 +50,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Fix broken Circuit Schematic Builder problem template
 # https://github.com/openedx/edx-platform/pull/31365
 RUN curl -fsSL https://github.com/openedx/edx-platform/commit/20b93b8b01276edadddfbbb67f15714fddd81c31.patch | git am
+# Fix TinyMCE editor for html components
+# https://github.com/openedx/edx-platform/pull/31500
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/5af42f8ba3.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
