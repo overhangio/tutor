@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# If the the entry points info file (within the *egg-info directory)
+# doesn't exist or is out-of-date with respect to setup.py,
+# then we need to (re-)generate the egg-info by pip-installing this directory.
+# Otherwise, XBlocks and Django App Plugins will not be registered.
+ENTRY_POINTS_INFO=Open_edX.egg-info/entry_points.txt
+if [ ! -f "$ENTRY_POINTS_INFO" ] || [ "$ENTRY_POINTS_INFO" -ot setup.py ]; then
+	pip install -e .
+fi
+
+# Run all arguments as a command.
+"$@" || true

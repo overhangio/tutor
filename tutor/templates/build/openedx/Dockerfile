@@ -210,6 +210,7 @@ ENV DJANGO_SETTINGS_MODULE lms.envs.tutor.production
 {{ patch("openedx-dockerfile") }}
 
 EXPOSE 8000
+ENTRYPOINT ["set-up-and-run"]
 
 ###### Intermediate image with dev/test dependencies
 FROM production as development
