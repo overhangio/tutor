@@ -5,15 +5,21 @@ Open edX development
 
 In addition to running Open edX in production, Tutor can be used for local development of Open edX. This means that it is possible to hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
+.. _edx_platform_dev_env:
 
 First-time setup
 ----------------
 
 First, ensure you have already :ref:`installed Tutor <install>` (for development against the named releases of Open edX) or :ref:`Tutor Nightly <nightly>` (for development against Open edX's master branches).
 
-Then, launch the developer platform setup process::
+Then, run one of the following in order to launch the developer platform setup process::
 
+    # To use the edx-platform repository that is built into the image:
     tutor dev launch
+
+    # To bind-mount and run your local clone of edx-platform,
+    # where './edx-platform' should be replaced with your local edx-platform's path:
+    tutor dev launch --mount=./edx-platform
 
 This will perform several tasks for you. It will:
 
@@ -33,12 +39,30 @@ This will perform several tasks for you. It will:
 
 * run service initialization scripts, such as service user creation and Waffle configuration.
 
+Additionally, if you chose to bind-mount your local clone of edx-platform, it will:
+
+* re-run setup.py,
+
+* clean-reinstall Node modules, and
+
+* regenerate static assets.
+
 Once setup is complete, the platform will be running in the background:
 
 * LMS will be accessible at `http://local.overhang.io:8000 <http://local.overhang.io:8000>`_.
 * CMS will be accessible at `http://studio.local.overhang.io:8001 <http://studio.local.overhang.io:8001>`_.
 * Plugged-in services should be accessible at their documented URLs.
 
+Now, you can use the ``tutor dev ...`` command-line interface to manage your development environment. Some common commands are described below.
+
+.. note::
+
+  Wherever you see ``[--mount=./edx-platform]``, either:
+
+  * omit it, if you are using the edx-platform repository built into the image, or
+  * substitute it with ``--mount=<path/to/your/edx-platform>``.
+
+  You can :ref:`read more about bind-mounts below <bind_mounts>`.
 
 Stopping the platform
 ---------------------
@@ -47,38 +71,52 @@ To bring down your platform's containers, simply run::
 
   tutor dev stop
 
-
 Starting the platform back up
 -----------------------------
 
-Once you have used ``launch`` once, you can start the platform in the future with the lighter-weight ``start`` command, which brings up containers but does not perform any initialization tasks::
+Once you have used ``launch`` once, you can start the platform in the future with the lighter-weight ``start -d`` command, which brings up containers *detached* (that is: in the background), but does not perform any initialization tasks::
 
-  tutor dev start     # Run platform in the same terminal ("attached")
-  tutor dev start -d  # Or, run platform the in the background ("detached")
+  tutor dev start -d [--mount=./edx-platform]
 
-Nonetheless, ``launch`` is idempotent, so it is always safe to run it again in the future without risk to your data. In fact, you may find it useful to use this command as a one-stop-shop for pulling images, running migrations, initializing new plugins you have enabled, and/or executing any new initialization steps that may have been introduced since you set up Tutor::
+If you prefer to run containers *attached* (that is: in the foreground, your current terminal), you can omit the ``-d`` flag::
 
-  tutor dev launch --pullimages
+  tutor dev start [--mount=./edx-platform]
 
+When running containers attached, you can stop the platform with ``Ctrl+c``, or switch to detached mode using ``Ctrl+z``.
+
+Finally, you can always start your platform with ``launch``, even if you have already run it in the past. It will take longer, but it will ensure that your config is applied, your database is provisioned, your plugins are fully initialized, and (if mounted) your local edx-platform is set up. If you include the ``--pullimages`` flag it will also ensure that your container images are up-to-date as well::
+
+  tutor dev launch [--mount=./edx-platform] --pullimages
+
+Debugging with breakpoints
+--------------------------
+
+To debug a local edx-platform repository, you can add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in your code. Then, attach to the applicable service's container by running ``start`` (without ``-d``) followed by the service's name:
+
+  # Debugging LMS:
+  tutor dev start [--mount=./edx-platform] lms
+
+  # Or, debugging CMS:
+  tutor dev start [--mount=./edx-platform] cms
 
 Running arbitrary commands
 --------------------------
 
 To run any command inside one of the containers, run ``tutor dev run [OPTIONS] SERVICE [COMMAND] [ARGS]...``. For instance, to open a bash shell in the LMS or CMS containers::
 
-    tutor dev run lms bash
-    tutor dev run cms bash
+    tutor dev run [--mount=./edx-platform] lms bash
+    tutor dev run [--mount=./edx-platform] cms bash
 
 To open a python shell in the LMS or CMS, run::
 
-    tutor dev run lms ./manage.py lms shell
-    tutor dev run cms ./manage.py cms shell
+    tutor dev run [--mount=./edx-platform] lms ./manage.py lms shell
+    tutor dev run [--mount=./edx-platform] cms ./manage.py cms shell
 
 You can then import edx-platform and django modules and execute python code.
 
-To collect assets, you can use the ``openedx-assets`` command that ships with Tutor::
+To rebuild assets, you can use the ``openedx-assets`` command that ships with Tutor::
 
-    tutor dev run lms openedx-assets build --env=dev
+    tutor dev run [--mount=./edx-platform] lms openedx-assets build --env=dev
 
 
 .. _specialized for developer usage: 
@@ -192,42 +230,6 @@ This override file will be loaded when running any ``tutor dev ..`` command. The
 
 Common tasks
 ------------
-
-.. _edx_platform_dev_env:
-
-Setting up a development environment for edx-platform
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Following the instructions :ref:`above <bind_mounts>` on how to bind-mount directories from the host above, you may mount your own `edx-platform <https://github.com/openedx/edx-platform/>`__ fork in your containers by running::
-
-    tutor dev start -d --mount=/path/to/edx-platform lms
-
-But to achieve that, you will have to make sure that your fork works with Tutor.
-
-First of all, you should make sure that you are working off the latest release tag (unless you are running the Tutor :ref:`nightly <nightly>` branch). See the :ref:`fork edx-platform section <edx_platform_fork>` for more information.
-
-Then, you should run the following commands::
-
-    # Run bash in the lms container
-    tutor dev run --mount=/path/to/edx-platform lms bash
-
-    # Compile local python requirements
-    pip install --requirement requirements/edx/development.txt
-
-    # Install nodejs packages in node_modules/
-    npm clean-install
-
-    # Rebuild static assets
-    openedx-assets build --env=dev
-
-After running all these commands, your edx-platform repository will be ready for local development. To debug a local edx-platform repository, you can then add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in your code and run::
-
-    tutor dev start --mount=/path/to/edx-platform lms
-
-The default debugger is ``ipdb.set_trace``. ``PYTHONBREAKPOINT`` can be modified by setting an environment variable in the Docker imamge.
-
-If LMS isn't running, this will start it in your terminal. If an LMS container is already running background, this command will stop it, recreate it, and attach your terminal to it. Later, to detach your terminal without stopping the container, just hit ``Ctrl+z``.
-
 
 XBlock and edx-platform plugin development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
