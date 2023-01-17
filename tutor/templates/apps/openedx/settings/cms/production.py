@@ -8,6 +8,7 @@ ALLOWED_HOSTS = [
     ENV_TOKENS.get("CMS_BASE"),
     "cms",
 ]
+CORS_ORIGIN_WHITELIST.append("{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ CMS_HOST }}")
 
 # Authentication
 SOCIAL_AUTH_EDX_OAUTH2_KEY = "{{ CMS_OAUTH2_KEY_SSO }}"

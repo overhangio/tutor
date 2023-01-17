@@ -9,6 +9,7 @@ ALLOWED_HOSTS = [
     FEATURES["PREVIEW_LMS_BASE"],
     "lms",
 ]
+CORS_ORIGIN_WHITELIST.append("{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}")
 
 {% if ENABLE_HTTPS %}
 # Properly set the "secure" attribute on session/csrf cookies. This is required in
