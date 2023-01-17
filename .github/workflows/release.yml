@@ -70,16 +70,9 @@ jobs:
 
       ##### Create release on GitHub
       - name: Create or update GitHub release
-        # I wish there was an `--update` option to the `gh release create` command, but
-        # there isn't.
-        # https://cli.github.com/manual/gh_release_create
-        run: |
-          make release-description | tee release_description.md
-          export GH_ARGS="${{ github.ref_name }} --notes-file=release_description.md"
-          echo "gh args: '$GH_ARGS'"
-          ${{ env.gh_bin }} release create $GH_ARGS || ${{ env.gh_bin }} release edit $GH_ARGS
+        run: scriv github-release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Upload release asset to GitHub
         run: |
           export FILENAME="tutor-$(uname -s)_$(uname -m)"

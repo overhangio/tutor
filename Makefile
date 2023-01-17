@@ -54,12 +54,11 @@ format: ## Format code automatically
 isort: ##  Sort imports. This target is not mandatory because the output may be incompatible with black formatting. Provided for convenience purposes.
 	isort --skip=templates ${SRC_DIRS}
 
-bootstrap-dev: ## Install dev requirements
-	pip install .
-	pip install -r requirements/dev.txt
+changelog-entry: ## Create a new changelog entry
+	scriv create
 
-bootstrap-dev-plugins: bootstrap-dev ## Install dev requirements and all supported plugins
-	pip install -r requirements/plugins.txt
+changelog: ## Collect changelog entries in the CHANGELOG.md file
+	scriv collect
 
 ###### Code coverage
 
@@ -78,23 +77,17 @@ coverage-html: coverage-report ## Generate HTML report for the code coverage
 coverage-browse-report: coverage-html ## Open the HTML report in the browser
 	sensible-browser htmlcov/index.html
 
-###### Deployment
+###### Continuous integration tasks
 
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller tutor.spec
 
+bootstrap-dev: ## Install dev requirements
+	pip install .
+	pip install -r requirements/dev.txt
 
-changelog-entry: ## Create a new changelog entry
-	scriv create
-
-changelog: ## Collect changelog entries in the CHANGELOG.md file
-	scriv collect
-
-release-description:  ## Write the current release description to a file
-	@sed "s/TUTOR_VERSION/v$(shell make version)/g" docs/_release_description.md
-	@git log -1 --pretty=format:%b
-
-###### Continuous integration tasks
+bootstrap-dev-plugins: bootstrap-dev ## Install dev requirements and all supported plugins
+	pip install -r requirements/plugins.txt
 
 pull-base-images: # Manually pull base images
 	docker image pull docker.io/ubuntu:20.04
