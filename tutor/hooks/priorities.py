@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing as t
 
 from typing_extensions import Protocol
@@ -14,7 +15,7 @@ class PrioritizedCallback(Protocol):
 TPrioritized = t.TypeVar("TPrioritized", bound=PrioritizedCallback)
 
 
-def insert_callback(callback: TPrioritized, callbacks: t.List[TPrioritized]) -> None:
+def insert_callback(callback: TPrioritized, callbacks: list[TPrioritized]) -> None:
     # I wish we could use bisect.insort_right here but the `key=` parameter
     # is unsupported in Python 3.9
     position = 0

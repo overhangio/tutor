@@ -1,3 +1,4 @@
+from __future__ import annotations
 import sys
 import typing as t
 
@@ -61,7 +62,7 @@ class TutorCli(click.MultiCommand):
             hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
             cls.IS_ROOT_READY = True
 
-    def list_commands(self, ctx: click.Context) -> t.List[str]:
+    def list_commands(self, ctx: click.Context) -> list[str]:
         """
         This is run in the following cases:
         - shell autocompletion: tutor <tab>

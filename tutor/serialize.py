@@ -1,3 +1,4 @@
+from __future__ import annotations
 import re
 import typing as t
 
@@ -36,7 +37,7 @@ def parse(v: t.Union[str, t.IO[str]]) -> t.Any:
     return v
 
 
-def parse_key_value(text: str) -> t.Optional[t.Tuple[str, t.Any]]:
+def parse_key_value(text: str) -> t.Optional[tuple[str, t.Any]]:
     """
     Parse <KEY>=<YAML VALUE> command line arguments.
 

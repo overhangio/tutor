@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
@@ -53,11 +55,11 @@ class Action(t.Generic[P]):
     This strong typing makes it easier for plugin developers to quickly check whether they are adding and calling action callbacks correctly.
     """
 
-    INDEX: t.Dict[str, "Action[t.Any]"] = {}
+    INDEX: dict[str, "Action[t.Any]"] = {}
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self.callbacks: t.List[ActionCallback[P]] = []
+        self.callbacks: list[ActionCallback[P]] = []
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.name}')"

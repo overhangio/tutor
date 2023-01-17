@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import re
 import shutil
@@ -111,7 +112,7 @@ class Renderer:
         The elements of `prefix` must contain only "/", and not os.sep.
         """
         full_prefix = "/".join(prefix)
-        env_templates: t.List[str] = self.environment.loader.list_templates()
+        env_templates: list[str] = self.environment.loader.list_templates()
         for template in env_templates:
             if template.startswith(full_prefix):
                 # Exclude templates that match certain patterns

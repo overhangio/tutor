@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing as t
 
 import click
@@ -70,7 +71,7 @@ def local(context: click.Context) -> None:
 @click.pass_context
 def launch(
     context: click.Context,
-    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
+    mounts: tuple[list[compose.MountParam.MountType]],
     non_interactive: bool,
     pullimages: bool,
 ) -> None:

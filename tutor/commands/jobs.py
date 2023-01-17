@@ -1,6 +1,7 @@
 """
 Common jobs that must be added both to local, dev and k8s commands.
 """
+from __future__ import annotations
 import functools
 import typing as t
 
@@ -49,7 +50,7 @@ def _add_core_init_tasks() -> None:
 
 @click.command("init", help="Initialise all applications")
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
-def initialise(limit: t.Optional[str]) -> t.Iterator[t.Tuple[str, str]]:
+def initialise(limit: t.Optional[str]) -> t.Iterator[tuple[str, str]]:
     fmt.echo_info("Initialising all services...")
     filter_context = hooks.Contexts.APP(limit).name if limit else None
 
@@ -99,7 +100,7 @@ def createuser(
     password: str,
     name: str,
     email: str,
-) -> t.Iterable[t.Tuple[str, str]]:
+) -> t.Iterable[tuple[str, str]]:
     """
     Create an Open edX user
 
@@ -127,7 +128,7 @@ u.save()"
 
 
 @click.command(help="Import the demo course")
-def importdemocourse() -> t.Iterable[t.Tuple[str, str]]:
+def importdemocourse() -> t.Iterable[tuple[str, str]]:
     template = """
 # Import demo course
 git clone https://github.com/openedx/edx-demo-course --branch {{ OPENEDX_COMMON_VERSION }} --depth 1 ../edx-demo-course
@@ -150,7 +151,7 @@ python ./manage.py cms import ../data ../edx-demo-course
     ),
 )
 @click.argument("theme_name")
-def settheme(domains: t.List[str], theme_name: str) -> t.Iterable[t.Tuple[str, str]]:
+def settheme(domains: list[str], theme_name: str) -> t.Iterable[tuple[str, str]]:
     """
     Assign a theme to the LMS and the CMS.
 
@@ -159,7 +160,7 @@ def settheme(domains: t.List[str], theme_name: str) -> t.Iterable[t.Tuple[str, s
     yield ("lms", set_theme_template(theme_name, domains))
 
 
-def set_theme_template(theme_name: str, domain_names: t.List[str]) -> str:
+def set_theme_template(theme_name: str, domain_names: list[str]) -> str:
     """
     For each domain, get or create a Site object and assign the selected theme.
     """
@@ -231,7 +232,7 @@ P = ParamSpec("P")
 
 
 def _patch_callback(
-    job_name: str, func: t.Callable[P, t.Iterable[t.Tuple[str, str]]]
+    job_name: str, func: t.Callable[P, t.Iterable[tuple[str, str]]]
 ) -> t.Callable[P, None]:
     """
     Modify a subcommand callback function such that its results are processed by `do_callback`.
@@ -247,7 +248,7 @@ def _patch_callback(
     return new_callback
 
 
-def do_callback(service_commands: t.Iterable[t.Tuple[str, str]]) -> None:
+def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
     """
     This function must be added as a callback to all `do` subcommands.
 
