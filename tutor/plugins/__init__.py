@@ -1,6 +1,7 @@
 """
 Provide API for plugin features.
 """
+from __future__ import annotations
 import typing as t
 from copy import deepcopy
 
@@ -20,7 +21,7 @@ def _convert_plugin_patches() -> None:
 
     This action is run after plugins have been loaded.
     """
-    patches: t.Iterable[t.Tuple[str, str]] = hooks.Filters.ENV_PATCHES.iterate()
+    patches: t.Iterable[tuple[str, str]] = hooks.Filters.ENV_PATCHES.iterate()
     for name, content in patches:
         hooks.Filters.ENV_PATCH(name).add_item(content)
 
@@ -44,14 +45,14 @@ def iter_installed() -> t.Iterator[str]:
     yield from sorted(hooks.Filters.PLUGINS_INSTALLED.iterate())
 
 
-def iter_info() -> t.Iterator[t.Tuple[str, t.Optional[str]]]:
+def iter_info() -> t.Iterator[tuple[str, t.Optional[str]]]:
     """
     Iterate on the information of all installed plugins.
 
     Yields (<plugin name>, <info>) tuples.
     """
 
-    def plugin_info_name(info: t.Tuple[str, t.Optional[str]]) -> str:
+    def plugin_info_name(info: tuple[str, t.Optional[str]]) -> str:
         return info[0]
 
     yield from sorted(hooks.Filters.PLUGINS_INFO.iterate(), key=plugin_info_name)

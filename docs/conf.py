@@ -38,6 +38,12 @@ nitpick_ignore = [
     ("py:class", "tutor.hooks.filters.P"),
     ("py:class", "tutor.hooks.filters.T"),
     ("py:class", "tutor.hooks.actions.P"),
+    ("py:class", "P"),
+    ("py:class", "P.args"),
+    ("py:class", "P.kwargs"),
+    ("py:class", "T"),
+    ("py:class", "t.Any"),
+    ("py:class", "t.Optional"),
 ]
 
 # -- Sphinx-Click configuration

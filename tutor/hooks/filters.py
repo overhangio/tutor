@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
@@ -58,11 +60,11 @@ class Filter(t.Generic[T, P]):
     they are adding and calling filter callbacks correctly.
     """
 
-    INDEX: t.Dict[str, "Filter[t.Any, t.Any]"] = {}
+    INDEX: dict[str, "Filter[t.Any, t.Any]"] = {}
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self.callbacks: t.List[FilterCallback[T, P]] = []
+        self.callbacks: list[FilterCallback[T, P]] = []
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.name}')"
@@ -143,12 +145,12 @@ class Filter(t.Generic[T, P]):
 
     # The methods below are specific to filters which take lists as first arguments
     def add_item(
-        self: "Filter[t.List[E], P]", item: E, priority: t.Optional[int] = None
+        self: "Filter[list[E], P]", item: E, priority: t.Optional[int] = None
     ) -> None:
         self.add_items([item], priority=priority)
 
     def add_items(
-        self: "Filter[t.List[E], P]", items: t.List[E], priority: t.Optional[int] = None
+        self: "Filter[list[E], P]", items: list[E], priority: t.Optional[int] = None
     ) -> None:
         # Unfortunately we have to type-ignore this line. If not, mypy complains with:
         #
@@ -158,18 +160,16 @@ class Filter(t.Generic[T, P]):
         # But we are unable to mark arguments positional-only (by adding / after values arg) in Python 3.7.
         # Get rid of this statement after Python 3.7 EOL.
         @self.add(priority=priority)  # type: ignore
-        def callback(
-            values: t.List[E], *_args: P.args, **_kwargs: P.kwargs
-        ) -> t.List[E]:
+        def callback(values: list[E], *_args: P.args, **_kwargs: P.kwargs) -> list[E]:
             return values + items
 
     def iterate(
-        self: "Filter[t.List[E], P]", *args: P.args, **kwargs: P.kwargs
+        self: "Filter[list[E], P]", *args: P.args, **kwargs: P.kwargs
     ) -> t.Iterator[E]:
         yield from self.iterate_from_context(None, *args, **kwargs)
 
     def iterate_from_context(
-        self: "Filter[t.List[E], P]",
+        self: "Filter[list[E], P]",
         context: t.Optional[str],
         *args: P.args,
         **kwargs: P.kwargs,
@@ -268,7 +268,7 @@ def add_item(name: str, item: T, priority: t.Optional[int] = None) -> None:
     get(name).add_item(item, priority=priority)
 
 
-def add_items(name: str, items: t.List[T], priority: t.Optional[int] = None) -> None:
+def add_items(name: str, items: list[T], priority: t.Optional[int] = None) -> None:
     """
     Convenience function to add multiple item to a filter that returns a list of items.
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import typing as t
 
@@ -27,7 +28,7 @@ class ConfigKeyParamType(click.ParamType):
 
     def shell_complete(
         self, ctx: click.Context, param: click.Parameter, incomplete: str
-    ) -> t.List[click.shell_completion.CompletionItem]:
+    ) -> list[click.shell_completion.CompletionItem]:
         return [
             click.shell_completion.CompletionItem(key)
             for key, _value in self._shell_complete_config_items(ctx, incomplete)
@@ -36,7 +37,7 @@ class ConfigKeyParamType(click.ParamType):
     @staticmethod
     def _shell_complete_config_items(
         ctx: click.Context, incomplete: str
-    ) -> t.List[t.Tuple[str, ConfigValue]]:
+    ) -> list[tuple[str, ConfigValue]]:
         # Here we want to auto-complete the name of the config key. For that we need to
         # figure out the list of enabled plugins, and for that we need the project root.
         # The project root would ordinarily be stored in ctx.obj.root, but during
@@ -58,7 +59,7 @@ class ConfigKeyValParamType(ConfigKeyParamType):
 
     name = "configkeyval"
 
-    def convert(self, value: str, param: t.Any, ctx: t.Any) -> t.Tuple[str, t.Any]:
+    def convert(self, value: str, param: t.Any, ctx: t.Any) -> tuple[str, t.Any]:
         result = serialize.parse_key_value(value)
         if result is None:
             self.fail(f"'{value}' is not of the form 'key=value'.", param, ctx)
@@ -66,7 +67,7 @@ class ConfigKeyValParamType(ConfigKeyParamType):
 
     def shell_complete(
         self, ctx: click.Context, param: click.Parameter, incomplete: str
-    ) -> t.List[click.shell_completion.CompletionItem]:
+    ) -> list[click.shell_completion.CompletionItem]:
         """
         Nice and friendly <KEY>=<VAL> auto-completion.
         """
@@ -117,7 +118,7 @@ def save(
     context: Context,
     interactive: bool,
     set_vars: Config,
-    unset_vars: t.List[str],
+    unset_vars: list[str],
     env_only: bool,
 ) -> None:
     config = tutor_config.load_minimal(context.root)

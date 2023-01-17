@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing as t
 from unittest.mock import patch
 
@@ -197,9 +198,7 @@ class PluginsTests(PluginsTestCase):
             {"name": "myplugin", "config": {"set": {"KEY": "value"}}, "version": "0.1"}
         )
         plugins.load("myplugin")
-        overriden_items: t.List[
-            t.Tuple[str, t.Any]
-        ] = hooks.Filters.CONFIG_OVERRIDES.apply([])
+        overriden_items = hooks.Filters.CONFIG_OVERRIDES.apply([])
         versions = list(plugins.iter_info())
         self.assertEqual("myplugin", plugin.name)
         self.assertEqual([("myplugin", "0.1")], versions)

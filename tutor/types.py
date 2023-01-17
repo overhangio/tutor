@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
@@ -38,9 +40,9 @@ T = t.TypeVar("T")
 
 
 def get_typed(
-    config: t.Dict[str, t.Any],
+    config: dict[str, t.Any],
     key: str,
-    expected_type: t.Type[T],
+    expected_type: type[T],
     default: t.Optional[T] = None,
 ) -> T:
     value = config.get(key, default)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing as t
 
 import click
@@ -21,9 +22,9 @@ VENDOR_IMAGES = [
 
 @hooks.Filters.IMAGES_BUILD.add()
 def _add_core_images_to_build(
-    build_images: t.List[t.Tuple[str, t.Tuple[str, ...], str, t.Tuple[str, ...]]],
+    build_images: list[tuple[str, tuple[str, ...], str, tuple[str, ...]]],
     config: Config,
-) -> t.List[t.Tuple[str, t.Tuple[str, ...], str, t.Tuple[str, ...]]]:
+) -> list[tuple[str, tuple[str, ...], str, tuple[str, ...]]]:
     """
     Add base images to the list of Docker images to build on `tutor build all`.
     """
@@ -35,8 +36,8 @@ def _add_core_images_to_build(
 
 @hooks.Filters.IMAGES_PULL.add()
 def _add_images_to_pull(
-    remote_images: t.List[t.Tuple[str, str]], config: Config
-) -> t.List[t.Tuple[str, str]]:
+    remote_images: list[tuple[str, str]], config: Config
+) -> list[tuple[str, str]]:
     """
     Add base and vendor images to the list of Docker images to pull on `tutor pull all`.
     """
@@ -50,8 +51,8 @@ def _add_images_to_pull(
 
 @hooks.Filters.IMAGES_PUSH.add()
 def _add_core_images_to_push(
-    remote_images: t.List[t.Tuple[str, str]], config: Config
-) -> t.List[t.Tuple[str, str]]:
+    remote_images: list[tuple[str, str]], config: Config
+) -> list[tuple[str, str]]:
     """
     Add base images to the list of Docker images to push on `tutor push all`.
     """
@@ -100,12 +101,12 @@ def images_command() -> None:
 @click.pass_obj
 def build(
     context: Context,
-    image_names: t.List[str],
+    image_names: list[str],
     no_cache: bool,
-    build_args: t.List[str],
-    add_hosts: t.List[str],
+    build_args: list[str],
+    add_hosts: list[str],
     target: str,
-    docker_args: t.List[str],
+    docker_args: list[str],
 ) -> None:
     config = tutor_config.load(context.root)
     command_args = []
@@ -132,7 +133,7 @@ def build(
 @click.command(short_help="Pull images from the Docker registry")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def pull(context: Context, image_names: t.List[str]) -> None:
+def pull(context: Context, image_names: list[str]) -> None:
     config = tutor_config.load_full(context.root)
     for image in image_names:
         for tag in find_remote_image_tags(config, hooks.Filters.IMAGES_PULL, image):
@@ -142,7 +143,7 @@ def pull(context: Context, image_names: t.List[str]) -> None:
 @click.command(short_help="Push images to the Docker registry")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def push(context: Context, image_names: t.List[str]) -> None:
+def push(context: Context, image_names: list[str]) -> None:
     config = tutor_config.load_full(context.root)
     for image in image_names:
         for tag in find_remote_image_tags(config, hooks.Filters.IMAGES_PUSH, image):
@@ -152,7 +153,7 @@ def push(context: Context, image_names: t.List[str]) -> None:
 @click.command(short_help="Print tag associated to a Docker image")
 @click.argument("image_names", metavar="image", nargs=-1)
 @click.pass_obj
-def printtag(context: Context, image_names: t.List[str]) -> None:
+def printtag(context: Context, image_names: list[str]) -> None:
     config = tutor_config.load_full(context.root)
     for image in image_names:
         for _name, _path, tag, _args in find_images_to_build(config, image):
@@ -161,7 +162,7 @@ def printtag(context: Context, image_names: t.List[str]) -> None:
 
 def find_images_to_build(
     config: Config, image: str
-) -> t.Iterator[t.Tuple[str, t.Tuple[str, ...], str, t.Tuple[str, ...]]]:
+) -> t.Iterator[tuple[str, tuple[str, ...], str, tuple[str, ...]]]:
     """
     Iterate over all images to build.
 
@@ -182,7 +183,7 @@ def find_images_to_build(
 
 def find_remote_image_tags(
     config: Config,
-    filtre: "hooks.filters.Filter[t.List[t.Tuple[str, str]], [Config]]",
+    filtre: "hooks.filters.Filter[list[tuple[str, str]], [Config]]",
     image: str,
 ) -> t.Iterator[str]:
     """

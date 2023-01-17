@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import re
 import typing as t
@@ -16,15 +17,15 @@ from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
 
-COMPOSE_FILTER_TYPE: TypeAlias = "hooks.filters.Filter[t.Dict[str, t.Any], []]"
+COMPOSE_FILTER_TYPE: TypeAlias = "hooks.filters.Filter[dict[str, t.Any], []]"
 
 
 class ComposeTaskRunner(BaseComposeTaskRunner):
     def __init__(self, root: str, config: Config):
         super().__init__(root, config)
         self.project_name = ""
-        self.docker_compose_files: t.List[str] = []
-        self.docker_compose_job_files: t.List[str] = []
+        self.docker_compose_files: list[str] = []
+        self.docker_compose_job_files: list[str] = []
 
     def docker_compose(self, *command: str) -> int:
         """
@@ -55,7 +56,7 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
         Update the contents of the docker-compose.tmp.yml and
         docker-compose.jobs.tmp.yml files, which are generated at runtime.
         """
-        compose_base: t.Dict[str, t.Any] = {
+        compose_base: dict[str, t.Any] = {
             "version": "{{ DOCKER_COMPOSE_VERSION }}",
             "services": {},
         }
@@ -134,11 +135,11 @@ class MountParam(click.ParamType):
         value: str,
         param: t.Optional["click.Parameter"],
         ctx: t.Optional[click.Context],
-    ) -> t.List["MountType"]:
+    ) -> list["MountType"]:
         mounts = self.convert_explicit_form(value) or self.convert_implicit_form(value)
         return mounts
 
-    def convert_explicit_form(self, value: str) -> t.List["MountParam.MountType"]:
+    def convert_explicit_form(self, value: str) -> list["MountParam.MountType"]:
         """
         Argument is of the form "containers:/host/path:/container/path".
         """
@@ -146,8 +147,8 @@ class MountParam(click.ParamType):
         if not match:
             return []
 
-        mounts: t.List["MountParam.MountType"] = []
-        services: t.List[str] = [
+        mounts: list["MountParam.MountType"] = []
+        services: list[str] = [
             service.strip() for service in match["services"].split(",")
         ]
         host_path = os.path.abspath(os.path.expanduser(match["host_path"]))
@@ -159,11 +160,11 @@ class MountParam(click.ParamType):
             mounts.append((service, host_path, container_path))
         return mounts
 
-    def convert_implicit_form(self, value: str) -> t.List["MountParam.MountType"]:
+    def convert_implicit_form(self, value: str) -> list["MountParam.MountType"]:
         """
         Argument is of the form "/host/path"
         """
-        mounts: t.List["MountParam.MountType"] = []
+        mounts: list["MountParam.MountType"] = []
         host_path = os.path.abspath(os.path.expanduser(value))
         for service, container_path in hooks.Filters.COMPOSE_MOUNTS.iterate(
             os.path.basename(host_path)
@@ -175,7 +176,7 @@ class MountParam(click.ParamType):
 
     def shell_complete(
         self, ctx: click.Context, param: click.Parameter, incomplete: str
-    ) -> t.List[CompletionItem]:
+    ) -> list[CompletionItem]:
         """
         Mount argument completion works only for the single path (implicit) form. The
         reason is that colons break words in bash completion:
@@ -197,7 +198,7 @@ mount_option = click.option(
 
 
 def mount_tmp_volumes(
-    all_mounts: t.Tuple[t.List[MountParam.MountType], ...],
+    all_mounts: tuple[list[MountParam.MountType], ...],
     context: BaseComposeContext,
 ) -> None:
     for mounts in all_mounts:
@@ -230,8 +231,8 @@ def mount_tmp_volume(
 
     @compose_tmp_filter.add()
     def _add_mounts_to_docker_compose_tmp(
-        docker_compose: t.Dict[str, t.Any],
-    ) -> t.Dict[str, t.Any]:
+        docker_compose: dict[str, t.Any],
+    ) -> dict[str, t.Any]:
         services = docker_compose.setdefault("services", {})
         services.setdefault(service, {"volumes": []})
         services[service]["volumes"].append(f"{host_path}:{container_path}")
@@ -251,8 +252,8 @@ def start(
     context: BaseComposeContext,
     skip_build: bool,
     detach: bool,
-    mounts: t.Tuple[t.List[MountParam.MountType]],
-    services: t.List[str],
+    mounts: tuple[list[MountParam.MountType]],
+    services: list[str],
 ) -> None:
     command = ["up", "--remove-orphans"]
     if not skip_build:
@@ -269,7 +270,7 @@ def start(
 @click.command(help="Stop a running platform")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def stop(context: BaseComposeContext, services: t.List[str]) -> None:
+def stop(context: BaseComposeContext, services: list[str]) -> None:
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose("stop", *services)
 
@@ -281,7 +282,7 @@ def stop(context: BaseComposeContext, services: t.List[str]) -> None:
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_context
-def reboot(context: click.Context, detach: bool, services: t.List[str]) -> None:
+def reboot(context: click.Context, detach: bool, services: list[str]) -> None:
     context.invoke(stop, services=services)
     context.invoke(start, detach=detach, services=services)
 
@@ -295,7 +296,7 @@ fully stop the platform, use the 'reboot' command.""",
 )
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
-def restart(context: BaseComposeContext, services: t.List[str]) -> None:
+def restart(context: BaseComposeContext, services: list[str]) -> None:
     config = tutor_config.load(context.root)
     command = ["restart"]
     if "all" in services:
@@ -315,9 +316,7 @@ def restart(context: BaseComposeContext, services: t.List[str]) -> None:
 @jobs.do_group
 @mount_option
 @click.pass_obj
-def do(
-    context: BaseComposeContext, mounts: t.Tuple[t.List[MountParam.MountType]]
-) -> None:
+def do(context: BaseComposeContext, mounts: tuple[list[MountParam.MountType]]) -> None:
     """
     Run a custom job in the right container(s).
     """
@@ -345,8 +344,8 @@ def do(
 @click.pass_context
 def run(
     context: click.Context,
-    mounts: t.Tuple[t.List[MountParam.MountType]],
-    args: t.List[str],
+    mounts: tuple[list[MountParam.MountType]],
+    args: list[str],
 ) -> None:
     extra_args = ["--rm"]
     if not utils.is_a_tty():
@@ -411,7 +410,7 @@ def copyfrom(
 )
 @click.argument("args", nargs=-1, required=True)
 @click.pass_context
-def execute(context: click.Context, args: t.List[str]) -> None:
+def execute(context: click.Context, args: list[str]) -> None:
     context.invoke(dc_command, command="exec", args=args)
 
 
@@ -454,9 +453,9 @@ def status(context: click.Context) -> None:
 @click.pass_obj
 def dc_command(
     context: BaseComposeContext,
-    mounts: t.Tuple[t.List[MountParam.MountType]],
+    mounts: tuple[list[MountParam.MountType]],
     command: str,
-    args: t.List[str],
+    args: list[str],
 ) -> None:
     mount_tmp_volumes(mounts, context)
     config = tutor_config.load(context.root)
@@ -465,8 +464,8 @@ def dc_command(
 
 @hooks.Filters.COMPOSE_MOUNTS.add()
 def _mount_edx_platform(
-    volumes: t.List[t.Tuple[str, str]], name: str
-) -> t.List[t.Tuple[str, str]]:
+    volumes: list[tuple[str, str]], name: str
+) -> list[tuple[str, str]]:
     """
     When mounting edx-platform with `--mount=/path/to/edx-platform`, bind-mount the host
     repo in the lms/cms containers.
