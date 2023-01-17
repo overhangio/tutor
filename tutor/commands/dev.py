@@ -1,4 +1,4 @@
-import typing as t
+from __future__ import annotations
 
 import click
 
@@ -70,7 +70,7 @@ def launch(
     context: click.Context,
     non_interactive: bool,
     pullimages: bool,
-    mounts: t.Tuple[t.List[compose.MountParam.MountType]],
+    mounts: tuple[list[compose.MountParam.MountType]],
 ) -> None:
     compose.mount_tmp_volumes(mounts, context.obj)
     try:

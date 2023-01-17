@@ -1,5 +1,5 @@
+from __future__ import annotations
 import os
-import typing as t
 
 from tutor import env, exceptions, fmt, hooks, plugins, serialize, utils
 from tutor.types import Config, ConfigValue, cast_config, get_typed
@@ -108,7 +108,7 @@ def get_base() -> Config:
     Entries in this configuration are unrendered.
     """
     base = get_template("base.yml")
-    extra_config: t.List[t.Tuple[str, ConfigValue]] = []
+    extra_config: list[tuple[str, ConfigValue]] = []
     extra_config = hooks.Filters.CONFIG_UNIQUE.apply(extra_config)
     extra_config = hooks.Filters.CONFIG_OVERRIDES.apply(extra_config)
     for name, value in extra_config:
@@ -269,7 +269,7 @@ def enable_plugins(config: Config) -> None:
     plugins.load_all(get_enabled_plugins(config))
 
 
-def get_enabled_plugins(config: Config) -> t.List[str]:
+def get_enabled_plugins(config: Config) -> list[str]:
     """
     Return the list of plugins that are enabled, as per the configuration. Note that
     this may differ from the list of loaded plugins. For instance when a plugin is

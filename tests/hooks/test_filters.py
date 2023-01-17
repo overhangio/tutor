@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing as t
 import unittest
 
@@ -23,14 +24,14 @@ class PluginFiltersTests(unittest.TestCase):
 
     def test_add_items(self) -> None:
         @hooks.filters.add("tests:add-sheeps")
-        def filter1(sheeps: t.List[int]) -> t.List[int]:
+        def filter1(sheeps: list[int]) -> list[int]:
             return sheeps + [0]
 
         hooks.filters.add_item("tests:add-sheeps", 1)
         hooks.filters.add_item("tests:add-sheeps", 2)
         hooks.filters.add_items("tests:add-sheeps", [3, 4])
 
-        sheeps: t.List[int] = hooks.filters.apply("tests:add-sheeps", [])
+        sheeps: list[int] = hooks.filters.apply("tests:add-sheeps", [])
         self.assertEqual([0, 1, 2, 3, 4], sheeps)
 
     def test_filter_callbacks(self) -> None:

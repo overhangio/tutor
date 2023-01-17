@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing as t
 import unittest
 from io import StringIO
@@ -62,9 +63,9 @@ class ComposeTests(unittest.TestCase):
         # Mount volumes
         compose.mount_tmp_volumes(mount_args, LocalContext(""))
 
-        compose_file: t.Dict[str, t.Any] = hooks.Filters.COMPOSE_LOCAL_TMP.apply({})
-        actual_services: t.Dict[str, t.Any] = compose_file["services"]
-        expected_services: t.Dict[str, t.Any] = {
+        compose_file: dict[str, t.Any] = hooks.Filters.COMPOSE_LOCAL_TMP.apply({})
+        actual_services: dict[str, t.Any] = compose_file["services"]
+        expected_services: dict[str, t.Any] = {
             "cms": {"volumes": ["/path/to/edx-platform:/openedx/edx-platform"]},
             "cms-worker": {"volumes": ["/path/to/edx-platform:/openedx/edx-platform"]},
             "lms": {
@@ -78,11 +79,9 @@ class ComposeTests(unittest.TestCase):
         }
         self.assertEqual(actual_services, expected_services)
 
-        compose_jobs_file: t.Dict[
-            str, t.Any
-        ] = hooks.Filters.COMPOSE_LOCAL_JOBS_TMP.apply({})
-        actual_jobs_services: t.Dict[str, t.Any] = compose_jobs_file["services"]
-        expected_jobs_services: t.Dict[str, t.Any] = {
+        compose_jobs_file = hooks.Filters.COMPOSE_LOCAL_JOBS_TMP.apply({})
+        actual_jobs_services = compose_jobs_file["services"]
+        expected_jobs_services: dict[str, t.Any] = {
             "cms-job": {"volumes": ["/path/to/edx-platform:/openedx/edx-platform"]},
             "lms-job": {"volumes": ["/path/to/edx-platform:/openedx/edx-platform"]},
         }

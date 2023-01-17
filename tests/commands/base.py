@@ -1,4 +1,4 @@
-import typing as t
+from __future__ import annotations
 
 import click.testing
 
@@ -12,13 +12,13 @@ class TestCommandMixin:
     """
 
     @staticmethod
-    def invoke(args: t.List[str]) -> click.testing.Result:
+    def invoke(args: list[str]) -> click.testing.Result:
         with temporary_root() as root:
             return TestCommandMixin.invoke_in_root(root, args)
 
     @staticmethod
     def invoke_in_root(
-        root: str, args: t.List[str], catch_exceptions: bool = True
+        root: str, args: list[str], catch_exceptions: bool = True
     ) -> click.testing.Result:
         """
         Use this method for commands that all need to run in the same root:

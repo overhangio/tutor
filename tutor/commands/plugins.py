@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import typing as t
 import urllib.request
@@ -22,13 +23,13 @@ class PluginName(click.ParamType):
 
     def shell_complete(
         self, ctx: click.Context, param: click.Parameter, incomplete: str
-    ) -> t.List[click.shell_completion.CompletionItem]:
+    ) -> list[click.shell_completion.CompletionItem]:
         return [
             click.shell_completion.CompletionItem(name)
             for name in self.get_names(incomplete)
         ]
 
-    def get_names(self, incomplete: str) -> t.List[str]:
+    def get_names(self, incomplete: str) -> list[str]:
         candidates = []
         if self.allow_all:
             candidates.append("all")
@@ -67,7 +68,7 @@ def list_command() -> None:
 @click.command(help="Enable a plugin")
 @click.argument("plugin_names", metavar="plugin", nargs=-1, type=PluginName())
 @click.pass_obj
-def enable(context: Context, plugin_names: t.List[str]) -> None:
+def enable(context: Context, plugin_names: list[str]) -> None:
     config = tutor_config.load_minimal(context.root)
     for plugin in plugin_names:
         plugins.load(plugin)
@@ -87,10 +88,10 @@ def enable(context: Context, plugin_names: t.List[str]) -> None:
     "plugin_names", metavar="plugin", nargs=-1, type=PluginName(allow_all=True)
 )
 @click.pass_obj
-def disable(context: Context, plugin_names: t.List[str]) -> None:
+def disable(context: Context, plugin_names: list[str]) -> None:
     config = tutor_config.load_minimal(context.root)
     disable_all = "all" in plugin_names
-    disabled: t.List[str] = []
+    disabled: list[str] = []
     for plugin in tutor_config.get_enabled_plugins(config):
         if disable_all or plugin in plugin_names:
             fmt.echo_info(f"Disabling plugin {plugin}...")
