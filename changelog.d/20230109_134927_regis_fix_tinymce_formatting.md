@@ -1,1 +1,0 @@
-- [Bugfix] Fix HTML component editing in studio by cherry-picking [upstream fix](https://github.com/openedx/edx-platform/pull/31500). (by @regisb)

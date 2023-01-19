@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.2.0'></a>
+## v15.2.0 (2023-01-19)
+
+- 💥[Bugfix] Fix "example.com" links in registration emails. This is a breaking change for platforms that have modified the "id" field of the LMS site object in the database. These platforms should set `SITE_ID=1` in the common settings via a plugin. (by @regisb)
+- [Bugfix] Running `tutor k8s upgrade --from=maple` won't apply and won't wait for the MySQL deployment to be ready if `RUN_MYSQL: false` (When you host your MySQL somewhere else like RDS) (by @CodeWithEmad)
+- [Bugfix] Fix HTML component editing in studio by cherry-picking [upstream fix](https://github.com/openedx/edx-platform/pull/31500). (by @regisb)
+- [Improvement] Changes annotations from `typing` to use built-in generic types from `__future__.annotations` (by @Carlos-Muniz)
+- [Improvement] Resolve `CORS_ORIGIN_WHITELIST` warnings that pollute the LMS and CMS logs. As far as we know they were not causing any issue, apart from being a nuisance. (by @regisb)
+
 <a id='changelog-15.1.0'></a>
 ## v15.1.0 (2022-12-13)
 
