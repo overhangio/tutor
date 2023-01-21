@@ -32,12 +32,12 @@ SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = False
 
 # Caching
 CACHES["staticfiles"] = {
-    "KEY_PREFIX": "staticfiles_lms",
+    "KEY_PREFIX": "staticfiles_lms{% if REDIS_KEY_PREFIX %}-{{ REDIS_KEY_PREFIX }}{% endif %}",
     "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     "LOCATION": "staticfiles_lms",
 }
 CACHES["ora2-storage"] = {
-    "KEY_PREFIX": "ora2-storage",
+    "KEY_PREFIX": "ora2-storage{% if REDIS_KEY_PREFIX %}-{{ REDIS_KEY_PREFIX }}{% endif %}",
     "BACKEND": "django_redis.cache.RedisCache",
     "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
 }

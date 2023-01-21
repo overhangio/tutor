@@ -43,7 +43,7 @@ ELASTIC_SEARCH_CONFIG = [{
 # Common cache config
 CACHES = {
     "default": {
-        "KEY_PREFIX": "default",
+        "KEY_PREFIX": "default{% if REDIS_KEY_PREFIX %}-{{ REDIS_KEY_PREFIX }}{% endif %}",
         "VERSION": "1",
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",

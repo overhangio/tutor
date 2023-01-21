@@ -258,6 +258,7 @@ Redis
 - ``REDIS_PORT`` (default: ``6379``)
 - ``REDIS_USERNAME`` (default: ``""``)
 - ``REDIS_PASSWORD`` (default: ``""``)
+- ``REDIS_KEY_PREFIX`` (default: ``""``)
 
 Note that Redis has replaced Rabbitmq as the Celery message broker since Tutor v11.0.0.
 
