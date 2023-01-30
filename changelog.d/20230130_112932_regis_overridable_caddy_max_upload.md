@@ -1,0 +1,1 @@
+- [Improvement] Make it possible to override the max upload size in the LMS and the CMS. This is achieved by moving the "caddyfile-lms" and "caddyfile-cms" patches just before the `import proxy` declarations. We also wrap the `request_body` directives within `handle` statements, which means that the `max_body` sizes can be overridden for specific paths. (by @regisb)
