@@ -67,7 +67,7 @@ This configuration parameter defines the name of the Docker image to run for the
 
 This configuration paramater defines the name of the Docker image to run the development version of the lms and cms containers.  By default, the Docker image tag matches the Tutor version it was built with.
 
-- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.4.6"``)
+- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.6.2"``)
 
 This configuration paramater defines which Caddy Docker image to use.
 
