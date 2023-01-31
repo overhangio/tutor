@@ -6,6 +6,7 @@ import unittest.result
 
 from tutor import hooks
 from tutor.commands.context import BaseTaskContext
+from tutor.core.hooks.contexts import enter as enter_context
 from tutor.tasks import BaseTaskRunner
 from tutor.types import Config
 
@@ -64,8 +65,7 @@ class PluginsTestCase(unittest.TestCase):
             hooks.Contexts.PLUGINS_V0_YAML.name,
             "unittests",
         ]:
-            hooks.filters.clear_all(context=context)
-            hooks.actions.clear_all(context=context)
+            hooks.clear_all(context=context)
 
     def run(
         self, result: t.Optional[unittest.result.TestResult] = None
@@ -74,5 +74,5 @@ class PluginsTestCase(unittest.TestCase):
         Run all actions and filters with a test context, such that they can be cleared
         from one run to the next.
         """
-        with hooks.contexts.enter("unittests"):
+        with enter_context("unittests"):
             return super().run(result=result)

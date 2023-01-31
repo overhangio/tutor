@@ -3,14 +3,7 @@ __license__ = "Apache 2.0"
 
 import typing as t
 
-# These imports are the hooks API
-from . import actions, contexts, filters, priorities
-from .consts import *
+# The imports that follow are the hooks API
+from tutor.core.hooks import clear_all, priorities
 
-
-def clear_all(context: t.Optional[str] = None) -> None:
-    """
-    Clear both actions and filters.
-    """
-    filters.clear_all(context=context)
-    actions.clear_all(context=context)
+from .catalog import Actions, Contexts, Filters

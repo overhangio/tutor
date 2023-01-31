@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import os
 import sys
@@ -9,8 +11,8 @@ import docutils.parsers.rst
 # -- Project information -----------------------------------------------------
 
 project = "Tutor"
-copyright = ""
-author = "Overhang.io"
+copyright = ""  # pylint: disable=redefined-builtin
+author = "Overhang.IO"
 
 # The short X.Y version
 version = ""
@@ -32,19 +34,36 @@ extensions.append("sphinx.ext.autodoc")
 autodoc_typehints = "description"
 # For the life of me I can't get the docs to compile in nitpicky mode without these
 # ignore statements. You are most welcome to try and remove them.
+# To make matters worse, some ignores are only required for some versions of Python,
+# from 3.7 to 3.10...
 nitpick_ignore = [
-    ("py:class", "Config"),
+    # Sphinx does not handle ParamSpec arguments
+    ("py:class", "T.args"),
+    ("py:class", "T.kwargs"),
+    ("py:class", "T2.args"),
+    ("py:class", "T2.kwargs"),
+    # Sphinx doesn't know about the following classes
     ("py:class", "click.Command"),
-    ("py:class", "tutor.hooks.filters.P"),
-    ("py:class", "tutor.hooks.filters.T"),
-    ("py:class", "tutor.hooks.actions.P"),
-    ("py:class", "P"),
-    ("py:class", "P.args"),
-    ("py:class", "P.kwargs"),
-    ("py:class", "T"),
     ("py:class", "t.Any"),
+    ("py:class", "t.Callable"),
+    ("py:class", "t.Iterator"),
     ("py:class", "t.Optional"),
+    # python 3.7
+    ("py:class", "Concatenate"),
+    # python 3.10
+    ("py:class", "NoneType"),
+    ("py:class", "click.core.Command"),
 ]
+# Resolve type aliases here
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_type_aliases
+autodoc_type_aliases: dict[str, str] = {
+    "T1": "tutor.core.hooks.filters.T1",
+    "L": "tutor.core.hooks.filters.L",
+    # python 3.10
+    "T": "tutor.core.hooks.actions.T",
+    "T2": "tutor.core.hooks.filters.T2",
+}
+
 
 # -- Sphinx-Click configuration
 # https://sphinx-click.readthedocs.io/
@@ -87,13 +106,11 @@ about: Dict[str, str] = {}
 with io.open(
     os.path.join(here, "..", "tutor", "__about__.py"), "rt", encoding="utf-8"
 ) as f:
+    # pylint: disable=exec-used
     exec(f.read(), about)
-rst_prolog = """
-.. |tutor_version| replace:: {}
-""".format(
-    about["__version__"],
-)
-
+rst_prolog = f"""
+.. |tutor_version| replace:: {about["__version__"]}
+"""
 
 # Custom directives
 def youtube(

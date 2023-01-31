@@ -1,6 +1,6 @@
 from __future__ import annotations
+
 import os
-import typing as t
 import urllib.request
 
 import click

@@ -11,35 +11,59 @@ from typing import Any, Callable, Iterable
 
 import click
 
+from tutor.core.hooks import (
+    Action,
+    ActionTemplate,
+    Context,
+    ContextTemplate,
+    Filter,
+    FilterTemplate,
+    actions,
+    filters,
+)
 from tutor.types import Config
-
-from . import actions, contexts, filters
-from .actions import Action, ActionTemplate
-from .filters import Filter, FilterTemplate
 
 __all__ = ["Actions", "Filters", "Contexts"]
 
 
 class Actions:
     """
-    This class is a container for the names of all actions used across Tutor
-    (see :py:mod:`tutor.hooks.actions.do`). For each action, we describe the
-    arguments that are passed to the callback functions.
+    This class is a container for all actions used across Tutor (see
+    :py:class:`tutor.core.hooks.Action`). Actions are used to trigger callback functions at
+    specific moments in the Tutor life cycle.
 
-    To create a new callback for an existing action, write the following::
+    To create a new callback for an existing action, start by importing the hooks
+    module::
 
         from tutor import hooks
 
-        @hooks.Actions.YOUR_ACTION.add()
+    Then create your callback function and decorate it with the :py:meth:`add <tutor.core.hooks.Action.add>` method of the
+    action you're interested in::
+
+        @hooks.Actions.SOME_ACTION.add()
         def your_action():
             # Do stuff here
+
+    Your callback function should have the same signature as the original action. For
+    instance, to add a callback to the :py:data:`COMPOSE_PROJECT_STARTED` action::
+
+        @hooks.Actions.COMPOSE_PROJECT_STARTED.add():
+        def run_this_on_start(root, config, name):
+            print(root, config["LMS_HOST", name])
+
+    Your callback function will then be called whenever the ``COMPOSE_PROJECT_STARTED.do`` method
+    is called, i.e: when ``tutor local start`` or ``tutor dev start`` is run.
+
+    Note that action callbacks do not return anything.
+
+    For more information about how actions work, check out the :py:class:`tutor.core.hooks.Action` API.
     """
 
     #: Triggered whenever a "docker-compose start", "up" or "restart" command is executed.
     #:
-    #: :parameter: str root: project root.
-    #: :parameter: dict config: project configuration.
-    #: :parameter: str name: docker-compose project name.
+    #: :parameter str root: project root.
+    #: :parameter dict config: project configuration.
+    #: :parameter str name: docker-compose project name.
     COMPOSE_PROJECT_STARTED: Action[[str, Config, str]] = actions.get(
         "compose:project:started"
     )
@@ -59,17 +83,12 @@ class Actions:
     #: This action does not have any parameter.
     CORE_READY: Action[[]] = actions.get("core:ready")
 
-    #: Called just before triggering the job tasks of any `... do <job>` command.
+    #: Called just before triggering the job tasks of any ``... do <job>`` command.
     #:
-    #: :parameter: str job: job name.
-    #: :parameter: args: job positional arguments.
-    #: :parameter: kwargs: job named arguments.
+    #: :parameter str job: job name.
+    #: :parameter args: job positional arguments.
+    #: :parameter kwargs: job named arguments.
     DO_JOB: Action[[str, Any]] = actions.get("do:job")
-
-    #: Called as soon as we have access to the Tutor project root.
-    #:
-    #: :parameter str root: absolute path to the project root.
-    PROJECT_ROOT_READY: Action[str] = actions.get("project:root:ready")
 
     #: Triggered when a single plugin needs to be loaded. Only plugins that have previously been
     #: discovered can be loaded (see :py:data:`CORE_READY`).
@@ -103,24 +122,56 @@ class Actions:
     #: :parameter config: full project configuration
     PLUGIN_UNLOADED: Action[str, str, Config] = actions.get("plugins:unloaded")
 
+    #: Called as soon as we have access to the Tutor project root.
+    #:
+    #: :parameter str root: absolute path to the project root.
+    PROJECT_ROOT_READY: Action[str] = actions.get("project:root:ready")
+
 
 class Filters:
     """
-    Here are the names of all filters used across Tutor. For each filter, the
-    type of the first argument also indicates the type of the expected returned value.
+    Here are the names of all filters used across Tutor. (see
+    :py:class:`tutor.core.hooks.Filter`) Filters are used to modify some data at
+    specific points during the Tutor life cycle.
 
-    Filter names are all namespaced with domains separated by colons (":").
-
-    To add custom data to any filter, write the following in your plugin::
+    To add a callback to an existing filter, start by importing the hooks module::
 
         from tutor import hooks
 
-        @hooks.Filters.YOUR_FILTER.add()
-        def your_filter(items):
-            # do stuff with items
+    Then create your callback function and decorate it with :py:meth:`add
+    <tutor.core.hooks.Filter.add>` method of the filter instance you need::
+
+        @hooks.Filters.SOME_FILTER.add()
+        def your_filter_callback(some_data):
+            # Do stuff here with the data
             ...
-            # return the modified list of items
-            return items
+            # return the modified data
+            return some_data
+
+    Note that your filter callback should have the same signature as the original
+    filter. The return value should also have the same type as the first argument of the
+    callback function.
+
+    Many filters have a list of items as the first argument. Quite often, plugin
+    developers just want to add a new item at the end of that list. In such cases there
+    is no need for a callback function. Instead, you can use the `add_item` method. For
+    instance, you can add a "hello" to the init task of the lms container by modifying
+    the :py:data:`CLI_DO_INIT_TASKS` filter::
+
+        hooks.CLI_DO_INIT_TASKS.add_item(("lms", "echo hello"))
+
+    To add multiple items at a time, use `add_items`::
+
+        hooks.CLI_DO_INIT_TASKS.add_items(
+            ("lms", "echo 'hello from lms'"),
+            ("cms", "echo 'hello from cms'"),
+        )
+
+    The ``echo`` commands will then be run every time the "init" tasks are run, for
+    instance during `tutor local launch`.
+
+    For more information about how filters work, check out the
+    :py:class:`tutor.core.hooks.Filter` API.
     """
 
     #: List of command line interface (CLI) commands.
@@ -382,47 +433,31 @@ class Filters:
 
 class Contexts:
     """
-    Contexts are used to track in which parts of the code filters and actions have been
-    declared. Let's look at an example::
-
-        from tutor import hooks
-
-        with hooks.contexts.enter("c1"):
-            @filters.add("f1") def add_stuff_to_filter(...):
-                ...
-
-    The fact that our custom filter was added in a certain context allows us to later
-    remove it. To do so, we write::
-
-        from tutor import hooks
-        filters.clear("f1", context="c1")
-
-    This makes it easy to disable side-effects by plugins, provided they were created with appropriate contexts.
-
-    Here we list all the contexts that are used across Tutor. It is not expected that
+    Here we list all the :py:class:`contexts <tutor.core.hooks.Context>` that are used across Tutor. It is not expected that
     plugin developers will ever need to use contexts. But if you do, this is how it
     should be done::
 
         from tutor import hooks
 
-        with hooks.Contexts.MY_CONTEXT.enter():
-            # do stuff and all created hooks will include MY_CONTEXT
+        with hooks.Contexts.SOME_CONTEXT.enter():
+            # do stuff and all created hooks will include SOME_CONTEXT
+            ...
 
-        # Apply only the hook callbacks that were created within MY_CONTEXT
-        hooks.Actions.MY_ACTION.do_from_context(str(hooks.Contexts.MY_CONTEXT))
-        hooks.Filters.MY_FILTER.apply_from_context(hooks.Contexts.MY_CONTEXT.name)
+        # Apply only the hook callbacks that were created within SOME_CONTEXT
+        hooks.Actions.MY_ACTION.do_from_context(str(hooks.Contexts.SOME_CONTEXT))
+        hooks.Filters.MY_FILTER.apply_from_context(hooks.Contexts.SOME_CONTEXT.name)
     """
 
     #: We enter this context whenever we create hooks for a specific application or :
     #: plugin. For instance, plugin "myplugin" will be enabled within the "app:myplugin"
     #: context.
-    APP = contexts.ContextTemplate("app:{0}")
+    APP = ContextTemplate("app:{0}")
 
     #: Plugins will be installed and enabled within this context.
-    PLUGINS = contexts.Context("plugins")
+    PLUGINS = Context("plugins")
 
     #: YAML-formatted v0 plugins will be installed within this context.
-    PLUGINS_V0_YAML = contexts.Context("plugins:v0:yaml")
+    PLUGINS_V0_YAML = Context("plugins:v0:yaml")
 
     #: Python entrypoint plugins will be installed within this context.
-    PLUGINS_V0_ENTRYPOINT = contexts.Context("plugins:v0:entrypoint")
+    PLUGINS_V0_ENTRYPOINT = Context("plugins:v0:entrypoint")

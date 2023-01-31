@@ -2,6 +2,7 @@
 Provide API for plugin features.
 """
 from __future__ import annotations
+
 import typing as t
 from copy import deepcopy
 

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import os
 import re
 import typing as t
@@ -13,11 +14,12 @@ from tutor import env as tutor_env
 from tutor import fmt, hooks, serialize, utils
 from tutor.commands import jobs
 from tutor.commands.context import BaseTaskContext
+from tutor.core.hooks import Filter  # pylint: disable=unused-import
 from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
 
-COMPOSE_FILTER_TYPE: TypeAlias = "hooks.filters.Filter[dict[str, t.Any], []]"
+COMPOSE_FILTER_TYPE: TypeAlias = "Filter[dict[str, t.Any], []]"
 
 
 class ComposeTaskRunner(BaseComposeTaskRunner):
