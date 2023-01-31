@@ -71,7 +71,6 @@ Documentation
 -------------
 
 Extensive documentation is available: https://docs.tutor.overhang.io/
-Extensive documentation is available: https://docs.tutor.overhang.io/
 
 Is there a problem?
 -------------------
