@@ -95,7 +95,7 @@ class Actions:
     #:
     #: Plugins are typically loaded because they were enabled by the user; the list of
     #: plugins to enable is found in the project root (see
-    #: :py:data:``PROJECT_ROOT_READY``).
+    #: :py:data:`PROJECT_ROOT_READY`).
     #:
     #: Most plugin developers will not have to implement this action themselves, unless
     #: they want to perform a specific action at the moment the plugin is enabled.
@@ -104,7 +104,7 @@ class Actions:
     PLUGIN_LOADED: ActionTemplate[[]] = actions.get_template("plugins:loaded:{0}")
 
     #: Triggered after all plugins have been loaded. At this point the list of loaded
-    #: plugins may be obtained from the :py:data:``Filters.PLUGINS_LOADED`` filter.
+    #: plugins may be obtained from the :py:data:`Filters.PLUGINS_LOADED` filter.
     #:
     #: This action does not have any parameter.
     PLUGINS_LOADED: Action[[]] = actions.get("plugins:loaded")
