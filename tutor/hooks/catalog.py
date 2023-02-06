@@ -212,7 +212,7 @@ class Filters:
     #:     - ``path`` is a tuple that corresponds to a template relative path.
     #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see :py:data:`IMAGES_BUILD`).
     #:       The command to execute will be read from that template, after it is rendered.
-    COMMANDS_INIT: Filter[list[tuple[str, tuple[str, ...]]], str] = filters.get(
+    COMMANDS_INIT: Filter[list[tuple[str, tuple[str, ...]]], []] = filters.get(
         "commands:init"
     )
 
