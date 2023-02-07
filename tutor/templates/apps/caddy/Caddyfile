@@ -37,16 +37,21 @@
     rewrite @favicon_matcher /theming/asset/images/favicon.ico
 
     # Limit profile image upload size
-    request_body /api/profile_images/*/*/upload {
-        max_size 1MB
-    }
-    request_body {
-        max_size 4MB
+    handle_path /api/profile_images/*/*/upload {
+        request_body {
+            max_size 1MB
+        }
     }
 
     import proxy "lms:8000"
 
     {{ patch("caddyfile-lms")|indent(4) }}
+
+    handle_path /* {
+        request_body {
+            max_size 4MB
+        }
+    }
 }
 
 {{ CMS_HOST }}{$default_site_port} {
@@ -55,13 +60,15 @@
     }
     rewrite @favicon_matcher /theming/asset/images/favicon.ico
 
-    request_body {
-        max_size 250MB
-    }
-
     import proxy "cms:8000"
 
     {{ patch("caddyfile-cms")|indent(4) }}
+
+    handle_path /* {
+        request_body {
+            max_size 250MB
+        }
+    }
 }
 
 {{ patch("caddyfile") }}
