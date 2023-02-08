@@ -155,6 +155,21 @@ def printvalue(context: Context, key: str) -> None:
         raise exceptions.TutorError(f"Missing configuration value: {key}") from e
 
 
+@click.group(name="patches", help="Commands related to patches in configurations")
+def patches_command() -> None:
+    pass
+
+
+@click.command(name="list", help="Print all available patches")
+@click.pass_obj
+def patches_list(context: Context) -> None:
+    config = tutor_config.load(context.root)
+    renderer = env.PatchRenderer(config)
+    renderer.print_patches_locations()
+
+
 config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
+config_command.add_command(patches_command)
+patches_command.add_command(patches_list)

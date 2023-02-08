@@ -58,3 +58,12 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
         self.assertTrue(result.output)
+
+
+class PatchesTests(unittest.TestCase, TestCommandMixin):
+    def test_config_patches_list(self) -> None:
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            result = self.invoke_in_root(root, ["config", "patches", "list"])
+        self.assertFalse(result.exception)
+        self.assertEqual(0, result.exit_code)
