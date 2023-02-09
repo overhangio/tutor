@@ -112,6 +112,7 @@ rst_prolog = f"""
 .. |tutor_version| replace:: {about["__version__"]}
 """
 
+
 # Custom directives
 def youtube(
     _name: Any,
