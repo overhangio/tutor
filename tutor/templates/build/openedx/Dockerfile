@@ -53,6 +53,9 @@ RUN curl -fsSL https://github.com/openedx/edx-platform/commit/20b93b8b01276edadd
 # Fix TinyMCE editor for html components
 # https://github.com/openedx/edx-platform/pull/31500
 RUN curl -fsSL https://github.com/openedx/edx-platform/commit/5af42f8ba3.patch | git am
+# Fix security issue in lti-consumer-xblock
+# https://github.com/openedx/edx-platform/pull/31724
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/5f901a35d2.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
