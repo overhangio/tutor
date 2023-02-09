@@ -1,5 +1,14 @@
 # Global configuration
 {
+
+    {% if not ENABLE_WEB_PROXY %}
+    # Enable proxying from all servers by default. Otherwise, X-Forwarded-* headers will
+    # be overwritten.
+    # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#defaults
+    servers {
+        trusted_proxies static 0.0.0.0/0 ::/0
+    }
+    {% endif %}
     {{ patch("caddyfile-global")|indent(4) }}
 }
 
