@@ -14,15 +14,13 @@ from .contexts import Contextualized
 #: Action generic signature.
 T = ParamSpec("T")
 
-# Similarly to CallableFilter, it should be possible to create a CallableAction alias in
-# the future.
-# CallableAction = t.Callable[T, None]
+ActionCallbackFunc = t.Callable[T, None]
 
 
 class ActionCallback(Contextualized, t.Generic[T]):
     def __init__(
         self,
-        func: t.Callable[T, None],
+        func: ActionCallbackFunc[T],
         priority: t.Optional[int] = None,
     ):
         super().__init__()
@@ -75,7 +73,7 @@ class Action(t.Generic[T]):
 
     def add(
         self, priority: t.Optional[int] = None
-    ) -> t.Callable[[t.Callable[T, None]], t.Callable[T, None]]:
+    ) -> t.Callable[[ActionCallbackFunc[T]], ActionCallbackFunc[T]]:
         """
         Decorator to add a callback to an action.
 
@@ -97,7 +95,7 @@ class Action(t.Generic[T]):
         to return any value. Returned values will be ignored.
         """
 
-        def inner(func: t.Callable[T, None]) -> t.Callable[T, None]:
+        def inner(func: ActionCallbackFunc[T]) -> ActionCallbackFunc[T]:
             callback = ActionCallback(func, priority=priority)
             priorities.insert_callback(callback, self.callbacks)
             return func
@@ -218,7 +216,7 @@ def get_template(name: str) -> ActionTemplate[t.Any]:
 
 def add(
     name: str, priority: t.Optional[int] = None
-) -> t.Callable[[t.Callable[T, None]], t.Callable[T, None]]:
+) -> t.Callable[[ActionCallbackFunc[T]], ActionCallbackFunc[T]]:
     """
     Decorator to add a callback action associated to a name.
     """

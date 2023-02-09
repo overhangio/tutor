@@ -17,16 +17,13 @@ T2 = ParamSpec("T2")
 #: Specialized typevar for list elements
 L = t.TypeVar("L")
 
-# I wish we could create such an alias, which would greatly simply the definitions
-# below. Unfortunately this does not work, yet. It will once the following issue is
-# resolved: https://github.com/python/mypy/issues/11855
-# CallableFilter = t.Callable[Concatenate[T1, T2], T1]
+FilterCallbackFunc = t.Callable[Concatenate[T1, T2], T1]
 
 
 class FilterCallback(contexts.Contextualized, t.Generic[T1, T2]):
     def __init__(
         self,
-        func: t.Callable[Concatenate[T1, T2], T1],
+        func: FilterCallbackFunc[T1, T2],
         priority: t.Optional[int] = None,
     ):
         super().__init__()
@@ -83,9 +80,7 @@ class Filter(t.Generic[T1, T2]):
 
     def add(
         self, priority: t.Optional[int] = None
-    ) -> t.Callable[
-        [t.Callable[Concatenate[T1, T2], T1]], t.Callable[Concatenate[T1, T2], T1]
-    ]:
+    ) -> t.Callable[[FilterCallbackFunc[T1, T2]], FilterCallbackFunc[T1, T2]]:
         """
         Decorator to add a filter callback.
 
@@ -112,10 +107,8 @@ class Filter(t.Generic[T1, T2]):
             final_value = my_filter.apply(initial_value, some_other_argument_value)
         """
 
-        def inner(
-            func: t.Callable[Concatenate[T1, T2], T1]
-        ) -> t.Callable[Concatenate[T1, T2], T1]:
-            callback = FilterCallback(func, priority=priority)
+        def inner(func: FilterCallbackFunc[T1, T2]) -> FilterCallbackFunc[T1, T2]:
+            callback: FilterCallback[T1, T2] = FilterCallback(func, priority=priority)
             priorities.insert_callback(callback, self.callbacks)
             return func
 
@@ -156,7 +149,6 @@ class Filter(t.Generic[T1, T2]):
         for callback in self.callbacks:
             if callback.is_in_context(context):
                 try:
-
                     value = callback.apply(
                         value,
                         *args,
@@ -232,6 +224,7 @@ class Filter(t.Generic[T1, T2]):
             my_filter.add_item("item1")
             my_filter.add_item("item2")
         """
+
         # Unfortunately we have to type-ignore this line. If not, mypy complains with:
         #
         #   Argument 1 has incompatible type "Callable[[Arg(List[E], 'values'), **T2], List[E]]"; expected "Callable[[List[E], **T2], List[E]]"
@@ -318,9 +311,7 @@ def get_template(name: str) -> FilterTemplate[t.Any, t.Any]:
 
 def add(
     name: str, priority: t.Optional[int] = None
-) -> t.Callable[
-    [t.Callable[Concatenate[T1, T2], T1]], t.Callable[Concatenate[T1, T2], T1]
-]:
+) -> t.Callable[[FilterCallbackFunc[T1, T2]], FilterCallbackFunc[T1, T2]]:
     """
     Decorator for functions that will be applied to a single named filter.
     """
