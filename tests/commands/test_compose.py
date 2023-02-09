@@ -13,7 +13,6 @@ from tutor.commands.local import LocalContext
 
 
 class ComposeTests(unittest.TestCase):
-
     maxDiff = None  # Ensure we can see long diffs of YAML files.
 
     def test_mount_option_parsing(self) -> None:

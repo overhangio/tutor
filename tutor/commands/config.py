@@ -24,7 +24,6 @@ def config_command() -> None:
 
 
 class ConfigKeyParamType(click.ParamType):
-
     name = "configkey"
 
     def shell_complete(

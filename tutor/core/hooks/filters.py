@@ -149,7 +149,6 @@ class Filter(t.Generic[T1, T2]):
         for callback in self.callbacks:
             if callback.is_in_context(context):
                 try:
-
                     value = callback.apply(
                         value,
                         *args,
@@ -225,6 +224,7 @@ class Filter(t.Generic[T1, T2]):
             my_filter.add_item("item1")
             my_filter.add_item("item2")
         """
+
         # Unfortunately we have to type-ignore this line. If not, mypy complains with:
         #
         #   Argument 1 has incompatible type "Callable[[Arg(List[E], 'values'), **T2], List[E]]"; expected "Callable[[List[E], **T2], List[E]]"
