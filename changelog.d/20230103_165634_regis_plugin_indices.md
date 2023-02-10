@@ -1,3 +1,0 @@
-- [Feature] Introduce plugin indexes, described in this [Tutor enhancement proposal](https://discuss.openedx.org/t/tutor-enhancement-proposal-tep-plugin-indices/8182). This new feature introduces a lot of new ``plugins`` commands. See the docs for more information. (by @regisb)
-- [Improvement] Add the `plugins list --enabled` option. (by @regisb)
-- 💥[Improvement] Modify the output of `plugins list`. Enabled plugins are indicated as "enabled". Installed but not enabled plugins are no longer indicated as "disabled" but as "installed".
