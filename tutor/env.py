@@ -370,7 +370,7 @@ def get_env_release(root: str) -> t.Optional[str]:
     return get_release(version)
 
 
-def get_package_release() -> str:
+def get_current_open_edx_release_name() -> str:
     """
     Return the release name associated to this package.
     """

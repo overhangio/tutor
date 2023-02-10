@@ -232,3 +232,10 @@ class UtilsTests(unittest.TestCase):
             with self.assertRaises(exceptions.TutorError) as e:
                 utils.check_macos_docker_memory()
             self.assertIn("Text encoding error", e.exception.args[0])
+
+    def test_is_http(self) -> None:
+        self.assertTrue(utils.is_http("http://overhang.io/tutor/main"))
+        self.assertTrue(utils.is_http("https://overhang.io/tutor/main"))
+        self.assertFalse(utils.is_http("/home/user/"))
+        self.assertFalse(utils.is_http("home/user/"))
+        self.assertFalse(utils.is_http("http-home/user/"))

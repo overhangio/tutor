@@ -94,7 +94,7 @@ Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instru
     if run_upgrade_from_release is not None:
         click.echo(fmt.title("Upgrading from an older release"))
         if not non_interactive:
-            to_release = tutor_env.get_package_release()
+            to_release = tutor_env.get_current_open_edx_release_name()
             question = f"""You are about to upgrade your Open edX platform from {run_upgrade_from_release.capitalize()} to {to_release.capitalize()}
 
 It is strongly recommended to make a backup before upgrading. To do so, run:
