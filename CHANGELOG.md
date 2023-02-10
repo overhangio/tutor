@@ -20,6 +20,26 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.3.0'></a>
+## v15.3.0 (2023-02-10)
+
+- [Feature] Introduce plugin indexes, described in this [Tutor enhancement proposal](https://discuss.openedx.org/t/tutor-enhancement-proposal-tep-plugin-indices/8182). This new feature introduces a lot of new ``plugins`` commands. See the docs for more information. (by @regisb)
+- [Improvement] Add the `plugins list --enabled` option. (by @regisb)
+- 💥[Improvement] Modify the output of `plugins list`. Enabled plugins are indicated as "enabled". Installed but not enabled plugins are no longer indicated as "disabled" but as "installed".
+
+- 💥[Feature] Simplify the hooks API. The modules `tutor.hooks.actions`, `tutor.hooks.filters`, and `tutor.hooks.contexts` are no longer part of the API. This change should not affect most developers, who only use the `Actions` and `Filters` classes (notice the plural) from `tutor.hooks`. (by @regisb)
+    - Instead of `tutor.hooks.actions.get("some:action")`, use `tutor.hooks.Actions.SOME_ACTION`.
+    - Instead of `tutor.hooks.filters.get("some:filter")`, use `tutor.hooks.Filters.SOME_FILTER`.
+    - Instead of `tutor.hooks.actions.add("some:action")`, use `tutor.hooks.Actions.SOME_ACTION.add()`. The same applies to the `do` method.
+    - Instead of `tutor.hooks.filters.add("some:filter")`, use `tutor.hooks.Filters.SOME_FILTER.add()`. The same applies to the `add_item`, `add_items`, `apply`, and `iterate` methods.
+    - Instead of `tutor.hooks.contexts.enter`, use `tutor.core.hooks.contexts.enter`.
+
+- [Improvement] Make it possible to override the max upload size in the LMS and the CMS. This is achieved by moving the "caddyfile-lms" and "caddyfile-cms" patches just before the `import proxy` declarations. We also wrap the `request_body` directives within `handle` statements, which means that the `max_body` sizes can be overridden for specific paths. (by @regisb)
+
+- [Security] Fix grading issue in LTI consumer XBlock. See [security advisory](https://github.com/openedx/xblock-lti-consumer/security/advisories/GHSA-7j9p-67mm-5g87). (by @regisb)
+
+- [Feature] Upgrade all Open edX services to open-release/olive.2. (by @regisb)
+
 <a id='changelog-15.2.0'></a>
 ## v15.2.0 (2023-01-19)
 
