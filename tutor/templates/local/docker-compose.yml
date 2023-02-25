@@ -111,6 +111,7 @@ services:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
       - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
       - ../apps/openedx/config:/openedx/config:ro
+      - ../apps/openedx/uwsgi.ini:/openedx/edx-platform/uwsgi.ini:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
@@ -142,6 +143,7 @@ services:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
       - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
       - ../apps/openedx/config:/openedx/config:ro
+      - ../apps/openedx/uwsgi.ini:/openedx/edx-platform/uwsgi.ini:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
