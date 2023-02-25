@@ -128,7 +128,7 @@ def list_command(show_enabled_only: bool) -> None:
                     (plugin_info or "").replace("\n", " "),
                 )
             )
-    fmt.echo(format_table(plugins_table))
+    fmt.echo(utils.format_table(plugins_table))
 
 
 @click.command(help="Enable a plugin")
@@ -302,7 +302,7 @@ def search(pattern: str) -> None:
                     plugin.short_description,
                 )
             )
-    print(format_table(results))
+    print(utils.format_table(results))
 
 
 @click.command()
@@ -406,34 +406,6 @@ def index_remove(context: Context, url: str) -> None:
         update_indexes(config)
     else:
         fmt.echo_alert("Plugin index not present")
-
-
-def format_table(rows: t.List[t.Tuple[str, ...]], separator: str = "\t") -> str:
-    """
-    Format a list of values as a tab-separated table. Column sizes are determined such
-    that row values are vertically aligned.
-    """
-    formatted = ""
-    if not rows:
-        return formatted
-    columns_count = len(rows[0])
-    # Determine each column size
-    col_sizes = [1] * columns_count
-    for row in rows:
-        for c, value in enumerate(row):
-            col_sizes[c] = max(col_sizes[c], len(value))
-    # Print all values
-    for r, row in enumerate(rows):
-        for c, value in enumerate(row):
-            if c < len(col_sizes) - 1:
-                formatted += f"{value:{col_sizes[c]}}{separator}"
-            else:
-                # The last column is not left-justified
-                formatted += f"{value}"
-        if r < len(rows) - 1:
-            # Append EOL at all lines but the last one
-            formatted += "\n"
-    return formatted
 
 
 index_command.add_command(index_add)

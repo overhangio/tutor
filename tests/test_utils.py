@@ -3,6 +3,7 @@ import os
 import tempfile
 import unittest
 from io import StringIO
+from typing import List, Tuple
 from unittest.mock import MagicMock, mock_open, patch
 
 from tutor import exceptions, utils
@@ -239,3 +240,17 @@ class UtilsTests(unittest.TestCase):
         self.assertFalse(utils.is_http("/home/user/"))
         self.assertFalse(utils.is_http("home/user/"))
         self.assertFalse(utils.is_http("http-home/user/"))
+
+    def test_format_table(self) -> None:
+        rows: List[Tuple[str, ...]] = [
+            ("a", "xyz", "value 1"),
+            ("abc", "x", "value 12345"),
+        ]
+        formatted = utils.format_table(rows, separator="  ")
+        self.assertEqual(
+            """
+a    xyz  value 1
+abc  x    value 12345
+""".strip(),
+            formatted,
+        )
