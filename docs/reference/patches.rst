@@ -356,3 +356,14 @@ Python-formatted LMS settings in development. Values defined here override the v
 File: ``apps/openedx/settings/lms/production.py``
 
 Python-formatted LMS settings in production. Values defined here override the values from :patch:`openedx-lms-common-settings`.
+
+``uwsgi-config``
+================
+
+File: ``apps/openedx/settings/uwsgi.ini``
+
+A .INI formatted file used to extend or override the uWSGI configuration.
+
+Check the uWSGI documentation for more details about the `.INI format <https://uwsgi-docs.readthedocs.io/en/latest/Configuration.html#ini-files>`__ and the `list of available options <https://uwsgi-docs.readthedocs.io/en/latest/Options.html>`__.
+
+.. patch:: uwsgi-config
