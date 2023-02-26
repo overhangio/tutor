@@ -65,7 +65,8 @@ class K8sTaskRunner(BaseTaskRunner):
 
     def run_task(self, service: str, command: str) -> int:
         canonical_job_name = f"{service}-job"
-        job = self.load_job(canonical_job_name)
+        all_jobs = list(self._load_jobs())
+        job = self._find_job(canonical_job_name, all_jobs)
         # Create a unique job name to make it deduplicate jobs and make it easier to
         # find later. Logs of older jobs will remain available for some time.
         job_name = canonical_job_name + "-" + datetime.now().strftime("%Y%m%d%H%M%S")
@@ -99,7 +100,10 @@ class K8sTaskRunner(BaseTaskRunner):
         job["spec"]["backoffLimit"] = 1
         job["spec"]["ttlSecondsAfterFinished"] = 3600
 
-        self._replace_job(canonical_job_name, job)
+        with open(
+            tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w", encoding="utf-8"
+        ) as job_file:
+            serialize.dump_all(all_jobs, job_file)
 
         # We cannot use the k8s API to create the job: configMap and volume names need
         # to be found with the right suffixes.
@@ -141,22 +145,22 @@ class K8sTaskRunner(BaseTaskRunner):
         """
         Find a given job definition in the rendered k8s/jobs.yml template.
         """
-        return self._extract_job(name, self._load_jobs())[1]
+        return self._find_job(name, self._load_jobs())
 
-    def _extract_job(self, name: str, all_jobs: Iterable[Any]) -> tuple[int, Any]:
+    def _find_job(self, name: str, all_jobs: Iterable[Any]) -> Any:
         """
         Find the matching job definition in the in the list of jobs provided.
 
-        Returns a tuple with the index of the found job and it's manifest.
+        Returns the found job's manifest.
         """
-        for index, job in enumerate(all_jobs):
+        for job in all_jobs:
             job_name = job["metadata"]["name"]
             if not isinstance(job_name, str):
                 raise exceptions.TutorError(
                     f"Invalid job name: '{job_name}'. Expected str."
                 )
             if job_name == name:
-                return index, job
+                return job
         raise exceptions.TutorError(f"Could not find job '{name}'")
 
     def _load_jobs(self) -> Iterable[Any]:
@@ -164,20 +168,6 @@ class K8sTaskRunner(BaseTaskRunner):
         for manifest in serialize.load_all(manifests):
             if manifest["kind"] == "Job":
                 yield manifest
-
-    def _replace_job(self, job_name: str, job: Config) -> List[Config]:
-        """
-        Replaces the job matching job_name in jobs.yml with the specified job.
-        """
-        all_jobs = list(self._load_jobs())
-        job_index = self._extract_job(job_name, all_jobs)[0]
-        all_jobs[job_index] = job
-        with open(
-            tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w", encoding="utf-8"
-        ) as job_file:
-            serialize.dump_all(all_jobs, job_file)
-
-        return all_jobs
 
     def active_job_names(self) -> List[str]:
         """

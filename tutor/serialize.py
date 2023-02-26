@@ -17,8 +17,8 @@ def load_all(stream: str) -> t.Iterator[t.Any]:
     return yaml.load_all(stream, Loader=yaml.SafeLoader)
 
 
-def dump_all(content: t.Any, fileobj: TextIOWrapper) -> None:
-    yaml.safe_dump_all(content, stream=fileobj, default_flow_style=False)
+def dump_all(documents: t.Sequence[t.Any], fileobj: TextIOWrapper) -> None:
+    yaml.safe_dump_all(documents, stream=fileobj, default_flow_style=False)
 
 
 def dump(content: t.Any, fileobj: TextIOWrapper) -> None:
