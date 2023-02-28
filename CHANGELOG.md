@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.3.1'></a>
+## v15.3.1 (2023-02-28)
+
+- [Bugfix] `patchStrategicMerge` can now be applied to jobs. (by @keithgg)
+
 <a id='changelog-15.3.0'></a>
 ## v15.3.0 (2023-02-10)
 
