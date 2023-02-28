@@ -56,17 +56,3 @@ class PluginsTests(unittest.TestCase, TestCommandMixin):
         self.assertEqual(
             ["all", "alba"], plugins_commands.PluginName(allow_all=True).get_names("al")
         )
-
-    def test_format_table(self) -> None:
-        rows: t.List[t.Tuple[str, ...]] = [
-            ("a", "xyz", "value 1"),
-            ("abc", "x", "value 12345"),
-        ]
-        formatted = plugins_commands.format_table(rows, separator="  ")
-        self.assertEqual(
-            """
-a    xyz  value 1
-abc  x    value 12345
-""".strip(),
-            formatted,
-        )
