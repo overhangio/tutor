@@ -215,6 +215,69 @@ class Renderer:
             raise exceptions.TutorError(f"Missing configuration value: {e.args[0]}")
 
 
+class PatchRenderer(Renderer):
+    """
+    Render patches for print it.
+    """
+
+    def __init__(self, config: t.Optional[Config] = None):
+        self.patches_locations: t.Dict[str, t.List[str]] = {}
+        self.current_template: str = ""
+        super().__init__(config)
+
+    def render_template(self, template_name: str) -> t.Union[str, bytes]:
+        """
+        Set the current template and render template from Renderer.
+        """
+        self.current_template = template_name
+        return super().render_template(self.current_template)
+
+    def patch(self, name: str, separator: str = "\n", suffix: str = "") -> str:
+        """
+        Set the patches locations and render calls to {{ patch("...") }} from Renderer.
+        """
+        if not self.patches_locations.get(name):
+            self.patches_locations.update({name: [self.current_template]})
+        else:
+            if self.current_template not in self.patches_locations[name]:
+                self.patches_locations[name].append(self.current_template)
+
+        # Store the template's name, and replace it with the name of this patch.
+        # This handles the case where patches themselves include patches.
+        original_template = self.current_template
+        self.current_template = f"within patch: {name}"
+
+        rendered_patch = super().patch(name, separator=separator, suffix=suffix)
+        self.current_template = (
+            original_template  # Restore the template's name from before.
+        )
+        return rendered_patch
+
+    def render_all(self, *prefix: str) -> None:
+        """
+        Render all templates.
+        """
+        for template_name in self.iter_templates_in(*prefix):
+            self.render_template(template_name)
+
+    def print_patches_locations(self) -> None:
+        """
+        Print patches locations.
+        """
+        plugins_table: list[tuple[str, ...]] = [("PATCH", "LOCATIONS")]
+        self.render_all()
+        for patch, locations in sorted(self.patches_locations.items()):
+            n_locations = 0
+            for location in locations:
+                if n_locations < 1:
+                    plugins_table.append((patch, location))
+                    n_locations += 1
+                else:
+                    plugins_table.append(("", location))
+
+        fmt.echo(utils.format_table(plugins_table))
+
+
 def is_rendered(path: str) -> bool:
     """
     Return whether the template should be rendered or not.

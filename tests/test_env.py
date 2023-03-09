@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+from io import StringIO
 from unittest.mock import Mock, patch
 
 from tests.helpers import PluginsTestCase, temporary_root
@@ -261,3 +262,138 @@ class CurrentVersionTests(unittest.TestCase):
             self.assertEqual("olive", env.get_env_release(root))
             self.assertIsNone(env.should_upgrade_from_release(root))
             self.assertTrue(env.is_up_to_date(root))
+
+
+class PatchRendererTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.render = env.PatchRenderer()
+        self.render.current_template = "current_template"
+        return super().setUp()
+
+    @patch("tutor.env.Renderer.render_template")
+    def test_render_template(self, render_template_mock: Mock) -> None:
+        """Test that render_template changes the current template and
+        calls once render_template from Renderer with the current template."""
+        self.render.render_template("new_template")
+
+        self.assertEqual(self.render.current_template, "new_template")
+        render_template_mock.assert_called_once_with("new_template")
+
+    @patch("tutor.env.Renderer.patch")
+    def test_patch_with_first_patch(self, patch_mock: Mock) -> None:
+        """Test that patch is called from Renderer and adds patches_locations
+        when we didn't have that patch."""
+        self.render.patches_locations = {}
+
+        self.render.patch("first_patch")
+
+        patch_mock.assert_called_once_with("first_patch", separator="\n", suffix="")
+        self.assertEqual(
+            self.render.patches_locations,
+            {"first_patch": [self.render.current_template]},
+        )
+
+    def test_patch_with_patch_multiple_locations(self) -> None:
+        """Test add more locations to a patch."""
+        self.render.patches_locations = {"first_patch": ["template_1"]}
+
+        self.render.patch("first_patch")
+
+        self.assertEqual(
+            self.render.patches_locations,
+            {"first_patch": ["template_1", "current_template"]},
+        )
+
+    @patch("tutor.env.plugins.iter_patches")
+    def test_patch_with_custom_patch_in_a_plugin_patch(
+        self, iter_patches_mock: Mock
+    ) -> None:
+        """Test the patch function with a plugin with a custom patch.
+        Examples:
+        - When first_patch is in a plugin patches and has a 'custom_patch',
+        the patches_locations will reflect that 'custom_patch' is from
+        first_patch location.
+        - If in tutor-mfe/tutormfe/patches/caddyfile you add a custom patch
+        inside the caddyfile patch, the patches_locations will reflect that.
+
+        Expected behavior:
+        - Process the first_patch and find the custom_patch in a plugin with
+        first_patch patch.
+        - Process the custom_patch and add "within patch: first_patch" in the
+        patches_locations."""
+        iter_patches_mock.side_effect = [
+            ["""{{ patch('custom_patch')|indent(4) }}"""],
+            [],
+        ]
+        self.render.patches_locations = {}
+        calls = [unittest.mock.call("first_patch"), unittest.mock.call("custom_patch")]
+
+        self.render.patch("first_patch")
+
+        iter_patches_mock.assert_has_calls(calls)
+        self.assertEqual(
+            self.render.patches_locations,
+            {
+                "first_patch": ["current_template"],
+                "custom_patch": ["within patch: first_patch"],
+            },
+        )
+
+    @patch("tutor.env.plugins.iter_patches")
+    def test_patch_with_processed_patch_in_a_plugin_patch(
+        self, iter_patches_mock: Mock
+    ) -> None:
+        """Test the patch function with a plugin with a processed patch.
+        Example:
+        - When first_patch was processed and the second_patch is used in a
+        plugin and call the first_patch again. Then the patches_locations will
+        reflect that first_patch also have a location from second_patch."""
+        iter_patches_mock.side_effect = [
+            ["""{{ patch('first_patch')|indent(4) }}"""],
+            [],
+        ]
+        self.render.patches_locations = {"first_patch": ["current_template"]}
+
+        self.render.patch("second_patch")
+
+        self.assertEqual(
+            self.render.patches_locations,
+            {
+                "first_patch": ["current_template", "within patch: second_patch"],
+                "second_patch": ["current_template"],
+            },
+        )
+
+    @patch("tutor.env.Renderer.iter_templates_in")
+    @patch("tutor.env.PatchRenderer.render_template")
+    def test_render_all(
+        self, render_template_mock: Mock, iter_templates_in_mock: Mock
+    ) -> None:
+        """Test render_template was called for templates in iter_templates_in."""
+        iter_templates_in_mock.return_value = ["template_1", "template_2"]
+        calls = [unittest.mock.call("template_1"), unittest.mock.call("template_2")]
+
+        self.render.render_all()
+
+        iter_templates_in_mock.assert_called_once()
+        render_template_mock.assert_has_calls(calls)
+
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("tutor.env.PatchRenderer.render_all")
+    def test_print_patches_locations(
+        self, render_all_mock: Mock, stdout_mock: Mock
+    ) -> None:
+        """Test render_all was called and the output of print_patches_locations."""
+        self.render.patches_locations = {"first_patch": ["template_1", "template_2"]}
+
+        self.render.print_patches_locations()
+
+        render_all_mock.assert_called_once()
+        self.assertEqual(
+            """
+PATCH      	LOCATIONS
+first_patch	template_1
+           	template_2
+""".strip(),
+            stdout_mock.getvalue().strip(),
+        )
