@@ -114,7 +114,7 @@ You can identify which containers are consuming most resources by running::
 
 In idle mode, the "mysql" container should use ~200MB memory; ~200-300MB for the the "lms" and "cms" containers.
 
-On some operating systems, such as RedHat, ArchLinux or Fedora, a very high limit of the number of open files (``nofile``) per container may cause the " mysql", "lms" and "cms" containers to use a lot of memory: up to 8-16GB. To check whether you might impacted, run::
+On some operating systems, such as RedHat, Arch Linux or Fedora, a very high limit of the number of open files (``nofile``) per container may cause the "mysql", "lms" and "cms" containers to use a lot of memory: up to 8-16GB. To check whether you might impacted, run::
 
     cat /proc/$(pgrep dockerd)/limits | grep "Max open files"
 
