@@ -84,13 +84,13 @@ The most common reason this happens is that you are running two different instan
     tutor dev stop
     tutor local stop
     tutor k8s stop
-    
+
 And then run your command(s) again, ensuring you're consistently using the correct Tutor variant (``tutor dev``, ``tutor local``, or ``tutor k8s``).
 
 If that doesn't work, then check if you have any other Docker containers running that may using port 3306::
 
     docker ps -a
-   
+
 For example, if you have ever used `Tutor Nightly <https://docs.tutor.overhang.io/tutorials/nightly.html>`_, check whether you still have ``tutor_nightly_`` containers running. Conversely, if you're trying to run Tutor Nightly now, check whether you have non-Nightly ``tutor_`` containers running. If so, switch to that other version of Tutor, run ``tutor (dev|local|k8s) stop``, and then switch back to your preferred version of Tutor.
 
 Alternatively, if there are any other non-Tutor containers using port 3306, then stop and remove them::
@@ -101,7 +101,7 @@ Alternatively, if there are any other non-Tutor containers using port 3306, then
 Finally, if you've ensured that containers or other programs are making use of port 3306, check the logs of the MySQL container itself::
 
     tutor (dev|local|k8s) logs mysql
-  
+
 Check whether the MySQL container is crashing upon startup, and if so, what is causing it to crash.
 
 
@@ -111,6 +111,34 @@ Help! The Docker containers are eating all my RAM/CPU/CHEESE
 You can identify which containers are consuming most resources by running::
 
     docker stats
+
+In idle mode, the "mysql" container should use ~200MB memory; ~200-300MB for the the "lms" and "cms" containers.
+
+On some operating systems, such as RedHat, ArchLinux or Fedora, a very high limit of the number of open files (``nofile``) per container may cause the " mysql", "lms" and "cms" containers to use a lot of memory: up to 8-16GB. To check whether you might impacted, run::
+
+    cat /proc/$(pgrep dockerd)/limits | grep "Max open files"
+
+If the output is 1073741816 or higher, then it is likely that you are affected by `this mysql issue <https://github.com/docker-library/mysql/issues/579>`__. To learn more about the root cause, read `this containerd issue comment <https://github.com/containerd/containerd/pull/7566#issuecomment-1285417325>`__. Basically, the OS is hard-coding a very high limit for the allowed number of open files, and this is causing some containers to fail. To resolve the problem, you should configure the Docker daemon to enforce a lower value, as described `here <https://github.com/docker-library/mysql/issues/579#issuecomment-1432576518>`__. Edit ``/etc/docker/daemon.json`` and add the following contents::
+
+    {
+        "default-ulimits": {
+            "nofile": {
+                "Name": "nofile",
+                "Hard": 1048576,
+                "Soft": 1048576
+            }
+        }
+    }
+
+Check your configuration is valid with::
+
+    dockerd --validate
+
+Then restart the Docker service::
+
+    sudo systemctl restart docker.service
+
+Launch your Open edX platform again with ``tutor local launch``. You should observe normal memory usage.
 
 "Build failed running pavelib.servers.lms: Subprocess return code: 1"
 -----------------------------------------------------------------------
