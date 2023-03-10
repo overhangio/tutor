@@ -85,6 +85,8 @@ spec:
             value: cms
           - name: DJANGO_SETTINGS_MODULE
             value: cms.envs.tutor.production
+          - name: UWSGI_WORKERS
+            value: "{{ OPENEDX_CMS_UWSGI_WORKERS }}"
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -185,6 +187,8 @@ spec:
             value: lms
           - name: DJANGO_SETTINGS_MODULE
             value: lms.envs.tutor.production
+          - name: UWSGI_WORKERS
+            value: "{{ OPENEDX_LMS_UWSGI_WORKERS }}"
           ports:
             - containerPort: 8000
           volumeMounts:
