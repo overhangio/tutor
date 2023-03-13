@@ -21,15 +21,6 @@ RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.2.2 --depth
 RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
 RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/python -m venv /openedx/venv
 
-###### Install Dockerize to wait for mysql DB availability
-FROM minimal as dockerize
-# https://github.com/powerman/dockerize/releases
-ARG DOCKERIZE_VERSION=v0.16.0
-RUN dockerize_url="https://github.com/powerman/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-$(uname -m | sed 's@aarch@arm@')" \
-    && echo "Downloading dockerize from $dockerize_url" \
-    && curl --fail --location --output /usr/local/bin/dockerize $dockerize_url \
-    && chmod a+x /usr/local/bin/dockerize
-
 ###### Checkout edx-platform code
 FROM minimal as code
 ARG EDX_PLATFORM_REPOSITORY={{ EDX_PLATFORM_REPOSITORY }}
@@ -136,7 +127,8 @@ RUN if [ "$APP_USER_ID" = 0 ]; then echo "app user may not be root" && false; fi
 RUN useradd --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER_ID} app
 USER ${APP_USER_ID}
 
-COPY --from=dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
+# https://hub.docker.com/r/powerman/dockerize/tags
+COPY --from=docker.io/powerman/dockerize:0.19.0 /usr/local/bin/dockerize /usr/local/bin/dockerize
 COPY --chown=app:app --from=code /openedx/edx-platform /openedx/edx-platform
 COPY --chown=app:app --from=locales /openedx/locale /openedx/locale
 COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv
