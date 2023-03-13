@@ -1,6 +1,6 @@
 from datetime import datetime
 from time import sleep
-from typing import Any, List, Optional, Type, Iterable
+from typing import Any, Iterable, List, Optional, Type
 
 import click
 
