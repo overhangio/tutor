@@ -21,6 +21,13 @@ instructions, because git commits are used to generate release notes:
 <!-- scriv-insert-here -->
 
 <a id='changelog-15.3.1'></a>
+## v15.3.2 (2023-03-13)
+
+- [Bugfix] Use supported YouTube API for transcripts imports. (by @mariajgrimaldi)
+- [Feature] Add `tutor config patches list` CLI for listing available patches. (by @mafermazu)
+- [Bugfix] Add the missing `UWSGI_WORKERS` env variables to the lms and cms k8s deployments. (by @MoisesGSalas)
+
+<a id='changelog-15.3.1'></a>
 ## v15.3.1 (2023-02-28)
 
 - [Bugfix] `patchStrategicMerge` can now be applied to jobs. (by @keithgg)
