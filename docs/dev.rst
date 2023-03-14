@@ -10,24 +10,24 @@ In addition to running Open edX in production, Tutor can be used for local devel
 First-time setup
 ----------------
 
-First, ensure you have already :ref:`installed Tutor <install>` (for development against the named releases of Open edX) or :ref:`Tutor Nightly <nightly>` (for development against Open edX's master branches).
+Firstly, either :ref:`install Tutor <install>` (for development against the named releases of Open edX) or :ref:`install Tutor Nightly <nightly>` (for development against Open edX's master branches).
 
 Then, run one of the following in order to launch the developer platform setup process::
 
-    # To use the edx-platform repository that is built into the image:
+    # To use the edx-platform repository that is built into the image, run:
     tutor dev launch
 
-    # To bind-mount and run your local clone of edx-platform,
-    # where './edx-platform' should be replaced with your local edx-platform's path:
+    # To bind-mount and run a local clone of edx-platform, replace
+    # './edx-platform' with the path to the local clone and run:
     tutor dev launch --mount=./edx-platform
 
-This will perform several tasks for you. It will:
+This will perform several tasks. It will:
 
 * stop any existing locally-running Tutor containers,
 
 * disable HTTPS,
 
-* set your ``LMS_HOST`` to `local.overhang.io <http://local.overhang.io>`_ (a convenience domain that simply `points at 127.0.0.1 <https://dnschecker.org/#A/local.overhang.io>`_),
+* set ``LMS_HOST`` to `local.overhang.io <http://local.overhang.io>`_ (a convenience domain that simply `points at 127.0.0.1 <https://dnschecker.org/#A/local.overhang.io>`_),
 
 * prompt for a platform details (with suitable defaults),
 
@@ -39,12 +39,10 @@ This will perform several tasks for you. It will:
 
 * run service initialization scripts, such as service user creation and Waffle configuration.
 
-Additionally, if you chose to bind-mount your local clone of edx-platform, it will:
+Additionally, when a local clone of edx-platform is bind-mounted, it will:
 
 * re-run setup.py,
-
 * clean-reinstall Node modules, and
-
 * regenerate static assets.
 
 Once setup is complete, the platform will be running in the background:
@@ -53,45 +51,45 @@ Once setup is complete, the platform will be running in the background:
 * CMS will be accessible at `http://studio.local.overhang.io:8001 <http://studio.local.overhang.io:8001>`_.
 * Plugged-in services should be accessible at their documented URLs.
 
-Now, you can use the ``tutor dev ...`` command-line interface to manage your development environment. Some common commands are described below.
+Now, use the ``tutor dev ...`` command-line interface to manage the development environment. Some common commands are described below.
 
 .. note::
 
-  Wherever you see ``[--mount=./edx-platform]``, either:
+  Wherever the ``[--mount=./edx-platform]`` option is present, either:
 
-  * omit it, if you are using the edx-platform repository built into the image, or
-  * substitute it with ``--mount=<path/to/your/edx-platform>``.
+  * omit it when running of the edx-platform repository built into the image, or
+  * substitute it with ``--mount=<path/to/edx-platform>``.
 
-  You can :ref:`read more about bind-mounts below <bind_mounts>`.
+  Read more about bind-mounts :ref:`below <bind_mounts>`.
 
 Stopping the platform
 ---------------------
 
-To bring down your platform's containers, simply run::
+To bring down the platform's containers, simply run::
 
   tutor dev stop
 
 Starting the platform back up
 -----------------------------
 
-Once you have used ``launch`` once, you can start the platform in the future with the lighter-weight ``start -d`` command, which brings up containers *detached* (that is: in the background), but does not perform any initialization tasks::
+Once first-time setup has been performed with ``launch``, the platform can be started going forward with the lighter-weight ``start -d`` command, which brings up containers *detached* (that is: in the background), but does not perform any initialization tasks::
 
   tutor dev start -d [--mount=./edx-platform]
 
-If you prefer to run containers *attached* (that is: in the foreground, your current terminal), you can omit the ``-d`` flag::
+Or, to start with platform with containers *attached* (that is: in the foreground, the current terminal), omit the ``-d`` flag::
 
   tutor dev start [--mount=./edx-platform]
 
-When running containers attached, you can stop the platform with ``Ctrl+c``, or switch to detached mode using ``Ctrl+z``.
+When running containers attached, stop the platform with ``Ctrl+c``, or switch to detached mode using ``Ctrl+z``.
 
-Finally, you can always start your platform with ``launch``, even if you have already run it in the past. It will take longer, but it will ensure that your config is applied, your database is provisioned, your plugins are fully initialized, and (if mounted) your local edx-platform is set up. If you include the ``--pullimages`` flag it will also ensure that your container images are up-to-date as well::
+Finally, the platform can also be started back up with ``launch``. It will take longer than ``start``, but it will ensure that config is applied, databases are provisioned & migrated, plugins are fully initialized, and (if applicable) the bind-mounted edx-platform is set up. Notably, ``launch`` is idempotent, so it is always safe to run it again without risk to data. Including the ``--pullimages`` flag will also ensure that container images are up-to-date::
 
   tutor dev launch [--mount=./edx-platform] --pullimages
 
 Debugging with breakpoints
 --------------------------
 
-To debug a local edx-platform repository, you can add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in your code. Then, attach to the applicable service's container by running ``start`` (without ``-d``) followed by the service's name:
+To debug a local edx-platform repository, add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in the code. Then, attach to the applicable service's container by running ``start`` (without ``-d``) followed by the service's name::
 
   # Debugging LMS:
   tutor dev start [--mount=./edx-platform] lms
