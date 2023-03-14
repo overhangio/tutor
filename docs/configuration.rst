@@ -150,7 +150,7 @@ These two configuration parameters define which Redis database to use for Open e
 
 .. _openedx_extra_pip_requirements:
 
-- ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``openedx-scorm-xblock>=15.0.0,<16.0.0``)
+- ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``["openedx-scorm-xblock>=15.0.0,<16.0.0"]``)
 
 This defines extra pip packages that are going to be installed for Open edX.
 
