@@ -1,0 +1,1 @@
+- [Bugfix] Running jobs in development mode with ``tutor dev do ...`` will now correctly use the development image. Previously, it used the production image, just like ``tutor local do ...``. (by @kdmccormick)

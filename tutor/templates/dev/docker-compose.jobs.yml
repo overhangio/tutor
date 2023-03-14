@@ -1,3 +1,21 @@
 version: "{{ DOCKER_COMPOSE_VERSION }}"
-services: {% if not patch("dev-docker-compose-jobs-services") %}{}{% endif %}
-    {{ patch("dev-docker-compose-jobs-services")|indent(4) }}
+
+x-openedx-job-service:
+  &openedx-job-service
+  image: {{ DOCKER_IMAGE_OPENEDX_DEV }}
+  build:
+    context: ../build/openedx/
+    target: development
+    args:
+      # Note that we never build the openedx-dev image with root user ID, as it would simply fail.
+      APP_USER_ID: "{{ HOST_USER_ID or 1000 }}"
+
+services:
+
+  lms-job:
+    <<: *openedx-job-service
+
+  cms-job:
+    <<: *openedx-job-service
+
+  {{ patch("dev-docker-compose-jobs-services")|indent(2) }}
