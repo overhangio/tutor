@@ -207,6 +207,13 @@ RUN openedx-assets themes \
 # Create a data directory, which might be used (or not)
 RUN mkdir /openedx/data
 
+# If this "canary" file is missing from a container, then that indicates that a
+# local edx-platform was bind-mounted into that container, thus overwriting the
+# canary. This information is useful during edx-platform initialisation.
+RUN echo \
+  "This copy of edx-platform was built into a Docker image." \
+  > bindmount-canary
+
 # service variant is "lms" or "cms"
 ENV SERVICE_VARIANT lms
 ENV DJANGO_SETTINGS_MODULE lms.envs.tutor.production
