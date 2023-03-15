@@ -51,6 +51,12 @@ configMapGenerator:
   options:
     labels:
         app.kubernetes.io/name: openedx
+- name: openedx-uwsgi-config
+  files:
+  - apps/openedx/uwsgi.ini
+  options:
+    labels:
+        app.kubernetes.io/name: openedx
 - name: redis-config
   files:
   - apps/redis/redis.conf

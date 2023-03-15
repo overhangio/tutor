@@ -244,17 +244,14 @@ CMD ./manage.py $SERVICE_VARIANT runserver 0.0.0.0:8000
 ###### Final image with production cmd
 FROM production as final
 
+# Default amount of uWSGI processes
+ENV UWSGI_WORKERS=2
+
+# Copy the default uWSGI configuration
+COPY --chown=app:app settings/uwsgi.ini .
+
 # Run server
-CMD uwsgi \
-    --static-map /static=/openedx/staticfiles/ \
-    --static-map /media=/openedx/media/ \
-    --http 0.0.0.0:8000 \
-    --thunder-lock \
-    --single-interpreter \
-    --enable-threads \
-    --processes=${UWSGI_WORKERS:-2} \
-    --buffer-size=8192 \
-    --wsgi-file $SERVICE_VARIANT/wsgi.py
+CMD uwsgi uwsgi.ini
 
 {{ patch("openedx-dockerfile-final") }}
 

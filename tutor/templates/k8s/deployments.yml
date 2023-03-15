@@ -96,6 +96,9 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+            - mountPath: /openedx/edx-platform/uwsgi.ini
+              name: uwsgi-config
+              subPath: uwsgi.ini
           resources:
             requests:
               memory: 2Gi
@@ -111,6 +114,12 @@ spec:
         - name: config
           configMap:
             name: openedx-config
+        - name: uwsgi-config
+          configMap:
+            name: openedx-uwsgi-config
+            items:
+              - key: uwsgi.ini
+                path: uwsgi.ini
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -198,6 +207,9 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
+            - mountPath: /openedx/edx-platform/uwsgi.ini
+              name: uwsgi-config
+              subPath: uwsgi.ini
           resources:
             requests:
               memory: 2Gi
@@ -213,6 +225,12 @@ spec:
         - name: config
           configMap:
             name: openedx-config
+        - name: uwsgi-config
+          configMap:
+            name: openedx-uwsgi-config
+            items:
+            - key: uwsgi.ini
+              path: uwsgi.ini
 ---
 apiVersion: apps/v1
 kind: Deployment
