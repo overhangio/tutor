@@ -11,6 +11,7 @@ from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
 from tutor import env, fmt, hooks
+from tutor.hooks import priorities
 
 
 class DoGroup(click.Group):
@@ -40,6 +41,15 @@ def _add_core_init_tasks() -> None:
             ("mysql", env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
     with hooks.Contexts.APP("lms").enter():
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+            (
+                "lms",
+                env.read_core_template_file("jobs", "init", "mounted-edx-platform.sh"),
+            ),
+            # If edx-platform is mounted, then we may need to perform some setup
+            # before other initialization scripts can be run.
+            priority=priorities.HIGH,
+        )
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("lms", env.read_core_template_file("jobs", "init", "lms.sh"))
         )
