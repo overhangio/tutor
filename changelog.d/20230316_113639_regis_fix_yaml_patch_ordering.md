@@ -1,0 +1,1 @@
+- [Bugfix] Make sure that v0 plugin patches are applied in the same order as plugins are listed. (by @regisb)
