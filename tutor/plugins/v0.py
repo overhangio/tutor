@@ -146,7 +146,7 @@ class BasePlugin:
                 raise exceptions.TutorError(
                     f"Invalid patch '{patch_name}' in plugin {self.name}. Expected str, got {content.__class__}."
                 )
-            hooks.Filters.ENV_PATCH(patch_name).add_item(content)
+            hooks.Filters.ENV_PATCHES.add_item((patch_name, content))
 
     def _load_tasks(self) -> None:
         """
