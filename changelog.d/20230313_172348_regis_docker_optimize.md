@@ -1,0 +1,1 @@
+- [Feature] Introduce the `DOCKER_BUILD_COMMAND` which makes it possible to customize the `docker build` command. (by @regisb)

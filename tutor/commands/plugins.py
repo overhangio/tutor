@@ -335,7 +335,7 @@ def plugin_status(name: str) -> str:
     Return the status of a plugin. Either: "enabled", "installed" or "not installed".
     """
     if plugins.is_loaded(name):
-        return "enabled"
+        return "✅ enabled"
     if plugins.is_installed(name):
         return "installed"
     return "not installed"

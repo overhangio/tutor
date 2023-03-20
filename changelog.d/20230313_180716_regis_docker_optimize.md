@@ -1,0 +1,1 @@
+- [Improvement] During openedx image build, copy `dockerize` utility from Docker registry for better efficiency. (by @regisb)

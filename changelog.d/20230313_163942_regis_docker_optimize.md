@@ -1,0 +1,1 @@
+- [Improvement] Faster build with `npm clean-install` instead of `npm install` in the openedx Docker image. This may change the version of npm packages installed next to edx-platform. (by @regisb)

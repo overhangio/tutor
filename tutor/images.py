@@ -1,5 +1,5 @@
-from . import fmt, utils
-from .types import Config, get_typed
+from tutor import fmt, hooks, utils
+from tutor.types import Config, get_typed
 
 
 def get_tag(config: Config, name: str) -> str:
@@ -9,7 +9,10 @@ def get_tag(config: Config, name: str) -> str:
 
 def build(path: str, tag: str, *args: str) -> None:
     fmt.echo_info(f"Building image {tag}")
-    utils.docker("build", "-t", tag, *args, path)
+    command = hooks.Filters.DOCKER_BUILD_COMMAND.apply(
+        ["build", "-t", tag, *args, path]
+    )
+    utils.docker(*command)
 
 
 def pull(tag: str) -> None:
