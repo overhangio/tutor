@@ -120,7 +120,19 @@ GRADES_DOWNLOAD = {
 
 ORA2_FILEUPLOAD_BACKEND = "filesystem"
 ORA2_FILEUPLOAD_ROOT = "/openedx/data/ora2"
+FILE_UPLOAD_STORAGE_BUCKET_NAME = "openedxuploads"
 ORA2_FILEUPLOAD_CACHE_NAME = "ora2-storage"
+# For a long while, we were storing ora2 uploads this directory.
+ora2_folder = os.path.join(ORA2_FILEUPLOAD_ROOT, FILE_UPLOAD_STORAGE_BUCKET_NAME)
+deprecated_ora2_folder = os.path.join(ORA2_FILEUPLOAD_ROOT, "SET-ME-PLEASE (ex. bucket-name)")
+if deprecated_ora2_folder != ora2_folder and os.path.exists(deprecated_ora2_folder):
+    if os.path.exists(ora2_folder):
+        # We are really not supposed to fall in this scenario, so print a warning
+        sys.stderr.write(f"⚠️ Deprecated ORA2 folder '{deprecated_ora2_folder}' exists. Its content should be moved to '{ora2_folder}'.\n")
+    else:
+        # This folder is a relic, let's rename it
+        print(f"Moving deprecated ORA2 folder from '{deprecated_ora2_folder}' to '{ora2_folder}'...")
+        os.rename(deprecated_ora2_folder, ora2_folder)
 
 # Change syslog-based loggers which don't work inside docker containers
 LOGGING["handlers"]["local"] = {
