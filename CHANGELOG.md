@@ -20,6 +20,19 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.3.3'></a>
+## v15.3.3 (2023-03-22)
+
+- [Improvement] Make it possible to extend or override the configuration of the uWSGI server. (by @MoisesGSalas)
+- [Improvement] Running `tutor dev launch --mount=edx-platform` now performs all necessary setup for a local edx-platform development. This includes running setup.py, installing node modules, and building assets; previously, those steps had to be run explicitly after bind-mounting a local copy of edx-platform (by @kdmccormick).
+- [Bugfix] Running jobs in development mode with `tutor dev do ...` will now correctly use the development image. Previously, it used the production image, just like `tutor local do ...`. (by @kdmccormick)
+- [Improvement] Faster build with `npm clean-install` instead of `npm install` in the openedx Docker image. This may change the version of npm packages installed next to edx-platform. (by @regisb)
+- [Feature] Introduce the `DOCKER_BUILD_COMMAND` filter which makes it possible to customize the `docker build` command. (by @regisb)
+- [Improvement] During openedx image build, copy `dockerize` utility from Docker registry for better efficiency. (by @regisb)
+- [Improvement] Better highlight enabled plugins in `tutor plugins list`. (by @regisb)
+
+- [Bugfix] Make sure that v0 plugin patches are applied in the same order as plugins are listed. (by @regisb)
+
 <a id='changelog-15.3.1'></a>
 ## v15.3.2 (2023-03-13)
 
