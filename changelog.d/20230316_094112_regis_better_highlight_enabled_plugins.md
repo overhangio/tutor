@@ -1,1 +1,0 @@
-- [Improvement] Better highlight enabled plugins in `tutor plugins list`. (by @regisb)
