@@ -1,6 +1,27 @@
 version: "{{ DOCKER_COMPOSE_VERSION }}"
 services:
 
+  # Set bind-mounted folder ownership
+  permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    restart: on-failure
+    entrypoint: []
+    command: ["sh", "/usr/local/bin/setowners.sh"]
+    environment:
+      OPENEDX_USER_ID: "1000"
+    volumes:
+      # Command script
+      - ../apps/permissions/setowners.sh:/usr/local/bin/setowners.sh:ro
+      # Bind-mounted volumes to set ownership
+      - ../../data/lms:/mounts/lms
+      - ../../data/cms:/mounts/cms
+      - ../../data/openedx-media:/mounts/openedx
+      {% if RUN_MONGODB %}- ../../data/mongodb:/mounts/mongodb{% endif %}
+      {% if RUN_MYSQL %}- ../../data/mysql:/mounts/mysql{% endif %}
+      {% if RUN_ELASTICSEARCH %}- ../../data/elasticsearch:/mounts/elasticsearch{% endif %}
+      {% if RUN_REDIS %}- ../../data/redis:/mounts/redis{% endif %}
+      {{ patch("local-docker-compose-permissions-volumes")|indent(6) }}
+
   ############# External services
 
   {% if RUN_MONGODB %}
@@ -13,13 +34,7 @@ services:
     volumes:
       - ../../data/mongodb:/data/db
     depends_on:
-      - mongodb-permissions
-  mongodb-permissions:
-    image: {{ DOCKER_IMAGE_PERMISSIONS }}
-    command: ["999", "/data/db"]
-    restart: on-failure
-    volumes:
-      - ../../data/mongodb:/data/db
+      - permissions
   {% endif %}
 
   {% if RUN_MYSQL %}
@@ -32,12 +47,6 @@ services:
       - ../../data/mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
-  mysql-permissions:
-    image: {{ DOCKER_IMAGE_PERMISSIONS }}
-    command: ["999", "/var/lib/mysql"]
-    restart: on-failure
-    volumes:
-      - ../../data/mysql:/var/lib/mysql
   {% endif %}
 
   {% if RUN_ELASTICSEARCH %}
@@ -57,13 +66,7 @@ services:
     volumes:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
     depends_on:
-      - elasticsearch-permissions
-  elasticsearch-permissions:
-    image: {{ DOCKER_IMAGE_PERMISSIONS }}
-    command: ["1000", "/usr/share/elasticsearch/data"]
-    restart: on-failure
-    volumes:
-      - ../../data/elasticsearch:/usr/share/elasticsearch/data
+      - permissions
   {% endif %}
 
   {% if RUN_REDIS %}
@@ -77,13 +80,7 @@ services:
     command: redis-server /openedx/redis/config/redis.conf
     restart: unless-stopped
     depends_on:
-      - redis-permissions
-  redis-permissions:
-    image: {{ DOCKER_IMAGE_PERMISSIONS }}
-    command: ["1000", "/openedx/redis/data"]
-    restart: on-failure
-    volumes:
-      - ../../data/redis:/openedx/redis/data
+      - permissions
   {% endif %}
 
   {% if RUN_SMTP %}
@@ -112,21 +109,13 @@ services:
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
-      - lms-permissions
+      - permissions
       {% if RUN_MYSQL %}- mysql{% endif %}
       {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if RUN_MONGODB %}- mongodb{% endif %}
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
       {{ patch("local-docker-compose-lms-dependencies")|indent(6) }}
-  lms-permissions:
-    image: {{ DOCKER_IMAGE_PERMISSIONS }}
-    command: ["1000", "/openedx/data", "/openedx/media"]
-    restart: on-failure
-    volumes:
-      - ../../data/lms:/openedx/data
-      - ../../data/openedx-media:/openedx/media
-  {% endif %}
 
   cms:
     image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -143,20 +132,14 @@ services:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
     depends_on:
-      - cms-permissions
+      - permissions
+      - lms
       {% if RUN_MYSQL %}- mysql{% endif %}
       {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
       {% if RUN_MONGODB %}- mongodb{% endif %}
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
       {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}
-  cms-permissions:
-    image: {{ DOCKER_IMAGE_PERMISSIONS }}
-    command: ["1000", "/openedx/data", "/openedx/media"]
-    restart: on-failure
-    volumes:
-      - ../../data/cms:/openedx/data
-      - ../../data/openedx-media:/openedx/media
 
   ############# LMS and CMS workers
 

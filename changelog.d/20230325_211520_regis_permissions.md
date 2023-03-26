@@ -1,0 +1,1 @@
+- [Improvement] Greatly simplify ownership of bind-mounted volumes with docker-compose. Instead of running one service per application, we run just a single "permissions" service. This change should be backward-compatible. (by @regisb)
