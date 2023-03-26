@@ -97,7 +97,6 @@ services:
 
   ############# LMS and CMS
 
-  {% if RUN_LMS %}
   lms:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -129,7 +128,6 @@ services:
       - ../../data/openedx-media:/openedx/media
   {% endif %}
 
-  {% if RUN_CMS %}
   cms:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -151,7 +149,6 @@ services:
       {% if RUN_MONGODB %}- mongodb{% endif %}
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
-      {% if RUN_LMS %}- lms{% endif %}
       {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}
   cms-permissions:
     image: {{ DOCKER_IMAGE_PERMISSIONS }}
@@ -160,11 +157,9 @@ services:
     volumes:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
-  {% endif %}
 
   ############# LMS and CMS workers
 
-  {% if RUN_LMS %}
   lms-worker:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -180,9 +175,7 @@ services:
       - ../../data/openedx-media:/openedx/media
     depends_on:
       - lms
-  {% endif %}
 
-  {% if RUN_CMS %}
   cms-worker:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -198,6 +191,5 @@ services:
       - ../../data/openedx-media:/openedx/media
     depends_on:
       - cms
-  {% endif %}
 
   {{ patch("local-docker-compose-services")|indent(2) }}

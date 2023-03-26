@@ -306,10 +306,7 @@ def restart(context: BaseComposeContext, services: list[str]) -> None:
     else:
         for service in services:
             if service == "openedx":
-                if config["RUN_LMS"]:
-                    command += ["lms", "lms-worker"]
-                if config["RUN_CMS"]:
-                    command += ["cms", "cms-worker"]
+                command += ["lms", "lms-worker", "cms", "cms-worker"]
             else:
                 command.append(service)
     context.job_runner(config).docker_compose(*command)
