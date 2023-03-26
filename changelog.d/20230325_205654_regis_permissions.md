@@ -1,0 +1,1 @@
+- 💥[Improvement] Deprecate the `RUN_LMS` and `RUN_CMS` tutor settings, which should be mostly unused. (by @regisb)

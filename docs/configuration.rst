@@ -40,8 +40,6 @@ With an up-to-date environment, Tutor is ready to launch an Open edX platform an
 Individual service activation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``RUN_LMS`` (default: ``true``)
-- ``RUN_CMS`` (default: ``true``)
 - ``RUN_ELASTICSEARCH`` (default: ``true``)
 - ``RUN_MONGODB`` (default: ``true``)
 - ``RUN_MYSQL`` (default: ``true``)
