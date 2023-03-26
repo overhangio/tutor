@@ -57,7 +57,6 @@ spec:
           persistentVolumeClaim:
             claimName: caddy
         {%- endif %}
-{% if RUN_CMS %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -167,8 +166,6 @@ spec:
         - name: config
           configMap:
             name: openedx-config
-{% endif %}
-{% if RUN_LMS %}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -278,7 +275,6 @@ spec:
         - name: config
           configMap:
             name: openedx-config
-{% endif %}
 {% if RUN_ELASTICSEARCH %}
 ---
 apiVersion: apps/v1
