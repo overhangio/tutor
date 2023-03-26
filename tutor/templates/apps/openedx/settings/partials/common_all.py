@@ -143,6 +143,11 @@ warnings.filterwarnings("ignore", category=RemovedInDjango40Warning)
 warnings.filterwarnings("ignore", category=RemovedInDjango41Warning)
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="lms.djangoapps.course_wiki.plugins.markdownedx.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="boto.plugin")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="botocore.vendored.requests.packages.urllib3._collections")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="storages.backends.s3boto")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="openedx.core.types.admin")
+SILENCED_SYSTEM_CHECKS = ["2_0.W001", "fields.W903"]
 
 # Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
