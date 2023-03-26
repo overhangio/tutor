@@ -34,7 +34,6 @@ spec:
   selector:
     app.kubernetes.io/name: caddy
 {% endif %}
-{% if RUN_CMS %}
 ---
 apiVersion: v1
 kind: Service
@@ -49,8 +48,6 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: cms
-{% endif %}
-{% if RUN_LMS %}
 ---
 apiVersion: v1
 kind: Service
@@ -65,7 +62,6 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: lms
-{% endif %}
 {% if RUN_ELASTICSEARCH %}
 ---
 apiVersion: v1
