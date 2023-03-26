@@ -203,6 +203,25 @@ File: ``local/docker-compose.jobs.yml``
 
 File: ``local/docker-compose.yml``
 
+.. patch:: local-docker-compose-permissions-command
+
+``local-docker-compose-permissions-command``
+============================================
+
+File: ``apps/permissions/setowners.sh``
+
+Add commands to this script to set ownership of bind-mounted docker-compose volumes at runtime. See :patch:`local-docker-compose-permissions-volumes`.
+
+
+.. patch:: local-docker-compose-permissions-volumes
+
+``local-docker-compose-permissions-volumes``
+============================================
+
+File: ``local/docker-compose.yml``
+
+Add bind-mounted volumes to this patch to set their owners properly. See :patch:`local-docker-compose-permissions-command`.
+
 .. patch:: local-docker-compose-prod-services
 
 ``local-docker-compose-prod-services``
