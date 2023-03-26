@@ -222,6 +222,26 @@ def assign_theme(name, domain):
     return f'./manage.py lms shell -c "{python_command}"'
 
 
+@click.command(
+    name="print-edx-platform-setting",
+    help="Print the value of an edx-platform Django setting.",
+)
+@click.argument("setting")
+@click.option(
+    "-s",
+    "--service",
+    type=click.Choice(["lms", "cms"]),
+    default="lms",
+    show_default=True,
+    help="Service to fetch the setting from",
+)
+def print_edx_platform_setting(
+    setting: str, service: str
+) -> t.Iterable[tuple[str, str]]:
+    command = f"./manage.py {service} shell -c 'from django.conf import settings; print(settings.{setting})'"
+    yield (service, command)
+
+
 def add_job_commands(do_command_group: click.Group) -> None:
     """
     This is meant to be called with the `local/dev/k8s do` group commands, to add the
@@ -300,6 +320,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         createuser,
         importdemocourse,
         initialise,
+        print_edx_platform_setting,
         settheme,
     ]
 )
