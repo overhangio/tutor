@@ -139,11 +139,26 @@ u.save()"
 
 
 @click.command(help="Import the demo course")
-def importdemocourse() -> t.Iterable[tuple[str, str]]:
-    template = """
+@click.option(
+    "-r",
+    "--repo",
+    default="https://github.com/openedx/edx-demo-course",
+    show_default=True,
+    help="Git repository that contains the course to be imported",
+)
+@click.option(
+    "-v",
+    "--version",
+    help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
+)
+def importdemocourse(
+    repo: str, version: t.Optional[str]
+) -> t.Iterable[tuple[str, str]]:
+    version = version or "{{ OPENEDX_COMMON_VERSION }}"
+    template = f"""
 # Import demo course
-git clone https://github.com/openedx/edx-demo-course --branch {{ OPENEDX_COMMON_VERSION }} --depth 1 ../edx-demo-course
-python ./manage.py cms import ../data ../edx-demo-course
+git clone {repo} --branch {version} --depth 1 /tmp/course
+python ./manage.py cms import ../data /tmp/course
 
 # Re-index courses
 ./manage.py cms reindex_course --all --setup"""
