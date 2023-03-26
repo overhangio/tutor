@@ -10,7 +10,6 @@ services:
     command: mongod --nojournal --storageEngine wiredTiger
     restart: unless-stopped
     user: "999:999"
-    privileged: false
     volumes:
       - ../../data/mongodb:/data/db
     depends_on:
@@ -29,7 +28,6 @@ services:
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
     restart: unless-stopped
     user: "999:999"
-    privileged: false
     volumes:
       - ../../data/mysql:/var/lib/mysql
     environment:
