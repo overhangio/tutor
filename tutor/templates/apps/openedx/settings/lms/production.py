@@ -9,6 +9,11 @@ ALLOWED_HOSTS = [
     FEATURES["PREVIEW_LMS_BASE"],
     "lms",
 ]
+
+{% for host in LMS_HOST_ALTS %}
+ALLOWED_HOSTS.append("{{ host }}")
+{% endfor %}
+
 CORS_ORIGIN_WHITELIST.append("{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}")
 
 {% if ENABLE_HTTPS %}
