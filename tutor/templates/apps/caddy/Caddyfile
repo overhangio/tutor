@@ -39,7 +39,7 @@
     }
 }
 
-{{ LMS_HOST }}{$default_site_port}, {{ PREVIEW_LMS_HOST }}{$default_site_port} {
+{{ LMS_HOST }}{$default_site_port}, {{ PREVIEW_LMS_HOST }}{$default_site_port}{% for host in LMS_HOST_ALTS %}, {{host}}{$default_site_port}{% endfor %} {
     @favicon_matcher {
         path_regexp ^/favicon.ico$
     }
