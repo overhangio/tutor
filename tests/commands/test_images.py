@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 
 from tests.helpers import PluginsTestCase, temporary_root
-from tutor import images, plugins
+from tutor import images, plugins, utils
 from tutor.__about__ import __version__
 from tutor.commands.images import ImageNotFoundError
 
@@ -128,16 +128,29 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
             "service1",
         ]
         with temporary_root() as root:
-            self.invoke_in_root(root, ["config", "save"])
-            result = self.invoke_in_root(root, build_args)
+            utils.is_buildkit_enabled.cache_clear()
+            with patch.object(utils, "is_buildkit_enabled", return_value=False):
+                self.invoke_in_root(root, ["config", "save"])
+                result = self.invoke_in_root(root, build_args)
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
         image_build.assert_called()
         self.assertIn("service1:1.0.0", image_build.call_args[0])
-        for arg in image_build.call_args[0][2:]:
-            # The only extra args are `--build-arg`
-            if arg != "--build-arg":
-                self.assertIn(arg, build_args)
+        self.assertEqual(
+            [
+                "service1:1.0.0",
+                "--no-cache",
+                "--build-arg",
+                "myarg=value",
+                "--add-host",
+                "host",
+                "--target",
+                "target",
+                "docker_args",
+                "--cache-from=type=registry,ref=service1:1.0.0-cache",
+            ],
+            list(image_build.call_args[0][1:])
+        )
 
     def test_images_push(self) -> None:
         result = self.invoke(["images", "push"])

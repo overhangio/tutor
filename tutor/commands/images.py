@@ -84,6 +84,14 @@ def images_command() -> None:
     help="Push the build cache to the remote registry. You should only enable this option if you have push rights to the remote registry.",
 )
 @click.option(
+    "--output",
+    "docker_output",
+    # Export image to docker. This is necessary to make the image available to docker-compose.
+    # The `--load` option is a shorthand for `--output=type=docker`.
+    default="type=docker",
+    help="Same as `docker build --output=...`. This option will only be used when BuildKit is enabled.",
+)
+@click.option(
     "-a",
     "--build-arg",
     "build_args",
@@ -114,6 +122,7 @@ def build(
     no_cache: bool,
     no_registry_cache: bool,
     cache_to_registry: bool,
+    docker_output: str,
     build_args: list[str],
     add_hosts: list[str],
     target: str,
@@ -135,9 +144,8 @@ def build(
         command_args += ["--add-host", add_host]
     if target:
         command_args += ["--target", target]
-    if utils.is_buildkit_enabled():
-        # Export image to docker.
-        command_args.append("--output=type=image")
+    if utils.is_buildkit_enabled() and docker_output:
+        command_args.append(f"--output={docker_output}")
     if docker_args:
         command_args += docker_args
     for image in image_names:
