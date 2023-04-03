@@ -54,6 +54,7 @@ def _prepare_environment() -> None:
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
+            ("is_buildkit_enabled", utils.is_buildkit_enabled),
         ],
     )
 
