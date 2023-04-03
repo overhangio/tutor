@@ -51,6 +51,7 @@ def _prepare_environment() -> None:
     # Template variables
     hooks.Filters.ENV_TEMPLATE_VARIABLES.add_items(
         [
+            ("BUILDKIT", utils.is_buildkit_enabled()),
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),

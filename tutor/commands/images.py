@@ -136,8 +136,9 @@ def build(
     if target:
         command_args += ["--target", target]
     if utils.is_buildkit_enabled():
-        # Export image to docker.
-        command_args.append("--output=type=image")
+        # Export image to docker. This is necessary to make the image available to docker-compose.
+        # The `--load` option is a shorthand for `--output=type=docker`.
+        command_args.append("--load")
     if docker_args:
         command_args += docker_args
     for image in image_names:
