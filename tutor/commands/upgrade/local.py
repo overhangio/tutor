@@ -39,6 +39,10 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         common_upgrade.upgrade_from_nutmeg(context, config)
         running_release = "olive"
 
+    if running_release == "olive":
+        upgrade_from_olive(context)
+        running_release = "palm"
+
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
@@ -144,6 +148,17 @@ def upgrade_from_maple(context: click.Context, config: Config) -> None:
         compose.run,
         args=["cms", "sh", "-e", "-c", "./manage.py cms simulate_publish"],
     )
+
+
+def upgrade_from_olive(context: click.Context) -> None:
+    # Note that we need to exec because the ora2 folder is not bind-mounted in the job
+    # services.
+    context.invoke(compose.start, detach=True, services=["lms"])
+    context.invoke(
+        compose.execute,
+        args=["lms", "sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
+    )
+    context.invoke(compose.stop)
 
 
 def upgrade_mongodb(

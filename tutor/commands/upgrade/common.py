@@ -39,3 +39,11 @@ def upgrade_from_nutmeg(context: click.Context, config: Config) -> None:
     context.obj.job_runner(config).run_task(
         "lms", "./manage.py lms compute_grades -v1 --all_courses"
     )
+
+
+PALM_RENAME_ORA2_FOLDER_COMMAND = """
+if stat '/openedx/data/ora2/SET-ME-PLEASE (ex. bucket-name)' 2> /dev/null; then
+    echo "Renaming ora2 folder..."
+    mv '/openedx/data/ora2/SET-ME-PLEASE (ex. bucket-name)' /openedx/data/ora2/openedxuploads
+fi
+"""

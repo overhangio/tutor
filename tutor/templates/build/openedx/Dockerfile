@@ -15,9 +15,11 @@ RUN apt update && \
     apt install -y libssl-dev zlib1g-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
     xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-ARG PYTHON_VERSION=3.8.12
+# https://github.com/pyenv/pyenv/releases
+# https://www.python.org/downloads/
+ARG PYTHON_VERSION=3.8.15
 ENV PYENV_ROOT /opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.2.2 --depth 1
+RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.17 --depth 1
 RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
 RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/python -m venv /openedx/venv
 
@@ -38,12 +40,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {%- else %}
 # Patch edx-platform
-# Fix broken Circuit Schematic Builder problem template
-# https://github.com/openedx/edx-platform/pull/31365
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/20b93b8b01276edadddfbbb67f15714fddd81c31.patch | git am
 {%- endif %}
 
-{# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1> | git am #}
+{# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
 {{ patch("openedx-dockerfile-post-git-checkout") }}
 
 ###### Download extra locales to /openedx/locale/contrib/locale
@@ -67,7 +66,7 @@ RUN apt update && apt install -y software-properties-common libmysqlclient-dev l
 # https://pypi.org/project/setuptools/
 # https://pypi.org/project/pip/
 # https://pypi.org/project/wheel/
-RUN pip install setuptools==65.5.1 pip==22.3.1. wheel==0.38.4
+RUN pip install setuptools==67.6.1 pip==23.0.1. wheel==0.40.0
 
 # Install base requirements
 COPY --from=code /openedx/edx-platform/requirements/edx/base.txt /tmp/base.txt
@@ -98,6 +97,7 @@ ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
+# https://github.com/pyenv/pyenv/releases
 RUN pip install nodeenv==1.7.0
 RUN nodeenv /openedx/nodeenv --node=16.14.0 --prebuilt
 
@@ -224,7 +224,7 @@ USER app
 RUN pip install -r requirements/edx/development.txt
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython
-RUN pip install ipdb==0.13.9 ipython==8.7.0
+RUN pip install ipdb==0.13.13 ipython==8.12.0
 
 # Add ipdb as default PYTHONBREAKPOINT
 ENV PYTHONBREAKPOINT=ipdb.set_trace

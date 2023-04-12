@@ -4,7 +4,7 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt, hooks
+from tutor import fmt, hooks
 from tutor import interactive as interactive_config
 from tutor import utils
 from tutor.commands import compose
@@ -73,15 +73,7 @@ def launch(
     mounts: tuple[list[compose.MountParam.MountType]],
 ) -> None:
     compose.mount_tmp_volumes(mounts, context.obj)
-    try:
-        utils.check_macos_docker_memory()
-    except exceptions.TutorError as e:
-        fmt.echo_alert(
-            f"""Could not verify sufficient RAM allocation in Docker:
-    {e}
-Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
-    https://docs.tutor.overhang.io/install.html"""
-        )
+    utils.warn_macos_docker_memory()
 
     click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
