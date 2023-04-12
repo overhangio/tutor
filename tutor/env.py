@@ -161,7 +161,7 @@ class Renderer:
             try:
                 patches.append(self.render_str(patch))
             except exceptions.TutorError:
-                fmt.echo_error(f"Error rendering patch '{name}': {patch}")
+                fmt.echo_error(f"Error rendering patch '{name}':\n{patch}")
                 raise
         rendered = separator.join(patches)
         if rendered:
@@ -169,7 +169,10 @@ class Renderer:
         return rendered
 
     def render_str(self, text: str) -> str:
-        template = self.environment.from_string(text)
+        try:
+            template = self.environment.from_string(text)
+        except jinja2.exceptions.TemplateSyntaxError as e:
+            raise exceptions.TutorError(f"Template syntax error: {e.args[0]}")
         return self.__render(template)
 
     def render_template(self, template_name: str) -> t.Union[str, bytes]:
@@ -450,6 +453,7 @@ def get_release(version: str) -> str:
         "13": "maple",
         "14": "nutmeg",
         "15": "olive",
+        "16": "palm",
     }[version.split(".", maxsplit=1)[0]]
 
 

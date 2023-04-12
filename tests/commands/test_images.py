@@ -49,7 +49,7 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
         # Note: we should update this tag whenever the mysql image is updated
-        image_pull.assert_called_once_with("docker.io/mysql:5.7.35")
+        image_pull.assert_called_once_with("docker.io/mysql:8.0.33")
 
     def test_images_printtag_image(self) -> None:
         result = self.invoke(["images", "printtag", "openedx"])

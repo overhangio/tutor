@@ -118,8 +118,10 @@ GRADES_DOWNLOAD = {
     },
 }
 
+# ORA2
 ORA2_FILEUPLOAD_BACKEND = "filesystem"
 ORA2_FILEUPLOAD_ROOT = "/openedx/data/ora2"
+FILE_UPLOAD_STORAGE_BUCKET_NAME = "openedxuploads"
 ORA2_FILEUPLOAD_CACHE_NAME = "ora2-storage"
 
 # Change syslog-based loggers which don't work inside docker containers
@@ -135,18 +137,21 @@ LOGGING["handlers"]["tracking"] = {
     "formatter": "standard",
 }
 LOGGING["loggers"]["tracking"]["handlers"] = ["console", "local", "tracking"]
-# Silence some loggers (note: we must attempt to get rid of these when upgrading from one release to the next)
 
+# Silence some loggers (note: we must attempt to get rid of these when upgrading from one release to the next)
+LOGGING["loggers"]["blockstore.apps.bundles.storage"] = {"handlers": ["console"], "level": "WARNING"}
+
+# These warnings are visible in simple commands and init tasks
 import warnings
 from django.utils.deprecation import RemovedInDjango40Warning, RemovedInDjango41Warning
 warnings.filterwarnings("ignore", category=RemovedInDjango40Warning)
 warnings.filterwarnings("ignore", category=RemovedInDjango41Warning)
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="lms.djangoapps.course_wiki.plugins.markdownedx.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="boto.plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="botocore.vendored.requests.packages.urllib3._collections")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="storages.backends.s3boto")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="openedx.core.types.admin")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resources")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="fs")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="fs.opener")
 SILENCED_SYSTEM_CHECKS = ["2_0.W001", "fields.W903"]
 
 # Email

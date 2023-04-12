@@ -7,7 +7,6 @@ Tutor can be used on ARM64 systems, although no official ARM64 docker images are
 
 .. note:: There are generally two ways to run Tutor on an ARM system - using emulation (via qemu or Rosetta 2) to run x86_64 images or running native ARM images. Since emulation can be noticeably slower (typically 20-100% slower depending on the emulation method), this tutorial aims to use native images where possible.
 
-
 Building the images
 -------------------
 
@@ -27,30 +26,14 @@ Then, build the "openedx" and "permissions" images::
 
     tutor images build openedx permissions
 
+.. TODO we don't want this instruction anymore
 If you want to use Tutor as an Open edX development environment, you should also build the development images::
-
     tutor dev dc build lms
-
-Change the database server
---------------------------
-
-The version of MySQL that Open edX uses by default (5.7) does not support the ARM architecture. You need to tell Tutor to use MySQL 8.0, which does support the ARM architecture and which has been supported by Open edX since the "Nutmeg" release.
-
-Configure Tutor to use MySQL 8::
-
-    tutor config save --set DOCKER_IMAGE_MYSQL=docker.io/mysql:8.0
-
-(If you need to run an older release of Open edX on ARM64, you can try using `mariadb:10.4` although it's not officially supported nor recommended for production.)
-
-Finish setup and start Tutor
-----------------------------
 
 From this point on, use Tutor as normal. For example, start Open edX and run migrations with::
 
-    tutor local start -d
-    tutor local do init
+    tutor local launch
 
 Or for a development environment::
 
-    tutor dev start -d
-    tutor dev do init
+    tutor dev launch

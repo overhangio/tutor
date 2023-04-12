@@ -261,6 +261,19 @@ def check_output(*command: str) -> bytes:
         raise exceptions.TutorError(f"Command failed: {literal_command}") from e
 
 
+def warn_macos_docker_memory() -> None:
+    try:
+        check_macos_docker_memory()
+    except exceptions.TutorError as e:
+        fmt.echo_alert(
+            f"""Could not verify sufficient RAM allocation in Docker:
+
+    {e}
+
+Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
+    https://docs.tutor.overhang.io/install.html"""
+        )
+
 def check_macos_docker_memory() -> None:
     """
     Try to check that the RAM allocated to the Docker VM on macOS is at least 4 GB.

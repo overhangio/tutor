@@ -38,6 +38,10 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         common_upgrade.upgrade_from_nutmeg(context, config)
         running_release = "olive"
 
+    if running_release == "olive":
+        upgrade_from_olive(context.obj, config)
+        running_release = "palm"
+
 
 def upgrade_from_ironwood(config: Config) -> None:
     if not config["RUN_MONGODB"]:
@@ -172,4 +176,20 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
     )
     k8s.kubectl_exec(
         config, "cms", ["sh", "-e", "-c", "./manage.py cms simulate_publish"]
+    )
+
+
+def upgrade_from_olive(context: Context, config: Config) -> None:
+    # Note that we need to exec because the ora2 folder is not bind-mounted in the job
+    # services.
+    k8s.kubectl_apply(
+        context.root,
+        "--selector",
+        "app.kubernetes.io/name=lms",
+    )
+    k8s.wait_for_deployment_ready(config, "lms")
+    k8s.kubectl_exec(
+        config,
+        "lms",
+        ["sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
     )
