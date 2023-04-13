@@ -58,16 +58,6 @@ jobs:
       - name: Test bundle
         run: make ci-test-bundle
 
-      ##### Download gh utility: https://github.com/cli/cli/releases
-      - name: Check for presence of "gh" CLI utility
-        run: echo "gh_bin=$(which gh)" >> $GITHUB_ENV
-      - name: Download gh utility
-        run: |
-          curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/v2.20.2/gh_2.20.2_${{ matrix.gh_os }}_amd64.tar.gz
-          tar xzf gh.tar.gz
-          echo "gh_bin=./gh_2.20.2_${{ matrix.gh_os }}_amd64/bin/gh" >> $GITHUB_ENV
-        if: ${{ env.gh_bin == '' }}
-
       ##### Create release on GitHub
       - name: Create or update GitHub release
         run: scriv github-release
