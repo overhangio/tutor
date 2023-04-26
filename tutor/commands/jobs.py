@@ -10,7 +10,7 @@ import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, fmt, hooks
+from tutor import env, fmt, hooks, utils
 from tutor.hooks import priorities
 
 
@@ -139,15 +139,50 @@ u.save()"
 
 
 @click.command(help="Import the demo course")
-def importdemocourse() -> t.Iterable[tuple[str, str]]:
-    template = """
+@click.option(
+    "-r",
+    "--repo",
+    default="https://github.com/openedx/edx-demo-course",
+    show_default=True,
+    help="Git repository that contains the course to be imported",
+)
+@click.option(
+    "-v",
+    "--version",
+    help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
+)
+def importdemocourse(
+    repo: str, version: t.Optional[str]
+) -> t.Iterable[tuple[str, str]]:
+    version = version or "{{ OPENEDX_COMMON_VERSION }}"
+    template = f"""
 # Import demo course
-git clone https://github.com/openedx/edx-demo-course --branch {{ OPENEDX_COMMON_VERSION }} --depth 1 ../edx-demo-course
-python ./manage.py cms import ../data ../edx-demo-course
+git clone {repo} --branch {version} --depth 1 /tmp/course
+python ./manage.py cms import ../data /tmp/course
 
 # Re-index courses
 ./manage.py cms reindex_course --all --setup"""
     yield ("cms", template)
+
+
+@click.command(
+    name="print-edx-platform-setting",
+    help="Print the value of an edx-platform Django setting.",
+)
+@click.argument("setting")
+@click.option(
+    "-s",
+    "--service",
+    type=click.Choice(["lms", "cms"]),
+    default="lms",
+    show_default=True,
+    help="Service to fetch the setting from",
+)
+def print_edx_platform_setting(
+    setting: str, service: str
+) -> t.Iterable[tuple[str, str]]:
+    command = f"./manage.py {service} shell -c 'from django.conf import settings; print(settings.{setting})'"
+    yield (service, command)
 
 
 @click.command()
@@ -205,6 +240,21 @@ def assign_theme(name, domain):
     for domain_name in domain_names:
         python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
     return f'./manage.py lms shell -c "{python_command}"'
+
+
+@click.command(context_settings={"ignore_unknown_options": True})
+@click.argument("args", nargs=-1)
+def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
+    """
+    Open an SQL shell as root
+
+    Extra arguments will be passed to the `mysql` command verbatim. For instance, to
+    show tables from the "openedx" database, run `do sqlshell openedx -e 'show tables'`.
+    """
+    command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }}"
+    if args:
+        command += " " + utils._shlex_join(*args)  # pylint: disable=protected-access
+    yield ("lms", command)
 
 
 def add_job_commands(do_command_group: click.Group) -> None:
@@ -285,6 +335,8 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         createuser,
         importdemocourse,
         initialise,
+        print_edx_platform_setting,
         settheme,
+        sqlshell,
     ]
 )
