@@ -1,1 +1,3 @@
 - [Improvement] Automatically pull Docker image cache from the remote registry. Again, this will considerably improve image build-time, particularly in "cold-start" scenarios, where the images need to be built from scratch. The registry cache can be disabled with the `tutor images build --no-registry-cache` option. (by @regisb)
+- [Feature] Automatically mount host folders *at build time*. This is a really important feature, as it allows us to transparently build images using local forks of remote repositories. (by @regisb)
+- 💥[Deprecation] Remove the various `--mount` options. These options are replaced by persistent mounts. (by @regisb)

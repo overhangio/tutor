@@ -27,6 +27,7 @@ Then, build the "openedx" and "permissions" images::
     tutor images build openedx permissions
 
 .. TODO we don't want this instruction anymore
+
 If you want to use Tutor as an Open edX development environment, you should also build the development images::
     tutor dev dc build lms
 

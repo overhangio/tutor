@@ -1,25 +1,18 @@
 from __future__ import annotations
 
 import os
-import re
-import typing as t
-from copy import deepcopy
 
 import click
-from click.shell_completion import CompletionItem
-from typing_extensions import TypeAlias
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import fmt, hooks, serialize, utils
+from tutor import bindmount, hooks, utils
 from tutor.commands import jobs
 from tutor.commands.context import BaseTaskContext
 from tutor.core.hooks import Filter  # pylint: disable=unused-import
 from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
-
-COMPOSE_FILTER_TYPE: TypeAlias = "Filter[dict[str, t.Any], []]"
 
 
 class ComposeTaskRunner(BaseComposeTaskRunner):
@@ -47,47 +40,6 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
             *args, "--project-name", self.project_name, *command
         )
 
-    def update_docker_compose_tmp(
-        self,
-        compose_tmp_filter: COMPOSE_FILTER_TYPE,
-        compose_jobs_tmp_filter: COMPOSE_FILTER_TYPE,
-        docker_compose_tmp_path: str,
-        docker_compose_jobs_tmp_path: str,
-    ) -> None:
-        """
-        Update the contents of the docker-compose.tmp.yml and
-        docker-compose.jobs.tmp.yml files, which are generated at runtime.
-        """
-        compose_base: dict[str, t.Any] = {
-            "version": "{{ DOCKER_COMPOSE_VERSION }}",
-            "services": {},
-        }
-
-        # 1. Apply compose_tmp filter
-        # 2. Render the resulting dict
-        # 3. Serialize to yaml
-        # 4. Save to disk
-        docker_compose_tmp: str = serialize.dumps(
-            tutor_env.render_unknown(
-                self.config, compose_tmp_filter.apply(deepcopy(compose_base))
-            )
-        )
-        tutor_env.write_to(
-            docker_compose_tmp,
-            docker_compose_tmp_path,
-        )
-
-        # Same thing but with tmp jobs
-        docker_compose_jobs_tmp: str = serialize.dumps(
-            tutor_env.render_unknown(
-                self.config, compose_jobs_tmp_filter.apply(deepcopy(compose_base))
-            )
-        )
-        tutor_env.write_to(
-            docker_compose_jobs_tmp,
-            docker_compose_jobs_tmp_path,
-        )
-
     def run_task(self, service: str, command: str) -> int:
         """
         Run the "{{ service }}-job" service from local/docker-compose.jobs.yml with the
@@ -113,132 +65,8 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
 
 
 class BaseComposeContext(BaseTaskContext):
-    COMPOSE_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
-    COMPOSE_JOBS_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
-
     def job_runner(self, config: Config) -> ComposeTaskRunner:
         raise NotImplementedError
-
-
-class MountParam(click.ParamType):
-    """
-    Parser for --mount arguments of the form "service1[,service2,...]:/host/path:/container/path".
-    """
-
-    name = "mount"
-    MountType = t.Tuple[str, str, str]
-    # Note that this syntax does not allow us to include colon ':' characters in paths
-    PARAM_REGEXP = (
-        r"(?P<services>[a-zA-Z0-9-_, ]+):(?P<host_path>[^:]+):(?P<container_path>[^:]+)"
-    )
-
-    def convert(
-        self,
-        value: str,
-        param: t.Optional["click.Parameter"],
-        ctx: t.Optional[click.Context],
-    ) -> list["MountType"]:
-        mounts = self.convert_explicit_form(value) or self.convert_implicit_form(value)
-        return mounts
-
-    def convert_explicit_form(self, value: str) -> list["MountParam.MountType"]:
-        """
-        Argument is of the form "containers:/host/path:/container/path".
-        """
-        match = re.match(self.PARAM_REGEXP, value)
-        if not match:
-            return []
-
-        mounts: list["MountParam.MountType"] = []
-        services: list[str] = [
-            service.strip() for service in match["services"].split(",")
-        ]
-        host_path = os.path.abspath(os.path.expanduser(match["host_path"]))
-        host_path = host_path.replace(os.path.sep, "/")
-        container_path = match["container_path"]
-        for service in services:
-            if not service:
-                self.fail(f"incorrect services syntax: '{match['services']}'")
-            mounts.append((service, host_path, container_path))
-        return mounts
-
-    def convert_implicit_form(self, value: str) -> list["MountParam.MountType"]:
-        """
-        Argument is of the form "/host/path"
-        """
-        mounts: list["MountParam.MountType"] = []
-        host_path = os.path.abspath(os.path.expanduser(value))
-        for service, container_path in hooks.Filters.COMPOSE_MOUNTS.iterate(
-            os.path.basename(host_path)
-        ):
-            mounts.append((service, host_path, container_path))
-        if not mounts:
-            raise self.fail(f"no mount found for {value}")
-        return mounts
-
-    def shell_complete(
-        self, ctx: click.Context, param: click.Parameter, incomplete: str
-    ) -> list[CompletionItem]:
-        """
-        Mount argument completion works only for the single path (implicit) form. The
-        reason is that colons break words in bash completion:
-        http://tiswww.case.edu/php/chet/bash/FAQ (E13)
-        Thus, we do not even attempt to auto-complete mount arguments that include
-        colons: such arguments will not even reach this method.
-        """
-        return [CompletionItem(incomplete, type="file")]
-
-
-mount_option = click.option(
-    "-m",
-    "--mount",
-    "mounts",
-    help="""Bind-mount a folder from the host in the right containers. This option can take two different forms. The first one is explicit: 'service1[,service2...]:/host/path:/container/path'. The other is implicit: '/host/path'. Arguments passed in the implicit form will be parsed by plugins to define the right folders to bind-mount from the host.""",
-    type=MountParam(),
-    multiple=True,
-)
-
-
-def mount_tmp_volumes(
-    all_mounts: tuple[list[MountParam.MountType], ...],
-    context: BaseComposeContext,
-) -> None:
-    for mounts in all_mounts:
-        for service, host_path, container_path in mounts:
-            mount_tmp_volume(service, host_path, container_path, context)
-
-
-def mount_tmp_volume(
-    service: str,
-    host_path: str,
-    container_path: str,
-    context: BaseComposeContext,
-) -> None:
-    """
-    Append user-defined bind-mounted volumes to the docker-compose.tmp file(s).
-
-    The service/host path/container path values are appended to the docker-compose
-    files by mean of two filters. Each dev/local environment is then responsible for
-    generating the files based on the output of these filters.
-
-    Bind-mounts that are associated to "*-job" services will be added to the
-    docker-compose jobs file.
-    """
-    fmt.echo_info(f"Bind-mount: {host_path} -> {container_path} in {service}")
-    compose_tmp_filter: COMPOSE_FILTER_TYPE = (
-        context.COMPOSE_JOBS_TMP_FILTER
-        if service.endswith("-job")
-        else context.COMPOSE_TMP_FILTER
-    )
-
-    @compose_tmp_filter.add()
-    def _add_mounts_to_docker_compose_tmp(
-        docker_compose: dict[str, t.Any],
-    ) -> dict[str, t.Any]:
-        services = docker_compose.setdefault("services", {})
-        services.setdefault(service, {"volumes": []})
-        services[service]["volumes"].append(f"{host_path}:{container_path}")
-        return docker_compose
 
 
 @click.command(
@@ -247,14 +75,12 @@ def mount_tmp_volume(
 )
 @click.option("--skip-build", is_flag=True, help="Skip image building")
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
-@mount_option
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def start(
     context: BaseComposeContext,
     skip_build: bool,
     detach: bool,
-    mounts: tuple[list[MountParam.MountType]],
     services: list[str],
 ) -> None:
     command = ["up", "--remove-orphans"]
@@ -264,7 +90,6 @@ def start(
         command.append("-d")
 
     # Start services
-    mount_tmp_volumes(mounts, context)
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(*command, *services)
 
@@ -313,20 +138,10 @@ def restart(context: BaseComposeContext, services: list[str]) -> None:
 
 
 @jobs.do_group
-@mount_option
-@click.pass_obj
-def do(context: BaseComposeContext, mounts: tuple[list[MountParam.MountType]]) -> None:
+def do() -> None:
     """
     Run a custom job in the right container(s).
     """
-
-    @hooks.Actions.DO_JOB.add()
-    def _mount_tmp_volumes(_job_name: str, *_args: t.Any, **_kwargs: t.Any) -> None:
-        """
-        We add this logic to an action callback because we do not want to trigger it
-        whenever we run `tutor local do <job> --help`.
-        """
-        mount_tmp_volumes(mounts, context)
 
 
 @click.command(
@@ -338,18 +153,16 @@ def do(context: BaseComposeContext, mounts: tuple[list[MountParam.MountType]]) -
     ),
     context_settings={"ignore_unknown_options": True},
 )
-@mount_option
 @click.argument("args", nargs=-1, required=True)
 @click.pass_context
 def run(
     context: click.Context,
-    mounts: tuple[list[MountParam.MountType]],
     args: list[str],
 ) -> None:
     extra_args = ["--rm"]
     if not utils.is_a_tty():
         extra_args.append("-T")
-    context.invoke(dc_command, mounts=mounts, command="run", args=[*extra_args, *args])
+    context.invoke(dc_command, command="run", args=[*extra_args, *args])
 
 
 @click.command(
@@ -446,17 +259,14 @@ def status(context: click.Context) -> None:
     context_settings={"ignore_unknown_options": True},
     name="dc",
 )
-@mount_option
 @click.argument("command")
 @click.argument("args", nargs=-1)
 @click.pass_obj
 def dc_command(
     context: BaseComposeContext,
-    mounts: tuple[list[MountParam.MountType]],
     command: str,
     args: list[str],
 ) -> None:
-    mount_tmp_volumes(mounts, context)
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(command, *args)
 
@@ -466,8 +276,8 @@ def _mount_edx_platform(
     volumes: list[tuple[str, str]], name: str
 ) -> list[tuple[str, str]]:
     """
-    When mounting edx-platform with `--mount=/path/to/edx-platform`, bind-mount the host
-    repo in the lms/cms containers.
+    When mounting edx-platform with `tutor config save --append MOUNTS=/path/to/edx-platform`,
+    bind-mount the host repo in the lms/cms containers.
     """
     if name == "edx-platform":
         path = "/openedx/edx-platform"
@@ -480,6 +290,9 @@ def _mount_edx_platform(
             ("cms-job", path),
         ]
     return volumes
+
+
+hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(("iter_mounts", bindmount.iter_mounts))
 
 
 def add_commands(command_group: click.Group) -> None:
