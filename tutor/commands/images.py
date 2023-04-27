@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import typing as t
 
 import click
@@ -141,8 +142,17 @@ def build(
         command_args.append("--load")
     if docker_args:
         command_args += docker_args
+    # Build context mounts
+    # TODO cleaner
+    build_contexts: dict[str, tuple[str, str]] = {}
+    for user_mount in config["MOUNTS"]:
+        for image_name, stage_name in hooks.Filters.IMAGES_BUILD_MOUNTS.iterate(user_mount):
+            if image_name not in build_contexts:
+                build_contexts[image_name] = []
+            build_contexts[image_name].append((user_mount, stage_name))
+
     for image in image_names:
-        for _name, path, tag, custom_args in find_images_to_build(config, image):
+        for name, path, tag, custom_args in find_images_to_build(config, image):
             image_build_args = [*command_args, *custom_args]
             if not no_registry_cache:
                 # Use registry cache
@@ -151,12 +161,26 @@ def build(
                 image_build_args.append(
                     f"--cache-to=type=registry,mode=max,ref={tag}-cache"
                 )
+            # Build contexts
+            for host_path, stage_name in build_contexts.get(name, []):
+                image_build_args.append(f"--build-context={stage_name}={host_path}")
             images.build(
                 tutor_env.pathjoin(context.root, *path),
                 tag,
                 *image_build_args,
             )
 
+
+@hooks.Filters.IMAGES_BUILD_MOUNTS.add()
+def _mount_edx_platform(
+    volumes: list[tuple[str, str]], path: str
+) -> list[tuple[str, str]]:
+    """
+    TODO document me
+    """
+    if os.path.basename(path) == "edx-platform":
+        volumes.append(("openedx", "edx-platform"))
+    return volumes
 
 @click.command(short_help="Pull images from the Docker registry")
 @click.argument("image_names", metavar="image", nargs=-1)

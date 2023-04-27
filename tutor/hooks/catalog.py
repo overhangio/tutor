@@ -227,23 +227,6 @@ class Filters:
         "commands:pre-init"
     )
 
-    #: Same as :py:data:`COMPOSE_LOCAL_JOBS_TMP` but for the development environment.
-    COMPOSE_DEV_JOBS_TMP: Filter[Config, []] = filters.get("compose:dev-jobs:tmp")
-
-    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for the development environment.
-    COMPOSE_DEV_TMP: Filter[Config, []] = filters.get("compose:dev:tmp")
-
-    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for jobs
-    COMPOSE_LOCAL_JOBS_TMP: Filter[Config, []] = filters.get("compose:local-jobs:tmp")
-
-    #: Contents of the (local|dev)/docker-compose.tmp.yml files that will be generated at
-    #: runtime. This is used for instance to bind-mount folders from the host (see
-    #: :py:data:`COMPOSE_MOUNTS`)
-    #:
-    #: :parameter dict[str, ...] docker_compose_tmp: values which will be serialized to local/docker-compose.tmp.yml.
-    #:   Keys and values will be rendered before saving, such that you may include ``{{ ... }}`` statements.
-    COMPOSE_LOCAL_TMP: Filter[Config, []] = filters.get("compose:local:tmp")
-
     #: List of folders to bind-mount in docker-compose containers, either in ``tutor local`` or ``tutor dev``.
     #:
     #: Many ``tutor local`` and ``tutor dev`` commands support ``--mounts`` options
@@ -401,6 +384,11 @@ class Filters:
     IMAGES_BUILD: Filter[
         list[tuple[str, tuple[str, ...], str, tuple[str, ...]]], [Config]
     ] = filters.get("images:build")
+
+    # TODO document me
+    # image name, stage name
+    # host path
+    IMAGES_BUILD_MOUNTS: Filter[list[tuple[str, str]], str] = filters.get("images:build:mounts")
 
     #: List of images to be pulled when we run ``tutor images pull ...``.
     #:
