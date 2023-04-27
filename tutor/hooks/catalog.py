@@ -227,33 +227,20 @@ class Filters:
         "commands:pre-init"
     )
 
-    #: Same as :py:data:`COMPOSE_LOCAL_JOBS_TMP` but for the development environment.
-    COMPOSE_DEV_JOBS_TMP: Filter[Config, []] = filters.get("compose:dev-jobs:tmp")
-
-    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for the development environment.
-    COMPOSE_DEV_TMP: Filter[Config, []] = filters.get("compose:dev:tmp")
-
-    #: Same as :py:data:`COMPOSE_LOCAL_TMP` but for jobs
-    COMPOSE_LOCAL_JOBS_TMP: Filter[Config, []] = filters.get("compose:local-jobs:tmp")
-
-    #: Contents of the (local|dev)/docker-compose.tmp.yml files that will be generated at
-    #: runtime. This is used for instance to bind-mount folders from the host (see
-    #: :py:data:`COMPOSE_MOUNTS`)
-    #:
-    #: :parameter dict[str, ...] docker_compose_tmp: values which will be serialized to local/docker-compose.tmp.yml.
-    #:   Keys and values will be rendered before saving, such that you may include ``{{ ... }}`` statements.
-    COMPOSE_LOCAL_TMP: Filter[Config, []] = filters.get("compose:local:tmp")
-
     #: List of folders to bind-mount in docker-compose containers, either in ``tutor local`` or ``tutor dev``.
     #:
-    #: Many ``tutor local`` and ``tutor dev`` commands support ``--mounts`` options
-    #: that allow plugins to define custom behaviour at runtime. For instance
-    #: ``--mount=/path/to/edx-platform`` would cause this host folder to be
-    #: bind-mounted in different containers (lms, lms-worker, cms, cms-worker) at the
+    #: This filter is for processing values of the ``MOUNTS`` setting such as::
+    #:
+    #:     tutor config save --append MOUNTS=/path/to/edx-platform
+    #:
+    #: In this example, this host folder would be bind-mounted in different containers
+    #: (lms, lms-worker, cms, cms-worker, lms-job, cms-job) at the
     #: /openedx/edx-platform location. Plugin developers may implement this filter to
     #: define custom behaviour when mounting folders that relate to their plugins. For
-    #: instance, the ecommerce plugin may process the ``--mount=/path/to/ecommerce``
-    #: option.
+    #: instance, the ecommerce plugin may process the ``/path/to/ecommerce`` value.
+    #:
+    #: To also bind-mount these folder at build time, implement also the
+    #: :py:data:`IMAGES_BUILD_MOUNTS` filter.
     #:
     #: :parameter list[tuple[str, str]] mounts: each item is a ``(service, path)``
     #:   tuple, where ``service`` is the name of the docker-compose service and ``path`` is
@@ -262,7 +249,7 @@ class Filters:
     #:   the ``path`` because it will fail on Windows.
     #: :parameter str name: basename of the host-mounted folder. In the example above,
     #:   this is "edx-platform". When implementing this filter you should check this name to
-    #:   conditionnally add mounts.
+    #:   conditionally add mounts.
     COMPOSE_MOUNTS: Filter[list[tuple[str, str]], [str]] = filters.get("compose:mounts")
 
     #: Declare new default configuration settings that don't necessarily have to be saved in the user
@@ -401,6 +388,26 @@ class Filters:
     IMAGES_BUILD: Filter[
         list[tuple[str, tuple[str, ...], str, tuple[str, ...]]], [Config]
     ] = filters.get("images:build")
+
+    #: List of host directories to be automatically bind-mounted in Docker images at
+    #: build time. For instance, this is useful to build Docker images using a custom
+    #: repository on the host.
+    #:
+    #: This filter works similarly to the :py:data:`COMPOSE_MOUNTS` filter, with a few differences.
+    #:
+    #: :parameter list[tuple[str, str]] mounts: each item is a pair of ``(name, value)``
+    #:   used to generate a build context at build time. See the corresponding `Docker
+    #:   documentation <https://docs.docker.com/engine/reference/commandline/buildx_build/#build-context>`__.
+    #:   The following option will be added to the ``docker buildx build`` command:
+    #:   ``--build-context={name}={value}``. If the Dockerfile contains a "name" stage, then
+    #:   that stage will be replaced by the corresponding directory on the host.
+    #: :parameter str name: full path to the host-mounted folder. As opposed to
+    #:   :py:data:`COMPOSE_MOUNTS`, this is not just the basename, but the full path. When
+    #:   implementing this filter you should check this path (for instance: with
+    #:   ``os.path.basename(path)``) to conditionally add mounts.
+    IMAGES_BUILD_MOUNTS: Filter[list[tuple[str, str]], [str]] = filters.get(
+        "images:build:mounts"
+    )
 
     #: List of images to be pulled when we run ``tutor images pull ...``.
     #:

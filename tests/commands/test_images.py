@@ -149,7 +149,7 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
                 "docker_args",
                 "--cache-from=type=registry,ref=service1:1.0.0-cache",
             ],
-            list(image_build.call_args[0][1:])
+            list(image_build.call_args[0][1:]),
         )
 
     def test_images_push(self) -> None:

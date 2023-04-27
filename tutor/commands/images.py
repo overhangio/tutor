@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import os
 import typing as t
 
 import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, hooks, images, utils
+from tutor import exceptions, hooks, images, types, utils
 from tutor.commands.context import Context
 from tutor.core.hooks import Filter
 from tutor.types import Config
@@ -148,21 +149,66 @@ def build(
         command_args.append(f"--output={docker_output}")
     if docker_args:
         command_args += docker_args
+    # Build context mounts
+    build_contexts = get_image_build_contexts(config)
+
     for image in image_names:
-        for _name, path, tag, custom_args in find_images_to_build(config, image):
+        for name, path, tag, custom_args in find_images_to_build(config, image):
             image_build_args = [*command_args, *custom_args]
+
+            # Registry cache
             if not no_registry_cache:
-                # Use registry cache
                 image_build_args.append(f"--cache-from=type=registry,ref={tag}-cache")
             if cache_to_registry:
                 image_build_args.append(
                     f"--cache-to=type=registry,mode=max,ref={tag}-cache"
                 )
+
+            # Build contexts
+            for host_path, stage_name in build_contexts.get(name, []):
+                image_build_args.append(f"--build-context={stage_name}={host_path}")
+
+            # Build
             images.build(
                 tutor_env.pathjoin(context.root, *path),
                 tag,
                 *image_build_args,
             )
+
+
+def get_image_build_contexts(config: Config) -> dict[str, list[tuple[str, str]]]:
+    """
+    Return all build contexts for all images.
+
+    A build context is to bind-mount a host directory at build-time. This is useful, for
+    instance to build a Docker image with a local git checkout of a remote repo.
+
+    Users configure bind-mounts with the `MOUNTS` config setting. Plugins can then
+    automaticall add build contexts based on these values.
+    """
+    user_mounts = types.get_typed(config, "MOUNTS", list)
+    build_contexts: dict[str, list[tuple[str, str]]] = {}
+    for user_mount in user_mounts:
+        for image_name, stage_name in hooks.Filters.IMAGES_BUILD_MOUNTS.iterate(
+            user_mount
+        ):
+            if image_name not in build_contexts:
+                build_contexts[image_name] = []
+            build_contexts[image_name].append((user_mount, stage_name))
+    return build_contexts
+
+
+@hooks.Filters.IMAGES_BUILD_MOUNTS.add()
+def _mount_edx_platform(
+    volumes: list[tuple[str, str]], path: str
+) -> list[tuple[str, str]]:
+    """
+    Automatically add an edx-platform repo from the host to the build context whenever
+    it is added to the `MOUNTS` setting.
+    """
+    if os.path.basename(path) == "edx-platform":
+        volumes.append(("openedx", "edx-platform"))
+    return volumes
 
 
 @click.command(short_help="Pull images from the Docker registry")

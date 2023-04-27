@@ -24,7 +24,7 @@ services:
 
   ############# External services
 
-  {% if RUN_MONGODB %}
+  {% if RUN_MONGODB -%}
   mongodb:
     image: {{ DOCKER_IMAGE_MONGODB }}
     # Use WiredTiger in all environments, just like at edx.org
@@ -35,9 +35,9 @@ services:
       - ../../data/mongodb:/data/db
     depends_on:
       - permissions
-  {% endif %}
+  {%- endif %}
 
-  {% if RUN_MYSQL %}
+  {% if RUN_MYSQL -%}
   mysql:
     image: {{ DOCKER_IMAGE_MYSQL }}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
@@ -47,9 +47,9 @@ services:
       - ../../data/mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
-  {% endif %}
+  {%- endif %}
 
-  {% if RUN_ELASTICSEARCH %}
+  {% if RUN_ELASTICSEARCH -%}
   elasticsearch:
     image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
     environment:
@@ -67,9 +67,9 @@ services:
       - ../../data/elasticsearch:/usr/share/elasticsearch/data
     depends_on:
       - permissions
-  {% endif %}
+  {%- endif %}
 
-  {% if RUN_REDIS %}
+  {% if RUN_REDIS -%}
   redis:
     image: {{ DOCKER_IMAGE_REDIS }}
     working_dir: /openedx/redis/data
@@ -81,16 +81,16 @@ services:
     restart: unless-stopped
     depends_on:
       - permissions
-  {% endif %}
+  {%- endif %}
 
-  {% if RUN_SMTP %}
+  {% if RUN_SMTP -%}
   smtp:
     image: {{ DOCKER_IMAGE_SMTP }}
     restart: unless-stopped
     user: "100:101"
     environment:
       HOSTNAME: "{{ LMS_HOST }}"
-  {% endif %}
+  {%- endif %}
 
   ############# LMS and CMS
 
@@ -108,6 +108,9 @@ services:
       - ../apps/openedx/uwsgi.ini:/openedx/edx-platform/uwsgi.ini:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      {%- for mount in iter_mounts(MOUNTS, "lms") %}
+      - {{ mount }}
+      {%- endfor %}
     depends_on:
       - permissions
       {% if RUN_MYSQL %}- mysql{% endif %}
@@ -131,6 +134,9 @@ services:
       - ../apps/openedx/uwsgi.ini:/openedx/edx-platform/uwsgi.ini:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      {%- for mount in iter_mounts(MOUNTS, "cms") %}
+      - {{ mount }}
+      {%- endfor %}
     depends_on:
       - permissions
       - lms
@@ -156,6 +162,9 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      {%- for mount in iter_mounts(MOUNTS, "lms-worker") %}
+      - {{ mount }}
+      {%- endfor %}
     depends_on:
       - lms
 
@@ -172,6 +181,9 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      {%- for mount in iter_mounts(MOUNTS, "cms-worker") %}
+      - {{ mount }}
+      {%- endfor %}
     depends_on:
       - cms
 
