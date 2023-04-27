@@ -1,0 +1,1 @@
+- [Improvement] Automatically pull Docker image cache from the remote registry. Again, this will considerably improve image build-time, particularly in "cold-start" scenarios, where the images need to be built from scratch. The registry cache can be disabled with the `tutor images build --no-registry-cache` option. (by @regisb)
