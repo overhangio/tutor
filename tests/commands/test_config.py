@@ -1,5 +1,6 @@
 import unittest
 
+from tutor import config as tutor_config
 from tests.helpers import temporary_root
 
 from .base import TestCommandMixin
@@ -58,6 +59,45 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
         self.assertTrue(result.output)
+
+    def test_config_append(self) -> None:
+        with temporary_root() as root:
+            self.invoke_in_root(
+                root, ["config", "save", "--append=TEST=value"], catch_exceptions=False
+            )
+            config1 = tutor_config.load(root)
+            self.invoke_in_root(
+                root, ["config", "save", "--append=TEST=value"], catch_exceptions=False
+            )
+            config2 = tutor_config.load(root)
+            self.invoke_in_root(
+                root, ["config", "save", "--remove=TEST=value"], catch_exceptions=False
+            )
+            config3 = tutor_config.load(root)
+        # Value is appended
+        self.assertEqual(["value"], config1["TEST"])
+        # Value is not appended a second time
+        self.assertEqual(["value"], config2["TEST"])
+        # Value is removed
+        self.assertEqual([], config3["TEST"])
+
+    def test_config_append_with_existing_default(self) -> None:
+        with temporary_root() as root:
+            self.invoke_in_root(
+                root,
+                [
+                    "config",
+                    "save",
+                    "--append=OPENEDX_EXTRA_PIP_REQUIREMENTS=my-package==1.0.0",
+                ],
+                catch_exceptions=False,
+            )
+            config = tutor_config.load(root)
+        assert isinstance(config["OPENEDX_EXTRA_PIP_REQUIREMENTS"], list)
+        self.assertEqual(2, len(config["OPENEDX_EXTRA_PIP_REQUIREMENTS"]))
+        self.assertEqual(
+            "my-package==1.0.0", config["OPENEDX_EXTRA_PIP_REQUIREMENTS"][1]
+        )
 
 
 class PatchesTests(unittest.TestCase, TestCommandMixin):
