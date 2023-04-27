@@ -359,18 +359,11 @@ Installing extra xblocks and requirements
 
 Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` parameter in the :ref:`config file <configuration>` or to the ``env/build/openedx/requirements/private.txt`` file. The difference between them, is that ``private.txt`` file, even though it could be used for both, :ref:`should be used for installing extra xblocks or requirements from private repositories <extra_private_xblocks>`. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_:
 
-- add the following to the ``config.yml``::
+    tutor config save --append OPENEDX_EXTRA_PIP_REQUIREMENTS=git+https://github.com/open-craft/xblock-poll.git
 
-    OPENEDX_EXTRA_PIP_REQUIREMENTS:
-    - "git+https://github.com/open-craft/xblock-poll.git"
-
-.. warning::
-   Specifying extra requirements through ``config.yml`` overwrites :ref:`the default extra requirements<openedx_extra_pip_requirements>`. You might need to add them to the list if your configuration depends on them.
-
-- or add the dependency to ``private.txt``::
+Alternatively, add the dependency to ``private.txt``::
 
     echo "git+https://github.com/open-craft/xblock-poll.git" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
-
 
 Then, the ``openedx`` docker image must be rebuilt::
 
