@@ -1,0 +1,1 @@
+- [Feature] Add a `config save -a/--append -A/--remove` options to conveniently append and remove values to/from list entries. (by @regisb)
