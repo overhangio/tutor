@@ -34,6 +34,20 @@ def _add_core_images_to_build(
     for image in BASE_IMAGE_NAMES:
         tag = images.get_tag(config, image)
         build_images.append((image, ("build", image), tag, ()))
+
+    # Build openedx-dev image
+    build_images.append(
+        (
+            "openedx-dev",
+            ("build", "openedx"),
+            images.get_tag(config, "openedx-dev"),
+            (
+                "--target=development",
+                f"--build-arg=APP_USER_ID={utils.get_user_id() or 1000}",
+            ),
+        )
+    )
+
     return build_images
 
 
@@ -208,6 +222,7 @@ def _mount_edx_platform(
     """
     if os.path.basename(path) == "edx-platform":
         volumes.append(("openedx", "edx-platform"))
+        volumes.append(("openedx-dev", "edx-platform"))
     return volumes
 
 
