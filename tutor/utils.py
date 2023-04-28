@@ -173,30 +173,8 @@ def docker(*command: str) -> int:
     return execute("docker", *command)
 
 
-@lru_cache(maxsize=None)
-def _docker_compose_command() -> Tuple[str, ...]:
-    """
-    A helper function to determine which program to call when running docker compose
-    """
-    if os.environ.get("TUTOR_USE_COMPOSE_SUBCOMMAND") is not None:
-        return ("docker", "compose")
-    if shutil.which("docker-compose") is not None:
-        return ("docker-compose",)
-    if shutil.which("docker") is not None:
-        if (
-            subprocess.run(
-                ["docker", "compose"], capture_output=True, check=False
-            ).returncode
-            == 0
-        ):
-            return ("docker", "compose")
-    raise exceptions.TutorError(
-        "docker-compose is not installed. Please follow instructions from https://docs.docker.com/compose/install/"
-    )
-
-
 def docker_compose(*command: str) -> int:
-    return execute(*_docker_compose_command(), *command)
+    return execute("docker", "compose", *command)
 
 
 def kubectl(*command: str) -> int:
