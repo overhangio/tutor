@@ -12,14 +12,13 @@ First-time setup
 
 Firstly, either :ref:`install Tutor <install>` (for development against the named releases of Open edX) or :ref:`install Tutor Nightly <nightly>` (for development against Open edX's master branches).
 
-Then, optionally, tell Tutor to use a local fork of edx-platform. In that case you will need to rebuild the "openedx" Docker image::
+Then, optionally, tell Tutor to use a local fork of edx-platform.::
 
     tutor config save --append MOUNTS=./edx-platform
-    tutor images build openedx
 
-Then, run one of the following in order to launch the developer platform setup process::
+Then, build the "openedx" Docker image for development and launch the developer platfornm setup process::
 
-    # To use the edx-platform repository that is built into the image, run:
+    tutor images build openedx-dev
     tutor dev launch
 
 This will perform several tasks. It will:
@@ -130,7 +129,7 @@ The ``openedx-dev`` Docker image is based on the same ``openedx`` image used by 
 
 If you are using a custom ``openedx`` image, then you will need to rebuild ``openedx-dev`` every time you modify ``openedx``. To so, run::
 
-    tutor dev dc build lms
+    tutor images build openedx-dev
 
 
 .. _bind_mounts:

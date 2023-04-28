@@ -163,6 +163,15 @@ class Filters:
     :py:class:`tutor.core.hooks.Filter` API.
     """
 
+    #: Hostnames of user-facing applications.
+    #:
+    #: So far this filter is only used to inform the user of application urls after they have run ``launch``.
+    #:
+    #: :parameter list[str] hostnames: items from this list are templates that will be
+    #:   rendered by the environment.
+    #: :parameter str project_name: compose project name, such as "local" or "dev".
+    APP_PUBLIC_HOSTS: Filter[list[str], [str]] = Filter()
+
     #: List of command line interface (CLI) commands.
     #:
     #: :parameter list commands: commands are instances of ``click.Command``. They will

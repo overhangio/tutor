@@ -1,15 +1,21 @@
 from __future__ import annotations
 
 import os
+import typing as t
 
 import click
 
 from tutor import bindmount
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import hooks, utils
+from tutor import fmt, hooks
+from tutor import interactive as interactive_config
+from tutor import utils
 from tutor.commands import jobs
+from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseTaskContext
+from tutor.commands.upgrade import OPENEDX_RELEASE_NAMES
+from tutor.commands.upgrade.compose import upgrade_from
 from tutor.core.hooks import Filter  # pylint: disable=unused-import
 from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
@@ -70,22 +76,143 @@ class BaseComposeContext(BaseTaskContext):
         raise NotImplementedError
 
 
+@click.command(help="Configure and run Open edX from scratch")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
+@click.pass_context
+def launch(
+    context: click.Context,
+    non_interactive: bool,
+    pullimages: bool,
+) -> None:
+    utils.warn_macos_docker_memory()
+    interactive_upgrade(context, not non_interactive)
+
+    click.echo(fmt.title("Stopping any existing platform"))
+    context.invoke(stop)
+
+    if pullimages:
+        click.echo(fmt.title("Docker image updates"))
+        context.invoke(dc_command, command="pull")
+
+    click.echo(fmt.title("Starting the platform in detached mode"))
+    context.invoke(start, detach=True)
+
+    click.echo(fmt.title("Database creation and migrations"))
+    context.invoke(do.commands["init"])
+
+    config = tutor_config.load(context.obj.root)
+    project_name = context.obj.job_runner(config).project_name
+
+    # Print the urls of the user-facing apps
+    public_app_hosts = ""
+    for host in hooks.Filters.APP_PUBLIC_HOSTS.iterate(project_name):
+        public_app_host = tutor_env.render_str(
+            config, "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://" + host
+        )
+        public_app_hosts += f"    {public_app_host}\n"
+    if public_app_hosts:
+        fmt.echo_info(
+            f"""The platform is now running and can be accessed at the following urls:
+
+{public_app_hosts}"""
+        )
+
+
+def interactive_upgrade(context: click.Context, interactive: bool) -> None:
+    """
+    Piece of code that is only used in launch.
+    """
+    run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
+    if run_upgrade_from_release is not None:
+        click.echo(fmt.title("Upgrading from an older release"))
+        if interactive:
+            to_release = tutor_env.get_current_open_edx_release_name()
+            question = f"""You are about to upgrade your Open edX platform from {run_upgrade_from_release.capitalize()} to {to_release.capitalize()}
+
+It is strongly recommended to make a backup before upgrading. To do so, run:
+
+    tutor local stop # or 'tutor dev stop' in development
+    sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/
+
+In case of problem, to restore your backup you will then have to run: sudo rsync -avr /tmp/tutor-backup/ "$(tutor config printroot)"/
+
+Are you sure you want to continue?"""
+            click.confirm(
+                fmt.question(question), default=True, abort=True, prompt_suffix=" "
+            )
+        context.invoke(
+            upgrade,
+            from_release=run_upgrade_from_release,
+        )
+
+    click.echo(fmt.title("Interactive platform configuration"))
+    config = tutor_config.load_minimal(context.obj.root)
+    if interactive:
+        interactive_config.ask_questions(config)
+    tutor_config.save_config_file(context.obj.root, config)
+    config = tutor_config.load_full(context.obj.root)
+    tutor_env.save(context.obj.root, config)
+
+    if run_upgrade_from_release and interactive:
+        question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
+
+If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
+
+    tutor images build all # list your custom images here
+
+See the documentation for more information:
+
+    https://docs.tutor.overhang.io/install.html#upgrading-to-a-new-open-edx-release
+
+Press enter when you are ready to continue"""
+        click.confirm(
+            fmt.question(question), default=True, abort=True, prompt_suffix=" "
+        )
+
+
+@click.command(
+    short_help="Perform release-specific upgrade tasks",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `launch`.",
+)
+@click.option(
+    "--from",
+    "from_release",
+    type=click.Choice(OPENEDX_RELEASE_NAMES),
+)
+@click.pass_context
+def upgrade(context: click.Context, from_release: t.Optional[str]) -> None:
+    fmt.echo_alert(
+        "This command only performs a partial upgrade of your Open edX platform. "
+        "To perform a full upgrade, you should run `tutor local launch` (or `tutor dev launch` "
+        "in development)."
+    )
+    if from_release is None:
+        from_release = tutor_env.get_env_release(context.obj.root)
+    if from_release is None:
+        fmt.echo_info("Your environment is already up-to-date")
+    else:
+        upgrade_from(context, from_release)
+    # We update the environment to update the version
+    context.invoke(config_save_command)
+
+
 @click.command(
     short_help="Run all or a selection of services.",
     help="Run all or a selection of services. Docker images will be rebuilt where necessary.",
 )
-@click.option("--skip-build", is_flag=True, help="Skip image building")
+@click.option("--build", is_flag=True, help="Build images on start")
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def start(
     context: BaseComposeContext,
-    skip_build: bool,
+    build: bool,
     detach: bool,
     services: list[str],
 ) -> None:
     command = ["up", "--remove-orphans"]
-    if not skip_build:
+    if build:
         command.append("--build")
     if detach:
         command.append("-d")
@@ -293,10 +420,21 @@ def _mount_edx_platform(
     return volumes
 
 
+def _edx_platform_public_hosts(hosts: list[str], project_name: str) -> list[str]:
+    edx_platform_hosts = ["{{ LMS_HOST }}", "{{ CMS_HOST }}"]
+    if project_name == "dev":
+        edx_platform_hosts[0] += ":8000"
+        edx_platform_hosts[1] += ":8001"
+    hosts += edx_platform_hosts
+    return hosts
+
+
 hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(("iter_mounts", bindmount.iter_mounts))
 
 
 def add_commands(command_group: click.Group) -> None:
+    command_group.add_command(launch)
+    command_group.add_command(upgrade)
     command_group.add_command(start)
     command_group.add_command(stop)
     command_group.add_command(restart)

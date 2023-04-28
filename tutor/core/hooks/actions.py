@@ -9,7 +9,6 @@ from weakref import WeakSet
 
 from typing_extensions import ParamSpec
 
-
 from . import priorities
 from .contexts import Contextualized
 

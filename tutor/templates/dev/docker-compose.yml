@@ -3,12 +3,6 @@ version: "{{ DOCKER_COMPOSE_VERSION }}"
 x-openedx-service:
   &openedx-service
   image: {{ DOCKER_IMAGE_OPENEDX_DEV }}
-  build:
-    context: ../build/openedx/
-    target: development
-    args:
-      # Note that we never build the openedx-dev image with root user ID, as it would simply fail.
-      APP_USER_ID: "{{ HOST_USER_ID or 1000 }}"
   stdin_open: true
   tty: true
   volumes:
