@@ -1,15 +1,13 @@
 import typing as t
 
-from .actions import Action, ActionTemplate
-from .actions import clear_all as _clear_all_actions
-from .contexts import Context, ContextTemplate
-from .filters import Filter, FilterTemplate
-from .filters import clear_all as _clear_all_filters
+from .actions import Action
+from .contexts import Context
+from .filters import Filter
 
 
 def clear_all(context: t.Optional[str] = None) -> None:
     """
     Clear both actions and filters.
     """
-    _clear_all_actions(context=context)
-    _clear_all_filters(context=context)
+    Action.clear_all(context=context)
+    Filter.clear_all(context=context)

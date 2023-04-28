@@ -43,16 +43,17 @@ def discover_module(path: str) -> None:
     hooks.Filters.PLUGINS_INFO.add_item((name, path))
 
     # Import module on enable
-    load_plugin_action = hooks.Actions.PLUGIN_LOADED(name)
-
-    @load_plugin_action.add()
-    def load() -> None:
-        # https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
-        spec = importlib.util.spec_from_file_location("tutor.plugin.v1.{name}", path)
-        if spec is None or spec.loader is None:
-            raise ValueError("Plugin could not be found: {path}")
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+    @hooks.Actions.PLUGIN_LOADED.add()
+    def load(plugin_name: str) -> None:
+        if name == plugin_name:
+            # https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+            spec = importlib.util.spec_from_file_location(
+                "tutor.plugin.v1.{name}", path
+            )
+            if spec is None or spec.loader is None:
+                raise ValueError("Plugin could not be found: {path}")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
 
 
 def discover_package(entrypoint: pkg_resources.EntryPoint) -> None:
@@ -70,8 +71,7 @@ def discover_package(entrypoint: pkg_resources.EntryPoint) -> None:
     hooks.Filters.PLUGINS_INFO.add_item((name, entrypoint.dist.version))
 
     # Import module on enable
-    load_plugin_action = hooks.Actions.PLUGIN_LOADED(name)
-
-    @load_plugin_action.add()
-    def load() -> None:
-        entrypoint.load()
+    @hooks.Actions.PLUGIN_LOADED.add()
+    def load(plugin_name: str) -> None:
+        if name == plugin_name:
+            entrypoint.load()

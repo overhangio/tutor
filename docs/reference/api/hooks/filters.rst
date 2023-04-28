@@ -9,9 +9,6 @@ Filters are one of the two types of hooks (the other being :ref:`actions`) that 
 .. autoclass:: tutor.core.hooks.Filter
     :members:
 
-.. autoclass:: tutor.core.hooks.FilterTemplate
-    :members:
-
 .. The following are only to ensure that the docs build without warnings
 .. class:: tutor.core.hooks.filters.T1
 .. class:: tutor.core.hooks.filters.T2

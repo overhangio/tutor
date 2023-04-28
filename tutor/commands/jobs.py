@@ -37,11 +37,11 @@ def _add_core_init_tasks() -> None:
     The context is important, because it allows us to select the init scripts based on
     the --limit argument.
     """
-    with hooks.Contexts.APP("mysql").enter():
+    with hooks.Contexts.app("mysql").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("mysql", env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
-    with hooks.Contexts.APP("lms").enter():
+    with hooks.Contexts.app("lms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             (
                 "lms",
@@ -54,7 +54,7 @@ def _add_core_init_tasks() -> None:
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("lms", env.read_core_template_file("jobs", "init", "lms.sh"))
         )
-    with hooks.Contexts.APP("cms").enter():
+    with hooks.Contexts.app("cms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("cms", env.read_core_template_file("jobs", "init", "cms.sh"))
         )
@@ -64,7 +64,7 @@ def _add_core_init_tasks() -> None:
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 def initialise(limit: t.Optional[str]) -> t.Iterator[tuple[str, str]]:
     fmt.echo_info("Initialising all services...")
-    filter_context = hooks.Contexts.APP(limit).name if limit else None
+    filter_context = hooks.Contexts.app(limit).name if limit else None
 
     # Deprecated pre-init tasks
     for service, path in hooks.Filters.COMMANDS_PRE_INIT.iterate_from_context(

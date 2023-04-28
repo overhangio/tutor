@@ -1,7 +1,7 @@
 import unittest
 
-from tutor import config as tutor_config
 from tests.helpers import temporary_root
+from tutor import config as tutor_config
 
 from .base import TestCommandMixin
 

@@ -304,7 +304,7 @@ def _remove_plugin_config_overrides_on_unload(
     # Find the configuration entries that were overridden by the plugin and
     # remove them from the current config
     for key, _value in hooks.Filters.CONFIG_OVERRIDES.iterate_from_context(
-        hooks.Contexts.APP(plugin).name
+        hooks.Contexts.app(plugin).name
     ):
         value = config.pop(key, None)
         value = env.render_unknown(config, value)
