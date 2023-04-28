@@ -66,30 +66,11 @@ def initialise(limit: t.Optional[str]) -> t.Iterator[tuple[str, str]]:
     fmt.echo_info("Initialising all services...")
     filter_context = hooks.Contexts.app(limit).name if limit else None
 
-    # Deprecated pre-init tasks
-    for service, path in hooks.Filters.COMMANDS_PRE_INIT.iterate_from_context(
-        filter_context
-    ):
-        fmt.echo_alert(
-            f"Running deprecated pre-init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_PRE_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead, with a high priority."
-        )
-        yield service, env.read_template_file(*path)
-
-    # Init tasks
     for service, task in hooks.Filters.CLI_DO_INIT_TASKS.iterate_from_context(
         filter_context
     ):
         fmt.echo_info(f"Running init task in {service}")
         yield service, task
-
-    # Deprecated init tasks
-    for service, path in hooks.Filters.COMMANDS_INIT.iterate_from_context(
-        filter_context
-    ):
-        fmt.echo_alert(
-            f"Running deprecated init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead."
-        )
-        yield service, env.read_template_file(*path)
 
     fmt.echo_info("All services initialised.")
 

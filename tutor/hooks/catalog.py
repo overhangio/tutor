@@ -188,28 +188,6 @@ class Filters:
     #:   may contain Jinja markup, similar to templates.
     CLI_DO_INIT_TASKS: Filter[list[tuple[str, str]], []] = Filter()
 
-    #: DEPRECATED use :py:data:`CLI_DO_INIT_TASKS` instead.
-    #:
-    #: List of commands to be executed during initialization. These commands typically
-    #: include database migrations, setting feature flags, etc.
-    #:
-    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)`` tasks.
-    #:
-    #:     - ``service`` is the name of the container in which the task will be executed.
-    #:     - ``path`` is a tuple that corresponds to a template relative path.
-    #:       Example: ``("myplugin", "hooks", "myservice", "pre-init")`` (see :py:data:`IMAGES_BUILD`).
-    #:       The command to execute will be read from that template, after it is rendered.
-    COMMANDS_INIT: Filter[list[tuple[str, tuple[str, ...]]], []] = Filter()
-
-    #: DEPRECATED use :py:data:`CLI_DO_INIT_TASKS` instead with a lower priority score.
-    #:
-    #: List of commands to be executed prior to initialization. These commands are run even
-    #: before the mysql databases are created and the migrations are applied.
-    #:
-    #: :parameter list[tuple[str, tuple[str, ...]]] tasks: list of ``(service, path)``
-    #:   tasks. (see :py:data:`COMMANDS_INIT`).
-    COMMANDS_PRE_INIT: Filter[list[tuple[str, tuple[str, ...]]], []] = Filter()
-
     #: List of folders to bind-mount in docker-compose containers, either in ``tutor local`` or ``tutor dev``.
     #:
     #: This filter is for processing values of the ``MOUNTS`` setting such as::
