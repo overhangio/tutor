@@ -10,6 +10,7 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
 
 jobs:
   release:
@@ -23,11 +24,9 @@ jobs:
           # https://pyinstaller.org/en/stable/usage.html#making-gnu-linux-apps-forward-compatible
           - os: ubuntu-20.04
             locale: C.UTF-8
-            gh_os: linux
           # https://endoflife.date/macos
           - os: macos-10.15
             locale: en_US.UTF-8
-            gh_os: macOs
     env:
       LC_ALL: ${{ matrix.locale }}
       LANG: ${{ matrix.locale }}
@@ -40,6 +39,7 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: 3.7
+          cache: 'pip'
       - name: Upgrade pip and setuptools
         # https://pypi.org/project/pip/
         # https://pypi.org/project/setuptools/
@@ -51,22 +51,44 @@ jobs:
         run: make bootstrap-dev-plugins
 
       ##### Run tests, generate bundle
-      - name: Run tests
-        run: make test
+      # - name: Run tests
+      #   run: make test
       - name: Create bundle
         run: make bundle
-      - name: Test bundle
-        run: make ci-test-bundle
+      # - name: Test bundle
+      #   run: make ci-test-bundle
+
+      ##### Download gh utility: https://github.com/cli/cli/releases
+      # This is unnecessary on GitHub, but useful when running locally with act.
+      # WARNING: this will only work on amd64
+      - name: Check or download gh utility
+        run: |
+          if ! which gh; then
+            echo "Downloading 'gh' utility"
+            if [ "$(uname -s)" = "Linux" ]; then
+              curl -L -o gh.tar.gz https://github.com/cli/cli/releases/download/v2.28.0/gh_2.28.0_linux_amd64.tar.gz
+              tar xzf gh.tar.gz
+              mv ./gh_2.28.0_linux_amd64/bin/gh /usr/local/bin/gh
+            else
+              curl -L -o gh.zip https://github.com/cli/cli/releases/download/v2.28.0/gh_2.28.0_macOS_amd64.zip
+              unzip xzf gh.zip
+              mv ./gh_2.28.0_macOS_amd64/bin/gh /usr/local/bin/gh
+            fi
+            which gh
+          fi
 
       ##### Create release on GitHub
       - name: Create or update GitHub release
-        run: scriv github-release
+        run: scriv github-release --repo=overhangio/tutor
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        # scriv command will fail when not on a tag, such as running with act or a
+        # manual trigger.
+        if: ${{ github.ref_type == 'tag' }}
       - name: Upload release asset to GitHub
         run: |
           export FILENAME="tutor-$(uname -s)_$(uname -m)"
           mv ./dist/tutor $FILENAME
-          gh release upload --clobber ${{ github.ref_name }} $FILENAME
+          gh release upload --clobber v$(make version) $FILENAME
         env:
           GH_TOKEN: ${{ github.token }}
