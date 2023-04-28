@@ -4,13 +4,14 @@ Common jobs that must be added both to local, dev and k8s commands.
 from __future__ import annotations
 
 import functools
+import shlex
 import typing as t
 
 import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, fmt, hooks, utils
+from tutor import env, fmt, hooks
 from tutor.hooks import priorities
 
 
@@ -260,7 +261,7 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     """
     command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }}"
     if args:
-        command += " " + utils._shlex_join(*args)  # pylint: disable=protected-access
+        command += " " + shlex.join(args)  # pylint: disable=protected-access
     yield ("lms", command)
 
 

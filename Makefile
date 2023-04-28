@@ -91,7 +91,6 @@ bootstrap-dev-plugins: bootstrap-dev ## Install dev requirements and all support
 
 pull-base-images: # Manually pull base images
 	docker image pull docker.io/ubuntu:20.04
-	docker image pull docker.io/python:3.7-alpine
 
 ci-info: ## Print info about environment
 	python --version

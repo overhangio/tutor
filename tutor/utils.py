@@ -216,7 +216,7 @@ def is_a_tty() -> bool:
 
 
 def execute(*command: str) -> int:
-    click.echo(fmt.command(_shlex_join(*command)))
+    click.echo(fmt.command(shlex.join(command)))
     return execute_silent(*command)
 
 
@@ -239,21 +239,8 @@ def execute_silent(*command: str) -> int:
     return result
 
 
-def _shlex_join(*split_command: str) -> str:
-    """
-    Return a shell-escaped string from *split_command.
-
-    TODO: REMOVE THIS FUNCTION AFTER 2023-06-27.
-      This function is a shim for the ``shlex.join`` standard library function,
-      which becomes available in Python 3.8  The end-of-life date for Python 3.7
-      is in Jan 2023 (https://endoflife.date/python). After that point, it
-      would be good to delete this function and just use Py3.8's ``shlex.join``.
-    """
-    return " ".join(shlex.quote(arg) for arg in split_command)
-
-
 def check_output(*command: str) -> bytes:
-    literal_command = _shlex_join(*command)
+    literal_command = shlex.join(command)
     click.echo(fmt.command(literal_command))
     try:
         return subprocess.check_output(command)

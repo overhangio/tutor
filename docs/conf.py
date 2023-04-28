@@ -35,7 +35,7 @@ autodoc_typehints = "description"
 # For the life of me I can't get the docs to compile in nitpicky mode without these
 # ignore statements. You are most welcome to try and remove them.
 # To make matters worse, some ignores are only required for some versions of Python,
-# from 3.7 to 3.10...
+# from 3.8 to 3.10...
 nitpick_ignore = [
     # Sphinx does not handle ParamSpec arguments
     ("py:class", "T.args"),
@@ -48,8 +48,6 @@ nitpick_ignore = [
     ("py:class", "t.Callable"),
     ("py:class", "t.Iterator"),
     ("py:class", "t.Optional"),
-    # python 3.7
-    ("py:class", "Concatenate"),
     # python 3.10
     ("py:class", "NoneType"),
     ("py:class", "click.core.Command"),
@@ -57,8 +55,6 @@ nitpick_ignore = [
 # Resolve type aliases here
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_type_aliases
 autodoc_type_aliases: dict[str, str] = {
-    "T1": "tutor.core.hooks.filters.T1",
-    "L": "tutor.core.hooks.filters.L",
     # python 3.10
     "T": "tutor.core.hooks.actions.T",
     "T2": "tutor.core.hooks.filters.T2",
@@ -132,14 +128,12 @@ def youtube(
     return [
         docutils.nodes.raw(
             "",
-            """
+            f"""
 <iframe width="560" height="315"
     src="https://www.youtube-nocookie.com/embed/{video_id}"
     frameborder="0"
     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-</iframe>""".format(
-                video_id=video_id
-            ),
+</iframe>""",
             format="html",
         )
     ]
