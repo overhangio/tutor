@@ -225,15 +225,10 @@ class Filter(t.Generic[T1, T2]):
             my_filter.add_item("item2")
         """
 
-        # Unfortunately we have to type-ignore this line. If not, mypy complains with:
-        #
-        #   Argument 1 has incompatible type "Callable[[Arg(List[E], 'values'), **T2], List[E]]"; expected "Callable[[List[E], **T2], List[E]]"
-        #   This is likely because "callback" has named arguments: "values". Consider marking them positional-only
-        #
-        # But we are unable to mark arguments positional-only (by adding / after values arg) in Python 3.7.
-        # Get rid of this statement after Python 3.7 EOL.
-        @self.add(priority=priority)  # type: ignore
-        def callback(values: list[L], *_args: T2.args, **_kwargs: T2.kwargs) -> list[L]:
+        @self.add(priority=priority)
+        def callback(
+            values: list[L], /, *_args: T2.args, **_kwargs: T2.kwargs
+        ) -> list[L]:
             return values + items
 
     def iterate(

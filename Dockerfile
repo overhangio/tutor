@@ -10,7 +10,7 @@
 # Because this image is still experimental, and we are not quite sure if it's going to 
 # be very useful, we do not provide any usage documentation.
 
-FROM docker.io/python:3.7-slim-stretch
+FROM docker.io/python:3.8-slim-stretch
 
 # As per https://github.com/docker/compose/issues/3918
 COPY --from=library/docker:19.03 /usr/local/bin/docker /usr/bin/docker

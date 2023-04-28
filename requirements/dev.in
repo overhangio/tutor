@@ -9,7 +9,7 @@ twine
 
 # doc requirement is lagging behind
 # https://github.com/readthedocs/sphinx_rtd_theme/issues/1323
-docutils<0.18
+docutils<0.19
 
 # Types packages
 types-docutils
