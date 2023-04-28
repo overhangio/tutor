@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from functools import lru_cache
 import os
 import re
 import typing as t
+from functools import lru_cache
 
 from tutor import hooks
 

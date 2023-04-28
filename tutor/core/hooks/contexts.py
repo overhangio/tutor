@@ -43,22 +43,6 @@ class Context:
             Context.CURRENT.pop()
 
 
-class ContextTemplate:
-    """
-    Context templates are for filters for which the name needs to be formatted
-    before the filter can be applied.
-    """
-
-    def __init__(self, name: str):
-        self.template = name
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}('{self.template}')"
-
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Context:
-        return Context(self.template.format(*args, **kwargs))
-
-
 class Contextualized:
     """
     This is a simple class to store the current context in hooks.

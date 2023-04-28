@@ -4,9 +4,10 @@ import os
 
 import click
 
+from tutor import bindmount
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import bindmount, hooks, utils
+from tutor import hooks, utils
 from tutor.commands import jobs
 from tutor.commands.context import BaseTaskContext
 from tutor.core.hooks import Filter  # pylint: disable=unused-import

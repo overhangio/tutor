@@ -5,8 +5,10 @@ __license__ = "Apache 2.0"
 
 import sys
 import typing as t
+from weakref import WeakSet
 
 from typing_extensions import ParamSpec
+
 
 from . import priorities
 from .contexts import Contextualized
@@ -44,32 +46,25 @@ class Action(t.Generic[T]):
 
     This is the typical action lifecycle:
 
-    1. Create an action with method :py:meth:`get`.
-    2. Add callbacks with method :py:meth:`add`.
-    3. Call the action callbacks with method :py:meth:`do`.
+    1. Create an action with ``Action()``.
+    2. Add callbacks with :py:meth:`add`.
+    3. Call the action callbacks with :py:meth:`do`.
 
-    The ``P`` type parameter of the Action class corresponds to the expected signature of
+    The ``T`` type parameter of the Action class corresponds to the expected signature of
     the action callbacks. For instance, ``Action[[str, int]]`` means that the action
     callbacks are expected to take two arguments: one string and one integer.
 
-    This strong typing makes it easier for plugin developers to quickly check whether they are adding and calling action callbacks correctly.
+    This strong typing makes it easier for plugin developers to quickly check whether
+    they are adding and calling action callbacks correctly.
     """
 
-    INDEX: dict[str, "Action[t.Any]"] = {}
+    # Keep a weak reference to all created filters. This allows us to clear them when
+    # necessary.
+    INSTANCES: WeakSet[Action[t.Any]] = WeakSet()
 
-    def __init__(self, name: str) -> None:
-        self.name = name
+    def __init__(self) -> None:
         self.callbacks: list[ActionCallback[T]] = []
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}('{self.name}')"
-
-    @classmethod
-    def get(cls, name: str) -> "Action[t.Any]":
-        """
-        Get an existing action with the given name from the index, or create one.
-        """
-        return cls.INDEX.setdefault(name, cls(name))
+        self.INSTANCES.add(self)
 
     def add(
         self, priority: t.Optional[int] = None
@@ -144,7 +139,7 @@ class Action(t.Generic[T]):
                     )
                 except:
                     sys.stderr.write(
-                        f"Error applying action '{self.name}': func={callback.func} contexts={callback.contexts}'\n"
+                        f"Error applying action: func={callback.func} contexts={callback.contexts}'\n"
                     )
                     raise
 
@@ -168,98 +163,10 @@ class Action(t.Generic[T]):
             if not callback.is_in_context(context)
         ]
 
-
-class ActionTemplate(t.Generic[T]):
-    """
-    Action templates are for actions for which the name needs to be formatted
-    before the action can be applied.
-
-    Action templates can generate different :py:class:`Action` objects for which the
-    name matches a certain template.
-
-    Templated actions must be formatted with ``(*args)`` before being applied. For example::
-
-        action_template = ActionTemplate("namespace:{0}")
-
-        # Return the action named "namespace:name"
-        my_action = action_template("name")
-
-        @my_action.add()
-        def my_callback():
-            ...
-
-        my_action.do()
-    """
-
-    def __init__(self, name: str):
-        self.template = name
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}('{self.template}')"
-
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> Action[T]:
-        name = self.template.format(*args, **kwargs)
-        action: Action[T] = Action.get(name)
-        return action
-
-
-# Syntactic sugar
-get = Action.get
-
-
-def get_template(name: str) -> ActionTemplate[t.Any]:
-    """
-    Create an action with a template name.
-    """
-    return ActionTemplate(name)
-
-
-def add(
-    name: str, priority: t.Optional[int] = None
-) -> t.Callable[[ActionCallbackFunc[T]], ActionCallbackFunc[T]]:
-    """
-    Decorator to add a callback action associated to a name.
-    """
-    return get(name).add(priority=priority)
-
-
-def do(
-    name: str,
-    *args: T.args,
-    **kwargs: T.kwargs,
-) -> None:
-    """
-    Run action callbacks associated to a name/context.
-    """
-    action: Action[T] = Action.get(name)
-    action.do(*args, **kwargs)
-
-
-def do_from_context(
-    context: str,
-    name: str,
-    *args: T.args,
-    **kwargs: T.kwargs,
-) -> None:
-    """
-    Same as :py:func:`do` but only run the callbacks that were created in a given context.
-    """
-    action: Action[T] = Action.get(name)
-    action.do_from_context(context, *args, **kwargs)
-
-
-def clear_all(context: t.Optional[str] = None) -> None:
-    """
-    Clear any previously defined filter with the  given context.
-
-    This will call :py:func:`clear` with all action names.
-    """
-    for name in Action.INDEX:
-        clear(name, context=context)
-
-
-def clear(name: str, context: t.Optional[str] = None) -> None:
-    """
-    Clear any previously defined action with the given name and context.
-    """
-    Action.get(name).clear(context=context)
+    @classmethod
+    def clear_all(cls, context: t.Optional[str] = None) -> None:
+        """
+        Clear any previously defined action with the given context.
+        """
+        for action in cls.INSTANCES:
+            action.clear(context)

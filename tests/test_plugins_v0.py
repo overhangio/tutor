@@ -92,7 +92,7 @@ class PluginsTests(PluginsTestCase):
 
     def test_plugin_without_patches(self) -> None:
         plugins_v0.DictPlugin({"name": "plugin1"})
-        plugins.load("plugin1")
+        plugins.load_all(["plugin1"])
         patches = list(plugins.iter_patches("patch1"))
         self.assertEqual([], patches)
 

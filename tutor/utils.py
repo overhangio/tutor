@@ -258,6 +258,7 @@ Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instru
     https://docs.tutor.overhang.io/install.html"""
         )
 
+
 def check_macos_docker_memory() -> None:
     """
     Try to check that the RAM allocated to the Docker VM on macOS is at least 4 GB.

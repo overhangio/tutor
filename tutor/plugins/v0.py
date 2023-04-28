@@ -60,7 +60,10 @@ class BasePlugin:
         hooks.Filters.PLUGINS_INFO.add_item((self.name, self._version() or ""))
 
         # Create actions and filters on load
-        hooks.Actions.PLUGIN_LOADED(self.name).add()(self.__load)
+        @hooks.Actions.PLUGIN_LOADED.add()
+        def _load_plugin(name: str) -> None:
+            if name == self.name:
+                self.__load()
 
     def __load(self) -> None:
         """

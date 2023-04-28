@@ -526,7 +526,7 @@ def _delete_plugin_templates(plugin: str, root: str, _config: Config) -> None:
     Delete plugin env files on unload.
     """
     targets = hooks.Filters.ENV_TEMPLATE_TARGETS.iterate_from_context(
-        hooks.Contexts.APP(plugin).name
+        hooks.Contexts.app(plugin).name
     )
     for src, dst in targets:
         path = pathjoin(root, dst.replace("/", os.sep), src.replace("/", os.sep))
