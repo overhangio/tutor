@@ -20,6 +20,14 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.3.5'></a>
+## v15.3.5 (2023-04-28)
+
+- [Feature] Make it possible to import the demo course from a different git repository or version. (by @regisb)
+- [Feature] Add a convenient `do print-edx-platform-setting` command to print the value of an edx-platform setting. (by @regisb)
+- [Improvement] Improve edx-platform logging by silencing a couple deprecation warnings. (by @regisb)
+- [Feature] Add a convenient `do sqlshell` command to enter a SQL shell as root. (by @regisb)
+
 <a id='changelog-15.3.4'></a>
 ## v15.3.4 (2023-04-13)
 
