@@ -25,7 +25,12 @@ It is then your responsibility to configure the web proxy on the host. There are
     - Perform SSL/TLS termination using your own certificates.
     - Forward http traffic to https.
 - Set the following headers appropriately: ``X-Forwarded-Proto``, ``X-Forwarded-Port``.
+- You probably would need to set the following setting in lms/cms: ``SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")`` [1]_.
 - Forward all traffic to ``localhost:81`` (or whatever port indicated by CADDY_HTTP_PORT, see above).
 
 .. note::
     If you want to run Open edX at ``https://...`` urls (as you probably do in production) it is *crucial* that the ``ENABLE_HTTPS`` flag is set to ``true``. If not, the web services will be configured to run at ``http://...`` URLs, and all sorts of trouble will happen. Therefore, make sure to continue answering ``y`` ("yes") to the quickstart dialogue question "Activate SSL/TLS certificates for HTTPS access?".
+
+.. [1] Is required for the django ``request.is_secure()`` to work as expected, `django settings ref`_, hence `edx-platform heavily utilize it`_.
+.. _django settings ref: https://docs.djangoproject.com/en/3.2/ref/settings/#secure-proxy-ssl-header
+.. _edx-platform heavily utilize it: https://github.com/search?q=repo%3Aopenedx%2Fedx-platform+request.is_secure%28%29&type=code
