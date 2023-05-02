@@ -16,18 +16,19 @@ Then, optionally, tell Tutor to use a local fork of edx-platform.::
 
     tutor config save --append MOUNTS=./edx-platform
 
-Then, build the "openedx" Docker image for development and launch the developer platfornm setup process::
+Then, launch the developer platform setup process::
 
     tutor images build openedx-dev
     tutor dev launch
 
 This will perform several tasks. It will:
 
+* build the "openedx-dev" Docker image, which is based on the "openedx" production image but is `specialized for developer usage`_ (eventually with your fork),
 * stop any existing locally-running Tutor containers,
 * disable HTTPS,
 * set ``LMS_HOST`` to `local.overhang.io <http://local.overhang.io>`_ (a convenience domain that simply `points at 127.0.0.1 <https://dnschecker.org/#A/local.overhang.io>`_),
 * prompt for a platform details (with suitable defaults),
-* build an ``openedx-dev`` image, which is based ``openedx`` production image but is `specialized for developer usage`_,
+* build an ``openedx-dev`` image,
 * start LMS, CMS, supporting services, and any plugged-in services,
 * ensure databases are created and migrated, and
 * run service initialization scripts, such as service user creation and Waffle configuration.
@@ -121,15 +122,17 @@ Rebuilding the openedx-dev image
 The ``openedx-dev`` Docker image is based on the same ``openedx`` image used by ``tutor local ...`` to run LMS and CMS. However, it has a few differences to make it more convenient for developers:
 
 - The user that runs inside the container has the same UID as the user on the host, to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
-
 - Additional Python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
-
 - The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/palm.master/requirements/edx/development.in>`__ are installed.
 
 
 If you are using a custom ``openedx`` image, then you will need to rebuild ``openedx-dev`` every time you modify ``openedx``. To so, run::
 
     tutor images build openedx-dev
+
+Alternatively, the image will be automatically rebuilt every time you run::
+
+    tutor dev launch
 
 
 .. _bind_mounts:

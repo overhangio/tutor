@@ -20,22 +20,27 @@ BASE_IMAGE_NAMES = [
 
 @hooks.Filters.IMAGES_BUILD.add()
 def _add_core_images_to_build(
-    build_images: list[tuple[str, tuple[str, ...], str, tuple[str, ...]]],
+    build_images: list[tuple[str, t.Union[str, tuple[str, ...]], str, tuple[str, ...]]],
     config: Config,
-) -> list[tuple[str, tuple[str, ...], str, tuple[str, ...]]]:
+) -> list[tuple[str, t.Union[str, tuple[str, ...]], str, tuple[str, ...]]]:
     """
     Add base images to the list of Docker images to build on `tutor build all`.
     """
     for image, tag in BASE_IMAGE_NAMES:
         build_images.append(
-            (image, ("build", image), tutor_config.get_typed(config, tag, str), ())
+            (
+                image,
+                os.path.join("build", image),
+                tutor_config.get_typed(config, tag, str),
+                (),
+            )
         )
 
     # Build openedx-dev image
     build_images.append(
         (
             "openedx-dev",
-            ("build", "openedx"),
+            os.path.join("build", "openedx"),
             tutor_config.get_typed(config, "DOCKER_IMAGE_OPENEDX_DEV", str),
             (
                 "--target=development",
@@ -188,7 +193,7 @@ def build(
 
             # Build
             images.build(
-                tutor_env.pathjoin(context.root, *path),
+                tutor_env.pathjoin(context.root, path),
                 tag,
                 *image_build_args,
             )
@@ -262,7 +267,7 @@ def printtag(context: Context, image_names: list[str]) -> None:
 
 def find_images_to_build(
     config: Config, image: str
-) -> t.Iterator[tuple[str, tuple[str, ...], str, tuple[str, ...]]]:
+) -> t.Iterator[tuple[str, str, str, tuple[str, ...]]]:
     """
     Iterate over all images to build.
 
@@ -272,10 +277,11 @@ def find_images_to_build(
     """
     found = False
     for name, path, tag, args in hooks.Filters.IMAGES_BUILD.iterate(config):
+        relative_path = path if isinstance(path, str) else os.path.join(*path)
         if image in [name, "all"]:
             found = True
             tag = tutor_env.render_str(config, tag)
-            yield (name, path, tag, args)
+            yield (name, relative_path, tag, args)
 
     if not found:
         raise ImageNotFoundError(image)

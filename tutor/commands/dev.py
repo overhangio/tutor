@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing as t
+
 import click
 
 from tutor import env as tutor_env
@@ -30,6 +32,8 @@ class DevTaskRunner(compose.ComposeTaskRunner):
 
 
 class DevContext(compose.BaseComposeContext):
+    NAME = "dev"
+
     def job_runner(self, config: Config) -> DevTaskRunner:
         return DevTaskRunner(self.root, config)
 
@@ -49,6 +53,15 @@ def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
     runner = DevTaskRunner(root, config)
     if project_name != runner.project_name:
         runner.docker_compose("stop")
+
+
+@hooks.Filters.IMAGES_BUILD_REQUIRED.add()
+def _build_openedx_dev_on_launch(
+    image_names: list[str], context_name: t.Literal["local", "dev"]
+) -> list[str]:
+    if context_name == "dev":
+        image_names.append("openedx-dev")
+    return image_names
 
 
 compose.add_commands(dev)

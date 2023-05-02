@@ -28,7 +28,7 @@ Then, build the "openedx" and "permissions" images::
 
 If you want to use Tutor as an Open edX development environment, you should also build the development image::
 
-    tutor images build openedx-dev
+    tutor images build openedx-dev # this will be automatically done by `tutor dev launch`
 
 From this point on, use Tutor as normal. For example, start Open edX and run migrations with::
 

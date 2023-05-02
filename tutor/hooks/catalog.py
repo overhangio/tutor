@@ -7,7 +7,7 @@ from __future__ import annotations
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Literal, Union
 
 import click
 
@@ -169,8 +169,8 @@ class Filters:
     #:
     #: :parameter list[str] hostnames: items from this list are templates that will be
     #:   rendered by the environment.
-    #: :parameter str project_name: compose project name, such as "local" or "dev".
-    APP_PUBLIC_HOSTS: Filter[list[str], [str]] = Filter()
+    #: :parameter str context_name: either "local" or "dev", depending on the calling context.
+    APP_PUBLIC_HOSTS: Filter[list[str], [Literal["local", "dev"]]] = Filter()
 
     #: List of command line interface (CLI) commands.
     #:
@@ -341,17 +341,24 @@ class Filters:
     #: :parameter list[tuple[str, tuple[str, ...], str, tuple[str, ...]]] tasks: list of ``(name, path, tag, args)`` tuples.
     #:
     #:    - ``name`` is the name of the image, as in ``tutor images build myimage``.
-    #:    - ``path`` is the relative path to the folder that contains the Dockerfile.
+    #:    - ``path`` is the relative path to the folder that contains the Dockerfile. This can be either a string or a tuple of strings.
     #:      For instance ``("myplugin", "build", "myservice")`` indicates that the template will be read from
-    #:      ``myplugin/build/myservice/Dockerfile``
+    #:      ``myplugin/build/myservice/Dockerfile``. This argument value would be equivalent to "myplugin/build/myservice".
     #:    - ``tag`` is the Docker tag that will be applied to the image. It will be
     #:      rendered at runtime with the user configuration. Thus, the image tag could
     #:      be ``"{{ DOCKER_REGISTRY }}/myimage:{{ TUTOR_VERSION }}"``.
     #:    - ``args`` is a list of arguments that will be passed to ``docker build ...``.
     #: :parameter Config config: user configuration.
     IMAGES_BUILD: Filter[
-        list[tuple[str, tuple[str, ...], str, tuple[str, ...]]], [Config]
+        list[tuple[str, Union[str, tuple[str, ...]], str, tuple[str, ...]]], [Config]
     ] = Filter()
+
+    #: List of image names which must be built prior to launching the platform. These
+    #: images will be built on launch, in "dev" and "local" mode (but not in Kubernetes).
+    #:
+    #: :parameter list[str] names: list of image names.
+    #: :parameter str context_name: either "local" or "dev", depending on the calling context.
+    IMAGES_BUILD_REQUIRED: Filter[list[str], [Literal["local", "dev"]]] = Filter()
 
     #: List of host directories to be automatically bind-mounted in Docker images at
     #: build time. For instance, this is useful to build Docker images using a custom
