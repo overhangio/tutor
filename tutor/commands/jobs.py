@@ -147,18 +147,25 @@ u.save()"
     help="Git repository that contains the course to be imported",
 )
 @click.option(
+    "-d",
+    "--repo-dir",
+    default="",
+    show_default=True,
+    help="Git relative subdirectory to import data from",
+)
+@click.option(
     "-v",
     "--version",
     help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
 )
 def importdemocourse(
-    repo: str, version: t.Optional[str]
+    repo: str, repo_dir: str, version: t.Optional[str]
 ) -> t.Iterable[tuple[str, str]]:
     version = version or "{{ OPENEDX_COMMON_VERSION }}"
     template = f"""
 # Import demo course
 git clone {repo} --branch {version} --depth 1 /tmp/course
-python ./manage.py cms import ../data /tmp/course
+python ./manage.py cms import ../data /tmp/course/{repo_dir}
 
 # Re-index courses
 ./manage.py cms reindex_course --all --setup"""
