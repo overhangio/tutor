@@ -12,14 +12,9 @@ from tutor.commands.context import Context
 from tutor.core.hooks import Filter
 from tutor.types import Config
 
-BASE_IMAGE_NAMES = ["openedx", "permissions"]
-VENDOR_IMAGES = [
-    "caddy",
-    "elasticsearch",
-    "mongodb",
-    "mysql",
-    "redis",
-    "smtp",
+BASE_IMAGE_NAMES = [
+    ("openedx", "DOCKER_IMAGE_OPENEDX"),
+    ("permissions", "DOCKER_IMAGE_PERMISSIONS"),
 ]
 
 
@@ -31,16 +26,17 @@ def _add_core_images_to_build(
     """
     Add base images to the list of Docker images to build on `tutor build all`.
     """
-    for image in BASE_IMAGE_NAMES:
-        tag = images.get_tag(config, image)
-        build_images.append((image, ("build", image), tag, ()))
+    for image, tag in BASE_IMAGE_NAMES:
+        build_images.append(
+            (image, ("build", image), tutor_config.get_typed(config, tag, str), ())
+        )
 
     # Build openedx-dev image
     build_images.append(
         (
             "openedx-dev",
             ("build", "openedx"),
-            images.get_tag(config, "openedx-dev"),
+            tutor_config.get_typed(config, "DOCKER_IMAGE_OPENEDX_DEV", str),
             (
                 "--target=development",
                 f"--build-arg=APP_USER_ID={utils.get_user_id() or 1000}",
@@ -58,11 +54,19 @@ def _add_images_to_pull(
     """
     Add base and vendor images to the list of Docker images to pull on `tutor pull all`.
     """
-    for image in VENDOR_IMAGES:
+    vendor_images = [
+        ("caddy", "DOCKER_IMAGE_CADDY"),
+        ("elasticsearch", "DOCKER_IMAGE_ELASTICSEARCH"),
+        ("mongodb", "DOCKER_IMAGE_MONGODB"),
+        ("mysql", "DOCKER_IMAGE_MYSQL"),
+        ("redis", "DOCKER_IMAGE_REDIS"),
+        ("smtp", "DOCKER_IMAGE_SMTP"),
+    ]
+    for image, tag_name in vendor_images:
         if config.get(f"RUN_{image.upper()}", True):
-            remote_images.append((image, images.get_tag(config, image)))
-    for image in BASE_IMAGE_NAMES:
-        remote_images.append((image, images.get_tag(config, image)))
+            remote_images.append((image, tutor_config.get_typed(config, tag_name, str)))
+    for image, tag in BASE_IMAGE_NAMES:
+        remote_images.append((image, tutor_config.get_typed(config, tag, str)))
     return remote_images
 
 
@@ -73,8 +77,8 @@ def _add_core_images_to_push(
     """
     Add base images to the list of Docker images to push on `tutor push all`.
     """
-    for image in BASE_IMAGE_NAMES:
-        remote_images.append((image, images.get_tag(config, image)))
+    for image, tag in BASE_IMAGE_NAMES:
+        remote_images.append((image, tutor_config.get_typed(config, tag, str)))
     return remote_images
 
 
