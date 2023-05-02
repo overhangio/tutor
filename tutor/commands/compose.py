@@ -11,7 +11,7 @@ from tutor import env as tutor_env
 from tutor import fmt, hooks
 from tutor import interactive as interactive_config
 from tutor import utils
-from tutor.commands import jobs
+from tutor.commands import images, jobs
 from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseTaskContext
 from tutor.commands.upgrade import OPENEDX_RELEASE_NAMES
@@ -72,6 +72,8 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
 
 
 class BaseComposeContext(BaseTaskContext):
+    NAME: t.Literal["local", "dev"]
+
     def job_runner(self, config: Config) -> ComposeTaskRunner:
         raise NotImplementedError
 
@@ -79,14 +81,29 @@ class BaseComposeContext(BaseTaskContext):
 @click.command(help="Configure and run Open edX from scratch")
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
+@click.option("--skip-build", is_flag=True, help="Skip building Docker images")
 @click.pass_context
 def launch(
     context: click.Context,
     non_interactive: bool,
     pullimages: bool,
+    skip_build: bool,
 ) -> None:
+    context_name = context.obj.NAME
+    run_for_prod = context_name != "dev"
+
     utils.warn_macos_docker_memory()
-    interactive_upgrade(context, not non_interactive)
+    interactive_upgrade(context, not non_interactive, run_for_prod)
+    interactive_configuration(context, not non_interactive, run_for_prod)
+
+    config = tutor_config.load(context.obj.root)
+
+    if not skip_build:
+        click.echo(fmt.title("Building Docker images"))
+        images_to_build = hooks.Filters.IMAGES_BUILD_REQUIRED.apply([], context_name)
+        if not images_to_build:
+            fmt.echo_info("No image to build")
+        context.invoke(images.build, image_names=images_to_build)
 
     click.echo(fmt.title("Stopping any existing platform"))
     context.invoke(stop)
@@ -101,12 +118,9 @@ def launch(
     click.echo(fmt.title("Database creation and migrations"))
     context.invoke(do.commands["init"])
 
-    config = tutor_config.load(context.obj.root)
-    project_name = context.obj.job_runner(config).project_name
-
     # Print the urls of the user-facing apps
     public_app_hosts = ""
-    for host in hooks.Filters.APP_PUBLIC_HOSTS.iterate(project_name):
+    for host in hooks.Filters.APP_PUBLIC_HOSTS.iterate(context_name):
         public_app_host = tutor_env.render_str(
             config, "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://" + host
         )
@@ -119,7 +133,9 @@ def launch(
         )
 
 
-def interactive_upgrade(context: click.Context, interactive: bool) -> None:
+def interactive_upgrade(
+    context: click.Context, interactive: bool, run_for_prod: bool
+) -> None:
     """
     Piece of code that is only used in launch.
     """
@@ -146,29 +162,37 @@ Are you sure you want to continue?"""
             from_release=run_upgrade_from_release,
         )
 
+        # Update env and configuration
+        interactive_configuration(context, interactive, run_for_prod)
+
+        # Post upgrade
+        if run_upgrade_from_release and interactive:
+            question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
+
+    If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
+
+        tutor images build all # list your custom images here
+
+    See the documentation for more information:
+
+        https://docs.tutor.overhang.io/install.html#upgrading-to-a-new-open-edx-release
+
+    Press enter when you are ready to continue"""
+            click.confirm(
+                fmt.question(question), default=True, abort=True, prompt_suffix=" "
+            )
+
+
+def interactive_configuration(
+    context: click.Context, interactive: bool, run_for_prod: bool
+) -> None:
     click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
     if interactive:
-        interactive_config.ask_questions(config)
+        interactive_config.ask_questions(config, run_for_prod=run_for_prod)
     tutor_config.save_config_file(context.obj.root, config)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)
-
-    if run_upgrade_from_release and interactive:
-        question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
-
-If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
-
-    tutor images build all # list your custom images here
-
-See the documentation for more information:
-
-    https://docs.tutor.overhang.io/install.html#upgrading-to-a-new-open-edx-release
-
-Press enter when you are ready to continue"""
-        click.confirm(
-            fmt.question(question), default=True, abort=True, prompt_suffix=" "
-        )
 
 
 @click.command(
@@ -420,12 +444,14 @@ def _mount_edx_platform(
     return volumes
 
 
-def _edx_platform_public_hosts(hosts: list[str], project_name: str) -> list[str]:
-    edx_platform_hosts = ["{{ LMS_HOST }}", "{{ CMS_HOST }}"]
-    if project_name == "dev":
-        edx_platform_hosts[0] += ":8000"
-        edx_platform_hosts[1] += ":8001"
-    hosts += edx_platform_hosts
+@hooks.Filters.APP_PUBLIC_HOSTS.add()
+def _edx_platform_public_hosts(
+    hosts: list[str], context_name: t.Literal["local", "dev"]
+) -> list[str]:
+    if context_name == "dev":
+        hosts += ["{{ LMS_HOST }}:8000", "{{ CMS_HOST }}:8001"]
+    else:
+        hosts += ["{{ LMS_HOST }}", "{{ CMS_HOST }}"]
     return hosts
 
 

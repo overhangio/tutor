@@ -28,6 +28,8 @@ class LocalTaskRunner(compose.ComposeTaskRunner):
 
 # pylint: disable=too-few-public-methods
 class LocalContext(compose.BaseComposeContext):
+    NAME = "local"
+
     def job_runner(self, config: Config) -> LocalTaskRunner:
         return LocalTaskRunner(self.root, config)
 
