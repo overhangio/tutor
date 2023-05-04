@@ -7,7 +7,7 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, hooks, images, types, utils
+from tutor import exceptions, fmt, hooks, images, types, utils
 from tutor.commands.context import Context
 from tutor.core.hooks import Filter
 from tutor.types import Config
@@ -87,13 +87,60 @@ def _add_core_images_to_push(
     return remote_images
 
 
+class ImageNameParam(click.ParamType):
+    """
+    Convenient auto-completion of image names.
+    """
+
+    def shell_complete(
+        self, ctx: click.Context, param: click.Parameter, incomplete: str
+    ) -> list[click.shell_completion.CompletionItem]:
+        # Hackish way to get the project root and config
+        root = getattr(
+            getattr(getattr(ctx, "parent", None), "parent", None), "params", {}
+        ).get("root", "")
+        config = tutor_config.load_full(root)
+
+        results = []
+        for name in self.iter_image_names(config):
+            if name.startswith(incomplete):
+                results.append(click.shell_completion.CompletionItem(name))
+        return results
+
+    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
+        raise NotImplementedError
+
+
+class BuildImageNameParam(ImageNameParam):
+    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
+        for name, _path, _tag, _args in hooks.Filters.IMAGES_BUILD.iterate(config):
+            yield name
+
+
+class PullImageNameParam(ImageNameParam):
+    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
+        for name, _tag in hooks.Filters.IMAGES_PULL.iterate(config):
+            yield name
+
+
+class PushImageNameParam(ImageNameParam):
+    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
+        for name, _tag in hooks.Filters.IMAGES_PUSH.iterate(config):
+            yield name
+
+
 @click.group(name="images", short_help="Manage docker images")
 def images_command() -> None:
     pass
 
 
 @click.command()
-@click.argument("image_names", metavar="image", nargs=-1)
+@click.argument(
+    "image_names",
+    metavar="image",
+    nargs=-1,
+    type=BuildImageNameParam(),
+)
 @click.option(
     "--no-cache", is_flag=True, help="Do not use cache when building the image"
 )
@@ -207,7 +254,7 @@ def get_image_build_contexts(config: Config) -> dict[str, list[tuple[str, str]]]
     instance to build a Docker image with a local git checkout of a remote repo.
 
     Users configure bind-mounts with the `MOUNTS` config setting. Plugins can then
-    automaticall add build contexts based on these values.
+    automatically add build contexts based on these values.
     """
     user_mounts = types.get_typed(config, "MOUNTS", list)
     build_contexts: dict[str, list[tuple[str, str]]] = {}
@@ -215,6 +262,9 @@ def get_image_build_contexts(config: Config) -> dict[str, list[tuple[str, str]]]
         for image_name, stage_name in hooks.Filters.IMAGES_BUILD_MOUNTS.iterate(
             user_mount
         ):
+            fmt.echo_info(
+                f"Adding {user_mount} to the build context '{stage_name}' of image '{image_name}'"
+            )
             if image_name not in build_contexts:
                 build_contexts[image_name] = []
             build_contexts[image_name].append((user_mount, stage_name))
@@ -236,7 +286,7 @@ def _mount_edx_platform(
 
 
 @click.command(short_help="Pull images from the Docker registry")
-@click.argument("image_names", metavar="image", nargs=-1)
+@click.argument("image_names", metavar="image", type=PullImageNameParam(), nargs=-1)
 @click.pass_obj
 def pull(context: Context, image_names: list[str]) -> None:
     config = tutor_config.load_full(context.root)
@@ -246,7 +296,7 @@ def pull(context: Context, image_names: list[str]) -> None:
 
 
 @click.command(short_help="Push images to the Docker registry")
-@click.argument("image_names", metavar="image", nargs=-1)
+@click.argument("image_names", metavar="image", type=PushImageNameParam(), nargs=-1)
 @click.pass_obj
 def push(context: Context, image_names: list[str]) -> None:
     config = tutor_config.load_full(context.root)
@@ -256,7 +306,7 @@ def push(context: Context, image_names: list[str]) -> None:
 
 
 @click.command(short_help="Print tag associated to a Docker image")
-@click.argument("image_names", metavar="image", nargs=-1)
+@click.argument("image_names", metavar="image", type=BuildImageNameParam(), nargs=-1)
 @click.pass_obj
 def printtag(context: Context, image_names: list[str]) -> None:
     config = tutor_config.load_full(context.root)
