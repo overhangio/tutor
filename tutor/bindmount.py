@@ -5,7 +5,11 @@ import re
 import typing as t
 from functools import lru_cache
 
-from tutor import hooks
+from tutor import hooks, types
+
+
+def get_mounts(config: types.Config) -> list[str]:
+    return types.get_typed(config, "MOUNTS", list)
 
 
 def iter_mounts(user_mounts: list[str], name: str) -> t.Iterable[str]:
@@ -25,7 +29,8 @@ def iter_mounts(user_mounts: list[str], name: str) -> t.Iterable[str]:
 
 def parse_mount(value: str) -> list[tuple[str, str, str]]:
     """
-    Parser for mount arguments of the form "service1[,service2,...]:/host/path:/container/path".
+    Parser for mount arguments of the form
+    "service1[,service2,...]:/host/path:/container/path" (explicit) or "/host/path".
 
     Returns a list of (service, host_path, container_path) tuples.
     """
@@ -60,7 +65,7 @@ def parse_explicit_mount(value: str) -> list[tuple[str, str, str]]:
 @lru_cache(maxsize=None)
 def parse_implicit_mount(value: str) -> list[tuple[str, str, str]]:
     """
-    Argument is of the form "/host/path"
+    Argument is of the form "/path/to/host/directory"
     """
     mounts: list[tuple[str, str, str]] = []
     host_path = os.path.abspath(os.path.expanduser(value))

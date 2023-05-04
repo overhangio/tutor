@@ -14,6 +14,7 @@ from tutor.commands.dev import dev
 from tutor.commands.images import images_command
 from tutor.commands.k8s import k8s
 from tutor.commands.local import local
+from tutor.commands.mounts import mounts_command
 from tutor.commands.plugins import plugins_command
 
 
@@ -129,7 +130,16 @@ def help_command(context: click.Context) -> None:
 
 
 hooks.Filters.CLI_COMMANDS.add_items(
-    [images_command, config_command, local, dev, k8s, help_command, plugins_command]
+    [
+        config_command,
+        dev,
+        help_command,
+        images_command,
+        k8s,
+        local,
+        mounts_command,
+        plugins_command,
+    ]
 )
 
 

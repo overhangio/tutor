@@ -201,7 +201,7 @@ class Filters:
     #:
     #: This filter is for processing values of the ``MOUNTS`` setting such as::
     #:
-    #:     tutor config save --append MOUNTS=/path/to/edx-platform
+    #:     tutor mounts add /path/to/edx-platform
     #:
     #: In this example, this host folder would be bind-mounted in different containers
     #: (lms, lms-worker, cms, cms-worker, lms-job, cms-job) at the
