@@ -6,12 +6,13 @@ import typing as t
 import click
 import click.shell_completion
 
-from .. import config as tutor_config
-from .. import env, exceptions, fmt
-from .. import interactive as interactive_config
-from .. import serialize
-from ..types import Config, ConfigValue
-from .context import Context
+from tutor import config as tutor_config
+from tutor import env, exceptions, fmt
+from tutor import interactive as interactive_config
+from tutor import serialize
+from tutor.commands.context import Context
+from tutor.commands.params import ConfigLoaderParam
+from tutor.types import ConfigValue
 
 
 @click.group(
@@ -23,7 +24,7 @@ def config_command() -> None:
     pass
 
 
-class ConfigKeyParamType(click.ParamType):
+class ConfigKeyParamType(ConfigLoaderParam):
     name = "configkey"
 
     def shell_complete(
@@ -31,31 +32,20 @@ class ConfigKeyParamType(click.ParamType):
     ) -> list[click.shell_completion.CompletionItem]:
         return [
             click.shell_completion.CompletionItem(key)
-            for key, _value in self._shell_complete_config_items(ctx, incomplete)
+            for key, _value in self._shell_complete_config_items(incomplete)
         ]
 
     def _shell_complete_config_items(
-        self, ctx: click.Context, incomplete: str
+        self, incomplete: str
     ) -> list[tuple[str, ConfigValue]]:
-        # Here we want to auto-complete the name of the config key. For that we need to
-        # figure out the list of enabled plugins, and for that we need the project root.
-        # The project root would ordinarily be stored in ctx.obj.root, but during
-        # auto-completion we don't have access to our custom Tutor context. So we resort
-        # to a dirty hack, which is to examine the grandparent context.
-        root = getattr(
-            getattr(getattr(ctx, "parent", None), "parent", None), "params", {}
-        ).get("root", "")
-        config = tutor_config.load_full(root)
         return [
             (key, value)
-            for key, value in self._candidate_config_items(config)
+            for key, value in self._candidate_config_items()
             if key.startswith(incomplete)
         ]
 
-    def _candidate_config_items(
-        self, config: Config
-    ) -> t.Iterable[tuple[str, ConfigValue]]:
-        yield from config.items()
+    def _candidate_config_items(self) -> t.Iterable[tuple[str, ConfigValue]]:
+        yield from self.config.items()
 
 
 class ConfigKeyValParamType(ConfigKeyParamType):
@@ -82,16 +72,14 @@ class ConfigKeyValParamType(ConfigKeyParamType):
             # further auto-complete later.
             return [
                 click.shell_completion.CompletionItem(f"'{key}='")
-                for key, value in self._shell_complete_config_items(ctx, incomplete)
+                for key, value in self._shell_complete_config_items(incomplete)
             ]
         if incomplete.endswith("="):
             # raise ValueError(f"incomplete: <{incomplete}>")
             # Auto-complete with '<KEY>=<VALUE>'
             return [
                 click.shell_completion.CompletionItem(f"{key}={json.dumps(value)}")
-                for key, value in self._shell_complete_config_items(
-                    ctx, incomplete[:-1]
-                )
+                for key, value in self._shell_complete_config_items(incomplete[:-1])
             ]
         # Else, don't bother
         return []
@@ -102,10 +90,8 @@ class ConfigListKeyValParamType(ConfigKeyValParamType):
     Same as the parent class, but for keys of type `list`.
     """
 
-    def _candidate_config_items(
-        self, config: Config
-    ) -> t.Iterable[tuple[str, ConfigValue]]:
-        for key, val in config.items():
+    def _candidate_config_items(self) -> t.Iterable[tuple[str, ConfigValue]]:
+        for key, val in self.config.items():
             if isinstance(val, list):
                 yield key, val
 
@@ -154,9 +140,9 @@ class ConfigListKeyValParamType(ConfigKeyValParamType):
 def save(
     context: Context,
     interactive: bool,
-    set_vars: tuple[str, t.Any],
-    append_vars: tuple[str, t.Any],
-    remove_vars: tuple[str, t.Any],
+    set_vars: list[tuple[str, t.Any]],
+    append_vars: list[tuple[str, t.Any]],
+    remove_vars: list[tuple[str, t.Any]],
     unset_vars: list[str],
     env_only: bool,
 ) -> None:
@@ -235,5 +221,5 @@ def patches_list(context: Context) -> None:
 config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
-config_command.add_command(patches_command)
 patches_command.add_command(patches_list)
+config_command.add_command(patches_command)

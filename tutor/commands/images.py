@@ -5,10 +5,12 @@ import typing as t
 
 import click
 
+from tutor import bindmount
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt, hooks, images, types, utils
+from tutor import exceptions, fmt, hooks, images, utils
 from tutor.commands.context import Context
+from tutor.commands.params import ConfigLoaderParam
 from tutor.core.hooks import Filter
 from tutor.types import Config
 
@@ -87,7 +89,7 @@ def _add_core_images_to_push(
     return remote_images
 
 
-class ImageNameParam(click.ParamType):
+class ImageNameParam(ConfigLoaderParam):
     """
     Convenient auto-completion of image names.
     """
@@ -95,37 +97,31 @@ class ImageNameParam(click.ParamType):
     def shell_complete(
         self, ctx: click.Context, param: click.Parameter, incomplete: str
     ) -> list[click.shell_completion.CompletionItem]:
-        # Hackish way to get the project root and config
-        root = getattr(
-            getattr(getattr(ctx, "parent", None), "parent", None), "params", {}
-        ).get("root", "")
-        config = tutor_config.load_full(root)
-
         results = []
-        for name in self.iter_image_names(config):
+        for name in self.iter_image_names():
             if name.startswith(incomplete):
                 results.append(click.shell_completion.CompletionItem(name))
         return results
 
-    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
+    def iter_image_names(self) -> t.Iterable["str"]:
         raise NotImplementedError
 
 
 class BuildImageNameParam(ImageNameParam):
-    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
-        for name, _path, _tag, _args in hooks.Filters.IMAGES_BUILD.iterate(config):
+    def iter_image_names(self) -> t.Iterable["str"]:
+        for name, _path, _tag, _args in hooks.Filters.IMAGES_BUILD.iterate(self.config):
             yield name
 
 
 class PullImageNameParam(ImageNameParam):
-    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
-        for name, _tag in hooks.Filters.IMAGES_PULL.iterate(config):
+    def iter_image_names(self) -> t.Iterable["str"]:
+        for name, _tag in hooks.Filters.IMAGES_PULL.iterate(self.config):
             yield name
 
 
 class PushImageNameParam(ImageNameParam):
-    def iter_image_names(self, config: Config) -> t.Iterable["str"]:
-        for name, _tag in hooks.Filters.IMAGES_PUSH.iterate(config):
+    def iter_image_names(self) -> t.Iterable["str"]:
+        for name, _tag in hooks.Filters.IMAGES_PUSH.iterate(self.config):
             yield name
 
 
@@ -256,9 +252,8 @@ def get_image_build_contexts(config: Config) -> dict[str, list[tuple[str, str]]]
     Users configure bind-mounts with the `MOUNTS` config setting. Plugins can then
     automatically add build contexts based on these values.
     """
-    user_mounts = types.get_typed(config, "MOUNTS", list)
     build_contexts: dict[str, list[tuple[str, str]]] = {}
-    for user_mount in user_mounts:
+    for user_mount in bindmount.get_mounts(config):
         for image_name, stage_name in hooks.Filters.IMAGES_BUILD_MOUNTS.iterate(
             user_mount
         ):

@@ -428,7 +428,7 @@ def _mount_edx_platform(
     volumes: list[tuple[str, str]], name: str
 ) -> list[tuple[str, str]]:
     """
-    When mounting edx-platform with `tutor config save --append MOUNTS=/path/to/edx-platform`,
+    When mounting edx-platform with `tutor mounts add /path/to/edx-platform`,
     bind-mount the host repo in the lms/cms containers.
     """
     if name == "edx-platform":

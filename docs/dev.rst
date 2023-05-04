@@ -14,7 +14,7 @@ Firstly, either :ref:`install Tutor <install>` (for development against the name
 
 Then, optionally, tell Tutor to use a local fork of edx-platform.::
 
-    tutor config save --append MOUNTS=./edx-platform
+    tutor mounts add ./edx-platform
 
 Then, launch the developer platform setup process::
 
@@ -49,13 +49,13 @@ Now, use the ``tutor dev ...`` command-line interface to manage the development 
 
 .. note::
 
-  If you've added your edx-platform to the ``MOUNTS`` setting, you can remove at any time by running::
+  If you've added your edx-platform to the bind-mounted folders, you can remove at any time by running::
 
-    tutor config save --remove MOUNTS=./edx-platform
+    tutor mounts remove ./edx-platform
 
   At any time, check your configuration by running::
 
-    tutor config printvalue MOUNTS
+    tutor mounts list
 
   Read more about bind-mounts :ref:`below <bind_mounts>`.
 
@@ -144,40 +144,74 @@ It may sometimes be convenient to mount container directories on the host, for i
 
 .. _persistent_mounts:
 
-Persistent bind-mounted volumes with ``MOUNTS``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Persistent bind-mounted volumes with ``tutor mounts``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``MOUNTS`` is a Tutor setting to bind-mount host directories both at build time and run time:
+``tutor mounts`` is a set of Tutor command to manage bind-mounted host directories. Directories are mounted `both` at build time and run time:
 
-- At build time: plugins can automatically add certain directories listed in this setting to the `Docker build context <https://docs.docker.com/engine/reference/commandline/buildx_build/#build-context>`__. This makes it possible to transparently build a Docker image using a locally checked-out repository.
+- At build time: some of the host directories will be added the `Docker build context <https://docs.docker.com/engine/reference/commandline/buildx_build/#build-context>`__. This makes it possible to transparently build a Docker image using a locally checked-out repository.
 - At run time: host directories will be bind-mounted in running containers, using either an automatic or a manual configuration.
 
-After some values have been added to the ``MOUNTS`` setting, all ``tutor dev`` and ``tutor local`` commands will make use of these bind-mount volumes.
 
-Values added to ``MOUNTS`` can take one of two forms. The first is explicit::
+After some directories have been added with ``tutor mounts add``, all ``tutor dev`` and ``tutor local`` commands will make use of these bind-mount volumes.
 
-    tutor config save --append MOUNTS=lms:/path/to/edx-platform:/openedx/edx-platform
+Values passed to ``tutor mounts add ...`` can take one of two forms. The first is explicit::
+
+    tutor mounts add lms:/path/to/edx-platform:/openedx/edx-platform
 
 The second is implicit::
 
-    tutor config save --append MOUNTS=/path/to/edx-platform
+    tutor mounts add /path/to/edx-platform
 
-With the explicit form, the setting means "bind-mount the host folder /path/to/edx-platform to /openedx/edx-platform in the lms container at run time".
+With the explicit form, the value means "bind-mount the host folder /path/to/edx-platform to /openedx/edx-platform in the lms container at run time".
 
 If you use the explicit format, you will quickly realise that you usually want to bind-mount folders in multiple containers at a time. For instance, you will want to bind-mount the edx-platform repository in the "cms" container, but also the "lms-worker" and "cms-worker" containers. To do that, write instead::
 
     # each service is added to a coma-separated list
-    tutor config save --append MOUNTS=lms,cms,lms-worker,cms-worker:/path/to/edx-platform:/openedx/edx-platform
+    tutor mounts add lms,cms,lms-worker,cms-worker:/path/to/edx-platform:/openedx/edx-platform
 
-This command line is a bit cumbersome. In addition, with this explicit form, the edx-platform repository will *not* be added to the build context at build time. But Tutor can be smart about bind-mounting folders to the right containers in the right place when you use the implicit form of the ``MOUNTS`` setting. For instance, the following implicit form can be used instead of the explicit form above::
+This command line is a bit cumbersome. In addition, with this explicit form, the edx-platform repository will *not* be added to the build context at build time. But Tutor can be smart about bind-mounting folders to the right containers in the right place when you use the implicit form of the ``tutor mounts add`` command. For instance, the following implicit form can be used instead of the explicit form above::
 
-    tutor config save --append MOUNTS=/path/to/edx-platform
+    tutor mounts add /path/to/edx-platform
 
 With this implicit form, the edx-platform repo will be bind-mounted in the containers at run time, just like with the explicit form. But in addition, the edx-platform will also automatically be added to the Docker image at build time.
 
-So, when should you *not* be using the implicit form? That would be when Tutor does not know where to bind-mount your host folders. For instance, if you wanted to bind-mount your edx-platform virtual environment located in ``~/venvs/edx-platform``, you should not write ``--append MOUNTS=~/venvs/edx-platform``, because that folder would be mounted in a way that would override the edx-platform repository in the container. Instead, you should write::
+To check whether you have used the correct syntax, you should run ``tutor mounts list``. This command will indicate whether your folders will be bind-mounted at build time, run time, or both. For instance::
 
-    tutor config save --append MOUNTS=lms:~/venvs/edx-platform:/openedx/venv
+  $ tutor mounts add /path/to/edx-platform
+  $ tutor mounts list
+  - name: /home/data/regis/projets/overhang/repos/edx/edx-platform
+  build_mounts:
+  - image: openedx
+    context: edx-platform
+  - image: openedx-dev
+    context: edx-platform
+  compose_mounts:
+  - service: lms
+    container_path: /openedx/edx-platform
+  - service: cms
+    container_path: /openedx/edx-platform
+  - service: lms-worker
+    container_path: /openedx/edx-platform
+  - service: cms-worker
+    container_path: /openedx/edx-platform
+  - service: lms-job
+    container_path: /openedx/edx-platform
+  - service: cms-job
+    container_path: /openedx/edx-platform
+
+So, when should you *not* be using the implicit form? That would be when Tutor does not know where to bind-mount your host folders. For instance, if you wanted to bind-mount your edx-platform virtual environment located in ``~/venvs/edx-platform``, you should not write ``mounts add ~/venvs/edx-platform``, because that folder would be mounted in a way that would override the edx-platform repository in the container. Instead, you should write::
+
+    tutor mounts add lms:~/venvs/edx-platform:/openedx/venv
+
+Verify the configuration with the ``list`` command::
+
+    $ tutor mounts list
+    - name: lms:~/venvs/edx-platform:/openedx/venv
+      build_mounts: []
+      compose_mounts:
+      - service: lms
+        container_path: /openedx/venv
 
 .. note:: Remember to setup your edx-platform repository for development! See :ref:`edx_platform_dev_env`.
 
@@ -190,7 +224,7 @@ Sometimes, you may want to modify some of the files inside a container for which
 
 Then, bind-mount that folder back in the container with the ``MOUNTS`` setting (described :ref:`above <persistent_mounts>`)::
 
-    tutor config save --append MOUNTS=lms:~/venv:/openedx/venv
+    tutor mounts add lms:~/venv:/openedx/venv
 
 You can then edit the files in ``~/venv`` on your local filesystem and see the changes live in your "lms" container.
 
