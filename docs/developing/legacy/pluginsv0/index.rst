@@ -1,6 +1,6 @@
-=============
-Legacy v0 API
-=============
+=====================
+Plugins Legacy v0 API
+=====================
 
 .. include:: legacy.rst
 
