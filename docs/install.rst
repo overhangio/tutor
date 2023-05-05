@@ -27,6 +27,34 @@ Requirements
 .. note::
     On Mac OS, by default, containers are allocated 2 GB of RAM, which is not enough. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 GB to the Docker daemon. If the deployment fails because of insufficient memory during database migrations, check the :ref:`relevant section in the troubleshooting guide <migrations_killed>`.
 
+Quickstart (1-click install)
+----------------------------
+
+1. Install the latest stable release of Tutor from pip:
+
+.. include:: download/pip.rst
+
+Or `download <https://github.com/overhangio/tutor/releases>`_ the pre-compiled binary and place the ``tutor`` executable in your path:
+
+.. include:: download/binary.rst
+
+2. Run ``tutor local launch``
+3. You're done!
+
+**That's it?**
+
+Yes :) This is what happens when you run ``tutor local launch``:
+
+1. You answer a few questions about the :ref:`configuration` of your Open edX platform.
+2. Configuration files are generated from templates.
+3. Docker images are downloaded.
+4. Docker containers are provisioned.
+5. A full, production-ready Open edX platform (`Nutmeg <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-olive.master/platform_releases/olive.html>`__ release) is run with docker-compose.
+
+The whole procedure should require less than 10 minutes, on a server with good bandwidth. Note that your host environment will not be affected in any way, since everything runs inside docker containers. Root access is not even necessary.
+
+If the launch installation method above somehow didn't work for you, check out the :ref:`troubleshooting` guide.
+
 Download
 --------
 

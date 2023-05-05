@@ -6,9 +6,9 @@ Configuration and customisation
 Tutor offers plenty of possibilities for platform customisation out of the box. There are two main ways in which the base Open edX installation can be customised:
 
 a. Modifying the Tutor :ref:`configuration parameters <configuration>`.
-b. Modifying the :ref:`Open edX docker image <customise>` that runs the Open edX platform.
+b. Modifying the :ref:`Open edX docker image <custom_openedx_docker_image>` that runs the Open edX platform.
 
-This section does not cover :ref:`plugin development <plugins>`. For simple changes, such as modifying the ``*.env.yml`` files or the edx-platform settings, *you should not fork edx-platform or tutor*! Instead, you should create a simple :ref:`plugin for Tutor <plugins_yaml>`.
+This section does not cover :ref:`plugin development <plugin_development>`. For simple changes, such as modifying the ``*.env.yml`` files or the edx-platform settings, *you should not fork edx-platform or tutor*! Instead, you should create a simple :ref:`plugin for Tutor <plugin_development_tutorial>`.
 
 .. _configuration:
 
@@ -293,8 +293,6 @@ If you would like to perform SSL/TLS termination with your own custom certificat
 
 .. _customise:
 
-.. _custom_openedx_docker_image:
-
 Kubernetes
 ~~~~~~~~~~
 
@@ -312,6 +310,8 @@ This configuration parameter sets the Contact Email.
 - ``PLATFORM_NAME`` (default: ``"My Open edX"``)
 
 This configuration parameter sets the Platform Name.
+
+.. _custom_openedx_docker_image:
 
 Custom Open edX docker image
 ----------------------------
@@ -497,3 +497,83 @@ In these situations, you can set ``--docker-arg`` flag in the ``tutor images bui
         --docker-arg="docker.io/myusername/openedx:mytag"
 
 This will result in passing the ``--cache-from`` option with the value ``docker.io/myusername/openedx:mytag`` to the docker build command.
+
+
+Modifying ``edx-platform`` settings
+-----------------------------------
+
+The default settings module loaded by ``edx-platform`` is ``tutor.production`` in production and ``tutor.development`` in development. The folders ``$(tutor config printroot)/env/apps/openedx/settings/lms`` and ``$(tutor config printroot)/env/apps/openedx/settings/cms`` are mounted as ``edx-platform/lms/envs/tutor`` and ``edx-platform/cms/envs/tutor`` inside the docker containers. To modify these settings you must create a plugin that implements one or more of the patch statements in those setting files. See the :ref:`plugin_development_tutorial` tutorial for more information on how to create a plugin.
+
+
+.. _theming:
+
+Installing a custom theme
+-------------------------
+
+Comprehensive theming is enabled by default, but only the default theme is compiled. `Indigo <https://github.com/overhangio/indigo>`__ is a better, ready-to-run theme that you can start using today.
+
+To compile your own theme, add it to the ``env/build/openedx/themes/`` folder::
+
+    git clone https://github.com/me/myopenedxtheme.git \
+      "$(tutor config printroot)/env/build/openedx/themes/myopenedxtheme"
+
+The ``themes`` folder should have the following structure::
+
+    openedx/themes/
+        mycustomtheme1/
+            cms/
+                ...
+            lms/
+                ...
+        mycustomtheme2/
+            ...
+
+Then you must rebuild the openedx Docker image::
+
+    tutor images build openedx
+
+Finally, you should enable your theme with the :ref:`settheme command <settheme>`.
+
+
+Using Google Mail as an SMTP server
+-----------------------------------
+
+By default, Tutor comes with a simple SMTP server for sending emails. Such a server has an important limitation: it does not implement mailing good practices, such as DKIM or SPF. As a consequence. the emails you send might be flagged as spam by their recipients. Thus, you might want to disable the SMTP server and run your own, for instance using your Google Mail account.
+
+.. warning::
+  Google Mail SMTP servers come with their own set of limitations. For instance, you are limited to sending 500 emails a day. Reference: https://support.google.com/mail/answer/22839
+
+You should authorize third-party to access your Google Mail account. In your Google Mail account, select "Manage Account", "Security", and turn on "Less Secure App Access". Check the Google documentation for more information on "less secure apps": https://support.google.com/accounts/answer/6010255
+
+Then, check that you can reach the Google Mail SMTP service from your own server::
+
+    $ telnet smtp.gmail.com 587
+
+If you get ``Connected to smtp.gmail.com.`` then it means that you can successfully reach the Google Mail SMTP servers. If not, you will have to reconfigure your firewall.
+
+To exit the ``telnet`` shell, type ``ctrl+]``, then ``ctrl+d``.
+
+Then, disable the SMTP server that comes with Tutor::
+
+    $ tutor config save --set RUN_SMTP=false
+
+Configure credentials to access your SMTP server::
+
+    $ tutor config save \
+      --set SMTP_HOST=smtp.gmail.com \
+      --set SMTP_PORT=587 \
+      --set SMTP_USE_SSL=false  \
+      --set SMTP_USE_TLS=true \
+      --set SMTP_USERNAME=YOURUSERNAME@gmail.com \
+      --set SMTP_PASSWORD='YOURPASSWORD'
+
+Don't forget to replace your email address and password in the prompt above. If your email password contains special characters, you might have to escape them.
+
+Then, restart your platform::
+
+    $ tutor local launch
+
+That's it! You can send a test email with the following command::
+
+    $ tutor local run --no-deps lms ./manage.py lms shell -c \
+      "from django.core.mail import send_mail; send_mail('test subject', 'test message', 'YOURUSERNAME@gmail.com', ['YOURRECIPIENT@domain.com'])"

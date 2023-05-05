@@ -3,17 +3,55 @@
 FAQ
 ===
 
-What is Tutor?
---------------
+Should I self-host Open edX or rely on a hosting provider?
+----------------------------------------------------------
 
-Tutor is an open source distribution of `Open edX <https://open.edx.org>`_. It uses the original code from the various Open edX repositories, such as `edx-platform <https://github.com/openedx/edx-platform/>`_, `cs_comments_service <https://github.com/openedx/cs_comments_service>`_, etc. and packages everything in a way that makes it very easy to install, administer and upgrade Open edX. In particular, all services are run inside Docker containers.
+Third-party Open edX providers can provide you with custom, closed-source features that they developed internally. However, their pricing is usually per-seat: that makes it difficult to predict how much running Open edX will actually cost you if you don't know in advance how many students will connect to your platform. And once you start scaling up and adding many students, running the platform will become very expensive.
 
-Tutor makes it possible to deploy Open edX locally, with `docker-compose <https://docs.docker.com/compose/overview/>`_ or on an existing `Kubernetes cluster <http://kubernetes.io/>`_. Want to learn more? Take a look at the :ref:`getting started concepts <intro>`.
+On the other hand, running Open edX on your own servers will help you keep your costs under control. Because you own your servers and data, you will always be able to migrate your platform, either to a different cloud provider or an Open edX service provider. This is the true power of the open source.
 
-What is the purpose of Tutor?
------------------------------
+Should I use Tutor?
+-------------------
 
-To make it possible to deploy, administer and upgrade Open edX anywhere, easily.
+Running software on-premises is cheaper only if your management costs don't go through the roof. You do not want to hire a full-time devops team just for managing your online learning platform. This is why we created Tutor: to make it easy to run a state-of-the-art online learning platform without breaking the bank. Historically, it's always been difficult to install Open edX with native installation scripts. For instance, there are no official instructions for upgrading an existing Open edX platform: the `recommended approach <https://docs.bitnami.com/azure/apps/edx/administration/upgrade/>`__ is to backup all data, trash the server, and create a new one. As a consequence, people tend not to upgrade their platform and keep running on deprecated releases. Tutor makes it possible even for non-technical users to launch, manage and upgrade Open edX at any scale. Should you choose at some point that Tutor is not the right solution for you, you always have an escape route: because Tutor is open source software, you can easily dump your data and switch to a different installation method. But we are confident you will not do that 😉
+
+To learn more about Tutor, watch this 7-minute lightning talk that was made at the 2019 Open edX conference in San Diego, CA (with `slides <https://regisb.github.io/openedx2019/>`_):
+
+.. youtube:: Oqc7c-3qFc4
+
+How does Tutor simplify Open edX deployment?
+--------------------------------------------
+
+Tutor simplifies the deployment of Open edX by:
+
+1. Separating the configuration logic from the deployment platforms.
+2. Running application processes in cleanly separated `docker containers <https://www.docker.com/resources/what-container>`_.
+3. Providing user-friendly, reliable commands for common administration tasks, including upgrades and monitoring.
+4. Using a simple :ref:`plugin system <plugins>` that makes it easy to extend and customise Open edX.
+
+.. image:: https://overhang.io/static/img/openedx-plus-docker-is-tutor.png
+  :alt: Open edX + Docker = Tutor
+  :width: 500px
+  :align: center
+
+Because Docker containers are becoming an industry-wide standard, that means that with Tutor it becomes possible to run Open edX anywhere: for now, Tutor supports deploying on a local server, with `docker-compose <https://docs.docker.com/compose/overview/>`_, and in a large cluster, with `Kubernetes <http://kubernetes.io/>`_. But in the future, Tutor may support other deployment platforms.
+
+Where can I try Open edX and Tutor?
+-----------------------------------
+
+A demo Open edX platform is available at https://demo.openedx.overhang.io. This platform was deployed using Tutor and the `Indigo theme <https://github.com/overhangio/indigo>`__. Feel free to play around with the following credentials:
+
+* Admin user: username=admin email=admin@overhang.io password=admin
+* Student user: username=student email=student@overhang.io password=student
+
+The Android mobile application for this demo platform can be downloaded at this url: https://mobile.demo.openedx.overhang.io/app.apk
+
+Urls:
+
+* LMS: https://demo.openedx.overhang.io
+* Studio (CMS): https://studio.demo.openedx.overhang.io
+
+The platform is reset every day at 9:00 AM, `Paris (France) time <https://time.is/Paris>`__, so feel free to try and break things as much as you want.
 
 .. _native:
 
@@ -33,7 +71,7 @@ Many features that are not included in the native installation, such as a `web u
 What's the difference with the official devstack?
 -------------------------------------------------
 
-The `devstack <https://github.com/openedx/devstack>`_ is meant for development only, not for production deployment. Tutor can be used both for production deployment and :ref:`locally hacking on Open edX <development>`.
+The `devstack <https://github.com/openedx/devstack>`_ is meant for development only, not for production deployment. Tutor can be used both for production deployment and :ref:`locally hacking on Open edX <openedx_development>`.
 
 Is Tutor officially supported by edX?
 -------------------------------------
@@ -56,3 +94,4 @@ Why should I trust software written by some random guy on the Internet?
 -----------------------------------------------------------------------
 
 You shouldn't :) Tutor is actively maintained by `Overhang.IO <https://overhang.io>`_, a France-based company founded by `Régis Behmo <https://github.com/regisb/>`_. Régis has been working on Tutor since early 2018; he has been a contributor to the Open edX project since 2015. In particular, he has worked for 2 years at `FUN-MOOC <https://www.fun-mooc.fr/>`_, one of the top 5 largest Open edX platforms in the world. In addition, the Tutor project is a community-led project with many contributions from its :ref:`project maintainers <maintainers>`.
+
