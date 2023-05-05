@@ -1,7 +1,5 @@
-.. _whatnext:
-
-What next?
-==========
+What's next
+===========
 
 You have gone through the :ref:`Quickstart installation <quickstart>`: at this point, you should have a running Open edX platform. If you don't, please follow the instructions from the :ref:`Troubleshooting <troubleshooting>` section.
 
@@ -44,3 +42,20 @@ Meeting the community
 ---------------------
 
 Ask your questions and chat with the Tutor community on the official Open edX community forum: https://discuss.openedx.org
+
+.. _autocomplete:
+
+Shell autocompletion
+--------------------
+
+Tutor is built on top of `Click <https://click.palletsprojects.com>`_, which is a great library for building command line interface (CLI) tools. As such, Tutor benefits from all Click features, including `auto-completion <https://click.palletsprojects.com/en/8.x/bashcomplete/>`_. After installing Tutor, auto-completion can be enabled in bash by running::
+
+    _TUTOR_COMPLETE=bash_source tutor >> ~/.bashrc
+
+If you are running zsh, run instead::
+
+    _TUTOR_COMPLETE=zsh_source tutor >> ~/.zshrc
+
+After opening a new shell, you can test auto-completion by typing::
+
+    tutor <tab><tab>

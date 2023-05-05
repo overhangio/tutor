@@ -3,7 +3,7 @@
 Kubernetes deployment
 =====================
 
-With the same docker images we created for :ref:`single server deployment <local>` and :ref:`local development <development>`, we can launch an Open edX platform on Kubernetes. Always in 1 click, of course :)
+With the same docker images we created for :ref:`single server deployment <local>` and :ref:`local development <openedx_development>`, we can launch an Open edX platform on Kubernetes. Always in 1 click, of course :)
 
 A word of warning: managing a Kubernetes platform is a fairly advanced endeavour. In this documentation, we assume familiarity with Kubernetes. Running an Open edX platform with Tutor on a single server or in a Kubernetes cluster are two very different things. The local Open edX install was designed such that users with no prior experience with system administration could still launch an Open edX platform. It is *not* the case for the installation method outlined here.
 

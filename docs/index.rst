@@ -12,26 +12,64 @@
 
 ----------------------------------
 
-.. include:: quickstart.rst
-    :start-line: 1
+.. toctree::
+   :maxdepth: 1
+   :caption: Concepts
+
+   concepts/tutor 
+   concepts/openedx
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Getting started
+
+   gettingstarted/requirements
+   gettingstarted/quickstart
+   gettingstarted/installation
+   gettingstarted/whatsnext
+
+.. toctree::
+   :maxdepth: 1
    :caption: User guide
 
-   gettingstarted
+   deployment
    run
    configuration
    plugins/index
-   reference/index
-   tutorials/index
+   sysadmin/index
+   upgrading
+   uninstallation
+   cli
    troubleshooting
-   tutor
-   faq
-
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Developer guide
+
+   developing/nightly
+   developing/plugins/index
+   tutor
+   developing/openedx
+   developing/themes
+   developing/legacy/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference
+
+   reference/cli/index
+   reference/api/hooks/index
+   reference/patches/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: About
+   
+   howtutorworks 
+   faq
+
+.. toctree::
+   :maxdepth: 1
    :caption: Project links
 
    Source code <https://github.com/overhangio/tutor>
