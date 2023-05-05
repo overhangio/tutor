@@ -47,7 +47,7 @@ However, these images include the application master branch at the point in time
     tutor images build --no-cache all
 
 Running Tutor Main alongside the latest release
---------------------------------------------------
+-----------------------------------------------
 
 When running Tutor Main, you usually do not want to override your existing Tutor installation. That's why a Tutor Main installation has the following differences from a regular release installation:
 

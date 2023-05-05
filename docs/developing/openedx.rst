@@ -1,4 +1,4 @@
-.. _development:
+.. _openedx_development:
 
 Open edX development
 ====================
@@ -256,3 +256,53 @@ This override file will be loaded when running any ``tutor dev ..`` command. The
 
 .. note::
     The ``tutor local`` commands load the ``docker-compose.override.yml`` file from the ``$(tutor config printroot)/env/local/docker-compose.override.yml`` directory. One-time jobs from initialisation commands load the ``local/docker-compose.jobs.override.yml`` and ``dev/docker-compose.jobs.override.yml``.
+
+
+XBlock and edx-platform plugin development
+------------------------------------------
+
+In some cases, you will have to develop features for packages that are pip-installed next to the edx-platform. This is quite easy with Tutor. Just add your packages to the ``$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
+
+    echo "-e ./mypackage" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
+
+The ``requirements`` folder should have the following content::
+
+    env/build/openedx/requirements/
+        private.txt
+        mypackage/
+            setup.py
+            ...
+
+You will have to re-build the openedx Docker image once::
+
+    tutor images build openedx
+
+You should then run the development server as usual, with ``start``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
+
+Running edx-platform unit tests
+-------------------------------
+
+It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/openedx/edx-platform/>`__. To do so, run a shell in the LMS development container::
+
+    tutor dev run lms bash
+
+Then, run unit tests with ``pytest`` commands::
+
+    # Run tests on common apps
+    unset DJANGO_SETTINGS_MODULE
+    unset SERVICE_VARIANT
+    export EDXAPP_TEST_MONGO_HOST=mongodb
+    pytest common
+    pytest openedx
+    pytest xmodule
+
+    # Run tests on LMS
+    export DJANGO_SETTINGS_MODULE=lms.envs.tutor.test
+    pytest lms
+
+    # Run tests on CMS
+    export DJANGO_SETTINGS_MODULE=cms.envs.tutor.test
+    pytest cms
+
+.. note::
+    Getting all edx-platform unit tests to pass on Tutor is currently a work-in-progress. Some unit tests are still failing. If you manage to fix some of these, please report your findings in the `Open edX forum <https://discuss.openedx.org/tag/tutor>`__.
