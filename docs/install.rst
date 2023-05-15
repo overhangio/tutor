@@ -12,8 +12,8 @@ Requirements
 * Architecture: support for ARM64 is a work-in-progress. See `this issue <https://github.com/overhangio/tutor/issues/510>`__.
 * Required software:
 
-    - `Docker <https://docs.docker.com/engine/installation/>`__: v18.06.0+
-    - `Docker Compose <https://docs.docker.com/compose/install/>`__: v1.22.0+
+    - `Docker <https://docs.docker.com/engine/installation/>`__: v20.10.15+
+    - `Docker Compose <https://docs.docker.com/compose/install/>`__: v2.0.0+
 
 .. warning::
     Do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
