@@ -199,10 +199,10 @@ def printroot(context: Context) -> None:
 def printvalue(context: Context, key: str) -> None:
     config = tutor_config.load(context.root)
     try:
-        # Note that this will incorrectly print None values
-        fmt.echo(str(config[key]))
+        value = config[key]
     except KeyError as e:
         raise exceptions.TutorError(f"Missing configuration value: {key}") from e
+    fmt.echo(serialize.str_format(value))
 
 
 @click.group(name="patches", help="Commands related to patches in configurations")

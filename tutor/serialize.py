@@ -18,17 +18,34 @@ def load_all(stream: str) -> t.Iterator[t.Any]:
 
 
 def dump_all(documents: t.Sequence[t.Any], fileobj: TextIOWrapper) -> None:
-    yaml.safe_dump_all(documents, stream=fileobj, default_flow_style=False)
+    yaml.safe_dump_all(
+        documents, stream=fileobj, default_flow_style=False, allow_unicode=True
+    )
 
 
 def dump(content: t.Any, fileobj: TextIOWrapper) -> None:
-    yaml.dump(content, stream=fileobj, default_flow_style=False)
+    yaml.dump(content, stream=fileobj, default_flow_style=False, allow_unicode=True)
 
 
 def dumps(content: t.Any) -> str:
-    result = yaml.dump(content, default_flow_style=False)
+    result = yaml.dump(content, default_flow_style=False, allow_unicode=True)
     assert isinstance(result, str)
     return result
+
+
+def str_format(content: t.Any) -> str:
+    """
+    Convert a value to str.
+
+    This is almost like json, but more convenient for printing to the standard output.
+    """
+    if content is True:
+        return "true"
+    if content is False:
+        return "false"
+    if content is None:
+        return "null"
+    return str(content)
 
 
 def parse(v: t.Union[str, t.IO[str]]) -> t.Any:
