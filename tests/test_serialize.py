@@ -41,3 +41,17 @@ class SerializeTests(unittest.TestCase):
                 "x=key1:\n  subkey: value\nkey2:\n  subkey: value"
             ),
         )
+
+    def test_str_format(self) -> None:
+        self.assertEqual("true", serialize.str_format(True))
+        self.assertEqual("false", serialize.str_format(False))
+        self.assertEqual("null", serialize.str_format(None))
+        self.assertEqual("éü©", serialize.str_format("éü©"))
+        self.assertEqual("""[1, 'abcd']""", serialize.str_format([1, "abcd"]))
+
+    def test_load_str_format(self) -> None:
+        self.assertEqual(True, serialize.load(serialize.str_format(True)))
+        self.assertEqual(False, serialize.load(serialize.str_format(False)))
+        self.assertEqual(None, serialize.load(serialize.str_format(None)))
+        self.assertEqual("éü©", serialize.load(serialize.str_format("éü©")))
+        self.assertEqual([1, "abcd"], serialize.load(serialize.str_format([1, "abcd"])))
