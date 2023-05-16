@@ -71,8 +71,10 @@ This imports the ``hooks`` module from Tutor, which grants us access to ``hooks.
 ::
 
     hooks.Filters.ENV_PATCHES.add_item(
-        <name>,
-        <content>
+        (
+            <name>,
+            <content>
+        )
     )
 
 This means "add ``<content>`` to the ``{{ patch("<name>") }}`` statement, thanks to the :py:data:`tutor.hooks.Filters.ENV_PATCHES` filter". In our case, we want to modify the LMS settings, both in production and development. The right patch for that is :patch:`openedx-lms-common-settings`. We add one item, which is a single Python-formatted line of code::
