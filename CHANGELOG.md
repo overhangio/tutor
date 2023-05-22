@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.3.6'></a>
+## v15.3.6 (2023-05-22)
+
+- [Feature] Upgrade to open-release/olive.4. (by @regisb)
+
 <a id='changelog-15.3.5'></a>
 ## v15.3.5 (2023-04-28)
 
