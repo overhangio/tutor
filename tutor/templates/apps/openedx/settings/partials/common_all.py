@@ -13,7 +13,7 @@ mongodb_parameters = {
     "password": {% if MONGODB_PASSWORD %}"{{ MONGODB_PASSWORD }}"{% else %}None{% endif %},
     # Connection/Authentication
     "ssl": {{ MONGODB_USE_SSL }},
-    "authSource": "{{ MONGODB_AUTH_SOURCE }}",
+    "authsource": "{{ MONGODB_AUTH_SOURCE }}",
     "replicaSet": {% if MONGODB_REPLICA_SET %}"{{ MONGODB_REPLICA_SET }}"{% else %}None{% endif %},
     {% if MONGODB_AUTH_MECHANISM %}"authMechanism": "{{ MONGODB_AUTH_MECHANISM }}",{% endif %}
 }
