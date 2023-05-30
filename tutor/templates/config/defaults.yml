@@ -14,7 +14,7 @@ DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION 
 DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_CADDY: "docker.io/caddy:2.6.4"
 DOCKER_IMAGE_ELASTICSEARCH: "docker.io/elasticsearch:7.17.9"
-DOCKER_IMAGE_MONGODB: "docker.io/mongo:4.2.24"
+DOCKER_IMAGE_MONGODB: "docker.io/mongo:4.4.22"
 DOCKER_IMAGE_MYSQL: "docker.io/mysql:8.0.33"
 DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_REDIS: "docker.io/redis:7.0.11"
