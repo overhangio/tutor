@@ -93,6 +93,8 @@ def launch(
     run_for_prod = context_name != "dev"
 
     utils.warn_macos_docker_memory()
+
+    # Upgrade has to run before configuration
     interactive_upgrade(context, not non_interactive, run_for_prod)
     interactive_configuration(context, not non_interactive, run_for_prod)
 
@@ -163,10 +165,11 @@ Are you sure you want to continue?"""
         )
 
         # Update env and configuration
-        interactive_configuration(context, interactive, run_for_prod)
+        # Don't run in interactive mode, otherwise users gets prompted twice.
+        interactive_configuration(context, False, run_for_prod)
 
         # Post upgrade
-        if run_upgrade_from_release and interactive:
+        if interactive:
             question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
 
     If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
