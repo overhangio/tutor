@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from time import sleep
 from typing import Any, Iterable, List, Optional, Type
@@ -26,7 +27,20 @@ class K8sClients:
         # pylint: disable=import-outside-toplevel
         from kubernetes import client, config
 
-        config.load_kube_config()
+        if os.path.exists(config.kube_config.KUBE_CONFIG_DEFAULT_LOCATION):
+            # found the kubeconfig file, let's load it!
+            config.load_kube_config()
+        elif (
+            config.incluster_config.SERVICE_HOST_ENV_NAME in os.environ
+            and config.incluster_config.SERVICE_PORT_ENV_NAME in os.environ
+        ):
+            # We are running inside a cluster, let's load the in-cluster configuration.
+            config.load_incluster_config()
+        else:
+            raise exceptions.TutorError(
+                f"there is no Kubernetes configuration file located in {config.kube_config.KUBE_CONFIG_DEFAULT_LOCATION}, and the service environment variables {config.incluster_config.SERVICE_HOST_ENV_NAME} and {config.incluster_config.SERVICE_PORT_ENV_NAME} have not been defined. To connect to a cluster, please configure your host appropriately."
+            )
+
         self._batch_api = None
         self._core_api = None
         self._client = client
