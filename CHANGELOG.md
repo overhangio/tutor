@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-15.3.7'></a>
+## v15.3.7 (2023-06-13)
+
+- [Bugfix] Change `authSource` to `authsource`(LOWERCASE) in mongo db parameters. This allow to authenticate with credentials in openedx code.(by @johanv26)
+ - [Feature] Add support for loading in-cluster config when running inside a pod. In certain scenarios, Tutor may operate within a pod that has access to a cluster through role binding and a service account. In these instances, the ./kube/config file may not be present, but kubectl commands can still execute without any problems. (by @CodeWithEmad)
+- [Improvement] Bump the default MongoDB Docker image reference from version 4.2.17 to 4.2.24. (by @fghaas)
+
 <a id='changelog-15.3.6'></a>
 ## v15.3.6 (2023-05-22)
 
@@ -850,41 +857,41 @@ instructions, because git commits are used to generate release notes:
 
 - [Bugfix] Fix auth problem in Android app (#289).
 
-## 3.11.3 (2020-01-21)
+## v3.11.3 (2020-01-21)
 
 - [Bugfix] Fix incorrectly parsed empty strings for `config save --set ...=...` commands.
 
-## 3.11.2 (2020-01-17)
+## v3.11.2 (2020-01-17)
 
 - [Bugfix] Make sure `docker-compose.override.yml` is loaded in dev and local contexts.
 
-## 3.11.1 (2020-01-16)
+## v3.11.1 (2020-01-16)
 
 - [Feature] Add `config render` command.
 
-## 3.11.0 (2020-01-14)
+## v3.11.0 (2020-01-14)
 
 - [Feature] Add support for simple, YAML-based plugins.
 - 💥[Improvement] The output of `plugins list` now includes plugin version numbers.
 
-## 3.10.1 (2020-01-13)
+## v3.10.1 (2020-01-13)
 
 - [Improvement] Explicitly point to docker.io images, when necessary, for [podman](https://podman.io/) compatibility.
 
-## 3.10.0 (2020-01-10)
+## v3.10.0 (2020-01-10)
 
 - [Bugfix] Fix OAuth authentication in dev mode.
 - [Improvement] Upgrade to the 3.7 docker-compose syntax.
 - [Improvement] The `dev runserver` command can now be run for just any service.
 - 💥[Feature] `dev run/exec` commands now support generic options which are passed to docker-compose. Consequently, defining the `TUTOR_EDX_PLATFORM_PATH` environment variable no longer works. Instead, users are encouraged to explicitly pass the `-v` option, define a command alias or create a `docker-compose.override.yml` file.
 
-## 3.9.1 (2020-01-08)
+## v3.9.1 (2020-01-08)
 
 - [Improvement] Make it possible to override the project name in development mode.
 - [Bugfix] Fix user switching in development mode.
 - [Bugfix] Fix "k8s quickstart" crash.
 
-## 3.9.0 (2019-12-21)
+## v3.9.0 (2019-12-21)
 
 - [Security] Apply django 1.11.21 -> 1.11.27 security patches.
 - [Bugfix] Fix running dev image with `sudo`.
@@ -895,7 +902,7 @@ instructions, because git commits are used to generate release notes:
 - [Improvement] Print gunicorn access logs in the console.
 - 💥[Improvement] Get rid of the `indexcourses` and `portainer` command (#269).
 
-## 3.8.0 (2019-11-22)
+## v3.8.0 (2019-11-22)
 
 - [Improvement] Add `k8s-deployments-nginx-volume-mounts` patch.
 - [Bugfix] Fix running forum locally when both Elasticsearch and MongoDB are not activated (#266).
@@ -903,51 +910,51 @@ instructions, because git commits are used to generate release notes:
 - 💥[Improvement] Better `dev` commands, with dedicated development docker image. One of the consequences is that the `dev watchthemes` command is replaced by `dev run lms watchthemes`.
 - [Improvement] `images` commands now accept multiple `image` arguments.
 
-## 3.7.4 (2019-10-19)
+## v3.7.4 (2019-10-19)
 
 - [Bugfix] Fix missing requirements file in PyPI package (#261).
 - [Improvement] Add missing cms/lms production/development setting patches.
 - [Improvement] Allow SigV4 authentication for video upload to S3.
 - [Bugfix] Fix cms development settings.
 
-## 3.7.3 (2019-10-17)
+## v3.7.3 (2019-10-17)
 
 - [Improvement] Upgrade openedx locales to Ironwood.
 
-## 3.7.2 (2019-10-09)
+## v3.7.2 (2019-10-09)
 
 - [Improvement] Properly set studio title (#246).
 - [Improvement] Enable Mysql strict mode.
 
-## 3.7.1 (2019-10-06)
+## v3.7.1 (2019-10-06)
 
 - [Feature] Introduce tutor docker image.
 - [Feature] Introduce `local hook` command for plugin development.
 - [Bugfix] Persist `private.txt` file between two runs of `config save` (#247).
 - [Improvement] Added configuration values to limit the number of gunicorn workers for the LMS and CMS.
 
-## 3.7.0 (2019-09-03)
+## v3.7.0 (2019-09-03)
 
 - 💥[Improvement] Get rid of mysql-client container.
 - [Improvement] Add "local-docker-compose-lms/cms-dependencies" plugin patches.
 - [Improvement] Use "exec" instead of "run" to initialise local platform.
 
-## 3.6.3 (2019-08-31)
+## v3.6.3 (2019-08-31)
 
 - [Security] Fix CustomTagModule mako template injection.
 - [Improvement] Move all plugins outside of the tutor repo.
 - [Bugfix/Improvement] Add all plugins (with data) into binary bundle (#242).
 
-## 3.6.2 (2019-08-07)
+## v3.6.2 (2019-08-07)
 
 - [Bugfix] Fix missing templates in bundled plugins.
 - [Bugfix] Enable HTML certificate view.
 
-## 3.6.1 (2019-07-27)
+## v3.6.1 (2019-07-27)
 
 - [Bugfix] Fix missing patches from minio plugin (thanks @Wejie!).
 
-## 3.6.0 (2019-07-11)
+## v3.6.0 (2019-07-11)
 
 - [Feature] Modify ``createuser`` commands to define a password from the command line.
 - [Improvement] Better YAML value parsing from the command line.
@@ -963,33 +970,33 @@ instructions, because git commits are used to generate release notes:
 - [Improvement] Make it possible to enable/disable multiple plugins at once.
 - [Improvement] Add a few local and k8s patches for plugins.
 
-## 3.5.3 (2019-07-05)
+## v3.5.3 (2019-07-05)
 
 - [Bugfix] Add pre-init hook for correct initialisation of minio.
 
-## 3.5.2 (2019-07-05)
+## v3.5.2 (2019-07-05)
 
 - [Security] Apply certificate XSS security patch.
 
-## 3.5.1 (2019-07-04)
+## v3.5.1 (2019-07-04)
 
 - [Feature] Make it possible for plugins to patch the build templates.
 - [Improvement] Move Xqueue and Student notes to a dedicated plugin.
 
-## 3.4.3 (2019-06-24)
+## v3.4.3 (2019-06-24)
 
 - [Bugfix] Fix missing password values from generated configuration.
 
-## 3.4.2 (2019-06-23)
+## v3.4.2 (2019-06-23)
 
 - [Bugfix] Fix incorrect settings during lms/cms init (#224).
 
-## 3.4.1 (2019-06-23)
+## v3.4.1 (2019-06-23)
 
 - [Bugfix] Fix install from PyPI.
 - [Improvement] Get rid of Kubernetes python package dependency.
 
-## 3.4.0 (2019-06-17)
+## v3.4.0 (2019-06-17)
 
 - [Feature] Creation of a plugin system.
 - [Feature] Kubernetes support out of beta.
@@ -1004,28 +1011,28 @@ instructions, because git commits are used to generate release notes:
 - [Improvement] Make it possible to configure the notes service hostname.
 - [Improvement] Better, more robust MySQL initialisation.
 
-## 3.3.10 (2019-05-15)
+## v3.3.10 (2019-05-15)
 
 - [Bugfix] Fix boolean configuration choices.
 
-## 3.3.9 (2019-05-13)
+## v3.3.9 (2019-05-13)
 - [Improvement] Add `local exec` command for running commands inside existing containers.
 - [Bugfix] Fix triple display of courses in LMS search (upstream patch, #189).
 
-## 3.3.8 (2019-04-28)
+## v3.3.8 (2019-04-28)
 
 - [Bugfix] Reduce the number of gunicorn workers to address RAM usage (#207).
 
-## 3.3.7 (2019-04-28)
+## v3.3.7 (2019-04-28)
 
 - [Bugfix] Fix "Timeout after 20s" on running migrations.
 
-## 3.3.6 (2019-04-27)
+## v3.3.6 (2019-04-27)
 
 - [Bugfix] Fix KeyError on the first quickstart.
 - [Improvement] De-duplication of prod/dev settings. Thanks, @silviot! 😺.
 
-## 3.3.5 (2019-04-22)
+## v3.3.5 (2019-04-22)
 
 - [Feature] Pluggable LMS/CMS/forum.
 - [Improvement] Safer environment overwrite. Thanks, @silviot! 👐.
@@ -1033,30 +1040,30 @@ instructions, because git commits are used to generate release notes:
 - [Improvement] Improve CLI cold start performance.
 - [Improvement] Allow uppercase "Y" and "N" as answers to boolean questions.
 
-## 3.3.4 (2019-04-09)
+## v3.3.4 (2019-04-09)
 
 - [Improvement] Rename `--silent` option to `-y/--yes`.
 - [Bugfix] Fix (again) login from studio when HTTPS is activated (#193).
 
-## 3.3.3 (2019-03-29)
+## v3.3.3 (2019-03-29)
 
 - [Bugfix] Fix `pip install tutor-openedx`.
 
-## 3.3.2 (2019-03-27)
+## v3.3.2 (2019-03-27)
 
 - [Bugfix] Fix login from localhost.
 - [Bugfix] Fix Android app image build.
 
-## 3.3.1 (2019-03-25)
+## v3.3.1 (2019-03-25)
 
 - [Improvement] Improve assets building for development.
 - [Improvement] Support CMS login when the CMS is not a subdomain of the LMS.
 
-## 3.3.0 (2019-03-22)
+## v3.3.0 (2019-03-22)
 
 - [Feature] Upgrade from Hawthorn to Ironwood.
 
-## 3.2.2 (2019-03-21)
+## v3.2.2 (2019-03-21)
 
 - [Feature] Multiple platforms on a single server \o/.
 - [Feature] Easily configure web proxy on the host.
@@ -1065,12 +1072,12 @@ instructions, because git commits are used to generate release notes:
 - [Improvement] Harmonize MySQL username/password configuration parameters.
 - [Feature] Configurable and pluggable data storage backends (#114).
 
-## 3.2.1 (2019-03-19)
+## v3.2.1 (2019-03-19)
 
 - [Feature] Enable grade downloads by default (#143).
 - [Improvement] Remove orphan containers on `local start`.
 
-## 3.2.0 (2019-03-18)
+## v3.2.0 (2019-03-18)
 
 - [Improvement] `images pull` now also pulls vendor images.
 - [Feature] Add convenient `config printvalue` command.
@@ -1080,7 +1087,7 @@ instructions, because git commits are used to generate release notes:
 - [Improvement] Error and interrupt handling in UI and web UI.
 - [Bugfix] Fix missing webui env directory.
 
-## 3.1.0 (2019-03-09)
+## v3.1.0 (2019-03-09)
 
 - [Improvement] Install python requirements in virtual env in docker image.
 - [Bugfix] Add missing volume for theme development.
@@ -1091,50 +1098,50 @@ instructions, because git commits are used to generate release notes:
 - [Improvement] Do not upgrade images as part of quickstart.
 - [Bugfix] Fix USERID setup in development mode and various dev-related docs (#177).
 
-## 3.0.6 (2019-02-26)
+## v3.0.6 (2019-02-26)
 
 - [Bugfix] Fix import/export of demo course (#175).
 
-## 3.0.5 (2019-02-14)
+## v3.0.5 (2019-02-14)
 
 - [Feature] Add cloud deployment script.
 - [Improvement] Run `images pull` command.
 - [Improvement] Run `indexcourses` on importing demo course.
 - [Improvement] Add `runserver stop` command.
 
-## 3.0.4 (2019-02-13)
+## v3.0.4 (2019-02-13)
 
 - [Minor] Minimum required `click` version is 7.0 (#171).
 - [Bugfix] Fix `runserver` dev command (#172).
 - [Minor] Fix non-https link to documentation in PyPI.
 - [Minor] Fix `createuser` documentation.
 
-## 3.0.3 (2019-02-12)
+## v3.0.3 (2019-02-12)
 
 - [Bugfix] Add missing template data to the PyPI package.
 - [Bugfix] Fix quickstart on Kubernetes (#164).
 - [Improvement] Add databases task to Kubernetes quickstart (#167).
 
-## 3.0.2 (2019-02-12)
+## v3.0.2 (2019-02-12)
 
 - [Bugfix] Fix import paths -- 🚀 thanks @silviot!.
 - [Bugfix] Properly set docker project name in MySQL logs -- 🦊 thanks again @silviot!.
 
-## 3.0.1 (2019-02-11)
+## v3.0.1 (2019-02-11)
 
 - [Bugfix] fix MySQL initialisation (#159, #160).
 - [Improvement] Better handling of continuous integration.
 - [Bugfix] fix `tutor --version` (#156).
 - [Improvement] Absolute settings imports -- 📯 thanks @tonytan4ever!.
 
-## 3.0.0 (2019-02-09)
+## v3.0.0 (2019-02-09)
 
 - [Improvement] Complete rewrite of Tutor: switch from a make-based project to a single binary that runs all commands.
 - [Feature] An web user interface can be created with `tutor webui start`.
 - [Bugfix] Add missing Elasticsearch to Kubernetes deployment (#147).
 - [Improvement] Upload `tutor-openedx` to PyPI .
 
-## Older changes
+## Older changes (< 3.0.0)
 
 - 2019-01-27 [Bugfix] Fix video transcript/srt upload and download of user-uploaded files. Thanks @dannielariola!.
 - 2019-01-20 [Improvement] Make it easy to load custom settings for the local production install.
