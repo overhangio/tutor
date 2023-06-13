@@ -1,1 +1,0 @@
- - [Feature] Add support for loading in-cluster config when running inside a pod. In certain scenarios, Tutor may operate within a pod that has access to a cluster through role binding and a service account. In these instances, the ./kube/config file may not be present, but kubectl commands can still execute without any problems. (by @CodeWithEmad)
