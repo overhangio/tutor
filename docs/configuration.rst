@@ -75,7 +75,7 @@ This configuration paramater defines which Caddy Docker image to use.
 
 This configuration parameter defines which Elasticsearch Docker image to use.
 
-- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:4.2.17"``)
+- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:4.2.24"``)
 
 This configuration parameter defines which MongoDB Docker image to use.
 
