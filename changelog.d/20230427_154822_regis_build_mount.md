@@ -1,1 +1,0 @@
-- [Improvement] Considerably accelerate building the "openedx" Docker image with `RUN --mount=type=cache`. This feature is only for Docker with BuildKit, so detection is performed at build-time. (by @regisb)
