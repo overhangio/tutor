@@ -4,13 +4,14 @@ Common jobs that must be added both to local, dev and k8s commands.
 from __future__ import annotations
 
 import functools
+import shlex
 import typing as t
 
 import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, fmt, hooks, utils
+from tutor import env, fmt, hooks
 from tutor.hooks import priorities
 
 
@@ -36,11 +37,11 @@ def _add_core_init_tasks() -> None:
     The context is important, because it allows us to select the init scripts based on
     the --limit argument.
     """
-    with hooks.Contexts.APP("mysql").enter():
+    with hooks.Contexts.app("mysql").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("mysql", env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
-    with hooks.Contexts.APP("lms").enter():
+    with hooks.Contexts.app("lms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             (
                 "lms",
@@ -53,7 +54,7 @@ def _add_core_init_tasks() -> None:
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("lms", env.read_core_template_file("jobs", "init", "lms.sh"))
         )
-    with hooks.Contexts.APP("cms").enter():
+    with hooks.Contexts.app("cms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("cms", env.read_core_template_file("jobs", "init", "cms.sh"))
         )
@@ -63,32 +64,13 @@ def _add_core_init_tasks() -> None:
 @click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
 def initialise(limit: t.Optional[str]) -> t.Iterator[tuple[str, str]]:
     fmt.echo_info("Initialising all services...")
-    filter_context = hooks.Contexts.APP(limit).name if limit else None
+    filter_context = hooks.Contexts.app(limit).name if limit else None
 
-    # Deprecated pre-init tasks
-    for service, path in hooks.Filters.COMMANDS_PRE_INIT.iterate_from_context(
-        filter_context
-    ):
-        fmt.echo_alert(
-            f"Running deprecated pre-init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_PRE_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead, with a high priority."
-        )
-        yield service, env.read_template_file(*path)
-
-    # Init tasks
     for service, task in hooks.Filters.CLI_DO_INIT_TASKS.iterate_from_context(
         filter_context
     ):
         fmt.echo_info(f"Running init task in {service}")
         yield service, task
-
-    # Deprecated init tasks
-    for service, path in hooks.Filters.COMMANDS_INIT.iterate_from_context(
-        filter_context
-    ):
-        fmt.echo_alert(
-            f"Running deprecated init task: {'/'.join(path)}. Init tasks should no longer be added to the COMMANDS_INIT filter. Plugin developers should use the CLI_DO_INIT_TASKS filter instead."
-        )
-        yield service, env.read_template_file(*path)
 
     fmt.echo_info("All services initialised.")
 
@@ -147,18 +129,25 @@ u.save()"
     help="Git repository that contains the course to be imported",
 )
 @click.option(
+    "-d",
+    "--repo-dir",
+    default="",
+    show_default=True,
+    help="Git relative subdirectory to import data from",
+)
+@click.option(
     "-v",
     "--version",
     help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
 )
 def importdemocourse(
-    repo: str, version: t.Optional[str]
+    repo: str, repo_dir: str, version: t.Optional[str]
 ) -> t.Iterable[tuple[str, str]]:
     version = version or "{{ OPENEDX_COMMON_VERSION }}"
     template = f"""
 # Import demo course
 git clone {repo} --branch {version} --depth 1 /tmp/course
-python ./manage.py cms import ../data /tmp/course
+python ./manage.py cms import ../data /tmp/course/{repo_dir}
 
 # Re-index courses
 ./manage.py cms reindex_course --all --setup"""
@@ -253,7 +242,7 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     """
     command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }}"
     if args:
-        command += " " + utils._shlex_join(*args)  # pylint: disable=protected-access
+        command += " " + shlex.join(args)  # pylint: disable=protected-access
     yield ("lms", command)
 
 

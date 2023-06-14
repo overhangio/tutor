@@ -174,29 +174,26 @@ def docker(*command: str) -> int:
 
 
 @lru_cache(maxsize=None)
-def _docker_compose_command() -> Tuple[str, ...]:
+def is_buildkit_enabled() -> bool:
     """
-    A helper function to determine which program to call when running docker compose
+    A helper function to determine whether we can run `docker buildx` with BuildKit.
     """
-    if os.environ.get("TUTOR_USE_COMPOSE_SUBCOMMAND") is not None:
-        return ("docker", "compose")
-    if shutil.which("docker-compose") is not None:
-        return ("docker-compose",)
-    if shutil.which("docker") is not None:
-        if (
-            subprocess.run(
-                ["docker", "compose"], capture_output=True, check=False
-            ).returncode
-            == 0
-        ):
-            return ("docker", "compose")
-    raise exceptions.TutorError(
-        "docker-compose is not installed. Please follow instructions from https://docs.docker.com/compose/install/"
-    )
+    # First, we respect the DOCKER_BUILDKIT environment variable
+    enabled_by_env = {
+        "1": True,
+        "0": False,
+    }.get(os.environ.get("DOCKER_BUILDKIT", ""))
+    if enabled_by_env is not None:
+        return enabled_by_env
+    try:
+        subprocess.run(["docker", "buildx", "version"], capture_output=True, check=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 
 def docker_compose(*command: str) -> int:
-    return execute(*_docker_compose_command(), *command)
+    return execute("docker", "compose", *command)
 
 
 def kubectl(*command: str) -> int:
@@ -216,7 +213,7 @@ def is_a_tty() -> bool:
 
 
 def execute(*command: str) -> int:
-    click.echo(fmt.command(_shlex_join(*command)))
+    click.echo(fmt.command(shlex.join(command)))
     return execute_silent(*command)
 
 
@@ -239,26 +236,27 @@ def execute_silent(*command: str) -> int:
     return result
 
 
-def _shlex_join(*split_command: str) -> str:
-    """
-    Return a shell-escaped string from *split_command.
-
-    TODO: REMOVE THIS FUNCTION AFTER 2023-06-27.
-      This function is a shim for the ``shlex.join`` standard library function,
-      which becomes available in Python 3.8  The end-of-life date for Python 3.7
-      is in Jan 2023 (https://endoflife.date/python). After that point, it
-      would be good to delete this function and just use Py3.8's ``shlex.join``.
-    """
-    return " ".join(shlex.quote(arg) for arg in split_command)
-
-
 def check_output(*command: str) -> bytes:
-    literal_command = _shlex_join(*command)
+    literal_command = shlex.join(command)
     click.echo(fmt.command(literal_command))
     try:
         return subprocess.check_output(command)
     except Exception as e:
         raise exceptions.TutorError(f"Command failed: {literal_command}") from e
+
+
+def warn_macos_docker_memory() -> None:
+    try:
+        check_macos_docker_memory()
+    except exceptions.TutorError as e:
+        fmt.echo_alert(
+            f"""Could not verify sufficient RAM allocation in Docker:
+
+    {e}
+
+Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
+    https://docs.tutor.overhang.io/install.html"""
+        )
 
 
 def check_macos_docker_memory() -> None:

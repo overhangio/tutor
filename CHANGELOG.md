@@ -20,6 +20,37 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.0.0'></a>
+## v16.0.0 (2023-06-14)
+- 💥[Feature] Upgrade to Palm. (by @regisb)
+    - [Bugfix] Rename ORA2 file upload folder from "SET-ME-PLEASE (ex. bucket-name)" to "openedxuploads". This has the effect of moving the corresponding folder from the `<tutor root>/data/lms/ora2` directory. MinIO users were not affected by this bug.
+    - 💥[Improvement] During registration, the honor code and terms of service links are no longer visible by default. For most platforms, these links did not work anyway.
+    - 💥[Deprecation] Halt support for Python 3.7. The binary release of Tutor is also no longer compatible with macOS 10.
+    - 💥[Deprecation] Drop support for `docker-compose`, also known as Compose V1. The `docker compose` (no hyphen) plugin must be installed.
+    - 💥[Refactor] We simplify the hooks API by getting rid of the `ContextTemplate`, `FilterTemplate` and `ActionTemplate` classes. As a consequences, the following changes occur:
+        - `APP` was previously a ContextTemplate, and is now a dictionary of contexts indexed by name. Developers who implemented this context should replace `Contexts.APP(...)` by `Contexts.app(...)`.
+        - Removed the `ENV_PATCH` filter, which was for internal use only anyway.
+        - The `PLUGIN_LOADED` ActionTemplate is now an Action which takes a single argument. (the plugin name)
+    - 💥[Refactor] We refactored the hooks API further by removing the static hook indexes and the hooks names. As a consequence, the syntactic sugar functions from the "filters" and "actions" modules were all removed: `get`, `add*`, `iterate*`, `apply*`, `do*`, etc.
+    - 💥[Deprecation] The obsolete filters `COMMANDS_PRE_INIT` and `COMMANDS_INIT` have been removed. Plugin developers should instead use `CLI_DO_INIT_TASKS` (with suitable priorities).
+    - 💥[Feature] The "openedx" Docker image is no longer built with docker-compose in development on `tutor dev start`. This used to be the case to make sure that it was always up-to-date, but it introduced a discrepancy in how images were build (`docker compose build` vs `docker build`). As a consequence:
+        - The "openedx" Docker image in development can be built with `tutor images build openedx-dev`.
+        - The `tutor dev/local start --skip-build` option is removed. It is replaced by opt-in `--build`.
+    - [Improvement] The `IMAGES_BUILD` filter now supports relative paths as strings, and not just as tuple of strings.
+    - [Improvement] Auto-complete the image names in the `images build/pull/push/printtag` commands.
+    - [Deprecation] For local installations, Docker v20.10.15 and Compose v2.0.0 are now the minimum required versions.
+    - [Bugfix] Make `tutor config printvalue ...` print actual yaml-formatted values, such as "true" and "null"
+    - 💥[Improvement] MongoDb was upgraded to 4.4.
+- 💥[Improvement] Deprecate the `RUN_LMS` and `RUN_CMS` tutor settings, which should be mostly unused. (by @regisb)
+- [Improvement] Greatly simplify ownership of bind-mounted volumes with docker-compose. Instead of running one service per application, we run just a single "permissions" service. This change should be backward-compatible. (by @regisb)
+- [Feature] Add a `config save -a/--append -A/--remove` options to conveniently append and remove values to/from list entries. (by @regisb)
+- [Improvement] Considerably accelerate building the "openedx" Docker image with `RUN --mount=type=cache`. This feature is only for Docker with BuildKit, so detection is performed at build-time. (by @regisb)
+- [Improvement] Automatically pull Docker image cache from the remote registry. Again, this will considerably improve image build-time, particularly in "cold-start" scenarios, where the images need to be built from scratch. The registry cache can be disabled with the `tutor images build --no-registry-cache` option. (by @regisb)
+- [Feature] Automatically mount host folders *at build time*. This is a really important feature, as it allows us to transparently build images using local forks of remote repositories. (by @regisb)
+- 💥[Deprecation] Remove the various `--mount` options. These options are replaced by persistent mounts, which are managed by the `tutor mounts` commands. (by @regisb)
+- [Feature] Add the `do importdemocourse --repo-dir=...` option, to import courses from subdirectories of git repositories. This allows us to import the openedx-test-course in Palm with: `tutor local do importdemocourse --repo=https://github.com/openedx/openedx-test-course --version=o
+pen-release/palm.master --repo-dir=test-course/course`. (by @regisb)
+
 <a id='changelog-15.3.7'></a>
 ## v15.3.7 (2023-06-13)
 

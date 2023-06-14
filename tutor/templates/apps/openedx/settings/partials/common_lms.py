@@ -4,7 +4,7 @@
 LOGIN_REDIRECT_WHITELIST = ["{{ CMS_HOST }}"]
 
 # Better layout of honor code/tos links during registration
-REGISTRATION_EXTRA_FIELDS["terms_of_service"] = "required"
+REGISTRATION_EXTRA_FIELDS["terms_of_service"] = "hidden"
 REGISTRATION_EXTRA_FIELDS["honor_code"] = "hidden"
 
 # Fix media files paths
@@ -35,11 +35,6 @@ CACHES["staticfiles"] = {
     "KEY_PREFIX": "staticfiles_lms",
     "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     "LOCATION": "staticfiles_lms",
-}
-CACHES["ora2-storage"] = {
-    "KEY_PREFIX": "ora2-storage",
-    "BACKEND": "django_redis.cache.RedisCache",
-    "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
 }
 
 # Create folders if necessary

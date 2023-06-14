@@ -6,12 +6,13 @@ import typing as t
 import click
 import click.shell_completion
 
-from .. import config as tutor_config
-from .. import env, exceptions, fmt
-from .. import interactive as interactive_config
-from .. import serialize
-from ..types import Config, ConfigValue
-from .context import Context
+from tutor import config as tutor_config
+from tutor import env, exceptions, fmt
+from tutor import interactive as interactive_config
+from tutor import serialize
+from tutor.commands.context import Context
+from tutor.commands.params import ConfigLoaderParam
+from tutor.types import ConfigValue
 
 
 @click.group(
@@ -23,7 +24,7 @@ def config_command() -> None:
     pass
 
 
-class ConfigKeyParamType(click.ParamType):
+class ConfigKeyParamType(ConfigLoaderParam):
     name = "configkey"
 
     def shell_complete(
@@ -31,25 +32,20 @@ class ConfigKeyParamType(click.ParamType):
     ) -> list[click.shell_completion.CompletionItem]:
         return [
             click.shell_completion.CompletionItem(key)
-            for key, _value in self._shell_complete_config_items(ctx, incomplete)
+            for key, _value in self._shell_complete_config_items(incomplete)
         ]
 
-    @staticmethod
     def _shell_complete_config_items(
-        ctx: click.Context, incomplete: str
+        self, incomplete: str
     ) -> list[tuple[str, ConfigValue]]:
-        # Here we want to auto-complete the name of the config key. For that we need to
-        # figure out the list of enabled plugins, and for that we need the project root.
-        # The project root would ordinarily be stored in ctx.obj.root, but during
-        # auto-completion we don't have access to our custom Tutor context. So we resort
-        # to a dirty hack, which is to examine the grandparent context.
-        root = getattr(
-            getattr(getattr(ctx, "parent", None), "parent", None), "params", {}
-        ).get("root", "")
-        config = tutor_config.load_full(root)
         return [
-            (key, value) for key, value in config.items() if key.startswith(incomplete)
+            (key, value)
+            for key, value in self._candidate_config_items()
+            if key.startswith(incomplete)
         ]
+
+    def _candidate_config_items(self) -> t.Iterable[tuple[str, ConfigValue]]:
+        yield from self.config.items()
 
 
 class ConfigKeyValParamType(ConfigKeyParamType):
@@ -76,19 +72,28 @@ class ConfigKeyValParamType(ConfigKeyParamType):
             # further auto-complete later.
             return [
                 click.shell_completion.CompletionItem(f"'{key}='")
-                for key, value in self._shell_complete_config_items(ctx, incomplete)
+                for key, value in self._shell_complete_config_items(incomplete)
             ]
         if incomplete.endswith("="):
             # raise ValueError(f"incomplete: <{incomplete}>")
             # Auto-complete with '<KEY>=<VALUE>'
             return [
                 click.shell_completion.CompletionItem(f"{key}={json.dumps(value)}")
-                for key, value in self._shell_complete_config_items(
-                    ctx, incomplete[:-1]
-                )
+                for key, value in self._shell_complete_config_items(incomplete[:-1])
             ]
         # Else, don't bother
         return []
+
+
+class ConfigListKeyValParamType(ConfigKeyValParamType):
+    """
+    Same as the parent class, but for keys of type `list`.
+    """
+
+    def _candidate_config_items(self) -> t.Iterable[tuple[str, ConfigValue]]:
+        for key, val in self.config.items():
+            if isinstance(val, list):
+                yield key, val
 
 
 @click.command(help="Create and save configuration interactively")
@@ -101,6 +106,24 @@ class ConfigKeyValParamType(ConfigKeyParamType):
     multiple=True,
     metavar="KEY=VAL",
     help="Set a configuration value (can be used multiple times)",
+)
+@click.option(
+    "-a",
+    "--append",
+    "append_vars",
+    type=ConfigListKeyValParamType(),
+    multiple=True,
+    metavar="KEY=VAL",
+    help="Append an item to a configuration value of type list. The value will only be added it it is not already present. (can be used multiple times)",
+)
+@click.option(
+    "-A",
+    "--remove",
+    "remove_vars",
+    type=ConfigListKeyValParamType(),
+    multiple=True,
+    metavar="KEY=VAL",
+    help="Remove an item from a configuration value of type list (can be used multiple times)",
 )
 @click.option(
     "-U",
@@ -117,16 +140,43 @@ class ConfigKeyValParamType(ConfigKeyParamType):
 def save(
     context: Context,
     interactive: bool,
-    set_vars: Config,
+    set_vars: list[tuple[str, t.Any]],
+    append_vars: list[tuple[str, t.Any]],
+    remove_vars: list[tuple[str, t.Any]],
     unset_vars: list[str],
     env_only: bool,
 ) -> None:
     config = tutor_config.load_minimal(context.root)
+    config_full = tutor_config.load_full(context.root)
     if interactive:
         interactive_config.ask_questions(config)
     if set_vars:
-        for key, value in dict(set_vars).items():
+        for key, value in set_vars:
             config[key] = env.render_unknown(config, value)
+    if append_vars:
+        for key, value in append_vars:
+            if key not in config:
+                config[key] = config_full.get(key, [])
+            values = config[key]
+            if not isinstance(values, list):
+                raise exceptions.TutorError(
+                    f"Could not append value to '{key}': current setting is of type '{values.__class__.__name__}', expected list."
+                )
+            if not isinstance(value, str):
+                raise exceptions.TutorError(
+                    f"Could not append value to '{key}': appended value is of type '{value.__class__.__name__}', expected str."
+                )
+            if value not in values:
+                values.append(value)
+    if remove_vars:
+        for key, value in remove_vars:
+            values = config.get(key, [])
+            if not isinstance(values, list):
+                raise exceptions.TutorError(
+                    f"Could not remove value from '{key}': current setting is of type '{values.__class__.__name__}', expected list."
+                )
+            while value in values:
+                values.remove(value)
     for key in unset_vars:
         config.pop(key, None)
     if not env_only:
@@ -149,10 +199,10 @@ def printroot(context: Context) -> None:
 def printvalue(context: Context, key: str) -> None:
     config = tutor_config.load(context.root)
     try:
-        # Note that this will incorrectly print None values
-        fmt.echo(str(config[key]))
+        value = config[key]
     except KeyError as e:
         raise exceptions.TutorError(f"Missing configuration value: {key}") from e
+    fmt.echo(serialize.str_format(value))
 
 
 @click.group(name="patches", help="Commands related to patches in configurations")
@@ -171,5 +221,5 @@ def patches_list(context: Context) -> None:
 config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
-config_command.add_command(patches_command)
 patches_command.add_command(patches_list)
+config_command.add_command(patches_command)

@@ -9,9 +9,6 @@ Actions are one of the two types of hooks (the other being :ref:`filters`) that 
 .. autoclass:: tutor.core.hooks.Action
     :members:
 
-.. autoclass:: tutor.core.hooks.ActionTemplate
-    :members:
-
 .. The following are only to ensure that the docs build without warnings
 .. class:: tutor.core.hooks.actions.T
 .. class:: tutor.types.Config

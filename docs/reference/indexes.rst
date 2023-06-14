@@ -7,10 +7,10 @@ Plugin indexes are a great way to have your plugins discovered by other users. P
 Index file paths
 ================
 
-A plugin index is a yaml-formatted file. It can be stored on the web or on your computer. In both cases, the index file location must end with "<current release name>/plugins.yml". For instance, the following are valid index locations if you run the Open edX "Olive" release:
+A plugin index is a yaml-formatted file. It can be stored on the web or on your computer. In both cases, the index file location must end with "<current release name>/plugins.yml". For instance, the following are valid index locations if you run the Open edX "Palm" release:
 
-- https://overhang.io/tutor/main/olive/plugins.yml
-- ``/path/to/your/local/index/olive/plugins.yml``
+- https://overhang.io/tutor/main/palm/plugins.yml
+- ``/path/to/your/local/index/palm/plugins.yml``
 
 To add either indexes, run the ``tutor plugins index add`` command without the suffix. For instance::
 
@@ -106,9 +106,9 @@ Manage plugins in development
 Plugin developers and maintainers often want to install local versions of their plugins. They usually achieve this with ``pip install -e /path/to/tutor-plugin``. We can improve that workflow by creating an index for local plugins::
 
     # Create the plugin index directory
-    mkdir -p ~/localindex/olive/
+    mkdir -p ~/localindex/palm/
     # Edit the index
-    vim ~/localindex/olive/plugins.yml
+    vim ~/localindex/palm/plugins.yml
 
 Add the following to the index::
 

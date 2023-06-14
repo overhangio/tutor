@@ -39,6 +39,10 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         common_upgrade.upgrade_from_nutmeg(context, config)
         running_release = "olive"
 
+    if running_release == "olive":
+        upgrade_from_olive(context, config)
+        running_release = "palm"
+
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
@@ -47,18 +51,8 @@ def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Stopping any existing platform"))
     context.invoke(compose.stop)
 
-    if not config["RUN_MONGODB"]:
-        fmt.echo_info(
-            "You are not running MongoDB (RUN_MONGODB=false). It is your "
-            "responsibility to upgrade your MongoDb instance to v3.6. There is "
-            "nothing left to do to upgrade from Ironwood to Juniper."
-        )
-        return
-
     upgrade_mongodb(context, config, "3.4", "3.4")
-    context.invoke(compose.stop)
     upgrade_mongodb(context, config, "3.6", "3.6")
-    context.invoke(compose.stop)
 
 
 def upgrade_from_juniper(context: click.Context, config: Config) -> None:
@@ -146,12 +140,31 @@ def upgrade_from_maple(context: click.Context, config: Config) -> None:
     )
 
 
+def upgrade_from_olive(context: click.Context, config: Config) -> None:
+    # Note that we need to exec because the ora2 folder is not bind-mounted in the job
+    # services.
+    context.invoke(compose.start, detach=True, services=["lms"])
+    context.invoke(
+        compose.execute,
+        args=["lms", "sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
+    )
+    upgrade_mongodb(context, config, "4.2.17", "4.2")
+    upgrade_mongodb(context, config, "4.4.22", "4.4")
+
+
 def upgrade_mongodb(
     context: click.Context,
     config: Config,
     to_docker_version: str,
     to_compatibility_version: str,
 ) -> None:
+    if not config["RUN_MONGODB"]:
+        fmt.echo_info(
+            f"You are not running MongoDB (RUN_MONGODB=false). It is your "
+            f"responsibility to upgrade your MongoDb instance to {to_docker_version}."
+        )
+        return
+
     click.echo(fmt.title(f"Upgrading MongoDb to v{to_docker_version}"))
     # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
     # environment, not the configuration.

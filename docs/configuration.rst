@@ -40,8 +40,6 @@ With an up-to-date environment, Tutor is ready to launch an Open edX platform an
 Individual service activation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``RUN_LMS`` (default: ``true``)
-- ``RUN_CMS`` (default: ``true``)
 - ``RUN_ELASTICSEARCH`` (default: ``true``)
 - ``RUN_MONGODB`` (default: ``true``)
 - ``RUN_MYSQL`` (default: ``true``)
@@ -67,27 +65,35 @@ This configuration parameter defines the name of the Docker image to run for the
 
 This configuration paramater defines the name of the Docker image to run the development version of the lms and cms containers.  By default, the Docker image tag matches the Tutor version it was built with.
 
+.. https://hub.docker.com/r/devture/exim-relay/tags
+
 - ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.6.2"``)
 
 This configuration paramater defines which Caddy Docker image to use.
 
-- ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"docker.io/elasticsearch:7.10.1"``)
+- ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"docker.io/elasticsearch:7.17.9"``)
 
 This configuration parameter defines which Elasticsearch Docker image to use.
 
-- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:4.2.24"``)
+- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:4.4.22"``)
 
 This configuration parameter defines which MongoDB Docker image to use.
 
-- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:5.7.35"``)
+.. https://hub.docker.com/_/mysql/tags?page=1&name=8.0
+
+- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:8.0.33"``)
 
 This configuration parameter defines which MySQL Docker image to use.
 
-- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:6.2.6"``)
+.. https://hub.docker.com/_/redis/tags
+
+- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:7.0.11"``)
 
 This configuration parameter defines which Redis Docker image to use.
 
-- ``DOCKER_IMAGE_SMTP`` (default: ``"docker.io/devture/exim-relay:4.95-r0-2``)
+.. https://hub.docker.com/r/devture/exim-relay/tags
+
+- ``DOCKER_IMAGE_SMTP`` (default: ``"docker.io/devture/exim-relay:4.96-r1-0``)
 
 This configuration parameter defines which Simple Mail Transfer Protocol (SMTP) Docker image to use.
 
@@ -130,7 +136,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/olive.4"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/palm.1"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -150,7 +156,7 @@ These two configuration parameters define which Redis database to use for Open e
 
 .. _openedx_extra_pip_requirements:
 
-- ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``["openedx-scorm-xblock>=15.0.0,<16.0.0"]``)
+- ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``["openedx-scorm-xblock>=16.0.0,<17.0.0"]``)
 
 This defines extra pip packages that are going to be installed for Open edX.
 
@@ -353,18 +359,11 @@ Installing extra xblocks and requirements
 
 Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` parameter in the :ref:`config file <configuration>` or to the ``env/build/openedx/requirements/private.txt`` file. The difference between them, is that ``private.txt`` file, even though it could be used for both, :ref:`should be used for installing extra xblocks or requirements from private repositories <extra_private_xblocks>`. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_:
 
-- add the following to the ``config.yml``::
+    tutor config save --append OPENEDX_EXTRA_PIP_REQUIREMENTS=git+https://github.com/open-craft/xblock-poll.git
 
-    OPENEDX_EXTRA_PIP_REQUIREMENTS:
-    - "git+https://github.com/open-craft/xblock-poll.git"
-
-.. warning::
-   Specifying extra requirements through ``config.yml`` overwrites :ref:`the default extra requirements<openedx_extra_pip_requirements>`. You might need to add them to the list if your configuration depends on them.
-
-- or add the dependency to ``private.txt``::
+Alternatively, add the dependency to ``private.txt``::
 
     echo "git+https://github.com/open-craft/xblock-poll.git" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
-
 
 Then, the ``openedx`` docker image must be rebuilt::
 
@@ -404,14 +403,14 @@ If you don't create your fork from this tag, you *will* have important compatibi
 
 - Do not try to run a fork from an older (pre-Olive) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
-- Do not try to run a fork from the open-release/olive.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/olive.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/olive.master branch.
+- Do not try to run a fork from the open-release/palm.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/palm.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/palm.master branch.
 
 .. _i18n:
 
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English (``LANGUAGE_CODE`` default: ``"en"``), chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/olive.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English (``LANGUAGE_CODE`` default: ``"en"``), chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/palm.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
@@ -432,9 +431,9 @@ Then, add a "django.po" file there that will contain your custom translations::
 .. warning::
     Don't forget to specify the file ``Content-Type`` when adding message strings with non-ASCII characters; otherwise a ``UnicodeDecodeError`` will be raised during compilation.
 
-The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/openedx/edx-platform/blob/open-release/olive.master/conf/locale/en/LC_MESSAGES/django.po>`__.
+The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/openedx/edx-platform/blob/open-release/palm.master/conf/locale/en/LC_MESSAGES/django.po>`__.
 
-If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/openedx/edx-platform/blob/open-release/olive.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
+If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/openedx/edx-platform/blob/open-release/palm.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
 
 To recap, here is an example. To translate a few strings in French, both from django.po and djangojs.po, we would have the following file hierarchy::
 

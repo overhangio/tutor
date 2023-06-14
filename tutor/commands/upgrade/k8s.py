@@ -38,32 +38,14 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         common_upgrade.upgrade_from_nutmeg(context, config)
         running_release = "olive"
 
+    if running_release == "olive":
+        upgrade_from_olive(context.obj, config)
+        running_release = "palm"
+
 
 def upgrade_from_ironwood(config: Config) -> None:
-    if not config["RUN_MONGODB"]:
-        fmt.echo_info(
-            "You are not running MongoDB (RUN_MONGODB=false). It is your "
-            "responsibility to upgrade your MongoDb instance to v3.6. There is "
-            "nothing left to do to upgrade from Ironwood."
-        )
-        return
-    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Ironwood, you should upgrade
-your MongoDb cluster from v3.2 to v3.6. You should run something similar to:
-
-    # Upgrade from v3.2 to v3.4
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.4.24
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.4" })'
-
-    # Upgrade from v3.4 to v3.6
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:3.6.18
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "3.6" })'
-
-    tutor config save --unset DOCKER_IMAGE_MONGODB"""
-    fmt.echo_info(message)
+    upgrade_mongodb(config, "3.4.24", "3.4")
+    upgrade_mongodb(config, "3.6.18", "3.6")
 
 
 def upgrade_from_juniper(config: Config) -> None:
@@ -87,23 +69,7 @@ your MySQL database from v5.6 to v5.7. You should run something similar to:
 
 
 def upgrade_from_koa(config: Config) -> None:
-    if not config["RUN_MONGODB"]:
-        fmt.echo_info(
-            "You are not running MongoDB (RUN_MONGODB=false). It is your "
-            "responsibility to upgrade your MongoDb instance to v4.0. There is "
-            "nothing left to do to upgrade to Lilac from Koa."
-        )
-        return
-    message = """Automatic release upgrade is unsupported in Kubernetes. To upgrade from Koa to Lilac, you should upgrade
-your MongoDb cluster from v3.6 to v4.0. You should run something similar to:
-
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:4.0.25
-    tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "4.0" })'
-    tutor config save --unset DOCKER_IMAGE_MONGODB
-    """
-    fmt.echo_info(message)
+    upgrade_mongodb(config, "4.0.25", "4.0")
 
 
 def upgrade_from_lilac(config: Config) -> None:
@@ -173,3 +139,42 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
     k8s.kubectl_exec(
         config, "cms", ["sh", "-e", "-c", "./manage.py cms simulate_publish"]
     )
+
+
+def upgrade_from_olive(context: Context, config: Config) -> None:
+    # Note that we need to exec because the ora2 folder is not bind-mounted in the job
+    # services.
+    k8s.kubectl_apply(
+        context.root,
+        "--selector",
+        "app.kubernetes.io/name=lms",
+    )
+    k8s.wait_for_deployment_ready(config, "lms")
+    k8s.kubectl_exec(
+        config,
+        "lms",
+        ["sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
+    )
+    upgrade_mongodb(config, "4.2.17", "4.2")
+    upgrade_mongodb(config, "4.4.22", "4.4")
+
+
+def upgrade_mongodb(
+    config: Config, to_docker_version: str, to_compatibility_version: str
+) -> None:
+    if not config["RUN_MONGODB"]:
+        fmt.echo_info(
+            "You are not running MongoDB (RUN_MONGODB=false). It is your "
+            "responsibility to upgrade your MongoDb instance to {to_docker_version}."
+        )
+        return
+    message = f"""Automatic release upgrade is unsupported in Kubernetes. You should manually upgrade
+your MongoDb cluster to {to_docker_version} by running something similar to:
+
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:{to_docker_version}
+    tutor k8s start
+    tutor k8s exec mongodb mongo --eval 'db.adminCommand({{ setFeatureCompatibilityVersion: "{to_compatibility_version}" }})'
+    tutor config save --unset DOCKER_IMAGE_MONGODB
+    """
+    fmt.echo_info(message)

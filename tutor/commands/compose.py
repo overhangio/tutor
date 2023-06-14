@@ -1,25 +1,25 @@
 from __future__ import annotations
 
 import os
-import re
 import typing as t
-from copy import deepcopy
 
 import click
-from click.shell_completion import CompletionItem
-from typing_extensions import TypeAlias
 
+from tutor import bindmount
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import fmt, hooks, serialize, utils
-from tutor.commands import jobs
+from tutor import fmt, hooks
+from tutor import interactive as interactive_config
+from tutor import utils
+from tutor.commands import images, jobs
+from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseTaskContext
+from tutor.commands.upgrade import OPENEDX_RELEASE_NAMES
+from tutor.commands.upgrade.compose import upgrade_from
 from tutor.core.hooks import Filter  # pylint: disable=unused-import
 from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
-
-COMPOSE_FILTER_TYPE: TypeAlias = "Filter[dict[str, t.Any], []]"
 
 
 class ComposeTaskRunner(BaseComposeTaskRunner):
@@ -47,47 +47,6 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
             *args, "--project-name", self.project_name, *command
         )
 
-    def update_docker_compose_tmp(
-        self,
-        compose_tmp_filter: COMPOSE_FILTER_TYPE,
-        compose_jobs_tmp_filter: COMPOSE_FILTER_TYPE,
-        docker_compose_tmp_path: str,
-        docker_compose_jobs_tmp_path: str,
-    ) -> None:
-        """
-        Update the contents of the docker-compose.tmp.yml and
-        docker-compose.jobs.tmp.yml files, which are generated at runtime.
-        """
-        compose_base: dict[str, t.Any] = {
-            "version": "{{ DOCKER_COMPOSE_VERSION }}",
-            "services": {},
-        }
-
-        # 1. Apply compose_tmp filter
-        # 2. Render the resulting dict
-        # 3. Serialize to yaml
-        # 4. Save to disk
-        docker_compose_tmp: str = serialize.dumps(
-            tutor_env.render_unknown(
-                self.config, compose_tmp_filter.apply(deepcopy(compose_base))
-            )
-        )
-        tutor_env.write_to(
-            docker_compose_tmp,
-            docker_compose_tmp_path,
-        )
-
-        # Same thing but with tmp jobs
-        docker_compose_jobs_tmp: str = serialize.dumps(
-            tutor_env.render_unknown(
-                self.config, compose_jobs_tmp_filter.apply(deepcopy(compose_base))
-            )
-        )
-        tutor_env.write_to(
-            docker_compose_jobs_tmp,
-            docker_compose_jobs_tmp_path,
-        )
-
     def run_task(self, service: str, command: str) -> int:
         """
         Run the "{{ service }}-job" service from local/docker-compose.jobs.yml with the
@@ -113,158 +72,179 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
 
 
 class BaseComposeContext(BaseTaskContext):
-    COMPOSE_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
-    COMPOSE_JOBS_TMP_FILTER: COMPOSE_FILTER_TYPE = NotImplemented
+    NAME: t.Literal["local", "dev"]
 
     def job_runner(self, config: Config) -> ComposeTaskRunner:
         raise NotImplementedError
 
 
-class MountParam(click.ParamType):
+@click.command(help="Configure and run Open edX from scratch")
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
+@click.option("--skip-build", is_flag=True, help="Skip building Docker images")
+@click.pass_context
+def launch(
+    context: click.Context,
+    non_interactive: bool,
+    pullimages: bool,
+    skip_build: bool,
+) -> None:
+    context_name = context.obj.NAME
+    run_for_prod = context_name != "dev"
+
+    utils.warn_macos_docker_memory()
+
+    # Upgrade has to run before configuration
+    interactive_upgrade(context, not non_interactive, run_for_prod)
+    interactive_configuration(context, not non_interactive, run_for_prod)
+
+    config = tutor_config.load(context.obj.root)
+
+    if not skip_build:
+        click.echo(fmt.title("Building Docker images"))
+        images_to_build = hooks.Filters.IMAGES_BUILD_REQUIRED.apply([], context_name)
+        if not images_to_build:
+            fmt.echo_info("No image to build")
+        context.invoke(images.build, image_names=images_to_build)
+
+    click.echo(fmt.title("Stopping any existing platform"))
+    context.invoke(stop)
+
+    if pullimages:
+        click.echo(fmt.title("Docker image updates"))
+        context.invoke(dc_command, command="pull")
+
+    click.echo(fmt.title("Starting the platform in detached mode"))
+    context.invoke(start, detach=True)
+
+    click.echo(fmt.title("Database creation and migrations"))
+    context.invoke(do.commands["init"])
+
+    # Print the urls of the user-facing apps
+    public_app_hosts = ""
+    for host in hooks.Filters.APP_PUBLIC_HOSTS.iterate(context_name):
+        public_app_host = tutor_env.render_str(
+            config, "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://" + host
+        )
+        public_app_hosts += f"    {public_app_host}\n"
+    if public_app_hosts:
+        fmt.echo_info(
+            f"""The platform is now running and can be accessed at the following urls:
+
+{public_app_hosts}"""
+        )
+
+
+def interactive_upgrade(
+    context: click.Context, interactive: bool, run_for_prod: bool
+) -> None:
     """
-    Parser for --mount arguments of the form "service1[,service2,...]:/host/path:/container/path".
+    Piece of code that is only used in launch.
     """
+    run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
+    if run_upgrade_from_release is not None:
+        click.echo(fmt.title("Upgrading from an older release"))
+        if interactive:
+            to_release = tutor_env.get_current_open_edx_release_name()
+            question = f"""You are about to upgrade your Open edX platform from {run_upgrade_from_release.capitalize()} to {to_release.capitalize()}
 
-    name = "mount"
-    MountType = t.Tuple[str, str, str]
-    # Note that this syntax does not allow us to include colon ':' characters in paths
-    PARAM_REGEXP = (
-        r"(?P<services>[a-zA-Z0-9-_, ]+):(?P<host_path>[^:]+):(?P<container_path>[^:]+)"
-    )
+It is strongly recommended to make a backup before upgrading. To do so, run:
 
-    def convert(
-        self,
-        value: str,
-        param: t.Optional["click.Parameter"],
-        ctx: t.Optional[click.Context],
-    ) -> list["MountType"]:
-        mounts = self.convert_explicit_form(value) or self.convert_implicit_form(value)
-        return mounts
+    tutor local stop # or 'tutor dev stop' in development
+    sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/
 
-    def convert_explicit_form(self, value: str) -> list["MountParam.MountType"]:
-        """
-        Argument is of the form "containers:/host/path:/container/path".
-        """
-        match = re.match(self.PARAM_REGEXP, value)
-        if not match:
-            return []
+In case of problem, to restore your backup you will then have to run: sudo rsync -avr /tmp/tutor-backup/ "$(tutor config printroot)"/
 
-        mounts: list["MountParam.MountType"] = []
-        services: list[str] = [
-            service.strip() for service in match["services"].split(",")
-        ]
-        host_path = os.path.abspath(os.path.expanduser(match["host_path"]))
-        host_path = host_path.replace(os.path.sep, "/")
-        container_path = match["container_path"]
-        for service in services:
-            if not service:
-                self.fail(f"incorrect services syntax: '{match['services']}'")
-            mounts.append((service, host_path, container_path))
-        return mounts
+Are you sure you want to continue?"""
+            click.confirm(
+                fmt.question(question), default=True, abort=True, prompt_suffix=" "
+            )
+        context.invoke(
+            upgrade,
+            from_release=run_upgrade_from_release,
+        )
 
-    def convert_implicit_form(self, value: str) -> list["MountParam.MountType"]:
-        """
-        Argument is of the form "/host/path"
-        """
-        mounts: list["MountParam.MountType"] = []
-        host_path = os.path.abspath(os.path.expanduser(value))
-        for service, container_path in hooks.Filters.COMPOSE_MOUNTS.iterate(
-            os.path.basename(host_path)
-        ):
-            mounts.append((service, host_path, container_path))
-        if not mounts:
-            raise self.fail(f"no mount found for {value}")
-        return mounts
+        # Update env and configuration
+        # Don't run in interactive mode, otherwise users gets prompted twice.
+        interactive_configuration(context, False, run_for_prod)
 
-    def shell_complete(
-        self, ctx: click.Context, param: click.Parameter, incomplete: str
-    ) -> list[CompletionItem]:
-        """
-        Mount argument completion works only for the single path (implicit) form. The
-        reason is that colons break words in bash completion:
-        http://tiswww.case.edu/php/chet/bash/FAQ (E13)
-        Thus, we do not even attempt to auto-complete mount arguments that include
-        colons: such arguments will not even reach this method.
-        """
-        return [CompletionItem(incomplete, type="file")]
+        # Post upgrade
+        if interactive:
+            question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
+
+    If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
+
+        tutor images build all # list your custom images here
+
+    See the documentation for more information:
+
+        https://docs.tutor.overhang.io/install.html#upgrading-to-a-new-open-edx-release
+
+    Press enter when you are ready to continue"""
+            click.confirm(
+                fmt.question(question), default=True, abort=True, prompt_suffix=" "
+            )
 
 
-mount_option = click.option(
-    "-m",
-    "--mount",
-    "mounts",
-    help="""Bind-mount a folder from the host in the right containers. This option can take two different forms. The first one is explicit: 'service1[,service2...]:/host/path:/container/path'. The other is implicit: '/host/path'. Arguments passed in the implicit form will be parsed by plugins to define the right folders to bind-mount from the host.""",
-    type=MountParam(),
-    multiple=True,
+def interactive_configuration(
+    context: click.Context, interactive: bool, run_for_prod: bool
+) -> None:
+    click.echo(fmt.title("Interactive platform configuration"))
+    config = tutor_config.load_minimal(context.obj.root)
+    if interactive:
+        interactive_config.ask_questions(config, run_for_prod=run_for_prod)
+    tutor_config.save_config_file(context.obj.root, config)
+    config = tutor_config.load_full(context.obj.root)
+    tutor_env.save(context.obj.root, config)
+
+
+@click.command(
+    short_help="Perform release-specific upgrade tasks",
+    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `launch`.",
 )
-
-
-def mount_tmp_volumes(
-    all_mounts: tuple[list[MountParam.MountType], ...],
-    context: BaseComposeContext,
-) -> None:
-    for mounts in all_mounts:
-        for service, host_path, container_path in mounts:
-            mount_tmp_volume(service, host_path, container_path, context)
-
-
-def mount_tmp_volume(
-    service: str,
-    host_path: str,
-    container_path: str,
-    context: BaseComposeContext,
-) -> None:
-    """
-    Append user-defined bind-mounted volumes to the docker-compose.tmp file(s).
-
-    The service/host path/container path values are appended to the docker-compose
-    files by mean of two filters. Each dev/local environment is then responsible for
-    generating the files based on the output of these filters.
-
-    Bind-mounts that are associated to "*-job" services will be added to the
-    docker-compose jobs file.
-    """
-    fmt.echo_info(f"Bind-mount: {host_path} -> {container_path} in {service}")
-    compose_tmp_filter: COMPOSE_FILTER_TYPE = (
-        context.COMPOSE_JOBS_TMP_FILTER
-        if service.endswith("-job")
-        else context.COMPOSE_TMP_FILTER
+@click.option(
+    "--from",
+    "from_release",
+    type=click.Choice(OPENEDX_RELEASE_NAMES),
+)
+@click.pass_context
+def upgrade(context: click.Context, from_release: t.Optional[str]) -> None:
+    fmt.echo_alert(
+        "This command only performs a partial upgrade of your Open edX platform. "
+        "To perform a full upgrade, you should run `tutor local launch` (or `tutor dev launch` "
+        "in development)."
     )
-
-    @compose_tmp_filter.add()
-    def _add_mounts_to_docker_compose_tmp(
-        docker_compose: dict[str, t.Any],
-    ) -> dict[str, t.Any]:
-        services = docker_compose.setdefault("services", {})
-        services.setdefault(service, {"volumes": []})
-        services[service]["volumes"].append(f"{host_path}:{container_path}")
-        return docker_compose
+    if from_release is None:
+        from_release = tutor_env.get_env_release(context.obj.root)
+    if from_release is None:
+        fmt.echo_info("Your environment is already up-to-date")
+    else:
+        upgrade_from(context, from_release)
+    # We update the environment to update the version
+    context.invoke(config_save_command)
 
 
 @click.command(
     short_help="Run all or a selection of services.",
     help="Run all or a selection of services. Docker images will be rebuilt where necessary.",
 )
-@click.option("--skip-build", is_flag=True, help="Skip image building")
+@click.option("--build", is_flag=True, help="Build images on start")
 @click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
-@mount_option
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def start(
     context: BaseComposeContext,
-    skip_build: bool,
+    build: bool,
     detach: bool,
-    mounts: tuple[list[MountParam.MountType]],
     services: list[str],
 ) -> None:
     command = ["up", "--remove-orphans"]
-    if not skip_build:
+    if build:
         command.append("--build")
     if detach:
         command.append("-d")
 
     # Start services
-    mount_tmp_volumes(mounts, context)
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(*command, *services)
 
@@ -306,30 +286,17 @@ def restart(context: BaseComposeContext, services: list[str]) -> None:
     else:
         for service in services:
             if service == "openedx":
-                if config["RUN_LMS"]:
-                    command += ["lms", "lms-worker"]
-                if config["RUN_CMS"]:
-                    command += ["cms", "cms-worker"]
+                command += ["lms", "lms-worker", "cms", "cms-worker"]
             else:
                 command.append(service)
     context.job_runner(config).docker_compose(*command)
 
 
 @jobs.do_group
-@mount_option
-@click.pass_obj
-def do(context: BaseComposeContext, mounts: tuple[list[MountParam.MountType]]) -> None:
+def do() -> None:
     """
     Run a custom job in the right container(s).
     """
-
-    @hooks.Actions.DO_JOB.add()
-    def _mount_tmp_volumes(_job_name: str, *_args: t.Any, **_kwargs: t.Any) -> None:
-        """
-        We add this logic to an action callback because we do not want to trigger it
-        whenever we run `tutor local do <job> --help`.
-        """
-        mount_tmp_volumes(mounts, context)
 
 
 @click.command(
@@ -341,18 +308,16 @@ def do(context: BaseComposeContext, mounts: tuple[list[MountParam.MountType]]) -
     ),
     context_settings={"ignore_unknown_options": True},
 )
-@mount_option
 @click.argument("args", nargs=-1, required=True)
 @click.pass_context
 def run(
     context: click.Context,
-    mounts: tuple[list[MountParam.MountType]],
     args: list[str],
 ) -> None:
     extra_args = ["--rm"]
     if not utils.is_a_tty():
         extra_args.append("-T")
-    context.invoke(dc_command, mounts=mounts, command="run", args=[*extra_args, *args])
+    context.invoke(dc_command, command="run", args=[*extra_args, *args])
 
 
 @click.command(
@@ -449,17 +414,14 @@ def status(context: click.Context) -> None:
     context_settings={"ignore_unknown_options": True},
     name="dc",
 )
-@mount_option
 @click.argument("command")
 @click.argument("args", nargs=-1)
 @click.pass_obj
 def dc_command(
     context: BaseComposeContext,
-    mounts: tuple[list[MountParam.MountType]],
     command: str,
     args: list[str],
 ) -> None:
-    mount_tmp_volumes(mounts, context)
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(command, *args)
 
@@ -469,8 +431,8 @@ def _mount_edx_platform(
     volumes: list[tuple[str, str]], name: str
 ) -> list[tuple[str, str]]:
     """
-    When mounting edx-platform with `--mount=/path/to/edx-platform`, bind-mount the host
-    repo in the lms/cms containers.
+    When mounting edx-platform with `tutor mounts add /path/to/edx-platform`,
+    bind-mount the host repo in the lms/cms containers.
     """
     if name == "edx-platform":
         path = "/openedx/edx-platform"
@@ -485,7 +447,23 @@ def _mount_edx_platform(
     return volumes
 
 
+@hooks.Filters.APP_PUBLIC_HOSTS.add()
+def _edx_platform_public_hosts(
+    hosts: list[str], context_name: t.Literal["local", "dev"]
+) -> list[str]:
+    if context_name == "dev":
+        hosts += ["{{ LMS_HOST }}:8000", "{{ CMS_HOST }}:8001"]
+    else:
+        hosts += ["{{ LMS_HOST }}", "{{ CMS_HOST }}"]
+    return hosts
+
+
+hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(("iter_mounts", bindmount.iter_mounts))
+
+
 def add_commands(command_group: click.Group) -> None:
+    command_group.add_command(launch)
+    command_group.add_command(upgrade)
     command_group.add_command(start)
     command_group.add_command(stop)
     command_group.add_command(restart)
