@@ -6,6 +6,6 @@ Reference
 
    api/hooks/index
    api/hooks/catalog
-   patches
+   patches/index
    cli/index
    indexes
