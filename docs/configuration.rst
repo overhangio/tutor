@@ -401,7 +401,7 @@ Note that your edx-platform version must be a fork of the latest release **tag**
 
 If you don't create your fork from this tag, you *will* have important compatibility issues with other services. In particular:
 
-- Do not try to run a fork from an older (pre-Olive) version of edx-platform: this will simply not work.
+- Do not try to run a fork from an older (pre-Palm) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
 - Do not try to run a fork from the open-release/palm.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/palm.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/palm.master branch.
 
