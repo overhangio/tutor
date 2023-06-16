@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.0.1'></a>
+## v16.0.1 (2023-06-16)
+
+- [Bugfix] Fix loading default Kubernetes config. (by @regisb)
+
 <a id='changelog-16.0.0'></a>
 ## v16.0.0 (2023-06-14)
 - 💥[Feature] Upgrade to Palm. (by @regisb)
