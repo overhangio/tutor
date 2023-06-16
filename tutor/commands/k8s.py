@@ -27,7 +27,9 @@ class K8sClients:
         # pylint: disable=import-outside-toplevel
         from kubernetes import client, config
 
-        if os.path.exists(config.kube_config.KUBE_CONFIG_DEFAULT_LOCATION):
+        if os.path.exists(
+            os.path.expanduser(config.kube_config.KUBE_CONFIG_DEFAULT_LOCATION)
+        ):
             # found the kubeconfig file, let's load it!
             config.load_kube_config()
         elif (
