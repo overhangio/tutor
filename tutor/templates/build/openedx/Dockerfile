@@ -45,6 +45,10 @@ WORKDIR /openedx/edx-platform
 RUN git config --global user.email "tutor@overhang.io" \
   && git config --global user.name "Tutor"
 
+# added a patch for this commit (https://github.com/openedx/edx-platform/pull/32506/commits/b3e9f0cbd5e44f25a42a7cbf4929b71ef122b697)
+# which is fix for this issue (https://github.com/overhangio/tutor-discovery/issues/40)
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/b3e9f0cbd5e44f25a42a7cbf4929b71ef122b697.patch | git am
+
 {%- if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
