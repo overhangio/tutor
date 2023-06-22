@@ -392,9 +392,7 @@ spec:
       containers:
         - name: mysql
           image: {{ DOCKER_IMAGE_MYSQL }}
-          # Note the ignore-db-dir: this is because ext4 volumes are created with a lost+found directory in them, which causes mysql
-          # initialisation to fail
-          args: ["mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci", "--ignore-db-dir=lost+found"]
+          args: ["mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci"]
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "{{ MYSQL_ROOT_PASSWORD }}"

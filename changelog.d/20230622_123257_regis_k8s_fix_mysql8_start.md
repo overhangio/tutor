@@ -1,0 +1,1 @@
+- [Bugfix] On Kubernetes, fix mysql deployment by removing the `-ignore-db-dir` option, which no longer exists on MySQL 8. (by @regisb)
