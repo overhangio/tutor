@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.0.2'></a>
+## v16.0.2 (2023-06-22)
+
+- [Bugfix] On Kubernetes, fix mysql deployment by removing the `--ignore-db-dir` option, which no longer exists on MySQL 8. (by @regisb)
+
 <a id='changelog-16.0.1'></a>
 ## v16.0.1 (2023-06-16)
 
