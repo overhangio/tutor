@@ -87,7 +87,9 @@ Tutor can be launched on Amazon Web Services very quickly with the `official Tut
 Upgrading
 ---------
 
-To upgrade Open edX or benefit from the latest features and bug fixes, you should simply upgrade Tutor. Start by upgrading the "tutor" package and its dependencies::
+To upgrade your Open edX site or benefit from the latest features and bug fixes, you should simply upgrade Tutor. Start by backing up your data and reading the `release notes <https://docs.openedx.org/en/latest/community/release_notes/>`_ for the current release.
+
+Next, upgrade the "tutor" package and its dependencies::
 
     pip install --upgrade "tutor[full]"
 
