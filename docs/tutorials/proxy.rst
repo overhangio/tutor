@@ -26,6 +26,7 @@ It is then your responsibility to configure the web proxy on the host. There are
     - Forward http traffic to https.
 - Set the following headers appropriately: ``X-Forwarded-Proto``, ``X-Forwarded-Port``.
 - Forward all traffic to ``localhost:81`` (or whatever port indicated by CADDY_HTTP_PORT, see above).
+- If possible, add support for `HTTP/3 <https://en.wikipedia.org/wiki/HTTP/3>`__, which considerably improves performance for Open edX (see `this comment <https://github.com/overhangio/tutor/issues/845#issuecomment-1566964289>`__).
 
 .. note::
     If you want to run Open edX at ``https://...`` urls (as you probably do in production) it is *crucial* that the ``ENABLE_HTTPS`` flag is set to ``true``. If not, the web services will be configured to run at ``http://...`` URLs, and all sorts of trouble will happen. Therefore, make sure to continue answering ``y`` ("yes") to the quickstart dialogue question "Activate SSL/TLS certificates for HTTPS access?".
