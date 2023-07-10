@@ -119,7 +119,7 @@ Common tasks
 Executing commands inside service pods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Tutor and plugin documentation usually often instructions to execute some ``tutor local run ...`` commands. These commands are only valid when running Tutor locally with docker-compose, and will not work on Kubernetes. Instead, you should run ``tutor k8s exec ...`` commands. Arguments and options should be identical.
+The Tutor and plugin documentation usually often instructions to execute some ``tutor local run ...`` commands. These commands are only valid when running Tutor locally with docker compose, and will not work on Kubernetes. Instead, you should run ``tutor k8s exec ...`` commands. Arguments and options should be identical.
 
 For instance, to run a Python shell in the lms container, run::
 

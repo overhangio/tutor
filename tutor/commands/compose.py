@@ -272,7 +272,7 @@ def reboot(context: click.Context, detach: bool, services: list[str]) -> None:
 @click.command(
     short_help="Restart some components from a running platform.",
     help="""Specify 'openedx' to restart the lms, cms and workers, or 'all' to
-restart all services. Note that this performs a 'docker-compose restart', so new images
+restart all services. Note that this performs a 'docker compose restart', so new images
 may not be taken into account. It is useful for reloading settings, for instance. To
 fully stop the platform, use the 'reboot' command.""",
 )
@@ -302,8 +302,8 @@ def do() -> None:
 @click.command(
     short_help="Run a command in a new container",
     help=(
-        "Run a command in a new container. This is a wrapper around `docker-compose run`. Any option or argument passed"
-        " to this command will be forwarded to docker-compose. Thus, you may use `-v` or `-p` to mount volumes and"
+        "Run a command in a new container. This is a wrapper around `docker compose run`. Any option or argument passed"
+        " to this command will be forwarded to docker compose. Thus, you may use `-v` or `-p` to mount volumes and"
         " expose ports."
     ),
     context_settings={"ignore_unknown_options": True},
@@ -368,7 +368,7 @@ def copyfrom(
 @click.command(
     short_help="Run a command in a running container",
     help=(
-        "Run a command in a running container. This is a wrapper around `docker-compose exec`. Any option or argument"
+        "Run a command in a running container. This is a wrapper around `docker compose exec`. Any option or argument"
         " passed to this command will be forwarded to docker-compose. Thus, you may use `-e` to manually define"
         " environment variables."
     ),
@@ -383,7 +383,7 @@ def execute(context: click.Context, args: list[str]) -> None:
 
 @click.command(
     short_help="View output from containers",
-    help="View output from containers. This is a wrapper around `docker-compose logs`.",
+    help="View output from containers. This is a wrapper around `docker compose logs`.",
 )
 @click.option("-f", "--follow", is_flag=True, help="Follow log output")
 @click.option("--tail", type=int, help="Number of lines to show from each container")
@@ -406,10 +406,10 @@ def status(context: click.Context) -> None:
 
 
 @click.command(
-    short_help="Direct interface to docker-compose.",
+    short_help="Direct interface to docker compose.",
     help=(
-        "Direct interface to docker-compose. This is a wrapper around `docker-compose`. Most commands, options and"
-        " arguments passed to this command will be forwarded as-is to docker-compose."
+        "Direct interface to docker compose. This is a wrapper around `docker compose`. Most commands, options and"
+        " arguments passed to this command will be forwarded as-is to docker compose."
     ),
     context_settings={"ignore_unknown_options": True},
     name="dc",
