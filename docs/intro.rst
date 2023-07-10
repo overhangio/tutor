@@ -51,7 +51,7 @@ Tutor simplifies the deployment of Open edX by:
   :width: 500px
   :align: center
 
-Because Docker containers are becoming an industry-wide standard, that means that with Tutor it becomes possible to run Open edX anywhere: for now, Tutor supports deploying on a local server, with `docker-compose <https://docs.docker.com/compose/overview/>`_, and in a large cluster, with `Kubernetes <http://kubernetes.io/>`_. But in the future, Tutor may support other deployment platforms.
+Because Docker containers are becoming an industry-wide standard, that means that with Tutor it becomes possible to run Open edX anywhere: for now, Tutor supports deploying on a local server, with `docker compose <https://docs.docker.com/compose/overview/>`_, and in a large cluster, with `Kubernetes <http://kubernetes.io/>`_. But in the future, Tutor may support other deployment platforms.
 
 Where can I try Open edX and Tutor?
 -----------------------------------
@@ -101,7 +101,7 @@ You can now take advantage of the Tutor-powered CLI (item #3) to bootstrap your 
 
     tutor local launch
 
-Under the hood, Tutor simply runs ``docker-compose`` and ``docker`` commands to launch your platform. These commands are printed in the standard output, such that you are free to replicate the same behaviour by simply copying/pasting the same commands.
+Under the hood, Tutor simply runs ``docker compose`` and ``docker`` commands to launch your platform. These commands are printed in the standard output, such that you are free to replicate the same behaviour by simply copying/pasting the same commands.
 
 How do I navigate Tutor's command-line interface?
 -------------------------------------------------

@@ -50,7 +50,7 @@ class Actions:
     For more information about how actions work, check out the :py:class:`tutor.core.hooks.Action` API.
     """
 
-    #: Triggered whenever a "docker-compose start", "up" or "restart" command is executed.
+    #: Triggered whenever a "docker compose start", "up" or "restart" command is executed.
     #:
     #: :parameter str root: project root.
     #: :parameter dict config: project configuration.

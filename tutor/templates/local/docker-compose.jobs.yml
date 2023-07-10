@@ -1,8 +1,8 @@
 # Tutor provides the `tutor MODE do JOB ...` CLI as a consistent way to execute jobs
-# across the dev, local, and k8s modes. To support jobs in the docker-compose modes
+# across the dev, local, and k8s modes. To support jobs in the docker compose modes
 # (dev and local), we must define a `-job` variant service in which jobs could be run.
 
-# When `tutor local do JOB ...` is invoked, we `docker-compose run` each of JOB's
+# When `tutor local do JOB ...` is invoked, we `docker compose run` each of JOB's
 # tasks against the appropriate `-job` services, as defined here.
 # When `tutor dev do JOB ...` is invoked, we do the same, but also include any
 # compose overrides in ../dev/docker-compose.jobs.yml.
