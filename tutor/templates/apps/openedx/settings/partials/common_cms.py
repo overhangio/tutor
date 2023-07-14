@@ -18,7 +18,7 @@ FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
     if not os.path.exists(folder):
-        os.makedirs(folder)
+        os.makedirs(folder, exist_ok=True)
 
 {{ patch("openedx-cms-common-settings") }}
 
