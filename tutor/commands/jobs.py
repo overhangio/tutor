@@ -216,7 +216,8 @@ def assign_theme(name, domain):
         site.name = domain[:name_max_length]
         site.save()
     site.themes.all().delete()
-    site.themes.create(theme_dir_name=name)
+    if name != 'default':
+        site.themes.create(theme_dir_name=name)
 """
     domain_names = domain_names or [
         "{{ LMS_HOST }}",
