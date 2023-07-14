@@ -253,6 +253,7 @@ pen-release/palm.master --repo-dir=test-course/course`. (by @regisb)
 - [Bugfix] Build openedx-dev Docker image even when the host user is root, for instance on Windows. (by @regisb)
 - [Bugfix] Patch nutmeg.1 release with [LTI 1.3 fix](https://github.com/openedx/edx-platform/pull/30716). (by @ormsbee)
 - [Improvement] Make it possible to override k8s resources in plugins using `k8s-override` patch. (by @foadlind)
+- [Bugfix] Fix a race condition that could prevent a newly provisioned Studio container from starting due to a FileExistsError when creating logs directory.
 
 ## v14.0.2 (2022-06-27)
 
