@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "db": {
+    "host": "",
+    "userName": "",
+    "password": "",
+    "account": "",
+    "dataSource": "UNIVERSE",
+    "port": 31438
+  },
+  "catalog": {
+    "isSearchAllDirs": false,
+    "readServerInterval": 5,
+    "programDirs": [
+      {
+        "fileName": "RTN1"
+      },
+      {
+        "account": "XDEMO",
+        "fileName": "RTN2"
+      }
+    ],
+    "programMapping": [
+      {
+        "catalogName": "RTN$NAME1",
+        "program": "SRC$NAME"
+      },
+      {
+        "catalogName": "RTN$NAME2",
+        "fileName": "BP",
+        "program": "SRC$NAME"
+      },
+      {
+        "catalogName": "RTN$NAME3",
+        "account": "XDEMO",
+        "fileName": "BP",
+        "program": "SRC$NAME"
+      }
+    ]
+  },
+  "includeMapping": [
+    {
+      "includeFile": "",
+      "account": "",
+      "fileName": ""
+    }
+  ],
+  "accounts": [
+    {
+      "name": "accountName",
+      "path": "accountFullPath"
+    }
+  ]
+}
