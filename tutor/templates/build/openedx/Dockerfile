@@ -123,6 +123,7 @@ RUN nodeenv /openedx/nodeenv --node=16.14.0 --prebuilt
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
 WORKDIR /openedx/edx-platform
+COPY --from=edx-platform scripts/copy-node-modules.sh scripts
 RUN {% if is_buildkit_enabled() %}--mount=type=bind,from=edx-platform,source=/package.json,target=/openedx/edx-platform/package.json \
     --mount=type=bind,from=edx-platform,source=/package-lock.json,target=/openedx/edx-platform/package-lock.json \
     --mount=type=cache,target=/root/.npm,sharing=shared {% endif %}npm clean-install --no-audit --registry=$NPM_REGISTRY
