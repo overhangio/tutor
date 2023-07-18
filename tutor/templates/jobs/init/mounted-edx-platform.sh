@@ -19,8 +19,8 @@ pip install -e .
 # Regenerate node_modules
 npm clean-install
 
-# Regenerate static assets.
-openedx-assets build --env=dev
+# Link to static assets in dev image.
+link-static-to-devcache
 
 set -x
 echo "Done setting up bind-mounted edx-platform."

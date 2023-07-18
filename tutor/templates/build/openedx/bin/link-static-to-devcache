@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+cd /openedx/edx-platform
+
+for path in common/static/bundles lms/static/css lms/static/certificates/css cms/static/css ; do
+	if [[ -L "$path" ]] ; then
+		rm -rf "$path"
+	elif [[ -e "$path" ]] ; then
+		mv "$path" "${path}.bak"
+	fi
+	ln -s "/openedx/devcache/$path" "$path"
+done

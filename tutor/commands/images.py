@@ -34,7 +34,9 @@ def _add_core_images_to_build(
                 image,
                 os.path.join("build", image),
                 tutor_config.get_typed(config, tag, str),
-                (),
+                (
+                    "--target=production",
+                ),
             )
         )
 
