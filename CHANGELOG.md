@@ -20,6 +20,12 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.0.3'></a>
+## v16.0.3 (2023-07-28)
+
+- [Bugfix] Improve `tutor ... do settheme default` so that it reverts to the default theme rather than trying to switch to a nonexistent theme named "default". This will clear up some error noise from LMS/CMS logs. (by @kdmccormick)
+- [Security] Fix content libraries creation by unprivileged users in studio (see [security advisory](https://github.com/openedx/edx-platform/security/advisories/GHSA-3q74-3rfh-g37j)). (by @regisb)
+
 <a id='changelog-16.0.2'></a>
 ## v16.0.2 (2023-06-22)
 
