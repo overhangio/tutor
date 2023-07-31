@@ -143,13 +143,13 @@ class Filters:
 
     Many filters have a list of items as the first argument. Quite often, plugin
     developers just want to add a new item at the end of that list. In such cases there
-    is no need for a callback function. Instead, you can use the `add_item` method. For
+    is no need for a callback function. Instead, you can use the ``add_item`` method. For
     instance, you can add a "hello" to the init task of the lms container by modifying
     the :py:data:`CLI_DO_INIT_TASKS` filter::
 
         hooks.CLI_DO_INIT_TASKS.add_item(("lms", "echo hello"))
 
-    To add multiple items at a time, use `add_items`::
+    To add multiple items at a time, use ``add_items``::
 
         hooks.CLI_DO_INIT_TASKS.add_items(
             ("lms", "echo 'hello from lms'"),
@@ -157,7 +157,7 @@ class Filters:
         )
 
     The ``echo`` commands will then be run every time the "init" tasks are run, for
-    instance during `tutor local launch`.
+    instance during ``tutor local launch``.
 
     For more information about how filters work, check out the
     :py:class:`tutor.core.hooks.Filter` API.
@@ -178,17 +178,17 @@ class Filters:
     #:   all be added as subcommands of the main ``tutor`` command.
     CLI_COMMANDS: Filter[list[click.Command], []] = Filter()
 
-    #: List of `do ...` commands.
+    #: List of ``do ...`` commands.
     #:
     #: :parameter list commands: see :py:data:`CLI_COMMANDS`. These commands will be
-    #:   added as subcommands to the `local/dev/k8s do` commands. They must return a list of
+    #:   added as subcommands to the ``local/dev/k8s do`` commands. They must return a list of
     #:   ("service name", "service command") tuples. Each "service command" will be executed
     #:   in the "service" container, both in local, dev and k8s mode.
     CLI_DO_COMMANDS: Filter[
         list[Callable[[Any], Iterable[tuple[str, str]]]], []
     ] = Filter()
 
-    #: List of initialization tasks (scripts) to be run in the `init` job. This job
+    #: List of initialization tasks (scripts) to be run in the ``init`` job. This job
     #: includes all database migrations, setting up, etc. To run some tasks before or
     #: after others, they should be assigned a different priority.
     #:
@@ -325,13 +325,13 @@ class Filters:
     #:
     #: Out of the box, this filter will include all configuration settings, but also the following:
     #:
-    #: - `HOST_USER_ID`: the numerical ID of the user on the host.
-    #: - `TUTOR_APP`: the app name ("tutor" by default), used to determine the dev/local project names.
-    #: - `TUTOR_VERSION`: the current version of Tutor.
-    #: - `is_buildkit_enabled`: a boolean function that indicates whether BuildKit is available on the host.
-    #: - `iter_values_named`: a function to iterate on variables that start or end with a given string.
-    #: - `iter_mounts`: a function that yields compose-compatible bind-mounts for any given service.
-    #: - `patch`: a function to incorporate extra content into a template.
+    #: - ``HOST_USER_ID``: the numerical ID of the user on the host.
+    #: - ``TUTOR_APP``: the app name ("tutor" by default), used to determine the dev/local project names.
+    #: - ``TUTOR_VERSION``: the current version of Tutor.
+    #: - ``is_buildkit_enabled``: a boolean function that indicates whether BuildKit is available on the host.
+    #: - ``iter_values_named``: a function to iterate on variables that start or end with a given string.
+    #: - ``iter_mounts``: a function that yields compose-compatible bind-mounts for any given service.
+    #: - ``patch``: a function to incorporate extra content into a template.
     #:
     #: :parameter filters: list of (name, value) tuples.
     ENV_TEMPLATE_VARIABLES: Filter[list[tuple[str, Any]], []] = Filter()
@@ -391,7 +391,7 @@ class Filters:
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
     IMAGES_PUSH: Filter[list[tuple[str, str]], [Config]] = Filter()
 
-    #: List of plugin indexes that are loaded when we run `tutor plugins update`. By
+    #: List of plugin indexes that are loaded when we run ``tutor plugins update``. By
     #: default, the plugin indexes are stored in the user configuration. This filter makes
     #: it possible to extend and modify this list with plugins.
     #:
@@ -402,11 +402,11 @@ class Filters:
     #: Filter to modify the url of a plugin index url. This is convenient to alias
     #: plugin indexes with a simple name, such as "main" or "contrib".
     #:
-    #: :parameter str url: value passed to the `index add/remove` commands.
+    #: :parameter str url: value passed to the ``index add/remove`` commands.
     PLUGIN_INDEX_URL: Filter[str, []] = Filter()
 
     #: When installing an entry from a plugin index, the plugin data from the index will
-    #: go through this filter before it is passed along to `pip install`. Thus, this is a
+    #: go through this filter before it is passed along to ``pip install``. Thus, this is a
     #: good place to add custom authentication when you need to install from a private
     #: index.
     #:
