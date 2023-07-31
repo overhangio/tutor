@@ -147,7 +147,6 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
                 "--target",
                 "target",
                 "docker_args",
-                "--cache-from=type=registry,ref=service1:1.0.0-cache",
             ],
             list(image_build.call_args[0][1:]),
         )
