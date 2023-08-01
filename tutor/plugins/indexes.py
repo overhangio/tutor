@@ -31,7 +31,6 @@ def _get_index_url_from_alias(url: str) -> str:
     known_aliases = {
         "main": "https://overhang.io/tutor/main",
         "contrib": "https://overhang.io/tutor/contrib",
-        "wizard": "https://overhang.io/tutor/wizard",
     }
     return known_aliases.get(url, url)
 
