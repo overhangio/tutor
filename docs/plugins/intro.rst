@@ -45,13 +45,12 @@ Many plugins are available from plugin indexes. These indexes are lists of plugi
     tutor plugins update
     tutor plugins search
 
-More plugins can be downloaded from the "contrib" and "wizard" indexes::
+More plugins can be downloaded from the "contrib" index::
 
     tutor plugins index add contrib
-    tutor plugins index add wizard
     tutor plugins search
 
-The "main", "contrib" and "wizard" indexes include a curated list of plugins that are well maintained and introduce useful features to Open edX. These indexes are maintained by `Overhang.IO <https://overhang.io>`__. For more information about these indexes, refer to the official `overhangio/tpi <https://github.com/overhangio/tpi>`__ repository.
+The "main" and "contrib" indexes include a curated list of plugins that are well maintained and introduce useful features to Open edX. These indexes are maintained by `Overhang.IO <https://overhang.io>`__. For more information about these indexes, refer to the official `overhangio/tpi <https://github.com/overhangio/tpi>`__ repository.
 
 Thanks to these indexes, it is very easy to download and upgrade plugins. For instance, to install the `notes plugin <https://github.com/overhangio/tutor-notes/>`__::
 

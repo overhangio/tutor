@@ -1,1 +1,0 @@
-- [Bugfix] Do not display discussion units when the forum is not enabled. (by @regisb)

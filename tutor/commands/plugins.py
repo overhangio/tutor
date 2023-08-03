@@ -382,8 +382,8 @@ def index_add(context: Context, url: str) -> None:
     The index URL will be appended with '{version}/plugins.yml'. The index path can be
     either an http(s) url or a local file path.
 
-    For official indexes, there is no need to pass a full URL. Instead, use "main",
-    "contrib" or "wizard".
+    For official indexes, there is no need to pass a full URL. Instead, use "main" or
+    "contrib".
     """
     config = tutor_config.load_minimal(context.root)
     if indexes.add(url, config):

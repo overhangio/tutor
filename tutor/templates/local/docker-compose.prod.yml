@@ -6,7 +6,11 @@ services:
     restart: unless-stopped
     ports:
       - "{{ CADDY_HTTP_PORT }}:80"
-      {% if ENABLE_HTTPS and ENABLE_WEB_PROXY %}- "443:443"{% endif %}
+      {% if ENABLE_HTTPS and ENABLE_WEB_PROXY %}
+      - "443:443"
+      # include support for http/3
+      - "443:443/udp"
+      {% endif %}
     environment:
       default_site_port: "{% if not ENABLE_HTTPS or not ENABLE_WEB_PROXY %}:80{% endif %}"
     volumes:

@@ -14,7 +14,12 @@ spec:
       name: http
     {%- if ENABLE_HTTPS %}
     - port: 443
+      protocol: TCP
       name: https
+    # include support for http/3
+    - port: 443
+      protocol: UDP
+      name: http3
     {%- endif %}
   selector:
     app.kubernetes.io/name: caddy
