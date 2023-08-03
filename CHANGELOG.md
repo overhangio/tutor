@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.0.4'></a>
+## v16.0.4 (2023-08-03)
+
+- [Feature] Add support for HTTP/3, which considerably improves performance for Open edX. (by @regisb and @ghassanmas)
+- [Bugfix] Do not display discussion units when the forum is not enabled. (by @regisb)
+- [Improvement] Remove references to the wizard edition. (by @CodeWithEmad)
+
 <a id='changelog-16.0.3'></a>
 ## v16.0.3 (2023-07-28)
 

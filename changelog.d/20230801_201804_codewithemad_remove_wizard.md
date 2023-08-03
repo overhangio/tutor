@@ -1,1 +1,0 @@
- - [Improvement] Wizard references removed. (by @CodeWithEmad)
