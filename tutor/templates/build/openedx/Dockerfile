@@ -50,12 +50,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {%- else %}
 # Patch edx-platform
-# Security advisory: https://github.com/openedx/edx-platform/security/advisories/GHSA-3q74-3rfh-g37j
-# https://github.com/openedx/edx-platform/pull/32838
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/163259779297a7dccb28e1f8c3dfa4d2cbdb9655.patch | git am
-# Fix discussion units when forum is not enabled
-# https://github.com/openedx/edx-platform/pull/32464
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/a9f66705503288c360055ab80c7c3bfb884f75fe.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
