@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.0.5'></a>
+## v16.0.5 (2023-08-09)
+
+- [Improvement] Upgrade the Open edX default version to open-release/palm.2. (by @regisb)
+
 <a id='changelog-16.0.4'></a>
 ## v16.0.4 (2023-08-03)
 
