@@ -147,11 +147,11 @@ class Filters:
     instance, you can add a "hello" to the init task of the lms container by modifying
     the :py:data:`CLI_DO_INIT_TASKS` filter::
 
-        hooks.CLI_DO_INIT_TASKS.add_item(("lms", "echo hello"))
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(("lms", "echo hello"))
 
     To add multiple items at a time, use ``add_items``::
 
-        hooks.CLI_DO_INIT_TASKS.add_items(
+        hooks.Filters.CLI_DO_INIT_TASKS.add_items(
             ("lms", "echo 'hello from lms'"),
             ("cms", "echo 'hello from cms'"),
         )
