@@ -1,1 +1,0 @@
-- [Bugfix] Ask whether user wants to run locally during `tutor local launch`. (by @regisb)

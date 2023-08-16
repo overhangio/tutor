@@ -20,6 +20,18 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.1.0'></a>
+## v16.1.0 (2023-08-16)
+
+- [Improvement] Improve support of legacy non-BuildKit mode: (by @regisb)
+  - [Bugfix] Fix building of openedx Docker image.
+  - [Improvement] Remove `--cache-from` build option.
+  - [Improvement] Add a warning concerning the lack of support of the `--build-context` option.
+- 💥[Bugfix] Fix mysql crash after upgrade to Palm. After an upgrade to Palm, the mysql client run by Django defaults to a utf8mb4 character set and collation, but the mysql server still runs with utf8mb3. This causes broken data during migration from Olive to Palm, and more generally when data is written to the database. To resolve this issue, we explicitely set the utf8mb3 charset and collation in the client. Users who were running Palm might have to fix their data manually. In the future we will upgrade the mysql server to utf8mb4. (by @regisb)
+- [Improvement] We upgrade to MySQL 8.1.0 to avoid having to restart the server after the upgrade.
+- [Bugfix] Ask whether user wants to run locally during `tutor local launch`. (by @regisb)
+- [Bugfix] Fix a race condition that could prevent a newly provisioned Studio container from starting due to a FileExistsError when creating logs directory.
+
 <a id='changelog-16.0.5'></a>
 ## v16.0.5 (2023-08-09)
 
@@ -253,7 +265,6 @@ pen-release/palm.master --repo-dir=test-course/course`. (by @regisb)
 - [Bugfix] Build openedx-dev Docker image even when the host user is root, for instance on Windows. (by @regisb)
 - [Bugfix] Patch nutmeg.1 release with [LTI 1.3 fix](https://github.com/openedx/edx-platform/pull/30716). (by @ormsbee)
 - [Improvement] Make it possible to override k8s resources in plugins using `k8s-override` patch. (by @foadlind)
-- [Bugfix] Fix a race condition that could prevent a newly provisioned Studio container from starting due to a FileExistsError when creating logs directory.
 
 ## v14.0.2 (2022-06-27)
 
