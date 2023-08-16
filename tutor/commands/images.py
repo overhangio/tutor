@@ -223,16 +223,27 @@ def build(
             image_build_args = [*command_args, *custom_args]
 
             # Registry cache
-            if not no_registry_cache:
-                image_build_args.append(f"--cache-from=type=registry,ref={tag}-cache")
-            if cache_to_registry:
-                image_build_args.append(
-                    f"--cache-to=type=registry,mode=max,ref={tag}-cache"
-                )
+            if utils.is_buildkit_enabled():
+                if not no_registry_cache:
+                    image_build_args.append(
+                        f"--cache-from=type=registry,ref={tag}-cache"
+                    )
+                if cache_to_registry:
+                    image_build_args.append(
+                        f"--cache-to=type=registry,mode=max,ref={tag}-cache"
+                    )
 
             # Build contexts
             for host_path, stage_name in build_contexts.get(name, []):
-                image_build_args.append(f"--build-context={stage_name}={host_path}")
+                if utils.is_buildkit_enabled():
+                    fmt.echo_info(
+                        f"Adding {host_path} to the build context '{stage_name}' of image '{image}'"
+                    )
+                    image_build_args.append(f"--build-context={stage_name}={host_path}")
+                else:
+                    fmt.echo_alert(
+                        f"Unable to add {host_path} to the build context '{stage_name}' of image '{host_path}' because BuildKit is disabled."
+                    )
 
             # Build
             images.build(
@@ -257,9 +268,6 @@ def get_image_build_contexts(config: Config) -> dict[str, list[tuple[str, str]]]
         for image_name, stage_name in hooks.Filters.IMAGES_BUILD_MOUNTS.iterate(
             user_mount
         ):
-            fmt.echo_info(
-                f"Adding {user_mount} to the build context '{stage_name}' of image '{image_name}'"
-            )
             if image_name not in build_contexts:
                 build_contexts[image_name] = []
             build_contexts[image_name].append((user_mount, stage_name))

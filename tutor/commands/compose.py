@@ -90,13 +90,13 @@ def launch(
     skip_build: bool,
 ) -> None:
     context_name = context.obj.NAME
-    run_for_prod = context_name != "dev"
+    run_for_prod = False if context_name == "dev" else None
 
     utils.warn_macos_docker_memory()
 
     # Upgrade has to run before configuration
-    interactive_upgrade(context, not non_interactive, run_for_prod)
-    interactive_configuration(context, not non_interactive, run_for_prod)
+    interactive_upgrade(context, not non_interactive, run_for_prod=run_for_prod)
+    interactive_configuration(context, not non_interactive, run_for_prod=run_for_prod)
 
     config = tutor_config.load(context.obj.root)
 
@@ -136,7 +136,7 @@ def launch(
 
 
 def interactive_upgrade(
-    context: click.Context, interactive: bool, run_for_prod: bool
+    context: click.Context, interactive: bool, run_for_prod: t.Optional[bool]
 ) -> None:
     """
     Piece of code that is only used in launch.
@@ -187,7 +187,7 @@ Are you sure you want to continue?"""
 
 
 def interactive_configuration(
-    context: click.Context, interactive: bool, run_for_prod: bool
+    context: click.Context, interactive: bool, run_for_prod: t.Optional[bool] = None
 ) -> None:
     click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)

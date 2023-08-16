@@ -81,7 +81,7 @@ This configuration parameter defines which MongoDB Docker image to use.
 
 .. https://hub.docker.com/_/mysql/tags?page=1&name=8.0
 
-- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:8.0.33"``)
+- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:8.1.0"``)
 
 This configuration parameter defines which MySQL Docker image to use.
 
@@ -136,7 +136,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/palm.1"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/palm.2"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
