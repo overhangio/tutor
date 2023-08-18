@@ -251,8 +251,7 @@ class Filters:
     #:   names must be prefixed with the plugin name in all-caps.
     CONFIG_UNIQUE: Filter[list[tuple[str, Any]], []] = Filter()
 
-    #: Use this filter to modify the ``docker build`` command. For instance, to replace
-    #: the ``build`` subcommand by ``buildx build``.
+    #: Use this filter to modify the ``docker build`` command.
     #:
     #: :parameter list[str] command: the full build command, including options and
     #:   arguments. Note that these arguments do not include the leading ``docker`` command.
@@ -335,7 +334,7 @@ class Filters:
     #: - ``HOST_USER_ID``: the numerical ID of the user on the host.
     #: - ``TUTOR_APP``: the app name ("tutor" by default), used to determine the dev/local project names.
     #: - ``TUTOR_VERSION``: the current version of Tutor.
-    #: - ``is_buildkit_enabled``: a boolean function that indicates whether BuildKit is available on the host.
+    #: - ``is_buildkit_enabled``: a deprecated function which always returns ``True`` now. Will be removed after Quince.
     #: - ``iter_values_named``: a function to iterate on variables that start or end with a given string.
     #: - ``iter_mounts``: a function that yields compose-compatible bind-mounts for any given service.
     #: - ``patch``: a function to incorporate extra content into a template.

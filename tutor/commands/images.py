@@ -156,7 +156,7 @@ def images_command() -> None:
     # Export image to docker. This is necessary to make the image available to docker-compose.
     # The `--load` option is a shorthand for `--output=type=docker`.
     default="type=docker",
-    help="Same as `docker build --output=...`. This option will only be used when BuildKit is enabled.",
+    help="Same as `docker build --output=...`.",
 )
 @click.option(
     "-a",
@@ -211,7 +211,7 @@ def build(
         command_args += ["--add-host", add_host]
     if target:
         command_args += ["--target", target]
-    if utils.is_buildkit_enabled() and docker_output:
+    if docker_output:
         command_args.append(f"--output={docker_output}")
     if docker_args:
         command_args += docker_args
@@ -223,27 +223,19 @@ def build(
             image_build_args = [*command_args, *custom_args]
 
             # Registry cache
-            if utils.is_buildkit_enabled():
-                if not no_registry_cache:
-                    image_build_args.append(
-                        f"--cache-from=type=registry,ref={tag}-cache"
-                    )
-                if cache_to_registry:
-                    image_build_args.append(
-                        f"--cache-to=type=registry,mode=max,ref={tag}-cache"
-                    )
+            if not no_registry_cache:
+                image_build_args.append(f"--cache-from=type=registry,ref={tag}-cache")
+            if cache_to_registry:
+                image_build_args.append(
+                    f"--cache-to=type=registry,mode=max,ref={tag}-cache"
+                )
 
             # Build contexts
             for host_path, stage_name in build_contexts.get(name, []):
-                if utils.is_buildkit_enabled():
-                    fmt.echo_info(
-                        f"Adding {host_path} to the build context '{stage_name}' of image '{image}'"
-                    )
-                    image_build_args.append(f"--build-context={stage_name}={host_path}")
-                else:
-                    fmt.echo_alert(
-                        f"Unable to add {host_path} to the build context '{stage_name}' of image '{host_path}' because BuildKit is disabled."
-                    )
+                fmt.echo_info(
+                    f"Adding {host_path} to the build context '{stage_name}' of image '{image}'"
+                )
+                image_build_args.append(f"--build-context={stage_name}={host_path}")
 
             # Build
             images.build(

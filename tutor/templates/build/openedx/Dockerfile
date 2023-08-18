@@ -1,11 +1,11 @@
-{% if is_buildkit_enabled() %}# syntax=docker/dockerfile:1.4{% endif %}
+# syntax=docker/dockerfile:1.4
 ###### Minimal image with base system requirements for most stages
 FROM docker.io/ubuntu:20.04 as minimal
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked{% endif %} \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
     apt install -y build-essential curl git language-pack-en
 ENV LC_ALL en_US.UTF-8
@@ -14,8 +14,9 @@ ENV LC_ALL en_US.UTF-8
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
 FROM minimal as python
 # https://github.com/pyenv/pyenv/wiki/Common-build-problems#prerequisites
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked {% endif %}apt update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt update && \
     apt install -y libssl-dev zlib1g-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
     xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
@@ -77,12 +78,14 @@ ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 ENV XDG_CACHE_HOME /openedx/.cache
 
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked {% endif %}apt update \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt update \
     && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
 
 # Install the right version of pip/setuptools
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}pip install \
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
@@ -92,14 +95,13 @@ RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,
 RUN pip install https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
 
 # Install base requirements
-{% if not is_buildkit_enabled() %}
-COPY --from=edx-platform /requirements/edx/base.txt /openedx/edx-platform/requirements/edx/base.txt
-{% endif %}
-RUN {% if is_buildkit_enabled() %}--mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
-    --mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}pip install -r /openedx/edx-platform/requirements/edx/base.txt
+RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
+    --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install -r /openedx/edx-platform/requirements/edx/base.txt
 
 # Install extra requirements
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}pip install \
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.2.0 \
     # uwsgi server https://pypi.org/project/uWSGI/
@@ -109,11 +111,14 @@ RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,
 
 # Install private requirements: this is useful for installing custom xblocks.
 COPY ./requirements/ /openedx/requirements
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}cd /openedx/requirements/ \
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+  cd /openedx/requirements/ \
   && touch ./private.txt \
   && pip install -r ./private.txt
 
-{% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}pip install '{{ extra_requirements }}'
+{% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install '{{ extra_requirements }}'
 {% endfor %}
 
 ###### Install nodejs with nodeenv in /openedx/nodeenv
@@ -129,21 +134,19 @@ RUN nodeenv /openedx/nodeenv --node=16.14.0 --prebuilt
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
 WORKDIR /openedx/edx-platform
-{% if not is_buildkit_enabled() %}
-COPY --from=edx-platform /package.json /openedx/edx-platform/package.json
-COPY --from=edx-platform /package-lock.json /openedx/edx-platform/package-lock.json
-{% endif %}
-RUN {% if is_buildkit_enabled() %}--mount=type=bind,from=edx-platform,source=/package.json,target=/openedx/edx-platform/package.json \
+RUN --mount=type=bind,from=edx-platform,source=/package.json,target=/openedx/edx-platform/package.json \
     --mount=type=bind,from=edx-platform,source=/package-lock.json,target=/openedx/edx-platform/package-lock.json \
     --mount=type=bind,from=edx-platform,source=/scripts/copy-node-modules.sh,target=/openedx/edx-platform/scripts/copy-node-modules.sh \
-    --mount=type=cache,target=/root/.npm,sharing=shared {% endif %}npm clean-install --no-audit --registry=$NPM_REGISTRY
+    --mount=type=cache,target=/root/.npm,sharing=shared \
+    npm clean-install --no-audit --registry=$NPM_REGISTRY
 
 ###### Production image with system and python requirements
 FROM minimal as production
 
 # Install system requirements
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked {% endif %}apt update \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt update \
     && apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng-dev libsqlite3-dev libxmlsec1-dev lynx mysql-client ntp pkg-config rdfind
 
 # From then on, run as unprivileged "app" user
@@ -154,7 +157,7 @@ RUN useradd --no-log-init --home-dir /openedx --create-home --shell /bin/bash --
 USER ${APP_USER_ID}
 
 # https://hub.docker.com/r/powerman/dockerize/tags
-COPY {% if is_buildkit_enabled() %}--link {% endif %}--from=docker.io/powerman/dockerize:0.19.0 /usr/local/bin/dockerize /usr/local/bin/dockerize
+COPY --link --from=docker.io/powerman/dockerize:0.19.0 /usr/local/bin/dockerize /usr/local/bin/dockerize
 COPY --chown=app:app --from=edx-platform / /openedx/edx-platform
 COPY --chown=app:app --from=locales /openedx/locale /openedx/locale
 COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv
@@ -248,16 +251,19 @@ FROM production as development
 
 # Install useful system requirements (as root)
 USER root
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked {% endif %}apt update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt update && \
     apt install -y vim iputils-ping dnsutils telnet
 USER app
 
 # Install dev python requirements
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}pip install -r requirements/edx/development.txt
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install -r requirements/edx/development.txt
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython
-RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}pip install ipdb==0.13.13 ipython==8.12.0
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install ipdb==0.13.13 ipython==8.12.0
 
 # Add ipdb as default PYTHONBREAKPOINT
 ENV PYTHONBREAKPOINT=ipdb.set_trace
