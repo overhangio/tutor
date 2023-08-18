@@ -9,7 +9,7 @@ Requirements
 ------------
 
 * Supported OS: Tutor runs on any 64-bit, UNIX-based OS. It was also reported to work on Windows (with `WSL 2 <https://docs.microsoft.com/en-us/windows/wsl/install>`__).
-* Architecture: support for ARM64 is a work-in-progress. See `this issue <https://github.com/overhangio/tutor/issues/510>`__.
+* Architecture: Both AMD64 and ARM64 are supported.
 * Required software:
 
     - `Docker <https://docs.docker.com/engine/installation/>`__: v20.10.15+
@@ -17,7 +17,6 @@ Requirements
 
 .. warning::
     Do not attempt to simply run ``apt-get install docker docker-compose`` on older Ubuntu platforms, such as 16.04 (Xenial), as you will get older versions of these utilities.
-
 * Ports 80 and 443 should be open. If other web services run on these ports, check the tutorial on :ref:`how to setup a web proxy <web_proxy>`.
 * Hardware:
 
