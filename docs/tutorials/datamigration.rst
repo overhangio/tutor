@@ -1,3 +1,5 @@
+.. _backup_tutorial:
+
 Making backups and migrating data
 ---------------------------------
 
@@ -10,7 +12,7 @@ With Tutor, all data are stored in a single folder. This means that it's extreme
 
 3. Transfer the configuration, environment, and platform data from server 1 to server 2::
 
-    rsync -avr "$(tutor config printroot)/" username@server2:/tmp/tutor/
+    sudo -avr "$(tutor config printroot)/" username@server2:/tmp/tutor/
 
 4. On server 2, move the data to the right location::
 
