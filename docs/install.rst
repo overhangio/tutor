@@ -9,7 +9,7 @@ Requirements
 ------------
 
 * Supported OS: Tutor runs on any 64-bit, UNIX-based OS. It was also reported to work on Windows (with `WSL 2 <https://docs.microsoft.com/en-us/windows/wsl/install>`__).
-* Architecture: support for ARM64 is a work-in-progress. See `this issue <https://github.com/overhangio/tutor/issues/510>`__.
+* Architecture: Both AMD64 and ARM64 are supported.
 * Required software:
 
     - `Docker <https://docs.docker.com/engine/installation/>`__: v20.10.15+
@@ -114,7 +114,7 @@ Upgrading to a new Open edX release
 Major Open edX releases are published twice a year, in June and December, by the Open edX `Build/Test/Release working group <https://discuss.openedx.org/c/working-groups/build-test-release/30>`__. When a new Open edX release comes out, Tutor gets a major version bump (see :ref:`versioning`). Such an upgrade typically includes multiple breaking changes. Any upgrade is final because downgrading is not supported. Thus, when upgrading your platform from one major version to the next, it is strongly recommended to do the following:
 
 1. Read the changes listed in the `CHANGELOG.md <https://github.com/overhangio/tutor/blob/master/CHANGELOG.md>`__ file. Breaking changes are identified by a "💥".
-2. Perform a backup. On a local installation, this is typically done with::
+2. Perform a backup (see the :ref:`backup tutorial <backup_tutorial>`). On a local installation, this is typically done with::
 
     tutor local stop
     sudo rsync -avr "$(tutor config printroot)"/ /tmp/tutor-backup/

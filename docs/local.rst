@@ -6,7 +6,7 @@ Local deployment
 This method is for deploying Open edX locally on a single server, where docker images are orchestrated with `docker-compose <https://docs.docker.com/compose/overview/>`_.
 
 .. note::
-    Tutor is compatible with the ``docker compose`` subcommand. However, this support is still in beta and we're not sure it will behave the same as the previous ``docker-compose`` command. So ``docker-compose`` will be preferred, unless you set an environment variable ``TUTOR_USE_COMPOSE_SUBCOMMAND`` to enforce using ``docker compose``.
+    As of v16.0.0, Tutor now uses the ``docker compose`` subcommand instead of the separate ``docker-compose`` command.
 
 .. _tutor_root:
 
