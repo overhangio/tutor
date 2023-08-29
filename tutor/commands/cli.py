@@ -32,7 +32,7 @@ def main() -> None:
         sys.exit(1)
 
 
-class TutorCli(click.MultiCommand):
+class TutorCli(click.Group):
     """
     Dynamically load subcommands at runtime.
 
@@ -43,26 +43,14 @@ class TutorCli(click.MultiCommand):
 
     IS_ROOT_READY = False
 
-    @classmethod
-    def iter_commands(cls, ctx: click.Context) -> t.Iterator[click.Command]:
+    def get_command(
+        self, ctx: click.Context, cmd_name: str
+    ) -> t.Optional[click.Command]:
         """
-        Return the list of subcommands (click.Command).
+        This is run when passing a command from the CLI. E.g: tutor config ...
         """
-        cls.ensure_plugins_enabled(ctx)
-        yield from hooks.Filters.CLI_COMMANDS.iterate()
-
-    @classmethod
-    def ensure_plugins_enabled(cls, ctx: click.Context) -> None:
-        """
-        We enable plugins as soon as possible to have access to commands.
-        """
-        if not "root" in ctx.params:
-            # When generating docs, this function is called with empty args.
-            # That's ok, we just ignore it.
-            return
-        if not cls.IS_ROOT_READY:
-            hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
-            cls.IS_ROOT_READY = True
+        self.ensure_plugins_enabled(ctx)
+        return super().get_command(ctx, cmd_name=cmd_name)
 
     def list_commands(self, ctx: click.Context) -> list[str]:
         """
@@ -70,20 +58,22 @@ class TutorCli(click.MultiCommand):
         - shell autocompletion: tutor <tab>
         - print help: tutor, tutor -h
         """
-        return sorted(
-            [command.name or "<undefined>" for command in self.iter_commands(ctx)]
-        )
+        self.ensure_plugins_enabled(ctx)
+        return super().list_commands(ctx)
 
-    def get_command(
-        self, ctx: click.Context, cmd_name: str
-    ) -> t.Optional[click.Command]:
+    def ensure_plugins_enabled(self, ctx: click.Context) -> None:
         """
-        This is run when passing a command from the CLI. E.g: tutor config ...
+        We enable plugins as soon as possible to have access to commands.
         """
-        for command in self.iter_commands(ctx):
-            if cmd_name == command.name:
-                return command
-        return None
+        if not "root" in ctx.params:
+            # When generating docs, this function is called with empty args.
+            # That's ok, we just ignore it.
+            return
+        if not self.IS_ROOT_READY:
+            hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
+            self.IS_ROOT_READY = True
+            for cmd in hooks.Filters.CLI_COMMANDS.iterate():
+                self.add_command(cmd)
 
 
 @click.group(
