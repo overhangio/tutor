@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.1.1'></a>
+## v16.1.1 (2023-08-29)
+
+- 💥[Bugfix] Apply "fix mysql crash after upgrade to Palm" from 16.1.0 to `tutor k8s` deployments, as well. Users previously running `tutor k8s` with `RUN_MYSQL: true`, with any version between 16.0.0 and 16.1.0 including, might have to fix their data manually. For users running `tutor local`, this change has no effect, as the underlying issue was already fixed in 16.1.0. For users running `tutor k8s` with `RUN_MYSQL: false`, this change is also a no-op. (by @fghaas)
+
 <a id='changelog-16.1.0'></a>
 ## v16.1.0 (2023-08-16)
 
