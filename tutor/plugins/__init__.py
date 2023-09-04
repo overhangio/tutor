@@ -10,7 +10,7 @@ from tutor import exceptions, fmt, hooks
 from tutor.types import Config, get_typed
 
 # Import modules to trigger hook creation
-from . import v0, v1
+from . import openedx, v0, v1
 
 # Cache of plugin patches, for efficiency
 ENV_PATCHES_DICT: dict[str, list[str]] = {}

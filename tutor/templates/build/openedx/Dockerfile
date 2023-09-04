@@ -61,6 +61,11 @@ RUN git config --global user.email "tutor@overhang.io" \
 FROM scratch as edx-platform
 COPY --from=code /openedx/edx-platform /
 
+{# Create empty layers for all bind-mounted directories #}
+{% for name in iter_mounted_directories(MOUNTS, "openedx") %}
+FROM scratch as mnt-{{ name }}
+{% endfor %}
+
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
 ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
@@ -159,6 +164,7 @@ COPY --chown=app:app --from=locales /openedx/locale /openedx/locale
 COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv
 COPY --chown=app:app --from=python-requirements /openedx/venv /openedx/venv
 COPY --chown=app:app --from=python-requirements /openedx/requirements /openedx/requirements
+COPY --chown=app:app --from=python-requirements /mnt /mnt
 COPY --chown=app:app --from=nodejs-requirements /openedx/nodeenv /openedx/nodeenv
 COPY --chown=app:app --from=nodejs-requirements /openedx/edx-platform/node_modules /openedx/node_modules
 
@@ -168,6 +174,12 @@ RUN ln -s /openedx/node_modules /openedx/edx-platform/node_modules
 ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 WORKDIR /openedx/edx-platform
+
+{# Install auto-mounted directories as Python packages. #}
+{% for name in iter_mounted_directories(MOUNTS, "openedx") %}
+COPY --from=mnt-{{ name }} --chown=app:app / /mnt/{{ name }}
+RUN pip install -e "/mnt/{{ name }}"
+{% endfor %}
 
 # We install edx-platform here because it creates an egg-info folder in the current
 # repo. We need both the source code and the virtualenv to run this command.
@@ -257,6 +269,12 @@ RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython
 RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,sharing=shared {% endif %}pip install ipdb==0.13.13 ipython==8.12.0
+
+{# Re-install mounted requirements, otherwise they will be superseded by upstream reqs #}
+{% for name in iter_mounted_directories(MOUNTS, "openedx") %}
+COPY --from=mnt-{{ name }} --chown=app:app / /mnt/{{ name }}
+RUN pip install -e "/mnt/{{ name }}"
+{% endfor %}
 
 # Add ipdb as default PYTHONBREAKPOINT
 ENV PYTHONBREAKPOINT=ipdb.set_trace

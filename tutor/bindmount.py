@@ -12,7 +12,7 @@ def get_mounts(config: types.Config) -> list[str]:
     return types.get_typed(config, "MOUNTS", list)
 
 
-def iter_mounts(user_mounts: list[str], name: str) -> t.Iterable[str]:
+def iter_mounts(user_mounts: list[str], *names: str) -> t.Iterable[str]:
     """
     Iterate on the bind-mounts that are available to any given compose service. The list
     of bind-mounts is parsed from `user_mounts` and we yield only those for service
@@ -23,7 +23,7 @@ def iter_mounts(user_mounts: list[str], name: str) -> t.Iterable[str]:
     """
     for user_mount in user_mounts:
         for service, host_path, container_path in parse_mount(user_mount):
-            if service == name:
+            if service in names:
                 yield f"{host_path}:{container_path}"
 
 
