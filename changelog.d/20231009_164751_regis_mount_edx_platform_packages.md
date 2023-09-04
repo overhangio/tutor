@@ -1,0 +1,2 @@
+- [Feature] Make it easy to work on 3rd-party edx-platform Python packages with `tutor mounts add /path/to/my/package`. (by @regisb)
+- [Feature] The ``iter_mounts`` template function can now take multiple image names as argument. This should concern only very advanced users. (by @regisb)

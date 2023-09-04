@@ -5,6 +5,8 @@ Open edX development
 
 In addition to running Open edX in production, Tutor can be used for local development of Open edX. This means that it is possible to hack on Open edX without setting up a Virtual Machine. Essentially, this replaces the devstack provided by edX.
 
+For detailed explanations on how to work on edx-platform and its dependencies, see the :ref:`edx_platform` tutorial.
+
 .. _edx_platform_dev_env:
 
 First-time setup
@@ -12,7 +14,7 @@ First-time setup
 
 Firstly, either :ref:`install Tutor <install>` (for development against the named releases of Open edX) or :ref:`install Tutor Nightly <nightly>` (for development against Open edX's master branches).
 
-Then, optionally, tell Tutor to use a local fork of edx-platform.::
+Then, optionally, tell Tutor to use a local fork of edx-platform::
 
     tutor mounts add ./edx-platform
 
@@ -28,7 +30,6 @@ This will perform several tasks. It will:
 * disable HTTPS,
 * set ``LMS_HOST`` to `local.overhang.io <http://local.overhang.io>`_ (a convenience domain that simply `points at 127.0.0.1 <https://dnschecker.org/#A/local.overhang.io>`_),
 * prompt for a platform details (with suitable defaults),
-* build an ``openedx-dev`` image,
 * start LMS, CMS, supporting services, and any plugged-in services,
 * ensure databases are created and migrated, and
 * run service initialization scripts, such as service user creation and Waffle configuration.
@@ -82,20 +83,6 @@ When running containers attached, stop the platform with ``Ctrl+c``, or switch t
 Finally, the platform can also be started back up with ``launch``. It will take longer than ``start``, but it will ensure that config is applied, databases are provisioned & migrated, plugins are fully initialized, and (if applicable) the bind-mounted edx-platform is set up. Notably, ``launch`` is idempotent, so it is always safe to run it again without risk to data. Including the ``--pullimages`` flag will also ensure that container images are up-to-date::
 
   tutor dev launch --pullimages
-
-Debugging with breakpoints
---------------------------
-
-To debug a local edx-platform repository, first, start development in detached mode (with ``-d``), add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in the code. Then, attach to the applicable service's container by running ``start`` (without ``-d``) followed by the service's name::
-
-  # Start in detached mode:
-  tutor dev start -d
-
-  # Debugging LMS:
-  tutor dev start lms
-
-  # Or, debugging CMS:
-  tutor dev start cms
 
 Running arbitrary commands
 --------------------------
@@ -234,7 +221,7 @@ You can then edit the files in ``~/venv`` on your local filesystem and see the c
 Manual bind-mount to any directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. warning:: Manually bind-mounting volumes with the ``--volume`` option makes it difficult to simultaneously bind-mount to multiple containers. Also, the ``--volume`` options are not compatible with ``start`` commands. For an alternative, see the :ref:`persistent mounts <persistent_mounts>`.
+.. warning:: Manually bind-mounting volumes with the ``--volume`` option makes it difficult to simultaneously bind-mount to multiple containers. Also, the ``--volume`` options are not compatible with ``start`` commands. As an alternative, you should consider following the instructions above: :ref:`persistent_mounts`.
 
 The above solution may not work for you if you already have an existing directory, outside of the "volumes/" directory, which you would like mounted in one of your containers. For instance, you may want to mount your copy of the `edx-platform <https://github.com/openedx/edx-platform/>`__ repository. In such cases, you can simply use the ``-v/--volume`` `Docker option <https://docs.docker.com/storage/volumes/#choose-the--v-or---mount-flag>`__::
 
@@ -242,6 +229,8 @@ The above solution may not work for you if you already have an existing director
 
 Override docker-compose volumes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. warning:: While the option described below "works", it will only bind-mount directories at run-time. In many cases you really want to bind-mount directories at build-time. For instance: when working on edx-platform requirements. As an alternative, you should consider following the instructions above: :ref:`persistent_mounts`.
 
 Adding items to the ``MOUNTS`` setting effectively adds new bind-mount volumes to the ``docker-compose.yml`` files. But you might want to have more control over your volumes, such as adding read-only options, or customising other fields of the different services. To address these issues, you can create a ``docker-compose.override.yml`` file that will specify custom volumes to be used with all ``dev`` commands::
 
@@ -268,55 +257,3 @@ This override file will be loaded when running any ``tutor dev ..`` command. The
 
 .. note::
     The ``tutor local`` commands load the ``docker-compose.override.yml`` file from the ``$(tutor config printroot)/env/local/docker-compose.override.yml`` directory. One-time jobs from initialisation commands load the ``local/docker-compose.jobs.override.yml`` and ``dev/docker-compose.jobs.override.yml``.
-
-Common tasks
-------------
-
-XBlock and edx-platform plugin development
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In some cases, you will have to develop features for packages that are pip-installed next to the edx-platform. This is quite easy with Tutor. Just add your packages to the ``$(tutor config printroot)/env/build/openedx/requirements/private.txt`` file. To avoid re-building the openedx Docker image at every change, you should add your package in editable mode. For instance::
-
-    echo "-e ./mypackage" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
-
-The ``requirements`` folder should have the following content::
-
-    env/build/openedx/requirements/
-        private.txt
-        mypackage/
-            setup.py
-            ...
-
-You will have to re-build the openedx Docker image once::
-
-    tutor images build openedx
-
-You should then run the development server as usual, with ``start``. Every change made to the ``mypackage`` folder will be picked up and the development server will be automatically reloaded.
-
-Running edx-platform unit tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/openedx/edx-platform/>`__. To do so, run a shell in the LMS development container::
-
-    tutor dev run lms bash
-
-Then, run unit tests with ``pytest`` commands::
-
-    # Run tests on common apps
-    unset DJANGO_SETTINGS_MODULE
-    unset SERVICE_VARIANT
-    export EDXAPP_TEST_MONGO_HOST=mongodb
-    pytest common
-    pytest openedx
-    pytest xmodule
-
-    # Run tests on LMS
-    export DJANGO_SETTINGS_MODULE=lms.envs.tutor.test
-    pytest lms
-
-    # Run tests on CMS
-    export DJANGO_SETTINGS_MODULE=cms.envs.tutor.test
-    pytest cms
-
-.. note::
-    Getting all edx-platform unit tests to pass on Tutor is currently a work-in-progress. Some unit tests are still failing. If you manage to fix some of these, please report your findings in the `Open edX forum <https://discuss.openedx.org/tag/tutor>`__.

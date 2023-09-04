@@ -426,38 +426,6 @@ def dc_command(
     context.job_runner(config).docker_compose(command, *args)
 
 
-@hooks.Filters.COMPOSE_MOUNTS.add()
-def _mount_edx_platform(
-    volumes: list[tuple[str, str]], name: str
-) -> list[tuple[str, str]]:
-    """
-    When mounting edx-platform with `tutor mounts add /path/to/edx-platform`,
-    bind-mount the host repo in the lms/cms containers.
-    """
-    if name == "edx-platform":
-        path = "/openedx/edx-platform"
-        volumes += [
-            ("lms", path),
-            ("cms", path),
-            ("lms-worker", path),
-            ("cms-worker", path),
-            ("lms-job", path),
-            ("cms-job", path),
-        ]
-    return volumes
-
-
-@hooks.Filters.APP_PUBLIC_HOSTS.add()
-def _edx_platform_public_hosts(
-    hosts: list[str], context_name: t.Literal["local", "dev"]
-) -> list[str]:
-    if context_name == "dev":
-        hosts += ["{{ LMS_HOST }}:8000", "{{ CMS_HOST }}:8001"]
-    else:
-        hosts += ["{{ LMS_HOST }}", "{{ CMS_HOST }}"]
-    return hosts
-
-
 hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(("iter_mounts", bindmount.iter_mounts))
 
 
