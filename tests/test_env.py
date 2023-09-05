@@ -64,6 +64,7 @@ class EnvTests(PluginsTestCase):
         }
         self.assertEqual("ab", env.render_unknown(config, "{{ var1 }}b"))
         self.assertEqual({"x": "ac"}, env.render_unknown(config, {"x": "{{ var1 }}c"}))
+        self.assertEqual(["x", "ac"], env.render_unknown(config, ["x", "{{ var1 }}c"]))
 
     def test_common_domain(self) -> None:
         self.assertEqual(
