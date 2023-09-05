@@ -1,0 +1,1 @@
+- [Bugfix] Render config settings that are inside lists. (by @regisb)

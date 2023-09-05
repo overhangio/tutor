@@ -376,6 +376,8 @@ def render_unknown(config: Config, value: t.Any) -> t.Any:
         return render_str(config, value)
     if isinstance(value, dict):
         return {k: render_unknown(config, v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [render_unknown(config, v) for v in value]
     return value
 
 
