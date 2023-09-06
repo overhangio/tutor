@@ -41,6 +41,10 @@ class SerializeTests(unittest.TestCase):
                 "x=key1:\n  subkey: value\nkey2:\n  subkey: value"
             ),
         )
+        self.assertEqual(
+            ("INDIGO_PRIMARY_COLOR", "#225522"),
+            serialize.parse_key_value("INDIGO_PRIMARY_COLOR=#225522"),
+        )
 
     def test_str_format(self) -> None:
         self.assertEqual("true", serialize.str_format(True))

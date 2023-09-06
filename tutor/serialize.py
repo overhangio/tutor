@@ -73,4 +73,8 @@ def parse_key_value(text: str) -> t.Optional[tuple[str, t.Any]]:
     if not value:
         # Empty strings are interpreted as null values, which is incorrect.
         value = "''"
+    elif "\n" not in value and value.startswith("#"):
+        # Single-line string that starts with a pound # key
+        # We need to escape the string, otherwise pound will be interpreted as a comment.
+        value = f'"{value}"'
     return key, parse(value)
