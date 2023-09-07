@@ -1,5 +1,6 @@
 # change version ranges when upgrading from palm
 tutor-android>=16.0.0,<17.0.0
+tutor-cairn>=16.0.0,<17.0.0
 tutor-discovery>=16.0.0,<17.0.0
 tutor-ecommerce>=16.0.0,<17.0.0
 tutor-forum>=16.0.0,<17.0.0
