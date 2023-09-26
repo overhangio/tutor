@@ -1,0 +1,1 @@
+- 💥[Feature] New action introduced: CONFIG_LOADED. This actions is called whenever the config is loaded. (by @CodeWithEmad)

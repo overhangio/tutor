@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 
 import os
 
@@ -26,6 +27,15 @@ def load(root: str) -> Config:
     return load_full(root)
 
 
+def load_defaults() -> Config:
+    """
+    Load default configuration.
+    """
+    config: Config = {}
+    update_with_defaults(config)
+    return config
+
+
 def load_minimal(root: str) -> Config:
     """
     Load a minimal configuration composed of the user and the base config.
@@ -51,6 +61,7 @@ def load_full(root: str) -> Config:
     update_with_base(config)
     update_with_defaults(config)
     render_full(config)
+    hooks.Actions.CONFIG_LOADED.do(deepcopy(config))
     return config
 
 
@@ -319,3 +330,19 @@ def _update_enabled_plugins_on_unload(_plugin: str, _root: str, config: Config) 
     Note that this action must be performed after the plugin has been unloaded, hence the low priority.
     """
     save_enabled_plugins(config)
+
+
+@hooks.Actions.CONFIG_LOADED.add()
+def _check_preview_lms_host(config: Config) -> None:
+    """
+    This will check if the PREVIEW_LMS_HOST is a subdomain of LMS_HOST.
+    if not, prints a warning to notify the user.
+    """
+
+    lms_host = get_typed(config, "LMS_HOST", str, "")
+    preview_lms_host = get_typed(config, "PREVIEW_LMS_HOST", str, "")
+    if not preview_lms_host.endswith("." + lms_host):
+        fmt.echo_alert(
+            f'Warning: PREVIEW_LMS_HOST="{preview_lms_host}" is not a subdomain of LMS_HOST="{lms_host}". '
+            "This configuration is not typically recommended and may lead to unexpected behavior."
+        )
