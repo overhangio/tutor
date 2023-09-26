@@ -114,7 +114,7 @@ class ConfigListKeyValParamType(ConfigKeyValParamType):
     type=ConfigListKeyValParamType(),
     multiple=True,
     metavar="KEY=VAL",
-    help="Append an item to a configuration value of type list. The value will only be added it it is not already present. (can be used multiple times)",
+    help="Append an item to a configuration value of type list. The value will only be added if it is not already present. (can be used multiple times)",
 )
 @click.option(
     "-A",
