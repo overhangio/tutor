@@ -7,14 +7,20 @@
 #
 # Note that this image does not come with any plugin, by default. Also, the image does
 # not include the `kubectl` binary, so `k8s` commands will not work.
-# Because this image is still experimental, and we are not quite sure if it's going to 
+# Because this image is still experimental, and we are not quite sure if it's going to
 # be very useful, we do not provide any usage documentation.
+ARG DOCKER_REGISTRY=docker.io
 
-FROM docker.io/python:3.8-slim-stretch
+# Define the docker and compose images as a separate stage to allow copying
+# from it while using a specififc registry.
+FROM ${DOCKER_REGISTRY}/docker:19.03 as dep-docker
+FROM ${DOCKER_REGISTRY}/docker/compose:1.24.0 as dep-docker-compose
+
+FROM ${DOCKER_REGISTRY}/python:3.8-slim
 
 # As per https://github.com/docker/compose/issues/3918
-COPY --from=library/docker:19.03 /usr/local/bin/docker /usr/bin/docker
-COPY --from=docker/compose:1.24.0 /usr/local/bin/docker-compose /usr/bin/docker-compose
+COPY --from=dep-docker /usr/local/bin/docker /usr/bin/docker
+COPY --from=dep-docker-compose /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 RUN pip install tutor
 RUN mkdir /opt/tutor

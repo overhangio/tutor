@@ -67,33 +67,33 @@ This configuration paramater defines the name of the Docker image to run the dev
 
 .. https://hub.docker.com/r/devture/exim-relay/tags
 
-- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.6.2"``)
+- ``DOCKER_IMAGE_CADDY`` (default: ``"{{ DOCKER_REGISTRY }}/caddy:2.6.2"``)
 
 This configuration paramater defines which Caddy Docker image to use.
 
-- ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"docker.io/elasticsearch:7.17.9"``)
+- ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"{{ DOCKER_REGISTRY }}/elasticsearch:7.17.9"``)
 
 This configuration parameter defines which Elasticsearch Docker image to use.
 
-- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:4.4.22"``)
+- ``DOCKER_IMAGE_MONGODB`` (default: ``"{{ DOCKER_REGISTRY }}/mongo:4.4.22"``)
 
 This configuration parameter defines which MongoDB Docker image to use.
 
 .. https://hub.docker.com/_/mysql/tags?page=1&name=8.0
 
-- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:8.1.0"``)
+- ``DOCKER_IMAGE_MYSQL`` (default: ``"{{ DOCKER_REGISTRY }}/mysql:8.1.0"``)
 
 This configuration parameter defines which MySQL Docker image to use.
 
 .. https://hub.docker.com/_/redis/tags
 
-- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:7.0.11"``)
+- ``DOCKER_IMAGE_REDIS`` (default: ``"{{ DOCKER_REGISTRY }}/redis:7.0.11"``)
 
 This configuration parameter defines which Redis Docker image to use.
 
 .. https://hub.docker.com/r/devture/exim-relay/tags
 
-- ``DOCKER_IMAGE_SMTP`` (default: ``"docker.io/devture/exim-relay:4.96-r1-0``)
+- ``DOCKER_IMAGE_SMTP`` (default: ``"{{ DOCKER_REGISTRY }}/devture/exim-relay:4.96-r1-0``)
 
 This configuration parameter defines which Simple Mail Transfer Protocol (SMTP) Docker image to use.
 
@@ -103,6 +103,8 @@ This configuration parameter defines the Docker image to be used for setting fil
 
 Custom registry
 ***************
+
+.. _custom_registry:
 
 - ``DOCKER_REGISTRY`` (default: ``"docker.io/"``)
 
@@ -483,6 +485,16 @@ By default, Tutor runs the `overhangio/openedx <https://hub.docker.com/r/overhan
 
 The customised Docker image tag value will then be used by Tutor to run the platform, for instance when running ``tutor local launch``.
 
+Using a private registry or a docker proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, Tutor uses the official `docker.io` registry, however, in some cases, you may want to use a proxy or private registry to avoid rate limits, use a pull-through cache or operate in a restricted network. To do so, you can set the ``DOCKER_REGISTRY`` configuration parameter to the registry you want to use.
+
+    tutor config save --set DOCKER_REGISTRY=myregistry.example.com
+    tutor images build openedx
+    tutor images push openedx
+
+(See the relevant :ref:`configuration parameters <custom_registry>`.)
 
 Passing custom docker build options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

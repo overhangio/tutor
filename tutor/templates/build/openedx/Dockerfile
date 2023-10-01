@@ -1,6 +1,12 @@
 {% if is_buildkit_enabled() %}# syntax=docker/dockerfile:1.4{% endif %}
 ###### Minimal image with base system requirements for most stages
-FROM docker.io/ubuntu:20.04 as minimal
+ARG DOCKER_REGISTRY={{ DOCKER_REGISTRY }}
+
+# Define the dockerize as a separate stage to allow copying from it while using
+# a specififc registry.
+FROM ${DOCKER_REGISTRY}/powerman/dockerize:0.19.0 as dep-powerman-dockerize
+
+FROM ${DOCKER_REGISTRY}/ubuntu:20.04 as minimal
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -43,7 +49,7 @@ WORKDIR /openedx/edx-platform
 
 # Identify tutor user to apply patches using git
 RUN git config --global user.email "tutor@overhang.io" \
-  && git config --global user.name "Tutor"
+    && git config --global user.name "Tutor"
 
 {%- if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
@@ -150,7 +156,7 @@ RUN useradd --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER
 USER ${APP_USER_ID}
 
 # https://hub.docker.com/r/powerman/dockerize/tags
-COPY {% if is_buildkit_enabled() %}--link {% endif %}--from=docker.io/powerman/dockerize:0.19.0 /usr/local/bin/dockerize /usr/local/bin/dockerize
+COPY {% if is_buildkit_enabled() %}--link {% endif %}--from=dep-powerman-dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
 COPY --chown=app:app --from=edx-platform / /openedx/edx-platform
 COPY --chown=app:app --from=locales /openedx/locale /openedx/locale
 COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv

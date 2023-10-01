@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 .PHONY: docs
+DOCKER_REGISTRY = docker.io
 SRC_DIRS = ./tutor ./tests ./bin ./docs
 BLACK_OPTS = --exclude templates ${SRC_DIRS}
 
@@ -90,7 +91,7 @@ bootstrap-dev-plugins: bootstrap-dev ## Install dev requirements and all support
 	pip install -r requirements/plugins.txt
 
 pull-base-images: # Manually pull base images
-	docker image pull docker.io/ubuntu:20.04
+	docker image pull $(DOCKER_REGISTRY)/ubuntu:20.04
 
 ci-info: ## Print info about environment
 	python --version
