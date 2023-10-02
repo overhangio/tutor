@@ -57,6 +57,13 @@ class Actions:
     #: :parameter str name: docker-compose project name.
     COMPOSE_PROJECT_STARTED: Action[[str, Config, str]] = Action()
 
+    #: This action is called at the end of the tutor.config.load_full function.
+    #: Modifying this object will not trigger changes in the configuration.
+    #: For all purposes, it should be considered read-only.
+    #:
+    #: :parameter dict config: project configuration.
+    CONFIG_LOADED: Action[[Config]] = Action()
+
     #: Called whenever the core project is ready to run. This action is called as soon
     #: as possible. This is the right time to discover plugins, for instance. In
     #: particular, we auto-discover the following plugins:
