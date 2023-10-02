@@ -20,6 +20,14 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.1.2'></a>
+## v16.1.2 (2023-10-02)
+
+- [Bugfix] Render config settings that are inside lists. (by @regisb)
+- [Bugfix] Correctly parse strings prefixed with pound "#" key in `tutor config save --set KEY=#value` commands. (by @regisb)
+- [Feature] New action introduced: `CONFIG_LOADED`. This action is called whenever the config is loaded and makes it possible to verify the validity of configuration settings at runtime. (by @CodeWithEmad)
+- [Bugfix] Fix file upload in open response assessments. (by @regisb)
+
 <a id='changelog-16.1.1'></a>
 ## v16.1.1 (2023-08-29)
 

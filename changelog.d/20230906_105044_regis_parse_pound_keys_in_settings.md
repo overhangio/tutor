@@ -1,1 +1,0 @@
-- [Bugfix] Correctly parse strings prefixed with pound "#" key in `tutor config save --set KEY=#value` commands. (by @regisb)
