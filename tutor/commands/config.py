@@ -114,7 +114,7 @@ class ConfigListKeyValParamType(ConfigKeyValParamType):
     type=ConfigListKeyValParamType(),
     multiple=True,
     metavar="KEY=VAL",
-    help="Append an item to a configuration value of type list. The value will only be added it it is not already present. (can be used multiple times)",
+    help="Append an item to a configuration value of type list. The value will only be added if it is not already present. (can be used multiple times)",
 )
 @click.option(
     "-A",
@@ -147,16 +147,18 @@ def save(
     env_only: bool,
 ) -> None:
     config = tutor_config.load_minimal(context.root)
-    config_full = tutor_config.load_full(context.root)
     if interactive:
         interactive_config.ask_questions(config)
     if set_vars:
         for key, value in set_vars:
             config[key] = env.render_unknown(config, value)
     if append_vars:
+        config_defaults = tutor_config.load_defaults()
         for key, value in append_vars:
             if key not in config:
-                config[key] = config_full.get(key, [])
+                config[key] = config[key] = config.get(
+                    key, config_defaults.get(key, [])
+                )
             values = config[key]
             if not isinstance(values, list):
                 raise exceptions.TutorError(
