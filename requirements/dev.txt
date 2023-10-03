@@ -186,8 +186,6 @@ six==1.16.0
     #   google-auth
     #   kubernetes
     #   python-dateutil
-tomli==2.0.1
-    # via -r base.txt
 tomlkit==0.12.1
     # via pylint
 twine==4.0.2
@@ -202,7 +200,7 @@ typing-extensions==4.7.1
     # via
     #   -r base.txt
     #   mypy
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -r base.txt
     #   google-auth
