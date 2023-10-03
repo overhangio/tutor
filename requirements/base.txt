@@ -67,7 +67,7 @@ typing-extensions==4.7.1
     # via
     #   -r requirements/base.in
     #   mypy
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   google-auth
     #   kubernetes
