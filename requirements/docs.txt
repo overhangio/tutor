@@ -84,7 +84,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/base.txt
     #   kubernetes
-pytz==2023.3
+pytz==2023.3.post1
     # via babel
 pyyaml==6.0.1
     # via
@@ -144,7 +144,7 @@ typing-extensions==4.7.1
     # via
     #   -r requirements/base.txt
     #   mypy
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -r requirements/base.txt
     #   google-auth
@@ -154,5 +154,5 @@ websocket-client==1.6.2
     # via
     #   -r requirements/base.txt
     #   kubernetes
-zipp==3.16.2
+zipp==3.17.0
     # via importlib-metadata
