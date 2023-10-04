@@ -1,0 +1,1 @@
+- [Bugfix] Override CMS_BASE setting in Studio for the development environment. Without this, parts of Studio will try to use the devstack default of localhost:8010 instead. (by @ormsbee)
