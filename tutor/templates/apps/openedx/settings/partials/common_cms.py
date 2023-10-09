@@ -21,7 +21,7 @@ FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 
 # Create folders if necessary
-for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE]:
+for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT_BASE, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
 
