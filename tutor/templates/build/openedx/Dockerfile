@@ -88,6 +88,9 @@ RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/openedx/.cache/pip,
     # https://pypi.org/project/wheel/
     setuptools==67.6.1 pip==23.0.1. wheel==0.40.0
 
+# Install missing py2neo package that was abruptly trimmed from pypi
+RUN pip install https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
+
 # Install base requirements
 {% if not is_buildkit_enabled() %}
 COPY --from=edx-platform /requirements/edx/base.txt /openedx/edx-platform/requirements/edx/base.txt
