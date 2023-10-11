@@ -1,0 +1,1 @@
+- [Improvement] No more large dev images. This was fixed by adding --no-log-init option to useradd command and reducing space usage of /var/log/faillog.  (by @CodeWithEmad)
