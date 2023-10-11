@@ -7,6 +7,12 @@ pyinstaller
 scriv
 twine
 
+# Constraints
+# for compatibility with sphinx-rtd-theme
+# drop this constraint once sphinx-rtd-theme 2.0.0 comes out
+# https://github.com/readthedocs/sphinx_rtd_theme/tags
+docutils<0.19.0
+
 # Types packages
 types-docutils
 types-PyYAML

@@ -459,6 +459,7 @@ def get_release(version: str) -> str:
         "14": "nutmeg",
         "15": "olive",
         "16": "palm",
+        "17": "quince",
     }[version.split(".", maxsplit=1)[0]]
 
 
