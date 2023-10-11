@@ -150,7 +150,7 @@ RUN {% if is_buildkit_enabled() %}--mount=type=cache,target=/var/cache/apt,shari
 # Note that this must always be different from root (APP_USER_ID=0)
 ARG APP_USER_ID=1000
 RUN if [ "$APP_USER_ID" = 0 ]; then echo "app user may not be root" && false; fi
-RUN useradd --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER_ID} app
+RUN useradd --no-log-init --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER_ID} app
 USER ${APP_USER_ID}
 
 # https://hub.docker.com/r/powerman/dockerize/tags
