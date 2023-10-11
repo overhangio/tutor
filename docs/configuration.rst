@@ -136,7 +136,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/palm.4"``, or ``master`` in :ref:`nightly <nightly>`)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/quince.1"``, or ``master`` in :ref:`nightly <nightly>`)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -156,9 +156,9 @@ These two configuration parameters define which Redis database to use for Open e
 
 .. _openedx_extra_pip_requirements:
 
-- ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``["openedx-scorm-xblock>=16.0.0,<17.0.0"]``)
+- ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` (default: ``[]``)
 
-This defines extra pip packages that are going to be installed for Open edX.
+Define extra pip packages that are going to be installed for edx-platform.
 
 - ``NPM_REGISTRY`` (default: ``"https://registry.npmjs.org/"``)
 
@@ -354,35 +354,15 @@ See :ref:`the corresponding tutorial <theming>`.
 
 .. _custom_extra_xblocks:
 
-Installing extra xblocks and requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` parameter in the :ref:`config file <configuration>` or to the ``env/build/openedx/requirements/private.txt`` file. The difference between them, is that ``private.txt`` file, even though it could be used for both, :ref:`should be used for installing extra xblocks or requirements from private repositories <extra_private_xblocks>`. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_:
+Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` parameter in the :ref:`config file <configuration>`. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_:
 
     tutor config save --append OPENEDX_EXTRA_PIP_REQUIREMENTS=git+https://github.com/open-craft/xblock-poll.git
-
-Alternatively, add the dependency to ``private.txt``::
-
-    echo "git+https://github.com/open-craft/xblock-poll.git" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
 
 Then, the ``openedx`` docker image must be rebuilt::
 
     tutor images build openedx
-
-.. _extra_private_xblocks:
-
-Installing extra requirements from private repositories
-*******************************************************
-
-When installing extra xblock or requirements from private repositories, ``private.txt`` file should be used, because it allows installing dependencies without adding git credentials to the Docker image. By adding your git credentials to the Docker image, you're risking leaking your git credentials, if you were to publish (intentionally or unintentionally) the Docker image in a public place.
-
-To install xblocks from a private repository that requires authentication, you must first clone the repository inside the ``openedx/requirements`` folder on the host::
-
-    git clone git@github.com:me/myprivaterepo.git "$(tutor config printroot)/env/build/openedx/requirements/myprivaterepo"
-
-Then, declare your extra requirements with the ``-e`` flag in ``openedx/requirements/private.txt``::
-
-    echo "-e ./myprivaterepo" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
 
 .. _edx_platform_fork:
 
@@ -401,16 +381,16 @@ Note that your edx-platform version must be a fork of the latest release **tag**
 
 If you don't create your fork from this tag, you *will* have important compatibility issues with other services. In particular:
 
-- Do not try to run a fork from an older (pre-Palm) version of edx-platform: this will simply not work.
+- Do not try to run a fork from an older (pre-Quince) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
-- Do not try to run a fork from the open-release/palm.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/palm.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/palm.master branch.
+- Do not try to run a fork from the open-release/quince.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/quince.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/quince.master branch.
 
 .. _i18n:
 
 Adding custom translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not running Open edX in English (``LANGUAGE_CODE`` default: ``"en"``), chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/palm.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
+If you are not running Open edX in English (``LANGUAGE_CODE`` default: ``"en"``), chances are that some strings will not be properly translated. In most cases, this is because not enough contributors have helped translate Open edX into your language. It happens! With Tutor, available translated languages include those that come bundled with `edx-platform <https://github.com/openedx/edx-platform/tree/open-release/quince.master/conf/locale>`__ as well as those from `openedx-i18n <https://github.com/openedx/openedx-i18n/tree/master/edx-platform/locale>`__.
 
 Tutor offers a relatively simple mechanism to add custom translations to the openedx Docker image. You should create a folder that corresponds to your language code in the "build/openedx/locale" folder of the Tutor environment. This folder should contain a "LC_MESSAGES" folder. For instance::
 
@@ -431,9 +411,9 @@ Then, add a "django.po" file there that will contain your custom translations::
 .. warning::
     Don't forget to specify the file ``Content-Type`` when adding message strings with non-ASCII characters; otherwise a ``UnicodeDecodeError`` will be raised during compilation.
 
-The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/openedx/edx-platform/blob/open-release/palm.master/conf/locale/en/LC_MESSAGES/django.po>`__.
+The "String to translate" part should match *exactly* the string that you would like to translate. You cannot make it up! The best way to find this string is to copy-paste it from the `upstream django.po file for the English language <https://github.com/openedx/edx-platform/blob/open-release/quince.master/conf/locale/en/LC_MESSAGES/django.po>`__.
 
-If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/openedx/edx-platform/blob/open-release/palm.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
+If you cannot find the string to translate in this file, then it means that you are trying to translate a string that is used in some piece of javascript code. Those strings are stored in a different file named "djangojs.po". You can check it out `in the edx-platform repo as well <https://github.com/openedx/edx-platform/blob/open-release/quince.master/conf/locale/en/LC_MESSAGES/djangojs.po>`__. Your custom javascript strings should also be stored in a "djangojs.po" file that should be placed in the same directory.
 
 To recap, here is an example. To translate a few strings in French, both from django.po and djangojs.po, we would have the following file hierarchy::
 

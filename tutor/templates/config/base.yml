@@ -6,8 +6,9 @@ MYSQL_ROOT_PASSWORD: "{{ 8|random_string }}"
 OPENEDX_MYSQL_PASSWORD: "{{ 8|random_string }}"
 OPENEDX_SECRET_KEY: "{{ 24|random_string }}"
 PLUGINS:
-  # The MFE plugin is required
+  # enabled by default
   - mfe
+  - indigo
 PLUGIN_INDEXES:
   # Indexes in this list will be suffixed with the Open edX named version and
   # "plugins.yml". E.g: https://overhang.io/tutor/main/olive/plugins.yml

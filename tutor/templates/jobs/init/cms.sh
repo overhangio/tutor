@@ -12,3 +12,7 @@ if [ -d /openedx/data/uploads/ ]; then
     rm -rf /openedx/data/uploads/
   fi
 fi
+
+# Create waffle switches to enable some features, if they have not been explicitly defined before
+# Copy-paste of units in Studio (highly requested new feature, but defaults to off in Quince)
+(./manage.py cms waffle_flag --list | grep contentstore.enable_copy_paste_units) || ./manage.py lms waffle_flag --create contentstore.enable_copy_paste_units --everyone

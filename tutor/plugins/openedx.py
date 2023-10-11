@@ -6,6 +6,16 @@ import typing as t
 
 from tutor import bindmount
 from tutor import hooks
+from tutor.__about__ import __version_suffix__
+
+
+@hooks.Filters.CONFIG_DEFAULTS.add()
+def _set_openedx_common_version_in_nightly(
+    items: list[tuple[str, t.Any]]
+) -> list[tuple[str, t.Any]]:
+    if __version_suffix__ == "nightly":
+        items.append(("OPENEDX_COMMON_VERSION", "master"))
+    return items
 
 
 @hooks.Filters.APP_PUBLIC_HOSTS.add()

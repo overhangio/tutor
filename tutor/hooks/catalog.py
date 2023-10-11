@@ -334,7 +334,6 @@ class Filters:
     #: - ``HOST_USER_ID``: the numerical ID of the user on the host.
     #: - ``TUTOR_APP``: the app name ("tutor" by default), used to determine the dev/local project names.
     #: - ``TUTOR_VERSION``: the current version of Tutor.
-    #: - ``is_buildkit_enabled``: a deprecated function which always returns ``True`` now. Will be removed after Quince.
     #: - ``iter_values_named``: a function to iterate on variables that start or end with a given string.
     #: - ``iter_mounts``: a function that yields compose-compatible bind-mounts for any given service.
     #: - ``iter_mounted_directories``: iterate on bind-mounted directory names.

@@ -20,6 +20,18 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-17.0.0'></a>
+## v17.0.0 (2023-12-09)
+
+- 💥[Feature] Upgrade to Quince. (by @regisb)
+- 💥[Feature] Replace "*.local.overhang.io" hostnames by "*.local.edly.io". (by @regisb)
+- 💥[Feature] Enable the Indigo theme by default, if no other theme is set. (by @regisb)
+- 💥[Deprecation] Tutor no longer supports the legacy Docker builder, which was previously available by setting `DOCKER_BUILDKIT=0` in the host environment. Going forward, Tutor will always use BuildKit (a.k.a. `docker buildx` in Docker v19-v22, or just `docker build` in Docker v23). This transition will improve build performance and should be seamless for Tutor users who are running a supported Docker version (by @kdmccormick).
+- 💥[Deprecation] The template variable `is_buildkit_enabled`, which now always returns True, is deprecated. Plugin authors should assume BuildKit is enabled and remove the variable from their templates (by @kdmccormick).
+- 💥[Deprecation] Adding Python packages to edx-platform via `private.txt` is no longer supported. Instead, users should bind-mount their requirement directories with `tutor mounts add ...`. (by @regisb)
+- [Bugfix] Updated how the Tutor setting `JWT_RSA_PRIVATE_KEY` is rendered into the LMS Django setting `JWT_AUTH['JWT_PRIVATE_SIGNING_JWK']` as required by a recent breaking upstream change. The new representation of the `JWT_PRIVATE_SIGNING_JWK` simply adds the `dq`, `dp`, and `qi` parameters. Without this fix, LMS would encounter an `InvalidKeyError` on all logins. (by @kdmccormick)
+- [Improvement] You don't have to run `tutor config save` every time you enable or disable a plugin anymore. (by @CodeWithEmad)
+
 <a id='changelog-16.1.8'></a>
 ## v16.1.8 (2023-12-10)
 

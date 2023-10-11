@@ -94,9 +94,8 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
             )
             config = tutor_config.load(root)
         assert isinstance(config["OPENEDX_EXTRA_PIP_REQUIREMENTS"], list)
-        self.assertEqual(2, len(config["OPENEDX_EXTRA_PIP_REQUIREMENTS"]))
         self.assertEqual(
-            "my-package==1.0.0", config["OPENEDX_EXTRA_PIP_REQUIREMENTS"][1]
+            ["my-package==1.0.0"], config["OPENEDX_EXTRA_PIP_REQUIREMENTS"]
         )
 
 

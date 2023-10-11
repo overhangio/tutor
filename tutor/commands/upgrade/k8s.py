@@ -42,6 +42,9 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         upgrade_from_olive(context.obj, config)
         running_release = "palm"
 
+    if running_release == "palm":
+        running_release = "quince"
+
 
 def upgrade_from_ironwood(config: Config) -> None:
     upgrade_mongodb(config, "3.4.24", "3.4")

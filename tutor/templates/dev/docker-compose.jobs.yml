@@ -16,8 +16,6 @@ x-openedx-job-service:
     - ../apps/openedx/config:/openedx/config:ro
     # theme files
     - ../build/openedx/themes:/openedx/themes
-    # editable requirements
-    - ../build/openedx/requirements:/openedx/requirements
 
 services:
 

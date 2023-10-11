@@ -153,18 +153,6 @@ def _load_config_defaults_yml(
     return items
 
 
-@hooks.Filters.CONFIG_DEFAULTS.add()
-def _set_openedx_common_version_in_nightly(
-    items: list[tuple[str, t.Any]]
-) -> list[tuple[str, t.Any]]:
-    # REMOVE-AFTER-v16 move this callback to the dedicated openedx/plugin.py module
-    from tutor.__about__ import __version_suffix__
-
-    if __version_suffix__ == "nightly":
-        items.append(("OPENEDX_COMMON_VERSION", "master"))
-    return items
-
-
 def get_template(filename: str) -> Config:
     """
     Get one of the configuration templates.

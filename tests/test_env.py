@@ -260,7 +260,7 @@ class CurrentVersionTests(unittest.TestCase):
             ) as f:
                 f.write(__version__)
             self.assertEqual(__version__, env.current_version(root))
-            self.assertEqual("palm", env.get_env_release(root))
+            self.assertEqual("quince", env.get_env_release(root))
             self.assertIsNone(env.should_upgrade_from_release(root))
             self.assertTrue(env.is_up_to_date(root))
 

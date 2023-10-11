@@ -4,21 +4,19 @@
 #
 #    pip-compile requirements/dev.in
 #
-altgraph==0.17.3
+altgraph==0.17.4
     # via pyinstaller
 appdirs==1.4.4
     # via -r requirements/base.txt
-astroid==2.15.6
+astroid==3.0.1
     # via pylint
 attrs==23.1.0
     # via scriv
-black==23.7.0
+black==23.10.1
     # via -r requirements/dev.in
-bleach==6.0.0
-    # via readme-renderer
-build==0.10.0
+build==1.0.3
     # via pip-tools
-cachetools==5.3.1
+cachetools==5.3.2
     # via
     #   -r requirements/base.txt
     #   google-auth
@@ -27,9 +25,9 @@ certifi==2023.7.22
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-cffi==1.15.1
+cffi==1.16.0
     # via cryptography
-charset-normalizer==3.2.0
+charset-normalizer==3.3.1
     # via
     #   -r requirements/base.txt
     #   requests
@@ -42,15 +40,17 @@ click==8.1.7
     #   scriv
 click-log==0.4.0
     # via scriv
-coverage==7.3.0
+coverage==7.3.2
     # via -r requirements/dev.in
 cryptography==41.0.7
     # via secretstorage
 dill==0.3.7
     # via pylint
-docutils==0.20.1
-    # via readme-renderer
-google-auth==2.22.0
+docutils==0.18.1
+    # via
+    #   -r requirements/dev.in
+    #   readme-renderer
+google-auth==2.23.3
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -60,7 +60,9 @@ idna==3.4
     #   requests
 importlib-metadata==6.8.0
     # via
+    #   build
     #   keyring
+    #   pyinstaller
     #   twine
 importlib-resources==6.1.1
     # via keyring
@@ -78,12 +80,12 @@ jinja2==3.1.2
     #   scriv
 keyring==24.2.0
     # via twine
-kubernetes==27.2.0
+kubernetes==28.1.0
     # via -r requirements/base.txt
-lazy-object-proxy==1.9.0
-    # via astroid
 markdown-it-py==3.0.0
-    # via rich
+    # via
+    #   rich
+    #   scriv
 markupsafe==2.1.3
     # via
     #   -r requirements/base.txt
@@ -94,29 +96,32 @@ mdurl==0.1.2
     # via markdown-it-py
 more-itertools==10.1.0
     # via jaraco-classes
-mypy==1.5.1
+mypy==1.6.1
     # via -r requirements/base.txt
 mypy-extensions==1.0.0
     # via
     #   -r requirements/base.txt
     #   black
     #   mypy
+nh3==0.2.14
+    # via readme-renderer
 oauthlib==3.2.2
     # via
     #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==23.1
+packaging==23.2
     # via
     #   black
     #   build
+    #   pyinstaller
 pathspec==0.11.2
     # via black
 pip-tools==7.3.0
     # via -r requirements/dev.in
 pkginfo==1.9.6
     # via twine
-platformdirs==3.10.0
+platformdirs==3.11.0
     # via
     #   black
     #   pylint
@@ -131,17 +136,17 @@ pyasn1-modules==0.3.0
     #   google-auth
 pycparser==2.21
     # via cffi
-pycryptodome==3.18.0
+pycryptodome==3.19.0
     # via -r requirements/base.txt
 pygments==2.16.1
     # via
     #   readme-renderer
     #   rich
-pyinstaller==5.13.1
+pyinstaller==6.1.0
     # via -r requirements/dev.in
-pyinstaller-hooks-contrib==2023.7
+pyinstaller-hooks-contrib==2023.10
     # via pyinstaller
-pylint==2.17.5
+pylint==3.0.2
     # via -r requirements/dev.in
 pyproject-hooks==1.0.0
     # via build
@@ -153,7 +158,7 @@ pyyaml==6.0.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
-readme-renderer==41.0
+readme-renderer==42.0
     # via twine
 requests==2.31.0
     # via
@@ -171,21 +176,19 @@ requests-toolbelt==1.0.0
     # via twine
 rfc3986==2.0.0
     # via twine
-rich==13.5.2
+rich==13.6.0
     # via twine
 rsa==4.9
     # via
     #   -r requirements/base.txt
     #   google-auth
-scriv==1.3.1
+scriv==1.5.0
     # via -r requirements/dev.in
 secretstorage==3.3.3
     # via keyring
 six==1.16.0
     # via
     #   -r requirements/base.txt
-    #   bleach
-    #   google-auth
     #   kubernetes
     #   python-dateutil
 tomli==2.0.1
@@ -203,11 +206,11 @@ twine==4.0.2
     # via -r requirements/dev.in
 types-docutils==0.20.0.3
     # via -r requirements/dev.in
-types-pyyaml==6.0.12.11
+types-pyyaml==6.0.12.12
     # via -r requirements/dev.in
-types-setuptools==68.1.0.0
+types-setuptools==68.2.0.0
     # via -r requirements/dev.in
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via
     #   -r requirements/base.txt
     #   astroid
@@ -218,21 +221,16 @@ typing-extensions==4.7.1
 urllib3==1.26.18
     # via
     #   -r requirements/base.txt
-    #   google-auth
     #   kubernetes
     #   requests
     #   twine
-webencodings==0.5.1
-    # via bleach
-websocket-client==1.6.2
+websocket-client==1.6.4
     # via
     #   -r requirements/base.txt
     #   kubernetes
 wheel==0.41.2
     # via pip-tools
-wrapt==1.15.0
-    # via astroid
-zipp==3.16.2
+zipp==3.17.0
     # via
     #   importlib-metadata
     #   importlib-resources

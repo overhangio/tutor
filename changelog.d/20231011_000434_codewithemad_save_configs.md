@@ -1,1 +1,0 @@
-- [Improvement] You don't have to run `tutor config save` every time you enable or disable a plugin anymore. (by @CodeWithEmad)

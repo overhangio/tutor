@@ -54,9 +54,6 @@ def _prepare_environment() -> None:
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
-            # BuildKit used to be optional. Now, it's always enabled.
-            # This constant is just for temporary backwards compatibility (REMOVE-AFTER-V16).
-            ("is_buildkit_enabled", lambda: True),
             ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
@@ -460,6 +457,7 @@ def get_release(version: str) -> str:
         "14": "nutmeg",
         "15": "olive",
         "16": "palm",
+        "17": "quince",
     }[version.split(".", maxsplit=1)[0]]
 
 

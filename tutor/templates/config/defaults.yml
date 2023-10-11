@@ -12,12 +12,18 @@ DOCKER_COMPOSE_VERSION: "3.7"
 DOCKER_REGISTRY: "docker.io/"
 DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev:{{ TUTOR_VERSION }}"
-DOCKER_IMAGE_CADDY: "docker.io/caddy:2.6.4"
-DOCKER_IMAGE_ELASTICSEARCH: "docker.io/elasticsearch:7.17.9"
-DOCKER_IMAGE_MONGODB: "docker.io/mongo:4.4.22"
+# https://hub.docker.com/_/caddy/tags
+DOCKER_IMAGE_CADDY: "docker.io/caddy:2.7.4"
+# https://hub.docker.com/_/elasticsearch/tags
+DOCKER_IMAGE_ELASTICSEARCH: "docker.io/elasticsearch:7.17.13"
+# https://hub.docker.com/_/mongo/tags
+DOCKER_IMAGE_MONGODB: "docker.io/mongo:4.4.25"
+# https://hub.docker.com/_/mysql/tags
 DOCKER_IMAGE_MYSQL: "docker.io/mysql:8.1.0"
 DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"
-DOCKER_IMAGE_REDIS: "docker.io/redis:7.0.11"
+# https://hub.docker.com/_/redis/tags
+DOCKER_IMAGE_REDIS: "docker.io/redis:7.2.1"
+# https://hub.docker.com/r/devture/exim-relay/tags
 DOCKER_IMAGE_SMTP: "docker.io/devture/exim-relay:4.96-r1-0"
 EDX_PLATFORM_REPOSITORY: "https://github.com/openedx/edx-platform.git"
 EDX_PLATFORM_VERSION: "{{ OPENEDX_COMMON_VERSION }}"
@@ -53,9 +59,8 @@ OPENEDX_LMS_UWSGI_WORKERS: 2
 OPENEDX_MYSQL_DATABASE: "openedx"
 OPENEDX_MYSQL_USERNAME: "openedx"
 # the common version will be automatically set to "master" in the nightly branch
-OPENEDX_COMMON_VERSION: "open-release/palm.4"
-OPENEDX_EXTRA_PIP_REQUIREMENTS:
-  - "openedx-scorm-xblock>=16.0.0,<17.0.0"
+OPENEDX_COMMON_VERSION: "open-release/quince.1"
+OPENEDX_EXTRA_PIP_REQUIREMENTS: []
 MYSQL_HOST: "mysql"
 MYSQL_PORT: 3306
 MYSQL_ROOT_USERNAME: "root"
