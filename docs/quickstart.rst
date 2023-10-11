@@ -22,7 +22,7 @@ Yes :) This is what happens when you run ``tutor local launch``:
 2. Configuration files are generated from templates.
 3. Docker images are downloaded.
 4. Docker containers are provisioned.
-5. A full, production-ready Open edX platform (`Palm <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-palm.master/platform_releases/palm.html>`__ release) is run with docker-compose.
+5. A full, production-ready Open edX platform (`Quince <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-quince.master/platform_releases/quince.html>`__ release) is run with docker-compose.
 
 The whole procedure should require less than 10 minutes, on a server with good bandwidth. Note that your host environment will not be affected in any way, since everything runs inside docker containers. Root access is not even necessary.
 
