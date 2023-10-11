@@ -38,7 +38,7 @@ The `devstack <https://github.com/openedx/devstack>`_ is meant for development o
 Is Tutor officially supported by edX?
 -------------------------------------
 
-Yes: as of the Open edX Maple release (December 9th 2021), Tutor is the only officially supported installation method for Open edX: see the `official installation instructions <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-palm.master/installation/index.html>`__.
+Yes: as of the Open edX Maple release (December 9th 2021), Tutor is the only officially supported installation method for Open edX: see the `official installation instructions <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-quince.master/installation/index.html>`__.
 
 What features are missing from Tutor?
 -------------------------------------

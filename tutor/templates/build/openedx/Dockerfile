@@ -24,9 +24,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Install pyenv
 # https://www.python.org/downloads/
 # https://github.com/pyenv/pyenv/releases
-ARG PYTHON_VERSION=3.8.15
+ARG PYTHON_VERSION=3.8.18
 ENV PYENV_ROOT /opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.17 --depth 1
+RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.29 --depth 1
 
 # Install Python
 RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
@@ -64,7 +64,9 @@ COPY --from=code /openedx/edx-platform /
 
 ###### Download extra locales to /openedx/locale/contrib/locale
 FROM minimal as locales
-ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
+# ARG OPENEDX_I18N_VERSION={{ OPENEDX_COMMON_VERSION }}
+# TODO upgrade to quince
+ARG OPENEDX_I18N_VERSION=open-release/palm.2
 RUN cd /tmp \
     && curl -L -o openedx-i18n.tar.gz https://github.com/openedx/openedx-i18n/archive/$OPENEDX_I18N_VERSION.tar.gz \
     && tar xzf /tmp/openedx-i18n.tar.gz \
@@ -89,10 +91,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools==67.6.1 pip==23.0.1. wheel==0.40.0
-
-# Install missing py2neo package that was abruptly trimmed from pypi
-RUN pip install https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
+    setuptools==68.2.2 pip==23.2.1. wheel==0.41.2
 
 # Install base requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
@@ -103,9 +102,9 @@ RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install \
     # Use redis as a django cache https://pypi.org/project/django-redis/
-    django-redis==5.2.0 \
+    django-redis==5.4.0 \
     # uwsgi server https://pypi.org/project/uWSGI/
-    uwsgi==2.0.21
+    uwsgi==2.0.22
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
@@ -261,9 +260,9 @@ USER app
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install -r requirements/edx/development.txt
 # https://pypi.org/project/ipdb/
-# https://pypi.org/project/ipython
+# https://pypi.org/project/ipython (8.12.x for Python 3.8)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install ipdb==0.13.13 ipython==8.12.0
+    pip install ipdb==0.13.13 ipython==8.12.3
 
 # Add ipdb as default PYTHONBREAKPOINT
 ENV PYTHONBREAKPOINT=ipdb.set_trace

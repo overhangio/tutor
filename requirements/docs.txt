@@ -8,9 +8,9 @@ alabaster==0.7.13
     # via sphinx
 appdirs==1.4.4
     # via -r requirements/base.txt
-babel==2.12.1
+babel==2.13.1
     # via sphinx
-cachetools==5.3.1
+cachetools==5.3.2
     # via
     #   -r requirements/base.txt
     #   google-auth
@@ -19,7 +19,7 @@ certifi==2023.7.22
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-charset-normalizer==3.2.0
+charset-normalizer==3.3.1
     # via
     #   -r requirements/base.txt
     #   requests
@@ -32,7 +32,7 @@ docutils==0.18.1
     #   sphinx
     #   sphinx-click
     #   sphinx-rtd-theme
-google-auth==2.22.0
+google-auth==2.23.3
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -48,13 +48,13 @@ jinja2==3.1.2
     # via
     #   -r requirements/base.txt
     #   sphinx
-kubernetes==27.2.0
+kubernetes==28.1.0
     # via -r requirements/base.txt
 markupsafe==2.1.3
     # via
     #   -r requirements/base.txt
     #   jinja2
-mypy==1.5.1
+mypy==1.6.1
     # via -r requirements/base.txt
 mypy-extensions==1.0.0
     # via
@@ -65,7 +65,7 @@ oauthlib==3.2.2
     #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==23.1
+packaging==23.2
     # via sphinx
 pyasn1==0.5.0
     # via
@@ -76,7 +76,7 @@ pyasn1-modules==0.3.0
     # via
     #   -r requirements/base.txt
     #   google-auth
-pycryptodome==3.18.0
+pycryptodome==3.19.0
     # via -r requirements/base.txt
 pygments==2.16.1
     # via sphinx
@@ -107,7 +107,6 @@ rsa==4.9
 six==1.16.0
     # via
     #   -r requirements/base.txt
-    #   google-auth
     #   kubernetes
     #   python-dateutil
 snowballstemmer==2.2.0
@@ -140,17 +139,16 @@ tomli==2.0.1
     # via
     #   -r requirements/base.txt
     #   mypy
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via
     #   -r requirements/base.txt
     #   mypy
 urllib3==1.26.18
     # via
     #   -r requirements/base.txt
-    #   google-auth
     #   kubernetes
     #   requests
-websocket-client==1.6.2
+websocket-client==1.6.4
     # via
     #   -r requirements/base.txt
     #   kubernetes

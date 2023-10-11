@@ -20,6 +20,12 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-17.0.0'></a>
+## v17.0.0 (2023-10-23)
+
+- 💥[Feature] Upgrade to Quince. (by @regisb)
+  - [Bugfix] Updated how the Tutor setting `JWT_RSA_PRIVATE_KEY` is rendered into the LMS Django setting `JWT_AUTH['JWT_PRIVATE_SIGNING_JWK']` as required by a recent breaking upstream change. The new representation of the `JWT_PRIVATE_SIGNING_JWK` simply adds the `dq`, `dp`, and `qi` parameters. Without this fix, LMS would encounter an `InvalidKeyError` on all logins. (by @kdmccormick)
+
 <a id='changelog-16.1.7'></a>
 ## v16.1.7 (2023-11-17)
 
