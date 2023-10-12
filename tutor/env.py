@@ -55,6 +55,7 @@ def _prepare_environment() -> None:
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
             ("is_buildkit_enabled", utils.is_buildkit_enabled),
+            ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
 

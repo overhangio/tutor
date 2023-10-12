@@ -52,4 +52,13 @@ services:
     command: openedx-assets watch-themes --env dev
     restart: unless-stopped
 
+  {% if RUN_ELASTICSEARCH and is_docker_rootless() %}
+  elasticsearch:
+    ulimits:
+      memlock:
+        # Fixes error setting rlimits for ready process in rootless docker
+        soft: 0  # zero means "unset" in the memlock context
+        hard: 0
+  {% endif %}
+
   {{ patch("local-docker-compose-dev-services")|indent(2) }}
