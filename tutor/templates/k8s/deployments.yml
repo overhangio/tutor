@@ -392,7 +392,11 @@ spec:
       containers:
         - name: mysql
           image: {{ DOCKER_IMAGE_MYSQL }}
-          args: ["mysqld", "--character-set-server=utf8mb3", "--collation-server=utf8mb3_general_ci"]
+          args:
+            - "mysqld"
+            - "--character-set-server=utf8mb3"
+            - "--collation-server=utf8mb3_general_ci"
+            {% if not MYSQL_ENABLE_BINLOG -%}- "--disable-log-bin" {%- endif %}
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "{{ MYSQL_ROOT_PASSWORD }}"
