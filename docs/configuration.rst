@@ -136,7 +136,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/palm.2"``)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/palm.3"``)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 

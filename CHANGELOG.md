@@ -20,6 +20,12 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.1.4'></a>
+## v16.1.4 (2023-10-13)
+
+- [Improvement] No more large dev images. This was fixed by adding `--no-log-init` option to useradd command and reducing space usage of `/var/log/faillog`. (by @CodeWithEmad)
+- [Improvement] Upgrade the Open edX default version to open-release/palm.3. (by @regisb)
+
 <a id='changelog-16.1.3'></a>
 ## v16.1.3 (2023-10-10)
 
