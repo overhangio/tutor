@@ -54,7 +54,8 @@ def _prepare_environment() -> None:
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
-            # For backwards compatability. Remove after Quince.
+            # BuildKit used to be optional. Now, it's always enabled.
+            # This constant is just for temporary backwards compatibility (REMOVE-AFTER-V16).
             ("is_buildkit_enabled", lambda: True),
         ],
     )
