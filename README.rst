@@ -81,7 +81,7 @@ Please follow the instructions from the `troubleshooting section <https://docs.t
 Support
 -------
 
-To get community support, go to the official Open edX discussion forum: https://discuss.openedx.org. For official support, please subscribe to a Long Term Support (LTS) license at https://overhang.io/tutor/pricing.
+To get community support, go to the official Open edX discussion forum: https://discuss.openedx.org. For official support, `Edly <https://edly.io>`__ provides professional assistance as part of its `Open edX installation service <https://edly.io/services/open-edx-installation/>`__.
 
 .. _readme_support_end:
 
