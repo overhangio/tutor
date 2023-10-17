@@ -16,7 +16,7 @@ What should you do if you have a problem?
 6. If despite all your efforts, you can't solve the problem by yourself, you should discuss it in the `Open edX community forum <https://discuss.openedx.org>`__. Please give as many details about your problem as possible! As a rule of thumb, **people will not dedicate more time to solving your problem than you took to write your question**. You should tag your topic with "tutor" or the corresponding Tutor plugin name ("tutor-discovery", etc.) in order to notify the maintainers.
 7. If you are *absolutely* positive that you are facing a technical issue with Tutor, and not with Open edX, not with your server, not your custom configuration, then, and only then, should you open an issue on `Github <https://github.com/overhangio/tutor/issues/>`__. You *must* follow the instructions from the issue template!!! If you do not follow this procedure, your Github issues will be mercilessly closed 🤯.
 
-Do you need professional assistance with your tutor-managed Open edX platform? Overhang.IO offers online support as part of its `Long Term Support (LTS) offering <https://overhang.io/tutor/pricing>`__.
+Do you need professional assistance with your Open edX platform? `Edly <https://edly.io>`__ provides online support as part of its `Open edX installation service <https://edly.io/services/open-edx-installation/>`__.
 
 .. _logging:
 
