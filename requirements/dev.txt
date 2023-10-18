@@ -215,7 +215,7 @@ typing-extensions==4.7.1
     #   mypy
     #   pylint
     #   rich
-urllib3==1.26.17
+urllib3==1.26.18
     # via
     #   -r requirements/base.txt
     #   google-auth
