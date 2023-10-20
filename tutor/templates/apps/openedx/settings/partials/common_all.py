@@ -189,6 +189,9 @@ JWT_AUTH["JWT_PRIVATE_SIGNING_JWK"] = json.dumps(
         "n": "{{ jwt_rsa_key.n|long_to_base64 }}",
         "p": "{{ jwt_rsa_key.p|long_to_base64 }}",
         "q": "{{ jwt_rsa_key.q|long_to_base64 }}",
+        "dq": "{{ jwt_rsa_key.dq|long_to_base64 }}",
+        "dp": "{{ jwt_rsa_key.dp|long_to_base64 }}",
+        "qi": "{{ jwt_rsa_key.invq|long_to_base64 }}",
     }
 )
 JWT_AUTH["JWT_PUBLIC_SIGNING_JWK_SET"] = json.dumps(
