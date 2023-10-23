@@ -40,7 +40,11 @@ services:
   {% if RUN_MYSQL -%}
   mysql:
     image: {{ DOCKER_IMAGE_MYSQL }}
-    command: mysqld --character-set-server=utf8mb3 --collation-server=utf8mb3_general_ci
+    command: >
+      mysqld
+      --character-set-server=utf8mb3
+      --collation-server=utf8mb3_general_ci
+      --binlog-expire-logs-seconds=259200
     restart: unless-stopped
     user: "999:999"
     volumes:
