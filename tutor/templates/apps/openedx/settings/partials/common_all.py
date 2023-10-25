@@ -235,5 +235,8 @@ CODE_JAIL = {
     "user": None,
 }
 
+# Run Celery tasks asynchronously on the workers (rather than blocking the app process).
+CELERY_ALWAYS_EAGER = False
+
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS
