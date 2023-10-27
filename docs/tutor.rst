@@ -93,6 +93,13 @@ An optional BRANCH suffix may be appended to the release name to indicate that e
 
 `Officially-supported plugins <https://overhang.io/tutor/plugins>`__ follow the same versioning pattern. As a third-party plugin developer, you are encouraged to use the same pattern to make it immediately clear to your end-users which Open edX versions are supported.
 
+In Tutor and its officially-supported plugins, certain features, API endpoints, and older depenency versions are periodically deprecated. Generally, warnings are added to the Changelogs and/or the command-line interface one major release before support for any behavior is removed. In order to keep track of pending removals in the source code, comments containing the string ``REMOVE-AFTER-VXX`` should be used, where ``<XX>`` is the last major version that must support the behavior. For example::
+
+    # This has been replaced with SOME_NEW_HOOK (REMOVE-AFTER-V25).
+    SOME_OLD_HOOK = Filter()
+
+indicates that this filter definition can be removed as soon as Tutor v26.0.0.
+
 .. _contributing:
 
 Contributing to Tutor

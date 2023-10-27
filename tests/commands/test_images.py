@@ -128,10 +128,8 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
             "service1",
         ]
         with temporary_root() as root:
-            utils.is_buildkit_enabled.cache_clear()
-            with patch.object(utils, "is_buildkit_enabled", return_value=False):
-                self.invoke_in_root(root, ["config", "save"])
-                result = self.invoke_in_root(root, build_args)
+            self.invoke_in_root(root, ["config", "save"])
+            result = self.invoke_in_root(root, build_args)
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
         image_build.assert_called()
@@ -146,7 +144,9 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
                 "host",
                 "--target",
                 "target",
+                "--output=type=docker",
                 "docker_args",
+                "--cache-from=type=registry,ref=service1:1.0.0-cache",
             ],
             list(image_build.call_args[0][1:]),
         )

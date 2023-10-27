@@ -173,25 +173,6 @@ def docker(*command: str) -> int:
     return execute("docker", *command)
 
 
-@lru_cache(maxsize=None)
-def is_buildkit_enabled() -> bool:
-    """
-    A helper function to determine whether we can run `docker buildx` with BuildKit.
-    """
-    # First, we respect the DOCKER_BUILDKIT environment variable
-    enabled_by_env = {
-        "1": True,
-        "0": False,
-    }.get(os.environ.get("DOCKER_BUILDKIT", ""))
-    if enabled_by_env is not None:
-        return enabled_by_env
-    try:
-        subprocess.run(["docker", "buildx", "version"], capture_output=True, check=True)
-        return True
-    except subprocess.CalledProcessError:
-        return False
-
-
 def docker_compose(*command: str) -> int:
     return execute("docker", "compose", *command)
 
