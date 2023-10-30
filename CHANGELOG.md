@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.1.5'></a>
+## v16.1.5 (2023-10-30)
+
+- [Bugfix] Fix ORA2 file uploads in CMS. As the cache settings are shared between CMS and LMS, the settings are moved from `common_lms.py` to `common_all.py`. (by @FatemeKhodayari)
+
 <a id='changelog-16.1.4'></a>
 ## v16.1.4 (2023-10-13)
 
