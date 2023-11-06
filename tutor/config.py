@@ -1,8 +1,8 @@
 from __future__ import annotations
-from copy import deepcopy
-import typing as t
 
 import os
+import typing as t
+from copy import deepcopy
 
 from tutor import env, exceptions, fmt, hooks, plugins, serialize, utils
 from tutor.types import Config, ConfigValue, cast_config, get_typed
