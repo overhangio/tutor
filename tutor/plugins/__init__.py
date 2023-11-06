@@ -32,6 +32,17 @@ def _convert_plugin_patches() -> None:
         ENV_PATCHES_DICT[name].append(content)
 
 
+@hooks.Actions.PLUGIN_UNLOADED.add()
+def _clear_plugin_patches(plugin: str, root: str, _config: Config) -> None:
+    """
+    After disabling a plugin, ENV_PATCHES_DICT should be cleared
+    and re-calculated.
+
+    This action is run after plugins have been unloaded.
+    """
+    ENV_PATCHES_DICT.clear()
+
+
 def is_installed(name: str) -> bool:
     """
     Return true if the plugin is installed.

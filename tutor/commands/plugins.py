@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 import typing as t
 
@@ -9,6 +10,7 @@ import click.shell_completion
 
 from tutor import config as tutor_config
 from tutor import exceptions, fmt, hooks, plugins, utils
+from tutor.commands.config import save as config_save_command
 from tutor.plugins import indexes
 from tutor.plugins.base import PLUGINS_ROOT, PLUGINS_ROOT_ENV_VAR_NAME
 from tutor.types import Config
@@ -133,17 +135,15 @@ def list_command(show_enabled_only: bool) -> None:
 
 @click.command(help="Enable a plugin")
 @click.argument("plugin_names", metavar="plugin", nargs=-1, type=PluginName())
-@click.pass_obj
-def enable(context: Context, plugin_names: list[str]) -> None:
-    config = tutor_config.load_minimal(context.root)
+@click.pass_context
+def enable(context: click.Context, plugin_names: list[str]) -> None:
+    config = tutor_config.load_minimal(context.obj.root)
     for plugin in plugin_names:
         plugins.load(plugin)
         fmt.echo_info(f"Plugin {plugin} enabled")
     tutor_config.save_enabled_plugins(config)
-    tutor_config.save_config_file(context.root, config)
-    fmt.echo_info(
-        "You should now re-generate your environment with `tutor config save`."
-    )
+    tutor_config.save_config_file(context.obj.root, config)
+    context.invoke(config_save_command, env_only=True)
 
 
 @click.command(
@@ -153,22 +153,20 @@ def enable(context: Context, plugin_names: list[str]) -> None:
 @click.argument(
     "plugin_names", metavar="plugin", nargs=-1, type=PluginName(allow_all=True)
 )
-@click.pass_obj
-def disable(context: Context, plugin_names: list[str]) -> None:
-    config = tutor_config.load_minimal(context.root)
+@click.pass_context
+def disable(context: click.Context, plugin_names: list[str]) -> None:
+    config = tutor_config.load_minimal(context.obj.root)
     disable_all = "all" in plugin_names
     disabled: list[str] = []
     for plugin in tutor_config.get_enabled_plugins(config):
         if disable_all or plugin in plugin_names:
             fmt.echo_info(f"Disabling plugin {plugin}...")
-            hooks.Actions.PLUGIN_UNLOADED.do(plugin, context.root, config)
+            hooks.Actions.PLUGIN_UNLOADED.do(plugin, context.obj.root, config)
             disabled.append(plugin)
             fmt.echo_info(f"Plugin {plugin} disabled")
     if disabled:
-        tutor_config.save_config_file(context.root, config)
-        fmt.echo_info(
-            "You should now re-generate your environment with `tutor config save`."
-        )
+        tutor_config.save_config_file(context.obj.root, config)
+        context.invoke(config_save_command, env_only=True)
 
 
 @click.command(name="update")
