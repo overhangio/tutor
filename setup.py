@@ -59,6 +59,7 @@ setup(
     python_requires=">=3.8",
     install_requires=load_requirements("base.in"),
     extras_require={
+        "dev": load_requirements("dev.txt"),
         "full": load_requirements("plugins.txt"),
     },
     entry_points={"console_scripts": ["tutor=tutor.commands.cli:main"]},
