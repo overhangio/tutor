@@ -192,4 +192,4 @@ Now build again::
 
     tutor images build
 
-By following these steps, you should be able to mitigate the problem.
+All build commands should now make use of the newly configured builder. To later revert to the default builder, run ``docker buildx use default``. 
