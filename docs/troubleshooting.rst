@@ -174,7 +174,6 @@ High resource consumption on ``tutor images build`` by docker
 
 This issue can occur when building multiple images simultaneously by Docker, issue specifically related to BuildKit.
 
-Troubleshooting Steps:
 
 Create a buildkit.toml configuration file with the following contents::
 
