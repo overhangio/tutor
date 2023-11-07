@@ -168,3 +168,28 @@ This issue should only happen in development mode. Long story short, it can be s
     tutor dev run lms ./manage.py lms waffle_switch block_structure.invalidate_cache_on_publish on --create
 
 If you'd like to learn more, please take a look at `this Github issue <https://github.com/overhangio/tutor/issues/302>`__.
+
+High resource consumption on ``tutor images build`` by docker 
+-------------------------------------------------------------
+
+This issue can occur when building multiple images simultaneously by Docker, issue specifically related to BuildKit.
+
+
+Create a buildkit.toml configuration file with the following contents::
+
+    [worker.oci]
+    max-parallelism = 2
+
+This configuration file limits the number of layers built concurrently to 2, which can significantly reduce resource consumption.
+
+Create a builder that uses this configuration::
+
+    docker buildx create --use --name=<name> --driver=docker-container --config=/path/to/buildkit.toml
+
+Replace <name> with a suitable name for your builder, and ensure that you specify the correct path to the buildkit.toml configuration file.
+
+Now build again::
+
+    tutor images build
+
+All build commands should now make use of the newly configured builder. To later revert to the default builder, run ``docker buildx use default``. 
