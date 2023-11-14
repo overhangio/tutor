@@ -201,7 +201,7 @@ Any user who installs the ``myplugin`` plugin can then run::
 
     $ tutor myplugin
     Hello from myplugin!
-    My LMS host is demo.openedx.overhang.io
+    My LMS host is learn.myserver.com
 
 You can even define subcommands by creating `command groups <https://click.palletsprojects.com/en/8.0.x/api/#click.Group>`__::
 
