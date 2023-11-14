@@ -68,10 +68,10 @@ Configuring DNS records
 
 When running a server in production, it is necessary to define `DNS records <https://en.wikipedia.org/wiki/Domain_Name_System#Resource_records>`__ which will make it possible to access your Open edX platform by name in your browser. The precise procedure to create DNS records varies from one provider to the next and is beyond the scope of these docs. You should create a record of type A with a name equal to your LMS hostname (given by ``tutor config printvalue LMS_HOST``) and a value that indicates the IP address of your server. Applications other than the LMS, such as the studio, ecommerce, etc. typically reside in subdomains of the LMS. Thus, you should also create a CNAME record to point all subdomains of the LMS to the LMS_HOST.
 
-For instance, the demo Open edX server that runs at https://demo.openedx.overhang.io has the following DNS records::
+For instance, to run an Open edX server at https://learn.mydomain.com on a server with IP address 1.1.1.1, you would need to configure the following DNS records::
 
-    demo.openedx 1800 IN A 172.105.89.208
-    *.demo.openedx 1800 IN CNAME demo.openedx.overhang.io.
+    learn 1800 IN A 1.1.1.1
+    *.learn 1800 IN CNAME learn.mydomain.com.
 
 .. _cloud_install:
 
