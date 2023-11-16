@@ -20,6 +20,12 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.1.6'></a>
+## v16.1.6 (2023-11-16)
+
+- [Feature] Upgrade to open-release/palm.4. It is strongly recommended to upgrade to this release for as long as possible before upgrading to Quince. Otherwise, many users will be logged out after the Quince upgrade and will have to log in again -- see the Quince release notes. (by @regisb)
+- [Improvement] Install tutor development tools with `pip install tutor[dev]`. (by @CodeWithEmad)
+
 <a id='changelog-16.1.5'></a>
 ## v16.1.5 (2023-10-30)
 
