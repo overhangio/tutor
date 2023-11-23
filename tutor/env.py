@@ -57,6 +57,7 @@ def _prepare_environment() -> None:
             # BuildKit used to be optional. Now, it's always enabled.
             # This constant is just for temporary backwards compatibility (REMOVE-AFTER-V16).
             ("is_buildkit_enabled", lambda: True),
+            ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
 
