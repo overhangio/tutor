@@ -65,12 +65,12 @@ configMapGenerator:
         app.kubernetes.io/name: redis
 {{ patch("kustomization-configmapgenerator") }}
 
-{%- if patch("k8s-override") or patch("kustomization-patches") %}
-patches:
+{%- if patch("k8s-override") or patch("kustomization-patches-strategic-merge") %}
+patchesStrategicMerge:
 {%- if patch("k8s-override") %}
-- path: k8s/override.yml
+- k8s/override.yml
 {%- endif %}
-{{ patch("kustomization-patches") }}
+{{ patch("kustomization-patches-strategic-merge") }}
 {%- endif %}
 
 {{ patch("kustomization") }}
