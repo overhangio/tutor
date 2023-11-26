@@ -190,6 +190,12 @@ ENV REVISION_CFG /openedx/config/revisions.yml
 COPY --chown=app:app settings/lms/*.py ./lms/envs/tutor/
 COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/
 
+{% if OPENEDX_ATLAS_PULL %}
+# Support the OEP-58 proposal behind a feature flag until it's fully implemented
+RUN find conf/locale -mindepth 1 -maxdepth 1 -type d -exec rm -r {} \;
+RUN atlas pull {{ patch("atlas-extra-args") }} translations/edx-platform/conf/locale:edx-platform/conf/locale
+{% endif %}
+
 # Copy user-specific locales to /openedx/locale/user/locale and compile them
 RUN mkdir /openedx/locale/user
 COPY --chown=app:app ./locale/ /openedx/locale/user/locale/

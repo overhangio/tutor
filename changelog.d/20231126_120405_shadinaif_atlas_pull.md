@@ -1,0 +1,1 @@
+- [Feature] Pull translations via `atlas` during Docker build. (by @shadinaif)
