@@ -183,7 +183,7 @@ To check whether you have used the correct syntax, you should run ``tutor mounts
 
   $ tutor mounts add /path/to/edx-platform
   $ tutor mounts list
-  - name: /home/data/regis/projets/overhang/repos/edx/edx-platform
+  - name: /path/to/edx-platform
   build_mounts:
   - image: openedx
     context: edx-platform
