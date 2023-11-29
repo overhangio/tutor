@@ -63,13 +63,13 @@ This configuration parameter defines the name of the Docker image to run for the
 
 - ``DOCKER_IMAGE_OPENEDX_DEV`` (default: ``"openedx-dev:{{ TUTOR_VERSION }}"``)
 
-This configuration paramater defines the name of the Docker image to run the development version of the lms and cms containers.  By default, the Docker image tag matches the Tutor version it was built with.
+This configuration parameter defines the name of the Docker image to run the development version of the lms and cms containers.  By default, the Docker image tag matches the Tutor version it was built with.
 
 .. https://hub.docker.com/r/devture/exim-relay/tags
 
 - ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.6.2"``)
 
-This configuration paramater defines which Caddy Docker image to use.
+This configuration parameter defines which Caddy Docker image to use.
 
 - ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"docker.io/elasticsearch:7.17.9"``)
 
@@ -99,7 +99,7 @@ This configuration parameter defines which Simple Mail Transfer Protocol (SMTP) 
 
 - ``DOCKER_IMAGE_PERMISSIONS`` (default: ``"{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"``)
 
-This configuration parameter defines the Docker image to be used for setting file permissions. The default image sets all containers to be run as unpriveleged users.
+This configuration parameter defines the Docker image to be used for setting file permissions. The default image sets all containers to be run as unprivileged users.
 
 Custom registry
 ***************

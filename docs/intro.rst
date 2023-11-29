@@ -129,7 +129,7 @@ Many commands can be further parameterized to specify their target and options, 
   tutor k8s logs mysql          # View logs of MySQL in Kubernetes-managed deployment.
   tutor dev logs lms --tail 10  # View ten lines of logs of the LMS container in development mode.
 
-And that's it! You do not need to understand Tutor's entire command-line interface to get started. Using the ``--help`` option that's availble on every command, it is easy to learn as you go. For an in-depth guide, you can also explore the `CLI Reference <reference/index.rst>`_.
+And that's it! You do not need to understand Tutor's entire command-line interface to get started. Using the ``--help`` option that's available on every command, it is easy to learn as you go. For an in-depth guide, you can also explore the `CLI Reference <reference/index.rst>`_.
 
 I'm ready, where do I start?
 ----------------------------

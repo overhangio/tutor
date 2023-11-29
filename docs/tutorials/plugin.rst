@@ -4,7 +4,7 @@
 Creating a Tutor plugin
 =======================
 
-Tutor plugins are the offically recommended way of customizing the behaviour of Tutor. If Tutor does not do things the way you want, then your first reaction should *not* be to fork Tutor, but instead to figure out whether you can create a plugin that will allow you to achieve what you want.
+Tutor plugins are the officially recommended way of customizing the behaviour of Tutor. If Tutor does not do things the way you want, then your first reaction should *not* be to fork Tutor, but instead to figure out whether you can create a plugin that will allow you to achieve what you want.
 
 You may be thinking that creating a plugin might be overkill for your use case. It's almost certainly not! The stable plugin API guarantees that your changes will keep working even after you upgrade from one major release to the next, with little to no extra work. Also, it allows you to distribute your changes to other users.
 
@@ -104,7 +104,7 @@ Modifying configuration
 
 In the previous section you've learned how to add custom content to the Tutor templates. Now we'll see how to modify the Tutor configuration. Configuration settings can be specified in three ways:
 
-1. "unique" settings that need to be generated or user-specified, and then preserved in config.yml: such settings do not have reasonable defaults for all users. Examples of such setttings include passwords and secret keys, which should be different for every user.
+1. "unique" settings that need to be generated or user-specified, and then preserved in config.yml: such settings do not have reasonable defaults for all users. Examples of such settings include passwords and secret keys, which should be different for every user.
 2. "default" settings have static fallback values. They are only stored in config.yml when they are modified by users. Most settings belong in this category.
 3. "override" settings modify configuration from Tutor core or from other plugins. These will be removed and restored to their default values when the plugin is disabled.
 
