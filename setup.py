@@ -41,9 +41,9 @@ ABOUT = load_about()
 setup(
     name="tutor",
     version=ABOUT["__package_version__"],
-    url="https://docs.tutor.overhang.io/",
+    url="https://docs.tutor.edly.io/",
     project_urls={
-        "Documentation": "https://docs.tutor.overhang.io/",
+        "Documentation": "https://docs.tutor.edly.io/",
         "Code": "https://github.com/overhangio/tutor",
         "Issue tracker": "https://github.com/overhangio/tutor/issues",
         "Community": "https://discuss.openedx.org/tag/tutor",

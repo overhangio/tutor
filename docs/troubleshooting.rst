@@ -91,7 +91,7 @@ If that doesn't work, then check if you have any other Docker containers running
 
     docker ps -a
 
-For example, if you have ever used `Tutor Nightly <https://docs.tutor.overhang.io/tutorials/nightly.html>`_, check whether you still have ``tutor_nightly_`` containers running. Conversely, if you're trying to run Tutor Nightly now, check whether you have non-Nightly ``tutor_`` containers running. If so, switch to that other version of Tutor, run ``tutor (dev|local|k8s) stop``, and then switch back to your preferred version of Tutor.
+For example, if you have ever used `Tutor Nightly <https://docs.tutor.edly.io/tutorials/nightly.html>`_, check whether you still have ``tutor_nightly_`` containers running. Conversely, if you're trying to run Tutor Nightly now, check whether you have non-Nightly ``tutor_`` containers running. If so, switch to that other version of Tutor, run ``tutor (dev|local|k8s) stop``, and then switch back to your preferred version of Tutor.
 
 Alternatively, if there are any other non-Tutor containers using port 3306, then stop and remove them::
 
