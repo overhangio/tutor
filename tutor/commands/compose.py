@@ -178,7 +178,7 @@ Are you sure you want to continue?"""
 
     See the documentation for more information:
 
-        https://docs.tutor.overhang.io/install.html#upgrading-to-a-new-open-edx-release
+        https://docs.tutor.edly.io/install.html#upgrading-to-a-new-open-edx-release
 
     Press enter when you are ready to continue"""
             click.confirm(

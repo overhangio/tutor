@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-<!-- Are you quite sure that you followed the instructions from the Troubleshooting section in the Tutor documentation? https://docs.tutor.overhang.io/troubleshooting.html -->
+<!-- Are you quite sure that you followed the instructions from the Troubleshooting section in the Tutor documentation? https://docs.tutor.edly.io/troubleshooting.html -->
 <!-- If not, please take the time to read them. -->
 
 **Bug description**

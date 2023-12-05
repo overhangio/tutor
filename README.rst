@@ -18,9 +18,9 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
   :alt: Forums
   :target: https://discuss.openedx.org/tag/tutor
 
-.. image:: https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.overhang.io
+.. image:: https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.edly.io
   :alt: Documentation
-  :target: https://docs.tutor.overhang.io
+  :target: https://docs.tutor.edly.io
 
 .. image:: https://img.shields.io/pypi/v/tutor?logo=python&logoColor=white
   :alt: PyPI releases
@@ -47,11 +47,11 @@ Features
 
 * 100% `open source <https://github.com/overhangio/tutor>`__
 * Runs entirely on Docker
-* World-famous 1-click `installation and upgrades <https://docs.tutor.overhang.io/install.html>`__
-* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.overhang.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/overhangio/tutor-android>`__, `custom translations <https://docs.tutor.overhang.io/configuration.html#adding-custom-translations>`__...
-* Extensible architecture with `plugins <https://docs.tutor.overhang.io/plugins/index.html>`__
-* Works with `Kubernetes <https://docs.tutor.overhang.io/k8s.html>`__
-* No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.overhang.io/install.html#zero-click-aws-installation>`__
+* World-famous 1-click `installation and upgrades <https://docs.tutor.edly.io/install.html>`__
+* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.edly.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/overhangio/tutor-android>`__, `custom translations <https://docs.tutor.edly.io/configuration.html#adding-custom-translations>`__...
+* Extensible architecture with `plugins <https://docs.tutor.edly.io/plugins/index.html>`__
+* Works with `Kubernetes <https://docs.tutor.edly.io/k8s.html>`__
+* No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.edly.io/install.html#zero-click-aws-installation>`__
 
 .. _readme_intro_end:
 
@@ -69,12 +69,12 @@ Quickstart
 Documentation
 -------------
 
-Extensive documentation is available: https://docs.tutor.overhang.io/
+Extensive documentation is available: https://docs.tutor.edly.io/
 
 Is there a problem?
 -------------------
 
-Please follow the instructions from the `troubleshooting section <https://docs.tutor.overhang.io/troubleshooting.html>`__ in the docs.
+Please follow the instructions from the `troubleshooting section <https://docs.tutor.edly.io/troubleshooting.html>`__ in the docs.
 
 .. _readme_support_start:
 
@@ -90,7 +90,7 @@ To get community support, go to the official Open edX discussion forum: https://
 Contributing
 ------------
 
-We welcome contributions to Tutor! To learn how you can contribute, please check the relevant section of the Tutor docs: `https://docs.tutor.overhang.io/tutor.html#contributing <https://docs.tutor.overhang.io/tutor.html#contributing>`__.
+We welcome contributions to Tutor! To learn how you can contribute, please check the relevant section of the Tutor docs: `https://docs.tutor.edly.io/tutor.html#contributing <https://docs.tutor.edly.io/tutor.html#contributing>`__.
 
 .. _readme_contributing_end:
 

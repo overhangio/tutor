@@ -269,7 +269,7 @@ def warn_macos_docker_memory() -> None:
     {e}
 
 Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
-    https://docs.tutor.overhang.io/install.html"""
+    https://docs.tutor.edly.io/install.html"""
         )
 
 
