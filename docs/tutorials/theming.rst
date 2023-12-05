@@ -46,7 +46,7 @@ Then, run a local webserver::
 
     tutor dev start lms
 
-The LMS can then be accessed at http://local.overhang.io:8000. You will then have to :ref:`enable that theme <settheme>`::
+The LMS can then be accessed at http://local.edly.io:8000. You will then have to :ref:`enable that theme <settheme>`::
 
     tutor dev do settheme mythemename
 
@@ -54,4 +54,4 @@ Watch the themes folders for changes (in a different terminal)::
 
     tutor dev run watchthemes
 
-Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://local.overhang.io:8000.
+Make changes to some of the files inside the theme directory: the theme assets should be automatically recompiled and visible at http://local.edly.io:8000.

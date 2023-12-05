@@ -1,0 +1,1 @@
+- 💥[Feature] Replace "*.local.overhang.io" hostnames by "*.local.edly.io". (by @regisb)
