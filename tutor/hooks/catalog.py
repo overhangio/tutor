@@ -57,6 +57,12 @@ class Actions:
     #: :parameter str name: docker-compose project name.
     COMPOSE_PROJECT_STARTED: Action[[str, Config, str]] = Action()
 
+    #: Triggered after all interactive questions have been asked.
+    #: You should use this action if you want to add new questions.
+    #:
+    #: :parameter dict config: project configuration.
+    CONFIG_INTERACTIVE: Action[[Config]] = Action()
+
     #: This action is called at the end of the tutor.config.load_full function.
     #: Modifying this object will not trigger changes in the configuration.
     #: For all purposes, it should be considered read-only.
