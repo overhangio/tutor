@@ -29,10 +29,6 @@ Enable/disable a plugin::
     tutor plugins enable myplugin
     tutor plugins disable myplugin
 
-After enabling or disabling a plugin, the environment should be re-generated with::
-
-    tutor config save
-
 The full plugins CLI is described in the :ref:`reference documentation <cli_plugins>`.
 
 .. _existing_plugins:

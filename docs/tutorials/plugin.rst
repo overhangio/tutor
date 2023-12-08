@@ -38,9 +38,9 @@ Our plugin is disabled, for now. To enable it, we run::
     $ tutor plugins enable myplugin
     Plugin myplugin enabled
     Configuration saved to /home/yourusername/.local/share/tutor/config.yml
-    You should now re-generate your environment with `tutor config save`.
+    Environment generated in /home/yourusername/.local/share/tutor/env
 
-At this point you could re-generate your environment with ``tutor config save``, but there would not be any change to your environment... because the plugin does not do anything. So let's get started and make some changes.
+At this point your environment was updated, but there would not be any change there... because the plugin does not do anything. So let's get started and make some changes.
 
 Modifying existing files with patches
 -------------------------------------

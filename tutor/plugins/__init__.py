@@ -17,30 +17,32 @@ ENV_PATCHES_DICT: dict[str, list[str]] = {}
 
 
 @hooks.Actions.PLUGINS_LOADED.add()
-def _convert_plugin_patches() -> None:
+def _fill_patch_cache_on_load() -> None:
+    """
+    This action is run after plugins have been loaded.
+    """
+    _fill_patches_cache()
+
+
+@hooks.Actions.PLUGIN_UNLOADED.add()
+def _fill_patch_cache_on_unload(plugin: str, root: str, _config: Config) -> None:
+    """
+    This action is run after plugins have been unloaded.
+    """
+    _fill_patches_cache()
+
+
+def _fill_patches_cache() -> None:
     """
     Some patches are added as (name, content) tuples with the ENV_PATCHES
     filter. We convert these patches to add them to ENV_PATCHES_DICT. This makes it
     easier for end-user to declare patches, and it's more performant.
-
-    This action is run after plugins have been loaded.
     """
     ENV_PATCHES_DICT.clear()
     patches: t.Iterable[tuple[str, str]] = hooks.Filters.ENV_PATCHES.iterate()
     for name, content in patches:
         ENV_PATCHES_DICT.setdefault(name, [])
         ENV_PATCHES_DICT[name].append(content)
-
-
-@hooks.Actions.PLUGIN_UNLOADED.add()
-def _clear_plugin_patches(plugin: str, root: str, _config: Config) -> None:
-    """
-    After disabling a plugin, ENV_PATCHES_DICT should be cleared
-    and re-calculated.
-
-    This action is run after plugins have been unloaded.
-    """
-    ENV_PATCHES_DICT.clear()
 
 
 def is_installed(name: str) -> bool:
@@ -135,6 +137,6 @@ def unload(plugin: str) -> None:
     hooks.clear_all(context=hooks.Contexts.app(plugin).name)
 
 
-@hooks.Actions.PLUGIN_UNLOADED.add(priority=50)
+@hooks.Actions.PLUGIN_UNLOADED.add(priority=hooks.priorities.HIGH)
 def _unload_on_disable(plugin: str, _root: str, _config: Config) -> None:
     unload(plugin)
