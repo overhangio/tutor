@@ -328,7 +328,9 @@ def _enable_plugins(root: str) -> None:
     enable_plugins(config)
 
 
-@hooks.Actions.PLUGIN_UNLOADED.add()
+# This is run with a very high priority such that it is called before the plugin hooks
+# are actually cleared.
+@hooks.Actions.PLUGIN_UNLOADED.add(priority=hooks.priorities.HIGH - 1)
 def _remove_plugin_config_overrides_on_unload(
     plugin: str, _root: str, config: Config
 ) -> None:
@@ -342,7 +344,7 @@ def _remove_plugin_config_overrides_on_unload(
         fmt.echo_info(f"    config - removing entry: {key}={value}")
 
 
-@hooks.Actions.PLUGIN_UNLOADED.add(priority=100)
+@hooks.Actions.PLUGIN_UNLOADED.add(priority=hooks.priorities.LOW)
 def _update_enabled_plugins_on_unload(_plugin: str, _root: str, config: Config) -> None:
     """
     Update the list of enabled plugins.

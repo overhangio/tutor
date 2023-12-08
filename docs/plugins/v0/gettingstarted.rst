@@ -41,10 +41,6 @@ You can then enable your newly-created plugin::
 
     tutor plugins enable googleanalytics
 
-Update your environment to apply changes from your plugin::
-
-    tutor config save
-
 You should be able to view your changes in every LMS and CMS settings file::
 
     grep -r googleanalytics "$(tutor config printroot)/env/apps/openedx/settings/"
