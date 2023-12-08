@@ -86,7 +86,10 @@ Finally, the platform can also be started back up with ``launch``. It will take 
 Debugging with breakpoints
 --------------------------
 
-To debug a local edx-platform repository, add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in the code. Then, attach to the applicable service's container by running ``start`` (without ``-d``) followed by the service's name::
+To debug a local edx-platform repository, first, start development in detached mode (with ``-d``), add a `python breakpoint <https://docs.python.org/3/library/functions.html#breakpoint>`__ with ``breakpoint()`` anywhere in the code. Then, attach to the applicable service's container by running ``start`` (without ``-d``) followed by the service's name::
+
+  # Start in detached mode:
+  tutor dev start -d
 
   # Debugging LMS:
   tutor dev start lms
@@ -180,7 +183,7 @@ To check whether you have used the correct syntax, you should run ``tutor mounts
 
   $ tutor mounts add /path/to/edx-platform
   $ tutor mounts list
-  - name: /home/data/regis/projets/overhang/repos/edx/edx-platform
+  - name: /path/to/edx-platform
   build_mounts:
   - image: openedx
     context: edx-platform
