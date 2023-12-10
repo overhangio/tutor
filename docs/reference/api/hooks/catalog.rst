@@ -16,3 +16,9 @@ The underlying Python hook classes and API are documented :ref:`here <hooks_api>
 
 .. autoclass:: tutor.hooks.Contexts
     :members:
+
+Open edX hooks
+--------------
+
+.. automodule:: tutor.plugins.openedx.hooks
+    :members:

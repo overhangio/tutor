@@ -337,6 +337,7 @@ class Filters:
     #: - ``is_buildkit_enabled``: a deprecated function which always returns ``True`` now. Will be removed after Quince.
     #: - ``iter_values_named``: a function to iterate on variables that start or end with a given string.
     #: - ``iter_mounts``: a function that yields compose-compatible bind-mounts for any given service.
+    #: - ``iter_mounted_directories``: iterate on bind-mounted directory names.
     #: - ``patch``: a function to incorporate extra content into a template.
     #:
     #: :parameter filters: list of (name, value) tuples.
@@ -396,6 +397,53 @@ class Filters:
     #: List of images to be pushed when we run ``tutor images push ...``.
     #: Parameters are the same as for :py:data:`IMAGES_PULL`.
     IMAGES_PUSH: Filter[list[tuple[str, str]], [Config]] = Filter()
+
+    #: List of directories that will be automatically bind-mounted in an image (at
+    #: build-time) and a container (at run-time).
+    #:
+    #: Whenever a user runs: ``tutor mounts add /path/to/name``, "name" will be matched to
+    #: the regular expressions in this filter. If it matches, then the directory will be
+    #: automatically bind-mounted in the matching Docker image at build time and run
+    #: time. At build-time, they will be added to a layer named "mnt-{name}". At
+    #: run-time, they wll be mounted in ``/mnt/<name>``.
+    #:
+    #: In the case of edx-platform, ``pip install -e .`` will be run in this directory
+    #: at build-time. And the same host directory will be bind-mounted in that location
+    #: at run time. This allows users to transparently work on edx-platform
+    #: dependencies, such as Python packages.
+    #:
+    #: By default, xblocks and some common edx-platform packages are already present in
+    #: this filter, and associated to the "openedx" image. Add your own Python
+    #: dependencies to this filter to make it easier for users to work on the
+    #: dependencies of your app.
+    #:
+    #: See the list of all edx-platform base requirements here:
+    #: https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
+    #:
+    #: This filter was mostly designed for edx-platform, but it can be used by any
+    #: Python-based Docker image as well. The Dockerfile must declare mounted layers::
+    #:
+    #:     {% for name in iter_mounted_directories(MOUNTS, "yourimage") %}
+    #:     FROM scratch as mnt-{{ name }}
+    #:     {% endfor %}
+    #:
+    #: Then, Python packages are installed with::
+    #:
+    #:     {% for name in iter_mounted_directories(MOUNTS, "yourimage") %}
+    #:     COPY --from=mnt-{{ name }} --chown=app:app / /mnt/{{ name }}
+    #:     RUN pip install -e "/mnt/{{ name }}"
+    #:     {% endfor %}
+    #:
+    #: And the docker-compose service must include the following::
+    #:
+    #:    volumes:
+    #:      {%- for mount in iter_mounts(MOUNTS, "yourimage") %}
+    #:      - {{ mount }}
+    #:      {%- endfor %}
+    #:
+    #: :parameter list[tuple[str, str]] name_regex: Each tuple is the name of an image and a
+    #:   regular expression. For instance: ``("openedx", r".*xblock.*")``.
+    MOUNTED_DIRECTORIES: Filter[list[tuple[str, str]], []] = Filter()
 
     #: List of plugin indexes that are loaded when we run ``tutor plugins update``. By
     #: default, the plugin indexes are stored in the user configuration. This filter makes
@@ -459,8 +507,8 @@ class Contexts:
     """
 
     #: Dictionary of name/contexts. Each value is a context that we enter whenever we
-    #: create hooks for a specific application or : : plugin. For instance, plugin
-    #: "myplugin" will be enabled within the "app:myplugin" : context.
+    #: create hooks for a specific application or plugin. For instance, plugin
+    #: "myplugin" will be enabled within the "app:myplugin" context.
     APP: dict[str, Context] = {}
 
     @classmethod

@@ -112,7 +112,7 @@ services:
       - ../apps/openedx/uwsgi.ini:/openedx/edx-platform/uwsgi.ini:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
-      {%- for mount in iter_mounts(MOUNTS, "lms") %}
+      {%- for mount in iter_mounts(MOUNTS, "openedx", "lms") %}
       - {{ mount }}
       {%- endfor %}
     depends_on:
@@ -138,7 +138,7 @@ services:
       - ../apps/openedx/uwsgi.ini:/openedx/edx-platform/uwsgi.ini:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
-      {%- for mount in iter_mounts(MOUNTS, "cms") %}
+      {%- for mount in iter_mounts(MOUNTS, "openedx", "cms") %}
       - {{ mount }}
       {%- endfor %}
     depends_on:
@@ -166,7 +166,7 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
-      {%- for mount in iter_mounts(MOUNTS, "lms-worker") %}
+      {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-worker") %}
       - {{ mount }}
       {%- endfor %}
     depends_on:
@@ -185,7 +185,7 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
-      {%- for mount in iter_mounts(MOUNTS, "cms-worker") %}
+      {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-worker") %}
       - {{ mount }}
       {%- endfor %}
     depends_on:

@@ -9,6 +9,7 @@ Open edX customization
 
    plugin
    theming
+   edx-platform
    edx-platform-settings
    google-smtp
    nightly

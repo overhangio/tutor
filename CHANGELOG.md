@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-16.1.8'></a>
+## v16.1.8 (2023-12-10)
+
+- [Feature] Make it easy to work on 3rd-party edx-platform Python packages with `tutor mounts add /path/to/my/package`. (by @regisb)
+- [Improvement] When configured with `RUN_MYSQL: true`, run `mysqld` with binlog expiry set to 3 days (rather than the default of 30).
+- [Improvement] Fix `ulimits` error for elasticsearch in Docker rootless mode (by @OmarIthawi)
+- [Improvement] Do not hardcode `OPENEDX_COMMON_VERSION = master` in the nightly branch. This removes git conflicts whenever we bump the common version in the master branch. (by @regisb)
+- [Improvement] The ``iter_mounts`` template function can now take multiple image names as argument. This should concern only very advanced users. (by @regisb)
+
 <a id='changelog-16.1.7'></a>
 ## v16.1.7 (2023-11-17)
 

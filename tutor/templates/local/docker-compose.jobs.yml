@@ -27,7 +27,7 @@ services:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
         - ../apps/openedx/config:/openedx/config:ro
-        {%- for mount in iter_mounts(MOUNTS, "lms-job") %}
+        {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-job") %}
         - {{ mount }}
         {%- endfor %}
       depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB)]|list_if }}
@@ -41,7 +41,7 @@ services:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
         - ../apps/openedx/config:/openedx/config:ro
-        {%- for mount in iter_mounts(MOUNTS, "cms-job") %}
+        {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-job") %}
         - {{ mount }}
         {%- endfor %}
       depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB), ("elasticsearch", RUN_ELASTICSEARCH), ("redis", RUN_REDIS)]|list_if }}

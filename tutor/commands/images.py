@@ -266,20 +266,6 @@ def get_image_build_contexts(config: Config) -> dict[str, list[tuple[str, str]]]
     return build_contexts
 
 
-@hooks.Filters.IMAGES_BUILD_MOUNTS.add()
-def _mount_edx_platform(
-    volumes: list[tuple[str, str]], path: str
-) -> list[tuple[str, str]]:
-    """
-    Automatically add an edx-platform repo from the host to the build context whenever
-    it is added to the `MOUNTS` setting.
-    """
-    if os.path.basename(path) == "edx-platform":
-        volumes.append(("openedx", "edx-platform"))
-        volumes.append(("openedx-dev", "edx-platform"))
-    return volumes
-
-
 @click.command(short_help="Pull images from the Docker registry")
 @click.argument("image_names", metavar="image", type=PullImageNameParam(), nargs=-1)
 @click.pass_obj

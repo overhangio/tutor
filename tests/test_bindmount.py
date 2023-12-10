@@ -53,13 +53,6 @@ class BindmountTests(unittest.TestCase):
         import tutor.commands.compose
 
         self.assertEqual(
-            [
-                ("lms", "/path/to/edx-platform", "/openedx/edx-platform"),
-                ("cms", "/path/to/edx-platform", "/openedx/edx-platform"),
-                ("lms-worker", "/path/to/edx-platform", "/openedx/edx-platform"),
-                ("cms-worker", "/path/to/edx-platform", "/openedx/edx-platform"),
-                ("lms-job", "/path/to/edx-platform", "/openedx/edx-platform"),
-                ("cms-job", "/path/to/edx-platform", "/openedx/edx-platform"),
-            ],
+            [("openedx", "/path/to/edx-platform", "/openedx/edx-platform")],
             bindmount.parse_implicit_mount("/path/to/edx-platform"),
         )
