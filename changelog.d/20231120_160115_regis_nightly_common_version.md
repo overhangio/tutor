@@ -1,1 +1,0 @@
-- [Improvement] Do not hardcode `OPENEDX_COMMON_VERSION = master` in the nightly branch. This removes git conflicts whenever we bump the common version in the master branch. (by @regisb)
