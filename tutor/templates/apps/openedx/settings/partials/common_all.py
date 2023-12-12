@@ -150,9 +150,12 @@ LOGGING["loggers"]["blockstore.apps.bundles.storage"] = {"handlers": ["console"]
 # These warnings are visible in simple commands and init tasks
 import warnings
 
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
-warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
-warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+try:
+    from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+    warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
+    warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+except ImportError:
+    pass
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="boto.plugin")
