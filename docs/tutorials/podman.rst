@@ -42,6 +42,8 @@ For rootless containers, this requires you to start the ``podman.service`` as a 
   # To set the DOCKER_HOST environment variable
   $ export DOCKER_HOST="unix://$XDG_RUNTIME_DIR/podman/podman.sock"
 
+If you are running in rootless mode, ``tutor local`` expects a web proxy to be running on port ``80`` or port ``443``. For instructions on how to configure a web proxy, view `this tutorial <https://docs.tutor.edly.io/tutorials/proxy.html>`_.
+
 .. note::
    As with the previous ``alias`` command, if you'd like to make the ``DOCKER_HOST`` variable permanent, you should put the entire export command in your ``bashrc`` or equivalent file.
 
