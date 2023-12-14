@@ -3,6 +3,6 @@ click>=8.0
 jinja2>=2.10
 kubernetes
 mypy
-pycryptodome
+pycryptodome>=3.17.0
 pyyaml>=6.0
 typing-extensions>=4.4.0
