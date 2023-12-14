@@ -1,5 +1,3 @@
-.. _readme_intro_start:
-
 Tutor: the Docker-based Open edX distribution designed for peace of mind
 ========================================================================
 
@@ -9,6 +7,8 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
   :align: center
 
 |
+
+.. _readme_intro_start:
 
 .. image:: https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=brightgreen&message=Source%20code
   :alt: Source code

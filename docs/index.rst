@@ -1,3 +1,6 @@
+Tutor: the Docker-based Open edX distribution designed for peace of mind
+========================================================================
+
 .. include:: ../README.rst
     :start-after: _readme_intro_start:
     :end-before: _readme_intro_end:
