@@ -2,6 +2,9 @@
 # This file includes all Tutor setting defaults. Settings that do not have a
 # default value, such as passwords, should be stored in base.yml.
 # This must be defined early
+ATLAS_REVISION: "{% if OPENEDX_COMMON_VERSION == 'master' %}main{% else %}{{ OPENEDX_COMMON_VERSION }}{% endif %}"
+ATLAS_REPOSITORY: "openedx/openedx-translations"
+ATLAS_OPTIONS: ""
 CADDY_HTTP_PORT: 80
 CMS_HOST: "studio.{{ LMS_HOST }}"
 CMS_OAUTH2_KEY_SSO: "cms-sso"
