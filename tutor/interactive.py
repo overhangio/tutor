@@ -3,7 +3,7 @@ from typing import List, Optional
 import click
 
 from . import config as tutor_config
-from . import env, exceptions, fmt
+from . import env, exceptions, fmt, hooks
 from .types import Config, get_typed
 
 
@@ -148,6 +148,8 @@ def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
             config,
             defaults,
         )
+
+    hooks.Actions.CONFIG_INTERACTIVE.do(config)
 
 
 def ask(question: str, key: str, config: Config, defaults: Config) -> None:
