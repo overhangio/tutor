@@ -178,8 +178,6 @@ ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
 EMAIL_FILE_PATH = "/tmp/openedx/emails"
 
 # Language/locales
-LOCALE_PATHS.append("/openedx/locale/contrib/locale")
-LOCALE_PATHS.append("/openedx/locale/user/locale")
 LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Allow the platform to include itself in an iframe

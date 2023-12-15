@@ -158,7 +158,9 @@ The error produced should help you better understand what is happening.
 The chosen default language does not display properly
 -----------------------------------------------------
 
-By default, Open edX comes with a `limited set <https://github.com/openedx/edx-platform/blob/master/conf/locale/config.yaml>` of translation/localization files. To complement these languages, we add locales from the `openedx-i18n project <https://github.com/openedx/openedx-i18n/blob/master/edx-platform/locale/config-extra.yaml>`_. But not all supported locales are downloaded. In some cases, the chosen default language will not display properly because it was not packaged in either edx-platform or openedx-i18n. If you feel like your language should be packaged, please `open an issue on the openedx-i18n project <https://github.com/openedx/openedx-i18n/issues>`_.
+By default, Open edX comes with a `limited set <https://github.com/openedx/openedx-translations/tree/main/translations/edx-platform/conf/locale>` of translation/localization files.
+
+Refer to the :ref:`i18n` section for more information about using your own translations.
 
 When I make changes to a course in the CMS, they are not taken into account by the LMS
 --------------------------------------------------------------------------------------
