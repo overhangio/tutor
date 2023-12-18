@@ -100,13 +100,30 @@ Contributing to Tutor
 
 Third-party contributions to Tutor and its plugins are more than welcome! Just make sure to follow these guidelines:
 
-- Outside of obvious bugs, contributions should be discussed first in the `official Open edX forum <https://discuss.openedx.org>`__.
-- Once we agree on a high-level solution, you should open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ or the corresponding plugin.
-- Make sure that all tests pass by running ``make test`` (see above).
-- If your PR is in the Tutor core repository, add a changelog entry by running ``make changelog-entry``. Edit the new file and follow the formatting instructions that it contains.
-- Write a good Git commit title and message: explain why you are making this change, what problem you are solving and which solution you adopted. Link to the relevant conversation topics in the forums and describe your use case. We *love* long, verbose descriptions :) As for the title, `conventional commits <https://www.conventionalcommits.org>`__ are preferred. Check the repo history!
+- **General Discussion**: For anything beyond obvious bugs, initiate a discussion in the `official Open edX forum <https://discuss.openedx.org>`__. This helps in agreeing on a high-level solution.
+- **Pull Requests**: Open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ for changes to the Tutor core or the corresponding plugin for plugin-specific changes.
+- **Running Tests**: Ensure that all tests pass by running ``make test``. This applies to both the Tutor core and plugin contributions.
+- **Changelog Entry**: If your PR is in the Tutor core repository or affects plugin users, add a changelog entry by running ``make changelog-entry``. Edit the new file as per the formatting instructions.
+- **Code Formatting**: Format your code, if necessary, using ``make format``.
+- **Commit Messages**: Craft a clear Git commit title and message. Explain the rationale behind your changes, the problem you're addressing, and the chosen solution. Link to relevant forum discussions and detail your use case. We appreciate detailed explanations. Use `conventional commits <https://www.conventionalcommits.org>`__ for the title.
 
-Happy hacking! ☘️
+Plugin-Specific Guidelines
+--------------------------
+
+For plugin contributions, keep the following additional points in mind:
+
+- Do not bump the version number in your contributions. This is handled separately during the release process.
+
+Releasing a New Version
+-----------------------
+
+For releasing a new version :
+
+- **Version Number**: Bump the version number in ``__about__.py``.
+- **Changelog Compilation**: Collect all changelog entries using ``make changelog``.
+- **Git Commit for Release**: Indicate the new version in the git commit title with the format ``git commit -a -m "vX.Y.Z"``.
+
+Happy hacking! ☘️☘️
 
 .. _maintainers:
 
