@@ -150,9 +150,16 @@ LOGGING["loggers"]["blockstore.apps.bundles.storage"] = {"handlers": ["console"]
 # These warnings are visible in simple commands and init tasks
 import warnings
 
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
-warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
-warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+try:
+    from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+    warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
+    warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+except ImportError:
+    # REMOVE-AFTER-V18:
+    # In Quince, edx-platform uses Django 5. But on master, edx-platform still uses Django 3.
+    # So, Tutor v17 needs to silence these warnings, whereas Tutor v17-nightly fails to import them.
+    # Once edx-platform master is upgraded to Django 5, the try-except wrapper can be removed.
+    pass
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="boto.plugin")
