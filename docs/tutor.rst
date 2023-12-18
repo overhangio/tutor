@@ -113,7 +113,7 @@ Releasing a new version
 
 When releasing a new version:
 
-- **Version Number**: Update the version number in ``__about__.py``.
+- **Version Number**: Update the version number in `__about__.py`. For detailed guidelines on version numbering, refer to the [versioning guidelines](:ref:`versioning`).
 - **Changelog Compilation**: Compile all changelog entries using ``make changelog``.
 - **Git Commit for Release**: Use the format ``git commit -a -m "vX.Y.Z"`` to indicate the new version in the git commit title.
 
