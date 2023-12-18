@@ -98,32 +98,26 @@ An optional BRANCH suffix may be appended to the release name to indicate that e
 Contributing to Tutor
 ---------------------
 
-Third-party contributions to Tutor and its plugins are more than welcome! Just make sure to follow these guidelines:
+Contributions to Tutor and its plugins are highly encouraged. Please adhere to the following guidelines:
 
-- **General Discussion**: For anything beyond obvious bugs, initiate a discussion in the `official Open edX forum <https://discuss.openedx.org>`__. This helps in agreeing on a high-level solution.
-- **Pull Requests**: Open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ for changes to the Tutor core or the corresponding plugin for plugin-specific changes.
-- **Running Tests**: Ensure that all tests pass by running ``make test``. This applies to both the Tutor core and plugin contributions.
-- **Changelog Entry**: If your PR is in the Tutor core repository or affects plugin users, add a changelog entry by running ``make changelog-entry``. Edit the new file as per the formatting instructions.
-- **Code Formatting**: Format your code, if necessary, using ``make format``.
-- **Commit Messages**: Craft a clear Git commit title and message. Explain the rationale behind your changes, the problem you're addressing, and the chosen solution. Link to relevant forum discussions and detail your use case. We appreciate detailed explanations. Use `conventional commits <https://www.conventionalcommits.org>`__ for the title.
+- **General Discussion**: Before addressing anything other than clear-cut bugs, start a discussion on the `official Open edX forum <https://discuss.openedx.org>`__. This facilitates reaching a consensus on a high-level solution.
+- **Pull Requests**: For changes to Tutor core or plugin-specific modifications, open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__.
+- **Running Tests and Code Formatting**:
+  - Ensure all tests pass by running ``make test``. This is mandatory for both Tutor core and plugin contributions.
+  - If formatting tests fail, correct your code format using ``make format``.
+- **Changelog Entry**: Create a changelog entry for significant changes (excluding reformatting or documentation) by running ``make changelog-entry``. Edit the newly created file following the given formatting instructions. This applies to both Tutor core and plugin changes.
+- **Commit Messages**: Write clear Git commit titles and messages. Detail the rationale for your changes, the issue being addressed, and your solution. Include links to relevant forum discussions and describe your use case. Detailed explanations are valuable. For commit titles, follow `conventional commits <https://www.conventionalcommits.org>`__ guidelines.
 
-Plugin-Specific Guidelines
---------------------------
-
-For plugin contributions, keep the following additional points in mind:
-
-- Do not bump the version number in your contributions. This is handled separately during the release process.
-
-Releasing a New Version
+Releasing a new version
 -----------------------
 
-For releasing a new version :
+When releasing a new version:
 
-- **Version Number**: Bump the version number in ``__about__.py``.
-- **Changelog Compilation**: Collect all changelog entries using ``make changelog``.
-- **Git Commit for Release**: Indicate the new version in the git commit title with the format ``git commit -a -m "vX.Y.Z"``.
+- **Version Number**: Update the version number in ``__about__.py``.
+- **Changelog Compilation**: Compile all changelog entries using ``make changelog``.
+- **Git Commit for Release**: Use the format ``git commit -a -m "vX.Y.Z"`` to indicate the new version in the git commit title.
 
-Happy hacking! ☘️☘️
+Happy hacking! ☘️
 
 .. _maintainers:
 
