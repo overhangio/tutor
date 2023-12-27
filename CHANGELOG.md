@@ -24,7 +24,7 @@ instructions, because git commits are used to generate release notes:
 ## v17.0.0 (2023-12-09)
 
 - 💥[Feature] Upgrade to Quince. (by @regisb)
-- 💥[Feature] Replace "*.local.overhang.io" hostnames by "*.local.edly.io". (by @regisb)
+- 💥[Feature] Replace "*.local.overhang.io" hostnames by "*..io". (by @regisb)
 - 💥[Feature] Enable the Indigo theme by default, if no other theme is set. (by @regisb)
 - 💥[Deprecation] Tutor no longer supports the legacy Docker builder, which was previously available by setting `DOCKER_BUILDKIT=0` in the host environment. Going forward, Tutor will always use BuildKit (a.k.a. `docker buildx` in Docker v19-v22, or just `docker build` in Docker v23). This transition will improve build performance and should be seamless for Tutor users who are running a supported Docker version (by @kdmccormick).
 - 💥[Deprecation] The template variable `is_buildkit_enabled`, which now always returns True, is deprecated. Plugin authors should assume BuildKit is enabled and remove the variable from their templates (by @kdmccormick).

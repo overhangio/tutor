@@ -378,7 +378,7 @@ class PatchRendererTests(unittest.TestCase):
 
         iter_templates_in_mock.assert_called_once()
         render_template_mock.assert_has_calls(calls)
-
+mfe
     @patch("sys.stdout", new_callable=StringIO)
     @patch("tutor.env.PatchRenderer.render_all")
     def test_print_patches_locations(
