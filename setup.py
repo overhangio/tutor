@@ -57,7 +57,7 @@ setup(
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
     python_requires=">=3.8",
-    install_requires=load_requirements("base.in"),
+    install_requires=load_requirements("base.txt"),
     extras_require={
         "dev": load_requirements("dev.txt"),
         "full": load_requirements("plugins.txt"),
