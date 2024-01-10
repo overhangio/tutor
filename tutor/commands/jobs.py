@@ -124,7 +124,7 @@ u.save()"
 @click.option(
     "-r",
     "--repo",
-    default="https://github.com/openedx/edx-demo-course",
+    default="https://github.com/openedx/openedx-demo-course",
     show_default=True,
     help="Git repository that contains the course to be imported",
 )
@@ -133,7 +133,7 @@ u.save()"
     "--repo-dir",
     default="",
     show_default=True,
-    help="Git relative subdirectory to import data from",
+    help="Git relative subdirectory to import data from. If unspecified, will default to the directory containing course.xml",
 )
 @click.option(
     "-v",
@@ -145,12 +145,79 @@ def importdemocourse(
 ) -> t.Iterable[tuple[str, str]]:
     version = version or "{{ OPENEDX_COMMON_VERSION }}"
     template = f"""
-# Import demo course
+# Clone the repo
 git clone {repo} --branch {version} --depth 1 /tmp/course
-python ./manage.py cms import ../data /tmp/course/{repo_dir}
+
+# Determine root directory for course import. If one is provided, use that.
+# Otherwise, use the directory containing course.xml, failing if there isn't exactly one.
+if [ -n "{repo_dir}" ] ; then
+    course_root=/tmp/course/{repo_dir}
+else
+    course_xml_first="$(find /tmp/course -name course.xml | head -n 1)"
+    course_xml_extra="$(find /tmp/course -name course.xml | tail -n +2)"
+    echo "INFO: Found course.xml files(s): $course_xml_first $course_xml_extra"
+    if [ -z "$course_xml_first" ] ; then
+        echo "ERROR: Could not find course.xml. Are you sure this is the right repository?"
+        exit 1
+    fi
+    if [ -n "$course_xml_extra" ] ; then
+        echo "ERROR: Found multiple course.xml files--course root is ambiguous!"
+        echo "       Please specify a course root dir (relative to repo root) using --repo-dir."
+        exit 1
+    fi
+    course_root="$(dirname "$course_xml_first")"
+fi
+echo "INFO: Will import course data at: $course_root" && echo
+
+# Import into CMS
+python ./manage.py cms import ../data "$course_root"
 
 # Re-index courses
 ./manage.py cms reindex_course --all --setup"""
+    yield ("cms", template)
+
+
+@click.command(help="Import the demo content libraries")
+@click.argument("owner_username")
+@click.option(
+    "-r",
+    "--repo",
+    default="https://github.com/openedx/openedx-demo-course",
+    show_default=True,
+    help="Git repository that contains the library/libraries to be imported",
+)
+@click.option(
+    "-v",
+    "--version",
+    help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
+)
+def importdemolibraries(
+    owner_username: str, repo: str, version: t.Optional[str]
+) -> t.Iterable[tuple[str, str]]:
+    version = version or "{{ OPENEDX_COMMON_VERSION }}"
+    template = f"""
+# Clone the repo
+git clone {repo} --branch {version} --depth 1 /tmp/library
+
+# Fail loudly if:
+# * there no library.xml files, or
+# * any library.xml is not within a directory named "library/" (upstream edx-platform expectation).
+if ! find /tmp/library -name library.xml | grep -q "." ; then
+    echo "ERROR: No library.xml files found in repository. Are you sure this is the right repository and version?"
+    exit 1
+fi
+
+# For every library.xml file, create a tar of its parent directory, and import into CMS.
+for lib_root in $(find /tmp/library -name library.xml | xargs dirname) ; do
+    echo "INFO: Will import library at $lib_root"
+    if [ "$(basename "$lib_root")" != "library" ] ; then
+        echo "ERROR: can only import library.xml files that are within a directory named 'library'"
+        exit 1
+    fi
+    rm -rf /tmp/library.tar.gz
+    ( cd "$(dirname "$lib_root")" && tar czvf /tmp/library.tar.gz library )
+    yes | ./manage.py cms import_content_library /tmp/library.tar.gz {owner_username}
+done"""
     yield ("cms", template)
 
 
@@ -324,6 +391,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
     [
         createuser,
         importdemocourse,
+        importdemolibraries,
         initialise,
         print_edx_platform_setting,
         settheme,
