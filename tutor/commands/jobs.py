@@ -120,20 +120,33 @@ u.save()"
 """
 
 
-@click.command(help="Import the demo course")
+@click.command(help="Import the demo course and content library")
 @click.option(
     "-r",
     "--repo",
-    default="https://github.com/openedx/edx-demo-course",
+    default="https://github.com/openedx/openedx-demo-course",
     show_default=True,
     help="Git repository that contains the course to be imported",
 )
 @click.option(
     "-d",
     "--repo-dir",
-    default="",
+    default="demo-course/course",
     show_default=True,
-    help="Git relative subdirectory to import data from",
+    help="Git relative subdirectory to import course data from",
+)
+@click.option(
+    "-l",
+    "--library-tar",
+    default="dist/demo-content-library.tar.gz",
+    show_default=True,
+    help="Git relative .tar.gz path to import content library from",
+)
+@click.option(
+    "-L",
+    "--library-owner",
+    show_default=True,
+    help="Name of Open edX user who will own the library. If omitted, library import will be skipped.",
 )
 @click.option(
     "-v",
@@ -141,16 +154,20 @@ u.save()"
     help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
 )
 def importdemocourse(
-    repo: str, repo_dir: str, version: t.Optional[str]
+    repo: str,
+    repo_dir: str,
+    library_tar: str,
+    library_owner: t.Optional[str],
+    version: t.Optional[str],
 ) -> t.Iterable[tuple[str, str]]:
     version = version or "{{ OPENEDX_COMMON_VERSION }}"
-    template = f"""
-# Import demo course
-git clone {repo} --branch {version} --depth 1 /tmp/course
-python ./manage.py cms import ../data /tmp/course/{repo_dir}
-
-# Re-index courses
-./manage.py cms reindex_course --all --setup"""
+    template = f"git clone {repo} --branch {version} --depth 1 /tmp/course"
+    if library_owner:
+        template += f"\nyes | ./manage.py cms import_content_library /tmp/course/{library_tar} {library_owner}"
+    else:
+        template += "\necho 'WARNING: Skipped demo library import because --library-owner was not provided.'"
+    template += f"\npython ./manage.py cms import ../data /tmp/course/{repo_dir}"
+    template += f"\n./manage.py cms reindex_course --all --setup"
     yield ("cms", template)
 
 
