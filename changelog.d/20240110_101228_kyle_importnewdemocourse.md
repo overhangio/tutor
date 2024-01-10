@@ -1,0 +1,7 @@
+- [Feature] Several enhancements to the Demo Course (by @kdmccormick):
+  - The [Open edX Demo Course](https://github.com/openedx/openedx-demo-course) has been re-built from scratch with up-to-date instruction-focused content. Its directory structure has changed.
+  - In order to support both the old and new structures of the Demo Course's repository, the command `tutor local do importdemocourse` will now auto-determine the course root based on the location of `course.xml`. Use the `--repo-dir` argument to override this behavior.
+  - The new command `tutor local do importdemolibraries` will import any content libraries defined within the Demo Course repository. At the moment, that is just the "Respiratory System Question Bank", which is an optional but helpful extension to the new Demo Course.
+  - To try out the new Demo Course now, run: `tutor local do importdemocourse --version master`.
+  - To try out the demo Respiratory System Question Bank now, run: `tutor local do importdemolibraries --version master`.
+  - To revert back to an older Demo Course version at any point, run: `tutor local do importdemocourse --version open-release/quince.2`, replacing `quince.2` with your preferred course version.
