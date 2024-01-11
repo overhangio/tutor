@@ -1,0 +1,222 @@
+Metadata-Version: 2.1
+Name: tutor
+Version: 17.0.0
+Summary: The Docker-based Open edX distribution designed for peace of mind
+Home-page: https://docs.tutor.edly.io/
+Author: Edly
+Author-email: hello@edly.io
+License: AGPLv3
+Project-URL: Documentation, https://docs.tutor.edly.io/
+Project-URL: Code, https://github.com/overhangio/tutor
+Project-URL: Issue tracker, https://github.com/overhangio/tutor/issues
+Project-URL: Community, https://discuss.openedx.org/tag/tutor
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/x-rst
+License-File: LICENSE.txt
+Requires-Dist: appdirs
+Requires-Dist: click >=8.0
+Requires-Dist: jinja2 >=2.10
+Requires-Dist: kubernetes
+Requires-Dist: mypy
+Requires-Dist: pycryptodome >=3.17.0
+Requires-Dist: pyyaml >=6.0
+Requires-Dist: typing-extensions >=4.4.0
+Requires-Dist: importlib-metadata >=7.0.1
+Requires-Dist: importlib-resources >=6.1.1
+Provides-Extra: dev
+Requires-Dist: altgraph ==0.17.4 ; extra == 'dev'
+Requires-Dist: appdirs ==1.4.4 ; extra == 'dev'
+Requires-Dist: astroid ==3.0.1 ; extra == 'dev'
+Requires-Dist: attrs ==23.1.0 ; extra == 'dev'
+Requires-Dist: black ==23.10.1 ; extra == 'dev'
+Requires-Dist: build ==1.0.3 ; extra == 'dev'
+Requires-Dist: cachetools ==5.3.2 ; extra == 'dev'
+Requires-Dist: certifi ==2023.7.22 ; extra == 'dev'
+Requires-Dist: cffi ==1.16.0 ; extra == 'dev'
+Requires-Dist: charset-normalizer ==3.3.1 ; extra == 'dev'
+Requires-Dist: click ==8.1.7 ; extra == 'dev'
+Requires-Dist: click-log ==0.4.0 ; extra == 'dev'
+Requires-Dist: coverage ==7.3.2 ; extra == 'dev'
+Requires-Dist: cryptography ==41.0.7 ; extra == 'dev'
+Requires-Dist: dill ==0.3.7 ; extra == 'dev'
+Requires-Dist: docutils ==0.18.1 ; extra == 'dev'
+Requires-Dist: google-auth ==2.23.3 ; extra == 'dev'
+Requires-Dist: idna ==3.4 ; extra == 'dev'
+Requires-Dist: importlib-metadata ==6.8.0 ; extra == 'dev'
+Requires-Dist: importlib-resources ==6.1.1 ; extra == 'dev'
+Requires-Dist: isort ==5.12.0 ; extra == 'dev'
+Requires-Dist: jaraco-classes ==3.3.0 ; extra == 'dev'
+Requires-Dist: jeepney ==0.8.0 ; extra == 'dev'
+Requires-Dist: jinja2 ==3.1.2 ; extra == 'dev'
+Requires-Dist: keyring ==24.2.0 ; extra == 'dev'
+Requires-Dist: kubernetes ==28.1.0 ; extra == 'dev'
+Requires-Dist: markdown-it-py ==3.0.0 ; extra == 'dev'
+Requires-Dist: markupsafe ==2.1.3 ; extra == 'dev'
+Requires-Dist: mccabe ==0.7.0 ; extra == 'dev'
+Requires-Dist: mdurl ==0.1.2 ; extra == 'dev'
+Requires-Dist: more-itertools ==10.1.0 ; extra == 'dev'
+Requires-Dist: mypy ==1.6.1 ; extra == 'dev'
+Requires-Dist: mypy-extensions ==1.0.0 ; extra == 'dev'
+Requires-Dist: nh3 ==0.2.14 ; extra == 'dev'
+Requires-Dist: oauthlib ==3.2.2 ; extra == 'dev'
+Requires-Dist: packaging ==23.2 ; extra == 'dev'
+Requires-Dist: pathspec ==0.11.2 ; extra == 'dev'
+Requires-Dist: pip-tools ==7.3.0 ; extra == 'dev'
+Requires-Dist: pkginfo ==1.9.6 ; extra == 'dev'
+Requires-Dist: platformdirs ==3.11.0 ; extra == 'dev'
+Requires-Dist: pyasn1 ==0.5.0 ; extra == 'dev'
+Requires-Dist: pyasn1-modules ==0.3.0 ; extra == 'dev'
+Requires-Dist: pycparser ==2.21 ; extra == 'dev'
+Requires-Dist: pycryptodome ==3.19.0 ; extra == 'dev'
+Requires-Dist: pygments ==2.16.1 ; extra == 'dev'
+Requires-Dist: pyinstaller ==6.1.0 ; extra == 'dev'
+Requires-Dist: pyinstaller-hooks-contrib ==2023.10 ; extra == 'dev'
+Requires-Dist: pylint ==3.0.2 ; extra == 'dev'
+Requires-Dist: pyproject-hooks ==1.0.0 ; extra == 'dev'
+Requires-Dist: python-dateutil ==2.8.2 ; extra == 'dev'
+Requires-Dist: pyyaml ==6.0.1 ; extra == 'dev'
+Requires-Dist: readme-renderer ==42.0 ; extra == 'dev'
+Requires-Dist: requests ==2.31.0 ; extra == 'dev'
+Requires-Dist: requests-oauthlib ==1.3.1 ; extra == 'dev'
+Requires-Dist: requests-toolbelt ==1.0.0 ; extra == 'dev'
+Requires-Dist: rfc3986 ==2.0.0 ; extra == 'dev'
+Requires-Dist: rich ==13.6.0 ; extra == 'dev'
+Requires-Dist: rsa ==4.9 ; extra == 'dev'
+Requires-Dist: scriv ==1.5.0 ; extra == 'dev'
+Requires-Dist: secretstorage ==3.3.3 ; extra == 'dev'
+Requires-Dist: six ==1.16.0 ; extra == 'dev'
+Requires-Dist: tomli ==2.0.1 ; extra == 'dev'
+Requires-Dist: tomlkit ==0.12.1 ; extra == 'dev'
+Requires-Dist: twine ==4.0.2 ; extra == 'dev'
+Requires-Dist: types-docutils ==0.20.0.3 ; extra == 'dev'
+Requires-Dist: types-pyyaml ==6.0.12.12 ; extra == 'dev'
+Requires-Dist: types-setuptools ==68.2.0.0 ; extra == 'dev'
+Requires-Dist: typing-extensions ==4.8.0 ; extra == 'dev'
+Requires-Dist: urllib3 ==1.26.18 ; extra == 'dev'
+Requires-Dist: websocket-client ==1.6.4 ; extra == 'dev'
+Requires-Dist: wheel ==0.41.2 ; extra == 'dev'
+Requires-Dist: zipp ==3.17.0 ; extra == 'dev'
+Provides-Extra: full
+Requires-Dist: tutor-android <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-cairn <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-credentials <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-discovery <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-ecommerce <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-forum <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-jupyter <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-mfe <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-minio <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-notes <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-webui <18.0.0,>=17.0.0 ; extra == 'full'
+Requires-Dist: tutor-xqueue <18.0.0,>=17.0.0 ; extra == 'full'
+
+Tutor: the Docker-based Open edX distribution designed for peace of mind
+========================================================================
+
+.. image:: https://overhang.io/static/img/tutor-logo.svg
+  :alt: Tutor logo
+  :width: 500px
+  :align: center
+
+|
+
+.. _readme_intro_start:
+
+.. image:: https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=brightgreen&message=Source%20code
+  :alt: Source code
+  :target: https://github.com/overhangio/tutor
+
+.. image:: https://img.shields.io/static/v1?logo=discourse&label=Forums&style=flat-square&color=ff0080&message=discuss.openedx.org
+  :alt: Forums
+  :target: https://discuss.openedx.org/tag/tutor
+
+.. image:: https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.edly.io
+  :alt: Documentation
+  :target: https://docs.tutor.edly.io
+
+.. image:: https://img.shields.io/pypi/v/tutor?logo=python&logoColor=white
+  :alt: PyPI releases
+  :target: https://pypi.org/project/tutor
+
+.. image:: https://img.shields.io/github/license/overhangio/tutor.svg?style=flat-square
+  :alt: AGPL License
+  :target: https://www.gnu.org/licenses/agpl-3.0.en.html
+
+.. image:: https://img.shields.io/static/v1?logo=twitter&label=Twitter&style=flat-square&color=1d9bf0&message=@overhangio
+  :alt: Follow us on Twitter
+  :target: https://twitter.com/overhangio/
+
+.. image:: https://img.shields.io/static/v1?logo=youtube&label=YouTube&style=flat-square&color=ff0000&message=@overhangio
+    :alt: Follow us on Youtube
+    :target: https://www.youtube.com/c/OverhangIO
+
+**Tutor** is the official Docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customise, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used to deploy hundreds of Open edX platforms around the world.
+
+Do you need professional assistance setting up or managing your Open edX platform? `Edly <https://edly.io>`__ provides online support as part of its `Open edX installation service <https://edly.io/services/open-edx-installation/>`__.
+
+Features
+--------
+
+* 100% `open source <https://github.com/overhangio/tutor>`__
+* Runs entirely on Docker
+* World-famous 1-click `installation and upgrades <https://docs.tutor.edly.io/install.html>`__
+* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.edly.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/overhangio/tutor-android>`__, `custom translations <https://docs.tutor.edly.io/configuration.html#adding-custom-translations>`__...
+* Extensible architecture with `plugins <https://docs.tutor.edly.io/plugins/index.html>`__
+* Works with `Kubernetes <https://docs.tutor.edly.io/k8s.html>`__
+* No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.edly.io/install.html#zero-click-aws-installation>`__
+
+.. _readme_intro_end:
+
+.. image:: https://github.com/overhangio/tutor/raw/master/docs/img/launch.webp
+    :alt: Tutor local launch
+    :target: https://www.terminalizer.com/view/3a8d55835686
+
+Quickstart
+----------
+
+1. Install the `latest stable release <https://github.com/overhangio/tutor/releases>`_ of Tutor
+2. Run ``tutor local launch``
+3. You're done!
+
+Documentation
+-------------
+
+Extensive documentation is available: https://docs.tutor.edly.io/
+
+Is there a problem?
+-------------------
+
+Please follow the instructions from the `troubleshooting section <https://docs.tutor.edly.io/troubleshooting.html>`__ in the docs.
+
+.. _readme_support_start:
+
+Support
+-------
+
+To get community support, go to the official Open edX discussion forum: https://discuss.openedx.org. For official support, `Edly <https://edly.io>`__ provides professional assistance as part of its `Open edX installation service <https://edly.io/services/open-edx-installation/>`__.
+
+.. _readme_support_end:
+
+.. _readme_contributing_start:
+
+Contributing
+------------
+
+We welcome contributions to Tutor! To learn how you can contribute, please check the relevant section of the Tutor docs: `https://docs.tutor.edly.io/tutor.html#contributing <https://docs.tutor.edly.io/tutor.html#contributing>`__.
+
+.. _readme_contributing_end:
+
+License
+-------
+
+This work is licensed under the terms of the `GNU Affero General Public License (AGPL) <https://github.com/overhangio/tutor/blob/master/LICENSE.txt>`_.

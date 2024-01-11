@@ -1,7 +1,7 @@
 # -*- mode: python -*-
 import importlib
 import os
-import pkg_resources
+from importlib_metadata import entry_points
 
 block_cipher = None
 
@@ -10,7 +10,7 @@ hidden_imports = []
 
 # Auto-discover plugins and include patches & templates folders
 for entrypoint_version in ["tutor.plugin.v0", "tutor.plugin.v1"]:
-    for entrypoint in pkg_resources.iter_entry_points(entrypoint_version):
+    for entrypoint in entry_points().select(group=entrypoint_version):
         plugin_name = entrypoint.name
         try:
             plugin = entrypoint.load()
