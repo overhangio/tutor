@@ -265,8 +265,6 @@ class EntrypointPlugin(BasePlugin):
             try:
                 error: t.Optional[str] = None
                 cls(entrypoint)
-            except Distribution.VersionConflict as e:
-                error = e.report()
             except Exception as e:  # pylint: disable=broad-except
                 error = str(e)
             if error:
