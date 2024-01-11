@@ -5,7 +5,7 @@ import typing as t
 from glob import glob
 
 import click
-import pkg_resources
+import importlib_metadata
 
 from tutor import env, exceptions, fmt, hooks, serialize
 from tutor.__about__ import __app__
@@ -246,12 +246,12 @@ class EntrypointPlugin(BasePlugin):
 
     ENTRYPOINT = "tutor.plugin.v0"
 
-    def __init__(self, entrypoint: pkg_resources.EntryPoint) -> None:
-        self.loader: pkg_resources.EntryPoint
+    def __init__(self, entrypoint: importlib_metadata.EntryPoint) -> None:
+        self.loader: importlib_metadata.EntryPoint = entrypoint
         super().__init__(entrypoint.name, entrypoint)
 
     def _load_obj(self) -> None:
-        self.obj = self.loader.load()
+        self.obj = importlib.import_module(self.loader.value)
 
     def _version(self) -> t.Optional[str]:
         if not self.loader.dist:
@@ -260,12 +260,11 @@ class EntrypointPlugin(BasePlugin):
 
     @classmethod
     def discover_all(cls) -> None:
-        for entrypoint in pkg_resources.iter_entry_points(cls.ENTRYPOINT):
+        entrypoints = importlib_metadata.entry_points(group=cls.ENTRYPOINT)
+        for entrypoint in entrypoints:
             try:
                 error: t.Optional[str] = None
                 cls(entrypoint)
-            except pkg_resources.VersionConflict as e:
-                error = e.report()
             except Exception as e:  # pylint: disable=broad-except
                 error = str(e)
             if error:
