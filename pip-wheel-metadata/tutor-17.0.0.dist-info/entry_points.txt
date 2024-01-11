@@ -1,2 +1,0 @@
-[console_scripts]
-tutor = tutor.commands.cli:main
