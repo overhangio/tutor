@@ -334,8 +334,8 @@ The following sections describe how to modify various aspects of the docker imag
 
 The custom image will be used the next time you run ``tutor local launch`` or ``tutor local start``. Do not attempt to run ``tutor local restart``! Restarting will not pick up the new image and will continue to use the old image.
 
-openedx Docker Image build arguments
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"openedx" Docker image build arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When building the "openedx" Docker image, it is possible to specify a few `arguments <https://docs.docker.com/engine/reference/builder/#arg>`__:
 
@@ -354,9 +354,10 @@ See :ref:`the corresponding tutorial <theming>`.
 
 .. _custom_extra_xblocks:
 
+Installing extra xblocks and requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` parameter in the :ref:`config file <configuration>`. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_:
+Would you like to include custom xblocks, or extra requirements to your Open edX platform? Additional requirements can be added to the ``OPENEDX_EXTRA_PIP_REQUIREMENTS`` parameter in the :ref:`config file <configuration>`. For instance, to include the `polling xblock from Opencraft <https://github.com/open-craft/xblock-poll/>`_::
 
     tutor config save --append OPENEDX_EXTRA_PIP_REQUIREMENTS=git+https://github.com/open-craft/xblock-poll.git
 
