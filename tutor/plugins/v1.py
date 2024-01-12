@@ -26,7 +26,7 @@ def _discover_entrypoint_plugins() -> None:
     """
     with hooks.Contexts.PLUGINS.enter():
         if "TUTOR_IGNORE_ENTRYPOINT_PLUGINS" not in os.environ:
-            for entrypoint in entry_points().select(group='tutor.plugin.v1'):  # type: ignore[no-untyped-call]
+            for entrypoint in entry_points().select(group="tutor.plugin.v1"):  # type: ignore[no-untyped-call]
                 discover_package(entrypoint)
 
 

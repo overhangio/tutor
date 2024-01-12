@@ -13,7 +13,7 @@ from tutor import exceptions, fmt, hooks, plugins, utils
 from tutor.__about__ import __app__, __version__
 from tutor.types import Config, ConfigValue
 
-ref = files('tutor') / 'templates'
+ref = files("tutor") / "templates"
 with as_file(ref) as path:
     TEMPLATES_ROOT = str(path)
 VERSION_FILENAME = "version"
