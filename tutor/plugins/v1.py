@@ -68,7 +68,7 @@ def discover_package(entrypoint: EntryPoint) -> None:
     # Add plugin information
     if entrypoint.dist is None:
         raise ValueError(f"Could not read plugin version: {name}")
-    dist_version = entrypoint.dist.version if entrypoint.dist else None
+    dist_version = entrypoint.dist.version if entrypoint.dist else "Unknown"
     hooks.Filters.PLUGINS_INFO.add_item((name, dist_version))
 
     # Import module on enable
