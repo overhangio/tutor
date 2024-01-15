@@ -7,15 +7,13 @@ import typing as t
 from copy import deepcopy
 
 import jinja2
-from importlib_resources import files, as_file
+import importlib_resources
 
 from tutor import exceptions, fmt, hooks, plugins, utils
 from tutor.__about__ import __app__, __version__
 from tutor.types import Config, ConfigValue
 
-ref = files("tutor") / "templates"
-with as_file(ref) as path:
-    TEMPLATES_ROOT = str(path)
+TEMPLATES_ROOT = str(importlib_resources.files("tutor") / "templates")
 VERSION_FILENAME = "version"
 BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".patch", ".png", ".ttf", ".woff", ".woff2"]
 JinjaFilter = t.Callable[..., t.Any]

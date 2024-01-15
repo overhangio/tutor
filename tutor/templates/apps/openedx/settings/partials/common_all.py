@@ -157,6 +157,7 @@ warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="boto.plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="botocore.vendored.requests.packages.urllib3._collections")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resources")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="fs")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="fs.opener")
 SILENCED_SYSTEM_CHECKS = ["2_0.W001", "fields.W903"]

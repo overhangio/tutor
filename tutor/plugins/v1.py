@@ -2,7 +2,7 @@ import importlib.util
 import os
 from glob import glob
 
-from importlib_metadata import entry_points, EntryPoint
+import importlib_metadata
 
 from tutor import hooks
 
@@ -26,7 +26,7 @@ def _discover_entrypoint_plugins() -> None:
     """
     with hooks.Contexts.PLUGINS.enter():
         if "TUTOR_IGNORE_ENTRYPOINT_PLUGINS" not in os.environ:
-            for entrypoint in entry_points().select(group="tutor.plugin.v1"):  # type: ignore[no-untyped-call]
+            for entrypoint in importlib_metadata.entry_points().select(group="tutor.plugin.v1"):  # type: ignore[no-untyped-call]
                 discover_package(entrypoint)
 
 
@@ -56,7 +56,7 @@ def discover_module(path: str) -> None:
             spec.loader.exec_module(module)
 
 
-def discover_package(entrypoint: EntryPoint) -> None:
+def discover_package(entrypoint: importlib_metadata.EntryPoint) -> None:
     """
     Install a plugin from a python package.
     """

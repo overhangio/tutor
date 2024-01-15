@@ -5,7 +5,7 @@ import typing as t
 from glob import glob
 
 import click
-from importlib_metadata import EntryPoint, entry_points, Distribution
+import importlib_metadata
 
 from tutor import env, exceptions, fmt, hooks, serialize
 from tutor.__about__ import __app__
@@ -246,8 +246,8 @@ class EntrypointPlugin(BasePlugin):
 
     ENTRYPOINT = "tutor.plugin.v0"
 
-    def __init__(self, entrypoint: EntryPoint) -> None:
-        self.loader: EntryPoint = entrypoint
+    def __init__(self, entrypoint: importlib_metadata.EntryPoint) -> None:
+        self.loader: importlib_metadata.EntryPoint = entrypoint
         super().__init__(entrypoint.name, entrypoint)
 
     def _load_obj(self) -> None:
@@ -260,7 +260,7 @@ class EntrypointPlugin(BasePlugin):
 
     @classmethod
     def discover_all(cls) -> None:
-        entrypoints = entry_points().select(group=cls.ENTRYPOINT)  # type: ignore[no-untyped-call]
+        entrypoints = importlib_metadata.entry_points().select(group=cls.ENTRYPOINT)  # type: ignore[no-untyped-call]
         for entrypoint in entrypoints:
             try:
                 error: t.Optional[str] = None
