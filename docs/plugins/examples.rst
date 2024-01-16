@@ -43,18 +43,18 @@ Enable Google Analytics
 
 ::
 
-    from tutor import hooks
+  from tutor import hooks
 
-      hooks.Filters.ENV_PATCHES.add_items([
-          (
-              "openedx-common-settings",
-              "GOOGLE_ANALYTICS_4_ID = 'MY-MEASUREMENT-ID'"
-          ),
-          (
-              "mfe-lms-common-settings",
-              "MFE_CONFIG['GOOGLE_ANALYTICS_4_ID'] = 'MY-MEASUREMENT-ID'"
-          ),
-      ])
+  hooks.Filters.ENV_PATCHES.add_items([
+      (
+          "openedx-common-settings",
+          "GOOGLE_ANALYTICS_4_ID = 'MY-MEASUREMENT-ID'"
+      ),
+      (
+          "mfe-lms-common-settings",
+          "MFE_CONFIG['GOOGLE_ANALYTICS_4_ID'] = 'MY-MEASUREMENT-ID'"
+      ),
+  ])
 
 .. note::
     Please be aware that as of May 2023 Google Analytics support has been upgraded from Google Universal Analytics to Google Analytics 4 and you may need to update your configuration as mentioned in the `Open edX docs <https://docs.openedx.org/en/latest/site_ops/how-tos/google-analytics.html>`__.
