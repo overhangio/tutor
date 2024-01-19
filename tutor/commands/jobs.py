@@ -120,7 +120,7 @@ u.save()"
 """
 
 
-@click.command(help="Import the demo course and content library")
+@click.command(help="Import the demo course")
 @click.option(
     "-r",
     "--repo",
@@ -133,20 +133,7 @@ u.save()"
     "--repo-dir",
     default="demo-course/course",
     show_default=True,
-    help="Git relative subdirectory to import course data from",
-)
-@click.option(
-    "-l",
-    "--library-tar",
-    default="dist/demo-content-library.tar.gz",
-    show_default=True,
-    help="Git relative .tar.gz path to import content library from",
-)
-@click.option(
-    "-L",
-    "--library-owner",
-    show_default=True,
-    help="Name of Open edX user who will own the library. If omitted, library import will be skipped.",
+    help="Git relative subdirectory to import data from",
 )
 @click.option(
     "-v",
@@ -154,20 +141,47 @@ u.save()"
     help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
 )
 def importdemocourse(
-    repo: str,
-    repo_dir: str,
-    library_tar: str,
-    library_owner: t.Optional[str],
-    version: t.Optional[str],
+    repo: str, repo_dir: str, version: t.Optional[str]
 ) -> t.Iterable[tuple[str, str]]:
     version = version or "{{ OPENEDX_COMMON_VERSION }}"
-    template = f"git clone {repo} --branch {version} --depth 1 /tmp/course"
-    if library_owner:
-        template += f"\nyes | ./manage.py cms import_content_library /tmp/course/{library_tar} {library_owner}"
-    else:
-        template += "\necho 'WARNING: Skipped demo library import because --library-owner was not provided.'"
-    template += f"\npython ./manage.py cms import ../data /tmp/course/{repo_dir}"
-    template += f"\n./manage.py cms reindex_course --all --setup"
+    template = f"""
+# Import demo course
+git clone {repo} --branch {version} --depth 1 /tmp/course
+python ./manage.py cms import ../data /tmp/course/{repo_dir}
+
+# Re-index courses
+./manage.py cms reindex_course --all --setup"""
+    yield ("cms", template)
+
+
+@click.command(help="Import the demo content library")
+@click.argument("owner_username")
+@click.option(
+    "-r",
+    "--repo",
+    default="https://github.com/openedx/openedx-demo-course",
+    show_default=True,
+    help="Git repository that contains the library to be imported",
+)
+@click.option(
+    "-t",
+    "--repo-tar-path",
+    default="dist/demo-content-library.tar.gz",
+    show_default=True,
+    help="Git relative .tar.gz path to import content library from",
+)
+@click.option(
+    "-v",
+    "--version",
+    help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
+)
+def importdemolibrary(
+    owner_username: str, repo: str, repo_tar_path: str, version: t.Optional[str]
+) -> t.Iterable[tuple[str, str]]:
+    version = version or "{{ OPENEDX_COMMON_VERSION }}"
+    template = f"""
+git clone {repo} --branch {version} --depth 1 /tmp/course
+yes | ./manage.py cms import_content_library /tmp/course/{repo_tar_path} {owner_username}"""
     yield ("cms", template)
 
 
@@ -341,6 +355,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
     [
         createuser,
         importdemocourse,
+        importdemolibrary,
         initialise,
         print_edx_platform_setting,
         settheme,

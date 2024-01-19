@@ -40,14 +40,21 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
         self.assertIn(
             "git clone https://github.com/openedx/openedx-demo-course", dc_args[-1]
         )
-        self.assertIn("Skipped demo library import", dc_args[-1])
 
-    def test_import_demo_course_and_library(self) -> None:
+    def test_import_demo_library(self) -> None:
         with temporary_root() as root:
             self.invoke_in_root(root, ["config", "save"])
             with patch("tutor.utils.docker_compose") as mock_docker_compose:
                 result = self.invoke_in_root(
-                    root, ["local", "do", "importdemocourse", "-L", "admin"]
+                    root,
+                    [
+                        "local",
+                        "do",
+                        "importdemolibrary",
+                        "-t",
+                        "fake/path.tar.gz",
+                        "admin",
+                    ],
                 )
                 dc_args, _dc_kwargs = mock_docker_compose.call_args
         self.assertIsNone(result.exception)
@@ -56,7 +63,10 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
         self.assertIn(
             "git clone https://github.com/openedx/openedx-demo-course", dc_args[-1]
         )
-        self.assertIn("./manage.py cms import_content_library ", dc_args[-1])
+        self.assertIn(
+            "./manage.py cms import_content_library /tmp/course/fake/path.tar.gz admin",
+            dc_args[-1],
+        )
 
     def test_set_theme(self) -> None:
         with temporary_root() as root:
