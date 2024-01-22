@@ -4,8 +4,12 @@ import typing as t
 
 from typing_extensions import Protocol
 
+#: High priority callbacks are triggered first.
 HIGH = 5
+#: By default, all callbacks have the same priority and are processed in the order they
+#: were added.
 DEFAULT = 10
+#: Low-priority callbacks are called last. Add callbacks with this priority to override previous callbacks. To add callbacks with even lower priority, use ``LOW + somevalue`` (though such behaviour is not encouraged).
 LOW = 50
 
 
