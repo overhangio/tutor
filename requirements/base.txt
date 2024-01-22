@@ -20,7 +20,7 @@ google-auth==2.23.3
     # via kubernetes
 idna==3.4
     # via requests
-jinja2==3.1.2
+jinja2==3.1.3
     # via -r requirements/base.in
 kubernetes==28.1.0
     # via -r requirements/base.in
@@ -40,7 +40,7 @@ pyasn1==0.5.0
     #   rsa
 pyasn1-modules==0.3.0
     # via google-auth
-pycryptodome==3.19.0
+pycryptodome==3.20.0
     # via -r requirements/base.in
 python-dateutil==2.8.2
     # via kubernetes
