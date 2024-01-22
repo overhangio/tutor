@@ -51,6 +51,8 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {%- else %}
 # Patch edx-platform
+# XBlock JWT security fix https://github.com/openedx/edx-platform/pull/34047
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/89f5f69682a5e1422f89e867491e8974dd0a8208.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
