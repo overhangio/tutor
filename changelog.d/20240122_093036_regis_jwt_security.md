@@ -1,0 +1,1 @@
+- [Security] Fix JWT scopes in XBlock callbacks. (by @regisb)
