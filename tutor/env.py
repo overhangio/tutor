@@ -15,7 +15,17 @@ from tutor.types import Config, ConfigValue
 
 TEMPLATES_ROOT = pkg_resources.resource_filename("tutor", "templates")
 VERSION_FILENAME = "version"
-BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".patch", ".png", ".ttf", ".woff", ".woff2"]
+BIN_FILE_EXTENSIONS = [
+    ".ico",
+    ".jpg",
+    ".otf",
+    ".patch",
+    ".png",
+    ".ttf",
+    ".webp",
+    ".woff",
+    ".woff2",
+]
 JinjaFilter = t.Callable[..., t.Any]
 
 
