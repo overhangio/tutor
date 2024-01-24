@@ -186,8 +186,14 @@ COPY --chown=app:app settings/lms/*.py ./lms/envs/tutor/
 COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/
 
 # Pull latest translations via atlas
-RUN atlas pull --repository='{{ ATLAS_REPOSITORY }}' --branch='{{ ATLAS_REVISION }}' {{ ATLAS_OPTIONS }} \
-    translations/edx-platform/conf/locale:conf/locale
+RUN ./manage.py lms --settings=tutor.i18n pull_plugin_translations --verbose --repository='{{ ATLAS_REPOSITORY }}' --revision='{{ ATLAS_REVISION }}' {{ ATLAS_OPTIONS }}
+RUN ./manage.py lms --settings=tutor.i18n pull_xblock_translations --repository='{{ ATLAS_REPOSITORY }}' --revision='{{ ATLAS_REVISION }}' {{ ATLAS_OPTIONS }}
+RUN atlas pull --repository='{{ ATLAS_REPOSITORY }}' --revision='{{ ATLAS_REVISION }}' {{ ATLAS_OPTIONS }} \
+    translations/edx-platform/conf/locale:conf/locale \
+    translations/studio-frontend/src/i18n/messages:conf/plugins-locale/studio-frontend
+RUN ./manage.py lms --settings=tutor.i18n compile_xblock_translations
+RUN ./manage.py cms --settings=tutor.i18n compile_xblock_translations
+RUN ./manage.py lms --settings=tutor.i18n compile_plugin_translations
 RUN ./manage.py lms --settings=tutor.i18n compilemessages -v1
 RUN ./manage.py lms --settings=tutor.i18n compilejsi18n
 RUN ./manage.py cms --settings=tutor.i18n compilejsi18n
