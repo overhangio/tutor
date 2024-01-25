@@ -20,6 +20,14 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-17.0.1'></a>
+## v17.0.1 (2024-01-25)
+
+- [Bugfix] Error "'Crypto.PublicKey.RSA.RsaKey object' has no attribute 'dq'" during `tutor config save` was caused by outdated minimum version of the pycryptodome package. To resolve this issue, run `pip install --upgrade pycryptodome`. (by @regisb)
+- [Feature] add `CONFIG_INTERACTIVE` action that allows tutor plugins to interact with the configuration at the time of the interactive questionnaire that happens during tutor local launch. (by @Alec4r).
+- [Improvement] Add `.webp` and. `.otf` extensions to list of binary extensions to ignore when rendering templates.
+- [Security] Fix JWT scopes in XBlock callbacks. (by @regisb)
+
 <a id='changelog-17.0.0'></a>
 ## v17.0.0 (2023-12-09)
 
