@@ -6,7 +6,6 @@ x-openedx-service:
   stdin_open: true
   tty: true
   volumes:
-    # Settings & config volumes are merged in from `local` docker compose config  
     # theme files
     - ../build/openedx/themes:/openedx/themes
 
