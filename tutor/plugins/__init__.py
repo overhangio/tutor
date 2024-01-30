@@ -3,6 +3,7 @@ Provide API for plugin features.
 """
 from __future__ import annotations
 
+import functools
 import typing as t
 from copy import deepcopy
 
@@ -11,38 +12,6 @@ from tutor.types import Config, get_typed
 
 # Import modules to trigger hook creation
 from . import openedx, v0, v1
-
-# Cache of plugin patches, for efficiency
-ENV_PATCHES_DICT: dict[str, list[str]] = {}
-
-
-@hooks.Actions.PLUGINS_LOADED.add()
-def _fill_patch_cache_on_load() -> None:
-    """
-    This action is run after plugins have been loaded.
-    """
-    _fill_patches_cache()
-
-
-@hooks.Actions.PLUGIN_UNLOADED.add()
-def _fill_patch_cache_on_unload(plugin: str, root: str, _config: Config) -> None:
-    """
-    This action is run after plugins have been unloaded.
-    """
-    _fill_patches_cache()
-
-
-def _fill_patches_cache() -> None:
-    """
-    Some patches are added as (name, content) tuples with the ENV_PATCHES
-    filter. We convert these patches to add them to ENV_PATCHES_DICT. This makes it
-    easier for end-user to declare patches, and it's more performant.
-    """
-    ENV_PATCHES_DICT.clear()
-    patches: t.Iterable[tuple[str, str]] = hooks.Filters.ENV_PATCHES.iterate()
-    for name, content in patches:
-        ENV_PATCHES_DICT.setdefault(name, [])
-        ENV_PATCHES_DICT[name].append(content)
 
 
 def is_installed(name: str) -> bool:
@@ -127,7 +96,19 @@ def iter_patches(name: str) -> t.Iterator[str]:
     """
     Yields: patch (str)
     """
-    yield from ENV_PATCHES_DICT.get(name, [])
+    yield from _env_patches().get(name, [])
+
+
+@hooks.lru_cache
+def _env_patches() -> dict[str, list[str]]:
+    """
+    Dictionary of patches, implemented for performance reasons.
+    """
+    patches: dict[str, list[str]] = {}
+    for name, content in hooks.Filters.ENV_PATCHES.iterate():
+        patches.setdefault(name, [])
+        patches[name].append(content)
+    return patches
 
 
 def unload(plugin: str) -> None:
