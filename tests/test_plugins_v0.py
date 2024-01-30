@@ -9,7 +9,7 @@ from tutor.plugins import v0 as plugins_v0
 from tutor.types import Config, get_typed
 
 
-class PluginsTests(PluginsTestCase):
+class PluginsV0Tests(PluginsTestCase):
     def test_iter_installed(self) -> None:
         self.assertEqual([], list(plugins.iter_installed()))
 

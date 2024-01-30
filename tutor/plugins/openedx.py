@@ -4,8 +4,7 @@ import os
 import re
 import typing as t
 
-from tutor import bindmount
-from tutor import hooks
+from tutor import bindmount, hooks
 from tutor.__about__ import __version_suffix__
 
 

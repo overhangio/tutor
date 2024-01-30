@@ -23,6 +23,7 @@ Functions
 ---------
 
 .. autofunction:: tutor.core.hooks::clear_all
+.. autofunction:: tutor.hooks::lru_cache
 
 Priorities
 ----------
