@@ -26,7 +26,7 @@ def _discover_entrypoint_plugins() -> None:
     """
     with hooks.Contexts.PLUGINS.enter():
         if "TUTOR_IGNORE_ENTRYPOINT_PLUGINS" not in os.environ:
-            for entrypoint in importlib_metadata.entry_points().select(group="tutor.plugin.v1"):  # type: ignore[no-untyped-call]
+            for entrypoint in importlib_metadata.entry_points(group="tutor.plugin.v1"):
                 discover_package(entrypoint)
 
 
@@ -75,4 +75,4 @@ def discover_package(entrypoint: importlib_metadata.EntryPoint) -> None:
     @hooks.Actions.PLUGIN_LOADED.add()
     def load(plugin_name: str) -> None:
         if name == plugin_name:
-            entrypoint.load()  # type: ignore[no-untyped-call]
+            importlib.import_module(entrypoint.value)

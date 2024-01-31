@@ -251,7 +251,7 @@ class EntrypointPlugin(BasePlugin):
         super().__init__(entrypoint.name, entrypoint)
 
     def _load_obj(self) -> None:
-        self.obj = self.loader.load()  # type: ignore[no-untyped-call]
+        self.obj = importlib.import_module(self.loader.value)
 
     def _version(self) -> t.Optional[str]:
         if not self.loader.dist:
@@ -260,7 +260,7 @@ class EntrypointPlugin(BasePlugin):
 
     @classmethod
     def discover_all(cls) -> None:
-        entrypoints = importlib_metadata.entry_points().select(group=cls.ENTRYPOINT)  # type: ignore[no-untyped-call]
+        entrypoints = importlib_metadata.entry_points(group=cls.ENTRYPOINT)
         for entrypoint in entrypoints:
             try:
                 error: t.Optional[str] = None
