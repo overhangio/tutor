@@ -119,7 +119,6 @@ VIDEO_TRANSCRIPTS_SETTINGS["STORAGE_KWARGS"]["location"] = MEDIA_ROOT
 GRADES_DOWNLOAD = {
     "STORAGE_TYPE": "",
     "STORAGE_KWARGS": {
-        "base_url": "/media/grades/",
         "location": "/openedx/media/grades",
     },
 }
