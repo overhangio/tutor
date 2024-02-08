@@ -1,0 +1,4 @@
+- 💥[Bugfix] Prevent infinite growth of course structure cache in Redis. (by @regisb)
+  - Redis is now configured with a maximum memory size of 4GB. If this is too low for your platform, you should increase this value using the new "redis-conf" patch.
+  - Make sure that course structure cache keys have an actual timeout.
+- [Feature] Introduce the "redis-conf" patch. (by @regisb)

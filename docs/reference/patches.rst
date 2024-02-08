@@ -376,6 +376,13 @@ File: ``apps/openedx/settings/lms/production.py``
 
 Python-formatted LMS settings in production. Values defined here override the values from :patch:`openedx-lms-common-settings`.
 
+``redis-conf``
+==============
+
+File: ``apps/redis/redis.conf``
+
+Implement this patch to override hard-coded Redis configuration values. See the `Redis configuration reference <https://redis.io/docs/management/config-file/>`__`.
+
 ``uwsgi-config``
 ================
 
