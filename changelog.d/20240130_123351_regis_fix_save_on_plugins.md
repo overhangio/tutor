@@ -1,0 +1,2 @@
+- [Bugfix] Actually update the environment on `tutor plugins enable ...`. (by @regisb)
+- [Feature] Introduce a `tutor.hooks.lru_cache` decorator that is automatically cleared whenever a plugin is loaded or unloaded. This is useful, in particular when a plugin implements a costly function that depends on tutor hooks. (by @regisb)
