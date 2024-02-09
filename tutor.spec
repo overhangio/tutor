@@ -1,7 +1,7 @@
 # -*- mode: python -*-
 import importlib
 import os
-from importlib_metadata
+import importlib_metadata
 
 block_cipher = None
 
@@ -19,7 +19,7 @@ for entrypoint_version in ["tutor.plugin.v0", "tutor.plugin.v1"]:
             continue
         plugin_root = os.path.dirname(plugin.__file__)
         plugin_root_module_name = os.path.basename(plugin_root)
-        hidden_imports.append(entrypoint.module_name)
+        hidden_imports.append(entrypoint.module)
         for folder in ["patches", "templates"]:
             path = os.path.join(plugin_root, folder)
             if os.path.exists(path):
