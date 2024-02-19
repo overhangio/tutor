@@ -510,7 +510,7 @@ def is_binary_file(path: str) -> bool:
     """
     mime_type, _ = mimetypes.guess_type(path)
     if mime_type:
-        return not mime_type.startswith('text/')
+        return not mime_type.startswith("text/")
     
     ext = os.path.splitext(path)[1].lower()
     return ext in BIN_FILE_EXTENSIONS
