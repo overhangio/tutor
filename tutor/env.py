@@ -6,6 +6,8 @@ import shutil
 import typing as t
 from copy import deepcopy
 
+import mimetypes
+
 import jinja2
 import pkg_resources
 
@@ -491,7 +493,26 @@ def read_core_template_file(*path: str) -> str:
 
 
 def is_binary_file(path: str) -> bool:
-    ext = os.path.splitext(path)[1]
+    """
+    Determines if the specified file is binary based on its MIME type or file extension.
+
+    This function first attempts to guess the MIME type of the file based on its path.
+    If the MIME type indicates that the file is not text, it is considered binary.
+    If the MIME type cannot be determined or is not indicative of a binary file,
+    the function then checks the file's extension against a predefined list of
+    binary file extensions.
+
+    Parameters:
+    - path (str): The path to the file whose type is to be determined.
+
+    Returns:
+    - bool: True if the file is determined to be binary, False otherwise.
+    """
+    mime_type, _ = mimetypes.guess_type(path)
+    if mime_type:
+        return not mime_type.startswith('text/')
+    
+    ext = os.path.splitext(path)[1].lower()
     return ext in BIN_FILE_EXTENSIONS
 
 
