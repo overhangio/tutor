@@ -51,6 +51,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {%- else %}
 # Patch edx-platform
+# Prevent course structure cache infinite growth
+# https://github.com/openedx/edx-platform/pull/34210
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/ad201cd664b6c722cbefcbda23ae390c06daf621.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
