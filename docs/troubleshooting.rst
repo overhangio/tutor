@@ -194,7 +194,7 @@ Now build again::
 
     tutor images build
 
-All build commands should now make use of the newly configured builder. To later revert to the default builder, run ``docker buildx use default``. 
+All build commands should now make use of the newly configured builder. To later revert to the default builder, run ``docker contextuse default``. 
 
 .. note::	
 	Setting a too low value for maximum parallelism will result in longer build times.
