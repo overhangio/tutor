@@ -497,7 +497,7 @@ def read_core_template_file(*path: str) -> str:
 def is_binary_file(path: str) -> bool:
     """
     Determines if the specified file is binary based on its MIME type or file extension.
-
+    
     This function first attempts to guess the MIME type of the file based on its path.
     If the MIME type indicates that the file is not text and not a known text-based MIME type,
     it is considered binary. If the MIME type cannot be determined or is not indicative
@@ -506,10 +506,12 @@ def is_binary_file(path: str) -> bool:
 
     Parameters:
     - path (str): The path to the file whose type is to be determined.
-
+    
     Returns:
     - bool: True if the file is determined to be binary, False otherwise.
     """
+    TEXT_MIME_TYPES = ["application/xml", "application/json"]
+    TEXT_FILE_EXTENSIONS = [".html", ".xml", ".json", ".css", ".js"]
     mime_type, _ = mimetypes.guess_type(path)
     if mime_type:
         if mime_type.startswith("text/") or mime_type in TEXT_MIME_TYPES:
@@ -519,7 +521,6 @@ def is_binary_file(path: str) -> bool:
     if ext in TEXT_FILE_EXTENSIONS:
         return False
     return ext in BIN_FILE_EXTENSIONS
-
 
 def data_path(root: str, *path: str) -> str:
     """
