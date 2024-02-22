@@ -1,0 +1,1 @@
+- [Bugfix] Fix merge conflicts in nightly when trying to apply patches from the master branch. (by @regisb)
