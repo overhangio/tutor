@@ -17,7 +17,7 @@ from tutor.types import Config, ConfigValue
 
 TEMPLATES_ROOT = str(importlib_resources.files("tutor") / "templates")
 VERSION_FILENAME = "version"
-N_FILE_EXTENSIONS = [
+BIN_FILE_EXTENSIONS = [
     ".ico",
     ".jpg",
     ".otf",
