@@ -68,9 +68,18 @@ You can then browse the documentation with::
 Releasing a new version
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-- Bump the ``__version__`` value in ``tutor/__about__.py``. (see :ref:`versioning` below)
-- Collect changelog entries with ``make changelog``.
-- Create a commit with the version changelog.
+Releasing a version includes two phases:
+
+1. Add changes and generate individual changelog entries:
+
+- run ``make changelog-entry``(or ``scriv create``) command - It will create changelog entries in a folder named changelog.d for the changes user has done for releasing a new version.
+- Commit and merge all the changes including the changelog entries. e.g this `commit <https://github.com/overhangio/tutor-discovery/commit/e30a78936d63439bde069aeff11960585bd81592>`__.
+
+2. Update version and compile changelogs:
+
+- Now bump the ``__version__`` value in ``tutor/__about__.py``. (see :ref:`versioning` below).
+- Collect changelog entries with ``make changelog``(or ``scriv collect``) command - It will delete all previous changelog entries from changelog.d folder and will add records of those entries to CHANGELOG.md file.
+- Create a commit with the version changelog e.g. this `commit <https://github.com/overhangio/tutor-discovery/commit/18cce706a794c4968e713f0f72c6b912a2ff1e53>`__.
 - Run tests with ``make test``.
 - Push your changes to the upstream repository.
 
@@ -105,13 +114,24 @@ indicates that this filter definition can be removed as soon as Tutor v26.0.0.
 Contributing to Tutor
 ---------------------
 
-Third-party contributions to Tutor and its plugins are more than welcome! Just make sure to follow these guidelines:
+Contributions to Tutor and its plugins are highly encouraged. Please adhere to the following guidelines:
 
-- Outside of obvious bugs, contributions should be discussed first in the `official Open edX forum <https://discuss.openedx.org>`__.
-- Once we agree on a high-level solution, you should open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ or the corresponding plugin.
-- Make sure that all tests pass by running ``make test`` (see above).
-- If your PR is in the Tutor core repository, add a changelog entry by running ``make changelog-entry``. Edit the new file and follow the formatting instructions that it contains.
-- Write a good Git commit title and message: explain why you are making this change, what problem you are solving and which solution you adopted. Link to the relevant conversation topics in the forums and describe your use case. We *love* long, verbose descriptions :) As for the title, `conventional commits <https://www.conventionalcommits.org>`__ are preferred. Check the repo history!
+- **General Discussion**: Before addressing anything other than clear-cut bugs, start a discussion on the `official Open edX forum <https://discuss.openedx.org>`__. This facilitates reaching a consensus on a high-level solution.
+- **Pull Requests**: For changes to Tutor core or plugin-specific modifications, open a pull request on the `Tutor repository <https://github.com/overhangio/tutor/pulls>`__ or the corresponding plugin repository.
+- **Running Tests and Code Formatting**:
+  - Ensure all tests pass by running ``make test``. This is mandatory for both Tutor core and plugin contributions.
+  - If formatting tests fail, correct your code format using ``make format``.
+- **Changelog Entry**: Create a changelog entry for significant changes (excluding reformatting or documentation) by running ``make changelog-entry``. Edit the newly created file following the given formatting instructions. This applies to both Tutor core and plugin changes.
+- **Commit Messages**: Write clear Git commit titles and messages. Detail the rationale for your changes, the issue being addressed, and your solution. Include links to relevant forum discussions and describe your use case. Detailed explanations are valuable. For commit titles, follow `conventional commits <https://www.conventionalcommits.org>`__ guidelines.Additionally, if your pull request addresses an existing GitHub issue, include 'Close #XXX' in your commit message, where XXX is the issue number.
+
+Releasing a new version
+-----------------------
+
+When releasing a new version:
+
+- **Version Number**: Update the version number in `__about__.py`. For detailed guidelines on version numbering, refer to the (versioning guidelines :ref:`versioning`).
+- **Changelog Compilation**: Compile all changelog entries using ``make changelog``.
+- **Git Commit for Release**: Use the format ``git commit -a -m "vX.Y.Z"`` to indicate the new version in the git commit title.
 
 Happy hacking! ☘️
 

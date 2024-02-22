@@ -1,0 +1,20 @@
+name: Auto Add Issues and Pull Requests to Project
+
+on:
+  pull_request:
+    types:
+      - opened
+  issues:
+    types:
+      - opened
+
+jobs:
+  # https://github.com/actions/add-to-project
+  add-to-project:
+    name: Add issue and bugs to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/orgs/overhangio/projects/4
+          github-token: ${{ secrets.GH_PROJECT_PERSONAL_ACCESS_TOKEN }}

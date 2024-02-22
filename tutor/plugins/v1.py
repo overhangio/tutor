@@ -2,7 +2,7 @@ import importlib.util
 import os
 from glob import glob
 
-import pkg_resources
+import importlib_metadata
 
 from tutor import hooks
 
@@ -26,7 +26,7 @@ def _discover_entrypoint_plugins() -> None:
     """
     with hooks.Contexts.PLUGINS.enter():
         if "TUTOR_IGNORE_ENTRYPOINT_PLUGINS" not in os.environ:
-            for entrypoint in pkg_resources.iter_entry_points("tutor.plugin.v1"):
+            for entrypoint in importlib_metadata.entry_points(group="tutor.plugin.v1"):
                 discover_package(entrypoint)
 
 
@@ -56,7 +56,7 @@ def discover_module(path: str) -> None:
             spec.loader.exec_module(module)
 
 
-def discover_package(entrypoint: pkg_resources.EntryPoint) -> None:
+def discover_package(entrypoint: importlib_metadata.EntryPoint) -> None:
     """
     Install a plugin from a python package.
     """
@@ -68,10 +68,11 @@ def discover_package(entrypoint: pkg_resources.EntryPoint) -> None:
     # Add plugin information
     if entrypoint.dist is None:
         raise ValueError(f"Could not read plugin version: {name}")
-    hooks.Filters.PLUGINS_INFO.add_item((name, entrypoint.dist.version))
+    dist_version = entrypoint.dist.version if entrypoint.dist else "Unknown"
+    hooks.Filters.PLUGINS_INFO.add_item((name, dist_version))
 
     # Import module on enable
     @hooks.Actions.PLUGIN_LOADED.add()
     def load(plugin_name: str) -> None:
         if name == plugin_name:
-            entrypoint.load()
+            importlib.import_module(entrypoint.value)

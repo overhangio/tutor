@@ -73,7 +73,7 @@ CACHES = {
     },
     "course_structure_cache": {
         "KEY_PREFIX": "course_structure",
-        "TIMEOUT": 7200,
+        "TIMEOUT": 604800, # 1 week
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     },
