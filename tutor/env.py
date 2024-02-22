@@ -17,7 +17,17 @@ from tutor.types import Config, ConfigValue
 
 TEMPLATES_ROOT = str(importlib_resources.files("tutor") / "templates")
 VERSION_FILENAME = "version"
-BIN_FILE_EXTENSIONS = [".ico", ".jpg", ".patch", ".png", ".ttf", ".woff", ".woff2"]
+N_FILE_EXTENSIONS = [
+    ".ico",
+    ".jpg",
+    ".otf",
+    ".patch",
+    ".png",
+    ".ttf",
+    ".webp",
+    ".woff",
+    ".woff2",
+]
 TEXT_MIME_TYPES = ["application/xml", "application/json"]
 TEXT_FILE_EXTENSIONS = [".html", ".xml", ".json", ".css", ".js"]
 JinjaFilter = t.Callable[..., t.Any]
