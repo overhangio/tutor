@@ -9,12 +9,15 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+         python-version: ['3.8', '3.12']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version:  ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: requirements/dev.txt
       - name: Upgrade pip
