@@ -149,6 +149,11 @@ This defines the version that will be pulled from just the Open edX platform git
 
 By default, there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.io/en/latest/Options.html#processes>`__ to serve requests for the LMS and the CMS. However, each worker requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
 
+- ``OPENEDX_LMS_CELERY_WORKERS`` (default: ``"0"``)
+- ``OPENEDX_CMS_CELERY_WORKERS`` (default: ``"0"``)
+
+This sets the number of Celery workers at startup.  Defaults to the number of CPUs detected on the system (represented by "0").
+
 - ``OPENEDX_CELERY_REDIS_DB`` (default: ``0``)
 - ``OPENEDX_CACHE_REDIS_DB`` (default: ``1``)
 
