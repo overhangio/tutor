@@ -1,0 +1,1 @@
+- [Feature] Allow the user to configure Celery worker concurrency. (by @arbrandes)
