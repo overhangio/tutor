@@ -1,0 +1,1 @@
+- [Bugfix] In development mode, Celery tasks will now be delegated to worker containers for asynchronous execution rather than eagerly exected by the lms/cms app processes. This matches the behavior of production mode and should enable more robust testing & debugging of Celery tasks. Unit tests, however, will still eagerly execute Celery tasks in-process (by @kdmccormick). 
