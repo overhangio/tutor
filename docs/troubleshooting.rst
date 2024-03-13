@@ -193,3 +193,16 @@ Now build again::
     tutor images build
 
 All build commands should now make use of the newly configured builder. To later revert to the default builder, run ``docker buildx use default``. 
+
+fatal: the remote end hung up unexpectedly / fatal: early EOF / fatal: index-pack failed
+----------------------------------------------------------------------------------------
+
+This issue can occur due to problems with your network while cloning edx-platform which is a fairly large repository.
+
+You should first of all try to rerun the command you were trying to run to see if it works.
+
+If that does not work, you can follow the tutorial above for `High resource consumption <#high-resource-consumption-on-tutor-images-build-by-docker>`_ and set `max-parallelism = 1` so that while edx-platform is being cloned, the network is not being utilized by another command.
+
+.. note::	
+	The build for the image will be considerably slow now as each step will be built one by one.
+
