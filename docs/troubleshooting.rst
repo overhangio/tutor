@@ -193,3 +193,31 @@ Now build again::
     tutor images build
 
 All build commands should now make use of the newly configured builder. To later revert to the default builder, run ``docker buildx use default``. 
+
+Can't override styles using Indigo Theme for MFEs
+-------------------------------------------------
+
+The indigo theme can’t override the styles for MFEs directly. It overrides styles for edx-platform. In case of MFEs, `@edx/brand <https://github.com/openedx/brand-openedx>`_ is used to override styles and then add your customized ``@edx/brand`` package in tutor-indigo. In this way, styles can be overidden::
+
+
+    hooks.Filters.ENV_PATCHES.add_item((
+                "mfe-dockerfile-post-npm-install",
+                """
+    RUN npm install '@edx/brand@npm:custom-brand-package'
+    RUN npm install '@edx/brand@git+https://github.com/username/brand-openedx.git#custom-branch'
+    """,
+            ))
+
+
+NPM Dependency Conflict When overriding ``@edx/frontend-component-header`` or ``@edx/frontend-component-footer``
+----------------------------------------------------------------------------------------------------------------
+
+When there is a need to customize the ``@edx/frontend-component-header`` or ``@edx/frontend-component-footer`` component, two things we have to care of to avoid dependency conflict error during ``npm`` installation. 
+
+1. Identify the version of openedx are you using such as ``quince`` for example.
+2. Navigate to `learning <https://github.com/openedx/frontend-app-learning>`_ and `learner-dashboard <https://github.com/openedx/frontend-app-learner-dashboard>`_ MFEs repositories and checkout to branch ``quince``. Inspect which `header` and `footer` version is installed from `package.json`. One can choose any two MFEs or check in other MFEs as well 
+3. Then, determine which versions of ``@edx/frontend-platform`` MFEs are utilizing and the header you plan to customize is compatible with the same version of ``@edx/frontend-platform`` specified in `package.json` file (peer-dependencies).
+4. Ensure consistency between the versions. For example, If MFE has ``@edx/frontend-platform: 7.0.1``, then customize the header component which has ``@edx/frontend-platform: ^7.0.0`` in `package.json` under peer-dependencies
+5. Checkout to that specific tag (e.g: ``v7.0.0``) of header component and customize it
+6. Install the customized header/footer components into your MFEs. This will resolve any npm dependency conflict issues.
+7. Repeat the same process for customizing the footer component if necessary.
