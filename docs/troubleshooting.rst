@@ -197,7 +197,7 @@ All build commands should now make use of the newly configured builder. To later
 Can't override styles using Indigo Theme for MFEs
 -------------------------------------------------
 
-The indigo theme can’t override the styles for MFEs directly. It overrides styles for edx-platform. In case of MFEs, `@edx/brand <https://github.com/openedx/brand-openedx>`_ is used to override styles and then add your customized ``@edx/brand`` package in tutor-indigo. In this way, styles can be overidden::
+The indigo theme can’t override styles for MFEs directly. It overrides the styles for edx-platform. In case of MFEs, `@edx/brand <https://github.com/openedx/brand-openedx>`_ is used to override the styles. Then, customize the ``@edx/brand`` package to your preferences and include this customized package in `tutor-indigo` plugin. In this way, styles can be overidden::
 
 
     hooks.Filters.ENV_PATCHES.add_item((
@@ -214,8 +214,8 @@ NPM Dependency Conflict When overriding ``@edx/frontend-component-header`` or ``
 
 When there is a need to customize the ``@edx/frontend-component-header`` or ``@edx/frontend-component-footer`` component, two things we have to care of to avoid dependency conflict error during ``npm`` installation. 
 
-1. Identify the version of openedx are you using such as ``quince`` for example.
-2. Navigate to `learning <https://github.com/openedx/frontend-app-learning>`_ and `learner-dashboard <https://github.com/openedx/frontend-app-learner-dashboard>`_ MFEs repositories and checkout to branch ``quince``. Inspect which `header` and `footer` version is installed from `package.json`. One can choose any two MFEs or check in other MFEs as well 
+1. Identify your openedx version, for example ``quince``.
+2. Navigate to `learning <https://github.com/openedx/frontend-app-learning>`_ and `learner-dashboard <https://github.com/openedx/frontend-app-learner-dashboard>`_ MFEs repositories and checkout to branch ``quince``. Inspect which `header` and `footer` versions are installed from `package.json`. You can explore the `header` and `footer` versions for additional MFEs to ensure that all MFEs support the same `major` versions of `header` and `footer`. 
 3. Then, determine which versions of ``@edx/frontend-platform`` MFEs are utilizing and the header you plan to customize is compatible with the same version of ``@edx/frontend-platform`` specified in `package.json` file (peer-dependencies).
 4. Ensure consistency between the versions. For example, If MFE has ``@edx/frontend-platform: 7.0.1``, then customize the header component which has ``@edx/frontend-platform: ^7.0.0`` in `package.json` under peer-dependencies
 5. Checkout to that specific tag (e.g: ``v7.0.0``) of header component and customize it
