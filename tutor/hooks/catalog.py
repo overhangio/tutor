@@ -257,6 +257,14 @@ class Filters:
     #:   names must be prefixed with the plugin name in all-caps.
     CONFIG_UNIQUE: Filter[list[tuple[str, Any]], []] = Filter()
 
+    #: Declare unique configuration settings that must be saved in the user ``config.yml`` file. This is where
+    #: you should declare passwords and randomly-generated values that are different from one environment to the next.
+    #: Callbacks using this Filter will overwrite the values of existing keys
+    #:
+    #: :parameter list[tuple[str, ...]] items: list of (name, value) new settings. All
+    #:   names must be prefixed with the plugin name in all-caps.
+    CONFIG_USER: Filter[list[tuple[str, Any]], []] = Filter()
+
     #: Use this filter to modify the ``docker build`` command.
     #:
     #: :parameter list[str] command: the full build command, including options and
