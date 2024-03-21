@@ -42,6 +42,15 @@ class EnvTests(PluginsTestCase):
     def test_is_binary_file(self) -> None:
         self.assertTrue(env.is_binary_file("/home/somefile.ico"))
 
+    def test_is_binary_file_with_text_extension(self) -> None:
+        self.assertFalse(env.is_binary_file("/home/script.js"))
+
+    def test_is_binary_file_with_unrecognized_extension(self) -> None:
+        self.assertFalse(env.is_binary_file("/home/unknown.extension"))
+
+    def test_is_binary_file_without_extension(self) -> None:
+        self.assertFalse(env.is_binary_file("/home/file"))
+
     def test_find_os_path(self) -> None:
         environment = env.JinjaEnvironment()
         path = environment.find_os_path("local/docker-compose.yml")
