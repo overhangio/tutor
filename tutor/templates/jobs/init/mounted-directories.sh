@@ -36,6 +36,21 @@ pip install -e .
 # Regenerate node_modules
 npm clean-install
 
+# Pull latest translations via atlas
+rm -rf conf/locale conf/plugins-locale
+./manage.py lms pull_plugin_translations --verbose --repository='{{ ATLAS_REPOSITORY }}' --revision='{{ ATLAS_REVISION }}' {{ ATLAS_OPTIONS }}
+./manage.py lms pull_xblock_translations --repository='{{ ATLAS_REPOSITORY }}' --revision='{{ ATLAS_REVISION }}' {{ ATLAS_OPTIONS }}
+rm -rf conf/locale
+atlas pull --repository='{{ ATLAS_REPOSITORY }}' --revision='{{ ATLAS_REVISION }}' {{ ATLAS_OPTIONS }} \
+	translations/edx-platform/conf/locale:conf/locale \
+	translations/studio-frontend/src/i18n/messages:conf/plugins-locale/studio-frontend
+./manage.py lms compile_xblock_translations
+./manage.py cms compile_xblock_translations
+./manage.py lms compile_plugin_translations
+./manage.py lms compilemessages -v1
+./manage.py lms compilejsi18n
+./manage.py cms compilejsi18n
+
 # Regenerate static assets.
 openedx-assets build --env=dev
 
