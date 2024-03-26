@@ -51,6 +51,8 @@ nitpick_ignore = [
     # python 3.10
     ("py:class", "NoneType"),
     ("py:class", "click.core.Command"),
+    # Python 3.12
+    ("py:class", "FilterCallbackFunc"),
 ]
 # Resolve type aliases here
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_type_aliases
@@ -58,6 +60,15 @@ autodoc_type_aliases: dict[str, str] = {
     # python 3.10
     "T": "tutor.core.hooks.actions.T",
     "T2": "tutor.core.hooks.filters.T2",
+    # # python 3.12
+    "L": "tutor.core.hooks.filters.L",
+    "FilterCallbackFunc": "tutor.core.hooks.filters.FilterCallbackFunc",
+    # https://stackoverflow.com/questions/73223417/type-aliases-in-type-hints-are-not-preserved
+    # https://github.com/sphinx-doc/sphinx/issues/10455
+    # https://github.com/sphinx-doc/sphinx/issues/10785
+    # https://github.com/emdgroup/baybe/pull/67
+    "Action": "tutor.core.hooks.actions.Action",
+    "Filter": "tutor.core.hooks.filters.Filter",
 }
 
 
