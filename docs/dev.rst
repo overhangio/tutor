@@ -60,6 +60,20 @@ Now, use the ``tutor dev ...`` command-line interface to manage the development 
 
   Read more about bind-mounts :ref:`below <bind_mounts>`.
 
+Conserving system resources
+---------------------------
+
+When developing, you'll usually want the development environment to take up as little system resources as possible.  To do so, we recommend setting the following Tutor configuration and relaunching your environment::
+
+  tutor config save \
+    --set OPENEDX_CMS_CELERY_WORKERS=1 \
+    --set OPENEDX_LMS_CELERY_WORKERS=1 \
+    --set OPENEDX_CMS_UWSGI_WORKERS=1 \
+    --set OPENEDX_LMS_UWSGI_WORKERS=1 \
+    --set ELASTICSEARCH_HEAP_SIZE=100m
+
+This has been known to reduce RAM usage by more than 70%, specially if you're running Docker natively and have a lot of CPU cores.
+
 Stopping the platform
 ---------------------
 
