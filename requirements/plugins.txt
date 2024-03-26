@@ -5,6 +5,7 @@ tutor-credentials>=17.0.0,<18.0.0
 tutor-discovery>=17.0.0,<18.0.0
 tutor-ecommerce>=17.0.0,<18.0.0
 tutor-forum>=17.0.0,<18.0.0
+tutor-indigo>=17.0.0,<18.0.0
 tutor-jupyter>=17.0.0,<18.0.0
 tutor-mfe>=17.0.0,<18.0.0
 tutor-minio>=17.0.0,<18.0.0

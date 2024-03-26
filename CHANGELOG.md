@@ -20,6 +20,16 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-17.0.3'></a>
+## v17.0.3 (2024-03-26)
+
+- 💥[Bugfix] Prevent infinite growth of course structure cache in Redis. (by @regisb)
+  - Redis is now configured with a maximum memory size of 4GB. If this is too low for your platform, you should increase this value using the new "redis-conf" patch.
+  - Make sure that course structure cache keys have an actual timeout.
+- [Feature] Introduce the "redis-conf" patch. (by @regisb)
+- [Bugfix] Fix merge conflicts in nightly when trying to apply patches from the master branch. (by @regisb)
+- [Bugfix] Ensure mounted installable packages are installed as expected upon initialization. (by @dawoudsheraz)
+
 <a id='changelog-17.0.2'></a>
 ## v17.0.2 (2024-02-09)
 
