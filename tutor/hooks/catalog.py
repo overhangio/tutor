@@ -257,9 +257,12 @@ class Filters:
     #:   names must be prefixed with the plugin name in all-caps.
     CONFIG_UNIQUE: Filter[list[tuple[str, Any]], []] = Filter()
 
-    #: Declare unique configuration settings that must be saved in the user ``config.yml`` file. This is where
-    #: you should declare passwords and randomly-generated values that are different from one environment to the next.
-    #: Callbacks using this Filter will overwrite the values of existing keys
+    #: Used to declare unique key:value pairs in the ``config.yml`` file that will be overwritten on ``tutor config save``.
+    #: This is where you should declare passwords and other secrets that need to be fetched live from an external secrets
+    #: store. Most users will not need to use this filter but it will allow you to programmatically fetch and set secrets
+    #: from an external secrets store such as AWS Secrets Manager via boto3.
+    #:
+    #: Values passed in to this filter will overwrite existing values in the ``config.yml`` file.
     #:
     #: :parameter list[tuple[str, ...]] items: list of (name, value) new settings. All
     #:   names must be prefixed with the plugin name in all-caps.
