@@ -28,6 +28,7 @@
    troubleshooting
    tutor
    faq
+   debugger/index
 
 
 .. toctree::
