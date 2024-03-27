@@ -1,4 +1,4 @@
-# Tutor Security Policy
+# Tutor Ethical Vulnerability Disclosure Policy
 
 
 ## Reporting a Vulnerability
@@ -14,3 +14,6 @@ To ensure the health of the codebase and the larger Open edX and Tutor communiti
 * A detailed description of the steps necessary to reproduce the issue
 * The links to the vulnerable code
 * The links to third-party libraries/packages if the vulnerability is present in such a dependency.
+
+## Bug Bounty
+Edly/Tutor does not offer a bug bounty for reported vulnerabilities.
