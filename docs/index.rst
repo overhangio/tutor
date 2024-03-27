@@ -31,6 +31,7 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
    troubleshooting
    tutor
    faq
+   debugger/index
 
 
 .. toctree::
