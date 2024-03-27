@@ -112,9 +112,7 @@ def get_user(root: str) -> Config:
     upgrade_obsolete(config)
     update_with_env(config)
 
-    extra_config: list[tuple[str, ConfigValue]] = []
-    extra_config = hooks.Filters.CONFIG_USER.apply(extra_config)
-    for name, value in extra_config:
+    for name, value in hooks.Filters.CONFIG_USER.iterate():
         config[name] = value
     
     return config
