@@ -160,7 +160,7 @@ It is quite possible that your package is not automatically recognized and bind-
 
 To do so, you will need to create a :ref:`Tutor plugin <plugin_development_tutorial>` that implements the :py:data:`tutor.hooks.Filters.MOUNTED_DIRECTORIES` filter::
 
-    import tutor import hooks
+    from tutor import hooks
     hooks.Filters.MOUNTED_DIRECTORIES.add_item(("openedx", "my-package"))
 
 After you implement and enable that plugin, ``tutor mounts list`` should display your directory among the bind-mounted directories.
