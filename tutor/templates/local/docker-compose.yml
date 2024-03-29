@@ -28,7 +28,7 @@ services:
   mongodb:
     image: {{ DOCKER_IMAGE_MONGODB }}
     # Use WiredTiger in all environments, just like at edx.org
-    command: mongod --nojournal --storageEngine wiredTiger
+    command: mongod --storageEngine wiredTiger
     restart: unless-stopped
     user: "999:999"
     volumes:

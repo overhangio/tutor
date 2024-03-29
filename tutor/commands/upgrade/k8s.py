@@ -45,6 +45,9 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
     if running_release == "palm":
         running_release = "quince"
 
+    if running_release == "quince":
+        upgrade_from_quince(config)
+
 
 def upgrade_from_ironwood(config: Config) -> None:
     upgrade_mongodb(config, "3.4.24", "3.4")
@@ -162,6 +165,13 @@ def upgrade_from_olive(context: Context, config: Config) -> None:
     upgrade_mongodb(config, "4.4.22", "4.4")
 
 
+def upgrade_from_quince(config: Config) -> None:
+    click.echo(fmt.title("Upgrading from Quince"))
+    upgrade_mongodb(config, "5.0.26", "5.0")
+    upgrade_mongodb(config, "6.0.14", "6.0")
+    upgrade_mongodb(config, "7.0.7", "7.0")
+
+
 def upgrade_mongodb(
     config: Config, to_docker_version: str, to_compatibility_version: str
 ) -> None:
@@ -171,13 +181,18 @@ def upgrade_mongodb(
             "responsibility to upgrade your MongoDb instance to {to_docker_version}."
         )
         return
+    mongo_version, admin_command = common_upgrade.get_mongo_upgrade_parameters(
+        to_docker_version, to_compatibility_version
+    )
+    mongo_binary = "mongosh" if mongo_version >= 6 else "mongo"
+
     message = f"""Automatic release upgrade is unsupported in Kubernetes. You should manually upgrade
 your MongoDb cluster to {to_docker_version} by running something similar to:
 
     tutor k8s stop
     tutor config save --set DOCKER_IMAGE_MONGODB=mongo:{to_docker_version}
     tutor k8s start
-    tutor k8s exec mongodb mongo --eval 'db.adminCommand({{ setFeatureCompatibilityVersion: "{to_compatibility_version}" }})'
+    tutor k8s exec mongodb {mongo_binary} --eval 'db.adminCommand({admin_command})'
     tutor config save --unset DOCKER_IMAGE_MONGODB
     """
     fmt.echo_info(message)
