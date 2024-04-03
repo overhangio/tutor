@@ -52,6 +52,13 @@ File: ``apps/caddy/Caddyfile``
 
 File: ``apps/caddy/Caddyfile``
 
+.. patch:: caddyfile-reverse-proxy-directive
+
+``caddyfile-reverse-proxy-directive``
+=================
+
+File: ``apps/caddy/Caddyfile``
+
 .. patch:: cms-env
 
 ``cms-env``
