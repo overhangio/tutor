@@ -52,10 +52,10 @@ File: ``apps/caddy/Caddyfile``
 
 File: ``apps/caddy/Caddyfile``
 
-.. patch:: caddyfile-reverse-proxy-directive
+.. patch:: caddyfile-reverse-proxy
 
-``caddyfile-reverse-proxy-directive``
-=====================================
+``caddyfile-reverse-proxy``
+===========================
 
 File: ``apps/caddy/Caddyfile``
 
