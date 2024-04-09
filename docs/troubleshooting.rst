@@ -169,7 +169,7 @@ This issue should only happen in development mode. Long story short, it can be s
 
 If you'd like to learn more, please take a look at `this Github issue <https://github.com/overhangio/tutor/issues/302>`__.
 
-.. _high_resource_comsumption:
+.. _high_resource_consumption:
 
 High resource consumption on ``tutor images build`` by docker 
 -------------------------------------------------------------
