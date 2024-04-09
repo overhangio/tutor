@@ -95,7 +95,7 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
-            - mountPath: /openedx/edx-platform/uwsgi.ini
+            - mountPath: /openedx/uwsgi.ini
               name: uwsgi-config
               subPath: uwsgi.ini
           resources:
@@ -204,7 +204,7 @@ spec:
               name: settings-cms
             - mountPath: /openedx/config
               name: config
-            - mountPath: /openedx/edx-platform/uwsgi.ini
+            - mountPath: /openedx/uwsgi.ini
               name: uwsgi-config
               subPath: uwsgi.ini
           resources:
