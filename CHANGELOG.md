@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-17.0.4'></a>
+## v17.0.4 (2024-04-09)
+
+- [Security] Update Redis to 7.2.4 (by @dawoudsheraz)
+
+- [Improvement] Update release to open-release/quince.3 (by @dawoudsheraz)
+
 <a id='changelog-17.0.3'></a>
 ## v17.0.3 (2024-03-26)
 
