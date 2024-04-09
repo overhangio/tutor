@@ -169,6 +169,8 @@ This issue should only happen in development mode. Long story short, it can be s
 
 If you'd like to learn more, please take a look at `this Github issue <https://github.com/overhangio/tutor/issues/302>`__.
 
+.. _high_resource_comsumption:
+
 High resource consumption on ``tutor images build`` by docker 
 -------------------------------------------------------------
 
@@ -194,15 +196,14 @@ Now build again::
 
 All build commands should now make use of the newly configured builder. To later revert to the default builder, run ``docker buildx use default``. 
 
-fatal: the remote end hung up unexpectedly / fatal: early EOF / fatal: index-pack failed when running `tutor images build ...`
-------------------------------------------------------------------------------------------------------------------------------
-
-This issue can occur due to problems with your network while cloning edx-platform which is a fairly large repository.
-
-First, try to run the same command once again to see if it works as your network connection can sometimes drop during the build process.
-
-If that does not work, you can follow the tutorial above for `High resource consumption <#high-resource-consumption-on-tutor-images-build-by-docker>`_ to limit the number of concurrent build steps so that your network is not being shared between multiple layers at once.
-
 .. note::	
-	The build for the image will be considerably slow now.
+	Setting a too low value for maximum parallelism will result in longer build times.
 
+fatal: the remote end hung up unexpectedly / fatal: early EOF / fatal: index-pack failed when running ``tutor images build ...``
+--------------------------------------------------------------------------------------------------------------------------------
+
+This issue can occur due to problems with the network connection while cloning edx-platform which is a fairly large repository.
+
+First, try to run the same command once again to see if it works as the network connection can sometimes drop during the build process.
+
+If that does not work, follow the tutorial above for :ref:`High resource consumption <high_resource_consumption>` to limit the number of concurrent build steps so that the network connection is not being shared between multiple layers at once.
