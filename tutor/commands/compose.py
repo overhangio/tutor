@@ -23,8 +23,9 @@ from tutor.types import Config
 
 
 class ComposeTaskRunner(BaseComposeTaskRunner):
-    def __init__(self, root: str, config: Config):
+    def __init__(self, root: str, config: Config, profile: str):
         super().__init__(root, config)
+        self.profile = profile
         self.project_name = ""
         self.docker_compose_files: list[str] = []
         self.docker_compose_job_files: list[str] = []
@@ -37,14 +38,19 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
             # Note that we don't trigger the action on "run". That's because we
             # don't want to trigger the action for every initialization script.
             hooks.Actions.COMPOSE_PROJECT_STARTED.do(
-                self.root, self.config, self.project_name
+                self.root, self.config, self.profile, self.project_name
             )
         args = []
         for docker_compose_path in self.docker_compose_files:
             if os.path.exists(docker_compose_path):
                 args += ["-f", docker_compose_path]
         return utils.docker_compose(
-            *args, "--project-name", self.project_name, *command
+            *args,
+            "--profile",
+            self.profile,
+            "--project-name",
+            self.project_name,
+            *command,
         )
 
     def run_task(self, service: str, command: str) -> int:

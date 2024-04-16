@@ -1,0 +1,2 @@
+- 💥[Feature] Use Docker compose profiles to control services. (by @arbrandes) -->
+- [Fix] Don't start Celery workers in dev mode, as they're never used. (by @arbrandes) -->
