@@ -52,9 +52,9 @@ File: ``apps/caddy/Caddyfile``
 
 File: ``apps/caddy/Caddyfile``
 
-.. patch:: caddyfile-reverse-proxy
+.. patch:: caddyfile-proxy
 
-``caddyfile-reverse-proxy``
+``caddyfile-proxy``
 ===========================
 
 File: ``apps/caddy/Caddyfile``
