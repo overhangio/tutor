@@ -8,14 +8,14 @@ By default, Tutor comes with a simple SMTP server for sending emails. Such a ser
 
 Authorization for Third-Party Access :
 
-Google has deprecated the "Less Secure App Access." Instead, it is recommended to use "Application-Specific Passwords" for more secure access:
+To enhance security, Google recommends the use of "Application-Specific Passwords" for third-party access to Google services:
 
-1. Ensure 2-Step Verification is enabled on your Google Account.
-2. Visit Google Account Security.
-3. Under "Signing in to Google," choose "App passwords."
-4. You might need to sign in again. Once you do, select "Select app" and choose "Other (Custom name)" from the dropdown.
-5. Enter a name that helps you remember the purpose of this password, like "Tutor SMTP".
-6. Generate and note your 16-character app-specific password.
+1. Activation of 2-Step Verification is required for the Google Account.
+2. Visit the Google Account Security page.
+3. Under "Signing in to Google," select "App passwords."
+4. It may be necessary to sign in again. After signing in, choose "Select app" and select "Other (Custom name)" from the dropdown.
+5. Provide a name that identifies the purpose of this password, such as "Tutor SMTP".
+6. Generate and record the 16-character app-specific password.
 
 Reference: https://support.google.com/mail/answer/185833
 
