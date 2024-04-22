@@ -6,22 +6,19 @@ By default, Tutor comes with a simple SMTP server for sending emails. Such a ser
 .. warning::
   Google Mail SMTP servers come with their own set of limitations. For instance, you are limited to sending 500 emails a day. Reference: https://support.google.com/mail/answer/22839
 
-Authorization for Third-party Access
+Authorization for Third-Party Access ::
 
-As Google has deprecated the "Less Secure App Access," it's recommended to use "Application-Specific Passwords" for a more secure connection. These passwords allow applications to access your Google Account securely and are necessary if you have 2-Step Verification enabled.
+Google has deprecated the "Less Secure App Access." Instead, it is recommended to use "Application-Specific Passwords" for more secure access:
 
-When to Use App Passwords
+1. Ensure 2-Step Verification is enabled on your Google Account.
+2. Visit Google Account Security.
+3. Under "Signing in to Google," choose "App passwords."
+4. You might need to sign in again. Once you do, select "Select app" and choose "Other (Custom name)" from the dropdown.
+5. Enter a name that helps you remember the purpose of this password, like "Tutor SMTP".
+6. Generate and note your 16-character app-specific password.
 
-Use an app password in cases where "Sign in with Google" is not available. App passwords can be a secure way to connect applications to your Google account, especially when the application does not support OAuth.
+Reference: https://support.google.com/mail/answer/185833
 
-Create and Use App Passwords
-
-Ensure you have 2-Step Verification enabled on your Google Account.
-Go to your Google Account settings.
-Under "Signing in to Google," select "App passwords."
-At the bottom of the page, select "Select app" and choose "Other (Custom name)." Enter "Tutor SMTP."
-Select "Generate." The 16-character code generated is your app password.
-Use this app password in your SMTP server configuration instead of your regular pas sword.
 Then, check that you can reach the Google Mail SMTP service from your own server:: 
 
     $ telnet smtp.gmail.com 587
