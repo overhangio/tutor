@@ -37,6 +37,8 @@
     reverse_proxy {args.0} {
         header_up X-Forwarded-Port {{ 443 if ENABLE_HTTPS else 80 }}
     }
+
+    {{ patch("caddyfile-proxy")|indent(4) }}
 }
 
 {{ LMS_HOST }}{$default_site_port}, {{ PREVIEW_LMS_HOST }}{$default_site_port} {
