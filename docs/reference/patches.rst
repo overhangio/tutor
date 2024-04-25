@@ -52,6 +52,13 @@ File: ``apps/caddy/Caddyfile``
 
 File: ``apps/caddy/Caddyfile``
 
+.. patch:: caddyfile-proxy
+
+``caddyfile-proxy``
+===========================
+
+File: ``apps/caddy/Caddyfile``
+
 .. patch:: cms-env
 
 ``cms-env``
