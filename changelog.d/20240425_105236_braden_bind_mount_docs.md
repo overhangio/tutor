@@ -1,0 +1,1 @@
+- [Improvement] Auto-detect bind mounts of openedx-learning for edx-platform (by @bradenmacdonald)
