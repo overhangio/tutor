@@ -49,7 +49,7 @@ def get_mongo_upgrade_parameters(
     """
     Helper utility to get parameters required during mongo upgrade.
     """
-    mongo_version = int(docker_version.split('.')[0])
+    mongo_version = int(docker_version.split(".")[0])
     admin_command: dict[str, int | str] = {
         "setFeatureCompatibilityVersion": compatibility_version
     }
