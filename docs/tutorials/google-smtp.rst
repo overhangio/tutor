@@ -6,7 +6,18 @@ By default, Tutor comes with a simple SMTP server for sending emails. Such a ser
 .. warning::
   Google Mail SMTP servers come with their own set of limitations. For instance, you are limited to sending 500 emails a day. Reference: https://support.google.com/mail/answer/22839
 
-You should authorize third-party to access your Google Mail account. In your Google Mail account, select "Manage Account", "Security", and turn on "Less Secure App Access". Check the Google documentation for more information on "less secure apps": https://support.google.com/accounts/answer/6010255
+Authorization for Third-Party Access :
+
+To enhance security, Google recommends the use of "Application-Specific Passwords" for third-party access to Google services. It's crucial to follow these steps to enable this feature:
+
+1. Activate 2-Step Verification for the Google Account. This is essential for setting up application-specific passwords.
+2. Visit the Google Account Security page.
+3. Under 'Signing in to Google,' select 'App passwords.'
+4. It may be necessary to sign in again. After signing in, choose "Select app" and select "Other (Custom name)" from the dropdown menu.
+5. Enter a name that describes the purpose of this password, such as 'Tutor SMTP'.
+6. Click 'Generate' to receive your 16-character app-specific password. Make sure to record this password securely.
+
+Reference: https://support.google.com/mail/answer/185833
 
 Then, check that you can reach the Google Mail SMTP service from your own server::
 
