@@ -46,6 +46,9 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
     if running_release == "palm":
         running_release = "quince"
 
+    if running_release == "quince":
+        upgrade_from_quince(context, config)
+
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
@@ -155,6 +158,13 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     upgrade_mongodb(context, config, "4.4.22", "4.4")
 
 
+def upgrade_from_quince(context: click.Context, config: Config) -> None:
+    click.echo(fmt.title("Upgrading from Quince"))
+    upgrade_mongodb(context, config, "5.0.26", "5.0")
+    upgrade_mongodb(context, config, "6.0.14", "6.0")
+    upgrade_mongodb(context, config, "7.0.7", "7.0")
+
+
 def upgrade_mongodb(
     context: click.Context,
     config: Config,
@@ -168,7 +178,11 @@ def upgrade_mongodb(
         )
         return
 
+    mongo_version, admin_command = common_upgrade.get_mongo_upgrade_parameters(
+        to_docker_version, to_compatibility_version
+    )
     click.echo(fmt.title(f"Upgrading MongoDb to v{to_docker_version}"))
+
     # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
     # environment, not the configuration.
     config["DOCKER_IMAGE_MONGODB"] = f"mongo:{to_docker_version}"
@@ -180,9 +194,9 @@ def upgrade_mongodb(
         compose.execute,
         args=[
             "mongodb",
-            "mongo",
+            "mongosh" if mongo_version >= 6 else "mongo",
             "--eval",
-            f'db.adminCommand({{ setFeatureCompatibilityVersion: "{to_compatibility_version}" }})',
+            f"db.adminCommand({admin_command})",
         ],
     )
     context.invoke(compose.stop)
