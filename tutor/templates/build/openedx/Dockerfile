@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ###### Minimal image with base system requirements for most stages
-FROM docker.io/python:3.11-slim-bookworm as minimal
+FROM docker.io/python:3.11.9-slim-bookworm as minimal
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -53,7 +53,7 @@ FROM scratch as mnt-{{ name }}
 {% endfor %}
 
 ###### Install python requirements in virtualenv
-FROM python as python-requirements
+FROM minimal as python-requirements
 ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 ENV XDG_CACHE_HOME /openedx/.cache
