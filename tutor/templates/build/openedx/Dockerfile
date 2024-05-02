@@ -1,38 +1,18 @@
 # syntax=docker/dockerfile:1
 ###### Minimal image with base system requirements for most stages
-FROM docker.io/ubuntu:20.04 as minimal
+FROM docker.io/python:3.11-slim-bookworm as minimal
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
-    apt install -y build-essential curl git language-pack-en
+    apt install -y locales python3-dev build-essential curl git
 ENV LC_ALL en_US.UTF-8
 {{ patch("openedx-dockerfile-minimal") }}
 
-###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
-FROM minimal as python
-# https://github.com/pyenv/pyenv/wiki/Common-build-problems#prerequisites
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt update && \
-    apt install -y libssl-dev zlib1g-dev libbz2-dev \
-    libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-    xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-
-# Install pyenv
-# https://www.python.org/downloads/
-# https://github.com/pyenv/pyenv/releases
-ARG PYTHON_VERSION=3.8.18
-ENV PYENV_ROOT /opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.29 --depth 1
-
-# Install Python
-RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
-
 # Create virtualenv
-RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/python -m venv /openedx/venv
+RUN python -m venv /openedx/venv
 
 ###### Checkout edx-platform code
 FROM minimal as code
@@ -81,7 +61,7 @@ ENV XDG_CACHE_HOME /openedx/.cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update \
-    && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
+    && apt install -y software-properties-common default-libmysqlclient-dev libxmlsec1-dev libgeos-dev
 
 # Install the right version of pip/setuptools
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -89,7 +69,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools==68.2.2 pip==23.2.1. wheel==0.41.2
+    setuptools==69.1.1 pip==24.0 wheel==0.43.0
 
 # Install base requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
@@ -102,7 +82,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.4.0 \
     # uwsgi server https://pypi.org/project/uWSGI/
-    uwsgi==2.0.22
+    uwsgi==2.0.24
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
@@ -140,7 +120,7 @@ FROM minimal as production
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update \
-    && apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng-dev libsqlite3-dev libxmlsec1-dev lynx mysql-client ntp pkg-config rdfind
+    && apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg62-turbo-dev liblapack-dev default-libmysqlclient-dev libpng-dev libsqlite3-dev libxmlsec1-dev lynx default-mysql-client ntp pkg-config rdfind
 
 # From then on, run as unprivileged "app" user
 # Note that this must always be different from root (APP_USER_ID=0)
@@ -152,7 +132,6 @@ USER ${APP_USER_ID}
 # https://hub.docker.com/r/powerman/dockerize/tags
 COPY --link --from=docker.io/powerman/dockerize:0.19.0 /usr/local/bin/dockerize /usr/local/bin/dockerize
 COPY --chown=app:app --from=edx-platform / /openedx/edx-platform
-COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv
 COPY --chown=app:app --from=python-requirements /openedx/venv /openedx/venv
 COPY --chown=app:app --from=python-requirements /mnt /mnt
 COPY --chown=app:app --from=nodejs-requirements /openedx/nodeenv /openedx/nodeenv
