@@ -53,13 +53,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patches in nightly node
 {%- else %}
 # Patches in non-nightly mode
-# Prevent course structure cache infinite growth
-# https://github.com/openedx/edx-platform/pull/34210
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/ad201cd664b6c722cbefcbda23ae390c06daf621.patch | git am
-# Security patch for "Privilege re-escalation in Studio after staff access removed"
-# https://github.com/openedx/edx-platform/security/advisories/GHSA-99vw-2wrq-xh9x
-# https://discuss.openedx.org/t/upcoming-security-fix-for-edx-platform-on-2024-05-17/13004
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/3ff69fd5813256f935f19c237ea0c42d4c16edbf.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
@@ -111,7 +104,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
 # Install scorm xblock
-RUN pip install "openedx-scorm-xblock>=17.0.0,<18.0.0"
+RUN pip install "openedx-scorm-xblock>=18.0.0,<19.0.0"
 
 {% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \

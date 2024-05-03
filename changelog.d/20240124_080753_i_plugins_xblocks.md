@@ -1,1 +1,0 @@
-- [Feature] `atlas pull` translations for XBlocks and Plugins (by @OmarIthawi)
