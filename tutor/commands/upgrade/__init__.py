@@ -9,5 +9,5 @@ OPENEDX_RELEASE_NAMES = [
     "olive",
     "palm",
     "quince",
-    "redwood"
+    "redwood",
 ]
