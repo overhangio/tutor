@@ -1,4 +1,4 @@
-# Note: don't forget to change this when we upgrade from quince
+# Note: don't forget to change this when we upgrade from redwood
 OPENEDX_RELEASE_NAMES = [
     "ironwood",
     "juniper",
@@ -9,4 +9,5 @@ OPENEDX_RELEASE_NAMES = [
     "olive",
     "palm",
     "quince",
+    "redwood"
 ]

@@ -48,6 +48,7 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
 
     if running_release == "quince":
         upgrade_from_quince(context, config)
+        running_release = "redwood"
 
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
