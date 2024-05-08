@@ -194,8 +194,7 @@ class Renderer:
         The template_name *always* uses "/" separators, and is not os-dependent. Do not pass the result of
         os.path.join(...) to this function.
         """
-        if is_binary_file(template_name):
-            # Don't try to render binary files
+        if not hooks.Filters.IS_FILE_RENDERED.apply(True, template_name):
             return self.environment.read_bytes(template_name)
 
         try:
@@ -551,3 +550,11 @@ def _delete_plugin_templates(plugin: str, root: str, _config: Config) -> None:
                 raise exceptions.TutorError(
                     f"Could not delete file {e.filename} from plugin {plugin} in folder {path}"
                 )
+
+
+@hooks.Filters.IS_FILE_RENDERED.add()
+def _do_not_render_binary_files(result: bool, path: str) -> bool:
+    """Return bianry file"""
+    if result and is_binary_file(path):
+        result = False
+    return result
