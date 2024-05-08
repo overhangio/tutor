@@ -2,6 +2,7 @@
 List of all the action, filter and context names used across Tutor. This module is used
 to generate part of the reference documentation.
 """
+
 from __future__ import annotations
 
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
@@ -197,10 +198,9 @@ class Filters:
     #:   added as subcommands to the ``local/dev/k8s do`` commands. They must return a list of
     #:   ("service name", "service command") tuples. Each "service command" will be executed
     #:   in the "service" container, both in local, dev and k8s mode.
-    CLI_DO_COMMANDS: Filter[
-        list[Callable[[Any], Iterable[tuple[str, str]]]], []
-    ] = Filter()
-
+    CLI_DO_COMMANDS: Filter[list[Callable[[Any], Iterable[tuple[str, str]]]], []] = (
+        Filter()
+    )
     #: List of initialization tasks (scripts) to be run in the ``init`` job. This job
     #: includes all database migrations, setting up, etc. To run some tasks before or
     #: after others, they should be assigned a different priority.
@@ -499,8 +499,7 @@ class Filters:
     #: :param bool should_render: Initial decision on rendering the file, typically set to True.
     #: :param str file_path: The path to the file being checked.
     #: This filter expects a boolean return value that indicates whether the file should be rendered.
-    IS_FILE_RENDERED: Filter[bool,[str]] = Filter()
-
+    IS_FILE_RENDERED: Filter[bool, [str]] = Filter()
 
 
 class Contexts:
