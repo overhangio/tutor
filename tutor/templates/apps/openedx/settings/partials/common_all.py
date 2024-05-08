@@ -230,7 +230,8 @@ FEATURES["ENABLE_CORS_HEADERS"] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_INSECURE = {% if ENABLE_HTTPS %}False{% else %}True{% endif %}
-CORS_ALLOW_HEADERS = corsheaders_default_headers + ('use-jwt-cookie',)
+# Note: CORS_ALLOW_HEADERS is intentionally not defined here, because it should
+# be consistent across deployments, and is therefore set in edx-platform.
 
 # Add your MFE and third-party app domains here
 CORS_ORIGIN_WHITELIST = []
