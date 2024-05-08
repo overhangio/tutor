@@ -49,13 +49,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {%- if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
-{%- elif EDX_PLATFORM_VERSION == "master" %}
-# Patches in nightly node
-{%- else %}
-# Patches in non-nightly mode
-# Prevent course structure cache infinite growth
-# https://github.com/openedx/edx-platform/pull/34210
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/ad201cd664b6c722cbefcbda23ae390c06daf621.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
