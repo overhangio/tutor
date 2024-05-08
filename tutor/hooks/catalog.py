@@ -499,7 +499,7 @@ class Filters:
     #: :param bool should_render: Initial decision on rendering the file, typically set to True.
     #: :param str file_path: The path to the file being checked.
     #: This filter expects a boolean return value that indicates whether the file should be rendered.
-    IS_FILE_RENDERED: Filter[bool, str] = Filter()
+    IS_FILE_RENDERED: Filter[bool,[str]] = Filter()
 
 
 
