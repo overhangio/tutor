@@ -114,7 +114,6 @@ def get_user(root: str) -> Config:
 
     for name, value in hooks.Filters.CONFIG_USER.iterate():
         config[name] = value
-    
     return config
 
 
