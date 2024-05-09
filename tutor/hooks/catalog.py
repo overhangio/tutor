@@ -496,9 +496,10 @@ class Filters:
     #: Use this filter to determine whether a file should be rendered. This can be useful in scenarios where
     #: certain types of files need special handling, such as binary files, which should not be rendered as text.
     #:
+    #: This filter expects a boolean return value that indicates whether the file should be rendered.
+    #:
     #: :param bool should_render: Initial decision on rendering the file, typically set to True.
     #: :param str file_path: The path to the file being checked.
-    #: This filter expects a boolean return value that indicates whether the file should be rendered.
     IS_FILE_RENDERED: Filter[bool, [str]] = Filter()
 
 
