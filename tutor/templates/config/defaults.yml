@@ -61,7 +61,7 @@ OPENEDX_LMS_UWSGI_WORKERS: 2
 OPENEDX_MYSQL_DATABASE: "openedx"
 OPENEDX_MYSQL_USERNAME: "openedx"
 # the common version will be automatically set to "master" in the nightly branch
-OPENEDX_COMMON_VERSION: "open-release/redwood.1"
+OPENEDX_COMMON_VERSION: "open-release/redwood.master"
 OPENEDX_EXTRA_PIP_REQUIREMENTS: []
 MYSQL_HOST: "mysql"
 MYSQL_PORT: 3306
