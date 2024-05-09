@@ -239,6 +239,8 @@ Elasticsearch
 - ``ELASTICSEARCH_HOST`` (default: ``"elasticsearch"``)
 - ``ELASTICSEARCH_PORT`` (default: ``9200``)
 - ``ELASTICSEARCH_HEAP_SIZE`` (default: ``"1g"``)
+- ``ELASTICSEARCH_USER`` (default: ``""``)
+- ``ELASTICSEARCH_PASSWORD`` (default: ``""``)
 
 MongoDB
 *******
