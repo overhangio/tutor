@@ -24,9 +24,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Install pyenv
 # https://www.python.org/downloads/
 # https://github.com/pyenv/pyenv/releases
-ARG PYTHON_VERSION=3.8.18
+ARG PYTHON_VERSION=3.11.8
 ENV PYENV_ROOT /opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.29 --depth 1
+RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.36 --depth 1
 
 # Install Python
 RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
@@ -89,7 +89,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools==68.2.2 pip==23.2.1. wheel==0.41.2
+    setuptools==69.1.1 pip==24.0 wheel==0.43.0
 
 # Install base requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
@@ -102,7 +102,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.4.0 \
     # uwsgi server https://pypi.org/project/uWSGI/
-    uwsgi==2.0.22
+    uwsgi==2.0.24
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
@@ -120,7 +120,6 @@ ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
-# https://github.com/pyenv/pyenv/releases
 RUN pip install nodeenv==1.8.0
 RUN nodeenv /openedx/nodeenv --node=18.20.1 --prebuilt
 
@@ -260,9 +259,9 @@ USER app
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install -r requirements/edx/development.txt
 # https://pypi.org/project/ipdb/
-# https://pypi.org/project/ipython (8.12.x for Python 3.8)
+# https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install ipdb==0.13.13 ipython==8.12.3
+    pip install ipdb==0.13.13 ipython==8.24.0
 
 {# Re-install mounted requirements, otherwise they will be superseded by upstream reqs #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
