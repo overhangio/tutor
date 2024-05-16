@@ -99,9 +99,9 @@ To open a python shell in the LMS or CMS, run::
 
 You can then import edx-platform and django modules and execute python code.
 
-To rebuild assets, you can use the ``openedx-assets`` command that ships with Tutor::
+To rebuild assets, you can run the ``build-dev`` NPM script that comes with edx-plaform::
 
-    tutor dev run lms openedx-assets build --env=dev
+    tutor dev run lms npm run build-dev
 
 
 .. _specialized for developer usage:

@@ -43,7 +43,7 @@ services:
   # Additional service for watching theme changes
   watchthemes:
     <<: *openedx-service
-    command: openedx-assets watch-themes --env dev
+    command: npm run watch-sass
     restart: unless-stopped
 
   {% if RUN_ELASTICSEARCH and is_docker_rootless() %}

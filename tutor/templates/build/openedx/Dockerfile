@@ -162,6 +162,10 @@ RUN ln -s /openedx/node_modules /openedx/edx-platform/node_modules
 
 ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
+ENV COMPREHENSIVE_THEME_DIRS /openedx/themes
+ENV STATIC_ROOT_LMS /openedx/staticfiles
+ENV STATIC_ROOT_CMS /openedx/staticfiles/studio
+
 WORKDIR /openedx/edx-platform
 
 {# Install auto-mounted directories as Python packages. #}
@@ -204,27 +208,22 @@ ENV PATH /openedx/bin:${PATH}
 
 {{ patch("openedx-dockerfile-pre-assets") }}
 
-# Collect production assets. By default, only assets from the default theme
+# Build & collect production assets. By default, only assets from the default theme
 # will be processed. This makes the docker image lighter and faster to build.
-# Only the custom themes added to /openedx/themes will be compiled.
-# Here, we don't run "paver update_assets" which is slow, compiles all themes
-# and requires a complex settings file. Instead, we decompose the commands
-# and run each one individually to collect the production static assets to
-# /openedx/staticfiles.
-ENV NO_PYTHON_UNINSTALL 1
-ENV NO_PREREQ_INSTALL 1
-# We need to rely on a separate openedx-assets command to accelerate asset processing.
-# For instance, we don't want to run all steps of asset collection every time the theme
-# is modified.
-RUN openedx-assets xmodule \
-    && openedx-assets npm \
-    && openedx-assets webpack --env=prod \
-    && openedx-assets common
-COPY --chown=app:app ./themes/ /openedx/themes/
-RUN openedx-assets themes \
-    && openedx-assets collect --settings=tutor.assets \
-    # De-duplicate static assets with symlinks
-    && rdfind -makesymlinks true -followsymlinks true /openedx/staticfiles/
+RUN npm run postinstall  # Postinstall artifacts are stuck in nodejs-requirements layer. Create them here too.
+RUN npm run compile-sass -- --skip-themes
+RUN npm run webpack
+
+# Now that the default theme is built, build any custom themes
+COPY --chown=app:app ./themes/ /openedx/themes
+RUN npm run compile-sass -- --skip-default
+
+# and finally, collect assets for the production image,
+# de-duping assets with symlinks.
+RUN ./manage.py lms collectstatic --noinput --settings=tutor.assets && \
+    ./manage.py cms collectstatic --noinput --settings=tutor.assets && \
+    # De-duplicate static assets with symlinks \
+    rdfind -makesymlinks true -followsymlinks true /openedx/staticfiles/
 
 # Create a data directory, which might be used (or not)
 RUN mkdir /openedx/data
@@ -277,7 +276,7 @@ ENV PYTHONBREAKPOINT=ipdb.set_trace
 # static assets, then production assets will be served instead.
 RUN rm -r /openedx/staticfiles && \
     mkdir /openedx/staticfiles && \
-    openedx-assets webpack --env=dev
+    npm run build-dev
 
 {{ patch("openedx-dev-dockerfile-post-python-requirements") }}
 
