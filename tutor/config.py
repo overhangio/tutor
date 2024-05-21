@@ -111,6 +111,9 @@ def get_user(root: str) -> Config:
         config = get_yaml_file(path)
     upgrade_obsolete(config)
     update_with_env(config)
+
+    for name, value in hooks.Filters.CONFIG_USER.iterate():
+        config[name] = value
     return config
 
 
