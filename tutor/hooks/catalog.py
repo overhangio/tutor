@@ -257,6 +257,17 @@ class Filters:
     #:   names must be prefixed with the plugin name in all-caps.
     CONFIG_UNIQUE: Filter[list[tuple[str, Any]], []] = Filter()
 
+    #: Used to declare unique key:value pairs in the ``config.yml`` file that will be overwritten on ``tutor config save``.
+    #: This is where you should declare passwords and other secrets that need to be fetched live from an external secrets
+    #: store. Most users will not need to use this filter but it will allow you to programmatically fetch and set secrets
+    #: from an external secrets store such as AWS Secrets Manager via boto3.
+    #:
+    #: Values passed in to this filter will overwrite existing values in the ``config.yml`` file.
+    #:
+    #: :parameter list[tuple[str, ...]] items: list of (name, value) new settings. All
+    #:   names must be prefixed with the plugin name in all-caps.
+    CONFIG_USER: Filter[list[tuple[str, Any]], []] = Filter()
+
     #: Use this filter to modify the ``docker build`` command.
     #:
     #: :parameter list[str] command: the full build command, including options and
