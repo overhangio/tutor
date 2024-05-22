@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-17.0.5'></a>
+## v17.0.5 (2024-05-22)
+
+- [Feature] Introduces the CONFIG_USER Filter. Used to declare unique key:value pairs in config.yml that will be overwritten when running tutor config save. Useful for injecting secrets from an external secrets manager into edx, or other values that may change over time that you need to programmatically fetch. (by @abonnell)
+
+- [Improvement] Add ability to patch proxy configuration for Caddy (by @ravikhetani)
+
+- [Security] Add Upstream "Privilege re-escalation in Studio after staff access removed" git security patch in Open edX Image(by @dawoudsheraz)
+
 <a id='changelog-17.0.4'></a>
 ## v17.0.4 (2024-04-09)
 
