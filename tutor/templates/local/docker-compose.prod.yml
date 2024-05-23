@@ -1,4 +1,3 @@
-version: "{{ DOCKER_COMPOSE_VERSION }}"
 services:
   # Web proxy for load balancing and SSL termination
   caddy:

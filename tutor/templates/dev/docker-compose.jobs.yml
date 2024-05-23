@@ -1,5 +1,3 @@
-version: "{{ DOCKER_COMPOSE_VERSION }}"
-
 x-openedx-job-service:
   &openedx-job-service
   image: {{ DOCKER_IMAGE_OPENEDX_DEV }}

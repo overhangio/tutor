@@ -11,7 +11,6 @@
 # This is because jobs are often used for initialization tasks, which may need to
 # happen before the service can be successfully `start`ed.
 
-version: "{{ DOCKER_COMPOSE_VERSION }}"
 services:
 
     mysql-job:
