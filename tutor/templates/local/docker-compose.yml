@@ -1,4 +1,3 @@
-version: "{{ DOCKER_COMPOSE_VERSION }}"
 services:
 
   # Set bind-mounted folder ownership

@@ -238,7 +238,6 @@ Adding items to the ``MOUNTS`` setting effectively adds new bind-mount volumes t
 
 You are then free to bind-mount any directory to any container. For instance, to mount your own edx-platform fork::
 
-    version: "3.7"
     services:
       lms:
         volumes:
