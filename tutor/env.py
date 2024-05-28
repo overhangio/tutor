@@ -194,8 +194,7 @@ class Renderer:
         The template_name *always* uses "/" separators, and is not os-dependent. Do not pass the result of
         os.path.join(...) to this function.
         """
-        if is_binary_file(template_name):
-            # Don't try to render binary files
+        if not hooks.Filters.IS_FILE_RENDERED.apply(True, template_name):
             return self.environment.read_bytes(template_name)
 
         try:
@@ -551,3 +550,24 @@ def _delete_plugin_templates(plugin: str, root: str, _config: Config) -> None:
                 raise exceptions.TutorError(
                     f"Could not delete file {e.filename} from plugin {plugin} in folder {path}"
                 )
+
+
+@hooks.Filters.IS_FILE_RENDERED.add()
+def _do_not_render_binary_files(result: bool, path: str) -> bool:
+    """
+    Determine whether a file should be rendered based on its binary nature.
+
+    This function checks if a file is binary and updates the rendering decision accordingly.
+    If the initial decision (`result`) is to render the file, but the file is detected as binary,
+    the function will override this decision to prevent rendering.
+
+    Parameters:
+    - result (bool): The initial decision on whether the file should be rendered.
+    - path (str): The file path to check for binary content.
+
+    Returns:
+    - bool: False if the file is binary and was initially set to be rendered, otherwise returns the initial decision.
+    """
+    if result and is_binary_file(path):
+        result = False
+    return result
