@@ -117,10 +117,6 @@ You may want to pull/push images from/to a custom docker registry. For instance,
 Compose
 *******
 
-- ``DOCKER_COMPOSE_VERSION`` (default: ``"3.7"``)
-
-This configuration parameter sets the version of Docker Compose to be used to build all containers.
-
 - ``DEV_PROJECT_NAME`` (default: ``"{{ TUTOR_APP }}_dev"``)
 
 This configuration parameter sets the Development version of the Docker Compose project name.
