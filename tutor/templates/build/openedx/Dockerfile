@@ -104,7 +104,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
 # Install scorm xblock
-RUN pip install "openedx-scorm-xblock>=17.0.0,<18.0.0"
+RUN pip install "openedx-scorm-xblock>=18.0.0,<19.0.0"
 
 {% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
