@@ -45,7 +45,6 @@ services:
       --character-set-server=utf8mb3
       --collation-server=utf8mb3_general_ci
       --binlog-expire-logs-seconds=259200
-      --mysql-native-password=ON
     restart: unless-stopped
     user: "999:999"
     volumes:
