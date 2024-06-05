@@ -152,14 +152,20 @@ RUN if [ "$APP_USER_ID" = 0 ]; then echo "app user may not be root" && false; fi
 RUN useradd --no-log-init --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER_ID} app
 USER ${APP_USER_ID}
 
+# Note:
+# For directories from other stages, we prefer 'COPY --link' to plain 'COPY' because it copies
+# without regard to files from previous layers, providing significant caching benefits. However,
+# since Linux's username->userid mapping is stored in a file (/etc/passwd), it means that we must
+# --chown with an integer user id ($APP_USER_ID) rather the a username (app).
+
 # https://hub.docker.com/r/powerman/dockerize/tags
 COPY --link --from=docker.io/powerman/dockerize:0.19.0 /usr/local/bin/dockerize /usr/local/bin/dockerize
-COPY --chown=app:app --from=edx-platform / /openedx/edx-platform
-COPY --chown=app:app --from=python /opt/pyenv /opt/pyenv
-COPY --chown=app:app --from=python-requirements /openedx/venv /openedx/venv
-COPY --chown=app:app --from=python-requirements /mnt /mnt
-COPY --chown=app:app --from=nodejs-requirements /openedx/nodeenv /openedx/nodeenv
-COPY --chown=app:app --from=nodejs-requirements /openedx/edx-platform/node_modules /openedx/node_modules
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=edx-platform / /openedx/edx-platform
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=python /opt/pyenv /opt/pyenv
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=python-requirements /openedx/venv /openedx/venv
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=python-requirements /mnt /mnt
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=nodejs-requirements /openedx/nodeenv /openedx/nodeenv
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=nodejs-requirements /openedx/edx-platform/node_modules /openedx/node_modules
 
 # Symlink node_modules such that we can bind-mount the edx-platform repository
 RUN ln -s /openedx/node_modules /openedx/edx-platform/node_modules
@@ -174,7 +180,7 @@ WORKDIR /openedx/edx-platform
 
 {# Install auto-mounted directories as Python packages. #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
-COPY --from=mnt-{{ name }} --chown=app:app / /mnt/{{ name }}
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=mnt-{{ name }} / /mnt/{{ name }}
 RUN pip install -e "/mnt/{{ name }}"
 {% endfor %}
 
@@ -269,7 +275,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 
 {# Re-install mounted requirements, otherwise they will be superseded by upstream reqs #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
-COPY --from=mnt-{{ name }} --chown=app:app / /mnt/{{ name }}
+COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=mnt-{{ name }} / /mnt/{{ name }}
 RUN pip install -e "/mnt/{{ name }}"
 {% endfor %}
 
