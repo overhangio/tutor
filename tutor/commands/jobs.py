@@ -1,6 +1,7 @@
 """
 Common jobs that must be added both to local, dev and k8s commands.
 """
+
 from __future__ import annotations
 
 import functools

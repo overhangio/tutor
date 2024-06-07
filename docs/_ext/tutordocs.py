@@ -2,6 +2,7 @@
 This module is heavily inspired by Django's djangodocs.py:
 https://github.com/django/django/blob/main/docs/_ext/djangodocs.py
 """
+
 from sphinx.application import Sphinx
 
 
