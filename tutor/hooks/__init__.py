@@ -1,8 +1,8 @@
 # The Tutor plugin system is licensed under the terms of the Apache 2.0 license.
 __license__ = "Apache 2.0"
 
-import typing as t
 import functools
+import typing as t
 
 from typing_extensions import ParamSpec
 

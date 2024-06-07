@@ -36,7 +36,7 @@ google-auth==2.23.3
     # via
     #   -r requirements/base.txt
     #   kubernetes
-idna==3.4
+idna==3.7
     # via
     #   -r requirements/base.txt
     #   requests
@@ -48,7 +48,7 @@ importlib-metadata==7.0.1
     #   sphinx
 importlib-resources==6.1.1
     # via -r requirements/base.txt
-jinja2==3.1.3
+jinja2==3.1.4
     # via
     #   -r requirements/base.txt
     #   sphinx
@@ -94,7 +94,7 @@ pyyaml==6.0.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
-requests==2.31.0
+requests==2.32.3
     # via
     #   -r requirements/base.txt
     #   kubernetes
