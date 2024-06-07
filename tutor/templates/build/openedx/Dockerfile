@@ -38,9 +38,9 @@ RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/python -m venv /openedx/venv
 FROM minimal as code
 ARG EDX_PLATFORM_REPOSITORY={{ EDX_PLATFORM_REPOSITORY }}
 ARG EDX_PLATFORM_VERSION={{ EDX_PLATFORM_VERSION }}
-RUN mkdir -p /openedx/edx-platform && \
-    git clone $EDX_PLATFORM_REPOSITORY --branch $EDX_PLATFORM_VERSION --depth 1 /openedx/edx-platform
+RUN mkdir -p /openedx/edx-platform
 WORKDIR /openedx/edx-platform
+ADD --keep-git-dir=true $EDX_PLATFORM_REPOSITORY#$EDX_PLATFORM_VERSION .
 
 # Identify tutor user to apply patches using git
 RUN git config --global user.email "tutor@overhang.io" \
