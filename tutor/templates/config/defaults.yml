@@ -21,7 +21,7 @@ DOCKER_IMAGE_ELASTICSEARCH: "docker.io/elasticsearch:7.17.13"
 # https://hub.docker.com/_/mongo/tags
 DOCKER_IMAGE_MONGODB: "docker.io/mongo:7.0.7"
 # https://hub.docker.com/_/mysql/tags
-DOCKER_IMAGE_MYSQL: "docker.io/mysql:8.1.0"
+DOCKER_IMAGE_MYSQL: "docker.io/mysql:8.4.0"
 DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"
 # https://hub.docker.com/_/redis/tags
 DOCKER_IMAGE_REDIS: "docker.io/redis:7.2.4"
