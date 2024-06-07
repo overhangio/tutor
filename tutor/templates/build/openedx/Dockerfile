@@ -120,9 +120,9 @@ ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
-# https://github.com/pyenv/pyenv/releases
+# https://github.com/ekalinin/nodeenv/releases
 RUN pip install nodeenv==1.8.0
-RUN nodeenv /openedx/nodeenv --node=16.14.0 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=16.20.2 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
