@@ -10,7 +10,7 @@ x-openedx-service:
 services:
   permissions:
     environment:
-      OPENEDX_USER_ID: "{{ HOST_USER_ID }}"
+      OPENEDX_USER_ID: "{{ HOST_USER_ID or 1000 }}"
 
   lms:
     <<: *openedx-service
