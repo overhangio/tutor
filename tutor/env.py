@@ -6,8 +6,8 @@ import shutil
 import typing as t
 from copy import deepcopy
 
-import jinja2
 import importlib_resources
+import jinja2
 
 from tutor import exceptions, fmt, hooks, plugins, utils
 from tutor.__about__ import __app__, __version__
