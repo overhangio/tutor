@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-17.0.6'></a>
+## v17.0.6 (2024-06-13)
+
+- [Feature] Introduces the IS_FILE_RENDERED Filter, which allows developers to specify files that should be copied directly without rendering. This update empowers developers to manage special file types, ensuring that they are transferred intact without undergoing template processing. (by @Abdul-Muqadim-Arbisoft)
+
+- [Improvement]  Remove the obsolete `version` property from all Docker Compose files and remove the DOCKER_COMPOSE_VERSION config setting. This addresses the deprecation warning from docker-compose (version 1.27 and above) regarding `version` being obsolete. (by @jasonmokk)
+
+- [Bugfix] Fix permissions error on windows when running `tutor dev start` (by @Danyal-Faheem)
+
 <a id='changelog-17.0.5'></a>
 ## v17.0.5 (2024-05-22)
 

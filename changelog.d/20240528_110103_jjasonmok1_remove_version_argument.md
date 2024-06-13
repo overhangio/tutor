@@ -1,1 +1,0 @@
-- [Improvement]  Remove the obsolete `version` property from all Docker Compose files and remove the DOCKER_COMPOSE_VERSION config setting. This addresses the deprecation warning from docker-compose (version 1.27 and above) regarding `version` being obsolete. (by @jasonmokk)
