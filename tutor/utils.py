@@ -366,3 +366,68 @@ def format_table(rows: List[Tuple[str, ...]], separator: str = "\t") -> str:
             # Append EOL at all lines but the last one
             formatted += "\n"
     return formatted
+
+
+def get_mysql_change_charset_query(
+    database: str,
+    charset: str,
+    collation: str,
+    query_to_append: str,
+    charset_to_upgrade_from : str, 
+) -> None:
+    """
+    Helper function to generate the mysql query to upgrade the charset and collation of tables
+    
+    Utilized in the `tutor local do convert-mysql-utf8mb4-charset` command
+    """
+    return f"""
+            DROP PROCEDURE IF EXISTS UpdateTables;
+            DELIMITER $$
+
+            CREATE PROCEDURE UpdateTables()
+            BEGIN
+
+                DECLARE done_tables_loop INT DEFAULT FALSE;
+                DECLARE _table_name VARCHAR(255);
+                DECLARE _column_name VARCHAR(255);
+                DECLARE _column_type VARCHAR(255);
+                DECLARE _collation_name VARCHAR(255);
+                
+                # We only upgrade columns with charset_to_upgrade_from(utf8mb3) charset for now
+                # This is done so that we do not upgrade columns that have been explicitly set to utf8mb4
+                # We also explicitly upgrade the utf8mb3_general_ci collations to utf8mb4_unicode_ci
+                # The other collations are upgraded from utf8mb3_* to utf8mb4_*
+                DECLARE columns_cur CURSOR FOR
+                        SELECT 
+                        table_name, 
+                        column_name, 
+                        column_type, 
+                        CONCAT('{charset}', IF(STRCMP(substring_index(collation_name, '{charset_to_upgrade_from}', -1), '_general_ci') = 0, substring_index('{collation}', '{charset}', -1), substring_index(collation_name, '{charset_to_upgrade_from}', -1))) as collation FROM information_schema.columns
+                        WHERE table_schema = '{database}' AND character_set_name = '{charset_to_upgrade_from}' {query_to_append};
+                DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_tables_loop = TRUE;
+                OPEN columns_cur;
+                tables_loop: LOOP
+                    FETCH columns_cur INTO _table_name, _column_name, _column_type, _collation_name;
+                    
+                    IF done_tables_loop THEN
+                    LEAVE tables_loop;
+                    END IF;
+                    
+                    
+                    SET FOREIGN_KEY_CHECKS = 0;
+                    SET @statement = CONCAT('ALTER TABLE `', _table_name, '` MODIFY `', _column_name, '` ', _column_type,' CHARACTER SET {charset} COLLATE ', _collation_name, ';'); 
+                    PREPARE query FROM @statement;
+                    EXECUTE query;
+                    DEALLOCATE PREPARE query; 
+                    SET FOREIGN_KEY_CHECKS = 1;
+                        
+                END LOOP;
+                CLOSE columns_cur;
+
+            END$$
+
+            DELIMITER ;
+            use {database};
+            ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};
+            CALL UpdateTables();
+            """
