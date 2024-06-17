@@ -172,7 +172,7 @@ SILENCED_SYSTEM_CHECKS = ["2_0.W001", "fields.W903"]
 # Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
 # Forward all emails from edX's Automated Communication Engine (ACE) to django.
-ACE_ENABLED_CHANNELS = ["django_email"]
+ACE_ENABLED_CHANNELS = ENV_TOKENS.get("ACE_ENABLED_CHANNELS", ["django_email"])
 ACE_CHANNEL_DEFAULT_EMAIL = "django_email"
 ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
 EMAIL_FILE_PATH = "/tmp/openedx/emails"
