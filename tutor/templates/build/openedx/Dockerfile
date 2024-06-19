@@ -307,10 +307,10 @@ FROM production as final
 ENV UWSGI_WORKERS=2
 
 # Copy the default uWSGI configuration
-COPY --chown=app:app settings/uwsgi.ini .
+COPY --chown=app:app settings/uwsgi.ini /openedx
 
 # Run server
-CMD uwsgi uwsgi.ini
+CMD uwsgi /openedx/uwsgi.ini
 
 {{ patch("openedx-dockerfile-final") }}
 
