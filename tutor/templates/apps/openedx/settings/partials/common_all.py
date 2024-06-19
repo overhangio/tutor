@@ -150,9 +150,16 @@ LOGGING["loggers"]["blockstore.apps.bundles.storage"] = {"handlers": ["console"]
 # These warnings are visible in simple commands and init tasks
 import warnings
 
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
-warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
-warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+try:
+    from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+    warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
+    warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+except ImportError:
+    # REMOVE-AFTER-V18:
+    # In Quince, edx-platform uses Django 5. But on master, edx-platform still uses Django 3.
+    # So, Tutor v17 needs to silence these warnings, whereas Tutor v17-nightly fails to import them.
+    # Once edx-platform master is upgraded to Django 5, the try-except wrapper can be removed.
+    pass
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="boto.plugin")
@@ -171,8 +178,6 @@ ACE_CHANNEL_TRANSACTIONAL_EMAIL = "django_email"
 EMAIL_FILE_PATH = "/tmp/openedx/emails"
 
 # Language/locales
-LOCALE_PATHS.append("/openedx/locale/contrib/locale")
-LOCALE_PATHS.append("/openedx/locale/user/locale")
 LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Allow the platform to include itself in an iframe
@@ -225,7 +230,8 @@ FEATURES["ENABLE_CORS_HEADERS"] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_INSECURE = {% if ENABLE_HTTPS %}False{% else %}True{% endif %}
-CORS_ALLOW_HEADERS = corsheaders_default_headers + ('use-jwt-cookie',)
+# Note: CORS_ALLOW_HEADERS is intentionally not defined here, because it should
+# be consistent across deployments, and is therefore set in edx-platform.
 
 # Add your MFE and third-party app domains here
 CORS_ORIGIN_WHITELIST = []

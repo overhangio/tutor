@@ -99,9 +99,9 @@ To open a python shell in the LMS or CMS, run::
 
 You can then import edx-platform and django modules and execute python code.
 
-To rebuild assets, you can use the ``openedx-assets`` command that ships with Tutor::
+To rebuild assets, you can run the ``build-dev`` NPM script that comes with edx-plaform::
 
-    tutor dev run lms openedx-assets build --env=dev
+    tutor dev run lms npm run build-dev
 
 
 .. _specialized for developer usage:
@@ -113,7 +113,7 @@ The ``openedx-dev`` Docker image is based on the same ``openedx`` image used by 
 
 - The user that runs inside the container has the same UID as the user on the host, to avoid permission problems inside mounted volumes (and in particular in the edx-platform repository).
 - Additional Python and system requirements are installed for convenient debugging: `ipython <https://ipython.org/>`__, `ipdb <https://pypi.org/project/ipdb/>`__, vim, telnet.
-- The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/quince.master/requirements/edx/development.in>`__ are installed.
+- The edx-platform `development requirements <https://github.com/openedx/edx-platform/blob/open-release/redwood.master/requirements/edx/development.in>`__ are installed.
 
 
 If you are using a custom ``openedx`` image, then you will need to rebuild ``openedx-dev`` every time you modify ``openedx``. To so, run::

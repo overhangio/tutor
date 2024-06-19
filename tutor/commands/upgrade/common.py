@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import click
 
 from tutor import config as tutor_config
@@ -39,6 +41,23 @@ def upgrade_from_nutmeg(context: click.Context, config: Config) -> None:
     context.obj.job_runner(config).run_task(
         "lms", "./manage.py lms compute_grades -v1 --all_courses"
     )
+
+
+def get_mongo_upgrade_parameters(
+    docker_version: str, compatibility_version: str
+) -> tuple[int, dict[str, int | str]]:
+    """
+    Helper utility to get parameters required during mongo upgrade.
+    """
+    mongo_version = int(docker_version.split(".")[0])
+    admin_command: dict[str, int | str] = {
+        "setFeatureCompatibilityVersion": compatibility_version
+    }
+    if mongo_version == 7:
+        # Explicit confirmation is required to upgrade to 7 from 6
+        # https://www.mongodb.com/docs/manual/reference/command/setFeatureCompatibilityVersion/#confirm
+        admin_command.update({"confirm": 1})
+    return mongo_version, admin_command
 
 
 PALM_RENAME_ORA2_FOLDER_COMMAND = """

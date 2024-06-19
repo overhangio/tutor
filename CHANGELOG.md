@@ -20,6 +20,45 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.0.0'></a>
+## v18.0.0 (2024-06-19)
+
+- 💥[Feature] Upgrade to Redwood (by @dawoudsheraz)
+- [Bugfix] Wrap Django5 warning imports in try-except block to avoid failures in django3 that's still in use in edx-platform's master branch (by @mariajgrimaldi).
+- 💥[Feature] Pull translations via `atlas` during Docker build. This breaks the `openedx-i18n` custom locale Tutor feature in favor of [OEP-58](https://docs.openedx.org/en/latest/developers/concepts/oep58.html) in favor of <https://github.com/openedx/openedx-translations>. (by @omarithawi)
+- 💥[Feature] The `openedx-assets` command is replaced with `npm run` subcommands. This will slightly reduce the build time for edx-platform assets and comprehensive themes. It will also open up the door for more significant build time reductions in the future. Here is a migration guide, where each command is to be run in the `lms` or `cms` container:
+
+  **Before**                               | **After**
+  -----------------------------------------|-------------------------------------------------------------------------------------
+  `openedx-assets build --env=prod ARGS`   | `npm run build -- ARGS`
+  `openedx-assets build --env=dev ARGS`    | `npm run build-dev -- ARGS`
+  `openedx-assets common --env=prod ARGS`  | `npm run compile-sass -- --skip-themes ARGS`
+  `openedx-assets common --env=dev ARGS`   | `npm run compile-sass-dev -- --skip-themes ARGS`
+  `openedx-assets webpack --env=prod ARGS` | `npm run webpack -- ARGS`
+  `openedx-assets webpack --env=dev ARGS`  | `npm run webpack-dev -- ARGS`
+  `openedx-assets npm`                     | `npm run postinstall` (`npm clean-install` runs this automatically)
+  `openedx-assets xmodule`                 | (no longer necessary)
+  `openedx-assets collect ARGS`            | `./manage.py lms collectstatic --noinput ARGS && ./manage.py cms collectstatic ARGS`
+  `openedx-assets watch-themes ARGS`       | `npm run watch-themes -- ARGS`
+
+For more details, see the [deprecation notice for paver](https://github.com/openedx/edx-platform/issues/34467)
+and the [static assets reference](https://github.com/openedx/edx-platform/tree/open-release/redwood.master/docs/references/static-assets.rst)
+in edx-platform.
+
+- 💥[Feature] Update MongoDB to v7.0.7 (by @dawoudsheraz) MongoDB is upgraded from version 4.4 to 7.0. Since there have been major releases since 4.4, the upgrade will need to go through them before running Mongo 7. MongoDB would need to follow 4.4 --> 5.0 --> 6.0 --> 7.0 upgrade path to work correctly. The container will keep on restarting with featureCompatibility error if the upgrade path is not followed. To upgrade mongo, run the following command based in the appropriate environment:
+
+    tutor <dev|local|k8s> upgrade --from=quince
+
+For k8s only, the above command will not perform the upgrade automatically. Instead, the command will output a series of commands that would need to be run manually to carry out the upgrade.
+
+- [Improvement] Upgrade Nodejs from 16.14.0 to 18.20.1 in edx-platform. (by @regisb)
+- [Improvement] Auto-detect bind mounts of openedx-learning for edx-platform (by @bradenmacdonald)
+- [Feature] Upgrade Open edX image to use Python 3.11 (by @dawoudsheraz)
+- [Bugfix] Remove CORS_ALLOW_HEADERS setting from the LMS/Studio config template. This setting, which holds site-agnostic application logic, is now consistently set to a reasonable value upstream by LMS and CMS config. Using the upstream values fixes a bug where course import in Studio using the new Course Authoring MFE was broken in Tutor deployments because it required additional headers to be allowed (content-range and content-disposition) (by @ormsbee)
+- [Improvement] Made Docker cache hits more frequent during the openedx image build via BuildKit's `COPY --link` feature (by @kdmccormick).
+- 💥[Improvement] Upgrade MySQL to 8.4.0. The upgrade should be automatic for most users. However, if you are running a third-party MySQL (i.e., RUN_MYSQL=false), you are expected to upgrade manually. Please refer to the third-party provider's documentation for detailed upgrade instructions. Ensuring that your MySQL version is up-to-date is crucial for maintaining compatibility and security. (by @rohansaeed)
+- 💥[Improvement] Ensure that the edx-platform repository git checkout is cached by Docker during image build. This means that the cache will automatically be cleared any time there is an upstream change. Thus, it is no longer necessary to run `tutor images build --no-cache` just to fetch the latest edx-platform changes. For this to work, any GitHub repository referenced by `EDX_PLATFORM_REPOSITORY` needs to end with ".git". Make sure that this is the case if you have modified the value of this setting in the past. (by @regisb)
+
 <a id='changelog-17.0.6'></a>
 ## v17.0.6 (2024-06-13)
 
