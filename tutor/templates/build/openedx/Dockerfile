@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ###### Minimal image with base system requirements for most stages
-FROM docker.io/ubuntu:20.04 as minimal
+FROM docker.io/ubuntu:20.04 AS minimal
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -8,11 +8,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
     apt install -y build-essential curl git language-pack-en
-ENV LC_ALL en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 {{ patch("openedx-dockerfile-minimal") }}
 
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
-FROM minimal as python
+FROM minimal AS python
 # https://github.com/pyenv/pyenv/wiki/Common-build-problems#prerequisites
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # https://www.python.org/downloads/
 # https://github.com/pyenv/pyenv/releases
 ARG PYTHON_VERSION=3.11.8
-ENV PYENV_ROOT /opt/pyenv
+ENV PYENV_ROOT=/opt/pyenv
 RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.36 --depth 1
 
 # Install Python
@@ -35,7 +35,7 @@ RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
 RUN $PYENV_ROOT/versions/$PYTHON_VERSION/bin/python -m venv /openedx/venv
 
 ###### Checkout edx-platform code
-FROM minimal as code
+FROM minimal AS code
 ARG EDX_PLATFORM_REPOSITORY={{ EDX_PLATFORM_REPOSITORY }}
 ARG EDX_PLATFORM_VERSION={{ EDX_PLATFORM_VERSION }}
 RUN mkdir -p /openedx/edx-platform
@@ -61,19 +61,19 @@ RUN git config --global user.email "tutor@overhang.io" \
 ##### Empty layer with just the repo at the root.
 # This is useful when overriding the build context with a host repo:
 # docker build --build-context edx-platform=/path/to/edx-platform
-FROM scratch as edx-platform
+FROM scratch AS edx-platform
 COPY --from=code /openedx/edx-platform /
 
 {# Create empty layers for all bind-mounted directories #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
-FROM scratch as mnt-{{ name }}
+FROM scratch AS mnt-{{ name }}
 {% endfor %}
 
 ###### Install python requirements in virtualenv
-FROM python as python-requirements
-ENV PATH /openedx/venv/bin:${PATH}
-ENV VIRTUAL_ENV /openedx/venv/
-ENV XDG_CACHE_HOME /openedx/.cache
+FROM python AS python-requirements
+ENV PATH=/openedx/venv/bin:${PATH}
+ENV VIRTUAL_ENV=/openedx/venv/
+ENV XDG_CACHE_HOME=/openedx/.cache
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -112,8 +112,8 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 {% endfor %}
 
 ###### Install nodejs with nodeenv in /openedx/nodeenv
-FROM python as nodejs-requirements
-ENV PATH /openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
+FROM python AS nodejs-requirements
+ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
@@ -130,7 +130,7 @@ RUN --mount=type=bind,from=edx-platform,source=/package.json,target=/openedx/edx
     npm clean-install --no-audit --registry=$NPM_REGISTRY
 
 ###### Production image with system and python requirements
-FROM minimal as production
+FROM minimal AS production
 
 # Install system requirements
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -163,11 +163,11 @@ COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=nodejs-requirements /opened
 # Symlink node_modules such that we can bind-mount the edx-platform repository
 RUN ln -s /openedx/node_modules /openedx/edx-platform/node_modules
 
-ENV PATH /openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
-ENV VIRTUAL_ENV /openedx/venv/
-ENV COMPREHENSIVE_THEME_DIRS /openedx/themes
-ENV STATIC_ROOT_LMS /openedx/staticfiles
-ENV STATIC_ROOT_CMS /openedx/staticfiles/studio
+ENV PATH=/openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
+ENV VIRTUAL_ENV=/openedx/venv/
+ENV COMPREHENSIVE_THEME_DIRS=/openedx/themes
+ENV STATIC_ROOT_LMS=/openedx/staticfiles
+ENV STATIC_ROOT_CMS=/openedx/staticfiles/studio
 
 WORKDIR /openedx/edx-platform
 
@@ -185,9 +185,9 @@ RUN pip install -e .
 # the tutor-specific settings files.
 RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
 COPY --chown=app:app revisions.yml /openedx/config/
-ENV LMS_CFG /openedx/config/lms.env.yml
-ENV CMS_CFG /openedx/config/cms.env.yml
-ENV REVISION_CFG /openedx/config/revisions.yml
+ENV LMS_CFG=/openedx/config/lms.env.yml
+ENV CMS_CFG=/openedx/config/cms.env.yml
+ENV REVISION_CFG=/openedx/config/revisions.yml
 COPY --chown=app:app settings/lms/*.py ./lms/envs/tutor/
 COPY --chown=app:app settings/cms/*.py ./cms/envs/tutor/
 
@@ -208,7 +208,7 @@ RUN ./manage.py cms --settings=tutor.i18n compilejsi18n
 # Copy scripts
 COPY --chown=app:app ./bin /openedx/bin
 RUN chmod a+x /openedx/bin/*
-ENV PATH /openedx/bin:${PATH}
+ENV PATH=/openedx/bin:${PATH}
 
 {{ patch("openedx-dockerfile-pre-assets") }}
 
@@ -240,15 +240,15 @@ RUN echo \
   > bindmount-canary
 
 # service variant is "lms" or "cms"
-ENV SERVICE_VARIANT lms
-ENV DJANGO_SETTINGS_MODULE lms.envs.tutor.production
+ENV SERVICE_VARIANT=lms
+ENV DJANGO_SETTINGS_MODULE=lms.envs.tutor.production
 
 {{ patch("openedx-dockerfile") }}
 
 EXPOSE 8000
 
 ###### Intermediate image with dev/test dependencies
-FROM production as development
+FROM production AS development
 
 # Install useful system requirements (as root)
 USER root
@@ -285,12 +285,12 @@ RUN rm -r /openedx/staticfiles && \
 {{ patch("openedx-dev-dockerfile-post-python-requirements") }}
 
 # Default django settings
-ENV DJANGO_SETTINGS_MODULE lms.envs.tutor.development
+ENV DJANGO_SETTINGS_MODULE=lms.envs.tutor.development
 
-CMD ./manage.py $SERVICE_VARIANT runserver 0.0.0.0:8000
+CMD ["./manage.py", "$SERVICE_VARIANT", "runserver", "0.0.0.0:8000"]
 
 ###### Final image with production cmd
-FROM production as final
+FROM production AS final
 
 # Default amount of uWSGI processes
 ENV UWSGI_WORKERS=2
@@ -299,7 +299,7 @@ ENV UWSGI_WORKERS=2
 COPY --chown=app:app settings/uwsgi.ini .
 
 # Run server
-CMD uwsgi uwsgi.ini
+CMD ["uwsgi", "uwsgi.ini"]
 
 {{ patch("openedx-dockerfile-final") }}
 
