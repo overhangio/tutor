@@ -18,7 +18,7 @@ COPY --from=docker/compose:1.24.0 /usr/local/bin/docker-compose /usr/bin/docker-
 
 RUN pip install tutor
 RUN mkdir /opt/tutor
-ENV TUTOR_ROOT /opt/tutor
+ENV TUTOR_ROOT=/opt/tutor
 
 EXPOSE 80
 EXPOSE 443

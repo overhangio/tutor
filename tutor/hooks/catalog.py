@@ -441,7 +441,7 @@ class Filters:
     #: Python-based Docker image as well. The Dockerfile must declare mounted layers::
     #:
     #:     {% for name in iter_mounted_directories(MOUNTS, "yourimage") %}
-    #:     FROM scratch as mnt-{{ name }}
+    #:     FROM scratch AS mnt-{{ name }}
     #:     {% endfor %}
     #:
     #: Then, Python packages are installed with::
