@@ -296,18 +296,11 @@ def start(context: K8sContext, names: List[str]) -> None:
     names = names or ["all"]
     for name in names:
         if name == "all":
-            # Create volumes
-            kubectl_apply(
-                context.root,
-                "--wait",
-                "--selector",
-                "app.kubernetes.io/component=volume",
-            )
-            # Create everything else except jobs
+            # Create everything except jobs
             kubectl_apply(
                 context.root,
                 "--selector",
-                "app.kubernetes.io/component notin (job,volume,namespace)",
+                "app.kubernetes.io/component notin (job,namespace)",
             )
         else:
             kubectl_apply(

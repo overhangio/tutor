@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.1.0'></a>
+## v18.1.0 (2024-06-25)
+
+- 💥[Feature] Upgrade default charset and collation of mysql to "utf8mb4" and "utf8mb4_unicode_ci" respectively. This upgrade should be automatic for most users. However, if you are running a third-party MySQL (i.e. `RUN_MYSQL=false`), you are expected to upgrade manually. Please refer to the third-party provider's documentation for detailed upgrade instructions. Ensuring that your MySQL version is up-to-date is crucial for maintaining compatibility and security. (by @Danyal-Faheem)
+- [Bugfix] Do not fail on start when there are not persistent volume claims to apply. (by @snglth)
+- [Bugfix] Fix legacy warnings during Docker build. (by @regisb)
+
 <a id='changelog-18.0.0'></a>
 ## v18.0.0 (2024-06-19)
 
