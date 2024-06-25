@@ -64,6 +64,9 @@ def _prepare_environment() -> None:
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
+            ("TUTOR_VERSION_MAJOR", int(__version__.split('.')[0])),
+            ("TUTOR_VERSION_MINOR", int(__version__.split('.')[1]))
+            ("TUTOR_VERSION_PATCH", int(__version__.split('.')[2]))
             ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
