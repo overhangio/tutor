@@ -18,7 +18,7 @@ DATABASES:
     OPTIONS:
       init_command: "SET sql_mode='STRICT_TRANS_TABLES'"
       {%- if RUN_MYSQL %}
-      charset: "utf8mb3"
+      charset: "utf8mb4"
       {%- endif %}
 EMAIL_HOST_USER: "{{ SMTP_USERNAME }}"
 EMAIL_HOST_PASSWORD: "{{ SMTP_PASSWORD }}"

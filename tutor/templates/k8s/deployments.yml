@@ -394,8 +394,8 @@ spec:
           image: {{ DOCKER_IMAGE_MYSQL }}
           args:
             - "mysqld"
-            - "--character-set-server=utf8mb3"
-            - "--collation-server=utf8mb3_general_ci"
+            - "--character-set-server=utf8mb4"
+            - "--collation-server=utf8mb4_unicode_ci"
             - "--binlog-expire-logs-seconds=259200"
           env:
             - name: MYSQL_ROOT_PASSWORD

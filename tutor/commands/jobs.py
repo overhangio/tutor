@@ -309,7 +309,7 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     Extra arguments will be passed to the `mysql` command verbatim. For instance, to
     show tables from the "openedx" database, run `do sqlshell openedx -e 'show tables'`.
     """
-    command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --default-character-set=utf8mb3"
+    command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --default-character-set=utf8mb4"
     if args:
         command += " " + shlex.join(args)  # pylint: disable=protected-access
     yield ("lms", command)
