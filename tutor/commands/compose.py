@@ -82,12 +82,20 @@ class BaseComposeContext(BaseTaskContext):
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
 @click.option("--skip-build", is_flag=True, help="Skip building Docker images")
+@click.option(
+    "-c",
+    "--clean",
+    "clean_env",
+    is_flag=True,
+    help="Remove everything in the env directory before save",
+)
 @click.pass_context
 def launch(
     context: click.Context,
     non_interactive: bool,
     pullimages: bool,
     skip_build: bool,
+    clean_env: bool,
 ) -> None:
     context_name = context.obj.NAME
     run_for_prod = False if context_name == "dev" else None
@@ -96,7 +104,12 @@ def launch(
 
     # Upgrade has to run before configuration
     interactive_upgrade(context, not non_interactive, run_for_prod=run_for_prod)
-    interactive_configuration(context, not non_interactive, run_for_prod=run_for_prod)
+    interactive_configuration(
+        context,
+        not non_interactive,
+        run_for_prod=run_for_prod,
+        clean_environment=clean_env,
+    )
 
     config = tutor_config.load(context.obj.root)
 
@@ -187,12 +200,24 @@ Are you sure you want to continue?"""
 
 
 def interactive_configuration(
-    context: click.Context, interactive: bool, run_for_prod: t.Optional[bool] = None
+    context: click.Context,
+    interactive: bool,
+    run_for_prod: t.Optional[bool] = None,
+    clean_environment: bool = False,
 ) -> None:
     click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
     if interactive:
-        interactive_config.ask_questions(config, run_for_prod=run_for_prod)
+        interactive_config.ask_questions(
+            config,
+            context.obj.root,
+            run_for_prod=run_for_prod,
+            clean_environment=clean_environment,
+        )
+    else:
+        # Clean up in non-interactive mode
+        if clean_environment:
+            tutor_env.delete_env_dir(context.obj.root)
     tutor_config.save_config_file(context.obj.root, config)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)

@@ -17,6 +17,11 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
 
+    def test_config_save_cleanup_env_dir(self) -> None:
+        result = self.invoke(["config", "save", "-c"])
+        self.assertFalse(result.exception)
+        self.assertEqual(0, result.exit_code)
+
     def test_config_save_interactive(self) -> None:
         result = self.invoke(["config", "save", "-i"])
         self.assertFalse(result.exception)

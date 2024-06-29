@@ -215,8 +215,17 @@ def k8s(context: click.Context) -> None:
 
 @click.command(help="Configure and run Open edX from scratch")
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.option(
+    "-c",
+    "--clean",
+    "clean_env",
+    is_flag=True,
+    help="Remove everything in the env directory before save",
+)
 @click.pass_context
-def launch(context: click.Context, non_interactive: bool) -> None:
+def launch(
+    context: click.Context, non_interactive: bool, clean_env: bool = False
+) -> None:
     run_upgrade_from_release = tutor_env.should_upgrade_from_release(context.obj.root)
     if run_upgrade_from_release is not None:
         click.echo(fmt.title("Upgrading from an older release"))
@@ -228,7 +237,13 @@ def launch(context: click.Context, non_interactive: bool) -> None:
     click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
     if not non_interactive:
-        interactive_config.ask_questions(config, run_for_prod=True)
+        interactive_config.ask_questions(
+            config, context.obj.root, run_for_prod=True, clean_environment=clean_env
+        )
+    else:
+        # Clean up in non-interactive mode
+        if clean_env:
+            tutor_env.delete_env_dir(context.obj.root)
     tutor_config.save_config_file(context.obj.root, config)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)
