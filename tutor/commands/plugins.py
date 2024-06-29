@@ -99,7 +99,7 @@ def plugins_command() -> None:
 
 @click.command(
     short_help="Print the location of file-based plugins",
-    help=f"""Print the location of yaml-based plugins: nboth python v1 and yaml v0 plugins. This location can be manually
+    help=f"""Print the location of yaml-based plugins: both python v1 and yaml v0 plugins. This location can be manually
 defined by setting the {PLUGINS_ROOT_ENV_VAR_NAME} environment variable""",
 )
 def printroot() -> None:
