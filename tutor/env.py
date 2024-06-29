@@ -533,6 +533,19 @@ def root_dir(root: str) -> str:
     return os.path.abspath(root)
 
 
+def delete_env_dir(root: str) -> None:
+    env_path = base_dir(root)
+
+    if os.path.exists(env_path):
+        try:
+            shutil.rmtree(env_path)
+            fmt.echo_alert("All files in the env directory are deleted.")
+        except PermissionError:
+            raise exceptions.TutorError(
+                "Could not delete the env directory. Permission Denied."
+            )
+
+
 @hooks.Actions.PLUGIN_UNLOADED.add()
 def _delete_plugin_templates(plugin: str, root: str, _config: Config) -> None:
     """
