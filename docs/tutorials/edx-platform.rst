@@ -106,7 +106,7 @@ You should then re-build the "openedx" Docker image to pick up your changes::
 
     tutor images build openedx-dev
 
-Then, whenever you run ``tutor dev start``, the "lms" and "cms" container should automatically hot-reload your changes.
+Then, whenever you run ``tutor dev start``, the "lms" and "cms" containers should automatically hot-reload your changes.
 
 To push your changes in production, you should do the same with ``tutor local`` and the "openedx" image::
 
