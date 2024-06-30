@@ -11,11 +11,11 @@ from tutor.types import Config, get_typed
 
 
 class DevTaskRunner(compose.ComposeTaskRunner):
-    def __init__(self, root: str, config: Config):
+    def __init__(self, root: str, config: Config, profile: str):
         """
         Load docker-compose files from dev/ and local/
         """
-        super().__init__(root, config)
+        super().__init__(root, config, profile)
         self.project_name = get_typed(self.config, "DEV_PROJECT_NAME", str)
         self.docker_compose_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
@@ -35,7 +35,7 @@ class DevContext(compose.BaseComposeContext):
     NAME = "dev"
 
     def job_runner(self, config: Config) -> DevTaskRunner:
-        return DevTaskRunner(self.root, config)
+        return DevTaskRunner(self.root, config, self.NAME)
 
 
 @click.group(help="Run Open edX locally with development settings")
@@ -45,12 +45,14 @@ def dev(context: click.Context) -> None:
 
 
 @hooks.Actions.COMPOSE_PROJECT_STARTED.add()
-def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
+def _stop_on_local_start(
+    root: str, config: Config, profile: str, project_name: str
+) -> None:
     """
     Stop the dev platform as soon as a platform with a different project name is
     started.
     """
-    runner = DevTaskRunner(root, config)
+    runner = DevTaskRunner(root, config, profile)
     if project_name != runner.project_name:
         runner.docker_compose("stop")
 
