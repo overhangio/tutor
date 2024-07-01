@@ -39,6 +39,9 @@ ELASTIC_SEARCH_CONFIG = [{
   {% if ELASTICSEARCH_SCHEME == "https" %}"use_ssl": True,{% endif %}
   "host": "{{ ELASTICSEARCH_HOST }}",
   "port": {{ ELASTICSEARCH_PORT }},
+  {% if ELASTICSEARCH_USER != '' and ELASTICSEARCH_PASSWORD != '' %}
+  "http_auth": ("{{ ELASTICSEARCH_USER}}", "{{ ELASTICSEARCH_PASSWORD }}"),
+  {% endif %}
 }]
 
 # Common cache config
