@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.1.1'></a>
+## v18.1.1 (2024-07-04)
+
+- [Bugfix] Fix `mysql-native-password is not loaded` error in MySQL 8.4 when upgrading from tutor 15 or an earlier release to tutor 18 by enabling the plugin. (by @Danyal-Faheem)
+
 <a id='changelog-18.1.0'></a>
 ## v18.1.0 (2024-06-25)
 
