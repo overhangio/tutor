@@ -215,4 +215,4 @@ The solution can be found in `tutor-indigo <https://github.com/overhangio/tutor-
 NPM Dependency Conflict When overriding ``@edx/frontend-component-header`` or ``@edx/frontend-component-footer``
 ----------------------------------------------------------------------------------------------------------------
 
-Detailed steps are mentioned in `tutor-mfe <https://github.com/overhangio/tutor-mfe?tab=readme-ov-file#npm-dependency-conflict-when-overriding-edxfrontend-component-header-or-edxfrontend-component-footer>`__ documentation.
+The detailed steps are mentioned in `tutor-mfe <https://github.com/overhangio/tutor-mfe?tab=readme-ov-file#npm-dependency-conflict-when-overriding-edxfrontend-component-header-or-edxfrontend-component-footer>`__ documentation.
