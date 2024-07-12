@@ -299,7 +299,7 @@ ENV UWSGI_WORKERS=2
 COPY --chown=app:app settings/uwsgi.ini /openedx
 
 # Run server
-CMD ["uwsgi", "uwsgi.ini"]
+CMD ["uwsgi", "/openedx/uwsgi.ini"]
 
 {{ patch("openedx-dockerfile-final") }}
 
