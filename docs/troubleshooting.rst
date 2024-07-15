@@ -205,3 +205,14 @@ This issue can occur due to problems with the network connection while cloning e
 First, try to run the same command once again to see if it works, as the network connection can sometimes drop during the build process.
 
 If that does not work, follow the tutorial above for :ref:`High resource consumption <high_resource_consumption>` to limit the number of concurrent build steps so that the network connection is not being shared between multiple layers at once.
+
+Can't override styles using Indigo Theme for MFEs
+-------------------------------------------------
+
+The solution can be found in `tutor-indigo <https://github.com/overhangio/tutor-indigo?tab=readme-ov-file#cant-override-styles-using-indigo-theme-for-mfes>`__ documentation.
+
+
+NPM Dependency Conflict When overriding ``@edx/frontend-component-header`` or ``@edx/frontend-component-footer``
+----------------------------------------------------------------------------------------------------------------
+
+The detailed steps are mentioned in `tutor-mfe <https://github.com/overhangio/tutor-mfe?tab=readme-ov-file#npm-dependency-conflict-when-overriding-edxfrontend-component-header-or-edxfrontend-component-footer>`__ documentation.
