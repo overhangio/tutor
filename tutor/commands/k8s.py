@@ -234,9 +234,9 @@ def launch(
             from_release=tutor_env.get_env_release(context.obj.root),
         )
 
-    click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
     if not non_interactive:
+        click.echo(fmt.title("Interactive platform configuration"))
         interactive_config.ask_questions(
             config, context.obj.root, run_for_prod=True, clean_environment=clean_env
         )
