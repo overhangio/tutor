@@ -171,6 +171,36 @@ def upgrade_from_quince(config: Config) -> None:
     upgrade_mongodb(config, "5.0.26", "5.0")
     upgrade_mongodb(config, "6.0.14", "6.0")
     upgrade_mongodb(config, "7.0.7", "7.0")
+    
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v8.4. There is "
+            "nothing left to do to upgrade from Quince."
+        )
+        return
+    
+    query = common_upgrade.get_mysql_change_authentication_plugin_query(config)
+    
+    # We need to first revert MySQL back to v8.1 to build the data dictionary on it
+    # And also to update the authentication plugin as it is disabled on v8.4
+    message = f"""Automatic release upgrade is unsupported in Kubernetes. If you are upgrading from Olive or an earlier release to Redwood, you
+    should upgrade the authentication plugin of your users. To upgrade, run something similar to:
+
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MYSQL=docker.io/mysql:8.1.0
+    tutor k8s start
+    tutor k8s exec mysql mysql \
+    --user=$(tutor config printvalue MYSQL_ROOT_USERNAME) \
+    --password=$(tutor config printvalue MYSQL_ROOT_PASSWORD) \
+    --host=$(tutor config printvalue MYSQL_HOST) \
+    --port=$(tutor config printvalue MYSQL_PORT) \
+    --database=$(tutor config printvalue OPENEDX_MYSQL_DATABASE) \
+    -e "{query}"
+    tutor config save --unset DOCKER_IMAGE_MYSQL
+    tutor k8s start
+    """
+    fmt.echo_info(message)
 
 
 def upgrade_mongodb(
