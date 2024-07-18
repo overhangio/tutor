@@ -191,9 +191,9 @@ def interactive_configuration(
     interactive: bool,
     run_for_prod: t.Optional[bool] = None,
 ) -> None:
-    click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
     if interactive:
+        click.echo(fmt.title("Interactive platform configuration"))
         interactive_config.ask_questions(
             config,
             context.obj.root,
