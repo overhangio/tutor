@@ -176,10 +176,9 @@ def upgrade_from_quince(context: click.Context, config: Config) -> None:
 
     # Revert the MySQL image first to build data dictionary on v8.1
     old_mysql_docker_image = "docker.io/mysql:8.1.0"
-    new_mysql_docker_image = config["DOCKER_IMAGE_MYSQL"]
+    new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
     config["DOCKER_IMAGE_MYSQL"] = old_mysql_docker_image
-    click.echo(
-        fmt.title(f"Upgrading MySQL to v{new_mysql_docker_image.split(':')[1]}"))
+    click.echo(fmt.title(f"Upgrading MySQL to v{new_mysql_docker_image.split(':')[1]}"))
     tutor_env.save(context.obj.root, config)
     context.invoke(compose.start, detach=True, services=["mysql"])
     fmt.echo_info("Waiting for MySQL to boot...")
@@ -195,12 +194,13 @@ def upgrade_from_quince(context: click.Context, config: Config) -> None:
             "bash",
             "-e",
             "-c",
-            f"mysql --user={config['MYSQL_ROOT_USERNAME']} --password='{config['MYSQL_ROOT_PASSWORD']}' --host={config['MYSQL_HOST']} --port={config['MYSQL_PORT']} --skip-column-names --silent " + shlex.join([
-                                                                                                                                                                                                                f"--database={config['OPENEDX_MYSQL_DATABASE']}", "-e", query])
-
+            f"mysql --user={config['MYSQL_ROOT_USERNAME']} --password='{config['MYSQL_ROOT_PASSWORD']}' --host={config['MYSQL_HOST']} --port={config['MYSQL_PORT']} --skip-column-names --silent "
+            + shlex.join(
+                [f"--database={config['OPENEDX_MYSQL_DATABASE']}", "-e", query]
+            ),
         ],
     )
-    
+
     # Upgrade back to v8.4
     config["DOCKER_IMAGE_MYSQL"] = new_mysql_docker_image
     tutor_env.save(context.obj.root, config)

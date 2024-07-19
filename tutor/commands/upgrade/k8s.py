@@ -171,7 +171,7 @@ def upgrade_from_quince(config: Config) -> None:
     upgrade_mongodb(config, "5.0.26", "5.0")
     upgrade_mongodb(config, "6.0.14", "6.0")
     upgrade_mongodb(config, "7.0.7", "7.0")
-    
+
     if not config["RUN_MYSQL"]:
         fmt.echo_info(
             "You are not running MySQL (RUN_MYSQL=false). It is your "
@@ -179,9 +179,9 @@ def upgrade_from_quince(config: Config) -> None:
             "nothing left to do to upgrade from Quince."
         )
         return
-    
+
     query = common_upgrade.get_mysql_change_authentication_plugin_query(config)
-    
+
     # We need to first revert MySQL back to v8.1 to build the data dictionary on it
     # And also to update the authentication plugin as it is disabled on v8.4
     message = f"""Automatic release upgrade is unsupported in Kubernetes. If you are upgrading from Olive or an earlier release to Redwood, you
