@@ -1,15 +1,19 @@
 from __future__ import annotations
 
 import json
+import os.path
+import subprocess
 import typing as t
 
 import click
 import click.shell_completion
 
+from shutil import which
+
 from tutor import config as tutor_config
 from tutor import env, exceptions, fmt, hooks
 from tutor import interactive as interactive_config
-from tutor import serialize
+from tutor import serialize, utils
 from tutor.commands.context import Context
 from tutor.commands.params import ConfigLoaderParam
 from tutor.types import Config, ConfigValue
@@ -255,9 +259,37 @@ def patches_show(context: Context, name: str) -> None:
         print(rendered)
 
 
+@click.command(name="edit", help="Edit config.yml of the current environment")
+@click.pass_obj
+def edit(context: Context, editor: str, save: bool) -> None:
+    config_file = tutor_config.config_path(context.root)
+
+    if not os.path.isfile(config_file):
+        raise exceptions.TutorError(
+            f"Missing config file at {config_file}. Have you run 'tutor local launch' yet?"
+        )
+
+    open_cmd = []
+    if which("open"):  # MacOS & linux distributions that ship `open`. eg., Ubuntu
+        open_cmd = ["open", config_file]
+    elif which("xdg-open"):  # Linux
+        open_cmd = ["xdg-open", config_file]
+    elif which("start"):  # Windows
+        # Calling "start" on a regular file opens it with the default editor.
+        # The second argument "" just means "don't give the window a custom title".
+        open_cmd = ["start", '""', config_file]
+    else:
+        raise exceptions.TutorError(
+            f"Failed to find utility to launch an editor. Edit {config_file} with the editor of your choice."
+        )
+
+    utils.execute(*open_cmd)
+
+
 config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
 patches_command.add_command(patches_list)
 patches_command.add_command(patches_show)
 config_command.add_command(patches_command)
+config_command.add_command(edit)
