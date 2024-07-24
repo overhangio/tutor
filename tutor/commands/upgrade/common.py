@@ -44,7 +44,14 @@ def upgrade_from_nutmeg(context: click.Context, config: Config) -> None:
 
 
 def get_mysql_change_authentication_plugin_query(config: Config) -> str:
-    """Helper function to generate queries depending on the loaded plugins"""
+    """
+    Helper function to generate queries to upgrade the authentication plugin of MySQL users
+    By default, only the ROOT and OPENEDX users are upgraded
+    If any loaded plugins have database user configurations defined in the format:
+        <plugin>_MYSQL_USERNAME
+        <plugin>_MYSQL_PASSWORD
+    These users are also upgraded
+    """
     loaded_plugins = list(plugins.iter_loaded())
 
     def generate_mysql_authentication_plugin_update_query(

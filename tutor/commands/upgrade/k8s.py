@@ -185,7 +185,7 @@ def upgrade_from_quince(config: Config) -> None:
     # We need to first revert MySQL back to v8.1 to build the data dictionary on it
     # And also to update the authentication plugin as it is disabled on v8.4
     message = f"""Automatic release upgrade is unsupported in Kubernetes. If you are upgrading from Olive or an earlier release to Redwood, you
-    should upgrade the authentication plugin of your users. To upgrade, run something similar to:
+    should upgrade the authentication plugin of your users. To upgrade, run the following commands:
 
     tutor k8s stop
     tutor config save --set DOCKER_IMAGE_MYSQL=docker.io/mysql:8.1.0
