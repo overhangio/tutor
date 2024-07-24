@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import json
+import os.path
+import subprocess
 import typing as t
 
 import click
 import click.shell_completion
+
+from shutil import which
 
 from tutor import config as tutor_config
 from tutor import env, exceptions, fmt
@@ -230,8 +234,32 @@ def patches_list(context: Context) -> None:
     renderer.print_patches_locations()
 
 
+@click.command(name="edit", help="Edit config.yml of the current environment")
+@click.pass_obj
+def edit(context: Context) -> None:
+    config_file = os.path.join(context.root, "config.yml")
+
+    open_cmd = None
+
+    if which("open"):  # MacOS
+        open_cmd = ["open", config_file]
+    elif which("xdg-open"):  # Linux
+        open_cmd = ["xdg-open", config_file]
+    elif which("start"):  # Windows
+        open_cmd = ["start", '""', config_file]
+    else:
+        click.echo(
+            "Cannot find a way to open the editor automatically. Kindly open the file manually: "
+            + config_file
+        )
+        return
+
+    subprocess.call(open_cmd)
+
+
 config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
 patches_command.add_command(patches_list)
 config_command.add_command(patches_command)
+config_command.add_command(edit)
