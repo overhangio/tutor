@@ -1,0 +1,1 @@
+- [Improvement] New `kill` command for local and development environments. (by @CodeWithEmad)
