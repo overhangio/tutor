@@ -172,15 +172,15 @@ Are you sure you want to continue?"""
         if interactive:
             question = f"""Your platform is being upgraded from {run_upgrade_from_release.capitalize()}.
 
-    If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
+If you run custom Docker images, you must rebuild them now by running the following command in a different shell:
 
-        tutor images build all # list your custom images here
+    tutor images build all # list your custom images here
 
-    See the documentation for more information:
+See the documentation for more information:
 
-        https://docs.tutor.edly.io/install.html#upgrading-to-a-new-open-edx-release
+    https://docs.tutor.edly.io/install.html#upgrading-to-a-new-open-edx-release
 
-    Press enter when you are ready to continue"""
+Press enter when you are ready to continue"""
             click.confirm(
                 fmt.question(question), default=True, abort=True, prompt_suffix=" "
             )
