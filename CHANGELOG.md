@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.1.2'></a>
+## v18.1.2 (2024-07-26)
+
+- [Security] Add upstream security fix as patch in Open edX image (by @dawoudsheraz)
+
 <a id='changelog-18.1.1'></a>
 ## v18.1.1 (2024-07-04)
 
