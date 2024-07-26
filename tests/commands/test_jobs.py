@@ -90,7 +90,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIn("lms-job", dc_args)
             self.assertIn("assign_theme('beautiful', 'domain1')", dc_args[-1])
             self.assertIn("assign_theme('beautiful', 'domain2')", dc_args[-1])
-            
+
     def test_convert_mysql_utf8mb4_charset_all_tables(self) -> None:
         with temporary_root() as root:
             self.invoke_in_root(root, ["config", "save"])
@@ -101,7 +101,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
                         "local",
                         "do",
                         "convert-mysql-utf8mb4-charset",
-                        "--non-interactive"
+                        "--non-interactive",
                     ],
                 )
                 dc_args, _dc_kwargs = mock_docker_compose.call_args
@@ -113,7 +113,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIn("openedx", dc_args[-1])
             self.assertIn("utf8mb4_unicode_ci", dc_args[-1])
             self.assertNotIn("regexp", dc_args[-1])
-            
+
     def test_convert_mysql_utf8mb4_charset_include_tables(self) -> None:
         with temporary_root() as root:
             self.invoke_in_root(root, ["config", "save"])
@@ -138,7 +138,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIn("regexp", dc_args[-1])
             self.assertIn("courseware_studentmodule", dc_args[-1])
             self.assertIn("xblock", dc_args[-1])
-            
+
     def test_convert_mysql_utf8mb4_charset_exclude_tables(self) -> None:
         with temporary_root() as root:
             self.invoke_in_root(root, ["config", "save"])

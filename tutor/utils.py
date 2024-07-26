@@ -373,11 +373,11 @@ def get_mysql_change_charset_query(
     charset: str,
     collation: str,
     query_to_append: str,
-    charset_to_upgrade_from : str, 
-) -> None:
+    charset_to_upgrade_from: str,
+) -> str:
     """
     Helper function to generate the mysql query to upgrade the charset and collation of tables
-    
+
     Utilized in the `tutor local do convert-mysql-utf8mb4-charset` command
     """
     return f"""
