@@ -40,7 +40,7 @@ class Actions:
     instance, to add a callback to the :py:data:`COMPOSE_PROJECT_STARTED` action::
 
         @hooks.Actions.COMPOSE_PROJECT_STARTED.add():
-        def run_this_on_start(root, config, name):
+        def run_this_on_start(root, config, profile, name):
             print(root, config["LMS_HOST", name])
 
     Your callback function will then be called whenever the ``COMPOSE_PROJECT_STARTED.do`` method
@@ -55,8 +55,9 @@ class Actions:
     #:
     #: :parameter str root: project root.
     #: :parameter dict config: project configuration.
+    #: :parameter str profile: docker-compose profile.
     #: :parameter str name: docker-compose project name.
-    COMPOSE_PROJECT_STARTED: Action[[str, Config, str]] = Action()
+    COMPOSE_PROJECT_STARTED: Action[[str, Config, str, str]] = Action()
 
     #: Triggered after all interactive questions have been asked.
     #: You should use this action if you want to add new questions.

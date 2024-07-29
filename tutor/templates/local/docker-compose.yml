@@ -171,6 +171,8 @@ services:
       {%- endfor %}
     depends_on:
       - lms
+    profiles:
+      - local
 
   cms-worker:
     image: {{ DOCKER_IMAGE_OPENEDX }}
@@ -190,5 +192,7 @@ services:
       {%- endfor %}
     depends_on:
       - cms
+    profiles:
+      - local
 
   {{ patch("local-docker-compose-services")|indent(2) }}
