@@ -226,7 +226,7 @@ By default, a running Open edX platform deployed with Tutor includes all necessa
     MYSQL_ROOT_PASSWORD: <root user password>
 
 .. note::
-    When configuring an external MySQL database, please make sure it is using version 5.7.
+    When configuring an external MySQL database, please make sure it is using version 8.4.
 
 Elasticsearch
 *************
