@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via -r requirements/base.in
 cachetools==5.3.2
     # via google-auth
-certifi==2023.7.22
+certifi==2024.7.4
     # via
     #   kubernetes
     #   requests
@@ -70,13 +70,13 @@ typing-extensions==4.8.0
     # via
     #   -r requirements/base.in
     #   mypy
-urllib3==1.26.18
+urllib3==1.26.19
     # via
     #   kubernetes
     #   requests
 websocket-client==1.6.4
     # via kubernetes
-zipp==3.17.0
+zipp==3.19.2
     # via
     #   importlib-metadata
     #   importlib-resources
