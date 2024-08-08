@@ -4,7 +4,7 @@ import click
 
 from tutor import config as tutor_config
 from tutor import fmt, plugins
-from tutor.types import Config
+from tutor.types import Config, ConfigValue
 
 
 def upgrade_from_lilac(config: Config) -> None:
@@ -41,6 +41,46 @@ def upgrade_from_nutmeg(context: click.Context, config: Config) -> None:
     context.obj.job_runner(config).run_task(
         "lms", "./manage.py lms compute_grades -v1 --all_courses"
     )
+
+
+def get_mysql_change_authentication_plugin_query(config: Config) -> str:
+    """
+    Helper function to generate queries to upgrade the authentication plugin of MySQL users
+    By default, only the ROOT and OPENEDX users are upgraded
+    If any loaded plugins have database user configurations defined in the format:
+        <plugin>_MYSQL_USERNAME
+        <plugin>_MYSQL_PASSWORD
+    These users are also upgraded
+    """
+    loaded_plugins = list(plugins.iter_loaded())
+
+    def generate_mysql_authentication_plugin_update_query(
+        username: ConfigValue, password: ConfigValue, host: str
+    ) -> str:
+        return f"ALTER USER '{username}'@'{host}' IDENTIFIED with caching_sha2_password BY '{password}';"
+
+    host = "%"
+    query = ""
+    query += generate_mysql_authentication_plugin_update_query(
+        config["MYSQL_ROOT_USERNAME"], config["MYSQL_ROOT_PASSWORD"], host
+    )
+    query += generate_mysql_authentication_plugin_update_query(
+        config["OPENEDX_MYSQL_USERNAME"], config["OPENEDX_MYSQL_PASSWORD"], host
+    )
+
+    for plugin in loaded_plugins:
+        plugin_uppercase = plugin.upper()
+        if (
+            f"{plugin_uppercase}_MYSQL_USERNAME" in config
+            and f"{plugin_uppercase}_MYSQL_PASSWORD" in config
+        ):
+            query += generate_mysql_authentication_plugin_update_query(
+                config[f"{plugin_uppercase}_MYSQL_USERNAME"],
+                config[f"{plugin_uppercase}_MYSQL_PASSWORD"],
+                host,
+            )
+
+    return query
 
 
 def get_mongo_upgrade_parameters(

@@ -1,6 +1,7 @@
 from time import sleep
 
 import click
+import shlex
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
@@ -164,6 +165,52 @@ def upgrade_from_quince(context: click.Context, config: Config) -> None:
     upgrade_mongodb(context, config, "5.0.26", "5.0")
     upgrade_mongodb(context, config, "6.0.14", "6.0")
     upgrade_mongodb(context, config, "7.0.7", "7.0")
+
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v8.4. There is "
+            "nothing left to do to upgrade from Quince."
+        )
+        return
+
+    # Revert the MySQL image first to build data dictionary on v8.1
+    old_mysql_docker_image = "docker.io/mysql:8.1.0"
+    new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
+    click.echo(fmt.title(f"Upgrading MySQL to v{new_mysql_docker_image.split(':')[1]}"))
+    config["DOCKER_IMAGE_MYSQL"] = old_mysql_docker_image
+    # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
+    # environment, not the configuration.
+    tutor_env.save(context.obj.root, config)
+    context.invoke(compose.start, detach=True, services=["mysql"])
+    fmt.echo_info("Waiting for MySQL to boot...")
+    sleep(30)
+
+    query = common_upgrade.get_mysql_change_authentication_plugin_query(config)
+
+    # Update the authentication plugin in v8.1 as it is disabled in v8.4
+    context.invoke(
+        compose.execute,
+        args=[
+            "mysql",
+            "bash",
+            "-e",
+            "-c",
+            f"mysql --user={config['MYSQL_ROOT_USERNAME']} --password='{config['MYSQL_ROOT_PASSWORD']}' --host={config['MYSQL_HOST']} --port={config['MYSQL_PORT']} --skip-column-names --silent "
+            + shlex.join(
+                [f"--database={config['OPENEDX_MYSQL_DATABASE']}", "-e", query]
+            ),
+        ],
+    )
+
+    # Upgrade back to v8.4
+    config["DOCKER_IMAGE_MYSQL"] = new_mysql_docker_image
+    # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
+    # environment, not the configuration.
+    tutor_env.save(context.obj.root, config)
+    context.invoke(compose.start, detach=True, services=["mysql"])
+    fmt.echo_info("Waiting for MySQL to boot...")
+    sleep(30)
 
 
 def upgrade_mongodb(
