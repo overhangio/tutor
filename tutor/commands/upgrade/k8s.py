@@ -164,6 +164,36 @@ def upgrade_from_olive(context: Context, config: Config) -> None:
     )
     upgrade_mongodb(config, "4.2.17", "4.2")
     upgrade_mongodb(config, "4.4.22", "4.4")
+    
+    new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
+
+    # Do not perform manual upgrade if running v16 or v17, only for tutor v18 or later
+    if (
+        new_mysql_docker_image == "docker.io/mysql:8.0.33"
+        or new_mysql_docker_image == "docker.io/mysql:8.1.0"
+    ):
+        return
+    
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v8.4. There is "
+            "nothing left to do to upgrade from Quince."
+        )
+        return
+
+    # We need to first revert MySQL back to v8.1 to build the data dictionary on it
+    # And also to update the authentication plugin as it is disabled on v8.4
+    message = f"""Automatic release upgrade is unsupported in Kubernetes. If you are upgrading from Olive or an earlier release to Redwood, you
+    should upgrade the authentication plugin of your users. To upgrade, run the following commands:
+
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MYSQL=docker.io/mysql:8.1.0
+    tutor k8s start
+    tutor config save --unset DOCKER_IMAGE_MYSQL
+    tutor k8s start
+    """
+    fmt.echo_info(message)
 
 
 def upgrade_from_quince(config: Config) -> None:

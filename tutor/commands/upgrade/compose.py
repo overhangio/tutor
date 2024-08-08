@@ -158,6 +158,44 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     upgrade_mongodb(context, config, "4.2.17", "4.2")
     upgrade_mongodb(context, config, "4.4.22", "4.4")
 
+    new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
+
+    # Do not perform manual upgrade if running v16 or v17, only for tutor v18 or later
+    if (
+        new_mysql_docker_image == "docker.io/mysql:8.0.33"
+        or new_mysql_docker_image == "docker.io/mysql:8.1.0"
+    ):
+        return
+
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v8.4. There is "
+            "nothing left to do to upgrade from Olive."
+        )
+        return
+
+    # Revert the MySQL image first to build data dictionary on v8.1
+    old_mysql_docker_image = "docker.io/mysql:8.1.0"
+    click.echo(fmt.title(f"Upgrading MySQL to v{new_mysql_docker_image.split(':')[1]}"))
+    config["DOCKER_IMAGE_MYSQL"] = old_mysql_docker_image
+    # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
+    # environment, not the configuration.
+    tutor_env.save(context.obj.root, config)
+    context.invoke(compose.start, detach=True, services=["mysql"])
+    fmt.echo_info("Waiting for MySQL to boot...")
+    sleep(30)
+
+    # Upgrade back to v8.4
+    config["DOCKER_IMAGE_MYSQL"] = new_mysql_docker_image
+    # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
+    # environment, not the configuration.
+    tutor_env.save(context.obj.root, config)
+    context.invoke(compose.start, detach=True, services=["mysql"])
+    fmt.echo_info("Waiting for MySQL to boot...")
+    sleep(30)
+    context.invoke(compose.stop)
+
 
 def upgrade_from_quince(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Quince"))
