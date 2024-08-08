@@ -1,0 +1,1 @@
+- 💥[Feature] Enhance your workflow with the new `-c` or `--clean` option for the `tutor config save` and `tutor dev|local|k8s launch` commands! This feature allows you to clean your environment before each save or launch, ensuring that all files and directories within the `env/` folder are deleted, providing you with a fresh environment each time. (by @CodeWithEmad)
