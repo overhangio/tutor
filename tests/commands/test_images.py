@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 
 from tests.helpers import PluginsTestCase, temporary_root
-from tutor import images, plugins, utils
+from tutor import images, plugins
 from tutor.__about__ import __version__
 from tutor.commands.images import ImageNotFoundError
 

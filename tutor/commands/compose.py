@@ -257,6 +257,14 @@ def stop(context: BaseComposeContext, services: list[str]) -> None:
     context.job_runner(config).docker_compose("stop", *services)
 
 
+@click.command(help="Kill all running containers immediately")
+@click.argument("services", metavar="service", nargs=-1)
+@click.pass_obj
+def kill(context: BaseComposeContext, services: list[str]) -> None:
+    config = tutor_config.load(context.root)
+    context.job_runner(config).docker_compose("kill", *services)
+
+
 @click.command(
     short_help="Reboot an existing platform",
     help="This is more than just a restart: with reboot, the platform is fully stopped before being restarted again",
@@ -434,6 +442,7 @@ def add_commands(command_group: click.Group) -> None:
     command_group.add_command(upgrade)
     command_group.add_command(start)
     command_group.add_command(stop)
+    command_group.add_command(kill)
     command_group.add_command(restart)
     command_group.add_command(reboot)
     command_group.add_command(dc_command)
