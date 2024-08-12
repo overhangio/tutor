@@ -237,22 +237,21 @@ def patches_list(context: Context) -> None:
 @click.command(name="edit", help="Edit config.yml of the current environment")
 @click.pass_obj
 def edit(context: Context) -> None:
-    config_file = os.path.join(context.root, "config.yml")
+    config_file = tutor_config.config_path(context.root)
+
+    if not os.path.isfile(config_file):
+        raise exceptions.TutorError(f"Missing config file at {config_file}")
 
     open_cmd = None
 
-    if which("open"):  # MacOS
+    if which("open"):  # MacOS & linux distributions that ship `open`. eg., Ubuntu
         open_cmd = ["open", config_file]
     elif which("xdg-open"):  # Linux
         open_cmd = ["xdg-open", config_file]
     elif which("start"):  # Windows
         open_cmd = ["start", '""', config_file]
     else:
-        click.echo(
-            "Cannot find a way to open the editor automatically. Kindly open the file manually: "
-            + config_file
-        )
-        return
+        raise exceptions.TutorError(f"Failed to find utility to launch an editor.")
 
     subprocess.call(open_cmd)
 
