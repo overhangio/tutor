@@ -164,22 +164,12 @@ def upgrade_from_olive(context: Context, config: Config) -> None:
     )
     upgrade_mongodb(config, "4.2.17", "4.2")
     upgrade_mongodb(config, "4.4.22", "4.4")
-    
-    new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
 
-    # Do not perform manual upgrade if running v16 or v17, only for tutor v18 or later
-    if (
-        new_mysql_docker_image == "docker.io/mysql:8.0.33"
-        or new_mysql_docker_image == "docker.io/mysql:8.1.0"
-    ):
-        return
-    
-    if not config["RUN_MYSQL"]:
-        fmt.echo_info(
-            "You are not running MySQL (RUN_MYSQL=false). It is your "
-            "responsibility to upgrade your MySQL instance to v8.4. There is "
-            "nothing left to do to upgrade from Quince."
-        )
+    upgrade_to_redwood_onwards, _ = (
+        common_upgrade.verify_tutor_version_for_mysql_upgrade(config)
+    )
+
+    if not upgrade_to_redwood_onwards:
         return
 
     # We need to first revert MySQL back to v8.1 to build the data dictionary on it

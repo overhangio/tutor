@@ -60,6 +60,39 @@ def get_mongo_upgrade_parameters(
     return mongo_version, admin_command
 
 
+def verify_tutor_version_for_mysql_upgrade(config: Config) -> tuple[bool, str]:
+    """
+    Checks if a MySQL upgrade is needed based on the Tutor version and MySQL setup.
+
+    This method ensures that MySQL is running and determines if the upgrade
+    process should proceed based on the Tutor version. It is intended for upgrades
+    from Tutor version 15 to version 18 or later. Manual upgrade steps are not
+    required for versions 16 or 17.
+
+    Returns:
+        tuple: A boolean indicating whether the upgrade process should proceed and
+               a string representing the Docker image of MySQL if applicable.
+    """
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade your MySQL instance to v8.4. There is "
+            "nothing left to do to upgrade from Olive."
+        )
+        return False, ""
+
+    new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
+
+    # Do not perform manual upgrade if running v16 or v17, only for tutor v18 or later
+    if (
+        new_mysql_docker_image == "docker.io/mysql:8.0.33"
+        or new_mysql_docker_image == "docker.io/mysql:8.1.0"
+    ):
+        return False, ""
+
+    return True, new_mysql_docker_image
+
+
 PALM_RENAME_ORA2_FOLDER_COMMAND = """
 if stat '/openedx/data/ora2/SET-ME-PLEASE (ex. bucket-name)' 2> /dev/null; then
     echo "Renaming ora2 folder..."
