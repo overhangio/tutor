@@ -53,11 +53,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patches in nightly node
 {%- else %}
 # Patches in non-nightly mode
-# Security patch around content library permissions
-# https://discuss.openedx.org/t/security-upcoming-security-release-for-edx-platform-2024-07-25/13473
-# https://github.com/openedx/edx-platform/pull/35180
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/3160ff68ca4a4516375af3307fe84f22cd5e5b36.patch | git am
-
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
