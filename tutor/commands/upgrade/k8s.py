@@ -172,8 +172,6 @@ def upgrade_from_olive(context: Context, config: Config) -> None:
     if not upgrade_to_redwood_onwards:
         return
 
-    # We need to first revert MySQL back to v8.1 to build the data dictionary on it
-    # And also to update the authentication plugin as it is disabled on v8.4
     message = f"""Automatic release upgrade is unsupported in Kubernetes. If you are upgrading from Olive or an earlier release to Redwood, you
     should upgrade the authentication plugin of your users. To upgrade, run the following commands:
 

@@ -83,7 +83,6 @@ def verify_tutor_version_for_mysql_upgrade(config: Config) -> tuple[bool, str]:
 
     new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
 
-    # Do not perform manual upgrade if running v16 or v17, only for tutor v18 or later
     if (
         new_mysql_docker_image == "docker.io/mysql:8.0.33"
         or new_mysql_docker_image == "docker.io/mysql:8.1.0"
