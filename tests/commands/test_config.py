@@ -106,3 +106,8 @@ class PatchesTests(unittest.TestCase, TestCommandMixin):
             result = self.invoke_in_root(root, ["config", "patches", "list"])
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
+
+    def test_config_patches_show(self) -> None:
+        result = self.invoke(["config", "patches", "show", "mypatch"])
+        self.assertEqual(0, result.exit_code)
+        self.assertEqual("", result.stdout)
