@@ -172,18 +172,20 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
     # environment, not the configuration.
     tutor_env.save(context.obj.root, config)
-    context.invoke(compose.start, detach=True, services=["mysql"])
-    fmt.echo_info("Waiting for MySQL to boot...")
-    sleep(30)
+    if not is_mysql_service_ready(
+        context, config, old_mysql_docker_image.split(":")[1]
+    ):
+        return
 
     # Upgrade back to v8.4
     config["DOCKER_IMAGE_MYSQL"] = new_mysql_docker_image
     # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
     # environment, not the configuration.
     tutor_env.save(context.obj.root, config)
-    context.invoke(compose.start, detach=True, services=["mysql"])
-    fmt.echo_info("Waiting for MySQL to boot...")
-    sleep(30)
+    if not is_mysql_service_ready(
+        context, config, new_mysql_docker_image.split(":")[1]
+    ):
+        return
     context.invoke(compose.stop)
 
 
@@ -229,3 +231,42 @@ def upgrade_mongodb(
         ],
     )
     context.invoke(compose.stop)
+
+
+def is_mysql_service_ready(
+    context: click.Context, config: Config, version: str
+) -> bool:
+    """
+    Start the MySQL service and check if it is ready to accept connections
+    by attempting to connect multiple times with a delay in between each attempt.
+
+    Returns:
+        bool: True if MySQL is successfully started and accepts connections, False otherwise.
+    """
+
+    context.invoke(compose.start, detach=True, services=["mysql"])
+    mysql_connection_attempt = 1
+    mysql_connection_max_attempts = 5
+    while mysql_connection_attempt <= mysql_connection_max_attempts:
+        fmt.echo_info(
+            f"[{mysql_connection_attempt}/{mysql_connection_max_attempts}] Waiting for MySQL service to start (this may take a while)..."
+        )
+        try:
+            context.invoke(
+                compose.execute,
+                args=[
+                    "mysql",
+                    "bash",
+                    "-e",
+                    "-c",
+                    f"mysql --user={config['MYSQL_ROOT_USERNAME']} --password='{config['MYSQL_ROOT_PASSWORD']}' --host={config['MYSQL_HOST']} --port={config['MYSQL_PORT']} -e 'exit'",
+                ],
+            )
+            break
+        except:
+            if mysql_connection_attempt == mysql_connection_max_attempts:
+                fmt.echo_error(f"Failed to start MySQL v{version}")
+                return False
+            sleep(10)
+        mysql_connection_attempt += 1
+    return True
