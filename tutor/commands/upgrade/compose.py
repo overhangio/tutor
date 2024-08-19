@@ -263,7 +263,8 @@ def is_mysql_service_ready(
                 ],
             )
             break
-        except:
+        except Exception as e:
+            fmt.echo_error(e)
             if mysql_connection_attempt == mysql_connection_max_attempts:
                 fmt.echo_error(f"Failed to start MySQL v{version}")
                 return False
