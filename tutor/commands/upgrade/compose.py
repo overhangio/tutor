@@ -264,10 +264,10 @@ def is_mysql_service_ready(
             )
             break
         except Exception as e:
-            fmt.echo_error(e)
+            fmt.echo_alert(f"MySQL service not ready to accept connections: {e}")
             if mysql_connection_attempt == mysql_connection_max_attempts:
                 fmt.echo_error(f"Failed to start MySQL v{version}")
                 return False
-            sleep(10)
+            sleep(20)
         mysql_connection_attempt += 1
     return True
