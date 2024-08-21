@@ -397,7 +397,7 @@ spec:
             - "--character-set-server=utf8mb4"
             - "--collation-server=utf8mb4_unicode_ci"
             - "--binlog-expire-logs-seconds=259200"
-            - "--mysql-native-password=ON"
+            {% if DOCKER_IMAGE_MYSQL >= "docker.io/mysql:8.4.0" -%}- "--mysql-native-password=ON"{%- endif %}
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "{{ MYSQL_ROOT_PASSWORD }}"
