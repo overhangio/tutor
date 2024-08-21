@@ -22,6 +22,8 @@ With Tutor, all data are stored in a single folder. This means that it's extreme
 
     tutor local start -d
 
+.. _database_dumps:
+
 Making database dumps
 ---------------------
 

@@ -13,6 +13,7 @@ from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
 from tutor import env, fmt, hooks
+from tutor.utils import get_mysql_change_charset_query
 from tutor.hooks import priorities
 
 
@@ -315,6 +316,108 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     yield ("lms", command)
 
 
+@click.command(
+    short_help="Convert the charset and collation of mysql to utf8mb4.",
+    help=(
+        "Convert the charset and collation of mysql to utf8mb4. You can either upgrade all tables, specify only certain tables to upgrade or specify certain tables to exclude from the upgrade process"
+    ),
+    context_settings={"ignore_unknown_options": True},
+)
+@click.option(
+    "--include",
+    is_flag=False,
+    nargs=1,
+    help="Apps/Tables to include in the upgrade process. Requires comma-seperated values with no space in-between.",
+)
+@click.option(
+    "--exclude",
+    is_flag=False,
+    nargs=1,
+    help="Apps/Tables to exclude from the upgrade process. Requires comma-seperated values with no space in-between.",
+)
+@click.option(
+    "--database",
+    is_flag=False,
+    nargs=1,
+    default="{{ OPENEDX_MYSQL_DATABASE }}",
+    show_default=True,
+    required=True,
+    type=str,
+    help="The database of which the tables are to be upgraded",
+)
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+def convert_mysql_utf8mb4_charset(
+    include: str,
+    exclude: str,
+    database: str,
+    non_interactive: bool,
+) -> t.Iterable[tuple[str, str]]:
+    """
+    Do command to upgrade the charset and collation of tables in MySQL
+
+    Can specify whether to upgrade all tables, or include certain tables/apps or to exclude certain tables/apps
+    """
+
+    context = click.get_current_context().obj
+    config = tutor_config.load(context.root)
+
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            f"You are not running MySQL (RUN_MYSQL=false). It is your "
+            f"responsibility to upgrade the charset and collation of your MySQL instance."
+        )
+        return
+
+    # Prompt user for confirmation of upgrading all tables
+    if not include and not exclude and not non_interactive:
+        upgrade_all_tables = click.confirm(
+            "Are you sure you want to upgrade all tables? This process is potentially irreversible and may take a long time.",
+            prompt_suffix=" ",
+        )
+        if not upgrade_all_tables:
+            return
+
+    charset_to_upgrade_from = "utf8mb3"
+    charset = "utf8mb4"
+    collation = "utf8mb4_unicode_ci"
+
+    query_to_append = ""
+    if include or exclude:
+
+        def generate_query_to_append(tables: list[str], exclude: bool = False) -> str:
+            include = "NOT" if exclude else ""
+            table_names = f"^{tables[0]}"
+            for i in range(1, len(tables)):
+                table_names += f"|^{tables[i]}"
+            # We use regexp for pattern matching the names from the start of the tablename
+            query_to_append = f"AND table_name {include} regexp '{table_names}' "
+            return query_to_append
+
+        query_to_append += (
+            generate_query_to_append(include.split(",")) if include else ""
+        )
+        query_to_append += (
+            generate_query_to_append(exclude.split(","), exclude=True)
+            if exclude
+            else ""
+        )
+    click.echo(
+        fmt.title(
+            f"Updating charset and collation of tables in the {database} database to {charset} and {collation} respectively."
+        )
+    )
+    query = get_mysql_change_charset_query(
+        database, charset, collation, query_to_append, charset_to_upgrade_from
+    )
+    click.echo(fmt.info(query))
+    mysql_command = (
+        "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --skip-column-names --silent "
+        + shlex.join([f"--database={database}", "-e", query])
+    )
+    yield ("lms", mysql_command)
+    click.echo(fmt.info(f"MySQL charset and collation successfully upgraded"))
+
+
 def add_job_commands(do_command_group: click.Group) -> None:
     """
     This is meant to be called with the `local/dev/k8s do` group commands, to add the
@@ -390,6 +493,7 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
 
 hooks.Filters.CLI_DO_COMMANDS.add_items(
     [
+        convert_mysql_utf8mb4_charset,
         createuser,
         importdemocourse,
         importdemolibraries,
