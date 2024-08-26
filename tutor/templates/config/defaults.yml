@@ -4,7 +4,14 @@
 # This must be defined early
 ATLAS_REVISION: "{% if OPENEDX_COMMON_VERSION == 'master' %}main{% else %}{{ OPENEDX_COMMON_VERSION }}{% endif %}"
 ATLAS_REPOSITORY: "openedx/openedx-translations"
-ATLAS_OPTIONS: ""
+# Set revision to redwood.2.1 until redwood.3 tag is available.
+# redwood.2.1 is only available for openedx-translations
+# It is done here so that the config is available across all plugins.
+# openedx-atlas currently only supports branches or tags against revision
+# https://github.com/openedx/openedx-atlas?tab=readme-ov-file#usage
+# Security patch: https://discuss.openedx.org/t/security-upcoming-security-release-for-openedx-translations-2024-08-23/13720
+# https://github.com/openedx/openedx-translations/releases/tag/open-release%2Fredwood.2.1
+ATLAS_OPTIONS: "{% if OPENEDX_COMMON_VERSION == 'master' %}{% else %}--revision=open-release/redwood.2.1{% endif %}"
 CADDY_HTTP_PORT: 80
 CMS_HOST: "studio.{{ LMS_HOST }}"
 CMS_OAUTH2_KEY_SSO: "cms-sso"
