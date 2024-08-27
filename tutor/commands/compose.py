@@ -187,12 +187,18 @@ Press enter when you are ready to continue"""
 
 
 def interactive_configuration(
-    context: click.Context, interactive: bool, run_for_prod: t.Optional[bool] = None
+    context: click.Context,
+    interactive: bool,
+    run_for_prod: t.Optional[bool] = None,
 ) -> None:
-    click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
     if interactive:
-        interactive_config.ask_questions(config, run_for_prod=run_for_prod)
+        click.echo(fmt.title("Interactive platform configuration"))
+        interactive_config.ask_questions(
+            config,
+            context.obj.root,
+            run_for_prod=run_for_prod,
+        )
     tutor_config.save_config_file(context.obj.root, config)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)

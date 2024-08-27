@@ -225,10 +225,10 @@ def launch(context: click.Context, non_interactive: bool) -> None:
             from_release=tutor_env.get_env_release(context.obj.root),
         )
 
-    click.echo(fmt.title("Interactive platform configuration"))
     config = tutor_config.load_minimal(context.obj.root)
     if not non_interactive:
-        interactive_config.ask_questions(config, run_for_prod=True)
+        click.echo(fmt.title("Interactive platform configuration"))
+        interactive_config.ask_questions(config, context.obj.root, run_for_prod=True)
     tutor_config.save_config_file(context.obj.root, config)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)
