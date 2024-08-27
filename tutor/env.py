@@ -533,6 +533,20 @@ def root_dir(root: str) -> str:
     return os.path.abspath(root)
 
 
+def delete_env_dir(root: str) -> None:
+    env_path = base_dir(root)
+
+    try:
+        shutil.rmtree(env_path)
+        fmt.echo_alert(f"Removed existing Tutor environment at: {env_path}")
+    except PermissionError:
+        raise exceptions.TutorError(
+            f"Permission Denied while trying to remove existing Tutor environment at: {env_path}"
+        )
+    except FileNotFoundError:
+        fmt.echo_info(f"No existing Tutor environment to remove at: {env_path}")
+
+
 @hooks.Actions.PLUGIN_UNLOADED.add()
 def _delete_plugin_templates(plugin: str, root: str, _config: Config) -> None:
     """

@@ -136,6 +136,13 @@ class ConfigListKeyValParamType(ConfigKeyValParamType):
 @click.option(
     "-e", "--env-only", "env_only", is_flag=True, help="Skip updating config.yml"
 )
+@click.option(
+    "-c",
+    "--clean",
+    "clean_env",
+    is_flag=True,
+    help="Remove everything in the env directory before save",
+)
 @click.pass_obj
 def save(
     context: Context,
@@ -145,10 +152,13 @@ def save(
     remove_vars: list[tuple[str, t.Any]],
     unset_vars: list[str],
     env_only: bool,
+    clean_env: bool,
 ) -> None:
     config = tutor_config.load_minimal(context.root)
     if interactive:
-        interactive_config.ask_questions(config)
+        interactive_config.ask_questions(config, context.root, clean_env_prompt=True)
+    if clean_env:
+        env.delete_env_dir(context.root)
     if set_vars:
         for key, value in set_vars:
             config[key] = env.render_unknown(config, value)
