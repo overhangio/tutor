@@ -275,6 +275,10 @@ RUN pip install -e "/mnt/{{ name }}"
 # Add ipdb as default PYTHONBREAKPOINT
 ENV PYTHONBREAKPOINT=ipdb.set_trace
 
+# Point unit tests at the MongoDB container
+ENV EDXAPP_TEST_MONGO_HOST={{ MONGODB_HOST }}
+ENV EDXAPP_TEST_MONGO_PORT_NUM={{ MONGODB_PORT }}
+
 # Recompile static assets: in development mode all static assets are stored in edx-platform,
 # and the location of these files is stored in webpack-stats.json. If we don't recompile
 # static assets, then production assets will be served instead.
