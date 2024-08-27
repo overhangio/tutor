@@ -1,1 +1,1 @@
-- [Feature] Enhance your workflow with the new `-c` or `--clean` option for the `tutor config save` command! This feature allows you to clean your environment before each save, ensuring that all files and directories within the `env/` folder are deleted, providing you with a fresh environment each time. (by @CodeWithEmad)
+- [Feature] Added `-c` or `--clean` option to tutor config save: For plugin developers and advanced users, this option cleans the `env/` folder before saving, ensuring a fresh environment for testing and development. (by @CodeWithEmad)
