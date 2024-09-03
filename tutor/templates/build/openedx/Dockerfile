@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ###### Minimal image with base system requirements for most stages
-FROM docker.io/ubuntu:20.04 AS minimal
+FROM docker.io/ubuntu:24.04 AS minimal
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt update && \
     apt install -y libssl-dev zlib1g-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-    xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+    xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git
 
 # Install pyenv
 # https://www.python.org/downloads/
@@ -78,7 +78,10 @@ ENV XDG_CACHE_HOME=/openedx/.cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update \
-    && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
+    && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev \
+     # Install xmlsec dependencies
+    libxml2-dev \
+    libxmlsec1-openssl
 
 # Install the right version of pip/setuptools
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -138,9 +141,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt update \
     && apt install -y gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libmysqlclient-dev libpng-dev libsqlite3-dev libxmlsec1-dev lynx mysql-client ntp pkg-config rdfind
 
+
 # From then on, run as unprivileged "app" user
 # Note that this must always be different from root (APP_USER_ID=0)
-ARG APP_USER_ID=1000
+ARG APP_USER_ID=1001
 RUN if [ "$APP_USER_ID" = 0 ]; then echo "app user may not be root" && false; fi
 RUN useradd --no-log-init --home-dir /openedx --create-home --shell /bin/bash --uid ${APP_USER_ID} app
 USER ${APP_USER_ID}
