@@ -13,7 +13,8 @@ from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
 from tutor import env, fmt, hooks
-from tutor.utils import get_mysql_change_charset_query
+from tutor.commands.context import Context
+from tutor.commands.jobs_utils import get_mysql_change_charset_query
 from tutor.hooks import priorities
 
 
@@ -346,7 +347,9 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     help="The database of which the tables are to be upgraded",
 )
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
+@click.pass_obj
 def convert_mysql_utf8mb4_charset(
+    context: Context,
     include: str,
     exclude: str,
     database: str,
@@ -358,7 +361,6 @@ def convert_mysql_utf8mb4_charset(
     Can specify whether to upgrade all tables, or include certain tables/apps or to exclude certain tables/apps
     """
 
-    context = click.get_current_context().obj
     config = tutor_config.load(context.root)
 
     if not config["RUN_MYSQL"]:
@@ -409,13 +411,13 @@ def convert_mysql_utf8mb4_charset(
     query = get_mysql_change_charset_query(
         database, charset, collation, query_to_append, charset_to_upgrade_from
     )
-    click.echo(fmt.info(query))
+
     mysql_command = (
         "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --skip-column-names --silent "
         + shlex.join([f"--database={database}", "-e", query])
     )
     yield ("lms", mysql_command)
-    click.echo(fmt.info(f"MySQL charset and collation successfully upgraded"))
+    fmt.echo_info("MySQL charset and collation successfully upgraded")
 
 
 def add_job_commands(do_command_group: click.Group) -> None:
