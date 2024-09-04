@@ -1,3 +1,9 @@
+"""
+This module provides utility methods for tutor `do` commands
+
+Methods:
+- `get_mysql_change_charset_query`: Generates MySQL queries to upgrade the charset and collation of tables
+"""
 def get_mysql_change_charset_query(
     database: str,
     charset: str,
