@@ -146,7 +146,7 @@ Changing the mysql charset and collation
 
 .. note:: This command has been tested only for users upgrading from Quince. While it is expected to work for users on earlier releases, please use it with caution as it has not been tested with those versions.
 
-Your database's charset and collation might not support specific characters or emojis. Tutor will run fine without this change unless you explicity use specific characters in your instance.
+The database's charset and collation might not support specific characters or emojis. Tutor will function normally without this change unless specific characters are used in the instance.
 
 .. warning:: This change is potentially irreversible. It is recommended to make a backup of the MySQL database. See the :ref:`database dump instructions <database_dumps>` to create a DB dump.
 
@@ -154,17 +154,17 @@ To change the charset and collation of all the tables in the openedx database, r
 
     tutor local do convert-mysql-utf8mb4-charset
 
-Alternatively, if you only want to change the charset and collation of certain tables or exclude certain tables, you can use the ``--include`` or ``--exclude`` options. These options take comma separated names of tables/apps with no space in-between. To upgrade the ``courseware_studentmodule`` and ``courseware_studentmodulehistory`` tables, run::
+Alternatively, to change the charset and collation of certain tables or to exclude certain tables, the ``--include`` or ``--exclude`` options can be used. These options take comma separated names of tables/apps with no space in-between. To upgrade the ``courseware_studentmodule`` and ``courseware_studentmodulehistory`` tables, run::
 
     tutor local do convert-mysql-utf8mb4-charset --include=courseware_studentmodule,courseware_studentmodulehistory
 
-Tutor performs pattern matching from the start of the table name so you can just enter the name of the app to include/exclude all the tables under that app. To upgrade all the tables in the database except the ones under the student and wiki apps, run::
+Tutor performs pattern matching from the start of the table name so just the name of the app is enough to include/exclude all the tables under that app. To upgrade all the tables in the database except the ones under the student and wiki apps, run::
 
     tutor local do convert-mysql-utf8mb4-charset --exclude=student,wiki
 
 In the above command, all the tables whose name starts with either student or wiki will be excluded from the upgrade process.
 
-By default, only the tables in the openedx database are changed. If you are running any plugins with their own databases, you can upgrade them by utilizing the ``--database`` option. To upgrade all the tables in the discovery database, run::
+By default, only the tables in the openedx database are changed. For upgrading tables in any additional databases used by plugins, the ``--database`` option can be used to upgrade them. To upgrade all the tables in the discovery database, run::
 
     tutor local do convert-mysql-utf8mb4-charset --database=discovery
 

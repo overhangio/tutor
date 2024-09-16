@@ -2,7 +2,7 @@
 This module provides utility methods for tutor `do` commands
 
 Methods:
-- `get_mysql_change_charset_query`: Generates MySQL queries to upgrade the charset and collation of tables
+- `get_mysql_change_charset_query`: Generates MySQL queries to upgrade the charset and collation of columns, tables, and databases.
 """
 
 
@@ -14,7 +14,7 @@ def get_mysql_change_charset_query(
     charset_to_upgrade_from: str,
 ) -> str:
     """
-    Helper function to generate the mysql query to upgrade the charset and collation of tables
+    Helper function to generate the mysql query to upgrade the charset and collation of columns, tables, and databases
 
     Utilized in the `tutor local do convert-mysql-utf8mb4-charset` command
     """
