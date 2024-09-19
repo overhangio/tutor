@@ -4,12 +4,10 @@ Provide API for plugin features.
 
 from __future__ import annotations
 
-import functools
 import typing as t
-from copy import deepcopy
 
 from tutor import exceptions, fmt, hooks
-from tutor.types import Config, get_typed
+from tutor.types import Config
 
 # Import modules to trigger hook creation
 from . import openedx, v0, v1

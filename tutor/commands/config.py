@@ -230,8 +230,20 @@ def patches_list(context: Context) -> None:
     renderer.print_patches_locations()
 
 
+@click.command(name="show", help="Print the rendered contents of a template patch")
+@click.argument("name")
+@click.pass_obj
+def patches_show(context: Context, name: str) -> None:
+    config = tutor_config.load_full(context.root)
+    renderer = env.Renderer(config)
+    rendered = renderer.patch(name)
+    if rendered:
+        print(rendered)
+
+
 config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
 patches_command.add_command(patches_list)
+patches_command.add_command(patches_show)
 config_command.add_command(patches_command)
