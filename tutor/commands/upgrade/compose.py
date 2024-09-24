@@ -150,13 +150,13 @@ def upgrade_from_maple(context: click.Context, config: Config) -> None:
 def upgrade_from_olive(context: click.Context, config: Config) -> None:
     # Note that we need to exec because the ora2 folder is not bind-mounted in the job
     # services.
-    # context.invoke(compose.start, detach=True, services=["lms"])
-    # context.invoke(
-    #     compose.execute,
-    #     args=["lms", "sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
-    # )
-    # upgrade_mongodb(context, config, "4.2.17", "4.2")
-    # upgrade_mongodb(context, config, "4.4.22", "4.4")
+    context.invoke(compose.start, detach=True, services=["lms"])
+    context.invoke(
+        compose.execute,
+        args=["lms", "sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
+    )
+    upgrade_mongodb(context, config, "4.2.17", "4.2")
+    upgrade_mongodb(context, config, "4.4.22", "4.4")
 
     intermediate_mysql_docker_image = common_upgrade.get_intermediate_mysql_upgrade(
         config
