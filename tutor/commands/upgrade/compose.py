@@ -5,7 +5,7 @@ import click
 from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import fmt
-from tutor.commands import compose
+from tutor.commands import compose, jobs
 from tutor.types import Config
 
 from . import common as common_upgrade
@@ -150,43 +150,33 @@ def upgrade_from_maple(context: click.Context, config: Config) -> None:
 def upgrade_from_olive(context: click.Context, config: Config) -> None:
     # Note that we need to exec because the ora2 folder is not bind-mounted in the job
     # services.
-    context.invoke(compose.start, detach=True, services=["lms"])
-    context.invoke(
-        compose.execute,
-        args=["lms", "sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
+    # context.invoke(compose.start, detach=True, services=["lms"])
+    # context.invoke(
+    #     compose.execute,
+    #     args=["lms", "sh", "-e", "-c", common_upgrade.PALM_RENAME_ORA2_FOLDER_COMMAND],
+    # )
+    # upgrade_mongodb(context, config, "4.2.17", "4.2")
+    # upgrade_mongodb(context, config, "4.4.22", "4.4")
+
+    intermediate_mysql_docker_image = common_upgrade.get_intermediate_mysql_upgrade(
+        config
     )
-    upgrade_mongodb(context, config, "4.2.17", "4.2")
-    upgrade_mongodb(context, config, "4.4.22", "4.4")
-
-    upgrade_to_redwood_onwards, new_mysql_docker_image = (
-        common_upgrade.verify_tutor_version_for_mysql_upgrade(config)
-    )
-
-    if not upgrade_to_redwood_onwards:
+    if not intermediate_mysql_docker_image:
         return
 
-    # Revert the MySQL image first to build data dictionary on v8.1
-    old_mysql_docker_image = "docker.io/mysql:8.1.0"
-    click.echo(fmt.title(f"Upgrading MySQL to v{new_mysql_docker_image.split(':')[1]}"))
-    config["DOCKER_IMAGE_MYSQL"] = old_mysql_docker_image
-    # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
-    # environment, not the configuration.
+    click.echo(fmt.title(f"Upgrading MySQL to {intermediate_mysql_docker_image}"))
+
+    # Revert the MySQL image to build the data dictionary on v8.1
+    mysql_docker_image = config["DOCKER_IMAGE_MYSQL"]
+    config["DOCKER_IMAGE_MYSQL"] = intermediate_mysql_docker_image
     tutor_env.save(context.obj.root, config)
-    if not is_mysql_service_ready(
-        context, config, old_mysql_docker_image.split(":")[1]
-    ):
-        return
+    # Run the init command to make sure MySQL is ready for connections
+    context.invoke(jobs.initialise, limit="mysql")
 
-    # Upgrade back to v8.4
-    config["DOCKER_IMAGE_MYSQL"] = new_mysql_docker_image
-    # Note that the DOCKER_IMAGE_MYSQL value is never saved, because we only save the
-    # environment, not the configuration.
+    # Change the image back to v8.4
+    config["DOCKER_IMAGE_MYSQL"] = mysql_docker_image
     tutor_env.save(context.obj.root, config)
-    if not is_mysql_service_ready(
-        context, config, new_mysql_docker_image.split(":")[1]
-    ):
-        return
-    context.invoke(compose.stop)
+    context.invoke(compose.stop, services=["mysql"])
 
 
 def upgrade_from_quince(context: click.Context, config: Config) -> None:
@@ -231,43 +221,3 @@ def upgrade_mongodb(
         ],
     )
     context.invoke(compose.stop)
-
-
-def is_mysql_service_ready(
-    context: click.Context, config: Config, version: str
-) -> bool:
-    """
-    Start the MySQL service and check if it is ready to accept connections
-    by attempting to connect multiple times with a delay in between each attempt.
-
-    Returns:
-        bool: True if MySQL is successfully started and accepts connections, False otherwise.
-    """
-
-    context.invoke(compose.start, detach=True, services=["mysql"])
-    mysql_connection_attempt = 1
-    mysql_connection_max_attempts = 5
-    while mysql_connection_attempt <= mysql_connection_max_attempts:
-        fmt.echo_info(
-            f"[{mysql_connection_attempt}/{mysql_connection_max_attempts}] Waiting for MySQL service to start (this may take a while)..."
-        )
-        try:
-            context.invoke(
-                compose.execute,
-                args=[
-                    "mysql",
-                    "bash",
-                    "-e",
-                    "-c",
-                    f"mysql --user={config['MYSQL_ROOT_USERNAME']} --password='{config['MYSQL_ROOT_PASSWORD']}' --host={config['MYSQL_HOST']} --port={config['MYSQL_PORT']} -e 'exit'",
-                ],
-            )
-            break
-        except Exception as e:
-            fmt.echo_alert(f"MySQL service not ready to accept connections: {e}")
-            if mysql_connection_attempt == mysql_connection_max_attempts:
-                fmt.echo_error(f"Failed to start MySQL v{version}")
-                return False
-            sleep(20)
-        mysql_connection_attempt += 1
-    return True

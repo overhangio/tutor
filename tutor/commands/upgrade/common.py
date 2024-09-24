@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import click
+from packaging import version
 
 from tutor import config as tutor_config
 from tutor import fmt, plugins
-from tutor.types import Config
+from tutor.types import Config, get_typed
 
 
 def upgrade_from_lilac(config: Config) -> None:
@@ -60,7 +63,7 @@ def get_mongo_upgrade_parameters(
     return mongo_version, admin_command
 
 
-def verify_tutor_version_for_mysql_upgrade(config: Config) -> tuple[bool, str]:
+def get_intermediate_mysql_upgrade(config: Config) -> Optional[str]:
     """
     Checks if a MySQL upgrade is needed based on the Tutor version and MySQL setup.
 
@@ -70,26 +73,22 @@ def verify_tutor_version_for_mysql_upgrade(config: Config) -> tuple[bool, str]:
     required for versions 16 or 17.
 
     Returns:
-        tuple: A boolean indicating whether the upgrade process should proceed and
-               a string representing the Docker image of MySQL if applicable.
+        Optional[str]: The docker image of MySQL to upgrade to or None if not applicable
     """
-    if not config["RUN_MYSQL"]:
+    if not get_typed(config, "RUN_MYSQL", bool):
         fmt.echo_info(
             "You are not running MySQL (RUN_MYSQL=false). It is your "
             "responsibility to upgrade your MySQL instance to v8.4. There is "
             "nothing left to do to upgrade from Olive."
         )
-        return False, ""
-
-    new_mysql_docker_image = str(config["DOCKER_IMAGE_MYSQL"])
-
-    if (
-        new_mysql_docker_image == "docker.io/mysql:8.0.33"
-        or new_mysql_docker_image == "docker.io/mysql:8.1.0"
-    ):
-        return False, ""
-
-    return True, new_mysql_docker_image
+        return None
+    image_tag = get_typed(config, "DOCKER_IMAGE_MYSQL", str).split(":")[-1]
+    # If latest image, we assign a constant value to invalidate the condition
+    # as we know that the latest image will always be greater than 8.1.0
+    target_version = (
+        version.Version("8.1.1") if image_tag == "latest" else version.parse(image_tag)
+    )
+    return "docker.io/mysql:8.1.0" if target_version > version.parse("8.1.0") else None
 
 
 PALM_RENAME_ORA2_FOLDER_COMMAND = """
