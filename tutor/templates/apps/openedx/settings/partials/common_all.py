@@ -246,7 +246,7 @@ CODE_JAIL = {
     "user": None,
 }
 
-LEARNING_CORE = {
+OPENEDX_LEARNING = {
     'MEDIA': {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
         "OPTIONS": {
