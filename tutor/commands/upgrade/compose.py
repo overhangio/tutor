@@ -5,7 +5,7 @@ import click
 from tutor import config as tutor_config
 from tutor import env as tutor_env
 from tutor import fmt
-from tutor.commands import compose
+from tutor.commands import compose, jobs
 from tutor.types import Config
 
 from . import common as common_upgrade
@@ -157,6 +157,26 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     )
     upgrade_mongodb(context, config, "4.2.17", "4.2")
     upgrade_mongodb(context, config, "4.4.22", "4.4")
+
+    intermediate_mysql_docker_image = common_upgrade.get_intermediate_mysql_upgrade(
+        config
+    )
+    if not intermediate_mysql_docker_image:
+        return
+
+    click.echo(fmt.title(f"Upgrading MySQL to {intermediate_mysql_docker_image}"))
+
+    # Revert the MySQL image to build the data dictionary on v8.1
+    mysql_docker_image = config["DOCKER_IMAGE_MYSQL"]
+    config["DOCKER_IMAGE_MYSQL"] = intermediate_mysql_docker_image
+    tutor_env.save(context.obj.root, config)
+    # Run the init command to make sure MySQL is ready for connections
+    context.invoke(jobs.initialise, limit="mysql")
+
+    # Change the image back to v8.4
+    config["DOCKER_IMAGE_MYSQL"] = mysql_docker_image
+    tutor_env.save(context.obj.root, config)
+    context.invoke(compose.stop, services=["mysql"])
 
 
 def upgrade_from_quince(context: click.Context, config: Config) -> None:

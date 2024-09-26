@@ -165,6 +165,21 @@ def upgrade_from_olive(context: Context, config: Config) -> None:
     upgrade_mongodb(config, "4.2.17", "4.2")
     upgrade_mongodb(config, "4.4.22", "4.4")
 
+    intermediate_mysql_docker_image = common_upgrade.get_intermediate_mysql_upgrade(
+        config
+    )
+    if not intermediate_mysql_docker_image:
+        return
+
+    message = f"""Automatic release upgrade is unsupported in Kubernetes. If you are upgrading from Olive or an earlier release to Redwood, you will have to first upgrade MySQL to v8.1 and then to v8.4. To upgrade, run the following commands:
+
+    tutor k8s stop
+    tutor config save --set DOCKER_IMAGE_MYSQL=docker.io/mysql:8.1.0
+    tutor k8s start
+    tutor config save --unset DOCKER_IMAGE_MYSQL
+    """
+    fmt.echo_info(message)
+
 
 def upgrade_from_quince(config: Config) -> None:
     click.echo(fmt.title("Upgrading from Quince"))
