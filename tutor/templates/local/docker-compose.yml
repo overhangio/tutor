@@ -15,6 +15,7 @@ services:
       - ../../data/lms:/mounts/lms
       - ../../data/cms:/mounts/cms
       - ../../data/openedx-media:/mounts/openedx
+      - ../../data/openedx-media-private:/mounts/openedx-private
       {% if RUN_MONGODB %}- ../../data/mongodb:/mounts/mongodb{% endif %}
       {% if RUN_MYSQL %}- ../../data/mysql:/mounts/mysql{% endif %}
       {% if RUN_ELASTICSEARCH %}- ../../data/elasticsearch:/mounts/elasticsearch{% endif %}
@@ -112,6 +113,7 @@ services:
       - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
       {%- for mount in iter_mounts(MOUNTS, "openedx", "lms") %}
       - {{ mount }}
       {%- endfor %}
@@ -138,6 +140,7 @@ services:
       - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
       {%- for mount in iter_mounts(MOUNTS, "openedx", "cms") %}
       - {{ mount }}
       {%- endfor %}
@@ -166,6 +169,7 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
       {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-worker") %}
       - {{ mount }}
       {%- endfor %}
@@ -185,6 +189,7 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
       {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-worker") %}
       - {{ mount }}
       {%- endfor %}
