@@ -113,8 +113,9 @@ oauthlib==3.2.2
     #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==23.2
+packaging==24.1
     # via
+    #   -r requirements/base.txt
     #   black
     #   build
     #   pyinstaller
