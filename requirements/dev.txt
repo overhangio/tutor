@@ -42,7 +42,7 @@ click-log==0.4.0
     # via scriv
 coverage==7.3.2
     # via -r requirements/dev.in
-cryptography==42.0.8
+cryptography==43.0.1
     # via secretstorage
 dill==0.3.7
     # via pylint
