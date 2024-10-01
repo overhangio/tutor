@@ -100,7 +100,7 @@ When making a new Tutor release, increment the:
 
 An optional BRANCH suffix may be appended to the release name to indicate that extra changes were added on top of the latest release. For instance, "x.y.z-nightly" corresponds to release x.y.z on top of which extra changes were added to make it compatible with the Open edX master branches (see the :ref:`tutorial on running Tutor Nightly <nightly>`).
 
-`Officially-supported plugins <https://overhang.io/tutor/plugins>`__ follow the same versioning pattern. As a third-party plugin developer, you are encouraged to use the same pattern to make it immediately clear to your end-users which Open edX versions are supported.
+`Officially-supported plugins <https://edly.io/tutor/plugins-and-themes/>`__ follow the same versioning pattern. As a third-party plugin developer, you are encouraged to use the same pattern to make it immediately clear to your end-users which Open edX versions are supported.
 
 In Tutor and its officially-supported plugins, certain features, API endpoints, and older depenency versions are periodically deprecated. Generally, warnings are added to the Changelogs and/or the command-line interface one major release before support for any behavior is removed. In order to keep track of pending removals in the source code, comments containing the string ``REMOVE-AFTER-VXX`` should be used, where ``<XX>`` is the last major version that must support the behavior. For example::
 
