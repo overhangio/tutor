@@ -73,6 +73,7 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
 
 class BaseComposeContext(BaseTaskContext):
     NAME: t.Literal["local", "dev"]
+    OPENEDX_SERVICES: list[str] = ["lms", "cms"]
 
     def job_runner(self, config: Config) -> ComposeTaskRunner:
         raise NotImplementedError
@@ -292,7 +293,7 @@ def restart(context: BaseComposeContext, services: list[str]) -> None:
     else:
         for service in services:
             if service == "openedx":
-                command += ["lms", "lms-worker", "cms", "cms-worker"]
+                command += context.OPENEDX_SERVICES
             else:
                 command.append(service)
     context.job_runner(config).docker_compose(*command)
