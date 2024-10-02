@@ -246,5 +246,14 @@ CODE_JAIL = {
     "user": None,
 }
 
+OPENEDX_LEARNING = {
+    'MEDIA': {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {
+            "location": "/openedx/media-private/openedx-learning",
+        }
+    }
+}
+
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS
