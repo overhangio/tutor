@@ -123,53 +123,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cms-worker
-  labels:
-    app.kubernetes.io/name: cms-worker
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: cms-worker
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: cms-worker
-    spec:
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-      containers:
-        - name: cms-worker
-          image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ["celery", "--app=cms.celery", "worker", "--loglevel=info", "--hostname=edx.cms.core.default.%%h", "--max-tasks-per-child", "100", "--exclude-queues=edx.lms.core.default"]
-          env:
-          - name: SERVICE_VARIANT
-            value: cms
-          - name: DJANGO_SETTINGS_MODULE
-            value: cms.envs.tutor.production
-          volumeMounts:
-            - mountPath: /openedx/edx-platform/lms/envs/tutor/
-              name: settings-lms
-            - mountPath: /openedx/edx-platform/cms/envs/tutor/
-              name: settings-cms
-            - mountPath: /openedx/config
-              name: config
-          securityContext:
-            allowPrivilegeEscalation: false
-      volumes:
-        - name: settings-lms
-          configMap:
-            name: openedx-settings-lms
-        - name: settings-cms
-          configMap:
-            name: openedx-settings-cms
-        - name: config
-          configMap:
-            name: openedx-config
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: lms
   labels:
     app.kubernetes.io/name: lms
@@ -229,52 +182,60 @@ spec:
             - key: uwsgi.ini
               path: uwsgi.ini
 ---
+{% for service, variants in iter_celery_workers_config().items() %}
+{% for variant, config in variants.items() %}
+{% set deployment = service + "-" + "worker" + "-" + variant.replace("_", "-") %}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lms-worker
+  name: {{deployment}}
   labels:
-    app.kubernetes.io/name: lms-worker
+    app.kubernetes.io/name: {{deployment}}
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: lms-worker
+      app.kubernetes.io/name: {{deployment}}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: lms-worker
+        app.kubernetes.io/name: {{deployment}}
     spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
       containers:
-        - name: lms-worker
+        - name: {{deployment}}
           image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ["celery", "--app=lms.celery", "worker", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--max-tasks-per-child=100", "--exclude-queues=edx.cms.core.default"]
+          args:
+            - "celery"
+            - "--app={{service}}.celery"
+            - "worker"
+            - "--loglevel=info"
+            - "--hostname=edx.{{service}}.core.{{variant}}.%%h"
+            - "--queues=edx.{{service}}.core.{{variant}}"{% for setting, value in config.items() %}
+            - "--{{setting}}={{value}}"{% endfor %}
           env:
           - name: SERVICE_VARIANT
-            value: lms
+            value: {{service}}
           - name: DJANGO_SETTINGS_MODULE
-            value: lms.envs.tutor.production
+            value: {{service}}.envs.tutor.production
           volumeMounts:
-            - mountPath: /openedx/edx-platform/lms/envs/tutor/
-              name: settings-lms
-            - mountPath: /openedx/edx-platform/cms/envs/tutor/
-              name: settings-cms
+            - mountPath: /openedx/edx-platform/{{service}}/envs/tutor/
+              name: settings-{{service}}
             - mountPath: /openedx/config
               name: config
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
-        - name: settings-lms
+        - name: settings-{{service}}
           configMap:
-            name: openedx-settings-lms
-        - name: settings-cms
-          configMap:
-            name: openedx-settings-cms
+            name: openedx-settings-{{service}}
         - name: config
           configMap:
             name: openedx-config
+{% endfor %}
+{% endfor %}
 {% if RUN_ELASTICSEARCH %}
 ---
 apiVersion: apps/v1
