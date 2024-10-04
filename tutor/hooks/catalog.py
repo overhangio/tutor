@@ -514,6 +514,9 @@ class Filters:
     #: :param str file_path: The path to the file being checked.
     IS_FILE_RENDERED: Filter[bool, [str]] = Filter()
 
+    #: List of workers
+    CELERY_WORKERS_CONFIG: Filter[dict[str, dict[str, Any]], []] = Filter()
+
 
 class Contexts:
     """

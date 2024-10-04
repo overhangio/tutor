@@ -246,5 +246,8 @@ CODE_JAIL = {
     "user": None,
 }
 
+# Prevents losing tasks when workers are shutdown
+CELERY_ACKS_LATE = True
+
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS
