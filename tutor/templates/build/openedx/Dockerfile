@@ -99,7 +99,9 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.4.0 \
     # uwsgi server https://pypi.org/project/uWSGI/
-    uwsgi==2.0.24
+    uwsgi==2.0.24 \
+    # gevent for celery
+    gevent==24.2.1
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
