@@ -25,4 +25,45 @@ services:
           {{ patch("local-docker-compose-caddy-aliases")|indent(10) }}
     {% endif %}
 
+  ############# LMS and CMS workers
+  lms-worker:
+    image: {{ DOCKER_IMAGE_OPENEDX }}
+    environment:
+      SERVICE_VARIANT: lms
+      DJANGO_SETTINGS_MODULE: lms.envs.tutor.production
+    command: celery --app=lms.celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --max-tasks-per-child=100 --exclude-queues=edx.cms.core.default
+    restart: unless-stopped
+    volumes:
+      - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
+      - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
+      - ../apps/openedx/config:/openedx/config:ro
+      - ../../data/lms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
+      {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-worker") %}
+      - {{ mount }}
+      {%- endfor %}
+    depends_on:
+      - lms
+
+  cms-worker:
+    image: {{ DOCKER_IMAGE_OPENEDX }}
+    environment:
+      SERVICE_VARIANT: cms
+      DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
+    command: celery --app=cms.celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --max-tasks-per-child 100 --exclude-queues=edx.lms.core.default
+    restart: unless-stopped
+    volumes:
+      - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
+      - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
+      - ../apps/openedx/config:/openedx/config:ro
+      - ../../data/cms:/openedx/data
+      - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
+      {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-worker") %}
+      - {{ mount }}
+      {%- endfor %}
+    depends_on:
+      - cms
+
   {{ patch("local-docker-compose-prod-services")|indent(2) }}

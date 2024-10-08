@@ -32,12 +32,6 @@ services:
     ports:
         - "8001:8000"
 
-  lms-worker:
-    <<: *openedx-service
-
-  cms-worker:
-    <<: *openedx-service
-
   # Additional service for watching theme changes
   watchthemes:
     <<: *openedx-service
