@@ -45,7 +45,12 @@ services:
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
       --binlog-expire-logs-seconds=259200
+      # We only require this option for MySQL 8.4.0 and above
+      # Breaks MySQL for previous versions as this option does not exist on versions earlier than 8.4.0
+      {% set mysql_version = DOCKER_IMAGE_MYSQL.split(':')[-1] -%}
+      {% if mysql_version == "latest" or (mysql_version.split('.') | map('int') | list >= '8.4.0'.split('.') | map('int') | list) -%}
       --mysql-native-password=ON
+      {%- endif %}
     restart: unless-stopped
     user: "999:999"
     volumes:
