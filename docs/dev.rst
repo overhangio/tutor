@@ -28,7 +28,7 @@ This will perform several tasks. It will:
 * build the "openedx-dev" Docker image, which is based on the "openedx" production image but is `specialized for developer usage`_ (eventually with your fork),
 * stop any existing locally-running Tutor containers,
 * disable HTTPS,
-* set ``LMS_HOST`` to `local.edly.io <http://local.edly.io>`_ (a convenience domain that simply `points at 127.0.0.1 <https://dnschecker.org/#A/local.edly.io>`_),
+* set ``LMS_HOST`` to `local.openedx.io <http://local.openedx.io>`_ (a convenience domain that simply `points at 127.0.0.1 <https://dnschecker.org/#A/local.openedx.io>`_),
 * prompt for a platform details (with suitable defaults),
 * start LMS, CMS, supporting services, and any plugged-in services,
 * ensure databases are created and migrated, and
@@ -42,8 +42,8 @@ Additionally, when a local clone of edx-platform is bind-mounted, it will:
 
 Once setup is complete, the platform will be running in the background:
 
-* LMS will be accessible at `http://local.edly.io:8000 <http://local.edly.io:8000>`_.
-* CMS will be accessible at `http://studio.local.edly.io:8001 <http://studio.local.edly.io:8001>`_.
+* LMS will be accessible at `http://local.openedx.io:8000 <http://local.openedx.io:8000>`_.
+* CMS will be accessible at `http://studio.local.openedx.io:8001 <http://studio.local.openedx.io:8001>`_.
 * Plugged-in services should be accessible at their documented URLs.
 
 Now, use the ``tutor dev ...`` command-line interface to manage the development environment. Some common commands are described below.
