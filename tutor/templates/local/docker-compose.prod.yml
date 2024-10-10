@@ -19,7 +19,7 @@ services:
     networks:
       default:
         # These aliases are for internal communication between containers when running locally
-        # with *.local.edly.io hostnames.
+        # with *.local.openedx.io hostnames.
         aliases:
           - "{{ LMS_HOST }}"
           {{ patch("local-docker-compose-caddy-aliases")|indent(10) }}
