@@ -387,7 +387,7 @@ If you don't create your fork from this tag, you *will* have important compatibi
 Getting and customizing Translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Tutor builds images with the latest translations using the ``atlas pull`` `command <https://github.com/openedx/openedx-atlas>`__.
+Tutor builds images with the latest translations using the ``atlas pull`` `command <https://github.com/openedx/openedx-atlas>`_.
 
 By default the translations are pulled from the `openedx-translations repository <https://github.com/openedx/openedx-translations>`_
 from the ``ATLAS_REVISION`` branch. You can use custom translations on your fork of the openedx-translations repository by setting the following configuration parameters:
