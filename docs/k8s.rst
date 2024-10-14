@@ -152,7 +152,7 @@ Plugins can customize any Kubernetes resource in Tutor by overriding the definit
 ::
 
     # myplugin/tutormyplugin/patches/k8s-override
-    
+
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
