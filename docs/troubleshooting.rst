@@ -176,7 +176,7 @@ To learn more, check out `this GitHub issue <https://github.com/overhangio/tutor
 High resource consumption by Docker on ``tutor images build``
 -------------------------------------------------------------
 
-Some Docker images include many independent layers which are built in parallel by BuildKit. As a consequence, building these images will use up a lot of resources, sometimes even crashing the Docker daemon. To bypass this issue, we should explicitely limit the `maximum parallelism of BuildKit <https://docs.docker.com/build/buildkit/configure/#max-parallelism>`__. Create a ``buildkit.toml`` configuration file with the following contents::
+Some Docker images include many independent layers which are built in parallel by BuildKit. As a consequence, building these images will use up a lot of resources, sometimes even crashing the Docker daemon. To bypass this issue, we should explicitly limit the `maximum parallelism of BuildKit <https://docs.docker.com/build/buildkit/configure/#max-parallelism>`__. Create a ``buildkit.toml`` configuration file with the following contents::
 
     [worker.oci]
     max-parallelism = 2
