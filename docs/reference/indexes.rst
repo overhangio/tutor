@@ -7,10 +7,10 @@ Plugin indexes are a great way to have your plugins discovered by other users. P
 Index file paths
 ================
 
-A plugin index is a yaml-formatted file. It can be stored on the web or on your computer. In both cases, the index file location must end with "<current release name>/plugins.yml". For instance, the following are valid index locations if you run the Open edX "Redwood" release:
+A plugin index is a yaml-formatted file. It can be stored on the web or on your computer. In both cases, the index file location must end with "<current release name>/plugins.yml". For instance, the following are valid index locations if you run the Open edX "Sumac" release:
 
-- https://overhang.io/tutor/main/redwood/plugins.yml
-- ``/path/to/your/local/index/redwood/plugins.yml``
+- https://overhang.io/tutor/main/sumac/plugins.yml
+- ``/path/to/your/local/index/sumac/plugins.yml``
 
 To add either indexes, run the ``tutor plugins index add`` command without the suffix. For instance::
 
@@ -106,9 +106,9 @@ Manage plugins in development
 Plugin developers and maintainers often want to install local versions of their plugins. They usually achieve this with ``pip install -e /path/to/tutor-plugin``. We can improve that workflow by creating an index for local plugins::
 
     # Create the plugin index directory
-    mkdir -p ~/localindex/redwood/
+    mkdir -p ~/localindex/sumac/
     # Edit the index
-    vim ~/localindex/redwood/plugins.yml
+    vim ~/localindex/sumac/plugins.yml
 
 Add the following to the index::
 
