@@ -170,15 +170,17 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     )
     if not intermediate_mysql_docker_image:
         return
-    
+
     click.echo(fmt.title(f"Upgrading MySQL to {intermediate_mysql_docker_image}"))
-    
+
     # We start up a mysql-8.1 container to build data dictionary to preserve
     # the upgrade order of 5.7 -> 8.1 -> 8.4
     # Use the mysql-8.1 context so that we can clear these filters later on
     with hooks.Contexts.app("mysql-8.1").enter():
-        hooks.Filters.ENV_PATCHES.add_item(("k8s-deployments", 
-    """
+        hooks.Filters.ENV_PATCHES.add_item(
+            (
+                "k8s-deployments",
+                """
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -224,10 +226,13 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mysql
-    """
-    ))
-        hooks.Filters.ENV_PATCHES.add_item(("k8s-jobs",
-        """
+    """,
+            )
+        )
+        hooks.Filters.ENV_PATCHES.add_item(
+            (
+                "k8s-jobs",
+                """
 ---
 apiVersion: batch/v1
 kind: Job
@@ -242,10 +247,13 @@ spec:
       containers:
       - name: mysql-81
         image: docker.io/mysql:8.1.0
-        """
-        ))
-        hooks.Filters.ENV_PATCHES.add_item(("k8s-services",
-        """
+        """,
+            )
+        )
+        hooks.Filters.ENV_PATCHES.add_item(
+            (
+                "k8s-services",
+                """
 ---
 apiVersion: v1
 kind: Service
@@ -260,18 +268,17 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: mysql-81
-        """
-        ))
-        hooks.Filters.CONFIG_DEFAULTS.add_item(
-            ("MYSQL_HOST", "mysql-81")
+        """,
+            )
         )
-        
+        hooks.Filters.CONFIG_DEFAULTS.add_item(("MYSQL_HOST", "mysql-81"))
+
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("mysql-81", tutor_env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
 
     tutor_env.save(context.obj.root, config)
-    
+
     # Run the init command to make sure MySQL is ready for connections
     k8s.kubectl_apply(
         context.obj.root,
@@ -281,7 +288,6 @@ spec:
     k8s.wait_for_deployment_ready(config, "mysql-81")
     context.invoke(k8s.do.commands["init"], limit="mysql-8.1")
     context.invoke(k8s.stop, names=["mysql-81"])
-    
 
     # Clear the filters added for mysql-8.1 as we don't need them anymore
     hooks.clear_all(context="app:mysql-8.1")
@@ -296,7 +302,6 @@ spec:
     k8s.wait_for_deployment_ready(config, "mysql")
     context.invoke(k8s.do.commands["init"], limit="mysql")
     context.invoke(k8s.stop, names=["mysql"])
-
 
 
 def upgrade_from_quince(config: Config) -> None:

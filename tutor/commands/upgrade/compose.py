@@ -166,13 +166,15 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
         return
 
     click.echo(fmt.title(f"Upgrading MySQL to {intermediate_mysql_docker_image}"))
-    
+
     # We start up a mysql-8.1 container to build data dictionary to preserve
     # the upgrade order of 5.7 -> 8.1 -> 8.4
     # Use the mysql-8.1 context so that we can clear these filters later on
     with hooks.Contexts.app("mysql-8.1").enter():
-        hooks.Filters.ENV_PATCHES.add_item(("local-docker-compose-services", 
-    """
+        hooks.Filters.ENV_PATCHES.add_item(
+            (
+                "local-docker-compose-services",
+                """
 mysql-8.1:
   extends: mysql
   image: docker.io/mysql:8.1.0
@@ -181,25 +183,27 @@ mysql-8.1:
     --character-set-server=utf8mb3
     --collation-server=utf8mb3_general_ci
     --binlog-expire-logs-seconds=259200
-    """
-    ))
-        hooks.Filters.ENV_PATCHES.add_item(("local-docker-compose-jobs-services",
-        """
+    """,
+            )
+        )
+        hooks.Filters.ENV_PATCHES.add_item(
+            (
+                "local-docker-compose-jobs-services",
+                """
 mysql-8.1-job:
   image: docker.io/mysql:8.1.0
   depends_on: {{ [("mysql-8.1", RUN_MYSQL)]|list_if }}
-        """
-        ))
-        hooks.Filters.CONFIG_DEFAULTS.add_item(
-            ("MYSQL_HOST", "mysql-8.1")
+        """,
+            )
         )
-        
+        hooks.Filters.CONFIG_DEFAULTS.add_item(("MYSQL_HOST", "mysql-8.1"))
+
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("mysql-8.1", tutor_env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
 
     tutor_env.save(context.obj.root, config)
-    
+
     # Run the init command to make sure MySQL is ready for connections
     context.invoke(jobs.initialise, limit="mysql-8.1")
     context.invoke(compose.stop, services=["mysql-8.1"])
