@@ -67,21 +67,21 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: lms
-{% if RUN_ELASTICSEARCH %}
+{% if RUN_MEILISEARCH %}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: elasticsearch
+  name: meilisearch
   labels:
-    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/name: meilisearch
 spec:
   type: ClusterIP
   ports:
-    - port: 9200
+    - port: 7700
       protocol: TCP
   selector:
-    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/name: meilisearch
 {% endif %}
 {% if RUN_MONGODB %}
 ---

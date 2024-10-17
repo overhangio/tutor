@@ -44,6 +44,10 @@ def _add_core_init_tasks() -> None:
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("mysql", env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
+    with hooks.Contexts.app("meilisearch").enter():
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+            ("lms", env.read_core_template_file("jobs", "init", "meilisearch.sh"))
+        )
     with hooks.Contexts.app("lms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             (
@@ -176,7 +180,13 @@ echo "INFO: Will import course data at: $course_root" && echo
 python ./manage.py cms import ../data "$course_root"
 
 # Re-index courses
-./manage.py cms reindex_course --all --setup"""
+# TODO this is no longer compatible with meilisearch indexing. That is, until this PR is merged:
+# https://github.com/openedx/edx-platform/pull/35743
+# Anyway, it doesn't make much sense to reindex *all* courses after a single one has
+# been created. Thus we should # rely on course authors to press the "reindex" button in
+# the studio after the course has # been imported.
+#./manage.py cms reindex_course --all --setup
+"""
     yield ("cms", template)
 
 
