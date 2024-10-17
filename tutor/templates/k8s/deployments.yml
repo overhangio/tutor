@@ -278,24 +278,24 @@ spec:
         - name: config
           configMap:
             name: openedx-config
-{% if RUN_ELASTICSEARCH %}
+{% if RUN_MEILISEARCH %}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: elasticsearch
+  name: meilisearch
   labels:
-    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/name: meilisearch
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: elasticsearch
+      app.kubernetes.io/name: meilisearch
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: elasticsearch
+        app.kubernetes.io/name: meilisearch
     spec:
       securityContext:
         runAsUser: 1000
@@ -303,30 +303,22 @@ spec:
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-        - name: elasticsearch
-          image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
+        - name: meilisearch
+          image: {{ DOCKER_IMAGE_MEILISEARCH }}
           env:
-            - name: cluster.name
-              value: "openedx"
-            - name: bootstrap.memory_lock
-              value: "true"
-            - name: discovery.type
-              value: "single-node"
-            - name: ES_JAVA_OPTS
-              value: "-Xms{{ ELASTICSEARCH_HEAP_SIZE }} -Xmx{{ ELASTICSEARCH_HEAP_SIZE }}"
-            - name: TAKE_FILE_OWNERSHIP
-              value: "1"
+            - name: MEILI_MASTER_KEY
+              value: "{{ MEILISEARCH_MASTER_KEY }}"
           ports:
-            - containerPort: 9200
+            - containerPort: 7700
           securityContext:
             allowPrivilegeEscalation: false
           volumeMounts:
-            - mountPath: /usr/share/elasticsearch/data
+            - mountPath: /meili_data
               name: data
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: elasticsearch
+            claimName: meilisearch
 {% endif %}
 {% if RUN_MONGODB %}
 ---

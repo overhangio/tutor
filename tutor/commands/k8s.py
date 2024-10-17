@@ -390,7 +390,7 @@ def do(context: K8sContext) -> None:
         """
         config = tutor_config.load(context.root)
         wait_for_deployment_ready(config, "caddy")
-        for name in ["elasticsearch", "mysql", "mongodb"]:
+        for name in ["meilisearch", "mysql", "mongodb"]:
             if tutor_config.is_service_activated(config, name):
                 wait_for_deployment_ready(config, name)
 

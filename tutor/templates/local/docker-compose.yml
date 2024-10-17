@@ -18,7 +18,7 @@ services:
       - ../../data/openedx-media-private:/mounts/openedx-private
       {% if RUN_MONGODB %}- ../../data/mongodb:/mounts/mongodb{% endif %}
       {% if RUN_MYSQL %}- ../../data/mysql:/mounts/mysql{% endif %}
-      {% if RUN_ELASTICSEARCH %}- ../../data/elasticsearch:/mounts/elasticsearch{% endif %}
+      {% if RUN_MEILISEARCH %}- ../../data/meilisearch:/mounts/meilisearch{% endif %}
       {% if RUN_REDIS %}- ../../data/redis:/mounts/redis{% endif %}
       {{ patch("local-docker-compose-permissions-volumes")|indent(6) }}
 
@@ -54,22 +54,15 @@ services:
       MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
   {%- endif %}
 
-  {% if RUN_ELASTICSEARCH -%}
-  elasticsearch:
-    image: {{ DOCKER_IMAGE_ELASTICSEARCH }}
+  {% if RUN_MEILISEARCH -%}
+  meilisearch:
+    image: {{ DOCKER_IMAGE_MEILISEARCH }}
     environment:
-      - cluster.name=openedx
-      - bootstrap.memory_lock=true
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms{{ ELASTICSEARCH_HEAP_SIZE }} -Xmx{{ ELASTICSEARCH_HEAP_SIZE }}"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      MEILI_MASTER_KEY: "{{ MEILISEARCH_MASTER_KEY }}"
+    volumes:
+      - ../../data/meilisearch:/meili_data
     restart: unless-stopped
     user: "1000:1000"
-    volumes:
-      - ../../data/elasticsearch:/usr/share/elasticsearch/data
     depends_on:
       - permissions
   {%- endif %}
@@ -120,7 +113,7 @@ services:
     depends_on:
       - permissions
       {% if RUN_MYSQL %}- mysql{% endif %}
-      {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
+      {% if RUN_MEILISEARCH %}- meilisearch{% endif %}
       {% if RUN_MONGODB %}- mongodb{% endif %}
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
@@ -148,7 +141,7 @@ services:
       - permissions
       - lms
       {% if RUN_MYSQL %}- mysql{% endif %}
-      {% if RUN_ELASTICSEARCH %}- elasticsearch{% endif %}
+      {% if RUN_MEILISEARCH %}- meilisearch{% endif %}
       {% if RUN_MONGODB %}- mongodb{% endif %}
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
