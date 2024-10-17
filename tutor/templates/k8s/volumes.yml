@@ -14,15 +14,15 @@ spec:
     requests:
       storage: 1Gi
 {% endif %}
-{% if RUN_ELASTICSEARCH %}
+{% if RUN_MEILISEARCH %}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: elasticsearch
+  name: meilisearch
   labels:
     app.kubernetes.io/component: volume
-    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/name: meilisearch
 spec:
   accessModes:
     - ReadWriteOnce

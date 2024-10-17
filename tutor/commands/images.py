@@ -63,7 +63,7 @@ def _add_images_to_pull(
     """
     vendor_images = [
         ("caddy", "DOCKER_IMAGE_CADDY"),
-        ("elasticsearch", "DOCKER_IMAGE_ELASTICSEARCH"),
+        ("meilisearch", "DOCKER_IMAGE_MEILISEARCH"),
         ("mongodb", "DOCKER_IMAGE_MONGODB"),
         ("mysql", "DOCKER_IMAGE_MYSQL"),
         ("redis", "DOCKER_IMAGE_REDIS"),

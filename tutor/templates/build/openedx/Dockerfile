@@ -106,6 +106,12 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 # Install scorm xblock
 RUN pip install "openedx-scorm-xblock>=18.0.0,<19.0.0"
 
+# Install edx-search fork with meilisearch engine
+# TODO this should be a temporary change for the duration of the Sumac branch testing.
+# After that, the corresponding change should have been merged in edx-search and the
+# package upgraded in edx-platform (sumac release branch).
+RUN pip install git+https://github.com/regisb/edx-search@regisb/meilisearch#edx-search
+
 {% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install '{{ extra_requirements }}'
@@ -265,6 +271,8 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install ipdb==0.13.13 ipython==8.24.0
+# Re-install forked edx-search which is otherwise overridden by development.txt
+RUN pip install git+https://github.com/regisb/edx-search@regisb/meilisearch#edx-search
 
 {# Re-install mounted requirements, otherwise they will be superseded by upstream reqs #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}

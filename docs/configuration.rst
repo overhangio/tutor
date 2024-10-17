@@ -40,7 +40,7 @@ With an up-to-date environment, Tutor is ready to launch an Open edX platform an
 Individual service activation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``RUN_ELASTICSEARCH`` (default: ``true``)
+- ``RUN_MEILISEARCH`` (default: ``true``)
 - ``RUN_MONGODB`` (default: ``true``)
 - ``RUN_MYSQL`` (default: ``true``)
 - ``RUN_REDIS`` (default: ``true``)
@@ -71,9 +71,9 @@ This configuration parameter defines the name of the Docker image to run the dev
 
 This configuration parameter defines which Caddy Docker image to use.
 
-- ``DOCKER_IMAGE_ELASTICSEARCH`` (default: ``"docker.io/elasticsearch:7.17.9"``)
+- ``DOCKER_IMAGE_MEILISEARCH`` (default: ``"docker.io/getmeili/meilisearch:v1.8.4"``)
 
-This configuration parameter defines which Elasticsearch Docker image to use.
+This configuration parameter defines which Meilisearch Docker image to use.
 
 - ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:7.0.7"``)
 
@@ -228,13 +228,19 @@ By default, a running Open edX platform deployed with Tutor includes all necessa
 .. note::
     When configuring an external MySQL database, please make sure it is using version 8.4.
 
-Elasticsearch
-*************
+Meilisearch
+***********
 
-- ``ELASTICSEARCH_SCHEME`` (default: ``"http"``)
-- ``ELASTICSEARCH_HOST`` (default: ``"elasticsearch"``)
-- ``ELASTICSEARCH_PORT`` (default: ``9200``)
-- ``ELASTICSEARCH_HEAP_SIZE`` (default: ``"1g"``)
+- ``MEILISEARCH_URL`` (default: ``"http://meilisearch:7700"``): internal URL used for backend-to-backend communication.
+- ``MEILISEARCH_PUBLIC_URL`` (default: ``"{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://meilisearch.{{ LMS_HOST }}"``): external URL from which the frontend will access the Meilisearch instance.
+- ``MEILISEARCH_INDEX_PREFIX`` (default: ``"tutor_"``)
+- ``MEILISEARCH_MASTER_KEY`` (default: ``"{{ 24|random_string }}"``)
+- ``MEILISEARCH_API_KEY_UID`` (default: ``"{{ 4|uuid }}"``): UID used to sign the API key.
+- ``MEILISEARCH_API_KEY`` (default: ``"{{ MEILISEARCH_MASTER_KEY|uid_master_hash(MEILISEARCH_API_KEY_UID) }}"``)
+
+To reset the Meilisearch API key, make sure to unset both the API key and it's UID:
+
+    tutor config save --unset MEILISEARCH_API_KEY_UID MEILISEARCH_API_KEY
 
 MongoDB
 *******

@@ -34,12 +34,14 @@ for store in MODULESTORE["default"]["OPTIONS"]["stores"]:
 # Behave like memcache when it comes to connection errors
 DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
-# Elasticsearch connection parameters
-ELASTIC_SEARCH_CONFIG = [{
-  {% if ELASTICSEARCH_SCHEME == "https" %}"use_ssl": True,{% endif %}
-  "host": "{{ ELASTICSEARCH_HOST }}",
-  "port": {{ ELASTICSEARCH_PORT }},
-}]
+# Meilisearch connection parameters
+MEILISEARCH_ENABLED = True
+MEILISEARCH_URL = "{{ MEILISEARCH_URL }}"
+MEILISEARCH_PUBLIC_URL = "{{ MEILISEARCH_PUBLIC_URL }}"
+MEILISEARCH_INDEX_PREFIX = "{{ MEILISEARCH_INDEX_PREFIX }}"
+MEILISEARCH_API_KEY = "{{ MEILISEARCH_API_KEY }}"
+MEILISEARCH_MASTER_KEY = "{{ MEILISEARCH_MASTER_KEY }}"
+SEARCH_ENGINE = "search.meilisearch.MeilisearchEngine"
 
 # Common cache config
 CACHES = {

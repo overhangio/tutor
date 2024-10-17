@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import os
 import re
 import shutil
 import typing as t
-from copy import deepcopy
 
 import importlib_resources
 import jinja2
@@ -56,6 +56,8 @@ def _prepare_environment() -> None:
             ("reverse_host", utils.reverse_host),
             ("rsa_import_key", utils.rsa_import_key),
             ("rsa_private_key", utils.rsa_private_key),
+            ("uuid", utils.uuid),
+            ("uid_master_hash", utils.uid_master_hash),
         ],
     )
     # Template variables
