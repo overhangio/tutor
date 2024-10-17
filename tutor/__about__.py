@@ -2,7 +2,7 @@ import os
 
 # Increment this version number to trigger a new release. See
 # docs/tutor.html#versioning for information on the versioning scheme.
-__version__ = "18.1.3"
+__version__ = "19.0.0"
 
 # The version suffix will be appended to the actual version, separated by a
 # dash. Use this suffix to differentiate between the actual released version and
@@ -10,7 +10,7 @@ __version__ = "18.1.3"
 # the nightly branch.
 # The suffix is cleanly separated from the __version__ in this module to avoid
 # conflicts when merging branches.
-__version_suffix__ = "nightly"
+__version_suffix__ = ""
 
 # The app name will be used to define the name of the default tutor root and
 # plugin directory. To avoid conflicts between multiple locally-installed

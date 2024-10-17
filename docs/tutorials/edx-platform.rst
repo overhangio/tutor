@@ -69,7 +69,7 @@ Quite often, developers don't want to work on edx-platform directly, but on a de
     cd /my/workspace/edx-ora2
     git clone https://github.com/openedx/edx-ora2 .
 
-Then, check out the right version of the package. This is the version that is indicated in the `edx-platform/requirements/edx/base.txt <https://github.com/openedx/edx-platform/blob/open-release/redwood.master/requirements/edx/base.txt>`__. Be careful that the version that is currently in use in your version of edx-platform is **not necessarily the head of the master branch**::
+Then, check out the right version of the package. This is the version that is indicated in the `edx-platform/requirements/edx/base.txt <https://github.com/openedx/edx-platform/blob/release/sumac/requirements/edx/base.txt>`__. Be careful that the version that is currently in use in your version of edx-platform is **not necessarily the head of the master branch**::
 
     git checkout <my-version-tag-or-branch>
 
