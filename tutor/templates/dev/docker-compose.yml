@@ -32,19 +32,18 @@ services:
     ports:
         - "8001:8000"
 
+  meilisearch:
+    ports:
+      - "127.0.0.1:7700:7700"
+    networks:
+      default:
+        aliases:
+          - "{{ MEILISEARCH_PUBLIC_URL.split('://')[1] }}"
+
   # Additional service for watching theme changes
   watchthemes:
     <<: *openedx-service
     command: npm run watch-sass
     restart: unless-stopped
-
-  {% if RUN_ELASTICSEARCH and is_docker_rootless() %}
-  elasticsearch:
-    ulimits:
-      memlock:
-        # Fixes error setting rlimits for ready process in rootless docker
-        soft: 0  # zero means "unset" in the memlock context
-        hard: 0
-  {% endif %}
 
   {{ patch("local-docker-compose-dev-services")|indent(2) }}

@@ -42,6 +42,10 @@ def _add_core_init_tasks() -> None:
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("mysql", env.read_core_template_file("jobs", "init", "mysql.sh"))
         )
+    with hooks.Contexts.app("meilisearch").enter():
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+            ("lms", env.read_core_template_file("jobs", "init", "meilisearch.sh"))
+        )
     with hooks.Contexts.app("lms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             (

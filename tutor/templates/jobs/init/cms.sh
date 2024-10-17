@@ -16,3 +16,7 @@ fi
 # Create waffle switches to enable some features, if they have not been explicitly defined before
 # Copy-paste of units in Studio (highly requested new feature, but defaults to off in Quince)
 (./manage.py cms waffle_flag --list | grep contentstore.enable_copy_paste_units) || ./manage.py lms waffle_flag --create contentstore.enable_copy_paste_units --everyone
+
+# Re-index studio and courseware content
+./manage.py cms reindex_studio --experimental
+./manage.py cms reindex_course --active
