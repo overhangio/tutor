@@ -58,7 +58,7 @@ When running Tutor Nightly, you usually do not want to override your existing Tu
 Making changes to Tutor Nightly
 -------------------------------
 
-In general pull requests should be open on the "master" branch of Tutor: the "master" branch is automatically merged on the "nightly" branch at every commit, such that changes made to Tutor releases find their way to Tutor Nightly as soon as they are merged. However, sometimes you want to make changes to Tutor Nightly exclusively, and not to the Tutor releases. This might be the case for instance when upgrading the running version of a third-party service (for instance: Elasticsearch, MySQL), or when the master branch requires specific changes. In that case, you should follow the instructions from the :ref:`contributing` section of the docs, with the following differences:
+In general pull requests should be open on the "master" branch of Tutor: the "master" branch is automatically merged on the "nightly" branch at every commit, such that changes made to Tutor releases find their way to Tutor Nightly as soon as they are merged. However, sometimes you want to make changes to Tutor Nightly exclusively, and not to the Tutor releases. This might be the case for instance when upgrading the running version of a third-party service (for instance: Meilisearch, MySQL), or when the master branch requires specific changes. In that case, you should follow the instructions from the :ref:`contributing` section of the docs, with the following differences:
 
 - Open your pull request on top of the "nightly" branch instead of "master".
 - Add a description of your changes by creating a changelog entry with `make changelog-entry`, as in the master branch.

@@ -37,11 +37,11 @@ Offloading data storage
 
 Aside from web workers, the most resource-intensive services are in the data persistence layer. They are, by decreasing resource usage:
 
-- `Elasticsearch <https://www.elastic.co/elasticsearch/>`__: indexing of course contents and forum topics, mostly for search. Elasticsearch is never a source of truth in Open edX, and the data can thus be trashed and re-created safely.
 - `MySQL <https://www.mysql.com>`__: structured, consistent data storage which is the default destination of all data.
 - `MongoDB <https://www.mongodb.com>`__: structured storage of course data.
 - `Redis <https://redis.io/>`__: caching and asynchronous task management.
 - `MinIO <https://min.io>`__: S3-like object storage for user-uploaded files, which is enabled by the `tutor-minio <https://github.com/overhangio/tutor-minio>`__ plugin. It is possible to replace MinIO by direct filesystem storage (the default), but scaling will then become much more difficult down the road.
+- `Meilisearch <https://www.meilisearch.com>`__: indexing of course contents and forum topics, mostly for search. Meilisearch is never a source of truth in Open edX, and the data can thus be trashed and re-created safely.
 
 When attempting to scale a single-server deployment, we recommend starting by offloading some of these stateful data storage components, in the same order of priority. There are multiple benefits:
 
