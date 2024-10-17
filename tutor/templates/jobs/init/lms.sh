@@ -10,6 +10,9 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 ./manage.py lms migrate
 
+# Create meilisearch indexes
+./manage.py lms shell -c "import search.meilisearch; search.meilisearch.create_indexes()"
+
 # Create oauth2 apps for CMS SSO
 # https://github.com/openedx/edx-platform/blob/master/docs/guides/studio_oauth.rst
 ./manage.py lms manage_user cms cms@openedx --unusable-password
