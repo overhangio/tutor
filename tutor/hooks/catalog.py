@@ -514,6 +514,9 @@ class Filters:
     #: :param str file_path: The path to the file being checked.
     IS_FILE_RENDERED: Filter[bool, [str]] = Filter()
 
+    LMS_WORKER_COMMAND: Filter[dict[str, str], []] = Filter()
+    CMS_WORKER_COMMAND: Filter[dict[str, str], []] = Filter()
+
 
 class Contexts:
     """
