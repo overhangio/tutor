@@ -9,6 +9,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt update && \
     apt install -y build-essential curl git language-pack-en
 ENV LC_ALL=en_US.UTF-8
+
+COPY --from=ghcr.io/astral-sh/uv:0.4.21 /uv /usr/local/bin/uv
+ARG PIP_COMMAND="uv pip"
+
 {{ patch("openedx-dockerfile-minimal") }}
 
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
@@ -51,8 +55,10 @@ RUN git config --global user.email "tutor@overhang.io" \
 {{ patch("openedx-dockerfile-git-patches-default") }}
 {%- elif EDX_PLATFORM_VERSION == "master" %}
 # Patches in nightly node
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/3642cab3ac61ddfd360e7ceb7463b52be8c4deb0.patch | git am
 {%- else %}
 # Patches in non-nightly mode
+
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
@@ -74,6 +80,7 @@ FROM python AS python-requirements
 ENV PATH=/openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV=/openedx/venv/
 ENV XDG_CACHE_HOME=/openedx/.cache
+ENV UV_CACHE_DIR=$XDG_CACHE_HOME/pip
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -91,11 +98,11 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 # Install base requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install -r /openedx/edx-platform/requirements/edx/base.txt
+    $PIP_COMMAND install -r /openedx/edx-platform/requirements/edx/base.txt
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install \
+    $PIP_COMMAND install \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.4.0 \
     # uwsgi server https://pypi.org/project/uWSGI/
@@ -104,20 +111,21 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
 # Install scorm xblock
-RUN pip install "openedx-scorm-xblock>=18.0.0,<19.0.0"
+RUN $PIP_COMMAND install "openedx-scorm-xblock>=18.0.0,<19.0.0"
 
 {% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install '{{ extra_requirements }}'
+    $PIP_COMMAND install '{{ extra_requirements }}'
 {% endfor %}
 
 ###### Install nodejs with nodeenv in /openedx/nodeenv
 FROM python AS nodejs-requirements
+ENV VIRTUAL_ENV=/openedx/venv/
 ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
-RUN pip install nodeenv==1.8.0
+RUN $PIP_COMMAND install nodeenv==1.8.0
 RUN nodeenv /openedx/nodeenv --node=18.20.1 --prebuilt
 
 # Install nodejs requirements
@@ -174,12 +182,12 @@ WORKDIR /openedx/edx-platform
 {# Install auto-mounted directories as Python packages. #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=mnt-{{ name }} / /mnt/{{ name }}
-RUN pip install -e "/mnt/{{ name }}"
+RUN $PIP_COMMAND install -e "/mnt/{{ name }}"
 {% endfor %}
 
 # We install edx-platform here because it creates an egg-info folder in the current
 # repo. We need both the source code and the virtualenv to run this command.
-RUN pip install -e .
+RUN $PIP_COMMAND install -e .
 
 # Create folder that will store lms/cms.env.yml files, as well as
 # the tutor-specific settings files.
@@ -260,16 +268,16 @@ USER app
 
 # Install dev python requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install -r requirements/edx/development.txt
+    $PIP_COMMAND install -r requirements/edx/development.txt
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install ipdb==0.13.13 ipython==8.24.0
+    $PIP_COMMAND install ipdb==0.13.13 ipython==8.24.0
 
 {# Re-install mounted requirements, otherwise they will be superseded by upstream reqs #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=mnt-{{ name }} / /mnt/{{ name }}
-RUN pip install -e "/mnt/{{ name }}"
+RUN $PIP_COMMAND install -e "/mnt/{{ name }}"
 {% endfor %}
 
 # Add ipdb as default PYTHONBREAKPOINT
