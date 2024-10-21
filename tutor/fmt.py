@@ -46,6 +46,14 @@ def alert(text: str) -> str:
     return click.style("⚠️  " + text, fg="yellow", bold=True)
 
 
+def warning(text: str) -> str:
+    return click.style(text, fg="bright_yellow")
+
+
+def echo_warning(text: str) -> None:
+    echo(warning(text))
+
+
 def echo(text: str, err: bool = False) -> None:
     if os.environ.get("_TUTOR_COMPLETE"):
         if os.environ.get("COMP_WORDS") or os.environ.get("COMP_CWORD"):
