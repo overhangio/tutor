@@ -22,7 +22,7 @@ jobs:
           # It's important that we build the tutor binaries with the *oldest* possible
           # OS releases and Python version. See these docs for more information:
           # https://pyinstaller.org/en/stable/usage.html#making-gnu-linux-apps-forward-compatible
-          - os: ubuntu-24.04
+          - os: ubuntu-22.04
             locale: C.UTF-8
           # https://endoflife.date/macos
           - os: macos-12
