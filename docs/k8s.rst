@@ -116,6 +116,22 @@ All non-persisting data will be deleted, and then re-created.
 Common tasks
 ------------
 
+Using `tutor k8s apply` with Dry Run
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``tutor k8s apply`` command acts as a wrapper around ``kubectl apply``, facilitating the application of Kubernetes resource configurations stored in ``$(tutor config printroot)/env/k8s``. To apply the configurations, execute the following command::
+
+    tutor k8s apply
+
+Before making any changes, it is possible to validate the configurations without modifications by using the ``dry-run`` option along with server-side validation. The command is as follows::
+
+    tutor k8s apply --dry-run=server --validate=true
+
+- ``--dry-run=server``: This option simulates the application of configurations on the server-side, providing insights into how Kubernetes would interpret the changes.
+- ``--validate=true``: This option validates the manifests against Kubernetes API standards, which aids in catching potential errors prior to application.
+
+Utilizing the dry-run feature ensures a more robust deployment process for the Open edX platform on Kubernetes.
+
 Executing commands inside service pods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
