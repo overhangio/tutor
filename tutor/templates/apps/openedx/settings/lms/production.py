@@ -11,6 +11,8 @@ ALLOWED_HOSTS = [
 ]
 CORS_ORIGIN_WHITELIST.append("{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}")
 
+MEILISEARCH_PUBLIC_URL = "{{ MEILISEARCH_PUBLIC_URL }}"
+
 {% if ENABLE_HTTPS %}
 # Properly set the "secure" attribute on session/csrf cookies. This is required in
 # Chrome to support samesite=none cookies.

@@ -22,6 +22,7 @@ services:
         # with *.local.openedx.io hostnames.
         aliases:
           - "{{ LMS_HOST }}"
+          - "{{ MEILISEARCH_PUBLIC_URL.split('://')[1] }}"
           {{ patch("local-docker-compose-caddy-aliases")|indent(10) }}
     {% endif %}
 
