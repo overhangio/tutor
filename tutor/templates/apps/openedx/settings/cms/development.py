@@ -2,6 +2,8 @@
 import os
 from cms.envs.devstack import *
 
+{% include "apps/openedx/settings/partials/common_cms.py" %}
+
 LMS_BASE = "{{ LMS_HOST }}:8000"
 LMS_ROOT_URL = "http://" + LMS_BASE
 
@@ -15,8 +17,6 @@ SOCIAL_AUTH_EDX_OAUTH2_KEY = "{{ CMS_OAUTH2_KEY_SSO_DEV }}"
 SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = LMS_ROOT_URL
 
 FEATURES["PREVIEW_LMS_BASE"] = "{{ PREVIEW_LMS_HOST }}:8000"
-
-{% include "apps/openedx/settings/partials/common_cms.py" %}
 
 # Setup correct webpack configuration file for development
 WEBPACK_CONFIG_PATH = "webpack.dev.config.js"
