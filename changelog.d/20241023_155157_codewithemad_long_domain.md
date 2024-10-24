@@ -1,1 +1,0 @@
-- [Bugfix] Fixed an issue where the site name was not limited to 50 characters when creating a new site configuration. (by @CodeWithEmad)
