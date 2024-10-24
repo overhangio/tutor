@@ -1,1 +1,0 @@
-[Improvement] Fixes an issue which caused 502 errors by a premature closed connection by uwsgi, it also improves the handling of SIGTERM in docker and other uwsgi improvements (by @Ian2012).

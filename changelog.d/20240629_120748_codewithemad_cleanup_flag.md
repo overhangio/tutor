@@ -1,1 +1,0 @@
-- [Feature] Added `-c` or `--clean` option to tutor config save: For plugin developers and advanced users, this option cleans the `env/` folder before saving, ensuring a fresh environment for testing and development. (by @CodeWithEmad)

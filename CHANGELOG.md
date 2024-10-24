@@ -20,6 +20,23 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.1.4'></a>
+## v18.1.4 (2024-10-24)
+
+- [Improvement] Set `EDXAPP_TEST_MONGO_HOST` env var in the openedx-dev image so that it no longer needs to be set by hand when running edx-platform unit tests (by @kdmccormick).
+
+- [Feature] Added `-c` or `--clean` option to tutor config save: For plugin developers and advanced users, this option cleans the `env/` folder before saving, ensuring a fresh environment for testing and development. (by @CodeWithEmad)
+
+- [Feature] Add a `patches show my-patch-name`. This is a convenient command for the troubleshooting of plugins. (by @regisb)
+
+- [Improvement] Fixes an issue which caused 502 errors by a premature closed connection by uwsgi, it also improves the handling of SIGTERM in docker and other uwsgi improvements (by @Ian2012).
+
+- [Improvement] Do not run useless celery workers (lms-worker, cms-worker) in development. This should save us ~700MB memory. (by @arbrandes, @regisb).
+
+- [Bugfix] Fixed an issue where the site name was not limited to 50 characters when creating a new site configuration. (by @CodeWithEmad)
+
+- [Feature] Update Open edX version to redwood.3 (by @dawoudsheraz)
+
 <a id='changelog-18.1.3'></a>
 ## v18.1.3 (2024-08-13)
 
