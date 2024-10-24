@@ -142,3 +142,71 @@ def is_directory_mounted(image_name: str, dirname: str) -> bool:
 hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(
     ("iter_mounted_directories", iter_mounted_directories)
 )
+
+
+@hooks.Filters.LMS_WORKER_COMMAND.add(priority=hooks.priorities.HIGH)
+def _add_default_lms_worker_parameters(
+    worker_configs: dict[str, str]
+) -> dict[str, str]:
+    worker_configs = {
+        "loglevel": "info",
+        "hostname": "edx.lms.core.default.%%h",
+        "queues": "edx.lms.core.default,edx.lms.core.high,edx.lms.core.high_mem",
+        "max-tasks-per-child": "100",
+    }
+    return worker_configs
+
+
+@hooks.Filters.CMS_WORKER_COMMAND.add(priority=hooks.priorities.HIGH)
+def _add_default_cms_worker_parameters(
+    worker_configs: dict[str, str]
+) -> dict[str, str]:
+    worker_configs = {
+        "loglevel": "info",
+        "hostname": "edx.cms.core.default.%%h",
+        "queues": "edx.cms.core.default,edx.cms.core.high,edx.cms.core.low",
+        "max-tasks-per-child": "100",
+    }
+    return worker_configs
+
+
+@hooks.lru_cache
+def get_cms_celery_parameters() -> dict[str, str]:
+    """
+    This function is cached for performance.
+    """
+    return hooks.Filters.CMS_WORKER_COMMAND.apply({})
+
+
+@hooks.lru_cache
+def get_lms_celery_parameters() -> dict[str, str]:
+    """
+    This function is cached for performance.
+    """
+    return hooks.Filters.LMS_WORKER_COMMAND.apply({})
+
+
+def iter_cms_celery_parameters() -> dict[str, str]:
+    """
+    Yield:
+
+        (name, dict)
+    """
+    return {name: config for name, config in get_cms_celery_parameters().items()}
+
+
+def iter_lms_celery_parameters() -> dict[str, str]:
+    """
+    Yield:
+
+        (name, dict)
+    """
+    return {name: config for name, config in get_lms_celery_parameters().items()}
+
+
+hooks.Filters.ENV_TEMPLATE_VARIABLES.add_items(
+    [
+        ("iter_cms_celery_parameters", iter_cms_celery_parameters),
+        ("iter_lms_celery_parameters", iter_lms_celery_parameters),
+    ]
+)
