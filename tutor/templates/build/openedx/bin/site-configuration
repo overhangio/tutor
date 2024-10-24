@@ -60,7 +60,9 @@ def get_site_configuration(domain):
     domain = domain or settings.LMS_BASE
     site, site_created = Site.objects.get_or_create(domain=domain)
     if site_created:
-        site.name = domain
+        # Limit the site name to 50 characters
+        # https://github.com/django/django/blob/4.2.16/django/contrib/sites/models.py#L86
+        site.name = domain[:50]
         site.save()
     configuration, configuration_created = SiteConfiguration.objects.get_or_create(site=site)
     if configuration_created:
