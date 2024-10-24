@@ -1,1 +1,0 @@
-- [Feature] Add a `patches show my-patch-name`. This is a convenient command for the troubleshooting of plugins. (by @regisb)
