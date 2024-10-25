@@ -177,7 +177,8 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     # the upgrade order of 5.7 -> 8.1 -> 8.4
     # Use the mysql-8.1 context so that we can clear these filters later on
     with hooks.Contexts.app("mysql-8.1").enter():
-        hooks.Filters.ENV_PATCHES.add_item(
+        hooks.Filters.ENV_PATCHES.add_items(
+            [
             (
                 "k8s-deployments",
                 """
@@ -227,9 +228,7 @@ spec:
           persistentVolumeClaim:
             claimName: mysql
     """,
-            )
-        )
-        hooks.Filters.ENV_PATCHES.add_item(
+            ),
             (
                 "k8s-jobs",
                 """
@@ -249,7 +248,7 @@ spec:
         image: docker.io/mysql:8.1.0
         """,
             )
-        )
+        ])
         hooks.Filters.ENV_PATCHES.add_item(
             (
                 "k8s-services",

@@ -171,7 +171,8 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     # the upgrade order of 5.7 -> 8.1 -> 8.4
     # Use the mysql-8.1 context so that we can clear these filters later on
     with hooks.Contexts.app("mysql-8.1").enter():
-        hooks.Filters.ENV_PATCHES.add_item(
+        hooks.Filters.ENV_PATCHES.add_items(
+            [
             (
                 "local-docker-compose-services",
                 """
@@ -184,9 +185,7 @@ mysql-8.1:
     --collation-server=utf8mb3_general_ci
     --binlog-expire-logs-seconds=259200
     """,
-            )
-        )
-        hooks.Filters.ENV_PATCHES.add_item(
+            ),
             (
                 "local-docker-compose-jobs-services",
                 """
@@ -195,7 +194,7 @@ mysql-8.1-job:
   depends_on: {{ [("mysql-8.1", RUN_MYSQL)]|list_if }}
         """,
             )
-        )
+            ])
         hooks.Filters.CONFIG_DEFAULTS.add_item(("MYSQL_HOST", "mysql-8.1"))
 
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
