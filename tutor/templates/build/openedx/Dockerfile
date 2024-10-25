@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1
 ###### Minimal image with base system requirements for most stages
-FROM docker.io/ubuntu:20.04 AS minimal
+FROM docker.io/ubuntu:22.04 AS minimal
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 ENV DEBIAN_FRONTEND=noninteractive
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
@@ -19,7 +20,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt update && \
     apt install -y libssl-dev zlib1g-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-    xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+    xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git
 
 # Install pyenv
 # https://www.python.org/downloads/
@@ -78,7 +79,10 @@ ENV XDG_CACHE_HOME=/openedx/.cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update \
-    && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev
+    && apt install -y software-properties-common libmysqlclient-dev libxmlsec1-dev libgeos-dev \
+     # Install xmlsec dependencies
+    libxml2-dev \
+    libxmlsec1-openssl
 
 # Install the right version of pip/setuptools
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
