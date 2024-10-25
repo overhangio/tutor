@@ -179,9 +179,9 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     with hooks.Contexts.app("mysql-8.1").enter():
         hooks.Filters.ENV_PATCHES.add_items(
             [
-            (
-                "k8s-deployments",
-                """
+                (
+                    "k8s-deployments",
+                    """
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -228,10 +228,10 @@ spec:
           persistentVolumeClaim:
             claimName: mysql
     """,
-            ),
-            (
-                "k8s-jobs",
-                """
+                ),
+                (
+                    "k8s-jobs",
+                    """
 ---
 apiVersion: batch/v1
 kind: Job
@@ -247,8 +247,9 @@ spec:
       - name: mysql-81
         image: docker.io/mysql:8.1.0
         """,
-            )
-        ])
+                ),
+            ]
+        )
         hooks.Filters.ENV_PATCHES.add_item(
             (
                 "k8s-services",

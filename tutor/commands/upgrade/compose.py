@@ -173,9 +173,9 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
     with hooks.Contexts.app("mysql-8.1").enter():
         hooks.Filters.ENV_PATCHES.add_items(
             [
-            (
-                "local-docker-compose-services",
-                """
+                (
+                    "local-docker-compose-services",
+                    """
 mysql-8.1:
   extends: mysql
   image: docker.io/mysql:8.1.0
@@ -185,16 +185,17 @@ mysql-8.1:
     --collation-server=utf8mb3_general_ci
     --binlog-expire-logs-seconds=259200
     """,
-            ),
-            (
-                "local-docker-compose-jobs-services",
-                """
+                ),
+                (
+                    "local-docker-compose-jobs-services",
+                    """
 mysql-8.1-job:
   image: docker.io/mysql:8.1.0
   depends_on: {{ [("mysql-8.1", RUN_MYSQL)]|list_if }}
         """,
-            )
-            ])
+                ),
+            ]
+        )
         hooks.Filters.CONFIG_DEFAULTS.add_item(("MYSQL_HOST", "mysql-8.1"))
 
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
