@@ -2,7 +2,7 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import fmt
+from tutor import fmt, hooks
 from tutor.commands import k8s
 from tutor.commands.context import Context
 from tutor.types import Config
@@ -39,7 +39,7 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         running_release = "olive"
 
     if running_release == "olive":
-        upgrade_from_olive(context.obj, config)
+        upgrade_from_olive(context, config)
         running_release = "palm"
 
     if running_release == "palm":
@@ -148,11 +148,11 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
     )
 
 
-def upgrade_from_olive(context: Context, config: Config) -> None:
+def upgrade_from_olive(context: click.Context, config: Config) -> None:
     # Note that we need to exec because the ora2 folder is not bind-mounted in the job
     # services.
     k8s.kubectl_apply(
-        context.root,
+        context.obj.root,
         "--selector",
         "app.kubernetes.io/name=lms",
     )
@@ -171,14 +171,137 @@ def upgrade_from_olive(context: Context, config: Config) -> None:
     if not intermediate_mysql_docker_image:
         return
 
-    message = f"""Automatic release upgrade is unsupported in Kubernetes. If you are upgrading from Olive or an earlier release to Redwood, you will have to first upgrade MySQL to v8.1 and then to v8.4. To upgrade, run the following commands:
+    click.echo(fmt.title(f"Upgrading MySQL to {intermediate_mysql_docker_image}"))
 
-    tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MYSQL=docker.io/mysql:8.1.0
-    tutor k8s start
-    tutor config save --unset DOCKER_IMAGE_MYSQL
-    """
-    fmt.echo_info(message)
+    # We start up a mysql-8.1 container to build data dictionary to preserve
+    # the upgrade order of 5.7 -> 8.1 -> 8.4
+    # Use the mysql-8.1 context so that we can clear these filters later on
+    with hooks.Contexts.app("mysql-8.1").enter():
+        hooks.Filters.ENV_PATCHES.add_items(
+            [
+                (
+                    "k8s-deployments",
+                    """
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-81
+  labels:
+    app.kubernetes.io/name: mysql-81
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mysql-81
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mysql-81
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: "OnRootMismatch"
+      containers:
+        - name: mysql-81
+          image: docker.io/mysql:8.1.0
+          args:
+            - "mysqld"
+            - "--character-set-server=utf8mb3"
+            - "--collation-server=utf8mb3_general_ci"
+            - "--binlog-expire-logs-seconds=259200"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "{{ MYSQL_ROOT_PASSWORD }}"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: data
+          securityContext:
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mysql
+    """,
+                ),
+                (
+                    "k8s-jobs",
+                    """
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-81-job
+  labels:
+    app.kubernetes.io/component: job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mysql-81
+        image: docker.io/mysql:8.1.0
+        """,
+                ),
+            ]
+        )
+        hooks.Filters.ENV_PATCHES.add_item(
+            (
+                "k8s-services",
+                """
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-81
+  labels:
+    app.kubernetes.io/name: mysql-81
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: mysql-81
+        """,
+            )
+        )
+        hooks.Filters.CONFIG_DEFAULTS.add_item(("MYSQL_HOST", "mysql-81"))
+
+        hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+            ("mysql-81", tutor_env.read_core_template_file("jobs", "init", "mysql.sh"))
+        )
+
+    tutor_env.save(context.obj.root, config)
+
+    # Run the init command to make sure MySQL is ready for connections
+    k8s.kubectl_apply(
+        context.obj.root,
+        "--selector",
+        "app.kubernetes.io/name=mysql-81",
+    )
+    k8s.wait_for_deployment_ready(config, "mysql-81")
+    context.invoke(k8s.do.commands["init"], limit="mysql-8.1")
+    context.invoke(k8s.stop, names=["mysql-81"])
+
+    # Clear the filters added for mysql-8.1 as we don't need them anymore
+    hooks.clear_all(context="app:mysql-8.1")
+
+    # Save environment and run init for mysql 8.4 to make sure MySQL is ready
+    tutor_env.save(context.obj.root, config)
+    k8s.kubectl_apply(
+        context.obj.root,
+        "--selector",
+        "app.kubernetes.io/name=mysql",
+    )
+    k8s.wait_for_deployment_ready(config, "mysql")
+    context.invoke(k8s.do.commands["init"], limit="mysql")
+    context.invoke(k8s.stop, names=["mysql"])
 
 
 def upgrade_from_quince(config: Config) -> None:
