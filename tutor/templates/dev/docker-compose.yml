@@ -32,6 +32,7 @@ services:
     ports:
         - "8001:8000"
 
+  {% if RUN_MEILISEARCH -%}
   meilisearch:
     ports:
       - "127.0.0.1:7700:7700"
@@ -39,6 +40,7 @@ services:
       default:
         aliases:
           - "{{ MEILISEARCH_PUBLIC_URL.split('://')[1] }}"
+  {%- endif %}
 
   # Additional service for watching theme changes
   watchthemes:
