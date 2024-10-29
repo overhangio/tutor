@@ -32,7 +32,7 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
 
 .. image:: https://img.shields.io/static/v1?logo=youtube&label=YouTube&style=flat-square&color=ff0000&message=@tutor-edly
     :alt: Follow us on Youtube
-    :target: https://www.youtube.com/c/@tutor-edly
+    :target: https://www.youtube.com/@tutor-edly
 
 **Tutor** is the official Docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customise, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used to deploy hundreds of Open edX platforms around the world.
 
