@@ -27,7 +27,7 @@ click==8.1.7
     # via
     #   -r requirements/base.txt
     #   sphinx-click
-docutils==0.20.1
+docutils==0.21.2
     # via
     #   sphinx
     #   sphinx-click
@@ -119,7 +119,7 @@ six==1.16.0
     #   python-dateutil
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==7.1.2
+sphinx==7.4.7
     # via
     #   -r requirements/docs.in
     #   sphinx-click
@@ -147,6 +147,7 @@ tomli==2.0.2
     # via
     #   -r requirements/base.txt
     #   mypy
+    #   sphinx
 typing-extensions==4.12.2
     # via
     #   -r requirements/base.txt
