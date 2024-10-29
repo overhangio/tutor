@@ -106,12 +106,6 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 # Install scorm xblock
 RUN pip install "openedx-scorm-xblock>=18.0.0,<19.0.0"
 
-# Install edx-search fork with meilisearch engine
-# TODO this should be a temporary change for the duration of the Sumac branch testing.
-# After that, the corresponding change should have been merged in edx-search and the
-# package upgraded in edx-platform (sumac release branch).
-RUN pip install git+https://github.com/regisb/edx-search@regisb/meilisearch#edx-search
-
 {% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install '{{ extra_requirements }}'
