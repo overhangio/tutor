@@ -1,0 +1,1 @@
+- [Improvement] Do not prompt for environment deletion by default on `tutor config save --interactive`. (by @regisb)

@@ -7,12 +7,12 @@ import click
 import click.shell_completion
 
 from tutor import config as tutor_config
-from tutor import env, exceptions, fmt
+from tutor import env, exceptions, fmt, hooks
 from tutor import interactive as interactive_config
 from tutor import serialize
 from tutor.commands.context import Context
 from tutor.commands.params import ConfigLoaderParam
-from tutor.types import ConfigValue
+from tutor.types import Config, ConfigValue
 
 
 @click.group(
@@ -155,9 +155,23 @@ def save(
     clean_env: bool,
 ) -> None:
     config = tutor_config.load_minimal(context.root)
+
+    # Add question to interactive prompt, such that the environment is automatically
+    # deleted if necessary in interactive mode.
+    @hooks.Actions.CONFIG_INTERACTIVE.add()
+    def _prompt_for_env_deletion(_config: Config) -> None:
+        if clean_env:
+            run_clean = click.confirm(
+                fmt.question("Remove existing Tutor environment directory?"),
+                prompt_suffix=" ",
+                default=True,
+            )
+            if run_clean:
+                env.delete_env_dir(context.root)
+
     if interactive:
-        interactive_config.ask_questions(config, context.root, clean_env_prompt=True)
-    if clean_env:
+        interactive_config.ask_questions(config)
+    elif clean_env:
         env.delete_env_dir(context.root)
     if set_vars:
         for key, value in set_vars:
