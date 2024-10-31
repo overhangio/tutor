@@ -7,12 +7,7 @@ from . import env, exceptions, fmt, hooks
 from .types import Config, get_typed
 
 
-def ask_questions(
-    config: Config,
-    root: str,
-    run_for_prod: Optional[bool] = None,
-    clean_env_prompt: bool = False,
-) -> None:
+def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
     """
     Interactively ask questions to collect configuration values from the user.
 
@@ -20,8 +15,6 @@ def ask_questions(
         config: Existing (or minimal) configuration. Modified in-place.
         run_for_prod: Whether platform should be configured for production.
             If None, then ask the user.
-        clean_env_prompt: Whether to show the clean environment prompt before running.
-            defaults to False.
     Returns:
         None
     """
@@ -157,14 +150,6 @@ def ask_questions(
             config,
             defaults,
         )
-    if clean_env_prompt:
-        run_clean = click.confirm(
-            fmt.question("Remove existing Tutor environment directory?"),
-            prompt_suffix=" ",
-            default=True,
-        )
-        if run_clean:
-            env.delete_env_dir(root)
 
     hooks.Actions.CONFIG_INTERACTIVE.do(config)
 
