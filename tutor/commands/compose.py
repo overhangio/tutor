@@ -197,7 +197,6 @@ def interactive_configuration(
         click.echo(fmt.title("Interactive platform configuration"))
         interactive_config.ask_questions(
             config,
-            context.obj.root,
             run_for_prod=run_for_prod,
         )
     tutor_config.save_config_file(context.obj.root, config)

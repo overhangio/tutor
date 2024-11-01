@@ -539,10 +539,10 @@ def delete_env_dir(root: str) -> None:
     try:
         shutil.rmtree(env_path)
         fmt.echo_alert(f"Removed existing Tutor environment at: {env_path}")
-    except PermissionError:
+    except PermissionError as e:
         raise exceptions.TutorError(
             f"Permission Denied while trying to remove existing Tutor environment at: {env_path}"
-        )
+        ) from e
     except FileNotFoundError:
         fmt.echo_info(f"No existing Tutor environment to remove at: {env_path}")
 
