@@ -2,7 +2,7 @@ name: Sync with private repo
 
 on:
   push:
-    branches: [ master, main, nightly ]
+    branches: [ release, next ]
 
 jobs:
   sync:

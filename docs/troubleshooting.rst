@@ -91,7 +91,7 @@ If that does not work, then check if there are any other Docker containers runni
 
     docker ps -a
 
-For example, if you have ever used :ref:`Tutor Nightly <nightly>`, check whether there are still ``tutor_nightly_`` containers running. Conversely, if trying to run Tutor Nightly now, check whether there are non-Nightly ``tutor_`` containers running. If so, switch to that other version of Tutor, run ``tutor (dev|local|k8s) stop``, and then switch back to the preferred version of Tutor.
+For example, if you have ever used :ref:`Tutor Next <next>`, check whether there are still ``tutor_next`` containers running. Conversely, if trying to run Tutor Next now, check whether there are non-Next ``tutor_`` containers running. If so, switch to that other version of Tutor, run ``tutor (dev|local|k8s) stop``, and then switch back to the preferred version of Tutor.
 
 Alternatively, if there are any other non-Tutor containers using port 3306, then stop and remove them::
 
