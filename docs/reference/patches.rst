@@ -243,6 +243,13 @@ File: ``local/docker-compose.prod.yml``
 
 File: ``local/docker-compose.yml``
 
+.. patch:: mysql-options
+
+``mysql-options``
+=================
+
+File: ``apps/openedx/config/partials/auth.yml``
+
 .. patch:: openedx-auth
 
 ``openedx-auth``

@@ -20,5 +20,6 @@ DATABASES:
       {%- if RUN_MYSQL %}
       charset: "utf8mb4"
       {%- endif %}
+      {{ patch("mysql-options") }}
 EMAIL_HOST_USER: "{{ SMTP_USERNAME }}"
 EMAIL_HOST_PASSWORD: "{{ SMTP_PASSWORD }}"
