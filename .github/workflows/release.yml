@@ -38,7 +38,7 @@ jobs:
         # https://github.com/actions/setup-python
         uses: actions/setup-python@v3
         with:
-          python-version: 3.8
+          python-version: 3.9
           cache: 'pip'
           cache-dependency-path: requirements/dev.txt
       - name: Upgrade pip and setuptools
