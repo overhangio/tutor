@@ -52,6 +52,7 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         running_release = "redwood"
 
     if running_release == "redwood":
+        common_upgrade.upgrade_from_redwood(context, config)
         running_release = "sumac"
 
 

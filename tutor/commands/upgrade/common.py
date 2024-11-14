@@ -46,6 +46,22 @@ def upgrade_from_nutmeg(context: click.Context, config: Config) -> None:
     )
 
 
+def upgrade_from_redwood(context: click.Context, config: Config) -> None:
+    # Prevent switching to the MySQL storage backend in forum v2
+    if plugins.is_loaded("forum"):
+        fmt.echo_alert(
+            "Your platform is going to be configured to store forum data in MongoDB. "
+            "You are STRONGLY ENCOURAGED to migrate your forum data to MySQL as soon as possible. "
+            "To do so, refer to the tutor-forum plugin documentation: https://github.com/overhangio/tutor-forum/#installation"
+        )
+        context.obj.job_runner(config).run_task(
+            "lms",
+            """
+(./manage.py lms waffle_flag --list | grep forum_v2.enable_mysql_backend) || ./manage.py lms waffle_flag --create --deactivate forum_v2.enable_mysql_backend
+""",
+        )
+
+
 def get_mongo_upgrade_parameters(
     docker_version: str, compatibility_version: str
 ) -> tuple[int, dict[str, int | str]]:
