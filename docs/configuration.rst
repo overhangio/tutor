@@ -233,7 +233,7 @@ Meilisearch
 
 - ``MEILISEARCH_URL`` (default: ``"http://meilisearch:7700"``): internal URL used for backend-to-backend communication.
 - ``MEILISEARCH_PUBLIC_URL`` (default: ``"{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://meilisearch.{{ LMS_HOST }}"``): external URL from which the frontend will access the Meilisearch instance.
-- ``MEILISEARCH_INDEX_PREFIX`` (default: ``"openedx_{{K8S_NAMESPACE}}_"``)
+- ``MEILISEARCH_INDEX_PREFIX`` (default: ``"{{K8S_NAMESPACE}}_"``)
 - ``MEILISEARCH_MASTER_KEY`` (default: ``"{{ 24|random_string }}"``)
 - ``MEILISEARCH_API_KEY_UID`` (default: ``"{{ 4|uuid }}"``): UID used to sign the API key.
 - ``MEILISEARCH_API_KEY`` (default: ``"{{ MEILISEARCH_MASTER_KEY|uid_master_hash(MEILISEARCH_API_KEY_UID) }}"``)

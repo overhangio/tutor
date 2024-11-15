@@ -40,7 +40,11 @@ LMS_HOST: "www.myopenedx.com"
 LOCAL_PROJECT_NAME: "{{ TUTOR_APP }}_local"
 MEILISEARCH_URL: "http://meilisearch:7700"
 MEILISEARCH_PUBLIC_URL: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://meilisearch.{{ LMS_HOST }}"
-MEILISEARCH_INDEX_PREFIX: "openedx_{{K8S_NAMESPACE}}_"
+# Besides operators not using K8S, this variable is still defined as a default.
+# For operators running multiple installations, this default allows to support
+# multitenant meilisearch installations on K8S by default as installations are
+# deployed on different namespaces.
+MEILISEARCH_INDEX_PREFIX: "{{K8S_NAMESPACE}}_"
 MONGODB_AUTH_MECHANISM: ""
 MONGODB_AUTH_SOURCE: "admin"
 MONGODB_HOST: "mongodb"
