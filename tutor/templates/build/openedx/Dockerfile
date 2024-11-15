@@ -98,8 +98,10 @@ RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target
     pip install -r /openedx/edx-platform/requirements/edx/base.txt
 
 # Install extra requirements
+# We don't need xml configuration support in uwsgi so don't install it.
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install \
+    UWSGI_PROFILE_OVERRIDE="xml=no" \
+    pip install --no-cache-dir --compile \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.4.0 \
     # uwsgi server https://pypi.org/project/uWSGI/
