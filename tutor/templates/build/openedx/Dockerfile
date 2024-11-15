@@ -98,14 +98,18 @@ RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target
     pip install -r /openedx/edx-platform/requirements/edx/base.txt
 
 # Install extra requirements
-# We don't need xml configuration support in uwsgi so don't install it.
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install \
+    # Use redis as a django cache https://pypi.org/project/django-redis/
+    django-redis==5.4.0
+
+# uwsgi server https://pypi.org/project/uWSGI/
+# We don't need xml configuration support in uwsgi so don't install it, as it causes
+# uwsgi to crash
+# https://github.com/xmlsec/python-xmlsec/issues/320
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     UWSGI_PROFILE_OVERRIDE="xml=no" \
-    pip install --no-cache-dir --compile \
-    # Use redis as a django cache https://pypi.org/project/django-redis/
-    django-redis==5.4.0 \
-    # uwsgi server https://pypi.org/project/uWSGI/
-    uwsgi==2.0.24
+    pip install --no-cache-dir --compile uwsgi==2.0.24
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
