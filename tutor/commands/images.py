@@ -227,7 +227,7 @@ def build(
                 image_build_args.append(f"--cache-from=type=registry,ref={tag}-cache")
             if cache_to_registry:
                 image_build_args.append(
-                    f"--cache-to=type=registry,mode=max,ref={tag}-cache"
+                    f"--cache-to=type=registry,mode=max,ref={tag}-cache,image-manifest=true"
                 )
 
             # Build contexts
