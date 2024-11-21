@@ -72,7 +72,6 @@ def _prepare_environment() -> None:
             ("TUTOR_VERSION_MAJOR", int(__version__.split(".")[0])),
             ("TUTOR_VERSION_MINOR", int(__version__.split(".")[1])),
             ("TUTOR_BRANCH_IS_MAIN", __version_suffix__ == "main"),
-            ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
 
