@@ -153,6 +153,9 @@ hooks.Filters.LMS_WORKER_COMMAND.add_items(
         "--hostname=edx.lms.core.default.%h",
         "--queues=edx.lms.core.default,edx.lms.core.high,edx.lms.core.high_mem",
         "--max-tasks-per-child=100",
+        "--prefetch-multiplier=1",
+        "--without-gossip",
+        "--without-mingle",
     ]
 )
 
@@ -166,6 +169,9 @@ hooks.Filters.CMS_WORKER_COMMAND.add_items(
         "--hostname=edx.cms.core.default.%h",
         "--queues=edx.cms.core.default,edx.cms.core.high,edx.cms.core.low",
         "--max-tasks-per-child=100",
+        "--prefetch-multiplier=1",
+        "--without-gossip",
+        "--without-mingle",
     ]
 )
 
