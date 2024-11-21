@@ -67,7 +67,6 @@ def _prepare_environment() -> None:
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
             ("TUTOR_BRANCH_IS_MAIN", __version_suffix__ == "main"),
-            ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
 
