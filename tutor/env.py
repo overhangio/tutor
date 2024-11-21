@@ -66,7 +66,6 @@ def _prepare_environment() -> None:
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
-            ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
 
