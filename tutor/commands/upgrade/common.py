@@ -61,6 +61,11 @@ def upgrade_from_redwood(context: click.Context, config: Config) -> None:
 """,
         )
 
+    fmt.echo_alert(
+        """It is recommended to upgrade your character set and collation of the MySQL database after upgrading to Sumac.
+You can use the convert-mysql-utf8mb4-charset do job to upgrade the collation and character set. You can find more details regarding the command at https://docs.tutor.edly.io/local.html#changing-the-mysql-charset-and-collation"""
+    )
+
 
 def get_mongo_upgrade_parameters(
     docker_version: str, compatibility_version: str
