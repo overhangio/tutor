@@ -142,3 +142,45 @@ def is_directory_mounted(image_name: str, dirname: str) -> bool:
 hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(
     ("iter_mounted_directories", iter_mounted_directories)
 )
+
+
+hooks.Filters.LMS_WORKER_COMMAND.add_items(
+    [
+        "celery",
+        "--app=lms.celery",
+        "worker",
+        "--loglevel=info",
+        "--hostname=edx.lms.core.default.%h",
+        "--queues=edx.lms.core.default,edx.lms.core.high,edx.lms.core.high_mem",
+        "--max-tasks-per-child=100",
+    ]
+)
+
+
+hooks.Filters.CMS_WORKER_COMMAND.add_items(
+    [
+        "celery",
+        "--app=cms.celery",
+        "worker",
+        "--loglevel=info",
+        "--hostname=edx.cms.core.default.%h",
+        "--queues=edx.cms.core.default,edx.cms.core.high,edx.cms.core.low",
+        "--max-tasks-per-child=100",
+    ]
+)
+
+
+def iter_cms_celery_parameters() -> t.Iterator[str]:
+    yield from hooks.Filters.CMS_WORKER_COMMAND.iterate()
+
+
+def iter_lms_celery_parameters() -> t.Iterator[str]:
+    yield from hooks.Filters.LMS_WORKER_COMMAND.iterate()
+
+
+hooks.Filters.ENV_TEMPLATE_VARIABLES.add_items(
+    [
+        ("iter_cms_celery_parameters", iter_cms_celery_parameters),
+        ("iter_lms_celery_parameters", iter_lms_celery_parameters),
+    ]
+)
