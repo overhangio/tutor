@@ -9,16 +9,14 @@ docs: ## Build HTML documentation
 	$(MAKE) -C docs
 
 compile-requirements: ## Compile requirements files
-	pip-compile ${COMPILE_OPTS} --output-file=requirements/base.txt
+	pip-compile ${COMPILE_OPTS} requirements/base.in
 	pip-compile ${COMPILE_OPTS} requirements/dev.in
-	pip-compile ${COMPILE_OPTS} --extra=docs --output-file=requirements/docs.txt
+	pip-compile ${COMPILE_OPTS} requirements/docs.in
 
 upgrade-requirements: ## Upgrade requirements files
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
-build-pythonpackage: build-pythonpackage-tutor ## Build Python packages ready to upload to pypi
-
-build-pythonpackage-tutor: ## Build the "tutor" python package for upload to pypi
+build-pythonpackage: ## Build the "tutor" python package for upload to pypi
 	python -m build --sdist
 
 push-pythonpackage: ## Push python package to pypi

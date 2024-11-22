@@ -10,4 +10,3 @@ twine
 # Types packages
 types-docutils
 types-PyYAML
-types-setuptools

@@ -1,8 +1,7 @@
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/
-# https://setuptools.pypa.io/en/latest/userguide/quickstart.html
+# https://hatch.pypa.io/latest/config/build/
 
 [project]
-dynamic = ["version", "dependencies", "optional-dependencies"]
 name = "tutor"
 license = {file = "LICENSE.txt"}
 authors = [
@@ -22,6 +21,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
+# these fields will be set by hatch_build.py
+dynamic = ["version", "dependencies", "optional-dependencies"]
 
 [project.scripts]
 tutor = "tutor.commands.cli:main"
@@ -35,17 +36,25 @@ Issues = "https://github.com/overhangio/tutor/issues"
 Changelog = "https://github.com/overhangio/tutor/blob/master/CHANGELOG.md"
 Community = "https://discuss.openedx.org/tag/tutor"
 
-# Setuptools-specific configuration
+# hatch-specific configuration
+[tool.hatch.metadata.hooks.custom]
+path = ".hatch_build.py"
+
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.setuptools.dynamic]
-version = {attr = "tutor.__about__.__package_version__"}
-dependencies = {file = ["requirements/base.in"] }
-
-[tool.setuptools.dynamic.optional-dependencies]
-dev = {file = ["requirements/dev.txt"]}
-full = {file = ["requirements/plugins.txt"]}
-
-[tool.setuptools.packages.find]
+[tool.hatch.build.targets.sdist]
+# Disable strict naming, otherwise twine is not able to detect name/version
+strict-naming = false
+include = [
+  "/tutor",
+  "requirements/base.in",
+  "requirements/plugins.txt",
+  "requirements/dev.txt",
+]
 exclude = ["tests*"]
+
+[tool.hatch.metadata]
+# Allow github dependencies in plugins.txt
+allow-direct-references = true
