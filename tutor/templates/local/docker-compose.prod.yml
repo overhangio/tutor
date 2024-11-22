@@ -31,7 +31,8 @@ services:
     environment:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.tutor.production
-    command: celery --app=lms.celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --max-tasks-per-child=100 --exclude-queues=edx.cms.core.default
+    command: {% for value in iter_lms_celery_parameters() %}
+      - "{{value}}"{% endfor %}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
@@ -50,7 +51,8 @@ services:
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
-    command: celery --app=cms.celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --max-tasks-per-child 100 --exclude-queues=edx.lms.core.default
+    command: {% for value in iter_lms_celery_parameters() %}
+      - "{{value}}"{% endfor %}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro

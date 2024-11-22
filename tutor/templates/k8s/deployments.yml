@@ -141,7 +141,9 @@ spec:
       containers:
         - name: cms-worker
           image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ["celery", "--app=cms.celery", "worker", "--loglevel=info", "--hostname=edx.cms.core.default.%%h", "--max-tasks-per-child", "100", "--exclude-queues=edx.lms.core.default"]
+          args:
+          {% for value in iter_cms_celery_parameters() %}
+          - "{{value}}"{% endfor %}
           env:
           - name: SERVICE_VARIANT
             value: cms
@@ -250,7 +252,8 @@ spec:
       containers:
         - name: lms-worker
           image: {{ DOCKER_IMAGE_OPENEDX }}
-          args: ["celery", "--app=lms.celery", "worker", "--loglevel=info", "--hostname=edx.lms.core.default.%%h", "--max-tasks-per-child=100", "--exclude-queues=edx.cms.core.default"]
+          args: {% for value in iter_lms_celery_parameters() %}
+          - "{{value}}"{% endfor %}
           env:
           - name: SERVICE_VARIANT
             value: lms

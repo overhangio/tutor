@@ -514,6 +514,16 @@ class Filters:
     #: :param str file_path: The path to the file being checked.
     IS_FILE_RENDERED: Filter[bool, [str]] = Filter()
 
+    #: List of parameters to use when starting the LMS Celery worker ``celery worker ...``.
+    #:
+    #: :param list[str] command: the list of paramaters to use as the celery command.
+    LMS_WORKER_COMMAND: Filter[list[str], []] = Filter()
+
+    #: List of parameters to use when starting the CMS Celery worker ``celery worker ...``.
+    #:
+    #: :param list[str] command: the list of paramaters to use as the celery command.
+    CMS_WORKER_COMMAND: Filter[list[str], []] = Filter()
+
 
 class Contexts:
     """
