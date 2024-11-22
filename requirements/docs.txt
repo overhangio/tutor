@@ -36,7 +36,7 @@ durationpy==0.9
     # via
     #   -r requirements/base.txt
     #   kubernetes
-google-auth==2.35.0
+google-auth==2.36.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -73,7 +73,7 @@ oauthlib==3.2.2
     #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==24.1
+packaging==24.2
     # via
     #   -r requirements/base.txt
     #   sphinx
@@ -127,7 +127,7 @@ sphinx==7.4.7
     #   sphinxcontrib-jquery
 sphinx-click==6.0.0
     # via -r requirements/docs.in
-sphinx-rtd-theme==3.0.1
+sphinx-rtd-theme==3.0.2
     # via -r requirements/docs.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
@@ -143,7 +143,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-tomli==2.0.2
+tomli==2.1.0
     # via
     #   -r requirements/base.txt
     #   mypy
@@ -161,7 +161,7 @@ websocket-client==1.8.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
-zipp==3.20.2
+zipp==3.21.0
     # via
     #   -r requirements/base.txt
     #   importlib-metadata
