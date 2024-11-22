@@ -1,2 +1,51 @@
+# https://packaging.python.org/en/latest/tutorials/packaging-projects/
+# https://setuptools.pypa.io/en/latest/userguide/quickstart.html
+
+[project]
+dynamic = ["version", "dependencies", "optional-dependencies"]
+name = "tutor"
+license = {file = "LICENSE.txt"}
+authors = [
+  {name = "Edly", email = "hello@edly.io"},
+]
+description = "The Docker-based Open edX distribution designed for peace of mind"
+readme = {file = "README.rst", content-type = "text/x-rst"}
+requires-python = ">= 3.9"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.scripts]
+tutor = "tutor.commands.cli:main"
+
+# https://packaging.python.org/en/latest/specifications/well-known-project-urls/#well-known-labels
+[project.urls]
+Homepage = "https://docs.tutor.edly.io/"
+Documentation = "https://docs.tutor.edly.io/"
+Source = "https://github.com/overhangio/tutor"
+Issues = "https://github.com/overhangio/tutor/issues"
+Changelog = "https://github.com/overhangio/tutor/blob/master/CHANGELOG.md"
+Community = "https://discuss.openedx.org/tag/tutor"
+
+# Setuptools-specific configuration
 [build-system]
 requires = ["setuptools", "wheel"]
+
+[tool.setuptools.dynamic]
+version = {attr = "tutor.__about__.__package_version__"}
+dependencies = {file = ["requirements/base.in"] }
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = {file = ["requirements/dev.txt"]}
+full = {file = ["requirements/plugins.txt"]}
+
+[tool.setuptools.packages.find]
+exclude = ["tests*"]
