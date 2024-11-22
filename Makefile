@@ -9,19 +9,17 @@ docs: ## Build HTML documentation
 	$(MAKE) -C docs
 
 compile-requirements: ## Compile requirements files
-	pip-compile requirements/base.in
-	pip-compile requirements/dev.in
-	pip-compile requirements/docs.in
+	pip-compile ${COMPILE_OPTS} --output-file=requirements/base.txt
+	pip-compile ${COMPILE_OPTS} requirements/dev.in
+	pip-compile ${COMPILE_OPTS} --extra=docs --output-file=requirements/docs.txt
 
 upgrade-requirements: ## Upgrade requirements files
-	pip-compile --upgrade requirements/base.in
-	pip-compile --upgrade requirements/dev.in
-	pip-compile --upgrade requirements/docs.in
+	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 build-pythonpackage: build-pythonpackage-tutor ## Build Python packages ready to upload to pypi
 
 build-pythonpackage-tutor: ## Build the "tutor" python package for upload to pypi
-	python setup.py sdist
+	python -m build --sdist
 
 push-pythonpackage: ## Push python package to pypi
 	twine upload --skip-existing dist/tutor-$(shell make version).tar.gz
@@ -82,12 +80,8 @@ coverage-browse-report: coverage-html ## Open the HTML report in the browser
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller tutor.spec
 
-bootstrap-dev: ## Install dev requirements
-	pip install .
-	pip install -r requirements/dev.txt
-
-bootstrap-dev-plugins: bootstrap-dev ## Install dev requirements and all supported plugins
-	pip install -r requirements/plugins.txt
+bootstrap-dev: ## Install dev requirements and all supported plugins
+	pip install .[full,dev]
 
 pull-base-images: # Manually pull base images
 	docker image pull docker.io/ubuntu:22.04

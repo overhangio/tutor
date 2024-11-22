@@ -49,7 +49,7 @@ jobs:
       - name: Print info about the current python installation
         run: make ci-info
       - name: Install requirements
-        run: make bootstrap-dev-plugins
+        run: make bootstrap-dev
 
       ##### Run tests, generate bundle
       # - name: Run tests
