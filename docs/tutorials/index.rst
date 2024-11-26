@@ -12,7 +12,7 @@ Open edX customization
    edx-platform
    edx-platform-settings
    google-smtp
-   next
+   nightly
 
 System administration
 ---------------------

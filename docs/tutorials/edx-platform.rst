@@ -25,7 +25,7 @@ Check out the right version of the upstream repository. If you are working on th
     # I.e: aspen, birch, cypress, etc.
     git checkout open-release/zebulon.master
 
-On the other hand, if you are working on the Tutor :ref:`"Next" <next>` branch then you should checkout the master branch::
+On the other hand, if you are working on the Tutor :ref:`"nightly" <nightly>` branch then you should checkout the master branch::
 
     git checkout master
 

@@ -132,7 +132,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/redwood.3"``, or ``master`` in :ref:`Next <next>`)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/redwood.3"``, or ``master`` in :ref:`nightly <nightly>`)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -392,7 +392,7 @@ Tutor builds images with the latest translations using the ``atlas pull`` `comma
 By default the translations are pulled from the `openedx-translations repository <https://github.com/openedx/openedx-translations>`_
 from the ``ATLAS_REVISION`` branch. You can use custom translations on your fork of the openedx-translations repository by setting the following configuration parameters:
 
-- ``ATLAS_REVISION`` (default: ``"main"`` on Next and ``"{{ OPENEDX_COMMON_VERSION }}"`` if a named release is used)
+- ``ATLAS_REVISION`` (default: ``"main"`` on nightly and ``"{{ OPENEDX_COMMON_VERSION }}"`` if a named release is used)
 - ``ATLAS_REPOSITORY`` (default: ``"openedx/openedx-translations"``). There's a feature request to `support GitLab and other providers <https://github.com/openedx/openedx-atlas/issues/20>`_.
 - ``ATLAS_OPTIONS`` (default: ``""``) Pass additional arguments to ``atlas pull``. Refer to the `atlas documentations <https://github.com/openedx/openedx-atlas>`_ for more information.
 

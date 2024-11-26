@@ -6,8 +6,8 @@ __version__ = "18.1.4"
 
 # The version suffix will be appended to the actual version, separated by a
 # dash. Use this suffix to differentiate between the actual released version and
-# the versions from other branches. For instance: set the suffix to "next" in
-# the next branch.
+# the versions from other branches. For instance: set the suffix to "nightly" in
+# the nightly branch.
 # The suffix is cleanly separated from the __version__ in this module to avoid
 # conflicts when merging branches.
 __version_suffix__ = ""
@@ -19,7 +19,7 @@ __version_suffix__ = ""
 __app__ = os.environ.get("TUTOR_APP", "tutor")
 
 # Package version, as installed by pip, does not include the version suffix.
-# Otherwise, Next plugins will automatically install non-Next Tutor
+# Otherwise, nightly plugins will automatically install non-nightly Tutor
 # version.
 __package_version__ = __version__
 

@@ -12,7 +12,7 @@ For detailed explanations on how to work on edx-platform and its dependencies, s
 First-time setup
 ----------------
 
-Firstly, either :ref:`install Tutor <install>` (for development against the named releases of Open edX) or :ref:`install Tutor Next <next>` (for development against Open edX's master branches).
+Firstly, either :ref:`install Tutor <install>` (for development against the named releases of Open edX) or :ref:`install Tutor Nightly <nightly>` (for development against Open edX's master branches).
 
 Then, optionally, tell Tutor to use a local fork of edx-platform::
 
