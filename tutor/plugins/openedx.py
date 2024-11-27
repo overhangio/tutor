@@ -4,8 +4,39 @@ import os
 import re
 import typing as t
 
-from tutor import bindmount, hooks
+from tutor import bindmount, fmt, hooks
 from tutor.__about__ import __version_suffix__
+from tutor.plugins.base import PLUGINS_ROOT
+
+
+@hooks.Actions.PROJECT_ROOT_READY.add(priority=hooks.priorities.HIGH)
+def _migrate_obsolete_nightly_root(root: str):
+    """
+    Since Tutor switched from the "nightly" branch to the "main" branch, we
+    automatically migrate data from the project root and the plugins root.
+
+    REMOVE-ME-AFTER-v20: migrate this code to the sumac upgrade commands.
+    """
+    if __version_suffix__ == "main":
+        return
+
+    # Migrate the project root
+    nightly_root = os.path.join(os.path.dirname(root), "tutor-nightly")
+    if os.path.exists(nightly_root) and not os.path.exists(root):
+        fmt.echo_alert(
+            f"Migrating legacy nightly root from {nightly_root} to {root}..."
+        )
+        os.rename(nightly_root, root)
+
+    # Migrate the plugins root
+    nightly_plugins_root = os.path.join(
+        os.path.dirname(PLUGINS_ROOT), "tutor-nightly-plugins"
+    )
+    if os.path.exists(nightly_plugins_root) and not os.path.exists(PLUGINS_ROOT):
+        fmt.echo_alert(
+            f"Migrating legacy nightly plugins root from {nightly_plugins_root} to {PLUGINS_ROOT}..."
+        )
+        os.rename(nightly_plugins_root, PLUGINS_ROOT)
 
 
 @hooks.Filters.CONFIG_DEFAULTS.add()
