@@ -5,8 +5,6 @@ on:
     branches:
       - release
       - main
-      - master  # REMOVE-AFTER-V19: Old branch name
-      - nightly  # REMOVE-AFTER-V19: Old branch name
 
 jobs:
   sync:
