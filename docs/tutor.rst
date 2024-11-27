@@ -98,7 +98,7 @@ When making a new Tutor release, increment the:
 - MAJOR version when making a backward-incompatible change (prefixed by "💥" in the changelog, as explained below).
 - MINOR version when making a backward-compatible change.
 
-An optional BRANCH suffix may be appended to the release name to indicate that extra changes were added on top of the latest release. For instance, "x.y.z-nightly" corresponds to release x.y.z on top of which extra changes were added to make it compatible with the Open edX master branches (see the :ref:`tutorial on running Tutor Nightly <nightly>`).
+An optional BRANCH suffix may be appended to the release name to indicate that extra changes were added on top of the latest release. For instance, "x.y.z-main" corresponds to release x.y.z on top of which extra changes were added to make it compatible with the Open edX master branches (see the :ref:`tutorial on running Tutor Main <main>`).
 
 `Officially-supported plugins <https://edly.io/tutor/plugins-and-themes/>`__ follow the same versioning pattern. As a third-party plugin developer, you are encouraged to use the same pattern to make it immediately clear to your end-users which Open edX versions are supported.
 
