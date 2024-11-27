@@ -1,0 +1,2 @@
+- [Feature] Add the `TUTOR_BRANCH_IS_MAIN` variable to the template context, which is set to True for users running Tutor Main (by @kdmccormick).
+- [Bugfix] Use `TUTOR_BRANCH_IS_MAIN` rather than the edx-platform branch name in order to determine which patches to apply. This way, when developers are testing an edx-platform branch that is not master but which may be *based on* master, they will receive master patches rather than release patches, assuming they are running Tutor Main in the first place (by @kdmccormick).
