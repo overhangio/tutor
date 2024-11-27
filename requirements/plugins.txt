@@ -1,14 +1,14 @@
-# # For Tutor Nightly, we install plugins from their nightly branches instead of from PyPI
-tutor-android@git+https://github.com/overhangio/tutor-android@nightly
-tutor-cairn@git+https://github.com/overhangio/tutor-cairn@nightly
-tutor-credentials@git+https://github.com/overhangio/tutor-credentials@nightly
-tutor-discovery@git+https://github.com/overhangio/tutor-discovery@nightly
-tutor-ecommerce@git+https://github.com/overhangio/tutor-ecommerce@nightly
-tutor-forum@git+https://github.com/overhangio/tutor-forum@nightly
-tutor-indigo@git+https://github.com/overhangio/tutor-indigo@nightly
-tutor-jupyter@git+https://github.com/overhangio/tutor-jupyter@nightly
-tutor-mfe@git+https://github.com/overhangio/tutor-mfe@nightly
-tutor-minio@git+https://github.com/overhangio/tutor-minio@nightly
-tutor-notes@git+https://github.com/overhangio/tutor-notes@nightly
-tutor-webui@git+https://github.com/overhangio/tutor-webui@nightly
-tutor-xqueue@git+https://github.com/overhangio/tutor-xqueue@nightly
+# # For Tutor Main, we install plugins from their main branches instead of from PyPI
+tutor-android@git+https://github.com/overhangio/tutor-android@main
+tutor-cairn@git+https://github.com/overhangio/tutor-cairn@main
+tutor-credentials@git+https://github.com/overhangio/tutor-credentials@main
+tutor-discovery@git+https://github.com/overhangio/tutor-discovery@main
+tutor-ecommerce@git+https://github.com/overhangio/tutor-ecommerce@main
+tutor-forum@git+https://github.com/overhangio/tutor-forum@main
+tutor-indigo@git+https://github.com/overhangio/tutor-indigo@main
+tutor-jupyter@git+https://github.com/overhangio/tutor-jupyter@main
+tutor-mfe@git+https://github.com/overhangio/tutor-mfe@main
+tutor-minio@git+https://github.com/overhangio/tutor-minio@main
+tutor-notes@git+https://github.com/overhangio/tutor-notes@main
+tutor-webui@git+https://github.com/overhangio/tutor-webui@main
+tutor-xqueue@git+https://github.com/overhangio/tutor-xqueue@main
