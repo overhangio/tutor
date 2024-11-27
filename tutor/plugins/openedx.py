@@ -10,7 +10,7 @@ from tutor.plugins.base import PLUGINS_ROOT
 
 
 @hooks.Actions.PROJECT_ROOT_READY.add(priority=hooks.priorities.HIGH)
-def _migrate_obsolete_nightly_root(root: str):
+def _migrate_obsolete_nightly_root(root: str) -> None:
     """
     Since Tutor switched from the "nightly" branch to the "main" branch, we
     automatically migrate data from the project root and the plugins root.
