@@ -11,7 +11,7 @@ from tutor.exceptions import TutorError
 from tutor.types import Config, get_typed
 
 PLUGIN_INDEXES_KEY = "PLUGIN_INDEXES"
-# Current release name ('zebulon' or 'nightly') and version (1-26)
+# Current release name ('zebulon' or 'main') and version (1-26)
 RELEASE = __version_suffix__ or env.get_current_open_edx_release_name()
 MAJOR_VERSION = int(__version__.split(".", maxsplit=1)[0])
 

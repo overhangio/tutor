@@ -2,9 +2,17 @@ name: Run tests
 
 on:
   push:
-    branches: [ master, main, nightly ]
+    branches:
+      - release
+      - main
+      - master  # REMOVE-AFTER-V19: Old branch name
+      - nightly  # REMOVE-AFTER-V19: Old branch name
   pull_request:
-    branches: [ master, main, nightly ]
+    branches:
+      - release
+      - main
+      - master  # REMOVE-AFTER-V19: Old branch name
+      - nightly  # REMOVE-AFTER-V19: Old branch name
 
 jobs:
   tests:

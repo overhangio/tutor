@@ -9,10 +9,10 @@ from tutor.__about__ import __version_suffix__
 
 
 @hooks.Filters.CONFIG_DEFAULTS.add()
-def _set_openedx_common_version_in_nightly(
+def _set_openedx_common_version_in_main(
     items: list[tuple[str, t.Any]]
 ) -> list[tuple[str, t.Any]]:
-    if __version_suffix__ == "nightly":
+    if __version_suffix__ == "main":
         items.append(("OPENEDX_COMMON_VERSION", "master"))
     return items
 
