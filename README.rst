@@ -93,4 +93,4 @@ We welcome contributions to Tutor! To learn how you can contribute, please check
 License
 -------
 
-This work is licensed under the terms of the `GNU Affero General Public License (AGPL) <https://github.com/overhangio/tutor/blob/master/LICENSE.txt>`_.
+This work is licensed under the terms of the `GNU Affero General Public License (AGPL) <https://github.com/overhangio/tutor/blob/release/LICENSE.txt>`_.

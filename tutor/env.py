@@ -10,7 +10,7 @@ import importlib_resources
 import jinja2
 
 from tutor import exceptions, fmt, hooks, plugins, utils
-from tutor.__about__ import __app__, __version__
+from tutor.__about__ import __app__, __version__, __version_suffix__
 from tutor.types import Config, ConfigValue
 
 TEMPLATES_ROOT = str(importlib_resources.files("tutor") / "templates")
@@ -64,6 +64,7 @@ def _prepare_environment() -> None:
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
+            ("TUTOR_BRANCH_IS_MAIN", __version_suffix__ == "main"),
             ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )

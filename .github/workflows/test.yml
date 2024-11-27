@@ -2,9 +2,13 @@ name: Run tests
 
 on:
   push:
-    branches: [ master, main, nightly ]
+    branches:
+      - release
+      - main
   pull_request:
-    branches: [ master, main, nightly ]
+    branches:
+      - release
+      - main
 
 jobs:
   tests:

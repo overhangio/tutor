@@ -49,10 +49,10 @@ RUN git config --global user.email "tutor@overhang.io" \
 {%- if patch("openedx-dockerfile-git-patches-default") %}
 # Custom edx-platform patches
 {{ patch("openedx-dockerfile-git-patches-default") }}
-{%- elif EDX_PLATFORM_VERSION == "master" %}
-# Patches in nightly node
+{%- elif TUTOR_BRANCH_IS_MAIN %}
+# Patches in Main node
 {%- else %}
-# Patches in non-nightly mode
+# Patches in non-Main mode (i.e., Release mode)
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
