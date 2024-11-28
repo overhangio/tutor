@@ -19,7 +19,7 @@ def _migrate_obsolete_nightly_root(root: str) -> None:
     """
 
     # Run it for old nightly only
-    if __version_suffix__ == "":
+    if __version_suffix__ != "main":
         return
 
     # Migrate the project root
