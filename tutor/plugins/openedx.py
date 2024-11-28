@@ -17,7 +17,9 @@ def _migrate_obsolete_nightly_root(root: str) -> None:
 
     REMOVE-ME-AFTER-v20: migrate this code to the sumac upgrade commands.
     """
-    if __version_suffix__ == "main":
+
+    # Run it for old nightly only
+    if __version_suffix__ != "main":
         return
 
     # Migrate the project root
