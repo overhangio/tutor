@@ -1,0 +1,1 @@
+- [Improvement] Migrate packaging from setup.py/setuptools to pyproject.toml/hatch. This should not be a breaking change for most users. (by @regisb)
