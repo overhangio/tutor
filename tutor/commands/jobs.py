@@ -12,9 +12,12 @@ import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, fmt, hooks
+from tutor import env, fmt, hooks, plugins
 from tutor.commands.context import Context
-from tutor.commands.jobs_utils import get_mysql_change_charset_query
+from tutor.commands.jobs_utils import (
+    get_mysql_change_authentication_plugin_query,
+    get_mysql_change_charset_query,
+)
 from tutor.hooks import priorities
 
 
@@ -428,6 +431,60 @@ def convert_mysql_utf8mb4_charset(
     fmt.echo_info("MySQL charset and collation successfully upgraded")
 
 
+@click.command(
+    short_help="Update the authentication plugin of mysql users to caching_sha2_password.",
+    help=(
+        "Update the authentication plugin of mysql users to caching_sha2_password from mysql_native_password. You can specify either specific users to update or all to update all users."
+    ),
+)
+@click.argument(
+    "users",
+    nargs=-1,
+)
+@click.pass_obj
+def update_mysql_authentication_plugin(
+    context: Context, users: tuple[str]
+) -> t.Iterable[tuple[str, str]]:
+    """
+    Update the authentication plugin of MySQL users from mysql_native_password to caching_sha2_password
+    Handy command utilized when upgrading to v8.4 of MySQL which deprecates mysql_native_password
+    """
+
+    config = tutor_config.load(context.root)
+
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            f"You are not running MySQL (RUN_MYSQL=False). It is your "
+            f"responsibility to update the authentication plugin of mysql users."
+        )
+        return
+
+    if not users:
+        fmt.echo_error(
+            f"Please specify a list of users to update the authentication plugin of.\n"
+            f"Or, specify 'all' to update all database users."
+        )
+        return
+
+    update_all = "all" in users
+    users_to_update = list(plugins.iter_loaded()) if update_all else users
+
+    query = get_mysql_change_authentication_plugin_query(
+        config, users_to_update, update_all
+    )
+
+    # In case there is no user to update the authentication plugin of
+    if not query:
+        return
+
+    mysql_command = (
+        "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --database={{ OPENEDX_MYSQL_DATABASE }} --show-warnings "
+        + shlex.join(["-e", query])
+    )
+
+    yield ("lms", mysql_command)
+
+
 def add_job_commands(do_command_group: click.Group) -> None:
     """
     This is meant to be called with the `local/dev/k8s do` group commands, to add the
@@ -511,5 +568,6 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         print_edx_platform_setting,
         settheme,
         sqlshell,
+        update_mysql_authentication_plugin,
     ]
 )
