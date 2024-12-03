@@ -52,7 +52,7 @@ services:
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
-    command: {% for value in iter_lms_celery_parameters() %}
+    command: {% for value in iter_cms_celery_parameters() %}
       - "{{value}}"{% endfor %}
     restart: unless-stopped
     volumes:

@@ -1,1 +1,0 @@
-- 💥 [Feature] Add a filter to define the celery workers startup command. (by @Ian2012)

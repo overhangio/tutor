@@ -20,6 +20,22 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.2.0'></a>
+## v18.2.0 (2024-12-03)
+
+- [Bugfix] Do not directly upgrade MySQL from v5.7 to v8.4 when upgrading from quince as MySQL does not allow that. First, upgrade to v8.1 and then to v8.4. This process should be automatic for most users. However, if you are running a third-party MySQL (i.e., `RUN_MYSQL=false`), you are expected to perform this process yourself. Please refer to the third-party provider's documentation for detailed instructions. Ensuring that your MySQL version is up-to-date is crucial for maintaining compatibility and security. (by @Danyal-Faheem)
+- [Bugfix] Run MySQL 8.1 as a separate container during upgrade from Olive to Redwood as it crashed otherwise due to the `--mysql-native-password` option not being present. (by @Danyal-Faheem)
+- [Improvement] Do not prompt for environment deletion by default on `tutor config save --interactive`. (by @regisb)
+- 💥[Improvement] Rename Tutor's two branches (by @kdmccormick):
+  * Rename **master** to **release**, as this branch runs the latest official Open edX release.
+  * Rename **nightly** to **main**, as this branch runs the Open edX master (a.k.a. main) branches, which are the basis fort the next Open edX release.
+  * For Tutor Nightly users who do not set a TUTOR_ROOT, both the project root (`~/.local/share/tutor-nightly` on Linux) and the plugins root (`~/.local/share/tutor-nightly-plugins` on Linux) will be automatically renamed. (by @regisb)
+- 💥 [Deprecation] Drop support for python 3.8 and set Python 3.9 as the minimum supported python version. (by @DawoudSheraz)
+- [Feature] Add a filter to define the celery workers startup command. (by @Ian2012)
+- [Improvement] When building images with `tutor images build --cache-to-registry`, use an OCI-compliant cache artifact format that should be universally compatible with all registries. This enables the use of that option when working with third-party registries such as [Harbor](https://goharbor.io/) or [ECR](https://aws.amazon.com/ecr/). Requires [BuildKit 0.12](https://github.com/moby/buildkit/releases/tag/v0.12.0) or later. (by @angonz and @fghaas)
+- [Feature] Add the `TUTOR_BRANCH_IS_MAIN` variable to the template context, which is set to True for users running Tutor Main (by @kdmccormick).
+- [Bugfix] Use `TUTOR_BRANCH_IS_MAIN` rather than the edx-platform branch name in order to determine which patches to apply. This way, when developers are testing an edx-platform branch that is not master but which may be *based on* master, they will receive master patches rather than release patches, assuming they are running Tutor Main in the first place (by @kdmccormick).
+
 <a id='changelog-18.1.4'></a>
 ## v18.1.4 (2024-10-24)
 
