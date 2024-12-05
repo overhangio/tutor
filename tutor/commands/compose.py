@@ -256,10 +256,11 @@ def start(
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(*command, *services)
     if attach and not detach:
-        fmt.echo_info(f"""Attaching to service {services[0]}
-ℹ️  To detach without stopping the service, use ctrl+p followed by ctrl+q""")
+        fmt.echo_info(
+            f"""Attaching to service {services[0]}
+ℹ️  To detach without stopping the service, use ctrl+p followed by ctrl+q"""
+        )
         context.job_runner(config).docker_compose("attach", *services)
-   
 
 
 @click.command(help="Stop a running platform")
