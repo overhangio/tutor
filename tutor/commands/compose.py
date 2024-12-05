@@ -245,14 +245,21 @@ def start(
     services: list[str],
 ) -> None:
     command = ["up", "--remove-orphans"]
+    attach = len(services) == 1
     if build:
         command.append("--build")
-    if detach:
+    # We have to run the container in detached mode first to attach to it
+    if detach or attach:
         command.append("-d")
 
     # Start services
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(*command, *services)
+    if attach and not detach:
+        fmt.echo_info(f"""Attaching to service {services[0]}
+ℹ️  To detach without stopping the service, use ctrl+p followed by ctrl+q""")
+        context.job_runner(config).docker_compose("attach", *services)
+   
 
 
 @click.command(help="Stop a running platform")
