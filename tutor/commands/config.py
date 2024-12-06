@@ -261,7 +261,7 @@ def patches_show(context: Context, name: str) -> None:
 
 @click.command(name="edit", help="Edit config.yml of the current environment")
 @click.pass_obj
-def edit(context: Context, editor: str, save: bool) -> None:
+def edit(context: Context) -> None:
     config_file = tutor_config.config_path(context.root)
 
     if not os.path.isfile(config_file):
