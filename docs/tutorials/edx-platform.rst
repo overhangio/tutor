@@ -139,6 +139,8 @@ To debug a local edx-platform repository, first, start development in detached m
   # Or, debugging CMS:
   tutor dev start cms
 
+To detach from the service without shutting it down, use ``Ctrl+p`` followed with ``Ctrl+q``.
+
 Running edx-platform unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
