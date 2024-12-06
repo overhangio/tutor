@@ -17,10 +17,10 @@ fi
 # Copy-paste of units in Studio (highly requested new feature, but defaults to off in Quince)
 (./manage.py cms waffle_flag --list | grep contentstore.enable_copy_paste_units) || ./manage.py lms waffle_flag --create contentstore.enable_copy_paste_units --everyone
 
-# Re-index studio and courseware content
-# Note that this might be slow for large courses until this issue is resolved:
-# https://github.com/openedx/modular-learning/issues/235
-# But this is a necessary step to make sure the indexes are created and properly
-# configured.
-./manage.py cms reindex_studio --experimental
+# Create the index for studio and courseware content. Because we specify --init,
+# this will not populate the index (potentially slow) nor replace any existing
+# index (resulting in broken features until it is complete). If either of those
+# are necessary, it will print instructions on what command to run to do so.
+./manage.py cms reindex_studio --experimental --init
+# Create the courseware content index
 ./manage.py cms reindex_course --active
