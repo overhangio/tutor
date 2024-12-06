@@ -253,17 +253,18 @@ def start(
         command.append("-d")
     else:
         fmt.echo_info("ℹ️  To exit logs without stopping the containers, use ctrl+z")
-    
+
     # Start services
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(*command, *services)
-    
+
     if attach:
         fmt.echo_info(
             f"""Attaching to service {services[0]}
 ℹ️  To detach without stopping the service, use ctrl+p followed by ctrl+q"""
         )
         context.job_runner(config).docker_compose("attach", *services)
+
 
 @click.command(help="Stop a running platform")
 @click.argument("services", metavar="service", nargs=-1)
