@@ -37,6 +37,11 @@ CACHES["staticfiles"] = {
     "LOCATION": "staticfiles_lms",
 }
 
+# Enable search features
+FEATURES["ENABLE_COURSE_DISCOVERY"] = True
+FEATURES["ENABLE_COURSEWARE_SEARCH"] = True
+FEATURES["ENABLE_DASHBOARD_SEARCH"] = True
+
 # Create folders if necessary
 for folder in [DATA_DIR, LOG_DIR, MEDIA_ROOT, STATIC_ROOT, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):

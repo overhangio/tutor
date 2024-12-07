@@ -20,6 +20,9 @@ MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 100
 FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 
+# Enable "reindex" button
+FEATURES["ENABLE_COURSEWARE_INDEX"] = True
+
 # Create folders if necessary
 for folder in [LOG_DIR, MEDIA_ROOT, STATIC_ROOT, ORA2_FILEUPLOAD_ROOT]:
     if not os.path.exists(folder):

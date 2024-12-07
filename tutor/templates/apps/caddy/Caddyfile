@@ -82,4 +82,10 @@
     }
 }
 
+{% if RUN_MEILISEARCH %}
+{{ MEILISEARCH_PUBLIC_URL.split("://")[1] }}{$default_site_port} {
+    import proxy "meilisearch:7700"
+}
+{% endif %}
+
 {{ patch("caddyfile") }}

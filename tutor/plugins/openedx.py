@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 import os
 import re
 import typing as t
@@ -58,6 +59,17 @@ def _edx_platform_public_hosts(
         hosts += ["{{ LMS_HOST }}:8000", "{{ CMS_HOST }}:8001"]
     else:
         hosts += ["{{ LMS_HOST }}", "{{ CMS_HOST }}"]
+    return hosts
+
+
+@hooks.Filters.APP_PUBLIC_HOSTS.add()
+def _meilisearch_public_hosts(
+    hosts: list[str], context_name: t.Literal["local", "dev"]
+) -> list[str]:
+    if context_name == "dev":
+        hosts.append("{{ MEILISEARCH_PUBLIC_URL.split('://')[1] }}:7700")
+    else:
+        hosts.append("{{ MEILISEARCH_PUBLIC_URL.split('://')[1] }}")
     return hosts
 
 
