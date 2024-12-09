@@ -43,6 +43,6 @@ services:
         {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-job") %}
         - {{ mount }}
         {%- endfor %}
-      depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB), ("elasticsearch", RUN_ELASTICSEARCH), ("redis", RUN_REDIS)]|list_if }}
+      depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB), ("meilisearch", RUN_MEILISEARCH), ("redis", RUN_REDIS)]|list_if }}
 
     {{ patch("local-docker-compose-jobs-services")|indent(4) }}

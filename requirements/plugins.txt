@@ -1,14 +1,14 @@
-# change version ranges when upgrading from redwood
-tutor-android>=18.0.0,<19.0.0
-tutor-cairn>=18.0.0,<19.0.0
-tutor-credentials>=18.0.0,<19.0.0
-tutor-discovery>=18.0.0,<19.0.0
-tutor-ecommerce>=18.0.0,<19.0.0
-tutor-forum>=18.0.0,<19.0.0
-tutor-indigo>=18.0.0,<19.0.0
-tutor-jupyter>=18.0.0,<19.0.0
-tutor-mfe>=18.0.0,<19.0.0
-tutor-minio>=18.0.0,<19.0.0
-tutor-notes>=18.0.0,<19.0.0
-tutor-webui>=18.0.0,<19.0.0
-tutor-xqueue>=18.0.0,<19.0.0
+# change version ranges when upgrading from sumac
+tutor-android>=19.0.0,<20.0.0
+tutor-cairn>=19.0.0,<20.0.0
+tutor-credentials>=19.0.0,<20.0.0
+tutor-discovery>=19.0.0,<20.0.0
+tutor-ecommerce>=19.0.0,<20.0.0
+tutor-forum>=19.0.0,<20.0.0
+tutor-indigo>=19.0.0,<20.0.0
+tutor-jupyter>=19.0.0,<20.0.0
+tutor-mfe>=19.0.0,<20.0.0
+tutor-minio>=19.0.0,<20.0.0
+tutor-notes>=19.0.0,<20.0.0
+tutor-webui>=19.0.0,<20.0.0
+tutor-xqueue>=19.0.0,<20.0.0

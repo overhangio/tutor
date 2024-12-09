@@ -1,0 +1,1 @@
+- 💥[Feature] Migrate from local.edly.io to local.openedx.io. (by @regisb)
