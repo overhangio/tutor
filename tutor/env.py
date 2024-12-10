@@ -64,6 +64,11 @@ def _prepare_environment() -> None:
             ("HOST_USER_ID", utils.get_user_id()),
             ("TUTOR_APP", __app__.replace("-", "_")),
             ("TUTOR_VERSION", __version__),
+            # We assume that TUTOR_VERSION is always MAJOR.MINOR.PATCH.
+            # We assume that MAJOR and MINOR are both integers.
+            # We make no assumptions about PATCH, and thus do not parse it for plugins to use.
+            ("TUTOR_VERSION_MAJOR", int(__version__.split(".")[0])),
+            ("TUTOR_VERSION_MINOR", int(__version__.split(".")[1])),
             ("TUTOR_BRANCH_IS_MAIN", __version_suffix__ == "main"),
             ("is_docker_rootless", utils.is_docker_rootless),
         ],

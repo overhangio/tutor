@@ -1,0 +1,1 @@
+- [Feature] Add integer variables `TUTOR_VERSION_MAJOR` and `TUTOR_VERSION_MINOR` to the template context. These are parsed from the existing `TUTOR_VERSION` string variable, which takes the format `"MAJOR.MINOR.PATCH"`. We add them as a convenience to developers who need to maintain version-agnostic Tutor plugins (by @michaelwheeler and @kdmccormick).
