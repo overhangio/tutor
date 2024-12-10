@@ -173,6 +173,9 @@ echo "INFO: Will import course data at: $course_root" && echo
 # Import into CMS
 python ./manage.py cms import ../data "$course_root"
 
+# Work around bug where outline is not generated
+python ./manage.py cms update_course_outline course-v1:OpenedX+DemoX+DemoCourse
+
 # Re-index courses
 ./manage.py cms reindex_course --all --setup"""
     yield ("cms", template)
