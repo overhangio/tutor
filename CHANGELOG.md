@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.2.2'></a>
+## v18.2.2 (2024-12-10)
+
+- [Bugfix] Fix CI scripts to publish macOS binaries.
+
 <a id='changelog-18.2.1'></a>
 ## v18.2.1 (2024-12-10)
 
