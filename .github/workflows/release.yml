@@ -25,7 +25,7 @@ jobs:
           - os: ubuntu-22.04
             locale: C.UTF-8
           # https://endoflife.date/macos
-          - os: macos-12
+          - os: macos-13
             locale: en_US.UTF-8
     env:
       LC_ALL: ${{ matrix.locale }}
