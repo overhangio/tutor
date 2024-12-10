@@ -20,6 +20,14 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-18.2.1'></a>
+## v18.2.1 (2024-12-10)
+
+- [Feature] Add integer variables `TUTOR_VERSION_MAJOR` and `TUTOR_VERSION_MINOR` to the template context. These are parsed from the existing `TUTOR_VERSION` string variable, which takes the format `"MAJOR.MINOR.PATCH"`. We add them as a convenience to developers who need to maintain version-agnostic Tutor plugins (by @michaelwheeler and @kdmccormick).
+- [Feature] Adds `tutor config edit` command. This opens the active tutor environment's config.yaml in an editor for manual editing. (by @tecoholic)
+- [Improvement] Disable celery gossip and mingle to improve celery performance. (by @Ian2012)
+- [Bugfix] Fix breakpoint debugging by attaching container stdin when running `tutor dev start <service>` for a single service. (by @Danyal-Faheem)
+
 <a id='changelog-18.2.0'></a>
 ## v18.2.0 (2024-12-03)
 

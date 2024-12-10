@@ -1,1 +1,0 @@
-- [Feature] Adds `tutor config edit`. This opens the active tutor environment's config.yaml in an editor for manual editing. (by @tecoholic)
