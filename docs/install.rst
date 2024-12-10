@@ -123,11 +123,11 @@ Major Open edX releases are published twice a year, in June and December, by the
 4. Test the new release in a sandboxed environment.
 5. If you are running edx-platform, or some other repository from a custom branch, then you should rebase (and test) your changes on top of the latest release tag (see :ref:`edx_platform_fork`).
 
-The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``launch`` command (see above). The single difference is that if the ``launch`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) before running ``launch``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Quince to Redwood and rebuild some Docker images, run::
+The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``launch`` command (see above). The single difference is that if the ``launch`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) before running ``launch``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Redwood to Sumac and rebuild some Docker images, run::
 
     tutor config save
     tutor images build all # list the images that should be rebuilt here
-    tutor local upgrade --from=quince
+    tutor local upgrade --from=redwood
     tutor local launch
 
 
@@ -156,6 +156,8 @@ Instructions for installing the appropriate Tutor version for older Open edX rel
 | Quince            | v17           | pip install 'tutor[full]>=17.0.0,<18.0.0'  |
 +-------------------+---------------+--------------------------------------------+
 | Redwood           | v18           | pip install 'tutor[full]>=18.0.0,<19.0.0'  |
++-------------------+---------------+--------------------------------------------+
+| Sumac             | v19           | pip install 'tutor[full]>=19.0.0,<20.0.0'  |
 +-------------------+---------------+--------------------------------------------+
 
 .. _autocomplete:

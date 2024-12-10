@@ -56,6 +56,8 @@ def _prepare_environment() -> None:
             ("reverse_host", utils.reverse_host),
             ("rsa_import_key", utils.rsa_import_key),
             ("rsa_private_key", utils.rsa_private_key),
+            ("uuid", utils.uuid),
+            ("uid_master_hash", utils.uid_master_hash),
         ],
     )
     # Template variables
@@ -70,7 +72,6 @@ def _prepare_environment() -> None:
             ("TUTOR_VERSION_MAJOR", int(__version__.split(".")[0])),
             ("TUTOR_VERSION_MINOR", int(__version__.split(".")[1])),
             ("TUTOR_BRANCH_IS_MAIN", __version_suffix__ == "main"),
-            ("is_docker_rootless", utils.is_docker_rootless),
         ],
     )
 
@@ -474,6 +475,7 @@ def get_release(version: str) -> str:
         "16": "palm",
         "17": "quince",
         "18": "redwood",
+        "19": "sumac",
     }[version.split(".", maxsplit=1)[0]]
 
 
