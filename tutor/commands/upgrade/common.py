@@ -50,7 +50,8 @@ def upgrade_from_redwood(context: click.Context, config: Config) -> None:
     # Forcefully enable the learning MFE's navigation sidebar.
     if plugins.is_loaded("mfe"):
         context.obj.job_runner(config).run_task(
-            "lms", "./manage.py lms waffle_flag --create --everyone courseware.enable_navigation_sidebar"
+            "lms",
+            "./manage.py lms waffle_flag --create --everyone courseware.enable_navigation_sidebar",
         )
 
     # Prevent switching to the MySQL storage backend in forum v2

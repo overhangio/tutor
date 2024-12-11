@@ -1,1 +1,0 @@
-- 💥[Improvement] Get rid of the `is_docker_rootless` template filter, which was used only by Elasticsearch. (by @regisb)
