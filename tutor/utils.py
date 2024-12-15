@@ -66,9 +66,12 @@ def ensure_directory_exists(path: str) -> None:
         os.makedirs(path)
 
 
-def random_string(length: int) -> str:
+def random_string(length: int, special: bool=False) -> str:
+    characters = string.ascii_letters + string.digits
+    if special:
+        characters += re.sub(r'[\'"]', '', string.punctuation)
     return "".join(
-        [random.choice(string.ascii_letters + string.digits) for _ in range(length)]
+        [random.choice(characters) for _ in range(length)]
     )
 
 
