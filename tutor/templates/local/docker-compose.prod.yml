@@ -19,7 +19,7 @@ services:
     networks:
       default:
         # These aliases are for internal communication between containers when running locally
-        # with *.local.edly.io hostnames.
+        # with *.local.openedx.io hostnames.
         aliases:
           - "{{ LMS_HOST }}"
           {{ patch("local-docker-compose-caddy-aliases")|indent(10) }}
@@ -40,6 +40,7 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
       {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-worker") %}
       - {{ mount }}
       {%- endfor %}
@@ -60,6 +61,7 @@ services:
       - ../apps/openedx/config:/openedx/config:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
+      - ../../data/openedx-media-private:/openedx/media-private
       {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-worker") %}
       - {{ mount }}
       {%- endfor %}

@@ -90,7 +90,7 @@ bootstrap-dev-plugins: bootstrap-dev ## Install dev requirements and all support
 	pip install -r requirements/plugins.txt
 
 pull-base-images: # Manually pull base images
-	docker image pull docker.io/ubuntu:20.04
+	docker image pull docker.io/ubuntu:22.04
 
 ci-info: ## Print info about environment
 	python --version

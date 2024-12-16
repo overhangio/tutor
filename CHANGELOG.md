@@ -20,6 +20,36 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-19.0.0'></a>
+## v19.0.0 (2024-12-11)
+
+- 💥[Feature] Upgrade default charset and collation of mysql to utf8mb4 and utf8mb4_unicode_ci respectively (by @Danyal-Faheem)
+    - Add do command to upgrade the charset and collation of tables in mysql.
+    - The command will perform the following upgrades:
+      - Upgrade all `utf8mb3` charset to `utf8mb4`
+      - Upgrade collation `utf8mb3_general_ci` to `utf8mb4_unicode_ci`
+      - Upgrade collation `utf8mb3_bin` to `utf8mb4_bin`
+      - Upgrade collation `utf8mb3_*` to `utf8mb4_*`
+
+- [Feature] Create a new /data/openedx-media-private volume to store media files that are not publicly accessible via the browser, and create configuration that Learning Core (openedx-learning) will use to access this storage space. Learning Core will use a sub-directory of /data/openedx-media-private to store Content Library file uploads, but other apps can create their own sub-directories for their own use. (by @ormsbee)
+
+- 💥[Feature] Update Open edX Image to use Ubuntu 22.04 as base OS. (by @dawoudsheraz)
+  - Adds xmlsec related dependencies to fix xmlsec import issues during translations build
+
+- 💥[Feature] Migrate from local.edly.io to local.openedx.io. (by @regisb)
+
+- 💥[Feature] Upgrade to Sumac. (by @dawoudsheraz)
+
+- 💥[Feature] Replace Elasticsearch by Meilisearch. Elasticsearch was both a source of complexity and high resource usage. With this change, we no longer run Elasticsearch to perform common search queries across Open edX. This includes: course discovery, courseware search and studio search. Instead, we index all these documents in a Meilisearch instance, which is much more lightweight in terms of memory consumption. (by @regisb)
+
+- [Bugfix] Don't build uwsgi with XML support (by @feanil)
+
+- [Feature] With the new forum v2 application, users have a choice to use MongoDB or MySQL as a storage backend, course per course. New users will automatically start using MySQL, while existing users will be responsible for migrating their data themselves (before the Teak release). Upgrade instructions are available here: https://github.com/overhangio/tutor-forum/#installation. (by @regisb)
+
+- 💥[Improvement] Get rid of the `is_docker_rootless` template filter, which was used only by Elasticsearch. (by @regisb)
+
+[Improvement] Forcefully enable the Learning MFE's navigation sidebar when upgrading to Sumac. (by @arbrandes)
+
 <a id='changelog-18.2.2'></a>
 ## v18.2.2 (2024-12-10)
 

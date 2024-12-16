@@ -49,6 +49,10 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
         upgrade_from_quince(config)
         running_release = "redwood"
 
+    if running_release == "redwood":
+        common_upgrade.upgrade_from_redwood(context, config)
+        running_release = "sumac"
+
 
 def upgrade_from_ironwood(config: Config) -> None:
     upgrade_mongodb(config, "3.4.24", "3.4")

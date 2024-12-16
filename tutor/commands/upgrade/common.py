@@ -46,6 +46,34 @@ def upgrade_from_nutmeg(context: click.Context, config: Config) -> None:
     )
 
 
+def upgrade_from_redwood(context: click.Context, config: Config) -> None:
+    # Forcefully enable the learning MFE's navigation sidebar.
+    if plugins.is_loaded("mfe"):
+        context.obj.job_runner(config).run_task(
+            "lms",
+            "./manage.py lms waffle_flag --create --everyone courseware.enable_navigation_sidebar",
+        )
+
+    # Prevent switching to the MySQL storage backend in forum v2
+    if plugins.is_loaded("forum"):
+        fmt.echo_alert(
+            "Your platform is going to be configured to store forum data in MongoDB. "
+            "You are STRONGLY ENCOURAGED to migrate your forum data to MySQL as soon as possible. "
+            "To do so, refer to the tutor-forum plugin documentation: https://github.com/overhangio/tutor-forum/#installation"
+        )
+        context.obj.job_runner(config).run_task(
+            "lms",
+            """
+(./manage.py lms waffle_flag --list | grep forum_v2.enable_mysql_backend) || ./manage.py lms waffle_flag --create --deactivate forum_v2.enable_mysql_backend
+""",
+        )
+
+    fmt.echo_alert(
+        """It is recommended to upgrade your character set and collation of the MySQL database after upgrading to Sumac.
+You can use the convert-mysql-utf8mb4-charset do job to upgrade the collation and character set. You can find more details regarding the command at https://docs.tutor.edly.io/local.html#changing-the-mysql-charset-and-collation"""
+    )
+
+
 def get_mongo_upgrade_parameters(
     docker_version: str, compatibility_version: str
 ) -> tuple[int, dict[str, int | str]]:

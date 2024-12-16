@@ -1,4 +1,6 @@
 import base64
+import hashlib
+import hmac
 import json
 import os
 import random
@@ -13,6 +15,7 @@ from functools import lru_cache
 from typing import List, Tuple
 from urllib.error import URLError
 from urllib.request import urlopen
+import uuid as uuid_module
 
 import click
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
@@ -110,6 +113,24 @@ def rsa_private_key(bits: int = 2048) -> str:
     return key.export_key().decode()
 
 
+def uuid(size: int) -> str:
+    """
+    Return a random uuid string with a given size.
+    """
+    fn = getattr(uuid_module, f"uuid{size}")
+    return str(fn())
+
+
+def uid_master_hash(master_key: str, uid: str) -> str:
+    """
+    Hash a key UID and master key to generate an API key
+
+    This is used specifically for meilisearch.
+    Source: https://www.meilisearch.com/docs/reference/api/keys#key
+    """
+    return hmac.new(master_key.encode(), uid.encode(), hashlib.sha256).hexdigest()
+
+
 def rsa_import_key(key: str) -> RsaKey:
     """
     Import PEM-formatted RSA key and return the corresponding object.
@@ -171,20 +192,6 @@ def docker(*command: str) -> int:
             "docker is not installed. Please follow instructions from https://docs.docker.com/install/"
         )
     return execute("docker", *command)
-
-
-@lru_cache(maxsize=None)
-def is_docker_rootless() -> bool:
-    """
-    A helper function to determine if Docker is running in rootless mode.
-
-     - https://docs.docker.com/engine/security/rootless/
-    """
-    try:
-        results = subprocess.run(["docker", "info"], capture_output=True, check=True)
-        return "rootless" in results.stdout.decode()
-    except subprocess.CalledProcessError:
-        return False
 
 
 def docker_compose(*command: str) -> int:
