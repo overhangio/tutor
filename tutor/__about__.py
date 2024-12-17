@@ -10,7 +10,7 @@ __version__ = "19.0.0"
 # the main branch.
 # The suffix is cleanly separated from the __version__ in this module to avoid
 # conflicts when merging branches.
-__version_suffix__ = ""
+__version_suffix__ = "main"
 
 # The app name will be used to define the name of the default tutor root and
 # plugin directory. To avoid conflicts between multiple locally-installed
