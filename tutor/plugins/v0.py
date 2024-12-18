@@ -282,7 +282,6 @@ class OfficialPlugin(BasePlugin):
     NAMES = [
         "android",
         "discovery",
-        "ecommerce",
         "forum",
         "license",
         "mfe",
