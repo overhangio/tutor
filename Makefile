@@ -103,7 +103,7 @@ ci-test-bundle: ## Run basic tests on bundle
 	yes "" | ./dist/tutor config save --interactive
 	./dist/tutor config save
 	./dist/tutor plugins list
-	./dist/tutor plugins enable android discovery ecommerce forum license mfe minio notes webui xqueue
+	./dist/tutor plugins enable android discovery forum license mfe minio notes webui xqueue
 	./dist/tutor plugins list
 	./dist/tutor license --help
 
