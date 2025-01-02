@@ -358,3 +358,23 @@ def _check_preview_lms_host(config: Config) -> None:
             f'Warning: PREVIEW_LMS_HOST="{preview_lms_host}" is not a subdomain of LMS_HOST="{lms_host}". '
             "This configuration is not typically recommended and may lead to unexpected behavior."
         )
+
+
+@hooks.Actions.CONFIG_LOADED.add()
+def _check_run_meilisearch(config: Config) -> None:
+    """
+    In case RUN_MEILISEARCH is set to false, check if
+    MEILISEARCH_URL has been set to a non-default value.
+    If not, print a warning to notify the user.
+    """
+
+    run_meilisearch = get_typed(config, "RUN_MEILISEARCH", bool, True)
+    if not run_meilisearch:
+        meilisearch_url = get_typed(config, "MEILISEARCH_URL", str, "")
+        meilisearch_url_default = get_defaults()["MEILISEARCH_URL"]
+        if meilisearch_url == meilisearch_url_default:
+            fmt.echo_alert(
+                "Warning: RUN_MEILISEARCH is false, but MEILISEARCH_URL is unset. "
+                "This configuration is not typically recommended and may lead to unexpected behavior. "
+                "Consider setting RUN_MEILISEARCH, or setting MEILISEARCH_URL to an existing, preconfigured Meilisearch instance."
+            )
