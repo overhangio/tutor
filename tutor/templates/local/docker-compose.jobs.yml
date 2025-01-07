@@ -29,7 +29,7 @@ services:
         {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-job") %}
         - {{ mount }}
         {%- endfor %}
-      depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB)]|list_if }}
+      depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB), ("meilisearch", RUN_MEILISEARCH)]|list_if }}
 
     cms-job:
       image: {{ DOCKER_IMAGE_OPENEDX }}
