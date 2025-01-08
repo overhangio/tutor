@@ -180,11 +180,9 @@ echo "INFO: Will import course data at: $course_root" && echo
 python ./manage.py cms import ../data "$course_root"
 
 # Re-index courses
-# TODO this is no longer compatible with meilisearch indexing. That is, until this PR is merged:
-# https://github.com/openedx/edx-platform/pull/35743
-# Anyway, it doesn't make much sense to reindex *all* courses after a single one has
-# been created. Thus we should # rely on course authors to press the "reindex" button in
-# the studio after the course has # been imported.
+# We are not doing this anymore, because it doesn't make much sense to reindex *all*
+# courses after a single one has been created. Thus we should # rely on course authors to
+# press the "reindex" button in the studio after the course has # been imported.
 #./manage.py cms reindex_course --all --setup
 """
     yield ("cms", template)

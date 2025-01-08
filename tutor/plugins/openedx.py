@@ -155,8 +155,6 @@ def _mount_edx_platform_python_requirements_compose(
     for image_name, regex in hooks.Filters.MOUNTED_DIRECTORIES.iterate():
         if re.match(regex, folder_name):
             # Bind-mount requirement
-            # TODO this is a breaking change because we associate runtime bind-mounts to
-            # "openedx" and no longer to "lms", "cms", etc.
             volumes.append((image_name, f"/mnt/{folder_name}"))
     return volumes
 
