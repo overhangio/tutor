@@ -152,24 +152,13 @@ LOGGING["loggers"]["blockstore.apps.bundles.storage"] = {"handlers": ["console"]
 # These warnings are visible in simple commands and init tasks
 import warnings
 
-try:
-    from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
-    warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
-    warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
-except ImportError:
-    # REMOVE-AFTER-V18:
-    # In Quince, edx-platform uses Django 5. But on master, edx-platform still uses Django 3.
-    # So, Tutor v17 needs to silence these warnings, whereas Tutor v17-nightly fails to import them.
-    # Once edx-platform master is upgraded to Django 5, the try-except wrapper can be removed.
-    pass
-
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="wiki.plugins.links.wiki_plugin")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="boto.plugin")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="botocore.vendored.requests.packages.urllib3._collections")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resources")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="fs")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="fs.opener")
-SILENCED_SYSTEM_CHECKS = ["2_0.W001", "fields.W903"]
+# REMOVE-ME-AFTER-v20: check if we can remove these lines after upgrade.
+from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+# RemovedInDjango5xWarning: 'xxx' is deprecated. Use 'yyy' in 'zzz' instead.
+warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
+warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+# DeprecationWarning: 'imghdr' is deprecated and slated for removal in Python 3.13
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="pgpy.constants")
 
 # Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
