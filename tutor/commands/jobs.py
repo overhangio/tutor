@@ -375,8 +375,8 @@ def convert_mysql_utf8mb4_charset(
 
     if not config["RUN_MYSQL"]:
         fmt.echo_info(
-            f"You are not running MySQL (RUN_MYSQL=false). It is your "
-            f"responsibility to upgrade the charset and collation of your MySQL instance."
+            "You are not running MySQL (RUN_MYSQL=false). It is your "
+            "responsibility to upgrade the charset and collation of your MySQL instance."
         )
         return
 
