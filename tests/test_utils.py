@@ -1,6 +1,5 @@
 import base64
 import os
-import subprocess
 import tempfile
 import unittest
 from io import StringIO
