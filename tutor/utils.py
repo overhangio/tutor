@@ -11,7 +11,6 @@ import string
 import struct
 import subprocess
 import sys
-from functools import lru_cache
 from typing import List, Tuple
 from urllib.error import URLError
 from urllib.request import urlopen

@@ -34,7 +34,7 @@ test-format: ## Run code formatting tests
 	black --check --diff $(BLACK_OPTS)
 
 test-lint: ## Run code linting tests
-	pylint --errors-only --enable=unused-import,unused-argument --ignore=templates --ignore=docs/_ext ${SRC_DIRS}
+	pylint --disable=all --enable=E --enable=unused-import,unused-argument,f-string-without-interpolation --ignore=templates --ignore=docs/_ext ${SRC_DIRS}
 
 test-unit: ## Run unit tests
 	python -m unittest discover tests
