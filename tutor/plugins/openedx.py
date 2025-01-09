@@ -16,7 +16,7 @@ def _migrate_obsolete_nightly_root(root: str) -> None:
     Since Tutor switched from the "nightly" branch to the "main" branch, we
     automatically migrate data from the project root and the plugins root.
 
-    REMOVE-ME-AFTER-v20: migrate this code to the sumac upgrade commands.
+    REMOVE-AFTER-V20: migrate this code to the sumac upgrade commands.
     """
 
     # Run it for old nightly only
