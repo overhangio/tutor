@@ -152,7 +152,7 @@ LOGGING["loggers"]["blockstore.apps.bundles.storage"] = {"handlers": ["console"]
 # These warnings are visible in simple commands and init tasks
 import warnings
 
-# REMOVE-ME-AFTER-v20: check if we can remove these lines after upgrade.
+# REMOVE-AFTER-V20: check if we can remove these lines after upgrade.
 from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 # RemovedInDjango5xWarning: 'xxx' is deprecated. Use 'yyy' in 'zzz' instead.
 warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
