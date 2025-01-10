@@ -1,1 +1,0 @@
-- [Improvement] Silence "imghdr" warning in edx-platform. (by @regisb)

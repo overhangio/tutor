@@ -20,10 +20,17 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-19.0.1'></a>
+## v19.0.1 (2025-01-10)
+
+- [Bugfix] Add meilisearch as a dependency on lms-job to avoid meilisearch init job crashing when the platform is stopped. (by @Danyal-Faheem)
+- [Improvement] Silence "imghdr" warning in edx-platform. (by @regisb)
+- [Bugfix] Properly reload a plugin module on enable/disable/enable. This is an edge case that should not have affected anyone. (by @regisb)
+
 <a id='changelog-19.0.0'></a>
 ## v19.0.0 (2024-12-11)
 
-- 💥[Feature] Upgrade default charset and collation of mysql to utf8mb4 and utf8mb4_unicode_ci respectively (by @Danyal-Faheem)
+- 💥[Feature] Upgrade default charset and collation of mysql to utf8mb4 and `utf8mb4_unicode_ci` respectively (by @Danyal-Faheem)
     - Add do command to upgrade the charset and collation of tables in mysql.
     - The command will perform the following upgrades:
       - Upgrade all `utf8mb3` charset to `utf8mb4`

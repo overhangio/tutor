@@ -1,1 +1,0 @@
-- [Bugfix] Properly reload a plugin module on enable/disable/enable. This is an edge case that should not have affected anyone. (by @regisb)
