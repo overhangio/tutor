@@ -12,13 +12,15 @@ import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, fmt, hooks, plugins
+from tutor import env, fmt, hooks
 from tutor.commands.context import Context
 from tutor.commands.jobs_utils import (
-    get_mysql_change_authentication_plugin_query,
+    create_user_template,
     get_mysql_change_charset_query,
+    set_theme_template,
 )
 from tutor.hooks import priorities
+from tutor.types import get_typed
 
 
 class DoGroup(click.Group):
@@ -110,24 +112,6 @@ def createuser(
     Password can be passed as an option or will be set interactively.
     """
     yield ("lms", create_user_template(superuser, staff, name, email, password))
-
-
-def create_user_template(
-    superuser: str, staff: bool, username: str, email: str, password: str
-) -> str:
-    opts = ""
-    if superuser:
-        opts += " --superuser"
-    if staff:
-        opts += " --staff"
-    return f"""
-./manage.py lms manage_user {opts} {username} {email}
-./manage.py lms shell -c "
-from django.contrib.auth import get_user_model
-u = get_user_model().objects.get(username='{username}')
-u.set_password('{password}')
-u.save()"
-"""
 
 
 @click.command(help="Import the demo course")
@@ -276,43 +260,6 @@ def settheme(domains: list[str], theme_name: str) -> t.Iterable[tuple[str, str]]
     yield ("lms", set_theme_template(theme_name, domains))
 
 
-def set_theme_template(theme_name: str, domain_names: list[str]) -> str:
-    """
-    For each domain, get or create a Site object and assign the selected theme.
-    """
-    # Note that there are no double quotes " in this piece of code
-    python_command = """
-import sys
-from django.contrib.sites.models import Site
-def assign_theme(name, domain):
-    print('Assigning theme', name, 'to', domain)
-    if len(domain) > 50:
-            sys.stderr.write(
-                'Assigning a theme to a site with a long (> 50 characters) domain name.'
-                ' The displayed site name will be truncated to 50 characters.\\n'
-            )
-    site, _ = Site.objects.get_or_create(domain=domain)
-    if not site.name:
-        name_max_length = Site._meta.get_field('name').max_length
-        site.name = domain[:name_max_length]
-        site.save()
-    site.themes.all().delete()
-    if name != 'default':
-        site.themes.create(theme_dir_name=name)
-"""
-    domain_names = domain_names or [
-        "{{ LMS_HOST }}",
-        "{{ LMS_HOST }}:8000",
-        "{{ CMS_HOST }}",
-        "{{ CMS_HOST }}:8001",
-        "{{ PREVIEW_LMS_HOST }}",
-        "{{ PREVIEW_LMS_HOST }}:8000",
-    ]
-    for domain_name in domain_names:
-        python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
-    return f'./manage.py lms shell -c "{python_command}"'
-
-
 @click.command(context_settings={"ignore_unknown_options": True})
 @click.argument("args", nargs=-1)
 def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
@@ -432,18 +379,26 @@ def convert_mysql_utf8mb4_charset(
 
 
 @click.command(
-    short_help="Update the authentication plugin of mysql users to caching_sha2_password.",
+    short_help="Update the authentication plugin of a mysql user to caching_sha2_password.",
     help=(
-        "Update the authentication plugin of mysql users to caching_sha2_password from mysql_native_password. You can specify either specific users to update or all to update all users."
+        "Update the authentication plugin of a mysql user to caching_sha2_password from mysql_native_password. You can specify either specific users to update or all to update all users."
     ),
 )
-@click.argument(
-    "users",
-    nargs=-1,
+@click.option(
+    "-p",
+    "--password",
+    help="Specify password from the command line. If undefined, you will be prompted to input a password",
+    prompt=True,
+    hide_input=True,
 )
+@click.argument(
+    "user",
+    nargs=1,
+)
+@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_obj
 def update_mysql_authentication_plugin(
-    context: Context, users: tuple[str]
+    context: Context, user: str, password: str, non_interactive: bool
 ) -> t.Iterable[tuple[str, str]]:
     """
     Update the authentication plugin of MySQL users from mysql_native_password to caching_sha2_password
@@ -454,28 +409,39 @@ def update_mysql_authentication_plugin(
 
     if not config["RUN_MYSQL"]:
         fmt.echo_info(
-            f"You are not running MySQL (RUN_MYSQL=False). It is your "
-            f"responsibility to update the authentication plugin of mysql users."
+            "You are not running MySQL (RUN_MYSQL=False). It is your "
+            "responsibility to update the authentication plugin of mysql users."
         )
         return
 
-    if not users:
-        fmt.echo_error(
-            f"Please specify a list of users to update the authentication plugin of.\n"
-            f"Or, specify 'all' to update all database users."
-        )
-        return
+    conventional_password_key = f"{user.upper()}_MYSQL_PASSWORD"
 
-    update_all = "all" in users
-    users_to_update = list(plugins.iter_loaded()) if update_all else users
+    # Prompt for confirmation to move forward if password not present in config with the conventional format USER_MYSQL_PASSWORD
+    if not non_interactive and not conventional_password_key in config:
+        if not click.confirm(
+            fmt.question(
+                f"""Password for user {user} could not be verified. The entered password is: {password}
+Would you still like to continue with the upgrade process? Note: a wrong password would update the password for the user."""
+            )
+        ):
+            return
+    # Prompt for confirmation to move forward is password is present in config with the conventional format USER_MYSQL_PASSWORD
+    # but it is not the same as the value of that config variable
+    elif (
+        not non_interactive
+        and get_typed(config, conventional_password_key, str, "") != password
+    ):
+        if not click.confirm(
+            fmt.question(
+                f"""Password for user {user} is suspected to be wrong. The entered password is: {password} while the password suspected to be the correct one is {config[conventional_password_key]}
+Would you still like to continue with the upgrade process? Note: a wrong password would update the password for the user."""
+            )
+        ):
+            return
 
-    query = get_mysql_change_authentication_plugin_query(
-        config, users_to_update, update_all
-    )
+    host = "%"
 
-    # In case there is no user to update the authentication plugin of
-    if not query:
-        return
+    query = f"ALTER USER IF EXISTS '{user}'@'{host}' IDENTIFIED with caching_sha2_password BY '{password}';"
 
     mysql_command = (
         "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --database={{ OPENEDX_MYSQL_DATABASE }} --show-warnings "

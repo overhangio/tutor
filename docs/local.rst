@@ -177,17 +177,15 @@ As of MySQL v8.4.0, the ``mysql_native_password`` authentication plugin has been
 
 Tutor makes it easy do so with this handy command::
 
-    tutor local do update-mysql-authentication-plugin all
+    tutor local do update-mysql-authentication-plugin myuser
 
-The above command will update all the database users created by Tutor. If you only want to update the authentication plugin of specific users, you can use the ``--users`` option. This option takes comma seperated names of users to upgrade::
+The password will be required to be entered interactively. Optionally, the password can also be provided as part of the command::
 
-    tutor local do update-mysql-authentication-plugin discovery ecommerce
+    tutor local do update-mysql-authentication-plugin myuser --password=mypassword
 
-For this command, Tutor expects specific entries in the configuration for the mysql username and password of a database user. For example, if you are trying to update the user ``myuser``, the following case sensitive entries need to be present in the configuration::
+Tutor may prompt you with some warnings if the entered password is suspected to be wrong. To avoid these prompts, use the non-interactive option::
 
-    MYUSER_MYSQL_USERNAME
-    MYUSER_MYSQL_PASSWORD
-
+    tutor local do update-mysql-authentication-plugin myuser --password=mypassword --non-interactive
 Running arbitrary ``manage.py`` commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
