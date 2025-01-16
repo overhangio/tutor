@@ -1,7 +1,10 @@
-name: Auto Add Issues to Project
+name: Auto Add Issues and Pull Requests to Project
 
 on:
   issues:
+    types:
+      - opened
+  pull_request_target:
     types:
       - opened
 
