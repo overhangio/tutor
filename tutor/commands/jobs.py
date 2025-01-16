@@ -442,12 +442,17 @@ Would you still like to continue with the upgrade process? Note: a wrong passwor
 
     query = f"ALTER USER IF EXISTS '{user}'@'{host}' IDENTIFIED with caching_sha2_password BY '{password}';"
 
-    mysql_command = (
-        "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --database={{ OPENEDX_MYSQL_DATABASE }} --show-warnings "
-        + shlex.join(["-e", query])
-    )
-
-    yield ("lms", mysql_command)
+    yield ("lms", shlex.join([
+        "mysql",
+        "--user={{ MYSQL_ROOT_USERNAME }}",
+        "--password={{ MYSQL_ROOT_PASSWORD }}",
+        "--host={{ MYSQL_HOST }}",
+        "--port={{ MYSQL_PORT }}",
+        "--database={{ OPENEDX_MYSQL_DATABASE }}",
+        "--show-warnings",
+        "-e",
+        query,
+    ]))
 
 
 def add_job_commands(do_command_group: click.Group) -> None:
