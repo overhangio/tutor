@@ -393,7 +393,6 @@ def convert_mysql_utf8mb4_charset(
 )
 @click.argument(
     "user",
-    nargs=1,
 )
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_obj

@@ -1,18 +1,12 @@
-"""
-This module provides utility methods for tutor `do` commands
-
-Methods:
-- `create_user_template`: Generates the necessary commands to create a user in openedx.
-- `get_mysql_change_charset_query`: Generates MySQL queries to upgrade the charset and collation of columns, tables, and databases.
-- `set_theme_template`: Generates the necessary commands to set a theme on a specific domain in openedx.
-"""
-
 from __future__ import annotations
 
 
 def create_user_template(
     superuser: str, staff: bool, username: str, email: str, password: str
 ) -> str:
+    """
+    Helper utility to generate the necessary commands to create a user in openedx
+    """
     opts = ""
     if superuser:
         opts += " --superuser"
