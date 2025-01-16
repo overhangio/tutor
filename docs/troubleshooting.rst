@@ -222,4 +222,7 @@ The detailed steps are mentioned in `tutor-mfe <https://github.com/overhangio/tu
 
 This issue can occur when Tutor is upgraded from v15 (Olive) or earlier to v18 (Redwood) because the users created in Tutor v15 utilize the mysql_native_password authentication plugin by default. This plugin has been deprecated as of MySQL v8.4.0 which is the default MySQL server used in Tutor v18.
 
-The handy :ref:`update-mysql-authentication-plugin <update_mysql_authentication_plugin>` do command in tutor can be used to fix this issue.
+The handy :ref:`update-mysql-authentication-plugin <update_mysql_authentication_plugin>` do command in tutor can be used to fix this issue. To update the database users for a vanilla tutor installation::
+
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME) --password=$(tutor config printvalue OPENEDX_MYSQL_PASSWORD) --non-interactive
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME) --password=$(tutor config printvalue MYSQL_ROOT_PASSWORD) --non-interactive

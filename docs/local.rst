@@ -177,15 +177,16 @@ As of MySQL v8.4.0, the ``mysql_native_password`` authentication plugin has been
 
 Tutor makes it easy do so with this handy command::
 
-    tutor local do update-mysql-authentication-plugin myuser
+    tutor local do update-mysql-authentication-plugin USERNAME
 
-The password will be required to be entered interactively. Optionally, the password can also be provided as part of the command::
+The password will be required to be entered interactively. Optionally, the password can also be provided as part of the command. To update the openedx mysql user::
 
-    tutor local do update-mysql-authentication-plugin myuser --password=mypassword
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME) --password=$(tutor config printvalue OPENEDX_MYSQL_PASSWORD)
 
-Tutor may prompt you with some warnings if the entered password is suspected to be wrong. To avoid these prompts, use the non-interactive option::
+Tutor may prompt you with some warnings if the entered password is suspected to be wrong. To avoid these prompts, the non-interactive option should be used. To update the root mysql user non-interactively::
 
-    tutor local do update-mysql-authentication-plugin myuser --password=mypassword --non-interactive
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME) --password=$(tutor config printvalue MYSQL_ROOT_PASSWORD) --non-interactive
+
 Running arbitrary ``manage.py`` commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
