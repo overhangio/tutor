@@ -179,6 +179,9 @@ echo "INFO: Will import course data at: $course_root" && echo
 # Import into CMS
 python ./manage.py cms import ../data "$course_root"
 
+# Work around bug where outline is not generated
+python ./manage.py cms update_course_outline course-v1:OpenedX+DemoX+DemoCourse
+
 # Re-index courses
 # We are not doing this anymore, because it doesn't make much sense to reindex *all*
 # courses after a single one has been created. Thus we should # rely on course authors to
