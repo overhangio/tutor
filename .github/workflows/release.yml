@@ -41,15 +41,12 @@ jobs:
           python-version: 3.9
           cache: 'pip'
           cache-dependency-path: requirements/dev.txt
-      - name: Upgrade pip and setuptools
-        # https://pypi.org/project/pip/
-        # https://pypi.org/project/setuptools/
-        # https://pypi.org/project/wheel/
-        run: python -m pip install --upgrade pip setuptools==65.6.3 wheel
+      - name: Install Hatch
+        uses: pypa/hatch@install
       - name: Print info about the current python installation
         run: make ci-info
       - name: Install requirements
-        run: make bootstrap-dev-plugins
+        run: make bootstrap-dev
 
       ##### Run tests, generate bundle
       # - name: Run tests

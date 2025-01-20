@@ -51,7 +51,7 @@ Features
 
 .. _readme_intro_end:
 
-.. image:: ./docs/img/launch.webp
+.. image:: https://github.com/overhangio/tutor/raw/master/docs/img/launch.webp
     :alt: Tutor local launch
     :target: https://www.terminalizer.com/view/3a8d55835686
 
