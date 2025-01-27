@@ -20,7 +20,6 @@ from tutor.commands.jobs_utils import (
     set_theme_template,
 )
 from tutor.hooks import priorities
-from tutor.types import get_typed
 
 
 class DoGroup(click.Group):
@@ -387,17 +386,14 @@ def convert_mysql_utf8mb4_charset(
 @click.option(
     "-p",
     "--password",
-    help="Specify password from the command line. If undefined, you will be prompted to input a password",
-    prompt=True,
-    hide_input=True,
+    help="Specify password from the command line.",
 )
 @click.argument(
     "user",
 )
-@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_obj
 def update_mysql_authentication_plugin(
-    context: Context, user: str, password: str, non_interactive: bool
+    context: Context, user: str, password: str
 ) -> t.Iterable[tuple[str, str]]:
     """
     Update the authentication plugin of MySQL users from mysql_native_password to caching_sha2_password
@@ -413,30 +409,40 @@ def update_mysql_authentication_plugin(
         )
         return
 
-    conventional_password_key = f"{user.upper()}_MYSQL_PASSWORD"
+    # Official plugins that have their own mysql user
+    known_plugins_with_mysql_keys = [
+        "credentials",
+        "discovery",
+        "ecommerce",
+        "jupyter",
+        "notes",
+        "openedx",
+        "xqueue",
+    ]
 
-    # Prompt for confirmation to move forward if password not present in config with the conventional format USER_MYSQL_PASSWORD
-    if not non_interactive and not conventional_password_key in config:
-        if not click.confirm(
-            fmt.question(
-                f"""Password for user {user} could not be verified. The entered password is: {password}
-Would you still like to continue with the upgrade process? Note: a wrong password would update the password for the user."""
-            )
-        ):
-            return
-    # Prompt for confirmation to move forward is password is present in config with the conventional format USER_MYSQL_PASSWORD
-    # but it is not the same as the value of that config variable
-    elif (
-        not non_interactive
-        and get_typed(config, conventional_password_key, str, "") != password
-    ):
-        if not click.confirm(
-            fmt.question(
-                f"""Password for user {user} is suspected to be wrong. The entered password is: {password} while the password suspected to be the correct one is {config[conventional_password_key]}
-Would you still like to continue with the upgrade process? Note: a wrong password would update the password for the user."""
-            )
-        ):
-            return
+    # Create a list of the usernames and passwords
+    known_mysql_credentials_keys = [
+        (f"{plugin.upper()}_MYSQL_USERNAME", f"{plugin.upper()}_MYSQL_PASSWORD")
+        for plugin in known_plugins_with_mysql_keys
+    ]
+    # Add the root user as it is the only one that is different from the rest
+    known_mysql_credentials_keys.append(("MYSQL_ROOT_USERNAME", "MYSQL_ROOT_PASSWORD"))
+
+    known_mysql_credentials = {}
+    # Build the dictionary of known credentials
+    for k, v in known_mysql_credentials_keys:
+        if username := config.get(k):
+            known_mysql_credentials[username] = config[v]
+
+    if not password:
+        password = known_mysql_credentials.get(user)  # type: ignore
+
+    # Prompt the user if password was not found in config
+    if not password:
+        password = click.prompt(
+            f"Please enter the password for the user {user}",
+            type=str,
+        )
 
     host = "%"
 

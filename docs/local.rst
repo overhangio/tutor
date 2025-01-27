@@ -179,13 +179,15 @@ Tutor makes it easy do so with this handy command::
 
     tutor local do update-mysql-authentication-plugin USERNAME
 
-The password will be required to be entered interactively. Optionally, the password can also be provided as part of the command. To update the openedx mysql user::
+The password will not be required for official plugins that have database users as tutor can infer it from the config. If the password cannot be found by tutor, you will be prompted to enter the password interactively. Alternatively, the password can also be provided as an option::
 
-    tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME) --password=$(tutor config printvalue OPENEDX_MYSQL_PASSWORD)
+    tutor local do update-mysql-authentication-plugin USERNAME --password=PASSWORD
 
-Tutor may prompt you with some warnings if the entered password is suspected to be wrong. To avoid these prompts, the non-interactive option should be used. To update the root mysql user non-interactively::
+To update the database users for a vanilla tutor installation::
 
-    tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME) --password=$(tutor config printvalue MYSQL_ROOT_PASSWORD) --non-interactive
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME)
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME)
+
 
 Running arbitrary ``manage.py`` commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
