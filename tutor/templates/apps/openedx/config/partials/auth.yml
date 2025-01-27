@@ -2,7 +2,6 @@ SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}"
 AWS_ACCESS_KEY_ID: "{{ OPENEDX_AWS_ACCESS_KEY }}"
 AWS_SECRET_ACCESS_KEY: "{{ OPENEDX_AWS_SECRET_ACCESS_KEY }}"
 DOC_STORE_CONFIG: null
-{{ patch("openedx-auth") }}
 XQUEUE_INTERFACE:
   django_auth: null
   url: null
@@ -22,3 +21,4 @@ DATABASES:
       {%- endif %}
 EMAIL_HOST_USER: "{{ SMTP_USERNAME }}"
 EMAIL_HOST_PASSWORD: "{{ SMTP_PASSWORD }}"
+{{ patch("openedx-auth") }}
