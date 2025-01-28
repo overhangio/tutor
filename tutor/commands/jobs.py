@@ -410,26 +410,27 @@ def update_mysql_authentication_plugin(
         return
 
     # Official plugins that have their own mysql user
-    known_plugins_with_mysql_keys = [
+    known_mysql_users = [
+        # Plugin users
         "credentials",
         "discovery",
-        "ecommerce",
         "jupyter",
         "notes",
-        "openedx",
         "xqueue",
+        # Core user
+        "openedx",
     ]
 
-    # Create a list of the usernames and passwords
+    # Create a list of the usernames and password config variables/keys
     known_mysql_credentials_keys = [
         (f"{plugin.upper()}_MYSQL_USERNAME", f"{plugin.upper()}_MYSQL_PASSWORD")
-        for plugin in known_plugins_with_mysql_keys
+        for plugin in known_mysql_users
     ]
     # Add the root user as it is the only one that is different from the rest
     known_mysql_credentials_keys.append(("MYSQL_ROOT_USERNAME", "MYSQL_ROOT_PASSWORD"))
 
     known_mysql_credentials = {}
-    # Build the dictionary of known credentials
+    # Build the dictionary of known credentials from config
     for k, v in known_mysql_credentials_keys:
         if username := config.get(k):
             known_mysql_credentials[username] = config[v]
