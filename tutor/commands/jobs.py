@@ -380,7 +380,7 @@ def convert_mysql_utf8mb4_charset(
 @click.command(
     short_help="Update the authentication plugin of a mysql user to caching_sha2_password.",
     help=(
-        "Update the authentication plugin of a mysql user to caching_sha2_password from mysql_native_password. You can specify either specific users to update or all to update all users."
+        "Update the authentication plugin of a mysql user to caching_sha2_password from mysql_native_password."
     ),
 )
 @click.option(
