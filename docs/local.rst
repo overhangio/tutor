@@ -168,6 +168,29 @@ By default, only the tables in the openedx database are changed. For upgrading t
 
     tutor local do convert-mysql-utf8mb4-charset --database=discovery
 
+.. _update_mysql_authentication_plugin:
+
+Updating the authentication plugin of MySQL users
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As of MySQL v8.4.0, the ``mysql_native_password`` authentication plugin has been deprecated. Users created with this authentication plugin should ideally be updated to use the latest ``caching_sha2_password`` authentication plugin.
+
+Tutor makes it easy do so with this handy command::
+
+    tutor local do update-mysql-authentication-plugin USERNAME
+
+The password will not be required for official plugins that have database users as tutor can infer it from the config. If the password cannot be found by tutor, you will be prompted to enter the password interactively. Alternatively, the password can also be provided as an option::
+
+    tutor local do update-mysql-authentication-plugin USERNAME --password=PASSWORD
+
+.. warning:: Since we are generating a new password hash, whatever password is entered here will be considered as the new password for the user. Please make similar changes to any connection strings to avoid database connection issues.
+
+To update the database users for a vanilla tutor installation::
+
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME)
+    tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME)
+
+
 Running arbitrary ``manage.py`` commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

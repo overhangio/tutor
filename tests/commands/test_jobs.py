@@ -165,3 +165,47 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIn("NOT", dc_args[-1])
             self.assertIn("course", dc_args[-1])
             self.assertIn("auth", dc_args[-1])
+
+    def test_update_mysql_authentication_plugin_official_plugin(self) -> None:
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            with patch("tutor.utils.docker_compose") as mock_docker_compose:
+                result = self.invoke_in_root(
+                    root,
+                    [
+                        "local",
+                        "do",
+                        "update-mysql-authentication-plugin",
+                        "openedx",
+                    ],
+                )
+                dc_args, _dc_kwargs = mock_docker_compose.call_args
+
+            self.assertIsNone(result.exception)
+            self.assertEqual(0, result.exit_code)
+            self.assertIn("lms-job", dc_args)
+            self.assertIn("caching_sha2_password", dc_args[-1])
+            self.assertIn("openedx", dc_args[-1])
+
+    def test_update_mysql_authentication_plugin_custom_plugin(self) -> None:
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            with patch("tutor.utils.docker_compose") as mock_docker_compose:
+                result = self.invoke_in_root(
+                    root,
+                    [
+                        "local",
+                        "do",
+                        "update-mysql-authentication-plugin",
+                        "mypluginuser",
+                        "--password=mypluginpassword",
+                    ],
+                )
+                dc_args, _dc_kwargs = mock_docker_compose.call_args
+
+            self.assertIsNone(result.exception)
+            self.assertEqual(0, result.exit_code)
+            self.assertIn("lms-job", dc_args)
+            self.assertIn("caching_sha2_password", dc_args[-1])
+            self.assertIn("mypluginuser", dc_args[-1])
+            self.assertIn("mypluginpassword", dc_args[-1])
