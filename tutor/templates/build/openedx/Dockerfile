@@ -112,10 +112,10 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     UWSGI_PROFILE_OVERRIDE="xml=no" \
     pip install --no-cache-dir --compile uwsgi==2.0.24
 
-{{ patch("openedx-dockerfile-post-python-requirements") }}
-
 # Install scorm xblock
 RUN pip install "openedx-scorm-xblock>=19.0.0,<20.0.0"
+
+{{ patch("openedx-dockerfile-post-python-requirements") }}
 
 {% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
