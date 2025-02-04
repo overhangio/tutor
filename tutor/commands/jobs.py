@@ -386,7 +386,7 @@ def convert_mysql_utf8mb4_charset(
 @click.option(
     "-p",
     "--password",
-    help="Specify password from the command line.",
+    help="Specify password from the command line. Updates the password for the user if a password that is different from the current one is specified.",
 )
 @click.argument(
     "user",
@@ -441,7 +441,7 @@ def update_mysql_authentication_plugin(
     # Prompt the user if password was not found in config
     if not password:
         password = click.prompt(
-            f"Please enter the password for the user {user}",
+            f"Please enter the password for the user {user}. Note that entering a different password here than the current one will update the password for user {user}.",
             type=str,
         )
 

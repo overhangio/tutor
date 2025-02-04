@@ -183,6 +183,8 @@ The password will not be required for official plugins that have database users 
 
     tutor local do update-mysql-authentication-plugin USERNAME --password=PASSWORD
 
+.. warning:: Since we are generating a new password hash, whatever password is entered here will be considered as the new password for the user. Please make similar changes to any connection strings to avoid database connection issues.
+
 To update the database users for a vanilla tutor installation::
 
     tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME)
