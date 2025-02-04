@@ -14,7 +14,11 @@ from typing_extensions import ParamSpec
 from tutor import config as tutor_config
 from tutor import env, fmt, hooks
 from tutor.commands.context import Context
-from tutor.commands.jobs_utils import get_mysql_change_charset_query
+from tutor.commands.jobs_utils import (
+    create_user_template,
+    get_mysql_change_charset_query,
+    set_theme_template,
+)
 from tutor.hooks import priorities
 
 
@@ -107,24 +111,6 @@ def createuser(
     Password can be passed as an option or will be set interactively.
     """
     yield ("lms", create_user_template(superuser, staff, name, email, password))
-
-
-def create_user_template(
-    superuser: str, staff: bool, username: str, email: str, password: str
-) -> str:
-    opts = ""
-    if superuser:
-        opts += " --superuser"
-    if staff:
-        opts += " --staff"
-    return f"""
-./manage.py lms manage_user {opts} {username} {email}
-./manage.py lms shell -c "
-from django.contrib.auth import get_user_model
-u = get_user_model().objects.get(username='{username}')
-u.set_password('{password}')
-u.save()"
-"""
 
 
 @click.command(help="Import the demo course")
@@ -273,43 +259,6 @@ def settheme(domains: list[str], theme_name: str) -> t.Iterable[tuple[str, str]]
     yield ("lms", set_theme_template(theme_name, domains))
 
 
-def set_theme_template(theme_name: str, domain_names: list[str]) -> str:
-    """
-    For each domain, get or create a Site object and assign the selected theme.
-    """
-    # Note that there are no double quotes " in this piece of code
-    python_command = """
-import sys
-from django.contrib.sites.models import Site
-def assign_theme(name, domain):
-    print('Assigning theme', name, 'to', domain)
-    if len(domain) > 50:
-            sys.stderr.write(
-                'Assigning a theme to a site with a long (> 50 characters) domain name.'
-                ' The displayed site name will be truncated to 50 characters.\\n'
-            )
-    site, _ = Site.objects.get_or_create(domain=domain)
-    if not site.name:
-        name_max_length = Site._meta.get_field('name').max_length
-        site.name = domain[:name_max_length]
-        site.save()
-    site.themes.all().delete()
-    if name != 'default':
-        site.themes.create(theme_dir_name=name)
-"""
-    domain_names = domain_names or [
-        "{{ LMS_HOST }}",
-        "{{ LMS_HOST }}:8000",
-        "{{ CMS_HOST }}",
-        "{{ CMS_HOST }}:8001",
-        "{{ PREVIEW_LMS_HOST }}",
-        "{{ PREVIEW_LMS_HOST }}:8000",
-    ]
-    for domain_name in domain_names:
-        python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
-    return f'./manage.py lms shell -c "{python_command}"'
-
-
 @click.command(context_settings={"ignore_unknown_options": True})
 @click.argument("args", nargs=-1)
 def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
@@ -428,6 +377,96 @@ def convert_mysql_utf8mb4_charset(
     fmt.echo_info("MySQL charset and collation successfully upgraded")
 
 
+@click.command(
+    short_help="Update the authentication plugin of a mysql user to caching_sha2_password.",
+    help=(
+        "Update the authentication plugin of a mysql user to caching_sha2_password from mysql_native_password."
+    ),
+)
+@click.option(
+    "-p",
+    "--password",
+    help="Specify password from the command line. Updates the password for the user if a password that is different from the current one is specified.",
+)
+@click.argument(
+    "user",
+)
+@click.pass_obj
+def update_mysql_authentication_plugin(
+    context: Context, user: str, password: str
+) -> t.Iterable[tuple[str, str]]:
+    """
+    Update the authentication plugin of MySQL users from mysql_native_password to caching_sha2_password
+    Handy command utilized when upgrading to v8.4 of MySQL which deprecates mysql_native_password
+    """
+
+    config = tutor_config.load(context.root)
+
+    if not config["RUN_MYSQL"]:
+        fmt.echo_info(
+            "You are not running MySQL (RUN_MYSQL=False). It is your "
+            "responsibility to update the authentication plugin of mysql users."
+        )
+        return
+
+    # Official plugins that have their own mysql user
+    known_mysql_users = [
+        # Plugin users
+        "credentials",
+        "discovery",
+        "jupyter",
+        "notes",
+        "xqueue",
+        # Core user
+        "openedx",
+    ]
+
+    # Create a list of the usernames and password config variables/keys
+    known_mysql_credentials_keys = [
+        (f"{plugin.upper()}_MYSQL_USERNAME", f"{plugin.upper()}_MYSQL_PASSWORD")
+        for plugin in known_mysql_users
+    ]
+    # Add the root user as it is the only one that is different from the rest
+    known_mysql_credentials_keys.append(("MYSQL_ROOT_USERNAME", "MYSQL_ROOT_PASSWORD"))
+
+    known_mysql_credentials = {}
+    # Build the dictionary of known credentials from config
+    for k, v in known_mysql_credentials_keys:
+        if username := config.get(k):
+            known_mysql_credentials[username] = config[v]
+
+    if not password:
+        password = known_mysql_credentials.get(user)  # type: ignore
+
+    # Prompt the user if password was not found in config
+    if not password:
+        password = click.prompt(
+            f"Please enter the password for the user {user}. Note that entering a different password here than the current one will update the password for user {user}.",
+            type=str,
+        )
+
+    host = "%"
+
+    query = f"ALTER USER IF EXISTS '{user}'@'{host}' IDENTIFIED with caching_sha2_password BY '{password}';"
+
+    yield (
+        "lms",
+        shlex.join(
+            [
+                "mysql",
+                "--user={{ MYSQL_ROOT_USERNAME }}",
+                "--password={{ MYSQL_ROOT_PASSWORD }}",
+                "--host={{ MYSQL_HOST }}",
+                "--port={{ MYSQL_PORT }}",
+                "--database={{ OPENEDX_MYSQL_DATABASE }}",
+                "--show-warnings",
+                "-e",
+                query,
+            ]
+        ),
+    )
+
+
 def add_job_commands(do_command_group: click.Group) -> None:
     """
     This is meant to be called with the `local/dev/k8s do` group commands, to add the
@@ -511,5 +550,6 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         print_edx_platform_setting,
         settheme,
         sqlshell,
+        update_mysql_authentication_plugin,
     ]
 )
