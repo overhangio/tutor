@@ -237,10 +237,14 @@ Meilisearch
 - ``MEILISEARCH_MASTER_KEY`` (default: ``"{{ 24|random_string }}"``)
 - ``MEILISEARCH_API_KEY_UID`` (default: ``"{{ 4|uuid }}"``): UID used to sign the API key.
 - ``MEILISEARCH_API_KEY`` (default: ``"{{ MEILISEARCH_MASTER_KEY|uid_master_hash(MEILISEARCH_API_KEY_UID) }}"``)
+- ``MEILISEARCH_STORAGE_SIZE`` (default: ``"5Gi"``): amount of persistent storage allocated.
 
 To reset the Meilisearch API key, make sure to unset both the API key and it's UID:
 
     tutor config save --unset MEILISEARCH_API_KEY_UID MEILISEARCH_API_KEY
+
+.. note::
+    Tutor does not support changing the storage size after it has been deployed. You'll have to manually resize the `pvc/meilisearch` using `kubectl`. Also note that it's not possible to reduce a `PVC` size, it must be deleted and recreated in such cases.
 
 MongoDB
 *******

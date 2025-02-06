@@ -28,7 +28,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: {{ MEILISEARCH_STORAGE_SIZE }}
 {% endif %}
 {% if RUN_MONGODB %}
 ---
