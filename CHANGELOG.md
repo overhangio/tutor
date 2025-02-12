@@ -20,6 +20,17 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-19.0.2'></a>
+## v19.0.2 (2025-02-12)
+
+- [Improvement] Add a do command to update the authentication plugin of existing MySQL users from mysql_native_password to caching_sha2_password for compatibility with MySQL v8.4.0 and above. (by @Danyal-Faheem)
+
+- [Improvement] Move the openedx-auth patch to the bottom of the auth.yml file to allow patching DATABASES, EMAIL and XQUEUE options. (by @Danyal-Faheem)
+
+- [Improvement] Allow installing custom openedx-scorm-xblock using the openedx-dockerfile-post-python-requirements patch. (by @Danyal-Faheem)
+
+- [Feature] Update OPENEDX_COMMON_VERSION to sumac.2 tag (by @dawoudsheraz)
+
 <a id='changelog-19.0.1'></a>
 ## v19.0.1 (2025-01-10)
 
