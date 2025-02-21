@@ -3,9 +3,9 @@
 
 [project]
 name = "tutor"
-license = {file = "LICENSE.txt"}
+license = {text = "AGPL-3.0-only"}
 authors = [
-  {name = "Edly", email = "hello@edly.io"},
+  {name = "Edly"}, { email = "hello@edly.io"}
 ]
 description = "The Docker-based Open edX distribution designed for peace of mind"
 readme = {file = "README.rst", content-type = "text/x-rst"}
@@ -52,6 +52,7 @@ include = [
   "requirements/base.in",
   "requirements/plugins.txt",
   "requirements/dev.txt",
+  "LICENSE.txt"
 ]
 exclude = ["tests*"]
 
