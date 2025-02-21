@@ -44,7 +44,7 @@ def _migrate_obsolete_nightly_root(root: str) -> None:
 
 @hooks.Filters.CONFIG_DEFAULTS.add()
 def _set_openedx_common_version_in_main(
-    items: list[tuple[str, t.Any]]
+    items: list[tuple[str, t.Any]],
 ) -> list[tuple[str, t.Any]]:
     if __version_suffix__ == "main":
         items.append(("OPENEDX_COMMON_VERSION", "master"))
@@ -118,7 +118,7 @@ hooks.Filters.MOUNTED_DIRECTORIES.add_items(
 
 @hooks.Filters.MOUNTED_DIRECTORIES.add(priority=hooks.priorities.LOW)
 def _add_openedx_dev_mounted_python_packages(
-    image_regex: list[tuple[str, str]]
+    image_regex: list[tuple[str, str]],
 ) -> list[tuple[str, str]]:
     """
     Automatically add python packages to "openedx-dev" if they are already in the
