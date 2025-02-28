@@ -8,22 +8,22 @@ alabaster==0.7.16
     # via sphinx
 appdirs==1.4.4
     # via -r requirements/base.txt
-babel==2.16.0
+babel==2.17.0
     # via sphinx
-cachetools==5.5.0
+cachetools==5.5.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2024.8.30
+certifi==2025.1.31
     # via
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
     # via
     #   -r requirements/base.txt
     #   requests
-click==8.1.7
+click==8.1.8
     # via
     #   -r requirements/base.txt
     #   sphinx-click
@@ -36,7 +36,7 @@ durationpy==0.9
     # via
     #   -r requirements/base.txt
     #   kubernetes
-google-auth==2.36.0
+google-auth==2.38.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -46,23 +46,23 @@ idna==3.10
     #   requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.5.0
+importlib-metadata==8.6.1
     # via
     #   -r requirements/base.txt
     #   sphinx
-importlib-resources==6.4.5
+importlib-resources==6.5.2
     # via -r requirements/base.txt
-jinja2==3.1.4
+jinja2==3.1.5
     # via
     #   -r requirements/base.txt
     #   sphinx
-kubernetes==31.0.0
+kubernetes==32.0.1
     # via -r requirements/base.txt
 markupsafe==3.0.2
     # via
     #   -r requirements/base.txt
     #   jinja2
-mypy==1.13.0
+mypy==1.15.0
     # via -r requirements/base.txt
 mypy-extensions==1.0.0
     # via
@@ -88,7 +88,7 @@ pyasn1-modules==0.4.1
     #   google-auth
 pycryptodome==3.21.0
     # via -r requirements/base.txt
-pygments==2.18.0
+pygments==2.19.1
     # via sphinx
 python-dateutil==2.9.0.post0
     # via
@@ -112,7 +112,7 @@ rsa==4.9
     # via
     #   -r requirements/base.txt
     #   google-auth
-six==1.16.0
+six==1.17.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -143,7 +143,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-tomli==2.1.0
+tomli==2.2.1
     # via
     #   -r requirements/base.txt
     #   mypy
@@ -152,7 +152,7 @@ typing-extensions==4.12.2
     # via
     #   -r requirements/base.txt
     #   mypy
-urllib3==2.2.3
+urllib3==2.3.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
