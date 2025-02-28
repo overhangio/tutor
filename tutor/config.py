@@ -149,7 +149,7 @@ def get_defaults() -> Config:
 
 @hooks.Filters.CONFIG_DEFAULTS.add(priority=hooks.priorities.HIGH)
 def _load_config_defaults_yml(
-    items: list[tuple[str, t.Any]]
+    items: list[tuple[str, t.Any]],
 ) -> list[tuple[str, t.Any]]:
     defaults = get_template("defaults.yml")
     items += list(defaults.items())

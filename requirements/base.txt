@@ -6,33 +6,33 @@
 #
 appdirs==1.4.4
     # via -r requirements/base.in
-cachetools==5.5.0
+cachetools==5.5.2
     # via google-auth
-certifi==2024.8.30
+certifi==2025.1.31
     # via
     #   kubernetes
     #   requests
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
     # via requests
-click==8.1.7
+click==8.1.8
     # via -r requirements/base.in
 durationpy==0.9
     # via kubernetes
-google-auth==2.36.0
+google-auth==2.38.0
     # via kubernetes
 idna==3.10
     # via requests
-importlib-metadata==8.5.0
+importlib-metadata==8.6.1
     # via -r requirements/base.in
-importlib-resources==6.4.5
+importlib-resources==6.5.2
     # via -r requirements/base.in
-jinja2==3.1.4
+jinja2==3.1.5
     # via -r requirements/base.in
-kubernetes==31.0.0
+kubernetes==32.0.1
     # via -r requirements/base.in
 markupsafe==3.0.2
     # via jinja2
-mypy==1.13.0
+mypy==1.15.0
     # via -r requirements/base.in
 mypy-extensions==1.0.0
     # via mypy
@@ -64,17 +64,17 @@ requests-oauthlib==2.0.0
     # via kubernetes
 rsa==4.9
     # via google-auth
-six==1.16.0
+six==1.17.0
     # via
     #   kubernetes
     #   python-dateutil
-tomli==2.1.0
+tomli==2.2.1
     # via mypy
 typing-extensions==4.12.2
     # via
     #   -r requirements/base.in
     #   mypy
-urllib3==2.2.3
+urllib3==2.3.0
     # via
     #   kubernetes
     #   requests
