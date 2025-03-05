@@ -16,7 +16,7 @@ Working on the "edx-platform" repository
 
 Download the code from the upstream repository::
 
-    cd /my/workspace/edx-plaform
+    cd /my/workspace/edx-platform
     git clone https://github.com/openedx/edx-platform .
 
 Check out the right version of the upstream repository. If you are working on the `current "zebulon" release <https://docs.openedx.org/en/latest/community/release_notes/index.html>`__ of Open edX, then you should checkout the corresponding branch::
@@ -31,7 +31,7 @@ On the other hand, if you are using :ref:`Tutor Main <main>`, then you should ch
 
 Then, mount the edx-platform repository with Tutor::
 
-    tutor mounts add /my/workspace/edx-plaform
+    tutor mounts add /my/workspace/edx-platform
 
 This command does a few "magical" things 🧙 behind the scenes:
 
