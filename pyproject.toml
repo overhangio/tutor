@@ -52,7 +52,8 @@ include = [
   "requirements/base.in",
   "requirements/plugins.txt",
   "requirements/dev.txt",
-  "LICENSE.txt"
+  "LICENSE.txt",
+  ".hatch_build.py",
 ]
 exclude = ["tests*"]
 
