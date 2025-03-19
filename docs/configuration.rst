@@ -407,6 +407,14 @@ If you are not running Open edX in English (``LANGUAGE_CODE`` default: ``"en"``)
 With ``atlas``, it's possible to add custom translations by either `contributing to the Translations project in Transifex <https://docs.openedx.org/en/latest/translators/index.html>`_ or forking the `openedx-translations repository <https://github.com/openedx/openedx-translations>`_
 and making custom changes as explained in `the repository docs <https://github.com/openedx/openedx-translations#readme>`_.
 
+Once you've applied your changes, you'll need to do the following:
+
+#. Add the .po/.json translation files to the correct locations
+
+#. Run the command ``tutor images build mfe``
+
+#. Restart with ``tutor local restart``
+
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
