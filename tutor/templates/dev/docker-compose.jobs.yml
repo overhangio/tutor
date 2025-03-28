@@ -19,8 +19,13 @@ services:
 
   lms-job:
     <<: *openedx-job-service
+    environment:
+      DJANGO_SETTINGS_MODULE: lms.envs.tutor.development
+
 
   cms-job:
     <<: *openedx-job-service
+    environment:
+      DJANGO_SETTINGS_MODULE: cms.envs.tutor.development
 
   {{ patch("dev-docker-compose-jobs-services")|indent(2) }}
