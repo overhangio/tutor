@@ -221,7 +221,7 @@ class Filters:
     #: (lms, lms-worker, cms, cms-worker, lms-job, cms-job) at the
     #: /openedx/edx-platform location. Plugin developers may implement this filter to
     #: define custom behaviour when mounting folders that relate to their plugins. For
-    #: instance, the ecommerce plugin may process the ``/path/to/ecommerce`` value.
+    #: instance, the credentials plugin may process the ``/path/to/credentials`` value.
     #:
     #: To also bind-mount these folder at build time, implement also the
     #: :py:data:`IMAGES_BUILD_MOUNTS` filter.
