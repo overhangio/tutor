@@ -49,7 +49,7 @@ We'll start by modifying some of our Open edX settings files. It's a frequent re
 
 If you have not already read :ref:`how_does_tutor_work` now would be a good time ☺️ Tutor uses templates to generate various files, such as settings, Dockerfiles, etc. These templates include ``{{ patch("patch-name") }}`` statements that allow plugins to insert arbitrary content in there. These patches are located at strategic locations. See :ref:`patches` for more information.
 
-Let's say that we would like to limit access to our brand new Open edX platform. It is not ready for prime-time yet, so we want to prevent users from registering new accounts. There is a feature flag for that in the LMS: `FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] <https://edx.readthedocs.io/projects/edx-platform-technical/en/latest/featuretoggles.html#featuretoggle-FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION']>`__. By default this flag is set to a true value, enabling anyone to create an account. In the following we'll set it to false.
+Let's say that we would like to limit access to our brand new Open edX platform. It is not ready for prime-time yet, so we want to prevent users from registering new accounts. There is a feature flag for that in the LMS: `FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] <https://docs.openedx.org/projects/edx-platform/en/latest/references/featuretoggles.html#featuretoggle-FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION']>`__. By default this flag is set to a true value, enabling anyone to create an account. In the following we'll set it to false.
 
 Add the following content to the ``myplugin.py`` file that you created earlier::
 

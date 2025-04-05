@@ -93,7 +93,7 @@ In addition, all LMS and CMS logs are persisted to disk by default in the follow
     $(tutor config printroot)/data/lms/logs/all.log
     $(tutor config printroot)/data/cms/logs/all.log
 
-Finally, tracking logs that store `user events <https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/index.html>`_ are persisted in the following files::
+Finally, tracking logs that store `user events <https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index.html>`_ are persisted in the following files::
 
     $(tutor config printroot)/data/lms/logs/tracking.log
     $(tutor config printroot)/data/cms/logs/tracking.log

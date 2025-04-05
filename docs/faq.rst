@@ -6,7 +6,7 @@ FAQ
 What is Tutor?
 --------------
 
-Tutor is an open source distribution of the `Open edX platform <https://open.edx.org>`_. It uses the original code from the various Open edX repositories, such as `edx-platform <https://github.com/openedx/edx-platform/>`_, `cs_comments_service <https://github.com/openedx/cs_comments_service>`_, etc. and packages everything in a way that makes it very easy to install, administer and upgrade an Open edX installation. In particular, all services are run inside Docker containers.
+Tutor is an open source distribution of the `Open edX platform <https://open.edx.org>`_. It uses the original code from the various Open edX repositories, such as `edx-platform <https://github.com/openedx/edx-platform/>`_, `frontend-app-learning <https://github.com/openedx/frontend-app-learning>`_, etc. and packages everything in a way that makes it very easy to install, administer and upgrade an Open edX installation. In particular, all services are run inside Docker containers.
 
 Tutor makes it possible to deploy an Open edX instance locally, with `docker-compose <https://docs.docker.com/compose/overview/>`_ or on an existing `Kubernetes cluster <http://kubernetes.io/>`_. Want to learn more? Take a look at the :ref:`getting started concepts <intro>`.
 
@@ -25,7 +25,7 @@ The `devstack <https://github.com/openedx/devstack>`_ was a tool meant only for 
 Is Tutor officially supported by the Open edX project?
 ------------------------------------------------------
 
-As of the Open edX Maple release (December 9th 2021), Tutor is the only community-supported installation method for the Open edX platform: see the `official installation instructions <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/open-release-quince.master/installation/index.html>`__.
+As of the Open edX Maple release (December 9th 2021), Tutor is the only community-supported installation method for the Open edX platform: see the `official installation instructions <https://docs.tutor.edly.io/>`__.
 
 What features are missing from Tutor?
 -------------------------------------
