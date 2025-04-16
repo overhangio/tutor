@@ -2,6 +2,7 @@
 tutor-android@git+https://github.com/overhangio/tutor-android@main
 tutor-cairn@git+https://github.com/overhangio/tutor-cairn@main
 tutor-credentials@git+https://github.com/overhangio/tutor-credentials@main
+tutor-deck@git+https://github.com/overhangio/tutor-deck@main
 tutor-discovery@git+https://github.com/overhangio/tutor-discovery@main
 tutor-forum@git+https://github.com/overhangio/tutor-forum@main
 tutor-indigo@git+https://github.com/overhangio/tutor-indigo@main
