@@ -2,6 +2,7 @@
 tutor-android>=19.0.0,<20.0.0
 tutor-cairn>=19.0.0,<20.0.0
 tutor-credentials>=19.0.0,<20.0.0
+tutor-deck>=19.0.0,<20.0.0
 tutor-discovery>=19.0.0,<20.0.0
 tutor-ecommerce>=19.0.0,<20.0.0
 tutor-forum>=19.0.0,<20.0.0
