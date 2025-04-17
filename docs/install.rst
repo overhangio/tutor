@@ -45,7 +45,7 @@ Check the "tutor" package on Pypi: https://pypi.org/project/tutor. You will need
 
 
 Virtual Environment (Recommended)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To prevent conflicts with other Python packages and maintain a clean environment, it's recommended that Tutor should be installed within a Python virtual environment. This is especially important on fresh or shared systems where installing packages globally may require elevated privileges and can interfere with system-level Python dependencies:
 
@@ -55,7 +55,6 @@ To prevent conflicts with other Python packages and maintain a clean environment
    source env/bin/activate
 
 For more details on virtual environments, refer to the official `Python documentation <https://docs.python.org/3/library/venv.html>`_.
-
 
 Binary release
 ~~~~~~~~~~~~~~
