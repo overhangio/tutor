@@ -11,10 +11,10 @@ import string
 import struct
 import subprocess
 import sys
+import uuid as uuid_module
 from typing import List, Tuple
 from urllib.error import URLError
 from urllib.request import urlopen
-import uuid as uuid_module
 
 import click
 from Crypto.Protocol.KDF import bcrypt, bcrypt_check
@@ -244,6 +244,18 @@ def check_output(*command: str) -> bytes:
         return subprocess.check_output(command)
     except Exception as e:
         raise exceptions.TutorError(f"Command failed: {literal_command}") from e
+
+
+def get_compose_stacks() -> list[str]:
+    """
+    Returns a list of names of all running docker compose projects
+    """
+    return [
+        entry["Name"]
+        for entry in json.loads(
+            check_output("docker", "compose", "ls", "--format", "json").decode("utf-8")
+        )
+    ]
 
 
 def warn_macos_docker_memory() -> None:

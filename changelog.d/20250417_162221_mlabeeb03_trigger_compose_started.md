@@ -1,0 +1,1 @@
+- [Improvement] Stop `dev` platform on `local run` commands. Trigger `COMPOSE_PROJECT_STARTED` only once per tutor runtime. (by @mlabeeb03)

@@ -23,6 +23,8 @@ from tutor.types import Config
 
 
 class ComposeTaskRunner(BaseComposeTaskRunner):
+    HOOK_FIRED: bool = False
+
     def __init__(self, root: str, config: Config):
         super().__init__(root, config)
         self.project_name = ""
@@ -33,9 +35,12 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
         """
         Run docker-compose with the right yml files.
         """
-        if "start" in command or "up" in command or "restart" in command:
-            # Note that we don't trigger the action on "run". That's because we
-            # don't want to trigger the action for every initialization script.
+        # Trigger the action just once per runtime
+        start_commands = ("start", "up", "restart", "run")
+        if not ComposeTaskRunner.HOOK_FIRED and any(
+            [cmd in command for cmd in start_commands]
+        ):
+            ComposeTaskRunner.HOOK_FIRED = True
             hooks.Actions.COMPOSE_PROJECT_STARTED.do(
                 self.root, self.config, self.project_name
             )
