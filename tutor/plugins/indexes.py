@@ -21,6 +21,13 @@ class Indexes:
     CACHE_PATH = ""
 
 
+class CacheNotFound(TutorError):
+    def __init__(self) -> None:
+        super().__init__(
+            f"Local index cache could not be found in {Indexes.CACHE_PATH}. Run `tutor plugins update`."
+        )
+
+
 @hooks.Actions.PROJECT_ROOT_READY.add()
 def _set_indexes_cache_path(root: str) -> None:
     Indexes.CACHE_PATH = env.pathjoin(root, "plugins", "index", "cache.yml")
@@ -233,12 +240,11 @@ def save_cache(plugins: list[dict[str, str]]) -> str:
     return Indexes.CACHE_PATH
 
 
+@hooks.lru_cache
 def load_cache() -> list[dict[str, str]]:
     try:
         with open(Indexes.CACHE_PATH, encoding="utf8") as cache_if:
             plugins = serialize.load(cache_if)
     except FileNotFoundError as e:
-        raise TutorError(
-            f"Local index cache could not be found in {Indexes.CACHE_PATH}. Run `tutor plugins update`."
-        ) from e
+        raise CacheNotFound() from e
     return validate_index(plugins)
