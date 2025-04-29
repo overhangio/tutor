@@ -36,14 +36,9 @@ The full plugins CLI is described in the :ref:`reference documentation <cli_plug
 Existing plugins
 ================
 
-Many plugins are available from plugin indexes. These indexes are lists of plugins, similar to the `pypi <https://pypi.org>`__ or `npm <npmjs.com/>`__ indexes. By default, Tutor comes with the "main" plugin index. You can check available plugins from this index by running::
+Many plugins are available from plugin indexes. These indexes are lists of plugins, similar to the `pypi <https://pypi.org>`__ or `npm <npmjs.com/>`__ indexes. By default, Tutor comes with the "main" and "contrib" plugin indexes. You can check available plugins from this index by running::
 
     tutor plugins update
-    tutor plugins search
-
-More plugins can be downloaded from the "contrib" index::
-
-    tutor plugins index add contrib
     tutor plugins search
 
 The "main" and "contrib" indexes include a curated list of plugins that are well maintained and introduce useful features to Open edX. These indexes are maintained by `Edly <https://edly.io>`__. For more information about these indexes, refer to the official `overhangio/tpi <https://github.com/overhangio/tpi>`__ repository.
@@ -59,5 +54,9 @@ Upgrade all your plugins with::
 To list indexes that you are downloading plugins from, run::
 
     tutor plugins index list
+
+To disable an index, for instance "contrib", use the ``plugins index remove`` command::
+
+    tutor plugins index remove contrib
 
 For more information about these indexes, check the `official Tutor plugin indexes (TPI) <https://github.com/overhangio/tpi/>`__ repository.
