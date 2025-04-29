@@ -14,7 +14,7 @@ cachetools==5.5.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2025.1.31
+certifi==2025.4.26
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -36,7 +36,7 @@ durationpy==0.9
     # via
     #   -r requirements/base.txt
     #   kubernetes
-google-auth==2.38.0
+google-auth==2.39.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -46,13 +46,13 @@ idna==3.10
     #   requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.6.1
+importlib-metadata==8.7.0
     # via
     #   -r requirements/base.txt
     #   sphinx
 importlib-resources==6.5.2
     # via -r requirements/base.txt
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   -r requirements/base.txt
     #   sphinx
@@ -64,7 +64,7 @@ markupsafe==3.0.2
     #   jinja2
 mypy==1.15.0
     # via -r requirements/base.txt
-mypy-extensions==1.0.0
+mypy-extensions==1.1.0
     # via
     #   -r requirements/base.txt
     #   mypy
@@ -73,7 +73,7 @@ oauthlib==3.2.2
     #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==24.2
+packaging==25.0
     # via
     #   -r requirements/base.txt
     #   sphinx
@@ -82,11 +82,11 @@ pyasn1==0.6.1
     #   -r requirements/base.txt
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.4.1
+pyasn1-modules==0.4.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-pycryptodome==3.21.0
+pycryptodome==3.22.0
     # via -r requirements/base.txt
 pygments==2.19.1
     # via sphinx
@@ -108,7 +108,7 @@ requests-oauthlib==2.0.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
-rsa==4.9
+rsa==4.9.1
     # via
     #   -r requirements/base.txt
     #   google-auth
@@ -148,11 +148,11 @@ tomli==2.2.1
     #   -r requirements/base.txt
     #   mypy
     #   sphinx
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
     #   -r requirements/base.txt
     #   mypy
-urllib3==2.3.0
+urllib3==2.4.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
