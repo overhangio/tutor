@@ -5,14 +5,12 @@
 #    pip-compile requirements/dev.in
 #
 altgraph==0.17.4
-    # via
-    #   macholib
-    #   pyinstaller
+    # via pyinstaller
 appdirs==1.4.4
     # via -r requirements/base.txt
-astroid==3.3.8
+astroid==3.3.9
     # via pylint
-attrs==25.1.0
+attrs==25.3.0
     # via scriv
 backports-tarfile==1.2.0
     # via jaraco-context
@@ -24,11 +22,13 @@ cachetools==5.5.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2025.1.31
+certifi==2025.4.26
     # via
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
+cffi==1.17.1
+    # via cryptography
 charset-normalizer==3.4.1
     # via
     #   -r requirements/base.txt
@@ -42,9 +42,11 @@ click==8.1.8
     #   scriv
 click-log==0.4.0
     # via scriv
-coverage==7.6.12
+coverage==7.8.0
     # via -r requirements/dev.in
-dill==0.3.9
+cryptography==44.0.2
+    # via secretstorage
+dill==0.4.0
     # via pylint
 docutils==0.21.2
     # via readme-renderer
@@ -52,7 +54,7 @@ durationpy==0.9
     # via
     #   -r requirements/base.txt
     #   kubernetes
-google-auth==2.38.0
+google-auth==2.39.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -62,7 +64,7 @@ idna==3.10
     # via
     #   -r requirements/base.txt
     #   requests
-importlib-metadata==8.6.1
+importlib-metadata==8.7.0
     # via
     #   -r requirements/base.txt
     #   build
@@ -72,7 +74,7 @@ importlib-metadata==8.6.1
     #   twine
 importlib-resources==6.5.2
     # via -r requirements/base.txt
-isort==6.0.0
+isort==6.0.1
     # via pylint
 jaraco-classes==3.4.0
     # via keyring
@@ -80,7 +82,11 @@ jaraco-context==6.0.1
     # via keyring
 jaraco-functools==4.1.0
     # via keyring
-jinja2==3.1.5
+jeepney==0.9.0
+    # via
+    #   keyring
+    #   secretstorage
+jinja2==3.1.6
     # via
     #   -r requirements/base.txt
     #   scriv
@@ -88,8 +94,6 @@ keyring==25.6.0
     # via twine
 kubernetes==32.0.1
     # via -r requirements/base.txt
-macholib==1.16.3
-    # via pyinstaller
 markdown-it-py==3.0.0
     # via
     #   rich
@@ -102,25 +106,25 @@ mccabe==0.7.0
     # via pylint
 mdurl==0.1.2
     # via markdown-it-py
-more-itertools==10.6.0
+more-itertools==10.7.0
     # via
     #   jaraco-classes
     #   jaraco-functools
 mypy==1.15.0
     # via -r requirements/base.txt
-mypy-extensions==1.0.0
+mypy-extensions==1.1.0
     # via
     #   -r requirements/base.txt
     #   black
     #   mypy
-nh3==0.2.20
+nh3==0.2.21
     # via readme-renderer
 oauthlib==3.2.2
     # via
     #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==24.2
+packaging==25.0
     # via
     #   -r requirements/base.txt
     #   black
@@ -132,7 +136,7 @@ pathspec==0.12.1
     # via black
 pip-tools==7.4.1
     # via -r requirements/dev.in
-platformdirs==4.3.6
+platformdirs==4.3.7
     # via
     #   black
     #   pylint
@@ -141,21 +145,23 @@ pyasn1==0.6.1
     #   -r requirements/base.txt
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.4.1
+pyasn1-modules==0.4.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-pycryptodome==3.21.0
+pycparser==2.22
+    # via cffi
+pycryptodome==3.22.0
     # via -r requirements/base.txt
 pygments==2.19.1
     # via
     #   readme-renderer
     #   rich
-pyinstaller==6.12.0
+pyinstaller==6.13.0
     # via -r requirements/dev.in
-pyinstaller-hooks-contrib==2025.1
+pyinstaller-hooks-contrib==2025.3
     # via pyinstaller
-pylint==3.3.4
+pylint==3.3.6
     # via -r requirements/dev.in
 pyproject-hooks==1.2.0
     # via
@@ -188,14 +194,16 @@ requests-toolbelt==1.0.0
     # via twine
 rfc3986==2.0.0
     # via twine
-rich==13.9.4
+rich==14.0.0
     # via twine
-rsa==4.9
+rsa==4.9.1
     # via
     #   -r requirements/base.txt
     #   google-auth
-scriv==1.5.1
+scriv==1.7.0
     # via -r requirements/dev.in
+secretstorage==3.3.3
+    # via keyring
 six==1.17.0
     # via
     #   -r requirements/base.txt
@@ -215,9 +223,9 @@ twine==6.1.0
     # via -r requirements/dev.in
 types-docutils==0.21.0.20241128
     # via -r requirements/dev.in
-types-pyyaml==6.0.12.20241230
+types-pyyaml==6.0.12.20250402
     # via -r requirements/dev.in
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
     #   -r requirements/base.txt
     #   astroid
@@ -225,7 +233,7 @@ typing-extensions==4.12.2
     #   mypy
     #   pylint
     #   rich
-urllib3==2.3.0
+urllib3==2.4.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
