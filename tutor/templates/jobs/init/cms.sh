@@ -13,10 +13,6 @@ if [ -d /openedx/data/uploads/ ]; then
   fi
 fi
 
-# Create waffle switches to enable some features, if they have not been explicitly defined before
-# Copy-paste of units in Studio (highly requested new feature, but defaults to off in Quince)
-(./manage.py cms waffle_flag --list | grep contentstore.enable_copy_paste_units) || ./manage.py lms waffle_flag --create contentstore.enable_copy_paste_units --everyone
-
 # Create the index for studio and courseware content. Because we specify --init,
 # this will not populate the index (potentially slow) nor replace any existing
 # index (resulting in broken features until it is complete). If either of those
