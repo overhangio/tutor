@@ -20,6 +20,7 @@ class LocalTaskRunner(compose.ComposeTaskRunner):
             tutor_env.pathjoin(self.root, "local", "docker-compose.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.prod.yml"),
             tutor_env.pathjoin(self.root, "local", "docker-compose.override.yml"),
+            tutor_env.pathjoin(self.root, "local", "docker-compose.prod.override.yml"),
         ]
         self.docker_compose_job_files += [
             tutor_env.pathjoin(self.root, "local", "docker-compose.jobs.yml"),
