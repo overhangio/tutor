@@ -178,15 +178,10 @@ def update(context: Context) -> None:
     update_indexes(config)
 
 
-def update_indexes(config: Config) -> None:
-    all_plugins = indexes.fetch(config)
-    cache_path = indexes.save_cache(all_plugins)
-    fmt.echo_info(f"Plugin index local cache: {cache_path}")
-
-
 @click.command()
 @click.argument("names", metavar="name", type=IndexPluginNameOrLocation(), nargs=-1)
-def install(names: list[str]) -> None:
+@click.pass_obj
+def install(context: Context, names: list[str]) -> None:
     """
     Install one or more plugins.
 
@@ -199,18 +194,24 @@ def install(names: list[str]) -> None:
     In cases 2. and 3., the plugin root corresponds to the path given by `tutor plugins
     printroot`.
     """
+    config = tutor_config.load(context.root)
+    check_cache_exists(config)
     find_and_install(names, [])
 
 
 @click.command()
 @click.argument("names", metavar="name", type=IndexPluginName(), nargs=-1)
-def upgrade(names: list[str]) -> None:
+@click.pass_obj
+def upgrade(context: Context, names: list[str]) -> None:
     """
     Upgrade one or more plugins.
 
     Specify "all" to upgrade all installed plugins. This command will only print a
     warning for plugins which cannot be found.
     """
+    config = tutor_config.load(context.root)
+    check_cache_exists(config)
+
     if "all" in names:
         names = list(plugins.iter_installed())
     available_names = []
@@ -225,6 +226,29 @@ def upgrade(names: list[str]) -> None:
             available_names.append(name)
 
     find_and_install(available_names, ["--upgrade"])
+
+
+def check_cache_exists(config: Config) -> None:
+    """
+    Check that the plugin cache exists prior to any operation requiring the cache. If it
+    doesn't exist, update it.
+    """
+    try:
+        indexes.load_cache()
+    except indexes.CacheNotFound:
+        fmt.echo_info(
+            f"Plugin cache not found in {indexes.Indexes.CACHE_PATH}. Updating..."
+        )
+        update_indexes(config)
+
+
+def update_indexes(config: Config) -> None:
+    """
+    Fetch index content and update the local cache.
+    """
+    all_plugins = indexes.fetch(config)
+    cache_path = indexes.save_cache(all_plugins)
+    fmt.echo_info(f"Plugin index local cache: {cache_path}")
 
 
 def find_and_install(names: list[str], pip_install_opts: t.List[str]) -> None:
@@ -285,10 +309,14 @@ def install_single_file_plugin(location: str) -> None:
 
 @click.command()
 @click.argument("pattern", default="")
-def search(pattern: str) -> None:
+@click.pass_obj
+def search(context: Context, pattern: str) -> None:
     """
     Search in plugin descriptions.
     """
+    config = tutor_config.load(context.root)
+    check_cache_exists(config)
+
     results: list[tuple[str, ...]] = [("NAME", "STATUS", "DESCRIPTION")]
     for plugin in indexes.iter_cache_entries():
         if plugin.match(pattern):
