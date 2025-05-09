@@ -5,12 +5,10 @@ import typing as t
 
 import click
 
-from tutor import bindmount
+from tutor import bindmount, fmt, hooks, utils
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import fmt, hooks
 from tutor import interactive as interactive_config
-from tutor import utils
 from tutor.commands import images, jobs
 from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseTaskContext
@@ -31,9 +29,9 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
         self.docker_compose_files: list[str] = []
         self.docker_compose_job_files: list[str] = []
 
-    def docker_compose(self, *command: str) -> int:
+    def _get_docker_compose_args(self, *command: str) -> list[str]:
         """
-        Run docker-compose with the right yml files.
+        Returns appropriate arguments (yml files) to be used with the docker compose commmand
         """
         # Trigger the action just once per runtime
         start_commands = ("start", "up", "restart", "run")
@@ -48,8 +46,21 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
         for docker_compose_path in self.docker_compose_files:
             if os.path.exists(docker_compose_path):
                 args += ["-f", docker_compose_path]
-        return utils.docker_compose(
-            *args, "--project-name", self.project_name, *command
+        args += ["--project-name", self.project_name, *command]
+        return args
+
+    def docker_compose(self, *command: str) -> int:
+        """
+        Run docker-compose with the right yml files.
+        """
+        return utils.docker_compose(*self._get_docker_compose_args(*command))
+
+    def docker_compose_output(self, *command: str) -> bytes:
+        """
+        Same as the docker_compose method except that it returns the command output.
+        """
+        return utils.check_output(
+            "docker", "compose", *self._get_docker_compose_args(*command)
         )
 
     def run_task(self, service: str, command: str) -> int:
