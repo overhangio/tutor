@@ -11,7 +11,6 @@ from tutor import env as tutor_env
 from tutor import fmt, hooks, utils
 from tutor.commands import compose
 from tutor.types import Config, get_typed
-from tutor.utils import get_compose_stacks
 
 
 class DevTaskRunner(compose.ComposeTaskRunner):
@@ -93,10 +92,7 @@ def _stop_on_local_start(root: str, config: Config, project_name: str) -> None:
     started.
     """
     runner = DevTaskRunner(root, config)
-    if (
-        runner.project_name in get_compose_stacks()
-        and project_name != runner.project_name
-    ):
+    if project_name != runner.project_name and runner.is_running():
         runner.docker_compose("stop")
 
 

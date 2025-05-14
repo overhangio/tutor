@@ -246,18 +246,6 @@ def check_output(*command: str) -> bytes:
         raise exceptions.TutorError(f"Command failed: {literal_command}") from e
 
 
-def get_compose_stacks() -> list[str]:
-    """
-    Returns a list of names of all running docker compose projects
-    """
-    return [
-        entry["Name"]
-        for entry in json.loads(
-            check_output("docker", "compose", "ls", "--format", "json").decode("utf-8")
-        )
-    ]
-
-
 def warn_macos_docker_memory() -> None:
     try:
         check_macos_docker_memory()

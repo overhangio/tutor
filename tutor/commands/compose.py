@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import typing as t
 
@@ -48,6 +49,18 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
                 args += ["-f", docker_compose_path]
         args += ["--project-name", self.project_name, *command]
         return args
+
+    def is_running(self) -> bool:
+        """
+        Return True if some containers from this project are running.
+        """
+        running_projects = [
+            entry["Name"]
+            for entry in json.loads(
+                self.docker_compose_output("ls", "--format", "json").decode("utf-8")
+            )
+        ]
+        return self.project_name in running_projects
 
     def docker_compose(self, *command: str) -> int:
         """

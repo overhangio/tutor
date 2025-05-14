@@ -1,0 +1,1 @@
+- [Improvement] When running `local/dev start/run`, run `dev/local stop` less frequently. Also, make sure that we detect only running docker compose projects associated to Tutor. (by @regisb)
