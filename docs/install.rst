@@ -27,6 +27,19 @@ Requirements
 .. note::
     On Mac OS, by default, containers are allocated 2 GB of RAM, which is not enough. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 GB to the Docker daemon. If the deployment fails because of insufficient memory during database migrations, check the :ref:`relevant section in the troubleshooting guide <migrations_killed>`.
 
+
+Virtual Environment (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To prevent conflicts with other Python packages and maintain a clean environment, it's recommended that Tutor should be installed within a Python virtual environment. This is especially important on fresh or shared systems where installing packages globally may require elevated privileges and can interfere with system-level Python dependencies:
+
+.. code-block:: bash
+
+   python3 -m venv env
+   source env/bin/activate
+
+For more details on virtual environments, refer to the official `Python documentation <https://docs.python.org/3/library/venv.html>`_.
+
 Download
 --------
 
@@ -42,6 +55,7 @@ Check the "tutor" package on Pypi: https://pypi.org/project/tutor. You will need
     sudo apt install python3 python3-pip libyaml-dev
 
 .. _install_binary:
+
 
 Binary release
 ~~~~~~~~~~~~~~
