@@ -7,9 +7,8 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt, hooks
+from tutor import exceptions, fmt, hooks, serialize, utils
 from tutor import interactive as interactive_config
-from tutor import serialize, utils
 from tutor.commands import jobs
 from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseTaskContext
@@ -187,7 +186,7 @@ class K8sTaskRunner(BaseTaskRunner):
 
     def active_job_names(self) -> List[str]:
         """
-        Return a list of active job names
+        Return a list of active job names that are managed by tutor.
         Docs:
         https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-job-v1-batch
 
@@ -197,7 +196,10 @@ class K8sTaskRunner(BaseTaskRunner):
         api = K8sClients.instance().batch_api
         return [
             job.metadata.name
-            for job in api.list_namespaced_job(k8s_namespace(self.config)).items
+            for job in api.list_namespaced_job(
+                k8s_namespace(self.config),
+                label_selector="app.kubernetes.io/managed-by=tutor",
+            ).items
             if job.status.active
         ]
 
