@@ -20,6 +20,31 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-19.0.3'></a>
+## v19.0.3 (2025-05-19)
+
+- [Improvement] Migrate packaging from setup.py/setuptools to pyproject.toml/hatch. This should not be a breaking change for most users. (by @regisb)
+
+- [Improvement] Add hatch_build.py in sdist target to fix the installation issues (by @dawoudsheraz)
+
+- [Improvement] MEILISEARCH_HOST enables Tutor to configure meilisearch host
+and expose it to be used by other plugins. For example MEILISEARCH_HOST can be
+optionally used to configure ingress controller in openedx-k8s-harmony like
+LMS_HOST etc.
+
+- [Bugfix] Update lms and cms dev jobs to use correct django settings (by @dawoudsheraz)
+
+- [Improvement] Add support for `docker-compose.prod.override.yml` when using
+  `tutor local` commands
+
+- [Feature] Add tutor deck to the list of plugins installed by default. (by @mlabeeb03)
+
+- [Improvement] Stop `dev` platform on `local run` commands. Trigger `COMPOSE_PROJECT_STARTED` only once per tutor runtime. (by @mlabeeb03)
+
+ - [Feature] Add new command `tutor dev hosts` that displays status of services. (by @mlabeeb03)
+
+- [Feature] Update OPENEDX_COMMON_VERSION to sumac.3 tag (by @dawoudsheraz)
+
 <a id='changelog-19.0.2'></a>
 ## v19.0.2 (2025-02-12)
 
