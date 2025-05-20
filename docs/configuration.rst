@@ -132,7 +132,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"open-release/teak.master"``, or ``master`` in :ref:`Tutor Main <main>`)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"release/teak"``, or ``master`` in :ref:`Tutor Main <main>`)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -385,7 +385,7 @@ If you don't create your fork from this tag, you *will* have important compatibi
 
 - Do not try to run a fork from an older (pre-Teak) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
-- Do not try to run a fork from the open-release/teak.master branch: Tutor will attempt to apply security and bug fix patches that might already be included in the open-release/teak.master but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the open-release/teak.master branch.
+- Do not try to run a fork from the release/teak branch: Tutor will attempt to apply security and bug fix patches that might already be included in the release/teak but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the release/teak branch.
 
 .. _i18n:
 
