@@ -142,7 +142,7 @@ To debug a local edx-platform repository, first, start development in detached m
 To detach from the service without shutting it down, use ``Ctrl+p`` followed with ``Ctrl+q``.
 
 Running edx-platform unit tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/openedx/edx-platform/>`__. To do so, run a shell in the LMS development container::
 
