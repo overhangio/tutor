@@ -80,7 +80,7 @@ To inspect the Tutor source code, install Tutor from `the Github repository <htt
 Configuring DNS records
 -----------------------
 
-When running a server in production, it is necessary to define `DNS records <https://en.wikipedia.org/wiki/Domain_Name_System#Resource_records>`__ which will make it possible to access your Open edX platform by name in your browser. The precise procedure to create DNS records varies from one provider to the next and is beyond the scope of these docs. You should create a record of type A with a name equal to your LMS hostname (given by ``tutor config printvalue LMS_HOST``) and a value that indicates the IP address of your server. Applications other than the LMS, such as the studio, ecommerce, etc. typically reside in subdomains of the LMS. Thus, you should also create a CNAME record to point all subdomains of the LMS to the LMS_HOST.
+When running a server in production, it is necessary to define `DNS records <https://en.wikipedia.org/wiki/Domain_Name_System#Resource_records>`__ which will make it possible to access your Open edX platform by name in your browser. The precise procedure to create DNS records varies from one provider to the next and is beyond the scope of these docs. You should create a record of type A with a name equal to your LMS hostname (given by ``tutor config printvalue LMS_HOST``) and a value that indicates the IP address of your server. Applications other than the LMS, such as the studio, credentials, etc. typically reside in subdomains of the LMS. Thus, you should also create a CNAME record to point all subdomains of the LMS to the LMS_HOST.
 
 For instance, to run an Open edX server at https://learn.mydomain.com on a server with IP address 1.1.1.1, you would need to configure the following DNS records::
 
@@ -137,11 +137,11 @@ Major Open edX releases are published twice a year, in June and December, by the
 4. Test the new release in a sandboxed environment.
 5. If you are running edx-platform, or some other repository from a custom branch, then you should rebase (and test) your changes on top of the latest release tag (see :ref:`edx_platform_fork`).
 
-The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``launch`` command (see above). The single difference is that if the ``launch`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) before running ``launch``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Redwood to Sumac and rebuild some Docker images, run::
+The process for upgrading from one major release to the next works similarly to any other upgrade, with the ``launch`` command (see above). The single difference is that if the ``launch`` command detects that your tutor environment was generated with an older release, it will perform a few release-specific upgrade steps. These extra upgrade steps will be performed just once. But they will be ignored if you updated your local environment (for instance: with ``tutor config save``) before running ``launch``. This situation typically occurs if you need to re-build some Docker images (see above). In such a case, you should make use of the ``upgrade`` command. For instance, to upgrade a local installation from Sumac to Teak and rebuild some Docker images, run::
 
     tutor config save
     tutor images build all # list the images that should be rebuilt here
-    tutor local upgrade --from=redwood
+    tutor local upgrade --from=sumac
     tutor local launch
 
 
@@ -153,8 +153,6 @@ Instructions for installing the appropriate Tutor version for older Open edX rel
 +-------------------+---------------+--------------------------------------------+
 | Open edX Release  | Tutor version | Installation command                       |
 +===================+===============+============================================+
-| Juniper           | v10           | pip install 'tutor[full]>=10.0.0,<11.0.0'  |
-+-------------------+---------------+--------------------------------------------+
 | Koa               | v11           | pip install 'tutor[full]>=11.0.0,<12.0.0'  |
 +-------------------+---------------+--------------------------------------------+
 | Lilac             | v12           | pip install 'tutor[full]>=12.0.0,<13.0.0'  |
@@ -172,6 +170,8 @@ Instructions for installing the appropriate Tutor version for older Open edX rel
 | Redwood           | v18           | pip install 'tutor[full]>=18.0.0,<19.0.0'  |
 +-------------------+---------------+--------------------------------------------+
 | Sumac             | v19           | pip install 'tutor[full]>=19.0.0,<20.0.0'  |
++-------------------+---------------+--------------------------------------------+
+| Teak              | v20           | pip install 'tutor[full]>=20.0.0,<21.0.0'  |
 +-------------------+---------------+--------------------------------------------+
 
 .. _autocomplete:
