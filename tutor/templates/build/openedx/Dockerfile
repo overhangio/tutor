@@ -172,7 +172,8 @@ COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=nodejs-requirements /opened
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=nodejs-requirements /openedx/edx-platform/node_modules /openedx/node_modules
 
 # Symlink node_modules such that we can bind-mount the edx-platform repository
-RUN ln -s /openedx/node_modules /openedx/edx-platform/node_modules
+RUN rm -rf /openedx/edx-platform/node_modules && \
+    ln -s /openedx/node_modules /openedx/edx-platform/node_modules
 
 ENV PATH=/openedx/venv/bin:./node_modules/.bin:/openedx/nodeenv/bin:${PATH}
 ENV VIRTUAL_ENV=/openedx/venv/
