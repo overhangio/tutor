@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import shutil
+import sys
 import tempfile
 import typing as t
 
@@ -261,9 +263,53 @@ def find_and_install(names: list[str], pip_install_opts: t.List[str]) -> None:
             tmp_reqs.write(requirements_txt)
             tmp_reqs.flush()
             fmt.echo_info(f"Installing pip requirements:\n{requirements_txt}")
+
             utils.execute(
-                "pip", "install", *pip_install_opts, "--requirement", tmp_reqs.name
+                *get_package_install_command(),
+                *pip_install_opts,
+                "--requirement",
+                tmp_reqs.name,
             )
+
+
+def get_package_install_command() -> list[str]:
+    """
+    Return the `pip install` or `uv install` part from the installation command.
+
+    We attempt to check whether the following commands are available, in this order:
+    1. python -m pip install
+    2. python -m uv install
+    3. uv install
+    """
+    # pip
+    try:
+        import pip  # pylint: disable=unused-import, import-outside-toplevel
+    except ImportError:
+        pass
+    else:
+        # Note that we call `python -m pip install...` instead of `pip install...`
+        # because it's easier to find the executable path this way. Especially if tutor
+        # was launched as: `./.venv/bin/tutor`.
+        if hasattr(pip, "main"):
+            return [sys.executable, "-m", "pip", "install"]
+
+    # uv: from python
+    try:
+        import uv  # pylint: disable=unused-import, import-outside-toplevel
+    except ImportError:
+        pass
+    else:
+        if hasattr(uv, "find_uv_bin"):
+            return ["python", "-m", "uv", "pip", "install"]
+
+    # uv: from binary
+    if uv := shutil.which("uv"):
+        return [uv, "pip", "install"]
+
+    raise exceptions.TutorError(
+        "Could not find a Python package installer such as 'pip' or 'uv'. "
+        "See: https://pip.pypa.io/en/stable/installation/"
+    )
 
 
 def install_single_file_plugin(location: str) -> None:

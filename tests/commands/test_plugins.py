@@ -55,3 +55,25 @@ class PluginsTests(unittest.TestCase, TestCommandMixin):
         self.assertEqual(
             ["all", "alba"], plugins_commands.PluginName(allow_all=True).get_names("al")
         )
+
+    def test_package_install_command(self) -> None:
+        # python -m pip
+        with patch.object(plugins_commands.sys, "executable", "/my/python"):
+            with patch.dict("sys.modules", pip=Mock(main=lambda: None)):
+                command = plugins_commands.get_package_install_command()
+        self.assertEqual(["/my/python", "-m", "pip", "install"], command)
+
+        # python -m uv
+        with patch.dict("sys.modules", pip=None, uv=Mock(find_uv_bin=lambda: None)):
+            command = plugins_commands.get_package_install_command()
+        self.assertEqual(["python", "-m", "uv", "pip", "install"], command)
+
+        # uv
+        with patch.dict("sys.modules", pip=None, uv=None):
+            with patch.object(
+                plugins_commands.shutil,
+                "which",
+                lambda name: "/my/uv" if name == "uv" else None,
+            ):
+                command = plugins_commands.get_package_install_command()
+        self.assertEqual(["/my/uv", "pip", "install"], command)
