@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-19.0.4'></a>
+## v19.0.4 (2025-05-27)
+
+- [Improvement] When running `local/dev start/run`, run `dev/local stop` less frequently. Also, make sure that we detect only running docker compose projects associated to Tutor. (by @regisb)
+- [Improvement] Do not wait for non-tutor jobs while running k8s. (by @mlabeeb03)
+- [Bugfix] Support plugin installation with unexpected `pip` path and/or uv. (by @regisb)
+
 <a id='changelog-19.0.3'></a>
 ## v19.0.3 (2025-05-19)
 
