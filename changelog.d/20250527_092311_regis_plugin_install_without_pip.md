@@ -1,0 +1,1 @@
+- [Bugfix] Support plugin installation with unexpected `pip` path and/or uv. (by @regisb)
