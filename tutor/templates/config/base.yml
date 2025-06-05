@@ -14,5 +14,6 @@ PLUGINS:
   - indigo
 PLUGIN_INDEXES:
   # Indexes in this list will be suffixed with the Open edX named version and
-  # "plugins.yml". E.g: https://overhang.io/tutor/main/olive/plugins.yml
+  # "plugins.yml". E.g: https://overhang.io/tutor/main/sumac/plugins.yml
   - https://overhang.io/tutor/main
+  - https://overhang.io/tutor/contrib
