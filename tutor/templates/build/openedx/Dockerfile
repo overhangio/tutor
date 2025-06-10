@@ -92,10 +92,11 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # https://pypi.org/project/wheel/
     setuptools==69.1.1 pip==24.0 wheel==0.43.0
 
-# Install base requirements
+# Install base requirements and asset-building requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
+    --mount=type=bind,from=edx-platform,source=/requirements/edx/assets.txt,target=/openedx/edx-platform/requirements/edx/assets.txt \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install -r /openedx/edx-platform/requirements/edx/base.txt
+    pip install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -126,8 +127,8 @@ FROM python AS nodejs-requirements
 ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
-# https://github.com/openedx/edx-platform/blob/master/requirements/edx/base.txt
-RUN pip install nodeenv==1.8.0
+# https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
+RUN pip install nodeenv==1.9.1
 RUN nodeenv /openedx/nodeenv --node=18.20.1 --prebuilt
 
 # Install nodejs requirements
