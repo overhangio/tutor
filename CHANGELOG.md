@@ -20,6 +20,12 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-19.0.5'></a>
+## v19.0.5 (2025-06-10)
+
+- [Feature] Enable the "contrib" plugin index by default. This enables platform users to view 3rd party plugins without having to run `tutor plugins index add contrib`. (by @regisb)
+- [Feature] Automatically update the plugin index cache on all commands that need it. Including: `plugins install/upgrade/search`. This makes it slightly easier for end users to use plugins. (by @regisb)
+
 <a id='changelog-19.0.4'></a>
 ## v19.0.4 (2025-05-27)
 
