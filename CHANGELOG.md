@@ -25,6 +25,8 @@ instructions, because git commits are used to generate release notes:
 
 - 💥[Depreciation] Remove the unnecessary site-configuration script in favour of the [`create_or_update_site_configuration`](https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/site_configuration/management/commands/create_or_update_site_configuration.py) management command provided in edx-platform. (by @Danyal-Faheem)
 
+- 💥[Depreciation] Remove preview page configuration as the page has been migrated to the learning MFE. (by @Danyal-Faheem)
+
 - 💥[Feature] Upgrade to Teak. (by @ahmed-arb)
 
 <a id='changelog-19.0.5'></a>
