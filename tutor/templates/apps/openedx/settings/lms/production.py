@@ -6,7 +6,6 @@ from lms.envs.production import *
 
 ALLOWED_HOSTS = [
     ENV_TOKENS.get("LMS_BASE"),
-    FEATURES["PREVIEW_LMS_BASE"],
     "lms",
 ]
 CORS_ORIGIN_WHITELIST.append("{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}")
