@@ -41,7 +41,7 @@
     {{ patch("caddyfile-proxy")|indent(4) }}
 }
 
-{{ LMS_HOST }}{$default_site_port} {
+{{ LMS_HOST }}{$default_site_port}, {{ PREVIEW_LMS_HOST }}{$default_site_port} {
     @favicon_matcher {
         path_regexp ^/favicon.ico$
     }
