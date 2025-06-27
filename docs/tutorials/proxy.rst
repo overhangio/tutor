@@ -20,7 +20,7 @@ With these changes, Tutor will no longer listen to ports 80 and 443 on the host.
 
 It is then your responsibility to configure the web proxy on the host. There are too many use cases and proxy vendors, so Tutor does not provide configuration files that will work for everyone. You should configure your web proxy to:
 
-- Capture traffic for the following hostnames: LMS_HOST, PREVIEW_LMS_HOST, CMS_HOST, as well as any additional host exposed by your plugins (MFE_HOST, ECOMMERCE_HOST, etc.). See each plugin documentation for more information.
+- Capture traffic for the following hostnames: LMS_HOST, PREVIEW_LMS_HOST, CMS_HOST, as well as any additional host exposed by your plugins (MFE_HOST, CREDENTIALS_HOST, etc.). See each plugin documentation for more information.
 - If SSL/TLS is enabled:
     - Perform SSL/TLS termination using your own certificates.
     - Forward http traffic to https.

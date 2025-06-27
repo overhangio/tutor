@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-20.0.0'></a>
+## v20.0.0 (2025-06-16)
+
+- 💥[Depreciation] Remove the unnecessary site-configuration script in favour of the [`create_or_update_site_configuration`](https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/site_configuration/management/commands/create_or_update_site_configuration.py) management command provided in edx-platform. (by @Danyal-Faheem)
+
+- 💥[Feature] Upgrade to Teak. (by @ahmed-arb)
+
 <a id='changelog-19.0.5'></a>
 ## v19.0.5 (2025-06-10)
 
