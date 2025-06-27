@@ -78,8 +78,11 @@ coverage-browse-report: coverage-html ## Open the HTML report in the browser
 bundle: ## Bundle the tutor package in a single "dist/tutor" executable
 	pyinstaller tutor.spec
 
-bootstrap-dev: ## Install dev requirements and all supported plugins
-	pip install .[full,dev]
+bootstrap-dev: ## Install dev requirements
+	pip install .[dev]
+
+bootstrap-dev-plugins: bootstrap-dev  ## Install dev requirements and all plugins
+	pip install .[full]
 
 pull-base-images: # Manually pull base images
 	docker image pull docker.io/ubuntu:22.04

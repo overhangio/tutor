@@ -46,7 +46,7 @@ jobs:
       - name: Print info about the current python installation
         run: make ci-info
       - name: Install requirements
-        run: make bootstrap-dev
+        run: make bootstrap-dev-plugins
 
       ##### Run tests, generate bundle
       # - name: Run tests
