@@ -1,0 +1,1 @@
+- [Improvement] Add a plausibility check that issues a warning if `RUN_MEILISEARCH` is `false` but `MEILISEARCH_URL` is unset. (by @fghaas)
