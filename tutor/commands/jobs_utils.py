@@ -177,8 +177,6 @@ def assign_theme(name, domain):
         "{{ LMS_HOST }}:8000",
         "{{ CMS_HOST }}",
         "{{ CMS_HOST }}:8001",
-        "{{ PREVIEW_LMS_HOST }}",
-        "{{ PREVIEW_LMS_HOST }}:8000",
     ]
     for domain_name in domain_names:
         python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
