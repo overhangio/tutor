@@ -44,7 +44,7 @@ Features
 * 100% `open source <https://github.com/overhangio/tutor>`__
 * Runs entirely on Docker
 * World-famous 1-click `installation and upgrades <https://docs.tutor.edly.io/install.html>`__
-* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.edly.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/overhangio/tutor-android>`__, `custom translations <https://docs.tutor.edly.io/configuration.html#adding-custom-translations>`__...
+* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.edly.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `mobile app <https://github.com/overhangio/tutor-android>`__, `custom translations <https://docs.tutor.edly.io/configuration.html#adding-custom-translations>`__...
 * Extensible architecture with `plugins <https://docs.tutor.edly.io/plugins/index.html>`__
 * Works with `Kubernetes <https://docs.tutor.edly.io/k8s.html>`__
 * No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.edly.io/install.html#zero-click-aws-installation>`__

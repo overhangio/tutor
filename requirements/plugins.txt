@@ -10,5 +10,4 @@ tutor-jupyter>=20.0.0,<21.0.0
 tutor-mfe>=20.0.0,<21.0.0
 tutor-minio>=20.0.0,<21.0.0
 tutor-notes>=20.0.0,<21.0.0
-tutor-webui>=20.0.0,<21.0.0
 tutor-xqueue>=20.0.0,<21.0.0
