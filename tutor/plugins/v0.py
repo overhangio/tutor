@@ -287,7 +287,6 @@ class OfficialPlugin(BasePlugin):
         "mfe",
         "minio",
         "notes",
-        "webui",
         "xqueue",
     ]
 
