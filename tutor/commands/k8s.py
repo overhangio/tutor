@@ -439,23 +439,36 @@ def exec_command(context: K8sContext, service: str, args: List[str]) -> None:
 @click.option("-c", "--container", help="Print the logs of this specific container")
 @click.option("-f", "--follow", is_flag=True, help="Follow log output")
 @click.option("--tail", type=int, help="Number of lines to show from each container")
+@click.option(
+    "-m",
+    "--max-log-requests",
+    "max_log_requests",
+    type=int,
+    help="Maximum allowed concurrency while streaming logs",
+)
 @click.argument("service")
 @click.pass_obj
 def logs(
-    context: K8sContext, container: str, follow: bool, tail: bool, service: str
+    context: K8sContext,
+    container: str,
+    follow: bool,
+    tail: bool,
+    max_log_requests: int,
+    service: str,
 ) -> None:
     config = tutor_config.load(context.root)
 
     command = ["logs"]
     selectors = ["app.kubernetes.io/name=" + service] if service else []
     command += resource_selector(config, *selectors)
-
     if container:
         command += ["-c", container]
     if follow:
         command += ["--follow"]
     if tail is not None:
         command += ["--tail", str(tail)]
+    if max_log_requests is not None:
+        command += ["--max-log-requests", str(max_log_requests)]
 
     utils.kubectl(*command)
 
