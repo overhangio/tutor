@@ -1,0 +1,1 @@
+- [Improvement] Redis version upgraded to 7.4.5. (by @CodeWithEmad)
