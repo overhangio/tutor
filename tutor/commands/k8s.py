@@ -277,8 +277,13 @@ Press enter when you are ready to continue"""
     ),
 )
 @click.argument("names", metavar="name", nargs=-1)
+@click.option(
+    "--prune-configmaps",
+    is_flag=True,
+    help="Prune ConfigMaps that are no longer in the manifests",
+)
 @click.pass_obj
-def start(context: K8sContext, names: List[str]) -> None:
+def start(context: K8sContext, names: List[str], prune_configmaps: bool) -> None:
     config = tutor_config.load(context.root)
     # Create namespace, if necessary
     # Note that this step should not be run for some users, in particular those
@@ -303,12 +308,14 @@ def start(context: K8sContext, names: List[str]) -> None:
                 context.root,
                 "--selector",
                 "app.kubernetes.io/component notin (job,namespace)",
+                prune_configmaps=prune_configmaps,
             )
         else:
             kubectl_apply(
                 context.root,
                 "--selector",
                 f"app.kubernetes.io/name={name}",
+                prune_configmaps=prune_configmaps,
             )
 
 
@@ -521,8 +528,23 @@ def apply_command(context: K8sContext, args: List[str]) -> None:
     kubectl_apply(context.root, *args)
 
 
-def kubectl_apply(root: str, *args: str) -> None:
-    utils.kubectl("apply", "--kustomize", tutor_env.pathjoin(root), *args)
+def kubectl_apply(root: str, *args: str, prune_configmaps: bool = False) -> None:
+    """
+    Apply Kubernetes resources using kubectl with optional ConfigMap pruning.
+
+    Args:
+        root: Root directory containing kustomization files
+        *args: Additional arguments to pass to kubectl apply
+        prune_configmaps: Enable pruning of ConfigMaps no longer in manifests
+    """
+    cmd_args = ["apply", "--kustomize", tutor_env.pathjoin(root)]
+
+    if prune_configmaps:
+        # Correct format is core/v1/ConfigMap
+        cmd_args.extend(["--prune", "--prune-allowlist", "core/v1/ConfigMap"])
+
+    cmd_args.extend(args)
+    utils.kubectl(*cmd_args)
 
 
 @click.command(help="Print status information for all k8s resources")
