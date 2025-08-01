@@ -9,6 +9,8 @@ XQUEUE_INTERFACE = {
 DATABASES = {
     "default": {},
 }
+LMS_BASE = "{{ LMS_HOST }}:8000"
+LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 
 derive_settings(__name__)
 
