@@ -10,5 +10,4 @@ tutor-jupyter@git+https://github.com/overhangio/tutor-jupyter@main
 tutor-mfe@git+https://github.com/overhangio/tutor-mfe@main
 tutor-minio@git+https://github.com/overhangio/tutor-minio@main
 tutor-notes@git+https://github.com/overhangio/tutor-notes@main
-tutor-webui@git+https://github.com/overhangio/tutor-webui@main
 tutor-xqueue@git+https://github.com/overhangio/tutor-xqueue@main
