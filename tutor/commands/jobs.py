@@ -540,6 +540,16 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
         runner.run_task_from_str(service, command)
 
 
+@click.command(help="Install an XBlock in a volume")
+@click.argument("package")
+def add_xblock(package: str) -> t.Iterable[tuple[str, str]]:
+    script = f"""
+set -e
+pip install --prefix=/mnt/third-party-xblock {package}
+"""
+    yield ("lms", script)
+
+
 hooks.Filters.CLI_DO_COMMANDS.add_items(
     [
         convert_mysql_utf8mb4_charset,
@@ -551,5 +561,6 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         settheme,
         sqlshell,
         update_mysql_authentication_plugin,
+        add_xblock,
     ]
 )
