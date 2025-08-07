@@ -16,6 +16,7 @@ from tutor.commands.k8s import k8s
 from tutor.commands.local import local
 from tutor.commands.mounts import mounts_command
 from tutor.commands.plugins import plugins_command
+from tutor.commands.xblocks import xblocks_command
 
 
 def main() -> None:
@@ -129,6 +130,7 @@ hooks.Filters.CLI_COMMANDS.add_items(
         local,
         mounts_command,
         plugins_command,
+        xblocks_command,
     ]
 )
 
