@@ -58,7 +58,7 @@ When running Tutor Main, you usually do not want to override your existing Tutor
 Making changes to Tutor Main
 ----------------------------
 
-In general pull requests should be open on the "release" branch of Tutor: the "release" branch is automatically merged on the "main" branch at every commit, such that changes made to Tutor releases find their way to Tutor Main as soon as they are merged. However, sometimes you want to make changes to Tutor Main exclusively, and not to the Tutor releases. This might be the case for instance when upgrading the running version of a third-party service (for instance: Elasticsearch, MySQL), or when the release branch requires specific changes. In that case, you should follow the instructions from the :ref:`contributing` section of the docs, with the following differences:
+In general pull requests should be open on the "release" branch of Tutor: the "release" branch is automatically merged on the "main" branch at every commit, such that changes made to Tutor releases find their way to Tutor Main as soon as they are merged. However, sometimes you want to make changes to Tutor Main exclusively, and not to the Tutor releases. This might be the case for instance when upgrading the running version of a third-party service (for instance: Meilisearch, MySQL), or when the release branch requires specific changes. In that case, you should follow the instructions from the :ref:`contributing` section of the docs, with the following differences:
 
 - Open your pull request on top of the "main" branch instead of "release".
 - Add a description of your changes by creating a changelog entry with `make changelog-entry`, as in the release branch.
