@@ -107,6 +107,7 @@ services:
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
       - ../../data/openedx-media-private:/openedx/media-private
+      - ../../data/third-party-xblock:/mnt/third-party-xblock
       {%- for mount in iter_mounts(MOUNTS, "openedx", "lms") %}
       - {{ mount }}
       {%- endfor %}
@@ -134,6 +135,7 @@ services:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
       - ../../data/openedx-media-private:/openedx/media-private
+      - ../../data/third-party-xblock:/mnt/third-party-xblock
       {%- for mount in iter_mounts(MOUNTS, "openedx", "cms") %}
       - {{ mount }}
       {%- endfor %}

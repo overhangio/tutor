@@ -562,7 +562,7 @@ def add_xblock(context: click.Context, package: str) -> t.Iterable[tuple[str, st
     fmt.echo_info("Xblock added to config")
 
     # The package could also be a git url if xblock is not available on pypy
-    script = f"pip install --prefix=/mnt/third-party-xblock {package}"
+    script = f"pip install --prefix=/mnt/third-party-xblock {package} && touch /mnt/third-party-xblock/.uwsgi_trigger"
     yield ("lms", script)
 
 @click.command(help="Remove an Xblock")
@@ -595,6 +595,7 @@ def remove_xblock(click_context: click.Context, context: Context, package: str) 
     remaining_xblocks = " ".join(values)
     if len(values) > 0:
         script += f" && pip install --prefix=/mnt/third-party-xblock {remaining_xblocks}"
+    script += " && touch /mnt/third-party-xblock/.uwsgi_trigger"
     yield ("lms", script)
 
 
