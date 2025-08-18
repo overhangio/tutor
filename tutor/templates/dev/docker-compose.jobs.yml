@@ -15,7 +15,7 @@ x-openedx-job-service:
     # theme files
     - ../build/openedx/themes:/openedx/themes
     # third party xblocks and their dependencies
-    - ../../data/third-party-xblock:/mnt/third-party-xblock
+    - ../../data/persistent-python-packages:/mnt/persistent-python-packages
 
 services:
 

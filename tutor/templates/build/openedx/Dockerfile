@@ -179,7 +179,7 @@ ENV VIRTUAL_ENV=/openedx/venv/
 ENV COMPREHENSIVE_THEME_DIRS=/openedx/themes
 ENV STATIC_ROOT_LMS=/openedx/staticfiles
 ENV STATIC_ROOT_CMS=/openedx/staticfiles/studio
-ENV PYTHONPATH=$PYTHONPATH:/mnt/third-party-xblock/lib/python3.11/site-packages
+ENV PYTHONPATH=/mnt/persistent-python-packages/lib/python3.11/site-packages
 
 WORKDIR /openedx/edx-platform
 

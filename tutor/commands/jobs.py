@@ -13,6 +13,7 @@ from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
 from tutor import env, fmt, hooks
+from tutor.commands.config import save as config_save_command
 from tutor.commands.context import Context
 from tutor.commands.jobs_utils import (
     create_user_template,
@@ -540,62 +541,82 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
         runner.run_task_from_str(service, command)
 
 
-# TODO Move all Xblock functions to xblocks.py?
-@click.command(help="Install an XBlock at runtime")
+@click.command(help="Install a pip package at runtime")
 @click.pass_context
 @click.argument("package")
-def add_xblock(context: click.Context, package: str) -> t.Iterable[tuple[str, str]]:
-    from tutor.commands.config import save as config_save_command
+def pip_install(context: click.Context, package: str) -> t.Iterable[tuple[str, str]]:
+    """
+    Installs a pip package persistently in the lms and cms container and
+    restarts with uwsgi server in both containers.
+    """
 
-    # TODO Only add Xblock to config if pip install is successful
-    fmt.echo_info("Adding xblock to config...")
+    # TODO Only add package to config if pip install is successful
+    fmt.echo_info(f"Adding {package} to config...")
     context.invoke(
         config_save_command,
-        interactive=False,  
-        set_vars=[],  
-        append_vars=[("INSTALLED_XBLOCKS", package)], 
-        remove_vars=[],  
-        unset_vars=[], 
-        env_only=False,  
-        clean_env=False  
+        interactive=False,
+        set_vars=[],
+        append_vars=[("PERSISTENT_PIP_PACKAGES", package)],
+        remove_vars=[],
+        unset_vars=[],
+        env_only=False,
+        clean_env=False,
     )
-    fmt.echo_info("Xblock added to config")
 
-    # The package could also be a git url if xblock is not available on pypy
-    script = f"pip install --prefix=/mnt/third-party-xblock {package} && touch /mnt/third-party-xblock/.uwsgi_trigger"
+    script = f"""
+    pip install \
+    --prefix=/mnt/persistent-python-packages \
+    {package} \
+    && echo \"$(date)\" > /mnt/persistent-python-packages/.uwsgi_trigger
+    """
+
     yield ("lms", script)
+
 
 @click.command(help="Remove an Xblock")
 @click.pass_obj
 @click.pass_context
 @click.argument("package")
-def remove_xblock(click_context: click.Context, context: Context, package: str) -> t.Iterable[tuple[str, str]]:
-    # Once a package is removed we should 
-    # 1) update the config 
-    # 2) delete the mounted volume files
-    # 3) reinstall those packages that are left in the config
-    from tutor.commands.config import save as config_save_command
+def pip_uninstall(
+    click_context: click.Context, context: Context, package: str
+) -> t.Iterable[tuple[str, str]]:
+    """
+    Deletes the persistently installed pip package along with its dependencies
+    """
 
-    fmt.echo_info("Removing xblock from config...")
+    fmt.echo_info(f"Removing {package} from config...")
     click_context.invoke(
         config_save_command,
-        interactive=False,  
-        set_vars=[],  
-        append_vars=[], 
-        remove_vars=[("INSTALLED_XBLOCKS", package)],  
-        unset_vars=[], 
-        env_only=False,  
-        clean_env=False  
+        interactive=False,
+        set_vars=[],
+        append_vars=[],
+        remove_vars=[("PERSISTENT_PIP_PACKAGES", package)],
+        unset_vars=[],
+        env_only=False,
+        clean_env=False,
     )
-    fmt.echo_info("Xblock removed from config")
 
-    script = f"rm -rf /mnt/third-party-xblock/lib/"
+    script = "rm -rf /mnt/persistent-python-packages/lib/"
     config = tutor_config.load(context.root)
-    values = config["INSTALLED_XBLOCKS"]
-    remaining_xblocks = " ".join(values)
+    values = config["PERSISTENT_PIP_PACKAGES"]
+    remaining_packages = " ".join(values)
     if len(values) > 0:
-        script += f" && pip install --prefix=/mnt/third-party-xblock {remaining_xblocks}"
-    script += " && touch /mnt/third-party-xblock/.uwsgi_trigger"
+        script += f" && pip install --prefix=/mnt/persistent-python-packages {remaining_packages}"
+    script += ' && echo "$(date)" > /mnt/persistent-python-packages/.uwsgi_trigger'
+
+    yield ("lms", script)
+
+
+@click.command(help="Run migrations for an app")
+@click.argument("package", required=False)
+def run_migrations(package: str) -> t.Iterable[tuple[str, str]]:
+    """
+    Run migrations for a specific app or all apps.
+    """
+    script = "./manage.py lms migrate "
+    if package:
+        script += package
+
     yield ("lms", script)
 
 
@@ -610,7 +631,8 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         settheme,
         sqlshell,
         update_mysql_authentication_plugin,
-        add_xblock,
-        remove_xblock,
+        pip_install,
+        pip_uninstall,
+        run_migrations,
     ]
 )

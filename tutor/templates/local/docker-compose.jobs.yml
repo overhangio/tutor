@@ -26,7 +26,7 @@ services:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
         - ../apps/openedx/config:/openedx/config:ro
-        - ../../data/third-party-xblock:/mnt/third-party-xblock
+        - ../../data/persistent-python-packages:/mnt/persistent-python-packages
         {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-job") %}
         - {{ mount }}
         {%- endfor %}
@@ -41,7 +41,7 @@ services:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
         - ../apps/openedx/config:/openedx/config:ro
-        - ../../data/third-party-xblock:/mnt/third-party-xblock
+        - ../../data/persistent-python-packages:/mnt/persistent-python-packages
         {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-job") %}
         - {{ mount }}
         {%- endfor %}
