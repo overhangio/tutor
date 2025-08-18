@@ -353,7 +353,7 @@ class Filters:
     #: - ``HOST_USER_ID``: the numerical ID of the user on the host.
     #: - ``TUTOR_APP``: the app name ("tutor" by default), used to determine the dev/local project names.
     #: - ``TUTOR_VERSION``: the current version of Tutor, as a string in the form MAJOR.MINOR.PATCH.
-    #: - ``TUTOR_VERSION_MAJOR``: the MAJOR part of TUTOR_VESRION, as an integer.
+    #: - ``TUTOR_VERSION_MAJOR``: the MAJOR part of TUTOR_VERSION, as an integer.
     #: - ``TUTOR_VERSION_MINOR``: the MINOR part of TUTOR_VERSION, as an integer.
     #: - ``iter_values_named``: a function to iterate on variables that start or end with a given string.
     #: - ``iter_mounts``: a function that yields compose-compatible bind-mounts for any given service.
@@ -519,12 +519,12 @@ class Filters:
 
     #: List of parameters to use when starting the LMS Celery worker ``celery worker ...``.
     #:
-    #: :param list[str] command: the list of paramaters to use as the celery command.
+    #: :param list[str] command: the list of parameters to use as the celery command.
     LMS_WORKER_COMMAND: Filter[list[str], []] = Filter()
 
     #: List of parameters to use when starting the CMS Celery worker ``celery worker ...``.
     #:
-    #: :param list[str] command: the list of paramaters to use as the celery command.
+    #: :param list[str] command: the list of parameters to use as the celery command.
     CMS_WORKER_COMMAND: Filter[list[str], []] = Filter()
 
 
