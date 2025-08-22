@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-20.0.1'></a>
+## v20.0.1 (2025-08-22)
+
+- [Feature] Add max-log-requests parameter for command `tutor k8s logs`. (by @mlabeeb03)
+
+- [Improvement] Redis version upgraded to 7.4.5. (by @CodeWithEmad)
+
+- [Feature] Update OPENEDX_COMMON_VERSION to teak.2 tag (by @ahmed-arb)
+
 <a id='changelog-20.0.0'></a>
 ## v20.0.0 (2025-06-16)
 
