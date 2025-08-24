@@ -441,3 +441,11 @@ In these situations, you can set ``--docker-arg`` flag in the ``tutor images bui
         --docker-arg="docker.io/myusername/openedx:mytag"
 
 This will result in passing the ``--cache-from`` option with the value ``docker.io/myusername/openedx:mytag`` to the docker build command.
+
+
+Skip reindexing of courses during initialization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``SKIP_REINDEX`` (default: ``false``)
+
+During initialization of CMS, studio and courseware contents are re-indexed. This flag skips the re-index step which would be helpful for large instances, since the re-index step might take many hours to run for such instances.
