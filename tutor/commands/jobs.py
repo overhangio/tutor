@@ -13,6 +13,7 @@ from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
 from tutor import env, fmt, hooks
+from tutor.commands.config import save as config_save_command
 from tutor.commands.context import Context
 from tutor.commands.jobs_utils import (
     create_user_template,
@@ -540,6 +541,85 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
         runner.run_task_from_str(service, command)
 
 
+@click.command(help="Install a pip package at runtime")
+@click.pass_context
+@click.argument("package")
+def pip_install(context: click.Context, package: str) -> t.Iterable[tuple[str, str]]:
+    """
+    Installs a pip package persistently in the lms and cms container and
+    restarts with uwsgi server in both containers.
+    """
+
+    # TODO Only add package to config if pip install is successful
+    fmt.echo_info(f"Adding {package} to config...")
+    context.invoke(
+        config_save_command,
+        interactive=False,
+        set_vars=[],
+        append_vars=[("PERSISTENT_PIP_PACKAGES", package)],
+        remove_vars=[],
+        unset_vars=[],
+        env_only=False,
+        clean_env=False,
+    )
+
+    script = f"""
+    pip install \
+    --prefix=/mnt/persistent-python-packages \
+    {package} \
+    && echo \"$(date)\" > /mnt/persistent-python-packages/.uwsgi_trigger
+    """
+
+    yield ("lms", script)
+
+
+@click.command(help="Remove an Xblock")
+@click.pass_obj
+@click.pass_context
+@click.argument("package")
+def pip_uninstall(
+    click_context: click.Context, context: Context, package: str
+) -> t.Iterable[tuple[str, str]]:
+    """
+    Deletes the persistently installed pip package along with its dependencies
+    """
+
+    fmt.echo_info(f"Removing {package} from config...")
+    click_context.invoke(
+        config_save_command,
+        interactive=False,
+        set_vars=[],
+        append_vars=[],
+        remove_vars=[("PERSISTENT_PIP_PACKAGES", package)],
+        unset_vars=[],
+        env_only=False,
+        clean_env=False,
+    )
+
+    script = "rm -rf /mnt/persistent-python-packages/lib/"
+    config = tutor_config.load(context.root)
+    values = config["PERSISTENT_PIP_PACKAGES"]
+    remaining_packages = " ".join(values)
+    if len(values) > 0:
+        script += f" && pip install --prefix=/mnt/persistent-python-packages {remaining_packages}"
+    script += ' && echo "$(date)" > /mnt/persistent-python-packages/.uwsgi_trigger'
+
+    yield ("lms", script)
+
+
+@click.command(help="Run migrations for an app")
+@click.argument("package", required=False)
+def run_migrations(package: str) -> t.Iterable[tuple[str, str]]:
+    """
+    Run migrations for a specific app or all apps.
+    """
+    script = "./manage.py lms migrate "
+    if package:
+        script += package
+
+    yield ("lms", script)
+
+
 hooks.Filters.CLI_DO_COMMANDS.add_items(
     [
         convert_mysql_utf8mb4_charset,
@@ -551,5 +631,8 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         settheme,
         sqlshell,
         update_mysql_authentication_plugin,
+        pip_install,
+        pip_uninstall,
+        run_migrations,
     ]
 )

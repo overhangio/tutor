@@ -6,6 +6,8 @@ x-openedx-service:
   volumes:
     # theme files
     - ../build/openedx/themes:/openedx/themes
+    # third party xblocks and their dependencies
+    - ../../data/persistent-python-packages:/mnt/persistent-python-packages
 
 services:
   permissions:
