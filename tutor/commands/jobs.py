@@ -573,7 +573,7 @@ def pip_install(context: click.Context, package: str) -> t.Iterable[tuple[str, s
     yield ("lms", script)
 
 
-@click.command(help="Remove an Xblock")
+@click.command(help="Remove a pip package at runtime")
 @click.pass_obj
 @click.pass_context
 @click.argument("package")
@@ -598,7 +598,7 @@ def pip_uninstall(
 
     script = "rm -rf /mnt/persistent-python-packages/lib/"
     config = tutor_config.load(context.root)
-    values = config["PERSISTENT_PIP_PACKAGES"]
+    values = t.cast(list[str], config["PERSISTENT_PIP_PACKAGES"])
     remaining_packages = " ".join(values)
     if len(values) > 0:
         script += f" && pip install --prefix=/mnt/persistent-python-packages {remaining_packages}"
