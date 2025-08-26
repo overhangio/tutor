@@ -72,7 +72,7 @@ Releasing a version includes two phases:
 
 1. Add changes and generate individual changelog entries:
 
-- run ``make changelog-entry``(or ``scriv create``) command - It will create changelog entries in a folder named changelog.d for the changes user has done for releasing a new version.
+- run ``make changelog-entry`` (or ``scriv create``) command - It will create changelog entries in a folder named changelog.d for the changes user has done for releasing a new version.
 - Commit and merge all the changes including the changelog entries. e.g this `commit <https://github.com/overhangio/tutor-discovery/commit/e30a78936d63439bde069aeff11960585bd81592>`__.
 
 2. Update version and compile changelogs:
