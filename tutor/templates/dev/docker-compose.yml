@@ -6,8 +6,6 @@ x-openedx-service:
   volumes:
     # theme files
     - ../build/openedx/themes:/openedx/themes
-    # third party xblocks and their dependencies
-    - ../../data/persistent-python-packages:/mnt/persistent-python-packages
 
 services:
   permissions:
@@ -19,6 +17,9 @@ services:
     command: ./manage.py lms runserver 0.0.0.0:8000
     environment:
         DJANGO_SETTINGS_MODULE: lms.envs.tutor.development
+        MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
+        OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
+        OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
     ports:
         - "8000:8000"
     networks:
@@ -31,6 +32,9 @@ services:
     command: ./manage.py cms runserver 0.0.0.0:8000
     environment:
         DJANGO_SETTINGS_MODULE: cms.envs.tutor.development
+        MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
+        OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
+        OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
     ports:
         - "8001:8000"
 

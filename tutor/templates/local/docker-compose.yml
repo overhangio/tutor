@@ -98,6 +98,9 @@ services:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.tutor.production
       UWSGI_WORKERS: {{ OPENEDX_LMS_UWSGI_WORKERS }}
+      MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
+      OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
+      OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
@@ -107,7 +110,6 @@ services:
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
       - ../../data/openedx-media-private:/openedx/media-private
-      - ../../data/persistent-python-packages:/mnt/persistent-python-packages
       {%- for mount in iter_mounts(MOUNTS, "openedx", "lms") %}
       - {{ mount }}
       {%- endfor %}
@@ -126,6 +128,9 @@ services:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
       UWSGI_WORKERS: {{ OPENEDX_CMS_UWSGI_WORKERS }}
+      MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
+      OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
+      OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
@@ -135,7 +140,6 @@ services:
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
       - ../../data/openedx-media-private:/openedx/media-private
-      - ../../data/persistent-python-packages:/mnt/persistent-python-packages
       {%- for mount in iter_mounts(MOUNTS, "openedx", "cms") %}
       - {{ mount }}
       {%- endfor %}

@@ -14,8 +14,6 @@ x-openedx-job-service:
     - ../apps/openedx/config:/openedx/config:ro
     # theme files
     - ../build/openedx/themes:/openedx/themes
-    # third party xblocks and their dependencies
-    - ../../data/persistent-python-packages:/mnt/persistent-python-packages
 
 services:
 
@@ -23,11 +21,17 @@ services:
     <<: *openedx-job-service
     environment:
       DJANGO_SETTINGS_MODULE: lms.envs.tutor.development
+      MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
+      OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
+      OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
 
 
   cms-job:
     <<: *openedx-job-service
     environment:
       DJANGO_SETTINGS_MODULE: cms.envs.tutor.development
+      MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
+      OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
+      OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
 
   {{ patch("dev-docker-compose-jobs-services")|indent(2) }}

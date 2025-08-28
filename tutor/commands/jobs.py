@@ -13,7 +13,6 @@ from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
 from tutor import env, fmt, hooks
-from tutor.commands.config import save as config_save_command
 from tutor.commands.context import Context
 from tutor.commands.jobs_utils import (
     create_user_template,
@@ -541,68 +540,57 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
         runner.run_task_from_str(service, command)
 
 
-@click.command(help="Install a pip package at runtime")
-@click.pass_context
-@click.argument("package")
-def pip_install(context: click.Context, package: str) -> t.Iterable[tuple[str, str]]:
+@click.command(help="Build all persistent pip packages and upload to MinIO")
+@click.pass_obj
+def build_packages(context: Context) -> t.Iterable[tuple[str, str]]:
     """
-    Installs a pip package persistently in the lms and cms container and
-    restarts with uwsgi server in both containers.
+    Build the persistent pip packages and upload to MinIO.
+    You need to update the `PERSISTENT_PIP_PACKAGES` variable
+    in the config file to add/remove packages.
     """
-
-    # TODO Only add package to config if pip install is successful
-    fmt.echo_info(f"Adding {package} to config...")
-    context.invoke(
-        config_save_command,
-        interactive=False,
-        set_vars=[],
-        append_vars=[("PERSISTENT_PIP_PACKAGES", package)],
-        remove_vars=[],
-        unset_vars=[],
-        env_only=False,
-        clean_env=False,
+    config = tutor_config.load(context.root)
+    all_packages = " ".join(
+        package for package in t.cast(list[str], config["PERSISTENT_PIP_PACKAGES"])
     )
 
     script = f"""
     pip install \
-    --prefix=/mnt/persistent-python-packages \
-    {package} \
-    && echo \"$(date)\" > /mnt/persistent-python-packages/.uwsgi_trigger
+    --prefix=/openedx/persistent-python-packages/deps \
+    {all_packages} \
+    && python3 -c '
+import os, shutil, tempfile, boto3, botocore, datetime, zipfile
+
+DEPS_DIR = "/openedx/persistent-python-packages/deps"
+MINIO_KEY = "deps.zip"
+DEPS_ZIP_PATH = DEPS_DIR[:-4] + MINIO_KEY
+MINIO_BUCKET = "tutor-deps"
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url="http://" + os.environ.get("MINIO_HOST"),
+    aws_access_key_id=os.environ.get("OPENEDX_AWS_ACCESS_KEY"),
+    aws_secret_access_key=os.environ.get("OPENEDX_AWS_SECRET_ACCESS_KEY"),
+)
+
+def _upload_to_minio(local_path):
+    try:
+        s3.head_bucket(Bucket=MINIO_BUCKET)
+    except botocore.exceptions.ClientError:
+        s3.create_bucket(Bucket=MINIO_BUCKET)
+    s3.upload_file(local_path, MINIO_BUCKET, MINIO_KEY)
+    print(f"Uploaded {{local_path}} → MinIO:{{MINIO_BUCKET}}/{{MINIO_KEY}}")
+    os.remove(local_path)
+
+def _make_zip_archive(src_dir):
+    with tempfile.TemporaryDirectory(prefix="tutor-depszip-") as zip_dir:
+        path = os.path.join(zip_dir, "deps.zip")
+        shutil.make_archive(path[:-4], format="zip", root_dir=src_dir)
+        shutil.move(path, DEPS_ZIP_PATH)
+
+_make_zip_archive(DEPS_DIR)
+_upload_to_minio(DEPS_ZIP_PATH)
+'
     """
-
-    yield ("lms", script)
-
-
-@click.command(help="Remove a pip package at runtime")
-@click.pass_obj
-@click.pass_context
-@click.argument("package")
-def pip_uninstall(
-    click_context: click.Context, context: Context, package: str
-) -> t.Iterable[tuple[str, str]]:
-    """
-    Deletes the persistently installed pip package along with its dependencies
-    """
-
-    fmt.echo_info(f"Removing {package} from config...")
-    click_context.invoke(
-        config_save_command,
-        interactive=False,
-        set_vars=[],
-        append_vars=[],
-        remove_vars=[("PERSISTENT_PIP_PACKAGES", package)],
-        unset_vars=[],
-        env_only=False,
-        clean_env=False,
-    )
-
-    script = "rm -rf /mnt/persistent-python-packages/lib/"
-    config = tutor_config.load(context.root)
-    values = t.cast(list[str], config["PERSISTENT_PIP_PACKAGES"])
-    remaining_packages = " ".join(values)
-    if len(values) > 0:
-        script += f" && pip install --prefix=/mnt/persistent-python-packages {remaining_packages}"
-    script += ' && echo "$(date)" > /mnt/persistent-python-packages/.uwsgi_trigger'
 
     yield ("lms", script)
 
@@ -631,8 +619,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         settheme,
         sqlshell,
         update_mysql_authentication_plugin,
-        pip_install,
-        pip_uninstall,
+        build_packages,
         run_migrations,
     ]
 )

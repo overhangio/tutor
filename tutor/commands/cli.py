@@ -16,7 +16,6 @@ from tutor.commands.k8s import k8s
 from tutor.commands.local import local
 from tutor.commands.mounts import mounts_command
 from tutor.commands.plugins import plugins_command
-from tutor.commands.packages import packages_command
 
 
 def main() -> None:
@@ -66,7 +65,7 @@ class TutorCli(click.Group):
         """
         We enable plugins as soon as possible to have access to commands.
         """
-        if not "root" in ctx.params:
+        if "root" not in ctx.params:
             # When generating docs, this function is called with empty args.
             # That's ok, we just ignore it.
             return
@@ -130,7 +129,6 @@ hooks.Filters.CLI_COMMANDS.add_items(
         local,
         mounts_command,
         plugins_command,
-        packages_command,
     ]
 )
 
