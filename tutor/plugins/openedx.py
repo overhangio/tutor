@@ -110,7 +110,8 @@ hooks.Filters.MOUNTED_DIRECTORIES.add_items(
         ("openedx", "edx-enterprise"),
         ("openedx", "edx-ora2"),
         ("openedx", "edx-search"),
-        ("openedx", "openedx-learning"),
+        ("openedx", r"openedx-.*"),
+        ("openedx", "opaque-keys"),
         ("openedx", r"platform-plugin-.*"),
     ]
 )
