@@ -1,0 +1,1 @@
+- [Security] Switch to a cryptographically secure number generator for the `random_string` function. (by @samuelallan72)
