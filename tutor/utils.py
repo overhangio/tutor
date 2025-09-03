@@ -3,8 +3,8 @@ import hashlib
 import hmac
 import json
 import os
-import random
 import re
+import secrets
 import shlex
 import shutil
 import string
@@ -70,7 +70,7 @@ def ensure_directory_exists(path: str) -> None:
 
 def random_string(length: int) -> str:
     return "".join(
-        [random.choice(string.ascii_letters + string.digits) for _ in range(length)]
+        [secrets.choice(string.ascii_letters + string.digits) for _ in range(length)]
     )
 
 
