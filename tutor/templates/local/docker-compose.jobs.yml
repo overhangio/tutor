@@ -22,9 +22,6 @@ services:
       environment:
         SERVICE_VARIANT: lms
         DJANGO_SETTINGS_MODULE: lms.envs.tutor.production
-        MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
-        OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
-        OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
       volumes:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
@@ -39,9 +36,6 @@ services:
       environment:
         SERVICE_VARIANT: cms
         DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
-        MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
-        OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
-        OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
       volumes:
         - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro

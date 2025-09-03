@@ -31,9 +31,6 @@ services:
     environment:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.tutor.production
-      MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
-      OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
-      OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
     command: {% for value in iter_lms_celery_parameters() %}
       - "{{value}}"{% endfor %}
     restart: unless-stopped
@@ -55,9 +52,6 @@ services:
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
-      MINIO_HOST: {{ MINIO_HOST | default("minio:9000") }}
-      OPENEDX_AWS_ACCESS_KEY: {{ OPENEDX_AWS_ACCESS_KEY}}
-      OPENEDX_AWS_SECRET_ACCESS_KEY: {{ OPENEDX_AWS_SECRET_ACCESS_KEY }}
     command: {% for value in iter_cms_celery_parameters() %}
       - "{{value}}"{% endfor %}
     restart: unless-stopped

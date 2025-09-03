@@ -179,7 +179,7 @@ ENV VIRTUAL_ENV=/openedx/venv/
 ENV COMPREHENSIVE_THEME_DIRS=/openedx/themes
 ENV STATIC_ROOT_LMS=/openedx/staticfiles
 ENV STATIC_ROOT_CMS=/openedx/staticfiles/studio
-ENV PYTHONPATH=/openedx/persistent-python-packages/deps/lib/python3.11/site-packages
+ENV PYTHONPATH=/openedx/live-dependencies/deps/lib/python3.11/site-packages
 
 WORKDIR /openedx/edx-platform
 
@@ -314,14 +314,14 @@ ENV UWSGI_WORKERS=2
 # Copy the default uWSGI configuration
 COPY --chown=app:app settings/uwsgi.ini /openedx
 
-# Copy the download script that fetches dependencies from MinIO
-COPY --chown=app:app settings/download_packages_from_minio.py /openedx
+# Copy live dependencies scripts and trigger file
+RUN mkdir -p /openedx/live-dependencies
+RUN touch /openedx/live-dependencies/uwsgi_trigger
+COPY --chown=app:app settings/monitor_livedeps.py /openedx/live-dependencies/
+COPY --chown=app:app settings/update_livedeps.py /openedx/live-dependencies/
 
 # Run server
-CMD sh -c "python /openedx/download_packages_from_minio.py & \
-           while true; do sleep 30; python /openedx/download_packages_from_minio.py; done & \
-           uwsgi /openedx/uwsgi.ini"
+CMD ["uwsgi", "/openedx/uwsgi.ini"]
 
 
 {{ patch("openedx-dockerfile-final") }}
-

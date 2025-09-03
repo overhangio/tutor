@@ -540,55 +540,39 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
         runner.run_task_from_str(service, command)
 
 
-@click.command(help="Build all persistent pip packages and upload to MinIO")
+@click.command(
+    help="Build all live dependencies, zip them and upload to storage backend"
+)
 @click.pass_obj
-def build_packages(context: Context) -> t.Iterable[tuple[str, str]]:
+def build_live_dependencies(context: Context) -> t.Iterable[tuple[str, str]]:
     """
-    Build the persistent pip packages and upload to MinIO.
-    You need to update the `PERSISTENT_PIP_PACKAGES` variable
-    in the config file to add/remove packages.
+    Build the live dependencies and upload using Django's storage API.
+    You need to update the `LIVE_DEPENDENCIES` variable in the config file to add/remove packages.
     """
     config = tutor_config.load(context.root)
     all_packages = " ".join(
-        package for package in t.cast(list[str], config["PERSISTENT_PIP_PACKAGES"])
+        package for package in t.cast(list[str], config["LIVE_DEPENDENCIES"])
     )
 
     script = f"""
     pip install \
-    --prefix=/openedx/persistent-python-packages/deps \
+    --prefix=/openedx/live-dependencies/deps \
     {all_packages} \
     && python3 -c '
-import os, shutil, tempfile, boto3, botocore, datetime, zipfile
+import os, shutil, tempfile
+from django.core.files.storage import storages
+from django.core.files.base import File
 
-DEPS_DIR = "/openedx/persistent-python-packages/deps"
-MINIO_KEY = "deps.zip"
-DEPS_ZIP_PATH = DEPS_DIR[:-4] + MINIO_KEY
-MINIO_BUCKET = "tutor-deps"
+DEPS_DIR = "/openedx/live-dependencies/deps"
+DEPS_KEY = "deps.zip"
 
-s3 = boto3.client(
-    "s3",
-    endpoint_url="http://" + os.environ.get("MINIO_HOST"),
-    aws_access_key_id=os.environ.get("OPENEDX_AWS_ACCESS_KEY"),
-    aws_secret_access_key=os.environ.get("OPENEDX_AWS_SECRET_ACCESS_KEY"),
-)
+with tempfile.TemporaryDirectory(prefix="tutor-livedeps-") as zip_dir:
+    base = os.path.join(zip_dir, DEPS_KEY)
+    archive_path = shutil.make_archive(base[:-4], format="zip", root_dir=DEPS_DIR)
 
-def _upload_to_minio(local_path):
-    try:
-        s3.head_bucket(Bucket=MINIO_BUCKET)
-    except botocore.exceptions.ClientError:
-        s3.create_bucket(Bucket=MINIO_BUCKET)
-    s3.upload_file(local_path, MINIO_BUCKET, MINIO_KEY)
-    print(f"Uploaded {{local_path}} → MinIO:{{MINIO_BUCKET}}/{{MINIO_KEY}}")
-    os.remove(local_path)
-
-def _make_zip_archive(src_dir):
-    with tempfile.TemporaryDirectory(prefix="tutor-depszip-") as zip_dir:
-        path = os.path.join(zip_dir, "deps.zip")
-        shutil.make_archive(path[:-4], format="zip", root_dir=src_dir)
-        shutil.move(path, DEPS_ZIP_PATH)
-
-_make_zip_archive(DEPS_DIR)
-_upload_to_minio(DEPS_ZIP_PATH)
+    with open(archive_path, "rb") as f:
+        # TODO Use a separate storage for live dependencies
+        storages["default"].save(DEPS_KEY, File(f))
 '
     """
 
@@ -619,7 +603,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         settheme,
         sqlshell,
         update_mysql_authentication_plugin,
-        build_packages,
+        build_live_dependencies,
         run_migrations,
     ]
 )
