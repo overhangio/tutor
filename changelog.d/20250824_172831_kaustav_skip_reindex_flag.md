@@ -1,0 +1,1 @@
+- [Feature] `SKIP_REINDEX` flag to skip reindexing of courses during initilization. (by @kaustavb12)
