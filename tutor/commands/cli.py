@@ -65,7 +65,7 @@ class TutorCli(click.Group):
         """
         We enable plugins as soon as possible to have access to commands.
         """
-        if not "root" in ctx.params:
+        if "root" not in ctx.params:
             # When generating docs, this function is called with empty args.
             # That's ok, we just ignore it.
             return

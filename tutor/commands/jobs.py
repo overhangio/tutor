@@ -540,6 +540,58 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
         runner.run_task_from_str(service, command)
 
 
+@click.command(
+    help="Build all live dependencies, zip them and upload to storage backend"
+)
+@click.pass_obj
+def build_live_dependencies(context: Context) -> t.Iterable[tuple[str, str]]:
+    """
+    Build the live dependencies and upload using Django's storage API.
+    You need to update the `LIVE_DEPENDENCIES` variable in the config file to add/remove packages.
+    """
+    config = tutor_config.load(context.root)
+    all_packages = " ".join(
+        package for package in t.cast(list[str], config["LIVE_DEPENDENCIES"])
+    )
+
+    script = f"""
+    pip install \
+    --prefix=/openedx/live-dependencies/deps \
+    {all_packages} \
+    && python3 -c '
+import os, shutil, tempfile
+from django.core.files.storage import storages
+from django.core.files.base import File
+
+DEPS_DIR = "/openedx/live-dependencies/deps"
+DEPS_KEY = "deps.zip"
+
+with tempfile.TemporaryDirectory(prefix="tutor-livedeps-") as zip_dir:
+    base = os.path.join(zip_dir, DEPS_KEY)
+    archive_path = shutil.make_archive(base[:-4], format="zip", root_dir=DEPS_DIR)
+
+    with open(archive_path, "rb") as f:
+        # TODO Use a separate storage for live dependencies
+        storages["default"].save(DEPS_KEY, File(f))
+'
+    """
+
+    yield ("lms", script)
+
+
+@click.command(help="Run migrations for an app")
+@click.argument("package", required=False)
+def run_migrations(package: str) -> t.Iterable[tuple[str, str]]:
+    """
+    Run migrations for a specific app or all apps.
+    """
+    script = "./manage.py lms migrate "
+    if package:
+        script += package
+
+    yield ("lms", script)
+
+
 hooks.Filters.CLI_DO_COMMANDS.add_items(
     [
         convert_mysql_utf8mb4_charset,
@@ -551,5 +603,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         settheme,
         sqlshell,
         update_mysql_authentication_plugin,
+        build_live_dependencies,
+        run_migrations,
     ]
 )
