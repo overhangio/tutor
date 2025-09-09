@@ -129,7 +129,7 @@ ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
 RUN pip install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=18.20.1 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=20.19.5 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
