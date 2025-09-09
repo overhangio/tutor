@@ -14,7 +14,7 @@ Or you can list all available patches with the following command::
 
     tutor config patches list
 
-See also `this GitHub search <https://github.com/search?utf8=✓&q={{+patch+repo%3Aoverhangio%2Ftutor+path%3A%2Ftutor%2Ftemplates&type=Code&ref=advsearch&l=&l= 8>`__.
+See also `this GitHub search <https://github.com/search?utf8=✓&q={{+patch+repo%3Aoverhangio%2Ftutor+path%3Atutor%2Ftemplates&type=Code&ref=advsearch&l=&l= 8>`__.
 
 .. patch:: caddyfile
 
