@@ -1,1 +1,1 @@
-[Feature] Added a variable `REDIS_TRANSPORT` (defaults to `redis`) but allows to change the redis transport protocol to secure redis (i.e `rediss`). (by @so-jd) 
+[Feature] Added a variable `REDIS_TRANSPORT` (defaults to `redis`) that allows to change the redis transport protocol to secure redis (i.e `rediss`). (by @so-jd) 
