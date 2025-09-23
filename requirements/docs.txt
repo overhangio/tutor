@@ -14,12 +14,12 @@ cachetools==5.5.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2025.4.26
+certifi==2025.8.3
     # via
     #   -r requirements/base.txt
     #   kubernetes
     #   requests
-charset-normalizer==3.4.1
+charset-normalizer==3.4.3
     # via
     #   -r requirements/base.txt
     #   requests
@@ -32,11 +32,11 @@ docutils==0.21.2
     #   sphinx
     #   sphinx-click
     #   sphinx-rtd-theme
-durationpy==0.9
+durationpy==0.10
     # via
     #   -r requirements/base.txt
     #   kubernetes
-google-auth==2.39.0
+google-auth==2.40.3
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -56,19 +56,19 @@ jinja2==3.1.6
     # via
     #   -r requirements/base.txt
     #   sphinx
-kubernetes==32.0.1
+kubernetes==33.1.0
     # via -r requirements/base.txt
 markupsafe==3.0.2
     # via
     #   -r requirements/base.txt
     #   jinja2
-mypy==1.15.0
+mypy==1.18.2
     # via -r requirements/base.txt
 mypy-extensions==1.1.0
     # via
     #   -r requirements/base.txt
     #   mypy
-oauthlib==3.2.2
+oauthlib==3.3.1
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -77,6 +77,10 @@ packaging==25.0
     # via
     #   -r requirements/base.txt
     #   sphinx
+pathspec==0.12.1
+    # via
+    #   -r requirements/base.txt
+    #   mypy
 pyasn1==0.6.1
     # via
     #   -r requirements/base.txt
@@ -86,9 +90,9 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements/base.txt
     #   google-auth
-pycryptodome==3.22.0
+pycryptodome==3.23.0
     # via -r requirements/base.txt
-pygments==2.19.1
+pygments==2.19.2
     # via sphinx
 python-dateutil==2.9.0.post0
     # via
@@ -98,7 +102,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/base.txt
     #   kubernetes
-requests==2.32.3
+requests==2.32.5
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -117,7 +121,7 @@ six==1.17.0
     #   -r requirements/base.txt
     #   kubernetes
     #   python-dateutil
-snowballstemmer==2.2.0
+snowballstemmer==3.0.1
     # via sphinx
 sphinx==7.4.7
     # via
@@ -148,11 +152,11 @@ tomli==2.2.1
     #   -r requirements/base.txt
     #   mypy
     #   sphinx
-typing-extensions==4.13.2
+typing-extensions==4.15.0
     # via
     #   -r requirements/base.txt
     #   mypy
-urllib3==2.4.0
+urllib3==2.5.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
@@ -161,7 +165,7 @@ websocket-client==1.8.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
-zipp==3.21.0
+zipp==3.23.0
     # via
     #   -r requirements/base.txt
     #   importlib-metadata
