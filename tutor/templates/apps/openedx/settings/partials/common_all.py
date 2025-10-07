@@ -153,13 +153,16 @@ LOGGING["loggers"]["blockstore.apps.bundles.storage"] = {"handlers": ["console"]
 import warnings
 
 # REMOVE-AFTER-V20: check if we can remove these lines after upgrade.
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
-# RemovedInDjango5xWarning: 'xxx' is deprecated. Use 'yyy' in 'zzz' instead.
-warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
-warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
-# DeprecationWarning: 'imghdr' is deprecated and slated for removal in Python 3.13
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="pgpy.constants")
-
+try:
+    from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+    # RemovedInDjango5xWarning: 'xxx' is deprecated. Use 'yyy' in 'zzz' instead.
+    warnings.filterwarnings("ignore", category=RemovedInDjango50Warning)
+    warnings.filterwarnings("ignore", category=RemovedInDjango51Warning)
+    # DeprecationWarning: 'imghdr' is deprecated and slated for removal in Python 3.13
+    warnings.filterwarnings("ignore", category=DeprecationWarning, module="pgpy.constants")
+except ImportError:
+    pass # If the warnings don't exist we don't need to filter them.
+    
 # Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
 # Forward all emails from edX's Automated Communication Engine (ACE) to django.
