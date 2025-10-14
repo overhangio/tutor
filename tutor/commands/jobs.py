@@ -167,9 +167,9 @@ python ./manage.py cms import ../data "$course_root"
 
 # Re-index courses
 # We are not doing this anymore, because it doesn't make much sense to reindex *all*
-# courses after a single one has been created. Thus we should # rely on course authors to
-# press the "reindex" button in the studio after the course has # been imported.
-#./manage.py cms reindex_course --all --setup
+# courses after a single one has been created. Thus we should rely on course authors to
+# press the "reindex" button in the studio after the course has been imported.
+# ./manage.py cms reindex_course --all --setup
 """
     yield ("cms", template)
 
@@ -285,13 +285,13 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     "--include",
     is_flag=False,
     nargs=1,
-    help="Apps/Tables to include in the upgrade process. Requires comma-seperated values with no space in-between.",
+    help="Apps/Tables to include in the upgrade process. Requires comma-separated values with no space in-between.",
 )
 @click.option(
     "--exclude",
     is_flag=False,
     nargs=1,
-    help="Apps/Tables to exclude from the upgrade process. Requires comma-seperated values with no space in-between.",
+    help="Apps/Tables to exclude from the upgrade process. Requires comma-separated values with no space in-between.",
 )
 @click.option(
     "--database",
