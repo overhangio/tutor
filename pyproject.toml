@@ -40,6 +40,9 @@ Community = "https://discuss.openedx.org/tag/tutor"
 [tool.hatch.metadata.hooks.custom]
 path = ".hatch_build.py"
 
+[tool.hatch.version]
+path = "tutor/__about__.py"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

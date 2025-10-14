@@ -1,0 +1,1 @@
+- [Chore] Remove unnecessary hatch definition for version. (by @mlabeeb03)
