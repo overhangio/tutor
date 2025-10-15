@@ -60,3 +60,21 @@ exclude = ["tests*"]
 [tool.hatch.metadata]
 # Allow github dependencies in plugins.txt
 allow-direct-references = true
+
+[tool.ruff]
+exclude = ["templates", "docs/_ext"]
+line-length = 120
+
+[tool.ruff.lint]
+# E: pycodestyle errors
+# I: isort
+# N: pep8-naming
+select = ["E", "I", "N"]
+
+# F401: unused-import
+# F841: unused-variable
+# F541: f-string without interpolation
+# W292: missing-newline-at-end-of-file
+extend-select = ["F401", "F841", "F541", "W292"]
+
+[tool.ruff.format]

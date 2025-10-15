@@ -270,7 +270,7 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     """
     command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --default-character-set=utf8mb4"
     if args:
-        command += " " + shlex.join(args)  # pylint: disable=protected-access
+        command += " " + shlex.join(args)
     yield ("lms", command)
 
 
