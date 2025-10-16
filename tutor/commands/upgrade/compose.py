@@ -4,8 +4,7 @@ import click
 
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import hooks
-from tutor import fmt
+from tutor import fmt, hooks
 from tutor.commands import compose, jobs
 from tutor.types import Config
 

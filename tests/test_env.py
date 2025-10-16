@@ -392,9 +392,9 @@ class PatchRendererTests(unittest.TestCase):
         render_all_mock.assert_called_once()
         self.assertEqual(
             """
-PATCH      	LOCATIONS
-first_patch	template_1
-           	template_2
+PATCH      \tLOCATIONS
+first_patch\ttemplate_1
+           \ttemplate_2
 """.strip(),
             stdout_mock.getvalue().strip(),
         )

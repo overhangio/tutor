@@ -307,7 +307,7 @@ def get_package_install_command() -> list[str]:
     """
     # pip
     try:
-        import pip  # pylint: disable=unused-import, import-outside-toplevel
+        import pip  # noqa: E402, F401
     except ImportError:
         pass
     else:
@@ -319,7 +319,7 @@ def get_package_install_command() -> list[str]:
 
     # uv: from python
     try:
-        import uv  # pylint: disable=unused-import, import-outside-toplevel
+        import uv  # noqa: E402, F401
     except ImportError:
         pass
     else:

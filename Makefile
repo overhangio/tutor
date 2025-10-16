@@ -27,10 +27,10 @@ test: test-lint test-unit test-types test-format test-pythonpackage ## Run all t
 test-static: test-lint test-types test-format  ## Run only static tests
 
 test-format: ## Run code formatting tests
-	black --check --diff $(BLACK_OPTS)
+	ruff format --check --diff $(SRC_DIRS)
 
 test-lint: ## Run code linting tests
-	pylint --disable=all --enable=E --enable=unused-import,unused-argument,f-string-without-interpolation --ignore=templates --ignore=docs/_ext ${SRC_DIRS}
+	ruff check ${SRC_DIRS}
 
 test-unit: ## Run unit tests
 	python -m unittest discover tests
@@ -45,10 +45,10 @@ test-k8s: ## Validate the k8s format with kubectl. Not part of the standard test
 	tutor k8s apply --dry-run=client --validate=true
 
 format: ## Format code automatically
-	black $(BLACK_OPTS)
+	ruff format ${SRC_DIRS}
 
-isort: ##  Sort imports. This target is not mandatory because the output may be incompatible with black formatting. Provided for convenience purposes.
-	isort --skip=templates ${SRC_DIRS}
+fix-lint: ## Fix lint errors automatically
+	ruff check --fix ${SRC_DIRS}
 
 changelog-entry: ## Create a new changelog entry
 	scriv create

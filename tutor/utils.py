@@ -255,8 +255,8 @@ def warn_macos_docker_memory() -> None:
 
     {e}
 
-Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions from:
-    https://docs.tutor.edly.io/install.html"""
+Tutor may not work if Docker is configured with < 4 GB RAM. Please follow instructions
+from: https://docs.tutor.edly.io/install.html"""
         )
 
 
@@ -289,8 +289,8 @@ def check_macos_docker_memory() -> None:
             f"Unexpected JSON data in {settings_path}: {e}"
         ) from e
     except KeyError as e:
-        # Value is absent (Docker creates the file with the default setting of 2048 explicitly
-        # written in, so we shouldn't need to assume a default value here.)
+        # Value is absent (Docker creates the file with the default setting of 2048
+        # explicitly written in, so we shouldn't need to assume a default value here.)
         raise exceptions.TutorError(
             f"key 'memoryMiB' not found in {settings_path}"
         ) from e
@@ -302,7 +302,8 @@ def check_macos_docker_memory() -> None:
 
     if memory_mib < 4096:
         raise exceptions.TutorError(
-            f"Docker is configured to allocate {memory_mib} MiB RAM, less than the recommended {4096} MiB"
+            f"Docker is configured to allocate {memory_mib} MiB RAM, "
+            f"less than the recommended {4096} MiB"
         )
 
 

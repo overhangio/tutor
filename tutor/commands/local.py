@@ -27,7 +27,6 @@ class LocalTaskRunner(compose.ComposeTaskRunner):
         ]
 
 
-# pylint: disable=too-few-public-methods
 class LocalContext(compose.BaseComposeContext):
     NAME = "local"
     OPENEDX_SERVICES = ["lms", "cms", "lms-worker", "cms-worker"]

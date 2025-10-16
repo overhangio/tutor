@@ -5,10 +5,9 @@ import typing as t
 
 import click
 
-from tutor import bindmount
+from tutor import bindmount, exceptions, fmt, hooks, images, utils
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt, hooks, images, utils
 from tutor.commands.context import Context
 from tutor.commands.params import ConfigLoaderParam
 from tutor.core.hooks import Filter

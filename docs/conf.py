@@ -11,7 +11,7 @@ import docutils.parsers.rst
 # -- Project information -----------------------------------------------------
 
 project = "Tutor"
-copyright = ""  # pylint: disable=redefined-builtin
+copyright = ""
 author = "Overhang.IO"
 
 # The short X.Y version
@@ -113,7 +113,6 @@ about: Dict[str, str] = {}
 with io.open(
     os.path.join(here, "..", "tutor", "__about__.py"), "rt", encoding="utf-8"
 ) as f:
-    # pylint: disable=exec-used
     exec(f.read(), about)
 rst_prolog = f"""
 .. |tutor_version| replace:: {about["__version__"]}
@@ -127,10 +126,10 @@ def youtube(
     _options: Any,
     content: List[str],
     _lineno: Any,
-    _contentOffset: Any,
-    _blockText: Any,
+    _content_offset: Any,
+    _block_text: Any,
     _state: Any,
-    _stateMachine: Any,
+    _state_machine: Any,
 ) -> Any:
     """Restructured text extension for inserting youtube embedded videos"""
     if not content:

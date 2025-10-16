@@ -60,7 +60,7 @@ def load_all(names: t.Iterable[str]) -> None:
     for name in names:
         try:
             load(name)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:
             fmt.echo_alert(f"Failed to enable plugin '{name}': {e}")
     hooks.Actions.PLUGINS_LOADED.do()
 

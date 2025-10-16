@@ -1,8 +1,7 @@
 -r base.txt
-black
+ruff
 coverage
 pip-tools
-pylint
 pyinstaller
 scriv
 twine

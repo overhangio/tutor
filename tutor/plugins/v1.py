@@ -1,7 +1,7 @@
 import importlib.util
 import os
-from glob import glob
 import sys
+from glob import glob
 
 import importlib_metadata
 

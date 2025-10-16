@@ -49,8 +49,7 @@ class BindmountTests(unittest.TestCase):
 
     def test_parse_implicit(self) -> None:
         # Import module to make sure filter is created
-        # pylint: disable=import-outside-toplevel,unused-import
-        import tutor.commands.compose
+        import tutor.commands.compose  # noqa: E402, F401
 
         self.assertEqual(
             [("openedx", "/path/to/edx-platform", "/openedx/edx-platform")],

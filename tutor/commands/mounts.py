@@ -5,9 +5,8 @@ import os
 import click
 import yaml
 
-from tutor import bindmount
+from tutor import bindmount, exceptions, fmt, hooks
 from tutor import config as tutor_config
-from tutor import exceptions, fmt, hooks
 from tutor.commands.config import save as config_save
 from tutor.commands.context import Context
 from tutor.commands.params import ConfigLoaderParam

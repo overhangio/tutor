@@ -43,16 +43,16 @@ class UtilsTests(unittest.TestCase):
 
     def test_ensure_file_directory_exists(self) -> None:
         with tempfile.TemporaryDirectory() as root:
-            tempPath = os.path.join(root, "tempDir", "tempFile")
-            utils.ensure_file_directory_exists(tempPath)
-            self.assertTrue(os.path.exists(os.path.dirname(tempPath)))
+            temp_path = os.path.join(root, "tempDir", "tempFile")
+            utils.ensure_file_directory_exists(temp_path)
+            self.assertTrue(os.path.exists(os.path.dirname(temp_path)))
 
-    def test_ensure_file_directory_exists_dirExists(self) -> None:
+    def test_ensure_file_directory_exists_when_directory_exists(self) -> None:
         with tempfile.TemporaryDirectory() as root:
-            tempPath = os.path.join(root, "tempDir")
-            os.makedirs(tempPath)
+            temp_path = os.path.join(root, "tempDir")
+            os.makedirs(temp_path)
             self.assertRaises(
-                exceptions.TutorError, utils.ensure_file_directory_exists, tempPath
+                exceptions.TutorError, utils.ensure_file_directory_exists, temp_path
             )
 
     def test_long_to_base64(self) -> None:
