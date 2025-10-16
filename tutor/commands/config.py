@@ -3,16 +3,14 @@ from __future__ import annotations
 import json
 import os.path
 import typing as t
+from shutil import which
 
 import click
 import click.shell_completion
 
-from shutil import which
-
 from tutor import config as tutor_config
-from tutor import env, exceptions, fmt, hooks
+from tutor import env, exceptions, fmt, hooks, serialize, utils
 from tutor import interactive as interactive_config
-from tutor import serialize, utils
 from tutor.commands.context import Context
 from tutor.commands.params import ConfigLoaderParam
 from tutor.types import Config, ConfigValue

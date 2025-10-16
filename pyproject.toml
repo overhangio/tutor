@@ -63,7 +63,6 @@ allow-direct-references = true
 
 [tool.ruff]
 exclude = ["templates", "docs/_ext"]
-line-length = 120
 
 [tool.ruff.lint]
 # E: pycodestyle errors
@@ -76,5 +75,13 @@ select = ["E", "I", "N"]
 # F541: f-string without interpolation
 # W292: missing-newline-at-end-of-file
 extend-select = ["F401", "F841", "F541", "W292"]
+
+# TODO: Re-enable E501 (line too long) after fixing the ~250 violating lines.
+# It’s currently disabled to keep this PR easy to review.
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore F401 (unused import) because init files usually import modules to initialize.
+"**/__init__.py" = ["F401"]
 
 [tool.ruff.format]

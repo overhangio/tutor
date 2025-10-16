@@ -20,7 +20,7 @@ def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
     """
     defaults = tutor_config.get_defaults()
     if run_for_prod is None:
-        run_for_prod = not config.get("LMS_HOST") in [
+        run_for_prod = config.get("LMS_HOST") not in [
             "local.openedx.io",
             "local.edly.io",
             "local.overhang.io",

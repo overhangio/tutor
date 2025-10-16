@@ -126,10 +126,10 @@ def youtube(
     _options: Any,
     content: List[str],
     _lineno: Any,
-    _contentOffset: Any,
-    _blockText: Any,
+    _content_offset: Any,
+    _block_text: Any,
     _state: Any,
-    _stateMachine: Any,
+    _state_machine: Any,
 ) -> Any:
     """Restructured text extension for inserting youtube embedded videos"""
     if not content:

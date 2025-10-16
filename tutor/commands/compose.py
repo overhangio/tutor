@@ -15,7 +15,7 @@ from tutor.commands.config import save as config_save_command
 from tutor.commands.context import BaseTaskContext
 from tutor.commands.upgrade import OPENEDX_RELEASE_NAMES
 from tutor.commands.upgrade.compose import upgrade_from
-from tutor.core.hooks import Filter  # pylint: disable=unused-import
+from tutor.core.hooks import Filter  # noqa: F401
 from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
