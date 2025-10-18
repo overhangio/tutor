@@ -42,6 +42,7 @@ MEILISEARCH_INDEX_PREFIX = "{{ MEILISEARCH_INDEX_PREFIX }}"
 MEILISEARCH_API_KEY = "{{ MEILISEARCH_API_KEY }}"
 MEILISEARCH_MASTER_KEY = "{{ MEILISEARCH_MASTER_KEY }}"
 SEARCH_ENGINE = "search.meilisearch.MeilisearchEngine"
+REDIS_TRANSPORT = "{{ REDIS_TRANSPORT }}"
 
 # Common cache config
 CACHES = {
@@ -49,40 +50,40 @@ CACHES = {
         "KEY_PREFIX": "default",
         "VERSION": "1",
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+        "LOCATION": "{{ REDIS_TRANSPORT }}://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     },
     "general": {
         "KEY_PREFIX": "general",
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+        "LOCATION": "{{ REDIS_TRANSPORT }}://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     },
     "mongo_metadata_inheritance": {
         "KEY_PREFIX": "mongo_metadata_inheritance",
         "TIMEOUT": 300,
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+        "LOCATION": "{{ REDIS_TRANSPORT }}://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     },
     "configuration": {
         "KEY_PREFIX": "configuration",
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+        "LOCATION": "{{ REDIS_TRANSPORT }}://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     },
     "celery": {
         "KEY_PREFIX": "celery",
         "TIMEOUT": 7200,
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+        "LOCATION": "{{ REDIS_TRANSPORT }}://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     },
     "course_structure_cache": {
         "KEY_PREFIX": "course_structure",
         "TIMEOUT": 604800, # 1 week
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+        "LOCATION": "{{ REDIS_TRANSPORT }}://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     },
     "ora2-storage": {
         "KEY_PREFIX": "ora2-storage",
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
+        "LOCATION": "{{ REDIS_TRANSPORT }}://{% if REDIS_USERNAME and REDIS_PASSWORD %}{{ REDIS_USERNAME }}:{{ REDIS_PASSWORD }}{% endif %}@{{ REDIS_HOST }}:{{ REDIS_PORT }}/{{ OPENEDX_CACHE_REDIS_DB }}",
     }
 }
 
