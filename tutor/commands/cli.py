@@ -24,7 +24,7 @@ def main() -> None:
         # Note that this action should not be triggered in the module scope, because it
         # makes it difficult for tests to rollback changes.
         hooks.Actions.CORE_READY.do()
-        cli()  # pylint: disable=no-value-for-parameter
+        cli()
     except KeyboardInterrupt:
         pass
     except exceptions.TutorError as e:
@@ -65,7 +65,7 @@ class TutorCli(click.Group):
         """
         We enable plugins as soon as possible to have access to commands.
         """
-        if not "root" in ctx.params:
+        if "root" not in ctx.params:
             # When generating docs, this function is called with empty args.
             # That's ok, we just ignore it.
             return

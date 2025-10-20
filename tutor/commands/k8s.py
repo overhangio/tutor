@@ -23,8 +23,7 @@ class K8sClients:
 
     def __init__(self) -> None:
         # Loading the kubernetes module here to avoid import overhead
-        # pylint: disable=import-outside-toplevel
-        from kubernetes import client, config
+        from kubernetes import client, config  # noqa: E402, F401
 
         if os.path.exists(
             os.path.expanduser(config.kube_config.KUBE_CONFIG_DEFAULT_LOCATION)

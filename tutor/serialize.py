@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import re
 import typing as t
+from _io import TextIOWrapper
 
 import yaml
-from _io import TextIOWrapper
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
