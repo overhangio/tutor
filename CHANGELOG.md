@@ -20,6 +20,17 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-20.0.2'></a>
+## v20.0.2 (2025-10-20)
+
+ - [Feature] Add support for pruning unused Kubernetes ConfigMaps with `--prune-configmaps` via the Tutor CLI. (by @dkaliberda)
+
+- [Security] Switch to a cryptographically secure number generator for the `random_string` function. (by @samuelallan72)
+
+- [Improvement] Upgrade node to v20.19.5 in Open edX Docker image. (by @dawoudsheraz)
+
+- [Improvement] Migrate from pylint and black to ruff. (by @ahmed-arb)
+
 <a id='changelog-20.0.1'></a>
 ## v20.0.1 (2025-08-22)
 
