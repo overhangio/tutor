@@ -21,7 +21,7 @@ class Indexes:
     CACHE_PATH = ""
 
 
-class CacheNotFound(TutorError):
+class CacheNotFound(TutorError):  # noqa: N818
     def __init__(self) -> None:
         super().__init__(
             f"Local index cache could not be found in {Indexes.CACHE_PATH}. Run `tutor plugins update`."

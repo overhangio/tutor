@@ -8,7 +8,7 @@ import click
 import importlib_metadata
 
 from tutor import env, exceptions, fmt, hooks, serialize
-from tutor.__about__ import __app__
+from tutor.__about__ import __app__  # noqa: F401
 from tutor.types import Config
 
 from .base import PLUGINS_ROOT
@@ -43,7 +43,8 @@ class BasePlugin:
     It is then assumed that there are `myplugin/hooks/service1/init` and
     `myplugin/hooks/service2/init` templates in the plugin `templates` directory.
 
-    `command` (click.Command): if a plugin exposes a `command` attribute, users will be able to run it from the command line as `tutor pluginname`.
+    `command` (click.Command): if a plugin exposes a `command` attribute, users will be
+    able to run it from the command line as `tutor pluginname`.
     """
 
     def __init__(self, name: str, loader: t.Optional[t.Any] = None) -> None:
@@ -143,7 +144,8 @@ class BasePlugin:
         for patch_name, content in patches.items():
             if not isinstance(patch_name, str):
                 raise exceptions.TutorError(
-                    f"Invalid patch name '{patch_name}' in plugin {self.name}. Expected str, got {patch_name.__class__}."
+                    f"Invalid patch name '{patch_name}' in plugin {self.name}. "
+                    f"Expected str, got {patch_name.__class__}."
                 )
             if not isinstance(content, str):
                 raise exceptions.TutorError(
@@ -265,11 +267,12 @@ class EntrypointPlugin(BasePlugin):
             try:
                 error: t.Optional[str] = None
                 cls(entrypoint)
-            except Exception as e:  # pylint: disable=broad-except
+            except Exception as e:  # noqa: BLE001
                 error = str(e)
             if error:
                 fmt.echo_error(
-                    f"Failed to load entrypoint '{entrypoint.name} = {entrypoint.module_name}' from distribution {entrypoint.dist}: {error}"
+                    f"Failed to load entrypoint '{entrypoint.name} = {entrypoint.module_name}' from distribution "
+                    f"{entrypoint.dist}: {error}"
                 )
 
 
@@ -395,5 +398,5 @@ def get_callable_attr(
     """
     attr = getattr(plugin, attr_name, default)
     if callable(attr):
-        attr = attr()  # pylint: disable=not-callable
+        attr = attr()
     return attr

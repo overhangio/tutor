@@ -21,7 +21,7 @@ class MetaDataHook(MetadataHookInterface):
 def load_about() -> dict[str, str]:
     about: dict[str, str] = {}
     with open(os.path.join(HERE, "tutor", "__about__.py"), "rt", encoding="utf-8") as f:
-        exec(f.read(), about)  # pylint: disable=exec-used
+        exec(f.read(), about)
     return about
 
 
