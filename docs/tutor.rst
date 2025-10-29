@@ -121,7 +121,7 @@ Contributions to Tutor and its plugins are highly encouraged. Please adhere to t
 
   - Target ``release`` if your change is compatible with the latest official Open edX release and it carries no major backwards-incompatibility nor risk of regression. This ensures that the latest stable release of Tutor benefits from bug fixes and incremental improvements. Once merged, your change will automatically be forward-ported to ``main``.
   - Target ``main`` if your change is only compatible with Open edX's master branches and/or your change would be disruptive to production Tutor site operators. If merged, your change will become part of the next pending release branch (described below) and then incorporated into ``release`` at the time of the next named Open edX release.
-  - At the beginning of each Open edX named release testing period, we split off from ``main`` a special pending release branch (e.g., ``sumac`` or ``teak``). If your Tutor change is necessary for that pending release, merge it to said branch. At the end of the testing period, the pending branch will be merged into ``release`` and deleted. As with any set of changes merged to ``release``, they will then be forward-ported to ``main``.
+  - At the beginning of each Open edX named release testing period, we split off from ``main`` a special pending release branch (e.g., ``teak`` or ``sumac``). If your Tutor change is necessary for that pending release, merge it to said branch. At the end of the testing period, the pending branch will be merged into ``release`` and deleted. As with any set of changes merged to ``release``, they will then be forward-ported to ``main``.
 
 - **Running Tests and Code Formatting**:
   
