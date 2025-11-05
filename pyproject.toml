@@ -55,7 +55,10 @@ include = [
   "LICENSE.txt",
   ".hatch_build.py",
 ]
-exclude = ["tests*"]
+exclude = [
+  "tests*",
+  "venv*"
+]
 
 [tool.hatch.metadata]
 # Allow github dependencies in plugins.txt
