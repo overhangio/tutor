@@ -145,14 +145,14 @@ File: ``kustomization.yml``
 
 File: ``kustomization.yml``
 
-.. patch:: kustomization-patches-strategic-merge
+.. patch:: kustomization-patches
 
-``kustomization-patches-strategic-merge``
+``kustomization-patches``
 =========================================
 
 File: ``kustomization.yml``
 
-This can be used to add more Kustomization patches that make use of the `strategic merge mechanism <https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#customizing>`__. 
+This can be used to add more Kustomization patches. See more details `here <https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/>`__.
 
 .. patch:: kustomization-resources
 
