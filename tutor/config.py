@@ -342,19 +342,3 @@ def _update_enabled_plugins_on_unload(_plugin: str, _root: str, config: Config) 
     Note that this action must be performed after the plugin has been unloaded, hence the low priority.
     """
     save_enabled_plugins(config)
-
-
-@hooks.Actions.CONFIG_LOADED.add()
-def _check_preview_lms_host(config: Config) -> None:
-    """
-    This will check if the PREVIEW_LMS_HOST is a subdomain of LMS_HOST.
-    if not, prints a warning to notify the user.
-    """
-
-    lms_host = get_typed(config, "LMS_HOST", str, "")
-    preview_lms_host = get_typed(config, "PREVIEW_LMS_HOST", str, "")
-    if not preview_lms_host.endswith("." + lms_host):
-        fmt.echo_alert(
-            f'Warning: PREVIEW_LMS_HOST="{preview_lms_host}" is not a subdomain of LMS_HOST="{lms_host}". '
-            "This configuration is not typically recommended and may lead to unexpected behavior."
-        )
