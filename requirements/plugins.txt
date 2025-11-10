@@ -7,6 +7,7 @@ tutor-discovery@git+https://github.com/overhangio/tutor-discovery@main
 tutor-forum@git+https://github.com/overhangio/tutor-forum@main
 tutor-indigo@git+https://github.com/overhangio/tutor-indigo@main
 tutor-jupyter@git+https://github.com/overhangio/tutor-jupyter@main
+tutor-livedeps@git+https://github.com/overhangio/tutor-livedeps@main
 tutor-mfe@git+https://github.com/overhangio/tutor-mfe@main
 tutor-minio@git+https://github.com/overhangio/tutor-minio@main
 tutor-notes@git+https://github.com/overhangio/tutor-notes@main
