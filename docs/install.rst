@@ -28,17 +28,36 @@ Requirements
     On Mac OS, by default, containers are allocated 2 GB of RAM, which is not enough. You should follow `these instructions from the official Docker documentation <https://docs.docker.com/docker-for-mac/#advanced>`__ to allocate at least 4-5 GB to the Docker daemon. If the deployment fails because of insufficient memory during database migrations, check the :ref:`relevant section in the troubleshooting guide <migrations_killed>`.
 
 
-Virtual Environment (Recommended)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Python Virtual Environment (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To prevent conflicts with other Python packages and maintain a clean environment, it's recommended that Tutor should be installed within a Python virtual environment. This is especially important on fresh or shared systems where installing packages globally may require elevated privileges and can interfere with system-level Python dependencies:
+To prevent conflicts with other Python packages and maintain a clean environment, it's recommended that Tutor should be installed within a Python virtual environment. This is especially important on fresh or shared systems where installing packages globally may require elevated privileges and can interfere with system-level Python dependencies.
+
+To create a virtual environment and activate it:
 
 .. code-block:: bash
 
    python3 -m venv env
    source env/bin/activate
 
+Note that ``env`` is an example name for the folder containing your virtual environment; you may choose a different name if you prefer. Once activated, you will see ``(env)`` in your terminal prompt, indicating that the environment is active:
+
+.. code-block:: bash
+
+   (env) user@hostname:~$
+
 For more details on virtual environments, refer to the official `Python documentation <https://docs.python.org/3/library/venv.html>`_.
+
+(Optional) Auto-activate Virtual Environment on session login
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you frequently use Tutor, or simply want the convenience of not having to activate the environment manually at every session, you can have it activate automatically whenever you open a new terminal. Append the activation command to your ``~/.bashrc`` file:
+
+.. code-block:: bash
+
+   echo 'source ~/env/bin/activate' >> ~/.bashrc
+   source ~/.bashrc
+
 
 Download
 --------
