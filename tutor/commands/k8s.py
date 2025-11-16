@@ -21,7 +21,7 @@ from tutor.types import Config, get_typed
 class K8sClients:
     _instance = None
 
-    def __init__(self) -> None:
+    def __init__(self, context: Optional[str] = None) -> None:
         # Loading the kubernetes module here to avoid import overhead
         from kubernetes import client, config  # noqa: E402, F401
 
@@ -29,7 +29,8 @@ class K8sClients:
             os.path.expanduser(config.kube_config.KUBE_CONFIG_DEFAULT_LOCATION)
         ):
             # found the kubeconfig file, let's load it!
-            config.load_kube_config()
+            # Pass context only if it's not empty
+            config.load_kube_config(context=context if context else None)
         elif (
             config.incluster_config.SERVICE_HOST_ENV_NAME in os.environ
             and config.incluster_config.SERVICE_PORT_ENV_NAME in os.environ
@@ -46,9 +47,9 @@ class K8sClients:
         self._client = client
 
     @classmethod
-    def instance(cls: Type["K8sClients"]) -> "K8sClients":
+    def instance(cls: Type["K8sClients"], context: Optional[str] = None) -> "K8sClients":
         if cls._instance is None:
-            cls._instance = cls()
+            cls._instance = cls(context)
         return cls._instance
 
     @property
@@ -127,18 +128,19 @@ class K8sTaskRunner(BaseTaskRunner):
             f"app.kubernetes.io/name={job_name}",
         )
 
+        context_args = f"--context={k8s_context(self.config)} " if k8s_context(self.config) else ""
         message = (
             "Job {job_name} is running. To view the logs from this job, run:\n\n"
-            """    kubectl logs --namespace={namespace} --follow $(kubectl get --namespace={namespace} pods """
+            """    kubectl logs {context_args}--namespace={namespace} --follow $(kubectl get {context_args}--namespace={namespace} pods """
             """--selector=job-name={job_name} -o=jsonpath="{{.items[0].metadata.name}}")\n\n"""
             "Waiting for job completion..."
-        ).format(job_name=job_name, namespace=k8s_namespace(self.config))
+        ).format(job_name=job_name, namespace=k8s_namespace(self.config), context_args=context_args)
         fmt.echo_info(message)
 
         # Wait for completion
         field_selector = f"metadata.name={job_name}"
         while True:
-            namespaced_jobs = K8sClients.instance().batch_api.list_namespaced_job(
+            namespaced_jobs = K8sClients.instance(k8s_context(self.config)).batch_api.list_namespaced_job(
                 k8s_namespace(self.config), field_selector=field_selector
             )
             if not namespaced_jobs.items:
@@ -192,7 +194,7 @@ class K8sTaskRunner(BaseTaskRunner):
         This is necessary to make sure that we don't run the same job multiple times at
         the same time.
         """
-        api = K8sClients.instance().batch_api
+        api = K8sClients.instance(k8s_context(self.config)).batch_api
         return [
             job.metadata.name
             for job in api.list_namespaced_job(
@@ -288,7 +290,7 @@ def start(context: K8sContext, names: List[str], prune_configmaps: bool) -> None
     # Note that this step should not be run for some users, in particular those
     # who do not have permission to edit the namespace.
     try:
-        utils.kubectl("get", "namespaces", k8s_namespace(config))
+        utils.kubectl(*kubectl_base_args(config), "get", "namespaces", k8s_namespace(config))
         fmt.echo_info("Namespace already exists: skipping creation.")
     except exceptions.TutorError:
         fmt.echo_info("Namespace does not exist: now creating it...")
@@ -371,7 +373,9 @@ def delete(context: K8sContext, yes: bool) -> None:
             "Are you sure you want to delete the platform? All data will be removed.",
             abort=True,
         )
+    config = tutor_config.load(context.root)
     utils.kubectl(
+        *kubectl_base_args(config),
         "delete",
         "-k",
         tutor_env.pathjoin(context.root),
@@ -536,7 +540,8 @@ def kubectl_apply(root: str, *args: str, prune_configmaps: bool = False) -> None
         *args: Additional arguments to pass to kubectl apply
         prune_configmaps: Enable pruning of ConfigMaps no longer in manifests
     """
-    cmd_args = ["apply", "--kustomize", tutor_env.pathjoin(root)]
+    config = tutor_config.load(root)
+    cmd_args = kubectl_base_args(config) + ["apply", "--kustomize", tutor_env.pathjoin(root)]
 
     if prune_configmaps:
         # Correct format is core/v1/ConfigMap
@@ -555,7 +560,7 @@ def status(context: K8sContext) -> int:
 
 def kubectl_exec(config: Config, service: str, command: List[str]) -> int:
     selector = f"app.kubernetes.io/name={service}"
-    pods = K8sClients.instance().core_api.list_namespaced_pod(
+    pods = K8sClients.instance(k8s_context(config)).core_api.list_namespaced_pod(
         namespace=k8s_namespace(config), label_selector=selector
     )
     if not pods.items:
@@ -566,6 +571,7 @@ def kubectl_exec(config: Config, service: str, command: List[str]) -> int:
 
     # Run command
     return utils.kubectl(
+        *kubectl_base_args(config),
         "exec",
         "--stdin",
         "--tty",
@@ -603,11 +609,26 @@ def resource_namespace_selector(config: Config) -> List[str]:
     """
     Convenient utility to filter the resources that belong to this project namespace.
     """
-    return ["--namespace", k8s_namespace(config)]
+    return kubectl_base_args(config) + ["--namespace", k8s_namespace(config)]
+
+
+def kubectl_base_args(config: Config) -> List[str]:
+    """
+    Return base kubectl arguments (context) for all kubectl commands.
+    """
+    args = []
+    context = k8s_context(config)
+    if context:
+        args += ["--context", context]
+    return args
 
 
 def k8s_namespace(config: Config) -> str:
     return get_typed(config, "K8S_NAMESPACE", str)
+
+
+def k8s_context(config: Config) -> str:
+    return get_typed(config, "K8S_CONTEXT", str)
 
 
 k8s.add_command(launch)
