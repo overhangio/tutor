@@ -310,6 +310,10 @@ Kubernetes
 
 This configuration parameter sets the Kubernetes Namespace.
 
+- ``K8S_CONTEXT`` (default: ``""``)
+
+This configuration parameter sets the Kubernetes context to use for all kubectl commands and API calls. When empty (default), Tutor uses the current context from your kubeconfig file.
+
 Miscellaneous Project Settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
