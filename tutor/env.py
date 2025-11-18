@@ -342,7 +342,7 @@ def save(root: str, config: Config) -> None:
         save_all_from(src, os.path.join(root_env, dst), config)
 
     upgrade_obsolete(root)
-    hooks.Actions.ENV_SAVED.do(root_env, config)
+    hooks.Actions.ENV_SAVED.do(root_env, deepcopy(config))
     fmt.echo_info(f"Environment generated in {base_dir(root)}")
 
 
