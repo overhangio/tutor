@@ -333,10 +333,6 @@ hooks.Filters.ENV_PATTERNS_IGNORE.add_items(
 )
 
 
-def deepcompare(val1, val2):
-    if type(val1) != type(val2):
-        pass
-
 def save(root: str, config: Config) -> None:
     """
     Save the full environment, including version information.
