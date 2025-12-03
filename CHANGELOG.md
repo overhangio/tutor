@@ -20,6 +20,16 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-20.0.3'></a>
+## v20.0.3 (2025-12-03)
+
+- [Bugfix] Fix packaging issue where a stray `venv/` directory was included in the source distribution (sdist)
+for previous releases. The build configuration now correctly excludes the `venv/` folder from package archives. (by @ahmed-arb)
+
+- [Feature] Add tutor livedeps to the list of plugins available by default. (by @mlabeeb03)
+
+- [Feature] Update OPENEDX_COMMON_VERSION to teak.3 tag (by @ahmed-arb)
+
 <a id='changelog-20.0.2'></a>
 ## v20.0.2 (2025-10-20)
 
