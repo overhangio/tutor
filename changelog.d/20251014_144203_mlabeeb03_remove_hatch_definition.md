@@ -1,0 +1,1 @@
+- [Chore] Update hatch definition for version. (by @mlabeeb03)
