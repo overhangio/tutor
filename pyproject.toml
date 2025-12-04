@@ -2,12 +2,12 @@
 # https://hatch.pypa.io/latest/config/build/
 
 [project]
-name = "tutor"
+name = "edops"
 license = {text = "AGPL-3.0-only"}
 authors = [
   {name = "Edly"}, { email = "hello@edly.io"}
 ]
-description = "The Docker-based Open edX distribution designed for peace of mind"
+description = "EdOps: Tutor-based deployment tooling for the zhjx teaching platforms"
 readme = {file = "README.rst", content-type = "text/x-rst"}
 requires-python = ">= 3.9"
 classifiers = [
@@ -25,16 +25,17 @@ classifiers = [
 dynamic = ["version", "dependencies", "optional-dependencies"]
 
 [project.scripts]
+edops = "tutor.commands.cli:main"
 tutor = "tutor.commands.cli:main"
 
 # https://packaging.python.org/en/latest/specifications/well-known-project-urls/#well-known-labels
 [project.urls]
-Homepage = "https://docs.tutor.edly.io/"
-Documentation = "https://docs.tutor.edly.io/"
-Source = "https://github.com/overhangio/tutor"
-Issues = "https://github.com/overhangio/tutor/issues"
-Changelog = "https://github.com/overhangio/tutor/blob/master/CHANGELOG.md"
-Community = "https://discuss.openedx.org/tag/tutor"
+Homepage = "https://github.com/GitHubZhuMin/edops"
+Documentation = "https://github.com/GitHubZhuMin/edops"
+Source = "https://github.com/GitHubZhuMin/edops"
+Issues = "https://github.com/GitHubZhuMin/edops/issues"
+Changelog = "https://github.com/GitHubZhuMin/edops/blob/edops-main/CHANGELOG.md"
+Community = "https://github.com/GitHubZhuMin/edops/discussions"
 
 # hatch-specific configuration
 [tool.hatch.metadata.hooks.custom]
@@ -55,6 +56,13 @@ include = [
   "LICENSE.txt",
   ".hatch_build.py",
 ]
+exclude = [
+  "tests*",
+  "venv*"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["tutor"]
 exclude = [
   "tests*",
   "venv*"

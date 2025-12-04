@@ -1,0 +1,65 @@
+---
+modules:
+  base:
+    required: true
+    description: "nacos/mysql/minio/redis/rabbitmq 等基础中间件"
+    template: "edops/local/zhjx-base.yml"
+    target: "local/zhjx-base.yml"
+    depends_on: []
+    health_checks:
+      - service: zhjx-nacos
+        type: http
+        url: "http://{{EDOPS_MASTER_NODE_IP}}:8848/nacos/"
+        timeout: 30
+      - service: zhjx-mysql
+        type: tcp
+        host: "{{EDOPS_MASTER_NODE_IP}}"
+        port: 3306
+        timeout: 10
+      - service: zhjx-redis
+        type: tcp
+        host: "{{EDOPS_MASTER_NODE_IP}}"
+        port: 6379
+        timeout: 10
+  common:
+    required: true
+    description: "共享域服务与租户管理前端"
+    template: "edops/local/zhjx-common.yml"
+    target: "local/zhjx-common.yml"
+    depends_on: ["base"]
+    images:
+      - name: ly-ac-gateway-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-gateway-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-users-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-users-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-auth-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-auth-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-admin-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-admin-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-console-ui
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-console-ui"
+        version_var: EDOPS_VERSION_UI_CONSOLE
+      - name: ly-ac-auth-ui
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-auth-ui"
+        version_var: EDOPS_VERSION_UI_AUTH
+    health_checks:
+      - service: ly-ac-gateway-svc
+        type: http
+        url: "http://localhost:50000/actuator/health"
+        timeout: 60
+  zhjx_zlmediakit:
+    required: false
+    description: "ZLMediaKit 直播流接入"
+    template: "edops/local/zhjx-zlmediakit.yml"
+    target: "local/zhjx-zlmediakit.yml"
+    depends_on: ["base"]
+    health_checks:
+      - service: zhjx-zlmediakit
+        type: tcp
+        host: "localhost"
+        port: 8080
+        timeout: 30

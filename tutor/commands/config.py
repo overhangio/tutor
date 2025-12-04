@@ -232,6 +232,125 @@ def printvalue(context: Context, key: str) -> None:
     fmt.echo(serialize.str_format(value))
 
 
+@click.command(help="获取配置项的值")
+@click.argument("key", type=ConfigKeyParamType())
+@click.pass_obj
+def get(context: Context, key: str) -> None:
+    """获取单个配置项的值。"""
+    printvalue.callback(context, key)
+
+
+@click.command(name="list", help="列出所有配置项")
+@click.option(
+    "--filter",
+    "filter_prefix",
+    default="",
+    help="按前缀过滤配置项（例如 EDOPS_）",
+)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json", "yaml"]),
+    default="text",
+    help="输出格式",
+)
+@click.pass_obj
+def list_config(
+    context: Context, filter_prefix: str, output_format: str
+) -> None:
+    """列出所有配置项，可按前缀过滤。"""
+    config = tutor_config.load(context.root)
+
+    # 过滤配置项
+    filtered_config = {
+        key: value
+        for key, value in config.items()
+        if key.startswith(filter_prefix)
+    }
+
+    if not filtered_config:
+        if filter_prefix:
+            msg = f"未找到前缀为 '{filter_prefix}' 的配置项"
+            fmt.echo(msg)
+        else:
+            fmt.echo("未找到配置项")
+        return
+
+    if output_format == "json":
+        click.echo(json.dumps(filtered_config, indent=2, default=str))
+    elif output_format == "yaml":
+        click.echo(serialize.dump(filtered_config))
+    else:
+        # 文本格式: KEY=VALUE
+        for key in sorted(filtered_config.keys()):
+            value = filtered_config[key]
+            fmt.echo(f"{key}={serialize.str_format(value)}")
+
+
+@click.command(help="验证必需的配置项")
+@click.pass_obj
+def validate(context: Context) -> None:
+    """验证所有必需的配置项已设置。"""
+    config = tutor_config.load(context.root)
+
+    # 定义 EdOps 必需的配置项
+    required_keys = [
+        "EDOPS_IMAGE_REGISTRY",
+        "EDOPS_MASTER_NODE_IP",
+        "EDOPS_NETWORK_NAME",
+    ]
+
+    missing_keys = []
+    for key in required_keys:
+        if key not in config or not config[key]:
+            missing_keys.append(key)
+
+    if missing_keys:
+        fmt.echo(fmt.error("配置验证失败！"))
+        missing_str = ", ".join(missing_keys)
+        fmt.echo(fmt.error(f"缺少必需的配置项: {missing_str}"))
+        hint = "\n请运行 'edops config save --interactive'"
+        fmt.echo(hint + " 来设置这些值")
+        raise exceptions.TutorError("配置验证失败")
+
+    fmt.echo(fmt.info("✓ 配置验证通过"))
+
+
+@click.command(help="渲染指定模块的模板")
+@click.argument("module_name")
+@click.pass_obj
+def render(context: Context, module_name: str) -> None:
+    """将指定的 EdOps 模块模板渲染到输出目录。"""
+    from tutor.edops import modules as edops_modules
+
+    config = tutor_config.load_full(context.root)
+
+    # 加载模块定义
+    try:
+        all_modules = edops_modules._load_modules()
+        if module_name not in all_modules:
+            available = ", ".join(all_modules.keys())
+            msg = f"未知模块 '{module_name}'。"
+            msg += f"可用模块: {available}"
+            raise exceptions.TutorError(msg)
+
+        module_def = all_modules[module_name]
+
+        # 渲染模块模板
+        renderer = env.Renderer(config)
+        content = renderer.render_template(module_def.template)
+
+        # 写入目标路径
+        dst = os.path.join(context.root, "env", module_def.target)
+        env.write_to(content, dst)
+
+        fmt.echo(fmt.info(f"✓ 已将模块 '{module_name}' 渲染到 {dst}"))
+
+    except Exception as e:
+        msg = f"渲染模块 '{module_name}' 失败: {e}"
+        raise exceptions.TutorError(msg) from e
+
+
 @click.group(name="patches", help="Commands related to patches in configurations")
 def patches_command() -> None:
     pass
@@ -286,6 +405,10 @@ def edit(context: Context) -> None:
 config_command.add_command(save)
 config_command.add_command(printroot)
 config_command.add_command(printvalue)
+config_command.add_command(get)
+config_command.add_command(list_config)
+config_command.add_command(validate)
+config_command.add_command(render)
 patches_command.add_command(patches_list)
 patches_command.add_command(patches_show)
 config_command.add_command(patches_command)

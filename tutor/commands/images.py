@@ -344,7 +344,101 @@ class ImageNotFoundError(exceptions.TutorError):
         super().__init__(f"Image '{image_name}' could not be found")
 
 
+@click.command(name="list", help="列出 EdOps 模块镜像")
+@click.option(
+    "--module",
+    "module_filter",
+    help="按模块名称过滤",
+)
+@click.pass_obj
+def edops_list(context: Context, module_filter: t.Optional[str]) -> None:
+    """列出所有 EdOps 模块镜像及其当前版本。"""
+    from tutor.edops import modules as edops_modules
+
+    config = tutor_config.load(context.root)
+    modules_list = edops_modules.get_enabled_modules(config)
+
+    if module_filter:
+        modules_list = [m for m in modules_list if m.name == module_filter]
+        if not modules_list:
+            fmt.echo_error(f"模块 '{module_filter}' 未找到或未启用")
+            return
+
+    fmt.echo_info("EdOps 模块镜像:\n")
+    for module in modules_list:
+        if not module.images:
+            continue
+
+        fmt.echo(f"\n{module.name}:")
+        for image in module.images:
+            # 渲染仓库和版本变量以获取实际值
+            repo = tutor_env.render_str(config, image.repository)
+            version_var = image.version_var
+            version = config.get(version_var, "unknown")
+            fmt.echo(f"  {image.name:30} {repo}:{version}")
+
+
+@click.command(name="versions", help="列出服务的可用版本")
+@click.argument("service_name")
+@click.pass_obj
+def edops_versions(context: Context, service_name: str) -> None:
+    """查询 Docker Registry 中的可用镜像版本。"""
+    from tutor.edops import image_registry
+
+    config = tutor_config.load(context.root)
+
+    try:
+        client = image_registry.get_registry_client(config)
+        tags = client.list_tags(service_name)
+
+        if not tags:
+            fmt.echo_info(f"未找到 {service_name} 的标签")
+            return
+
+        fmt.echo_info(f"{service_name} 的可用版本:\n")
+        # 排序标签，如果存在 'latest' 则放在最前面
+        sorted_tags = sorted(tags, reverse=True)
+        if "latest" in sorted_tags:
+            sorted_tags.remove("latest")
+            sorted_tags.insert(0, "latest")
+
+        for tag in sorted_tags:
+            fmt.echo(f"  - {tag}")
+
+    except Exception as e:
+        fmt.echo_error(f"列出版本失败: {e}")
+
+
+@click.command(name="inspect", help="检查镜像详情")
+@click.argument("service_name")
+@click.option("--tag", default="latest", help="要检查的镜像标签")
+@click.pass_obj
+def edops_inspect(context: Context, service_name: str, tag: str) -> None:
+    """从仓库获取镜像的详细信息。"""
+    from tutor.edops import image_registry
+    import json
+
+    config = tutor_config.load(context.root)
+
+    try:
+        client = image_registry.get_registry_client(config)
+        manifest = client.get_manifest(service_name, tag)
+
+        if not manifest:
+            fmt.echo_error(f"未找到 {service_name}:{tag} 的 manifest")
+            return
+
+        fmt.echo_info(f"镜像: {service_name}:{tag}\n")
+        fmt.echo(json.dumps(manifest, indent=2))
+
+    except Exception as e:
+        fmt.echo_error(f"检查镜像失败: {e}")
+
+
 images_command.add_command(build)
 images_command.add_command(pull)
 images_command.add_command(push)
 images_command.add_command(printtag)
+images_command.add_command(edops_list)
+images_command.add_command(edops_versions)
+images_command.add_command(edops_inspect)
