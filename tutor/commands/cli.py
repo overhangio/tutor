@@ -81,7 +81,7 @@ class TutorCli(click.Group):
     cls=TutorCli,
     invoke_without_command=True,
     add_help_option=False,  # Context is incorrectly loaded when help option is automatically added
-    help="Tutor is the Docker-based Open edX distribution designed for peace of mind.",
+    help="EdOps 是基于 Tutor 的智慧教学平台部署工具，支持 Open edX 和 zhjx 业务模块。",
 )
 @click.version_option(version=__version__)
 @click.option(
@@ -91,22 +91,22 @@ class TutorCli(click.Group):
     default=appdirs.user_data_dir(appname=__app__),
     show_default=True,
     type=click.Path(resolve_path=True),
-    help="Root project directory (environment variable: TUTOR_ROOT)",
+    help="项目根目录（环境变量：TUTOR_ROOT）",
 )
 @click.option(
     "-h",
     "--help",
     "show_help",
     is_flag=True,
-    help="Print this help",
+    help="显示帮助信息",
 )
 @click.pass_context
 def cli(context: click.Context, root: str, show_help: bool) -> None:
     if utils.is_root():
         fmt.echo_alert(
-            "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
-            " the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com"
-            "/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
+            "您正在以 root 用户运行 EdOps。强烈不建议这样做。如果是为了访问 Docker 守护进程，"
+            "应该将您的用户添加到 'docker' 组。（参见 https://docs.docker.com"
+            "/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user）"
         )
     context.obj = Context(root)
     context.help_option_names = ["-h", "--help"]
@@ -114,7 +114,7 @@ def cli(context: click.Context, root: str, show_help: bool) -> None:
         click.echo(context.get_help())
 
 
-@click.command(help="Print this help", name="help")
+@click.command(help="显示帮助信息", name="help")
 @click.pass_context
 def help_command(context: click.Context) -> None:
     context.invoke(cli, show_help=True)
