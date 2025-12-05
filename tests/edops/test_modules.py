@@ -1,5 +1,6 @@
 """Tests for EdOps modules."""
 from tutor.edops import modules
+from tutor.edops.health import HealthCheckType
 
 
 def test_load_modules():
@@ -38,7 +39,9 @@ def test_module_health_checks():
             break
 
     assert nacos_check is not None
-    assert nacos_check.type == "http"
+    # 类型应该是 HealthCheckType 枚举，不是字符串
+    assert nacos_check.type == HealthCheckType.HTTP
+    assert nacos_check.type.value == "http"  # 枚举的值是字符串
     assert nacos_check.timeout == 30
 
 
