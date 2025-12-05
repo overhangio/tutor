@@ -21,25 +21,59 @@ EdOps 是在 `Tutor <https://github.com/overhangio/tutor>`__ 框架基础上二�
 --------
 
 1. 克隆本仓库并切换到 ``edops-main`` 分支。
-2. 建议使用 Python ``3.10`` 以上版本，执行 ``pip install -e .``（或 ``hatch shell``）安装依赖。
-3. 运行 ``edops --help`` 查看已有命令；目前仍会看到部分 Tutor 命令，后续会逐步替换。
+2. 创建虚拟环境：``python3 -m venv venv && source venv/bin/activate``
+3. 安装 EdOps：``pip install -e .``
+4. 查看帮助：``edops --help``（全中文交互）
+5. 详细指南：查看 ``QUICKSTART_CN.md``
 
-目录结构速览
--------------
-
-``tutor/`` 目录仍然保留 Tutor 的核心代码，我们会逐步重命名为 ``edops``。主要关注点：
-
-``tutor/commands``  
-    Typer CLI 命令，后续会增加 ``edops`` 专属子命令。
-``tutor/templates``  
-    Jinja 模板目录，`tutor/templates/edops/local/` 已包含 base/common/``zhjx-zlmediakit`` 的 Compose 模板。
-``docs/``  
-    后续迁移 edops 文档与使用示例，`docs/zhjx-modules.md` 用于记录模块变量需求，对应的元数据位于 `tutor/templates/config/edops-modules.yml`。
-
-后续规划
+文档导航
 --------
 
-* 在 ``pyproject.toml`` 中完成包信息与依赖描述的迁移。
-* 完成 base/common/``zhjx-zlmediakit`` 模块模板与配置注入。
-* 增加 ``edops config save``、``edops local launch`` 的 zhjx 专属默认行为。
-* 编写中文文档与示例，方便内部同事快速上手。
+**快速上手**
+  ``QUICKSTART_CN.md``
+    5 分钟快速开始指南
+
+**参考文档**
+  ``docs/edops-cli.md``
+    完整的 CLI 命令参考手册
+  ``docs/DESIGN_DECISIONS_CN.md``
+    核心设计决策和技术共识
+  ``docs/zhjx-modules.md``
+    模块说明和配置
+
+**报告归档**
+  ``docs/reports/``
+    实施报告、Bug 修复记录、测试指南等
+  ``docs/reports/README.md``
+    报告目录索引
+
+目录结构
+--------
+
+``tutor/``
+    核心代码（保留 tutor 目录名以兼容上游）
+``tutor/commands/``
+    CLI 命令实现（已中文化）
+``tutor/edops/``
+    EdOps 专属模块（健康检查、镜像管理、模块定义）
+``tutor/templates/edops/``
+    EdOps 部署模板（base/common/zhjx-* 模块）
+``docs/``
+    文档目录（参考文档和报告归档）
+``tests/``
+    单元测试
+
+当前状态
+--------
+
+✅ **第 2 阶段已完成**（2024年12月5日）
+
+* ✅ 镜像管理：查询、列表、版本管理
+* ✅ 配置增强：get/list/validate/render 命令
+* ✅ 部署增强：status/healthcheck/history/rollback 命令
+* ✅ 健康检查：HTTP/TCP 自动检测
+* ✅ 历史追踪：完整的操作审计
+* ✅ 全面中文化：所有命令和消息
+* ✅ 双命令支持：edops ≡ tutor
+
+详见：``docs/reports/PHASE2_COMPLETION_CN.md``

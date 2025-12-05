@@ -129,7 +129,8 @@ edops local healthcheck
 
 - 完整 CLI 文档：`docs/edops-cli.md`
 - 模块说明：`docs/zhjx-modules.md`
-- 实施总结：`IMPLEMENTATION_SUMMARY.md`
+- 设计决策：`docs/DESIGN_DECISIONS_CN.md`
+- 实施报告：`docs/reports/` 目录
 
 ## 故障排查
 

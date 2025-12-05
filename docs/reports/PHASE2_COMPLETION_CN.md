@@ -66,8 +66,8 @@
 9. **文档体系** ✓
    - `docs/edops-cli.md` - 完整 CLI 参考（407 行）
    - `QUICKSTART_CN.md` - 快速开始指南（168 行）
-   - `IMPLEMENTATION_SUMMARY.md` - 实施总结（279 行）
-   - `LOCALIZATION_SUMMARY_CN.md` - 中文化总结（296 行）
+   - `docs/reports/IMPLEMENTATION_SUMMARY.md` - 实施总结（279 行）
+   - `docs/reports/LOCALIZATION_SUMMARY_CN.md` - 中文化总结（296 行）
    - `docs/DESIGN_DECISIONS_CN.md` - 设计决策（540 行）
 
 10. **测试覆盖** ✓

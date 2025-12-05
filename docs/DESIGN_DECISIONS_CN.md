@@ -528,8 +528,8 @@ edops --root /opt/prod-env local launch
 
 ## 参考文档
 
-- [EdOps 需求文档](../edops 工具 — 简要需求文档.md)
-- [实施总结](../IMPLEMENTATION_SUMMARY.md)
+- [EdOps 需求文档](../../edops 工具 — 简要需求文档.md)
+- [实施总结](reports/IMPLEMENTATION_SUMMARY.md)
 - [CLI 参考手册](edops-cli.md)
 - [快速开始](../QUICKSTART_CN.md)
 
