@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Set
 
 import importlib_resources
 
@@ -10,7 +10,10 @@ from tutor import exceptions, serialize
 from tutor.types import Config, get_typed
 
 MODULES_CONFIG_PATH = (
-    importlib_resources.files("tutor") / "templates" / "config" / "edops-modules.yml"
+    importlib_resources.files("tutor")
+    / "templates"
+    / "config"
+    / "edops-modules.yml"
 )
 
 
@@ -24,25 +27,13 @@ class ImageDef:
 
 
 @dataclass(frozen=True)
-class HealthCheckDef:
-    """服务的健康检查定义。"""
-
-    service: str
-    type: str
-    url: Optional[str] = None
-    host: Optional[str] = None
-    port: Optional[int] = None
-    timeout: int = 30
-
-
-@dataclass(frozen=True)
 class ModuleDef:
     name: str
     required: bool
     template: str
     target: str
     depends_on: List[str]
-    health_checks: List[HealthCheckDef]
+    health_checks: List[Any]  # HealthCheckDef from health.py
     images: List[ImageDef]
 
 
@@ -53,6 +44,10 @@ def _load_modules() -> Dict[str, ModuleDef]:
     global _MODULE_CACHE
     if _MODULE_CACHE is not None:
         return _MODULE_CACHE
+
+    # 导入健康检查定义（延迟导入避免循环依赖）
+    from tutor.edops.health import HealthCheckDef, HealthCheckType
+
     raw = serialize.load(MODULES_CONFIG_PATH.read_text(encoding="utf-8"))
     modules_section = raw.get("modules", {})
     modules: Dict[str, ModuleDef] = {}
@@ -60,10 +55,23 @@ def _load_modules() -> Dict[str, ModuleDef]:
         # 解析健康检查
         health_checks = []
         for hc in meta.get("health_checks", []):
+            # 将字符串类型转换为枚举
+            check_type_str = hc["type"].lower()
+            if check_type_str == "http":
+                check_type = HealthCheckType.HTTP
+            elif check_type_str == "tcp":
+                check_type = HealthCheckType.TCP
+            elif check_type_str == "container":
+                check_type = HealthCheckType.CONTAINER
+            else:
+                raise exceptions.TutorError(
+                    f"未知的健康检查类型: {hc['type']}"
+                )
+
             health_checks.append(
                 HealthCheckDef(
                     service=hc["service"],
-                    type=hc["type"],
+                    type=check_type,
                     url=hc.get("url"),
                     host=hc.get("host"),
                     port=hc.get("port"),

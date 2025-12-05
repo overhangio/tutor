@@ -31,14 +31,32 @@ modules:
       - name: ly-ac-gateway-svc
         repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-gateway-svc"
         version_var: EDOPS_VERSION_SVC_DEFAULT
-      - name: ly-ac-users-svc
-        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-users-svc"
+      - name: ly-ac-user-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-user-svc"
         version_var: EDOPS_VERSION_SVC_DEFAULT
       - name: ly-ac-auth-svc
         repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-auth-svc"
         version_var: EDOPS_VERSION_SVC_DEFAULT
       - name: ly-ac-admin-svc
         repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-admin-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-job-admin-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-job-admin-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-object-storage-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-object-storage-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-basic-data-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-basic-data-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-rtc-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-rtc-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-course-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-course-svc"
+        version_var: EDOPS_VERSION_SVC_DEFAULT
+      - name: ly-ac-classroom-svc
+        repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-classroom-svc"
         version_var: EDOPS_VERSION_SVC_DEFAULT
       - name: ly-ac-console-ui
         repository: "{{EDOPS_IMAGE_REGISTRY}}/ly-ac-console-ui"
