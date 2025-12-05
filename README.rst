@@ -1,96 +1,45 @@
-Tutor: the Docker-based Open edX distribution designed for peace of mind
-========================================================================
+EdOps：面向 zhjx 体系的统一部署 CLI
+===================================
 
-.. image:: https://overhang.io/static/img/tutor-logo.svg
-  :alt: Tutor logo
-  :width: 500px
-  :align: center
+EdOps 是在 `Tutor <https://github.com/overhangio/tutor>`__ 框架基础上二次开发的命令行工具，目标是把联奕智慧教学团队的 base/common/``zhjx-*`` 业务系统统一到一套配置、构建与部署流程里。它仍然沿用 Tutor 的 Typer CLI、模板渲染与插件机制，但默认能力全部面向混合教学、AI 督导、直播电商等业务场景。
 
-|
+目前我们聚焦以下三类工作：
 
-.. _readme_intro_start:
+* **命令体验迁移**：把 ``tutor`` 命令改造成 ``edops``，保留 ``config``、``local``、``dev``、``k8s`` 等核心子命令。
+* **模板替换**：用 `zhjx-hub/稳定1panel版本/` 里的 Compose 模板替换 Open edX 相关模板，优先支持 base、common、``zhjx-zlmediakit``。
+* **插件化模块**：把 ``zhjx-*`` 业务子系统抽象为插件（默认关闭），base/common 作为核心插件自动启用。
 
-.. image:: https://img.shields.io/static/v1?logo=github&label=Git&style=flat-square&color=brightgreen&message=Source%20code
-  :alt: Source code
-  :target: https://github.com/overhangio/tutor
-
-.. image:: https://img.shields.io/static/v1?logo=discourse&label=Forums&style=flat-square&color=ff0080&message=discuss.openedx.org
-  :alt: Forums
-  :target: https://discuss.openedx.org/tag/tutor
-
-.. image:: https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.edly.io
-  :alt: Documentation
-  :target: https://docs.tutor.edly.io
-
-.. image:: https://img.shields.io/pypi/v/tutor?logo=python&logoColor=white
-  :alt: PyPI releases
-  :target: https://pypi.org/project/tutor
-
-.. image:: https://img.shields.io/github/license/overhangio/tutor.svg?style=flat-square
-  :alt: AGPL License
-  :target: https://www.gnu.org/licenses/agpl-3.0.en.html
-
-.. image:: https://img.shields.io/static/v1?logo=youtube&label=YouTube&style=flat-square&color=ff0000&message=@tutor-edly
-    :alt: Follow us on Youtube
-    :target: https://www.youtube.com/@tutor-edly
-
-**Tutor** is the official Docker-based `Open edX <https://openedx.org>`_ distribution, both for production and local development. The goal of Tutor is to make it easy to deploy, customise, upgrade and scale Open edX. Tutor is reliable, fast, extensible, and it is already used to deploy hundreds of Open edX platforms around the world.
-
-Do you need professional assistance setting up or managing your Open edX platform? `Edly <https://edly.io>`__ provides online support as part of its `Open edX installation service <https://edly.io/services/open-edx-installation/>`__.
-
-Features
+核心特性
 --------
 
-* 100% `open source <https://github.com/overhangio/tutor>`__
-* Runs entirely on Docker
-* World-famous 1-click `installation and upgrades <https://docs.tutor.edly.io/install.html>`__
-* Comes with batteries included: `theming <https://github.com/overhangio/indigo>`__, `SCORM <https://github.com/overhangio/openedx-scorm-xblock>`__, `HTTPS <https://docs.tutor.edly.io/configuration.html#ssl-tls-certificates-for-https-access>`__, `web-based administration interface <https://github.com/overhangio/tutor-webui>`__, `mobile app <https://github.com/overhangio/tutor-android>`__, `custom translations <https://docs.tutor.edly.io/configuration.html#adding-custom-translations>`__...
-* Extensible architecture with `plugins <https://docs.tutor.edly.io/plugins/index.html>`__
-* Works with `Kubernetes <https://docs.tutor.edly.io/k8s.html>`__
-* No technical skill required with the `zero-click Tutor AWS image <https://docs.tutor.edly.io/install.html#zero-click-aws-installation>`__
+* **多环境统一**：沿用 Tutor 的 ``dev``、``local``、``k8s`` 三种模式，保证开发/单机/集群行为一致。
+* **集中配置**：所有镜像版本、域名、数据库参数统一记录在 ``edops-config.yml``，支持按环境覆盖。
+* **模块化控制**：base（nacos、mysql、minio、redis、MQ 等）和 common（用户、认证、后台、网关）始终启用，``zhjx-*`` 模块通过 ``EDOPS_ENABLED_MODULES`` 配置按需开启。
+* **日志追溯**：继承 Tutor 的日志与命令输出体系，便于对每一次构建、部署、回滚进行审计。
 
-.. _readme_intro_end:
+快速开始
+--------
 
-.. image:: https://github.com/overhangio/tutor/raw/master/docs/img/launch.webp
-    :alt: Tutor local launch
-    :target: https://www.terminalizer.com/view/3a8d55835686
+1. 克隆本仓库并切换到 ``edops-main`` 分支。
+2. 建议使用 Python ``3.10`` 以上版本，执行 ``pip install -e .``（或 ``hatch shell``）安装依赖。
+3. 运行 ``edops --help`` 查看已有命令；目前仍会看到部分 Tutor 命令，后续会逐步替换。
 
-Quickstart
-----------
-
-1. Install the `latest stable release <https://github.com/overhangio/tutor/releases>`_ of Tutor
-2. Run ``tutor local launch``
-3. You're done!
-
-Documentation
+目录结构速览
 -------------
 
-Extensive documentation is available: https://docs.tutor.edly.io/
+``tutor/`` 目录仍然保留 Tutor 的核心代码，我们会逐步重命名为 ``edops``。主要关注点：
 
-Is there a problem?
--------------------
+``tutor/commands``  
+    Typer CLI 命令，后续会增加 ``edops`` 专属子命令。
+``tutor/templates``  
+    Jinja 模板目录，`tutor/templates/edops/local/` 已包含 base/common/``zhjx-zlmediakit`` 的 Compose 模板。
+``docs/``  
+    后续迁移 edops 文档与使用示例，`docs/zhjx-modules.md` 用于记录模块变量需求，对应的元数据位于 `tutor/templates/config/edops-modules.yml`。
 
-Please follow the instructions from the `troubleshooting section <https://docs.tutor.edly.io/troubleshooting.html>`__ in the docs.
+后续规划
+--------
 
-.. _readme_support_start:
-
-Support
--------
-
-To get community support, go to the official Open edX discussion forum: https://discuss.openedx.org. For official support, `Edly <https://edly.io>`__ provides professional assistance as part of its `Open edX installation service <https://edly.io/services/open-edx-installation/>`__.
-
-.. _readme_support_end:
-
-.. _readme_contributing_start:
-
-Contributing
-------------
-
-We welcome contributions to Tutor! To learn how you can contribute, please check the relevant section of the Tutor docs: `https://docs.tutor.edly.io/tutor.html#contributing <https://docs.tutor.edly.io/tutor.html#contributing>`__.
-
-.. _readme_contributing_end:
-
-License
--------
-
-This work is licensed under the terms of the `GNU Affero General Public License (AGPL) <https://github.com/overhangio/tutor/blob/release/LICENSE.txt>`_.
+* 在 ``pyproject.toml`` 中完成包信息与依赖描述的迁移。
+* 完成 base/common/``zhjx-zlmediakit`` 模块模板与配置注入。
+* 增加 ``edops config save``、``edops local launch`` 的 zhjx 专属默认行为。
+* 编写中文文档与示例，方便内部同事快速上手。

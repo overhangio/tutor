@@ -71,28 +71,28 @@ def _add_core_init_tasks() -> None:
         )
 
 
-@click.command("init", help="Initialise all applications")
-@click.option("-l", "--limit", help="Limit initialisation to this service or plugin")
+@click.command("init", help="初始化所有应用")
+@click.option("-l", "--limit", help="将初始化限制到此服务或插件")
 def initialise(limit: t.Optional[str]) -> t.Iterator[tuple[str, str]]:
-    fmt.echo_info("Initialising all services...")
+    fmt.echo_info("正在初始化所有服务...")
     filter_context = hooks.Contexts.app(limit).name if limit else None
 
     for service, task in hooks.Filters.CLI_DO_INIT_TASKS.iterate_from_context(
         filter_context
     ):
-        fmt.echo_info(f"Running init task in {service}")
+        fmt.echo_info(f"在 {service} 中运行初始化任务")
         yield service, task
 
-    fmt.echo_info("All services initialised.")
+    fmt.echo_info("所有服务已初始化。")
 
 
-@click.command(help="Create an Open edX user and interactively set their password")
-@click.option("--superuser", is_flag=True, help="Make superuser")
-@click.option("--staff", is_flag=True, help="Make staff user")
+@click.command(help="创建 Open edX 用户并交互式设置密码")
+@click.option("--superuser", is_flag=True, help="创建超级用户")
+@click.option("--staff", is_flag=True, help="创建职员用户")
 @click.option(
     "-p",
     "--password",
-    help="Specify password from the command line. If undefined, you will be prompted to input a password",
+    help="从命令行指定密码。如果未定义，将提示您输入密码",
     prompt=True,
     hide_input=True,
 )
@@ -106,32 +106,32 @@ def createuser(
     email: str,
 ) -> t.Iterable[tuple[str, str]]:
     """
-    Create an Open edX user
+    创建 Open edX 用户
 
-    Password can be passed as an option or will be set interactively.
+    密码可以作为选项传递，或以交互方式设置。
     """
     yield ("lms", create_user_template(superuser, staff, name, email, password))
 
 
-@click.command(help="Import the demo course")
+@click.command(help="导入演示课程")
 @click.option(
     "-r",
     "--repo",
     default="https://github.com/openedx/openedx-demo-course",
     show_default=True,
-    help="Git repository that contains the course to be imported",
+    help="包含要导入课程的 Git 仓库",
 )
 @click.option(
     "-d",
     "--repo-dir",
     default="",
     show_default=True,
-    help="Git relative subdirectory to import data from. If unspecified, will default to the directory containing course.xml",
+    help="要从中导入数据的 Git 相对子目录。如果未指定，将默认为包含 course.xml 的目录",
 )
 @click.option(
     "-v",
     "--version",
-    help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
+    help="Git 分支、标签或 sha1 标识符。如果未指定，将默认为 OPENEDX_COMMON_VERSION 设置的值。",
 )
 def importdemocourse(
     repo: str, repo_dir: str, version: t.Optional[str]
@@ -174,19 +174,19 @@ python ./manage.py cms import ../data "$course_root"
     yield ("cms", template)
 
 
-@click.command(help="Import the demo content libraries")
+@click.command(help="导入演示内容库")
 @click.argument("owner_username")
 @click.option(
     "-r",
     "--repo",
     default="https://github.com/openedx/openedx-demo-course",
     show_default=True,
-    help="Git repository that contains the library/libraries to be imported",
+    help="包含要导入库的 Git 仓库",
 )
 @click.option(
     "-v",
     "--version",
-    help="Git branch, tag or sha1 identifier. If unspecified, will default to the value of the OPENEDX_COMMON_VERSION setting.",
+    help="Git 分支、标签或 sha1 标识符。如果未指定，将默认为 OPENEDX_COMMON_VERSION 设置的值。",
 )
 def importdemolibraries(
     owner_username: str, repo: str, version: t.Optional[str]

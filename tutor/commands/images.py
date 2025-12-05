@@ -124,7 +124,7 @@ class PushImageNameParam(ImageNameParam):
             yield name
 
 
-@click.group(name="images", short_help="Manage docker images")
+@click.group(name="images", short_help="管理 docker 镜像")
 def images_command() -> None:
     pass
 
@@ -137,49 +137,49 @@ def images_command() -> None:
     type=BuildImageNameParam(),
 )
 @click.option(
-    "--no-cache", is_flag=True, help="Do not use cache when building the image"
+    "--no-cache", is_flag=True, help="构建镜像时不使用缓存"
 )
 @click.option(
     "--no-registry-cache",
     is_flag=True,
-    help="Do not use registry cache when building the image",
+    help="构建镜像时不使用仓库缓存",
 )
 @click.option(
     "--cache-to-registry",
     is_flag=True,
-    help="Push the build cache to the remote registry. You should only enable this option if you have push rights to the remote registry.",
+    help="将构建缓存推送到远程仓库。仅当您拥有远程仓库的推送权限时才启用此选项。",
 )
 @click.option(
     "--output",
     "docker_output",
-    # Export image to docker. This is necessary to make the image available to docker-compose.
-    # The `--load` option is a shorthand for `--output=type=docker`.
+    # 导出镜像到 docker。这是使镜像可用于 docker-compose 所必需的。
+    # `--load` 选项是 `--output=type=docker` 的简写。
     default="type=docker",
-    help="Same as `docker build --output=...`.",
+    help="与 `docker build --output=...` 相同。",
 )
 @click.option(
     "-a",
     "--build-arg",
     "build_args",
     multiple=True,
-    help="Set build-time docker ARGS in the form 'myarg=value'. This option may be specified multiple times.",
+    help="以 'myarg=value' 形式设置构建时的 docker ARGS。此选项可以多次指定。",
 )
 @click.option(
     "--add-host",
     "add_hosts",
     multiple=True,
-    help="Set a custom host-to-IP mapping (host:ip).",
+    help="设置自定义主机到 IP 的映射（host:ip）。",
 )
 @click.option(
     "--target",
-    help="Set the target build stage to build.",
+    help="设置要构建的目标构建阶段。",
 )
 @click.option(
     "-d",
     "--docker-arg",
     "docker_args",
     multiple=True,
-    help="Set extra options for docker build command.",
+    help="为 docker build 命令设置额外选项。",
 )
 @click.pass_obj
 def build(
@@ -265,7 +265,7 @@ def get_image_build_contexts(config: Config) -> dict[str, list[tuple[str, str]]]
     return build_contexts
 
 
-@click.command(short_help="Pull images from the Docker registry")
+@click.command(short_help="从 Docker 仓库拉取镜像")
 @click.argument("image_names", metavar="image", type=PullImageNameParam(), nargs=-1)
 @click.pass_obj
 def pull(context: Context, image_names: list[str]) -> None:
@@ -275,7 +275,7 @@ def pull(context: Context, image_names: list[str]) -> None:
             images.pull(tag)
 
 
-@click.command(short_help="Push images to the Docker registry")
+@click.command(short_help="推送镜像到 Docker 仓库")
 @click.argument("image_names", metavar="image", type=PushImageNameParam(), nargs=-1)
 @click.pass_obj
 def push(context: Context, image_names: list[str]) -> None:
@@ -285,7 +285,7 @@ def push(context: Context, image_names: list[str]) -> None:
             images.push(tag)
 
 
-@click.command(short_help="Print tag associated to a Docker image")
+@click.command(short_help="打印 Docker 镜像关联的标签")
 @click.argument("image_names", metavar="image", type=BuildImageNameParam(), nargs=-1)
 @click.pass_obj
 def printtag(context: Context, image_names: list[str]) -> None:

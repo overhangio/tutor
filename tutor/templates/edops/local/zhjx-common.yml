@@ -1,0 +1,134 @@
+version: "3.8"
+
+x-ui-environment:
+  &ui-environment
+  spring.cloud.inetutils.preferred-networks: 10.10.0
+  API_GATEWAY_URL: "{{ EDOPS_API_GATEWAY_URL }}"
+  SCHOOL_ID: "{{ EDOPS_SCHOOL_ID }}"
+  API_TENANT_URL: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_API_TENANT_PORT }}"
+  API_OBJECT_STORAGE_URL: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_API_OBJECT_STORAGE_PORT }}"
+  ISPOT_APP_SOURCE: "{{ EDOPS_ISPOT_APP_SOURCE }}"
+
+x-svc-environment:
+  &svc-environment
+  discovery: zhjx-nacos
+  nacosGroup: DEFAULT_GROUP
+  mysqlHost: "{{ EDOPS_MASTER_NODE_IP }}"
+  mysqlPort: 3306
+  mysqlUser: root
+  mysqlPassword: "{{ EDOPS_MYSQL_ROOT_PASSWORD }}"
+  serverAddr: "http://zhjx-nacos:8848"
+
+services:
+  ly-ac-auth-ui:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-auth-ui:{{ EDOPS_VERSION_UI_AUTH }}
+    init: true
+    environment: *ui-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  ly-ac-console-ui:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-console-ui:{{ EDOPS_VERSION_UI_CONSOLE }}
+    init: true
+    environment: *ui-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  ly-ac-gateway-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-gateway-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    environment:
+      - nacosServerAddr=zhjx-nacos:8848
+      - nacosGroup=DEFAULT_GROUP
+      - nacosUser=nacos
+      - nacosPassword=37621040
+      - profilActive=dev
+      - sentinelDashboard=zhjx-sentinel:8858
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+  ly-ac-job-admin-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-job-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  ly-ac-object-storage-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-object-storage-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+  ly-ac-admin-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+  ly-ac-auth-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-auth-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+  ly-ac-basic-data-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-basic-data-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+  ly-ac-user-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-user-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+  ly-ac-rtc-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-rtc-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Shanghai /usr/local/app.jar"]
+
+  ly-ac-course-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-course-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    hostname: ly-ac-course-svc
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+  ly-ac-classroom-svc:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-classroom-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    init: true
+    hostname: ly-ac-classroom-svc
+    environment: *svc-environment
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    entrypoint: [""]
+    command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+
+networks:
+  {{ EDOPS_NETWORK_NAME }}:
+    external: true

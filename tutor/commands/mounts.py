@@ -29,10 +29,9 @@ class MountParamType(ConfigLoaderParam):
 @click.group(name="mounts")
 def mounts_command() -> None:
     """
-    Manage host bind-mounts
+    管理主机绑定挂载
 
-    Bind-mounted folders are used both in image building, development (`dev` commands)
-    and `local` deployments.
+    绑定挂载的文件夹在镜像构建、开发（`dev` 命令）和 `local` 部署中都会使用。
     """
 
 
@@ -40,9 +39,9 @@ def mounts_command() -> None:
 @click.pass_obj
 def mounts_list(context: Context) -> None:
     """
-    List bind-mounted folders
+    列出绑定挂载的文件夹
 
-    Entries will be fetched from the `MOUNTS` project setting.
+    条目将从 `MOUNTS` 项目设置中获取。
     """
     config = tutor_config.load(context.root)
     mounts = []
@@ -75,37 +74,35 @@ def mounts_list(context: Context) -> None:
 @click.pass_context
 def mounts_add(context: click.Context, mounts: list[str]) -> None:
     """
-    Add a bind-mounted folder
+    添加绑定挂载的文件夹
 
-    The bind-mounted folder will be added to the project configuration, in the ``MOUNTS``
-    setting.
+    绑定挂载的文件夹将添加到项目配置的 ``MOUNTS`` 设置中。
 
-    Values passed to this command can take one of two forms. The first is explicit::
+    传递给此命令的值可以采用两种形式。第一种是显式形式::
 
-        tutor mounts add myservice:/host/path:/container/path
+        edops mounts add myservice:/host/path:/container/path
 
-    The second is implicit::
+    第二种是隐式形式::
 
-        tutor mounts add /host/path
+        edops mounts add /host/path
 
-    With the explicit form, the value means "bind-mount the host folder /host/path to
-    /container/path in the "myservice" container at run time".
+    使用显式形式时，值表示"在运行时将主机文件夹 /host/path 绑定挂载到
+    myservice 容器中的 /container/path"。
 
-    With the implicit form, plugins are in charge of automatically detecting in which
-    containers and locations the /host/path folder should be bind-mounted. In this case,
-    folders can be bind-mounted at build-time -- which cannot be achieved with the
-    explicit form.
+    使用隐式形式时，插件负责自动检测 /host/path 文件夹应该绑定挂载到
+    哪些容器和位置。在这种情况下，文件夹可以在构建时绑定挂载
+    -- 这在显式形式中无法实现。
     """
     new_mounts = []
     for mount in mounts:
         if not bindmount.parse_explicit_mount(mount):
-            # Path is implicit: check that this path is valid
-            # (we don't try to validate explicit mounts)
+            # 路径是隐式的：检查此路径是否有效
+            # （我们不尝试验证显式挂载）
             mount = os.path.abspath(os.path.expanduser(mount))
             if not os.path.exists(mount):
-                raise exceptions.TutorError(f"Path {mount} does not exist on the host")
+                raise exceptions.TutorError(f"路径 {mount} 在主机上不存在")
         new_mounts.append(mount)
-        fmt.echo_info(f"Adding bind-mount: {mount}")
+        fmt.echo_info(f"正在添加绑定挂载: {mount}")
 
     context.invoke(config_save, append_vars=[("MOUNTS", mount) for mount in new_mounts])
 
@@ -115,17 +112,17 @@ def mounts_add(context: click.Context, mounts: list[str]) -> None:
 @click.pass_context
 def mounts_remove(context: click.Context, mounts: list[str]) -> None:
     """
-    Remove a bind-mounted folder
+    移除绑定挂载的文件夹
 
-    The bind-mounted folder will be removed from the ``MOUNTS`` project setting.
+    绑定挂载的文件夹将从 ``MOUNTS`` 项目设置中移除。
     """
     removed_mounts = []
     for mount in mounts:
         if not bindmount.parse_explicit_mount(mount):
-            # Path is implicit: expand it
+            # 路径是隐式的：展开它
             mount = os.path.abspath(os.path.expanduser(mount))
         removed_mounts.append(mount)
-        fmt.echo_info(f"Removing bind-mount: {mount}")
+        fmt.echo_info(f"正在移除绑定挂载: {mount}")
 
     context.invoke(
         config_save, remove_vars=[("MOUNTS", mount) for mount in removed_mounts]

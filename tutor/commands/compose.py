@@ -108,10 +108,10 @@ class BaseComposeContext(BaseTaskContext):
         raise NotImplementedError
 
 
-@click.command(help="Configure and run Open edX from scratch")
-@click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
-@click.option("-p", "--pullimages", is_flag=True, help="Update docker images")
-@click.option("--skip-build", is_flag=True, help="Skip building Docker images")
+@click.command(help="从头配置并运行 Open edX")
+@click.option("-I", "--non-interactive", is_flag=True, help="非交互式运行")
+@click.option("-p", "--pullimages", is_flag=True, help="更新 docker 镜像")
+@click.option("--skip-build", is_flag=True, help="跳过构建 Docker 镜像")
 @click.pass_context
 def launch(
     context: click.Context,
@@ -124,33 +124,33 @@ def launch(
 
     utils.warn_macos_docker_memory()
 
-    # Upgrade has to run before configuration
+    # 升级必须在配置之前运行
     interactive_upgrade(context, not non_interactive, run_for_prod=run_for_prod)
     interactive_configuration(context, not non_interactive, run_for_prod=run_for_prod)
 
     config = tutor_config.load(context.obj.root)
 
     if not skip_build:
-        click.echo(fmt.title("Building Docker images"))
+        click.echo(fmt.title("构建 Docker 镜像"))
         images_to_build = hooks.Filters.IMAGES_BUILD_REQUIRED.apply([], context_name)
         if not images_to_build:
-            fmt.echo_info("No image to build")
+            fmt.echo_info("没有需要构建的镜像")
         context.invoke(images.build, image_names=images_to_build)
 
-    click.echo(fmt.title("Stopping any existing platform"))
+    click.echo(fmt.title("停止现有平台"))
     context.invoke(stop)
 
     if pullimages:
-        click.echo(fmt.title("Docker image updates"))
+        click.echo(fmt.title("更新 Docker 镜像"))
         context.invoke(dc_command, command="pull")
 
-    click.echo(fmt.title("Starting the platform in detached mode"))
+    click.echo(fmt.title("以分离模式启动平台"))
     context.invoke(start, detach=True)
 
-    click.echo(fmt.title("Database creation and migrations"))
+    click.echo(fmt.title("创建数据库并执行迁移"))
     context.invoke(do.commands["init"])
 
-    # Print the urls of the user-facing apps
+    # 打印面向用户的应用 URL
     public_app_hosts = ""
     for host in hooks.Filters.APP_PUBLIC_HOSTS.iterate(context_name):
         public_app_host = tutor_env.render_str(
@@ -159,7 +159,7 @@ def launch(
         public_app_hosts += f"    {public_app_host}\n"
     if public_app_hosts:
         fmt.echo_info(
-            f"""The platform is now running and can be accessed at the following urls:
+            f"""平台现已运行，可通过以下 URL 访问：
 
 {public_app_hosts}"""
         )
@@ -234,8 +234,8 @@ def interactive_configuration(
 
 
 @click.command(
-    short_help="Perform release-specific upgrade tasks",
-    help="Perform release-specific upgrade tasks. To perform a full upgrade remember to run `launch`.",
+    short_help="执行特定版本的升级任务",
+    help="执行特定版本的升级任务。要执行完整升级，请记得运行 `launch`。",
 )
 @click.option(
     "--from",
@@ -245,26 +245,25 @@ def interactive_configuration(
 @click.pass_context
 def upgrade(context: click.Context, from_release: t.Optional[str]) -> None:
     fmt.echo_alert(
-        "This command only performs a partial upgrade of your Open edX platform. "
-        "To perform a full upgrade, you should run `tutor local launch` (or `tutor dev launch` "
-        "in development)."
+        "此命令仅执行 Open edX 平台的部分升级。"
+        "要执行完整升级，您应该运行 `edops local launch`（或在开发环境中运行 `edops dev launch`）。"
     )
     if from_release is None:
         from_release = tutor_env.get_env_release(context.obj.root)
     if from_release is None:
-        fmt.echo_info("Your environment is already up-to-date")
+        fmt.echo_info("您的环境已是最新版本")
     else:
         upgrade_from(context, from_release)
-    # We update the environment to update the version
+    # 我们更新环境以更新版本
     context.invoke(config_save_command)
 
 
 @click.command(
-    short_help="Run all or a selection of services.",
-    help="Run all or a selection of services. Docker images will be rebuilt where necessary.",
+    short_help="运行所有或选定的服务。",
+    help="运行所有或选定的服务。必要时会重新构建 Docker 镜像。",
 )
-@click.option("--build", is_flag=True, help="Build images on start")
-@click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
+@click.option("--build", is_flag=True, help="启动时构建镜像")
+@click.option("-d", "--detach", is_flag=True, help="以守护进程模式启动")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def start(
@@ -277,25 +276,25 @@ def start(
     attach = len(services) == 1 and not detach
     if build:
         command.append("--build")
-    # We have to run the container in detached mode first to attach to it
+    # 我们必须先以分离模式运行容器才能附加到它
     if detach or attach:
         command.append("-d")
     else:
-        fmt.echo_info("ℹ️  To exit logs without stopping the containers, use ctrl+z")
+        fmt.echo_info("ℹ️  要退出日志而不停止容器，请使用 ctrl+z")
 
-    # Start services
+    # 启动服务
     config = tutor_config.load(context.root)
     context.job_runner(config).docker_compose(*command, *services)
 
     if attach:
         fmt.echo_info(
-            f"""Attaching to service {services[0]}
-ℹ️  To detach without stopping the service, use ctrl+p followed by ctrl+q"""
+            f"""正在附加到服务 {services[0]}
+ℹ️  要分离而不停止服务，请使用 ctrl+p 然后 ctrl+q"""
         )
         context.job_runner(config).docker_compose("attach", *services)
 
 
-@click.command(help="Stop a running platform")
+@click.command(help="停止正在运行的平台")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
 def stop(context: BaseComposeContext, services: list[str]) -> None:
@@ -304,10 +303,10 @@ def stop(context: BaseComposeContext, services: list[str]) -> None:
 
 
 @click.command(
-    short_help="Reboot an existing platform",
-    help="This is more than just a restart: with reboot, the platform is fully stopped before being restarted again",
+    short_help="重启现有平台",
+    help="这不仅仅是重启：使用 reboot 时，平台会完全停止后再重新启动",
 )
-@click.option("-d", "--detach", is_flag=True, help="Start in daemon mode")
+@click.option("-d", "--detach", is_flag=True, help="以守护进程模式启动")
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_context
 def reboot(context: click.Context, detach: bool, services: list[str]) -> None:
@@ -316,11 +315,10 @@ def reboot(context: click.Context, detach: bool, services: list[str]) -> None:
 
 
 @click.command(
-    short_help="Restart some components from a running platform.",
-    help="""Specify 'openedx' to restart the lms, cms and workers, or 'all' to
-restart all services. Note that this performs a 'docker compose restart', so new images
-may not be taken into account. It is useful for reloading settings, for instance. To
-fully stop the platform, use the 'reboot' command.""",
+    short_help="从运行中的平台重启部分组件。",
+    help="""指定 'openedx' 以重启 lms、cms 和 workers，或指定 'all' 以
+重启所有服务。注意这执行的是 'docker compose restart'，因此可能不会使用新镜像。
+这对重新加载设置等场景很有用。要完全停止平台，请使用 'reboot' 命令。""",
 )
 @click.argument("services", metavar="service", nargs=-1)
 @click.pass_obj
@@ -341,16 +339,15 @@ def restart(context: BaseComposeContext, services: list[str]) -> None:
 @jobs.do_group
 def do() -> None:
     """
-    Run a custom job in the right container(s).
+    在正确的容器中运行自定义任务。
     """
 
 
 @click.command(
-    short_help="Run a command in a new container",
+    short_help="在新容器中运行命令",
     help=(
-        "Run a command in a new container. This is a wrapper around `docker compose run`. Any option or argument passed"
-        " to this command will be forwarded to docker compose. Thus, you may use `-v` or `-p` to mount volumes and"
-        " expose ports."
+        "在新容器中运行命令。这是 `docker compose run` 的封装。传递给此命令的任何选项或参数"
+        "都将转发给 docker compose。因此，您可以使用 `-v` 或 `-p` 来挂载卷和暴露端口。"
     ),
     context_settings={"ignore_unknown_options": True},
 )
@@ -368,7 +365,7 @@ def run(
 
 @click.command(
     name="copyfrom",
-    help="Copy files/folders from a container directory to the local filesystem.",
+    help="从容器目录复制文件/文件夹到本地文件系统。",
 )
 @click.argument("service")
 @click.argument("container_path")
@@ -380,20 +377,20 @@ def run(
 def copyfrom(
     context: BaseComposeContext, service: str, container_path: str, host_path: str
 ) -> None:
-    # Path management
+    # 路径管理
     container_root_path = "/tmp/mount"
     container_dst_path = container_root_path
     if not os.path.exists(host_path):
-        # Emulate cp semantics, where if the destination path does not exist
-        # then we copy to its parent and rename to the destination folder
+        # 模拟 cp 语义，如果目标路径不存在
+        # 则复制到其父目录并重命名为目标文件夹
         container_dst_path += "/" + os.path.basename(host_path)
         host_path = os.path.dirname(host_path)
     if not os.path.exists(host_path):
         raise TutorError(
-            f"Cannot create directory {host_path}. No such file or directory."
+            f"无法创建目录 {host_path}。文件或目录不存在。"
         )
 
-    # cp/mv commands
+    # cp/mv 命令
     command = f"cp --recursive --preserve {container_path} {container_dst_path}"
     config = tutor_config.load(context.root)
     runner = context.job_runner(config)
@@ -412,11 +409,10 @@ def copyfrom(
 
 
 @click.command(
-    short_help="Run a command in a running container",
+    short_help="在运行中的容器中执行命令",
     help=(
-        "Run a command in a running container. This is a wrapper around `docker compose exec`. Any option or argument"
-        " passed to this command will be forwarded to docker-compose. Thus, you may use `-e` to manually define"
-        " environment variables."
+        "在运行中的容器中执行命令。这是 `docker compose exec` 的封装。传递给此命令的任何选项"
+        "或参数都将转发给 docker-compose。因此，您可以使用 `-e` 来手动定义环境变量。"
     ),
     context_settings={"ignore_unknown_options": True},
     name="exec",
@@ -428,11 +424,11 @@ def execute(context: click.Context, args: list[str]) -> None:
 
 
 @click.command(
-    short_help="View output from containers",
-    help="View output from containers. This is a wrapper around `docker compose logs`.",
+    short_help="查看容器输出",
+    help="查看容器输出。这是 `docker compose logs` 的封装。",
 )
-@click.option("-f", "--follow", is_flag=True, help="Follow log output")
-@click.option("--tail", type=int, help="Number of lines to show from each container")
+@click.option("-f", "--follow", is_flag=True, help="跟踪日志输出")
+@click.option("--tail", type=int, help="从每个容器显示的行数")
 @click.argument("service", nargs=-1)
 @click.pass_context
 def logs(context: click.Context, follow: bool, tail: bool, service: str) -> None:
@@ -445,17 +441,17 @@ def logs(context: click.Context, follow: bool, tail: bool, service: str) -> None
     context.invoke(dc_command, command="logs", args=args)
 
 
-@click.command(help="Print status information for containers")
+@click.command(help="打印容器的状态信息")
 @click.pass_context
 def status(context: click.Context) -> None:
     context.invoke(dc_command, command="ps")
 
 
 @click.command(
-    short_help="Direct interface to docker compose.",
+    short_help="直接操作 docker compose。",
     help=(
-        "Direct interface to docker compose. This is a wrapper around `docker compose`. Most commands, options and"
-        " arguments passed to this command will be forwarded as-is to docker compose."
+        "直接操作 docker compose。这是 `docker compose` 的封装。传递给此命令的大多数命令、"
+        "选项和参数将按原样转发给 docker compose。"
     ),
     context_settings={"ignore_unknown_options": True},
     name="dc",

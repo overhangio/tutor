@@ -41,7 +41,7 @@ class DevContext(compose.BaseComposeContext):
         return DevTaskRunner(self.root, config)
 
 
-@click.group(help="Run Open edX locally with development settings")
+@click.group(help="使用开发设置在本地运行 Open edX")
 @click.pass_context
 def dev(context: click.Context) -> None:
     context.obj = DevContext(context.obj.root)

@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  zlmediakit:
+    image: {{ EDOPS_ZLMEDIAKIT_IMAGE }}
+    container_name: zlmediakit
+    restart: always
+    ports:
+      - "1935:1935"
+      - "8080:80"
+      - "8443:443"
+      - "554:554"
+      - "10000:10000"
+      - "10000:10000/udp"
+      - "8000:8000/udp"
+      - "9000:9000/udp"
+    volumes:
+      - "{{ EDOPS_MEDIA_CONF_PATH }}:/opt/media/conf"
+      - "{{ EDOPS_MEDIA_LOG_PATH }}:/opt/media/bin/log"
+      - "{{ EDOPS_MEDIA_WEB_PATH }}:/opt/media/bin/www"
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+networks:
+  {{ EDOPS_NETWORK_NAME }}:
+    external: true

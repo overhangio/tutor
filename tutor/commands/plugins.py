@@ -134,14 +134,14 @@ def list_command(show_enabled_only: bool) -> None:
     fmt.echo(utils.format_table(plugins_table))
 
 
-@click.command(help="Enable a plugin")
+@click.command(help="启用插件")
 @click.argument("plugin_names", metavar="plugin", nargs=-1, type=PluginName())
 @click.pass_context
 def enable(context: click.Context, plugin_names: list[str]) -> None:
     config = tutor_config.load_minimal(context.obj.root)
     for plugin in plugin_names:
         plugins.load(plugin)
-        fmt.echo_info(f"Plugin {plugin} enabled")
+        fmt.echo_info(f"插件 {plugin} 已启用")
     tutor_config.save_enabled_plugins(config)
     tutor_config.save_config_file(context.obj.root, config)
     context.invoke(config_save_command, env_only=True)
@@ -412,14 +412,14 @@ def plugin_status(name: str) -> str:
     return "not installed"
 
 
-@click.group(name="index", short_help="Manage plugin indexes")
+@click.group(name="index", short_help="管理插件索引")
 def index_command() -> None:
     """
-    Manage plugin indices.
+    管理插件索引。
 
-    A plugin index is a list of Tutor plugins. An index can be public and shared with
-    the community, or private, for instance to share plugins with a select group of
-    users. Plugin indexes are a great way to share your plugins with other Tutor users.
+    插件索引是 Tutor 插件的列表。索引可以是公共的并与社区共享，
+    也可以是私有的，例如与选定的用户组共享插件。
+    插件索引是与其他 Tutor 用户共享插件的好方法。
     By default, only the official plugin index is enabled.
 
     Plugin indexes are fetched by running:
@@ -432,11 +432,11 @@ def index_command() -> None:
     """
 
 
-@click.command(name="list", help="List plugin indexes")
+@click.command(name="list", help="列出插件索引")
 @click.pass_obj
 def index_list(context: Context) -> None:
     """
-    Print plugin indexes.
+    打印插件索引。
     """
     config = tutor_config.load(context.root)
     for index in indexes.get_all(config):

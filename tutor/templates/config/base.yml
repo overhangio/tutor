@@ -17,3 +17,7 @@ PLUGIN_INDEXES:
   # "plugins.yml". E.g: https://overhang.io/tutor/main/sumac/plugins.yml
   - https://overhang.io/tutor/main
   - https://overhang.io/tutor/contrib
+EDOPS_MYSQL_ROOT_PASSWORD: "{{ 12|random_string }}"
+EDOPS_RABBITMQ_DEFAULT_PASS: "{{ 12|random_string }}"
+EDOPS_MINIO_ROOT_PASSWORD: "{{ 12|random_string }}"
+EDOPS_ISPOT_APP_SOURCE: "{{ 64|random_string }}"

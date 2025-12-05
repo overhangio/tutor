@@ -7,6 +7,7 @@ __pycache__
 /build/
 /dist/
 /venv/
+/.venv/
 
 # Unit test/ coverage reports
 .coverage

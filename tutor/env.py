@@ -10,6 +10,7 @@ import importlib_resources
 import jinja2
 
 from tutor import exceptions, fmt, hooks, plugins, utils
+from tutor.edops import modules as edops_modules
 from tutor.__about__ import __app__, __version__, __version_suffix__
 from tutor.types import Config, ConfigValue
 
@@ -340,6 +341,7 @@ def save(root: str, config: Config) -> None:
     root_env = pathjoin(root)
     for src, dst in hooks.Filters.ENV_TEMPLATE_TARGETS.iterate():
         save_all_from(src, os.path.join(root_env, dst), config)
+    edops_modules.render_modules(root_env, config)
 
     upgrade_obsolete(root)
     fmt.echo_info(f"Environment generated in {base_dir(root)}")

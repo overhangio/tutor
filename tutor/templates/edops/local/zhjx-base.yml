@@ -1,0 +1,160 @@
+version: "3.8"
+
+services:
+  zhjx-nginx:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/nginx:1.23.2
+    init: true
+    hostname: zhjx-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ EDOPS_NGINX_CONF }}:/etc/nginx/nginx.conf"
+      - "{{ EDOPS_CERT_KEY_FILE }}:/data/nginx/portal_ly-sky_com.key"
+      - "{{ EDOPS_CERT_CRT_FILE }}:/data/nginx/portal_ly-sky_com.crt"
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  zhjx-rabbitmq:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/rabbitmq:3.8-management-delayed
+    hostname: zhjx-rabbitmq
+    init: true
+    environment:
+      - RABBITMQ_DEFAULT_USER={{ EDOPS_RABBITMQ_DEFAULT_USER }}
+      - RABBITMQ_DEFAULT_PASS={{ EDOPS_RABBITMQ_DEFAULT_PASS }}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  zhjx-redis:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/redis:5.0.7
+    hostname: zhjx-redis
+    init: true
+    restart: on-failure
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  zhjx-nacos:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/nacos-server:2.0.2
+    init: true
+    hostname: zhjx-nacos
+    environment:
+      - PREFER_HOST_MODE=hostname
+      - MODE=standalone
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST={{ EDOPS_MASTER_NODE_IP }}
+      - MYSQL_SERVICE_DB_NAME=nacos
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD={{ EDOPS_MYSQL_ROOT_PASSWORD }}
+      - DEBUG=true
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  zhjx-sentinel:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/sentinel-dashboard:1.8.5
+    init: true
+    hostname: zhjx-sentinel
+    depends_on:
+      - zhjx-nacos
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  zhjx-fileview:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/keking/kkfileview:3.1
+    init: true
+    hostname: zhjx-fileview
+    restart: always
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    environment:
+      KK_FILE_DIR: "/data/file"
+      KK_BASE_URL: "http://127.0.0.1/preview/"
+      KK_CONTEXT_PATH: "/preview/"
+    volumes:
+      - "kkfileview_data:/data/file"
+
+  zhjx-minio:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/minio:RELEASE.2022-08-02T23-59-16Z.fips
+    init: true
+    hostname: zhjx-minio
+    ports:
+      - "{{ EDOPS_MINIO_API_PORT }}:9000"
+      - "{{ EDOPS_MINIO_CONSOLE_PORT }}:9001"
+    command: server --console-address :9001 /data
+    restart: on-failure
+    environment:
+      MINIO_ROOT_USER: "{{ EDOPS_MINIO_ROOT_USER }}"
+      MINIO_ROOT_PASSWORD: "{{ EDOPS_MINIO_ROOT_PASSWORD }}"
+      MINIO_SERVER_URL: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_MINIO_API_PORT }}"
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+    volumes:
+      - "minio_data:/data"
+
+  zhjx-emqx:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/emqx:4.4.19
+    init: true
+    hostname: zhjx-emqx
+    ports:
+      - "1883:1883"
+      - "8081:8081"
+      - "8083:8083"
+      - "8883:8883"
+      - "8084:8084"
+      - "18083:18083"
+    environment:
+      - EMQX_PROTOCOL_MODULES="emqx_web_hook,emqx_recon,emqx_retainer,emqx_management,emqx_dashboard"
+      - EMQX_LISTENER__WSS__EXTERNAL__ACCEPTORS=4
+      - EMQX_LISTENER__WSS__EXTERNAL__SSL=true
+      - EMQX_LISTENER__WSS__EXTERNAL__SSL_OPTS="certfile:/etc/emqx/portal_ly-sky_com.crt,keyfile:/etc/emqx/portal_ly-sky_com.key"
+    restart: always
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  zhjx-kafka:
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/bitnami/kafka:3.5
+    init: true
+    hostname: zhjx-kafka
+    restart: on-failure
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://zhjx-kafka:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@zhjx-kafka:9093
+    volumes:
+      - "kafka_data:/bitnami/kafka"
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+  zhjx-elasticsearch:
+    init: true
+    hostname: zhjx-elasticsearch
+    image: {{ EDOPS_IMAGE_REGISTRY }}/library/elasticsearch:7.14.0-ik
+    volumes:
+      - "elasticsearch_data:/usr/share/elasticsearch/data"
+    environment:
+      ES_JAVA_OPTS: "-Xmx1024m -Xms1024m -Xlog:gc*,gc+age=trace,safepoint:file=/usr/share/elasticsearch/logs/gc.log:utctime,pid,tags:filecount=32,filesize=64m"
+      discovery.type: single-node
+      http.cors.enabled: "true"
+      http.cors.allow-origin: "*"
+    networks:
+      - {{ EDOPS_NETWORK_NAME }}
+
+networks:
+  {{ EDOPS_NETWORK_NAME }}:
+    external: true
+
+volumes:
+  rabbitmq_data:
+  minio_data:
+  elasticsearch_data:
+  kibana_data:
+  kafka_data:
+  kkfileview_data:
