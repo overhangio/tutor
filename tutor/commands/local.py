@@ -165,7 +165,26 @@ def healthcheck(
 
         fmt.echo_info(f"\n正在检查 {module.name}...")
         for check_def in module.health_checks:
-            passed = checker.check(check_def)
+            # 渲染健康检查中的模板变量
+            rendered_url = None
+            if check_def.url:
+                rendered_url = tutor_env.render_str(config, check_def.url)
+
+            rendered_host = None
+            if check_def.host:
+                rendered_host = tutor_env.render_str(config, check_def.host)
+
+            rendered_check = edops_health.HealthCheckDef(
+                service=check_def.service,
+                type=check_def.type,
+                url=rendered_url,
+                host=rendered_host,
+                port=check_def.port,
+                timeout=check_def.timeout,
+                interval=check_def.interval,
+                retries=check_def.retries,
+            )
+            passed = checker.check(rendered_check)
             if not passed:
                 all_passed = False
 
