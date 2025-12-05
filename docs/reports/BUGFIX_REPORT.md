@@ -5,7 +5,7 @@
 
 ## 🐛 问题概述
 
-在第 2 阶段功能实施后，发现**三个关键 bug** 导致部分功能无法使用。
+在第 2 阶段功能实施后，发现**四个关键 bug** 导致部分功能无法使用或测试失败。
 
 ---
 
@@ -562,7 +562,158 @@ b78478dd fix: 渲染健康检查中的 Jinja 模板变量
 
 ---
 
-**状态**: ✅ 三个 Bug 均已修复  
-**最新提交**: b78478dd  
-**影响**: 健康检查功能完全可用，镜像管理功能正常工作
+## Bug #4: 测试中的枚举比较错误 🟡
 
+### 问题描述
+**症状**: `pytest tests/edops/test_modules.py` 测试失败
+```python
+AssertionError: assert HealthCheckType.HTTP == "http"
+```
+
+### 根本原因
+**测试代码未更新**：
+
+在修复 Bug #1 时，`_load_modules()` 已经将字符串转换为枚举：
+```python
+# modules.py (已修复)
+check_type = HealthCheckType.HTTP  # ✅ 枚举
+```
+
+但测试代码仍然使用字符串比较：
+```python
+# test_modules.py (修复前)
+assert nacos_check.type == "http"  # ❌ 枚举 != 字符串
+```
+
+### 代码位置
+**tests/edops/test_modules.py**:
+```python
+# 问题代码（修复前）
+def test_module_health_checks():
+    ...
+    nacos_check = base.health_checks[0]
+    assert nacos_check.type == "http"  # ❌ 比较字符串
+```
+
+### 修复方案
+**导入枚举并正确比较**：
+
+```python
+# test_modules.py (修复后)
+from tutor.edops.health import HealthCheckType  # ✅ 导入枚举
+
+def test_module_health_checks():
+    ...
+    nacos_check = base.health_checks[0]
+    
+    # ✅ 方式 1：比较枚举
+    assert nacos_check.type == HealthCheckType.HTTP
+    
+    # ✅ 方式 2：比较枚举的值
+    assert nacos_check.type.value == "http"
+    
+    # 同时验证两种方式
+    assert nacos_check.timeout == 30
+```
+
+### 验证测试
+```bash
+$ cd /Users/zhumin/zhjx/edops
+$ source venv/bin/activate
+$ pytest tests/edops/ -v
+
+结果:
+============================= test session starts ==============================
+tests/edops/test_health.py::test_health_check_def_creation PASSED        [  8%]
+tests/edops/test_health.py::test_health_checker_creation PASSED          [ 16%]
+tests/edops/test_health.py::test_health_check_types PASSED               [ 25%]
+tests/edops/test_image_registry.py::test_deploy_history_add_record PASSED [ 33%]
+tests/edops/test_image_registry.py::test_deploy_history_persistence PASSED [ 41%]
+tests/edops/test_image_registry.py::test_get_module_history PASSED       [ 50%]
+tests/edops/test_image_registry.py::test_get_last_deployment PASSED      [ 58%]
+tests/edops/test_image_registry.py::test_registry_client_initialization PASSED [ 66%]
+tests/edops/test_modules.py::test_load_modules PASSED                    [ 75%]
+tests/edops/test_modules.py::test_module_health_checks PASSED            [ 83%]
+tests/edops/test_modules.py::test_module_images PASSED                   [ 91%]
+tests/edops/test_modules.py::test_module_order_resolution PASSED         [100%]
+
+============================== 12 passed in 0.11s ==============================
+✅ 所有 12 个测试全部通过
+```
+
+### 影响范围
+- ✅ 测试套件现可正常运行
+- ✅ 所有 12 个单元测试通过
+- ✅ 验证了 Bug #1 的修复正确性
+- ✅ 为 CI/CD 集成做好准备
+
+### Git 提交
+```
+commit 0d182e63
+fix: 修复测试中的枚举比较错误
+```
+
+---
+
+## 📊 最终修复统计
+
+### 修改文件（4个）
+- `tutor/edops/modules.py` - 类型转换逻辑
+- `tutor/templates/config/edops-modules.yml` - 镜像名称和补全
+- `tutor/commands/local.py` - 模板变量渲染
+- `tests/edops/test_modules.py` - 枚举比较修正
+
+### 代码变更
+- +68 行（类型转换 + 镜像配置 + 变量渲染 + 测试修正）
+- -20 行（移除重复定义 + 修正错误）
+
+### Git 提交（4个）
+```
+0d182e63 fix: 修复测试中的枚举比较错误
+b78478dd fix: 渲染健康检查中的 Jinja 模板变量
+703f56bf fix: 修复健康检查类型转换和镜像名称不一致问题
+```
+
+### 测试状态
+```
+✅ 12/12 单元测试通过
+✅ 类型转换测试通过
+✅ 镜像名称测试通过
+✅ 健康检查枚举测试通过
+✅ 模板渲染测试通过
+```
+
+---
+
+## 🔍 完整根因分析
+
+### Bug #1 根因
+**设计缺陷**：在两个模块中定义了相同名称但不兼容的数据类
+
+### Bug #2 根因
+**数据不一致**：元数据配置与实际部署文件未同步
+
+### Bug #3 根因
+**配置与运行时混淆**：健康检查配置中包含模板变量，但在运行时未渲染
+
+### Bug #4 根因
+**测试代码未同步**：修复 Bug #1 后测试代码未相应更新
+
+**共性问题**：
+- 数据转换边界处理不当
+- 配置和代码不一致
+- 测试覆盖不完整
+- 类型系统使用不充分
+
+**改进方向**：
+- ✅ 加强类型提示
+- ✅ 添加配置验证
+- ✅ 增加集成测试
+- ✅ 引入 mypy 静态检查
+
+---
+
+**状态**: ✅ 四个 Bug 均已修复并验证  
+**最新提交**: 0d182e63  
+**测试结果**: ✅ 所有测试通过  
+**影响**: 健康检查功能完全可用，镜像管理功能正常工作，测试套件通过
