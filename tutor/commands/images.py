@@ -380,22 +380,48 @@ def edops_list(context: Context, module_filter: t.Optional[str]) -> None:
 
 @click.command(name="versions", help="列出服务的可用版本")
 @click.argument("service_name")
+@click.option("--debug", is_flag=True, help="显示调试信息")
 @click.pass_obj
-def edops_versions(context: Context, service_name: str) -> None:
+def edops_versions(context: Context, service_name: str, debug: bool) -> None:
     """查询 Docker Registry 中的可用镜像版本。"""
     from tutor.edops import image_registry
 
     config = tutor_config.load(context.root)
 
     try:
+        # 从模块元数据解析完整的 repository 路径
+        repository = image_registry.resolve_repository_path(config, service_name)
+        
+        if debug:
+            fmt.echo_info("=== 调试信息 ===")
+            fmt.echo_info(f"Registry: {config.get('EDOPS_IMAGE_REGISTRY', '未设置')}")
+            fmt.echo_info(f"Username: {config.get('EDOPS_IMAGE_REGISTRY_USER', '未设置')}")
+            fmt.echo_info(f"Password: {'已设置' if config.get('EDOPS_IMAGE_REGISTRY_PASSWORD') else '未设置'}")
+            fmt.echo_info(f"Token: {'已设置' if config.get('EDOPS_IMAGE_REGISTRY_TOKEN') else '未设置'}")
+            fmt.echo_info(f"Repository: {repository}")
+            fmt.echo_info("===============\n")
+            
+            # 尝试获取 WWW-Authenticate 头用于调试
+            try:
+                from tutor.edops import image_registry
+                test_client = image_registry.get_registry_client(config)
+                test_url = f"https://{config.get('EDOPS_IMAGE_REGISTRY', '')}/v2/{repository}/tags/list"
+                import requests
+                test_response = requests.get(test_url, timeout=5)
+                if test_response.status_code == 401:
+                    www_auth = test_response.headers.get("WWW-Authenticate", "")
+                    fmt.echo_info(f"WWW-Authenticate: {www_auth}")
+            except Exception:
+                pass
+        
         client = image_registry.get_registry_client(config)
-        tags = client.list_tags(service_name)
+        tags = client.list_tags(repository)
 
         if not tags:
-            fmt.echo_info(f"未找到 {service_name} 的标签")
+            fmt.echo_info(f"未找到 {service_name} (repository: {repository}) 的标签")
             return
 
-        fmt.echo_info(f"{service_name} 的可用版本:\n")
+        fmt.echo_info(f"{service_name} (repository: {repository}) 的可用版本:\n")
         # 排序标签，如果存在 'latest' 则放在最前面
         sorted_tags = sorted(tags, reverse=True)
         if "latest" in sorted_tags:
@@ -407,6 +433,9 @@ def edops_versions(context: Context, service_name: str) -> None:
 
     except Exception as e:
         fmt.echo_error(f"列出版本失败: {e}")
+        if debug:
+            import traceback
+            fmt.echo_error(traceback.format_exc())
 
 
 @click.command(name="inspect", help="检查镜像详情")
@@ -421,14 +450,17 @@ def edops_inspect(context: Context, service_name: str, tag: str) -> None:
     config = tutor_config.load(context.root)
 
     try:
+        # 从模块元数据解析完整的 repository 路径
+        repository = image_registry.resolve_repository_path(config, service_name)
+        
         client = image_registry.get_registry_client(config)
-        manifest = client.get_manifest(service_name, tag)
+        manifest = client.get_manifest(repository, tag)
 
         if not manifest:
-            fmt.echo_error(f"未找到 {service_name}:{tag} 的 manifest")
+            fmt.echo_error(f"未找到 {service_name} (repository: {repository}):{tag} 的 manifest")
             return
 
-        fmt.echo_info(f"镜像: {service_name}:{tag}\n")
+        fmt.echo_info(f"镜像: {service_name} (repository: {repository}):{tag}\n")
         fmt.echo(json.dumps(manifest, indent=2))
 
     except Exception as e:

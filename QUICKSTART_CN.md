@@ -80,6 +80,51 @@ edops images versions ly-ac-gateway-svc
 edops images inspect ly-ac-gateway-svc --tag latest
 ```
 
+#### Docker Registry 认证配置
+
+使用 `edops images versions` 和 `inspect` 命令查询镜像仓库时，需要配置认证信息。
+
+**方式 1：使用环境变量（推荐）**
+
+```bash
+# 设置认证信息
+export EDOPS_IMAGE_REGISTRY_USER="tcr\$edops"
+export EDOPS_IMAGE_REGISTRY_PASSWORD="your-password"
+
+# 或使用 Token
+export EDOPS_IMAGE_REGISTRY_TOKEN="your-token"
+```
+
+**方式 2：使用配置文件**
+
+```bash
+# 使用 edops config save --set 命令
+edops config save --set EDOPS_IMAGE_REGISTRY_USER="tcr\$edops"
+edops config save --set EDOPS_IMAGE_REGISTRY_PASSWORD="your-password"
+
+# 或使用 Token
+edops config save --set EDOPS_IMAGE_REGISTRY_TOKEN="your-token"
+
+# 也可以一次设置多个值
+edops config save --set EDOPS_IMAGE_REGISTRY_USER="tcr\$edops" --set EDOPS_IMAGE_REGISTRY_PASSWORD="your-password"
+```
+
+**腾讯云 TCR 认证示例**
+
+```bash
+# 腾讯云 TCR 用户名格式：tcr$<namespace>
+export EDOPS_IMAGE_REGISTRY_USER="tcr\$edops"
+export EDOPS_IMAGE_REGISTRY_PASSWORD="jLLz5qLCFX8tOwiKbRA3Au1q3Ib8RKZW"
+
+# 验证配置
+edops images versions ly-ac-gateway-svc
+```
+
+**注意**：
+- 用户名中的 `$` 符号在 shell 中需要转义为 `\$`，或在配置文件中直接使用 `tcr$edops`
+- 密码和 Token 等敏感信息建议使用环境变量，避免写入配置文件
+- 如果未配置认证信息，查询镜像仓库时会返回 401 Unauthorized 错误
+
 ## 退出虚拟环境
 
 使用完毕后，可以退出虚拟环境：
