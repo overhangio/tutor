@@ -1,5 +1,3 @@
-version: "3.8"
-
 x-ui-environment:
   &ui-environment
   spring.cloud.inetutils.preferred-networks: 10.10.0
@@ -21,21 +19,21 @@ x-svc-environment:
 
 services:
   ly-ac-auth-ui:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-auth-ui:{{ EDOPS_VERSION_UI_AUTH }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-auth-ui:{{ EDOPS_VERSION_UI_AUTH }}
     init: true
     environment: *ui-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
 
   ly-ac-console-ui:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-console-ui:{{ EDOPS_VERSION_UI_CONSOLE }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-console-ui:{{ EDOPS_VERSION_UI_CONSOLE }}
     init: true
     environment: *ui-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
 
   ly-ac-gateway-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-gateway-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-gateway-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     environment:
@@ -49,14 +47,14 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
 
   ly-ac-job-admin-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-job-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-job-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
 
   ly-ac-object-storage-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-object-storage-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-object-storage-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     environment: *svc-environment
     networks:
@@ -65,7 +63,7 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
 
   ly-ac-admin-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     environment: *svc-environment
     networks:
@@ -74,7 +72,7 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
 
   ly-ac-auth-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-auth-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-auth-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     environment: *svc-environment
     networks:
@@ -83,7 +81,7 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
 
   ly-ac-basic-data-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-basic-data-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-basic-data-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     environment: *svc-environment
     networks:
@@ -92,7 +90,7 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
 
   ly-ac-user-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-user-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-user-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     environment: *svc-environment
     networks:
@@ -101,7 +99,7 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
 
   ly-ac-rtc-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-rtc-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-rtc-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     environment: *svc-environment
     networks:
@@ -110,7 +108,7 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Shanghai /usr/local/app.jar"]
 
   ly-ac-course-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-course-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-course-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     hostname: ly-ac-course-svc
     environment: *svc-environment
@@ -120,7 +118,7 @@ services:
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
 
   ly-ac-classroom-svc:
-    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-ac-classroom-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-classroom-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     hostname: ly-ac-classroom-svc
     environment: *svc-environment

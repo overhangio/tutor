@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import typing as t
 
 import click
@@ -16,6 +17,7 @@ from tutor.commands.context import BaseTaskContext
 from tutor.commands.upgrade import OPENEDX_RELEASE_NAMES
 from tutor.commands.upgrade.compose import upgrade_from
 from tutor.core.hooks import Filter  # noqa: F401
+from tutor.edops import modules as edops_modules
 from tutor.exceptions import TutorError
 from tutor.tasks import BaseComposeTaskRunner
 from tutor.types import Config
@@ -108,7 +110,7 @@ class BaseComposeContext(BaseTaskContext):
         raise NotImplementedError
 
 
-@click.command(help="从头配置并运行 Open edX")
+@click.command(help="从头配置并运行 EdOps 平台")
 @click.option("-I", "--non-interactive", is_flag=True, help="非交互式运行")
 @click.option("-p", "--pullimages", is_flag=True, help="更新 docker 镜像")
 @click.option("--skip-build", is_flag=True, help="跳过构建 Docker 镜像")
@@ -141,6 +143,8 @@ def launch(
     context.invoke(stop)
 
     if pullimages:
+        # 在拉取镜像前自动处理 Docker 登录
+        _ensure_docker_login(config)
         click.echo(fmt.title("更新 Docker 镜像"))
         context.invoke(dc_command, command="pull")
 
@@ -223,11 +227,19 @@ def interactive_configuration(
 ) -> None:
     config = tutor_config.load_minimal(context.obj.root)
     if interactive:
-        click.echo(fmt.title("Interactive platform configuration"))
-        interactive_config.ask_questions(
-            config,
-            run_for_prod=run_for_prod,
-        )
+        # 检查是否启用了 EdOps 模块
+        enabled_modules = edops_modules.get_enabled_modules(config)
+        if enabled_modules:
+            # 使用 EdOps 专用配置
+            click.echo(fmt.title("交互式平台配置"))
+            _ask_edops_questions(config, run_for_prod=run_for_prod)
+        else:
+            # 使用 Open edX 配置（向后兼容）
+            click.echo(fmt.title("交互式平台配置"))
+            interactive_config.ask_questions(
+                config,
+                run_for_prod=run_for_prod,
+            )
     tutor_config.save_config_file(context.obj.root, config)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)
@@ -469,6 +481,134 @@ def dc_command(
 
 
 hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(("iter_mounts", bindmount.iter_mounts))
+
+
+def _ensure_docker_login(config: tutor_config.Config) -> None:
+    """
+    确保已登录到 Docker 仓库。如果配置了私有仓库的用户名和密码，则自动登录。
+
+    Args:
+        config: EdOps 配置字典
+    """
+    registry = config.get("EDOPS_IMAGE_REGISTRY", "")
+    if not registry or registry == "docker.io":
+        # 使用公共仓库，无需登录
+        return
+
+    username = config.get("EDOPS_IMAGE_REGISTRY_USER")
+    password = config.get("EDOPS_IMAGE_REGISTRY_PASSWORD")
+
+    if not username or not password:
+        fmt.echo_info(
+            f"未配置 Docker 仓库认证信息。"
+            f"如需从私有仓库 {registry} 拉取镜像，请设置："
+        )
+        fmt.echo_info(f"  edops config save --set EDOPS_IMAGE_REGISTRY_USER=用户名")
+        fmt.echo_info(f"  edops config save --set EDOPS_IMAGE_REGISTRY_PASSWORD=密码")
+        fmt.echo_info("或使用环境变量：")
+        fmt.echo_info(f"  export EDOPS_IMAGE_REGISTRY_USER=用户名")
+        fmt.echo_info(f"  export EDOPS_IMAGE_REGISTRY_PASSWORD=密码")
+        return
+
+    # 尝试登录
+    try:
+        fmt.echo_info(f"正在登录 Docker 仓库: {registry}")
+        process = subprocess.Popen(
+            ["docker", "login", registry, "--username", username, "--password-stdin"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        stdout, stderr = process.communicate(input=password)
+        if process.returncode != 0:
+            fmt.echo_warning(
+                f"Docker 登录失败: {stderr.strip()}\n"
+                f"请手动执行: docker login {registry} --username {username}"
+            )
+        else:
+            fmt.echo_info("Docker 登录成功")
+    except Exception as e:
+        fmt.echo_warning(f"无法自动登录 Docker 仓库: {e}")
+        fmt.echo_info(f"请手动执行: docker login {registry} --username {username}")
+
+
+def _ask_edops_questions(config: tutor_config.Config, run_for_prod: t.Optional[bool] = None) -> None:
+    """
+    EdOps 专用的交互式配置问题。
+
+    Args:
+        config: 配置字典（会被修改）
+        run_for_prod: 是否用于生产环境
+    """
+    defaults = tutor_config.get_defaults()
+
+    # 询问是否生产环境
+    if run_for_prod is None:
+        run_for_prod = click.confirm(
+            fmt.question(
+                "是否配置生产环境？"
+                "输入 'n' 如果只是在本机测试 EdOps"
+            ),
+            prompt_suffix=" ",
+            default=False,
+        )
+
+    # 询问 Docker 镜像仓库
+    registry = config.get("EDOPS_IMAGE_REGISTRY", defaults.get("EDOPS_IMAGE_REGISTRY", ""))
+    registry = click.prompt(
+        fmt.question("Docker 镜像仓库地址"),
+        default=registry,
+        show_default=True,
+    )
+    config["EDOPS_IMAGE_REGISTRY"] = registry
+
+    # 如果使用私有仓库，询问认证信息
+    if registry and registry != "docker.io":
+        username = config.get("EDOPS_IMAGE_REGISTRY_USER", "")
+        if not username:
+            username = click.prompt(
+                fmt.question("Docker 仓库用户名（留空跳过）"),
+                default="",
+                show_default=False,
+            )
+            if username:
+                config["EDOPS_IMAGE_REGISTRY_USER"] = username
+
+        if username:
+            password = config.get("EDOPS_IMAGE_REGISTRY_PASSWORD", "")
+            if not password:
+                password = click.prompt(
+                    fmt.question("Docker 仓库密码（留空跳过）"),
+                    default="",
+                    show_default=False,
+                    hide_input=True,
+                )
+                if password:
+                    config["EDOPS_IMAGE_REGISTRY_PASSWORD"] = password
+
+    # 询问主节点 IP
+    master_ip = config.get("EDOPS_MASTER_NODE_IP", defaults.get("EDOPS_MASTER_NODE_IP", ""))
+    master_ip = click.prompt(
+        fmt.question("主节点 IP 地址"),
+        default=master_ip,
+        show_default=True,
+    )
+    config["EDOPS_MASTER_NODE_IP"] = master_ip
+
+    # 询问启用的模块
+    enabled = config.get("EDOPS_ENABLED_MODULES", [])
+    if not enabled:
+        fmt.echo_info("可选模块（base 和 common 模块始终启用）：")
+        available_modules = ["zhjx_zlmediakit", "zhjx_sup", "zhjx_ilive_ecom", "zhjx_media"]
+        for module in available_modules:
+            if click.confirm(f"  是否启用 {module} 模块？", default=False):
+                enabled.append(module)
+        if enabled:
+            config["EDOPS_ENABLED_MODULES"] = enabled
+
+    # 执行插件钩子
+    hooks.Actions.CONFIG_INTERACTIVE.do(config)
 
 
 def add_commands(command_group: click.Group) -> None:

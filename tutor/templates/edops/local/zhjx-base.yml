@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   zhjx-nginx:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/nginx:1.23.2

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   zlmediakit:
     image: {{ EDOPS_ZLMEDIAKIT_IMAGE }}
