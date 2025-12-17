@@ -91,7 +91,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # Install the right version of pip/setuptools
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install \
+    $PIP_COMMAND install \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
