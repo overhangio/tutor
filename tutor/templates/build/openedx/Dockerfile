@@ -11,7 +11,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt install -y build-essential curl git language-pack-en
 ENV LC_ALL=en_US.UTF-8
 
-COPY --from=ghcr.io/astral-sh/uv:0.4.21 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.18 /uv /usr/local/bin/uv
 ARG PIP_COMMAND="uv pip"
 
 {{ patch("openedx-dockerfile-minimal") }}
