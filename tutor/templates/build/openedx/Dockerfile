@@ -58,6 +58,10 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patches in Main node
 {%- else %}
 # Patches in non-Main mode (i.e., Release mode)
+# Security patch for "CourseLimitedStaffRole should not be able to access studio."
+# https://github.com/openedx/edx-platform/security/advisories/GHSA-rh64-vc2h-7wfj
+# https://discuss.openedx.org/t/security-upcoming-security-release-for-edx-platform-on-2025-12-16/17787
+RUN curl -fsSL https://github.com/openedx/edx-platform/commit/ea63816f91f5b7b1caf6b6d8f6aa6c45d346e80f.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
