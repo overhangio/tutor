@@ -20,6 +20,17 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-20.0.4'></a>
+## v20.0.4 (2025-12-22)
+
+- [Chore] Update hatch definition for version. (by @mlabeeb03)
+
+- [Improvement] Add ability to not delete namespace while running `tutor k8s delete` command. (by @mlabeeb03)
+
+- [Security] Add upstream security fix as patch in Open edX image (by @ahmed-arb)
+
+[Security] Bump urllib3 from 2.5.0 to 2.6.0 to address Dependabot alerts.
+
 <a id='changelog-20.0.3'></a>
 ## v20.0.3 (2025-12-03)
 
