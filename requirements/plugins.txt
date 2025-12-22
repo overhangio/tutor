@@ -12,3 +12,4 @@ tutor-mfe@git+https://github.com/overhangio/tutor-mfe@main
 tutor-minio@git+https://github.com/overhangio/tutor-minio@main
 tutor-notes@git+https://github.com/overhangio/tutor-notes@main
 tutor-xqueue@git+https://github.com/overhangio/tutor-xqueue@main
+tutor-contrib-notifications@git+https://github.com/openedx/tutor-contrib-notifications.git@main
