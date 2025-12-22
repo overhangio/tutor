@@ -364,20 +364,48 @@ def reboot(context: click.Context) -> None:
 
 @click.command(help="Completely delete an existing platform")
 @click.option("-y", "--yes", is_flag=True, help="Do not ask for confirmation")
+@click.option("--exclude-namespace", is_flag=True, help="Do not delete the namespace")
 @click.pass_obj
-def delete(context: K8sContext, yes: bool) -> None:
+def delete(context: K8sContext, yes: bool, exclude_namespace: bool) -> None:
     if not yes:
         click.confirm(
             "Are you sure you want to delete the platform? All data will be removed.",
             abort=True,
         )
-    utils.kubectl(
-        "delete",
-        "-k",
-        tutor_env.pathjoin(context.root),
-        "--ignore-not-found=true",
-        "--wait",
-    )
+    if not exclude_namespace:
+        utils.kubectl(
+            "delete",
+            "-k",
+            tutor_env.pathjoin(context.root),
+            "--ignore-not-found=true",
+            "--wait",
+        )
+    else:
+        # Fetch all the resources that would have been deleted
+        # and remove namespace from the list. Delete the remaining
+        # resources with a separate call.
+        resources: list[str] = [
+            line.decode("utf-8").strip()
+            for line in utils.check_output(
+                "kubectl",
+                "delete",
+                "-k",
+                tutor_env.pathjoin(context.root),
+                "--dry-run=client",
+                "-o",
+                "name",
+            ).splitlines()
+            if not line.startswith(b"namespace/")
+        ]
+        config = tutor_config.load(context.root)
+        utils.kubectl(
+            "delete",
+            "--namespace",
+            k8s_namespace(config),
+            "--ignore-not-found=true",
+            "--wait",
+            *resources,
+        )
 
 
 @jobs.do_group
