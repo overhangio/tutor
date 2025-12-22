@@ -14,5 +14,8 @@ XQUEUE_INTERFACE = {
 DATABASES = {
     "default": {},
 }
+# Dummy value required for the static asset build steps to run,
+# but it has no impact on the output produced by those steps.
+LMS_ROOT_URL = "https://lms.local"
 
 {{ patch("openedx-common-assets-settings") }}

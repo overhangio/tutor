@@ -1,0 +1,1 @@
+- [Feature] Add tutor livedeps to the list of plugins available by default. (by @mlabeeb03)
