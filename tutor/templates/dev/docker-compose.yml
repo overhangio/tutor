@@ -1,3 +1,4 @@
+{% if RUN_OPENEDX -%}
 x-openedx-service:
   &openedx-service
   image: {{ DOCKER_IMAGE_OPENEDX_DEV }}
@@ -6,12 +7,16 @@ x-openedx-service:
   volumes:
     # theme files
     - ../build/openedx/themes:/openedx/themes
+{%- endif %}
 
 services:
   permissions:
+    {% if RUN_OPENEDX -%}
     environment:
       OPENEDX_USER_ID: "{{ HOST_USER_ID or 1000 }}"
+    {%- endif %}
 
+  {% if RUN_OPENEDX -%}
   lms:
     <<: *openedx-service
     command: ./manage.py lms runserver 0.0.0.0:8000
@@ -32,6 +37,13 @@ services:
     ports:
         - "8001:8000"
 
+  # Additional service for watching theme changes
+  watchthemes:
+    <<: *openedx-service
+    command: npm run watch-sass
+    restart: unless-stopped
+  {%- endif %}
+
   {% if RUN_MEILISEARCH -%}
   meilisearch:
     ports:
@@ -41,11 +53,5 @@ services:
         aliases:
           - "{{ MEILISEARCH_PUBLIC_URL.split('://')[1] }}"
   {%- endif %}
-
-  # Additional service for watching theme changes
-  watchthemes:
-    <<: *openedx-service
-    command: npm run watch-sass
-    restart: unless-stopped
 
   {{ patch("local-docker-compose-dev-services")|indent(2) }}

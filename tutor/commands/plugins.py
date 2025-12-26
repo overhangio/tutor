@@ -80,7 +80,7 @@ class IndexPluginNameOrLocation(IndexPluginName):
 )
 def plugins_command() -> None:
     """
-    Manage Tutor plugins to add new features and customise your Open edX platform.
+    管理 Tutor 插件以添加新功能并自定义 EdOps 平台。
 
     Plugins can be downloaded from local and remote indexes. See the `tutor plugins
     index` subcommand.

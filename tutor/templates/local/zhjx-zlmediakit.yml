@@ -1,8 +1,10 @@
+{% if RUN_ZHJX_ZLMEDIAKIT %}
 services:
   zlmediakit:
     image: {{ EDOPS_ZLMEDIAKIT_IMAGE }}
     container_name: zlmediakit
-    restart: always
+    restart: unless-stopped
+    user: "1000:1000"
     ports:
       - "1935:1935"
       - "8080:80"
@@ -13,12 +15,16 @@ services:
       - "8000:8000/udp"
       - "9000:9000/udp"
     volumes:
-      - "{{ EDOPS_MEDIA_CONF_PATH }}:/opt/media/conf"
-      - "{{ EDOPS_MEDIA_LOG_PATH }}:/opt/media/bin/log"
-      - "{{ EDOPS_MEDIA_WEB_PATH }}:/opt/media/bin/www"
+      - ../../data/zlmediakit/conf:/opt/media/conf
+      - ../../data/zlmediakit/log:/opt/media/bin/log
+      - ../../data/zlmediakit/www:/opt/media/bin/www
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-permissions
 
 networks:
   {{ EDOPS_NETWORK_NAME }}:
     external: true
+{% endif %}
+

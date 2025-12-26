@@ -1,0 +1,38 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    nacos:
+      discovery:
+        ip: ${spring.application.name}
+        port: 52106
+  application:
+    name: ly-ac-classroom-svc
+  ####################################################################################
+  ###################################DataSource Config################################
+  ####################################################################################
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://{{ EDOPS_MYSQL_HOST }}:{{ EDOPS_MYSQL_PORT }}/ly_ac_classroom_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: {{ EDOPS_MYSQL_ROOT_USER }}
+    password: {{ EDOPS_MYSQL_ROOT_PASSWORD }}
+
+ly:
+  lock:
+    # 开启Redis分布式锁
+    enabled: true
+    address: redis://{{ EDOPS_REDIS_HOST }}:{{ EDOPS_REDIS_PORT }}
+    password: {{ EDOPS_REDIS_PASSWORD }}
+    database: {{ EDOPS_REDIS_DATABASE }}
+
+custom:
+  appKey: {{ EDOPS_REVIEW_LINK_APP_KEY }}
+  appSecret: {{ EDOPS_REVIEW_LINK_APP_SECRET }}
+  address: {{ EDOPS_REVIEW_LINK_ADDRESS }}
+
+######内容分析回调地址和请求地址
+content:
+  backUrl: http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_API_GATEWAY_PORT }}/api/ac-classroom/v1/classroom/ai/evaluation/test/callback
+  questUrl: http://{{ EDOPS_MASTER_NODE_IP }}:8000/api/v1/tasks/execute
+

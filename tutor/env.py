@@ -330,6 +330,9 @@ hooks.Filters.ENV_PATTERNS_IGNORE.add_items(
         r".*\.pyc$",
         # Skip files from "partials" folders
         r"(.*/)?partials(/.*)?$",
+        # 忽略所有 Open edX 相关模板（仅交付 zhjx 业务）
+        r"apps/openedx(/.*)?$",
+        r"build/openedx(/.*)?$",
     ]
 )
 

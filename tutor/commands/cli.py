@@ -15,6 +15,7 @@ from tutor.commands.images import images_command
 from tutor.commands.k8s import k8s
 from tutor.commands.local import local
 from tutor.commands.mounts import mounts_command
+from tutor.commands.nacos import nacos_command
 from tutor.commands.plugins import plugins_command
 from tutor.commands.portainer import portainer
 
@@ -129,6 +130,7 @@ hooks.Filters.CLI_COMMANDS.add_items(
         k8s,
         local,
         mounts_command,
+        nacos_command,
         plugins_command,
         portainer,
     ]

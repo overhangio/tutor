@@ -71,14 +71,6 @@ edops config validate
 - `EDOPS_MASTER_NODE_IP`
 - `EDOPS_NETWORK_NAME`
 
-### edops config render
-
-渲染单个模块模板。
-
-```bash
-edops config render base
-edops config render common
-```
 
 ## 部署命令
 
@@ -214,6 +206,30 @@ edops images inspect ly-ac-gateway-svc --tag v1.2.3
 ```bash
 edops images pull ly-ac-gateway-svc
 ```
+
+### edops images build permissions
+
+构建 Permissions 镜像。
+
+Permissions 镜像用于在容器启动前设置数据目录的所有权，避免权限问题。
+
+```bash
+# 构建 permissions 镜像
+edops images build permissions
+
+# 推送到镜像仓库
+docker tag ${EDOPS_IMAGE_REGISTRY}/library/permissions:v1.0.0 ${EDOPS_IMAGE_REGISTRY}/library/permissions:v1.0.0
+docker push ${EDOPS_IMAGE_REGISTRY}/library/permissions:v1.0.0
+```
+
+**UID 分配说明**：
+
+- **中间件服务**：
+  - RabbitMQ/Redis: UID 999
+  - MinIO/Elasticsearch/KKFileView/ZLMediaKit: UID 1000
+  - Kafka: UID 1001
+- **业务服务**：
+  - Spring Boot 微服务: UID 1000（预留，当前无数据目录挂载）
 
 ## Portainer 命令（实验性）
 

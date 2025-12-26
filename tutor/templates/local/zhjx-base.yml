@@ -1,9 +1,33 @@
 services:
+
+  # Set bind-mounted folder ownership for zhjx services
+  zhjx-permissions:
+    image: {{ DOCKER_IMAGE_PERMISSIONS }}
+    restart: on-failure
+    entrypoint: []
+    command: ["sh", "/usr/local/bin/setowners-zhjx.sh"]
+    volumes:
+      # Command script
+      - ../apps/permissions/setowners-zhjx.sh:/usr/local/bin/setowners-zhjx.sh:ro
+      # Bind-mounted volumes to set ownership
+      - ../../data/rabbitmq:/mounts/rabbitmq
+      - ../../data/redis:/mounts/redis
+      - ../../data/minio:/mounts/minio
+      - ../../data/elasticsearch:/mounts/elasticsearch
+      - ../../data/kafka:/mounts/kafka
+      - ../../data/kkfileview:/mounts/kkfileview
+      {% if RUN_ZHJX_ZLMEDIAKIT %}
+      - ../../data/zlmediakit/conf:/mounts/zlmediakit/conf
+      - ../../data/zlmediakit/log:/mounts/zlmediakit/log
+      - ../../data/zlmediakit/www:/mounts/zlmediakit/www
+      {% endif %}
+      {{ patch("local-docker-compose-permissions-zhjx-volumes")|indent(6) }}
+
   zhjx-nginx:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/nginx:1.23.2
     init: true
     hostname: zhjx-nginx
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -13,31 +37,42 @@ services:
       - "{{ EDOPS_CERT_CRT_FILE }}:/data/nginx/portal_ly-sky_com.crt"
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on: []
 
   zhjx-rabbitmq:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/rabbitmq:3.8-management-delayed
     hostname: zhjx-rabbitmq
     init: true
+    restart: unless-stopped
+    user: "999:999"
     environment:
       - RABBITMQ_DEFAULT_USER={{ EDOPS_RABBITMQ_DEFAULT_USER }}
       - RABBITMQ_DEFAULT_PASS={{ EDOPS_RABBITMQ_DEFAULT_PASS }}
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - ../../data/rabbitmq:/var/lib/rabbitmq
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-permissions
 
   zhjx-redis:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/redis:5.0.7
     hostname: zhjx-redis
     init: true
-    restart: on-failure
+    restart: unless-stopped
+    user: "999:999"
+    volumes:
+      - ../../data/redis:/data
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-permissions
 
   zhjx-nacos:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/nacos-server:2.0.2
     init: true
     hostname: zhjx-nacos
+    restart: unless-stopped
     environment:
       - PREFER_HOST_MODE=hostname
       - MODE=standalone
@@ -50,11 +85,15 @@ services:
       - DEBUG=true
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-permissions
+      - zhjx-redis
 
   zhjx-sentinel:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/sentinel-dashboard:1.8.5
     init: true
     hostname: zhjx-sentinel
+    restart: unless-stopped
     depends_on:
       - zhjx-nacos
     networks:
@@ -64,7 +103,8 @@ services:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/keking/kkfileview:3.1
     init: true
     hostname: zhjx-fileview
-    restart: always
+    restart: unless-stopped
+    user: "1000:1000"
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     environment:
@@ -72,17 +112,20 @@ services:
       KK_BASE_URL: "http://127.0.0.1/preview/"
       KK_CONTEXT_PATH: "/preview/"
     volumes:
-      - "kkfileview_data:/data/file"
+      - ../../data/kkfileview:/data/file
+    depends_on:
+      - zhjx-permissions
 
   zhjx-minio:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/minio:RELEASE.2022-08-02T23-59-16Z.fips
     init: true
     hostname: zhjx-minio
+    restart: unless-stopped
+    user: "1000:1000"
     ports:
       - "{{ EDOPS_MINIO_API_PORT }}:9000"
       - "{{ EDOPS_MINIO_CONSOLE_PORT }}:9001"
     command: server --console-address :9001 /data
-    restart: on-failure
     environment:
       MINIO_ROOT_USER: "{{ EDOPS_MINIO_ROOT_USER }}"
       MINIO_ROOT_PASSWORD: "{{ EDOPS_MINIO_ROOT_PASSWORD }}"
@@ -90,12 +133,15 @@ services:
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     volumes:
-      - "minio_data:/data"
+      - ../../data/minio:/data
+    depends_on:
+      - zhjx-permissions
 
   zhjx-emqx:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/emqx:4.4.19
     init: true
     hostname: zhjx-emqx
+    restart: unless-stopped
     ports:
       - "1883:1883"
       - "8081:8081"
@@ -108,15 +154,16 @@ services:
       - EMQX_LISTENER__WSS__EXTERNAL__ACCEPTORS=4
       - EMQX_LISTENER__WSS__EXTERNAL__SSL=true
       - EMQX_LISTENER__WSS__EXTERNAL__SSL_OPTS="certfile:/etc/emqx/portal_ly-sky_com.crt,keyfile:/etc/emqx/portal_ly-sky_com.key"
-    restart: always
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on: []
 
   zhjx-kafka:
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/bitnami/kafka:3.5
     init: true
     hostname: zhjx-kafka
-    restart: on-failure
+    restart: unless-stopped
+    user: "1001:1001"
     environment:
       KAFKA_ENABLE_KRAFT: "yes"
       KAFKA_CFG_NODE_ID: 1
@@ -127,16 +174,20 @@ services:
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@zhjx-kafka:9093
     volumes:
-      - "kafka_data:/bitnami/kafka"
+      - ../../data/kafka:/bitnami/kafka
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-permissions
 
   zhjx-elasticsearch:
     init: true
     hostname: zhjx-elasticsearch
     image: {{ EDOPS_IMAGE_REGISTRY }}/library/elasticsearch:7.14.0-ik
+    restart: unless-stopped
+    user: "1000:1000"
     volumes:
-      - "elasticsearch_data:/usr/share/elasticsearch/data"
+      - ../../data/elasticsearch:/usr/share/elasticsearch/data
     environment:
       ES_JAVA_OPTS: "-Xmx1024m -Xms1024m -Xlog:gc*,gc+age=trace,safepoint:file=/usr/share/elasticsearch/logs/gc.log:utctime,pid,tags:filecount=32,filesize=64m"
       discovery.type: single-node
@@ -144,15 +195,11 @@ services:
       http.cors.allow-origin: "*"
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-permissions
 
 networks:
   {{ EDOPS_NETWORK_NAME }}:
     external: true
 
-volumes:
-  rabbitmq_data:
-  minio_data:
-  elasticsearch_data:
-  kibana_data:
-  kafka_data:
-  kkfileview_data:
+

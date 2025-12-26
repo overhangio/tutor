@@ -1,0 +1,159 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  #########################################################################################################
+  ##########################################spring boot redis #############################################
+  #########################################################################################################
+  redis:
+    database: {{ EDOPS_REDIS_DATABASE }}
+    host: {{ EDOPS_REDIS_HOST }}
+    port: {{ EDOPS_REDIS_PORT }}
+    password: {{ EDOPS_REDIS_PASSWORD }}
+    timeout: 5000ms
+    jedis:
+      pool:
+        max-idle: 8
+        min-idle: 1
+        max-active: 8
+        max-wait: -1ms
+  #########################################################################################################
+  ##########################################spring boot rabbitmq ##########################################
+  #########################################################################################################
+  rabbitmq:
+    host: {{ EDOPS_RABBITMQ_HOST }}
+    port: {{ EDOPS_RABBITMQ_PORT }}
+    virtual-host: {{ EDOPS_RABBITMQ_VIRTUAL_HOST }}
+    username: {{ EDOPS_RABBITMQ_DEFAULT_USER }}
+    password: {{ EDOPS_RABBITMQ_DEFAULT_PASS }}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 2
+
+###########################################################################################################
+############################################## 延迟队列配置 ################################################
+###########################################################################################################
+queue:
+  #如需本地调试则enable设为true，priority设为2
+  enable: true
+  priority: 1
+
+###########################################################################################################
+######################################### 动态修改输出日志等级功能 ##########################################
+###########################################################################################################
+log:
+  update-level:
+    # 默认关闭，true表示开启此功能
+    enable: true
+
+###########################################################################################################
+############################################### xxl-job配置 ################################################
+###########################################################################################################
+xxl:
+  job:
+    accessToken: ''
+    admin:
+      addresses: {{ EDOPS_XXL_JOB_ADDRESSES }}
+    executor:
+      appname: ${spring.application.name}
+      address:
+      ## 配置可访问该服务的IP，如容器运行可配置容器内网访问IP
+      ip: ''
+      port: 9999
+      logpath: /data/applogs/xxl-job/jobhandler
+      logretentiondays: 30
+
+###########################################################################################################
+################################################ 数据库同步 ################################################
+###########################################################################################################
+db-script-sync:
+  enabled: true
+
+###########################################################################################################
+################################################ mqtt配置 #################################################
+###########################################################################################################
+mqtt:
+  client-id: ${spring.application.name}
+  broker-url: {{ EDOPS_MQTT_BROKER_URL }}
+  username: {{ EDOPS_MQTT_USERNAME }}
+  password: {{ EDOPS_MQTT_PASSWORD }}
+  topics:
+    - topic: ${spring.application.name}/#
+      qos: 0
+###########################################################################################################
+################################################ mqtt配置 #################################################
+###########################################################################################################
+mqttconfig:
+  mqtt-config-enable: {{ EDOPS_MQTT_CONFIG_ENABLE }}
+  mqtt-account: {{ EDOPS_MQTT_ACCOUNT }}
+  mqtt-account-password: {{ EDOPS_MQTT_ACCOUNT_PASSWORD }}
+  mqtt-domain-name: {{ EDOPS_MQTT_DOMAIN_NAME }}
+  mqtt-port: {{ EDOPS_MQTT_PORT }}
+  mqtt-protocol-prot: {{ EDOPS_MQTT_PROTOCOL_PORT }}
+  mqtt-url: {{ EDOPS_MQTT_URL }}
+###########################################################################################################
+############################################ 启用sentinel熔断/限流 #########################################
+###########################################################################################################
+feign:
+  sentinel:
+    enabled: true
+
+###########################################################################################################
+################################################ 负载均衡指定ip ############################################
+###########################################################################################################
+ly:
+  version: {{ EDOPS_SERVICE_VERSION }}
+  token:
+    sign-key: lyisapowerfulmicroservicearchitectureupgradedandoptimizedfromacommercialproject
+    state: true
+  encryption:
+    needEncryption: false
+    publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjQiQagQxdyMMk7/twPHqc9SkKrPBqoOStJmfemt6otIAZqFaEbj9nNcnjSW1Y6cySVsHH6M8VhnHxQbT3cE7gpkJkwq9ghOCo3HLHBi8/sKVG8EG6TXQnBUEgHXpb6tdpYEM4P/7l8wpohQkH8tcfk3hvlRvtXfhylgkTfJe37wIDAQAB
+    privateKey: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKNCJBqBDF3IwyTv+3A8epz1KQqs8Gqg5K0mZ96a3qi0gBmoVoRuP2c1yeNJbVjpzJJWwcfozxWGcfFBtPdwTuCmQmTCr2CE4KjccscGLz+wpUbwQbpNdCcFQSAdelvq12lgQzg//uXzCmiFCQfy1x+TeG+VG+1d+HKWCRN8l7fvAgMBAAECgYAC1eoo0bDKy9Fj41n9Kl4nOsGsCOWJT8kZBTYM19v7lylm1Xv6ad9mpgVr+E45AW3HS7cRVCBaRQ8JyM5Hwlod8qcAQZb0sZM3zFIhpD2BdtFnt+YJnTHZV83uDfxQxUOfIC50bioN7QFK/lZVKWCbvlZF5mUcH6P9Tzi60Yh64QJBAN/WEyQU6BvdVs1/jEUGeb6KdwQrGIYTUrX8wVSpuBS1HufmdLmfMbsV4ZXsAQrnjb+VuLFosSiyoBf2qkFDmmECQQC6t64IH0xS0CPbGtHeeaUmgzk9lBOXgYsX/li7MWaC/crc8MnF0ha1whsFkx7a8YtF4c53QLDrDcoIqr9DW5RPAkBMTcjmou3hGdoOYa2qliOIbeFWnW5Vvl6SxWAOgXDMNlYbzbb61Cb61OG63uIYGol6xwpYCA1kh0gGA0NUzjvhAkEAt6haf1TBzyc6TZco3atLngEvOXnAd6MNfPFKt/4Udj5K313dKj7G5ctipu4aSIOUWY2Nd1FjdCEhG7tP3GJlEwJBANYY98ES+QlJ1RrY/bthrvLdcgKrpZZvICMFbpWhkujoXDuxPemr1h2MqXUmgfW53qFL4mIu/VS8MociflHLDq4=
+  #多团队协作服务配置
+  loadbalancer:
+    #开启配置
+    enabled: true
+    #灰度版本
+    #version: 3.0.0
+    #负载均衡优先调用的ip段
+    prior-ip-pattern:
+      - 172.16.2.*
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: "always"
+
+###########################################################################################################
+################################################### es 配置 ################################################
+###########################################################################################################
+easy-es:
+  enable: true
+  #es的连接地址,必须含端口 若为集群,则可以用逗号隔开 例如:127.0.0.1:9200,127.0.0.2:9200
+  address : {{ EDOPS_ELASTICSEARCH_ADDRESS }}
+  ip: {{ EDOPS_MASTER_NODE_IP }}
+  scheme: http
+  port: 9200
+  #若无 则可省略此行配置
+  username: {{ EDOPS_ELASTICSEARCH_USERNAME }}
+  password: {{ EDOPS_ELASTICSEARCH_PASSWORD }}
+  environment: tencent
+  global-config:
+    process_index_mode: manual
+    print-dsl: true
+    distributed: true
+
+###########################################################################################################
+################################################# 应用认证配置 #############################################
+###########################################################################################################
+api:
+  permission:
+    # 默认不启用，则所有应用不校验接口访问权限
+    enable: {{ EDOPS_API_PERMISSION_ENABLE }}
+

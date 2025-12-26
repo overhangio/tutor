@@ -1,0 +1,335 @@
+#############################################################################
+############################## 服务统一配置变量 ###############################
+#############################################################################
+#服务API统一版本号，所有 svc 的版本号都一样
+lyVersion={{ EDOPS_SERVICE_VERSION }}
+#集群主IP
+masterIp={{ EDOPS_MASTER_NODE_IP }}
+#租户服务 API 地址
+tenantServiceApiUrl={{ EDOPS_API_TENANT_URL }}
+#当前环境租户模式，默认值false为本地化单租户模式、true为公有云租户模式
+tenantPublic={{ EDOPS_TENANT_PUBLIC_MODE }}
+#租户初始化前缀地址,，租户模式为公有云才需要配置
+tenantPrefixInitializeLink={{ EDOPS_TENANT_PREFIX_INITIALIZE_LINK }}
+#租户学校码
+## 本地单租户模式：按部署学校从租户管理后台获取，新环境部署必填参数
+## 多租户模式：不生效默认即可
+tenantSchoolId={{ EDOPS_TENANT_SCHOOL_ID }}
+#kafka服务地址，IP+Port
+kafkaService={{ EDOPS_KAFKA_HOST }}:{{ EDOPS_KAFKA_PORT }}
+#对象存储公网IP或域名
+storageEndpoint={{ EDOPS_STORAGE_ENDPOINT }}
+#对象存储IP内网访问
+storageEndpointForIp={{ EDOPS_STORAGE_ENDPOINT_INTERNAL }}
+#自定义存储桶名称
+storageBucketName={{ EDOPS_STORAGE_BUCKET_NAME }}
+#视频回放minio存储集群IP
+minioClusterIp={{ EDOPS_MINIO_CLUSTER_IP }}
+#视频回放minio集群域名 无域名则写ip，minio没有做集群时填部署时的minio服务ip
+minioClusterEndpoint={{ EDOPS_MINIO_CLUSTER_ENDPOINT }}
+#es的连接地址,必须含端口 若为集群,则可以用逗号隔开 例如:127.0.0.1:9200,127.0.0.2:9200
+esAddress={{ EDOPS_ELASTICSEARCH_ADDRESS }}
+#xxl定时任务地址 
+xxlAddresses={{ EDOPS_XXL_JOB_ADDRESSES }}
+#mqtt服务器地址
+mqttBrokerUrl={{ EDOPS_MQTT_BROKER_URL }}
+#zlm流媒体点播域名，有域名填域名(有域名的情况下一般写 域名/zlapi 例如：https://stu.118class.com/zlapi)，没有域名填ip
+streamsEndpoint={{ EDOPS_ZLM_STREAMS_ENDPOINT }}
+#zlm流媒体内网地址，需配置完整链接
+zlmAddress={{ EDOPS_ZLM_ADDRESS }}
+#zlm推流域名，支持ip和域名，ip则默认内网推流，域名一般用于有公网推流需求
+zlmPushHost={{ EDOPS_ZLM_PUSH_HOST }}
+#zlm播放域名，支持ip和域名，ip则默认内网点播，一般建议使用域名并开启https
+zlmPlayHost={{ EDOPS_ZLM_PLAY_HOST }}
+#应用认证是否启用接口权限
+apiPermissionEnable={{ EDOPS_API_PERMISSION_ENABLE }}
+
+################################################################分割线，以下是按需修改的配置########################################################
+
+#############################################################################
+################################## CAS配置 ###################################
+#############################################################################
+#cas登录url
+casLoginUrl={{ EDOPS_CAS_LOGIN_URL }}
+#cas登出url
+caslogoutUrl={{ EDOPS_CAS_LOGOUT_URL }}
+#重定向应用地址，目前统一重定向到前端（配置处无需URL编码）
+casServiceUrl={{ EDOPS_CAS_SERVICE_URL }}
+# cas票据验证url
+casValidateUrl={{ EDOPS_CAS_VALIDATE_URL }}
+# userid映射
+casUserIdXpath={{ EDOPS_CAS_USER_ID_XPATH }}
+# phone映射（按需配置）
+casPhoneXpath={{ EDOPS_CAS_PHONE_XPATH }}
+# email映射（按需配置）
+casEmailXpath={{ EDOPS_CAS_EMAIL_XPATH }}
+# CAS服务昵称/备注
+casServerNick={{ EDOPS_CAS_SERVER_NICK }}
+
+#————————————————————————————————腾讯云相关配置 begin————————————————————————#
+#############################################################################
+################################## sms短信配置 ###############################
+#############################################################################
+#是否启用短信
+smsEnabled={{ EDOPS_SMS_ENABLED }}
+#短信服务名称
+smsName={{ EDOPS_SMS_NAME }}
+#短信模板ID
+smsTemplated={{ EDOPS_SMS_TEMPLATE_ID }}
+#短信accessKey
+smsAccessKey={{ EDOPS_SMS_ACCESS_KEY }}
+#短信secretKey
+smsSecreKey={{ EDOPS_SMS_SECRET_KEY }}
+#短信签名
+smsSignName={{ EDOPS_SMS_SIGN_NAME }}
+#############################################################################
+################################ ses邮件配置 #################################
+#############################################################################
+#邮件启用
+sesEnabled={{ EDOPS_SES_ENABLED }}
+#邮件名称
+sesName={{ EDOPS_SES_NAME }}
+#邮件端点
+sesEndPoint={{ EDOPS_SES_END_POINT }}
+#邮件加密编号
+sesSecretId={{ EDOPS_SES_SECRET_ID }}
+#邮件加密密钥
+sesSecretKey={{ EDOPS_SES_SECRET_KEY }}
+#邮件发信邮件地址
+sesFromEmailAddress={{ EDOPS_SES_FROM_EMAIL_ADDRESS }}
+#邮件模板启用
+sesCaptchaIsEnable={{ EDOPS_SES_CAPTCHA_IS_ENABLE }}
+#邮件模板编号
+sesCaptchaTemplateId={{ EDOPS_SES_CAPTCHA_TEMPLATE_ID }}
+#邮件模板数据
+sesCaptchaTemplateData={{ EDOPS_SES_CAPTCHA_TEMPLATE_DATA }}
+#邮件模板名称
+sesCaptchaSubject={{ EDOPS_SES_CAPTCHA_SUBJECT }}
+#############################################################################
+########################## 腾讯天御验证码防刷 #################################
+#############################################################################
+captchaEnabled={{ EDOPS_CAPTCHA_ENABLED }}
+captchaName={{ EDOPS_CAPTCHA_NAME }}
+captchaAppId={{ EDOPS_CAPTCHA_APP_ID }}
+captchaAccessKey={{ EDOPS_CAPTCHA_ACCESS_KEY }}
+captchaSecretKey={{ EDOPS_CAPTCHA_SECRET_KEY }}
+captchaTencentAppId={{ EDOPS_CAPTCHA_TENCENT_APP_ID }}
+captchaTencentSecretKey={{ EDOPS_CAPTCHA_TENCENT_SECRET_KEY }}
+captchaType={{ EDOPS_CAPTCHA_TYPE }}
+#############################################################################
+########################### 媒体处理配置 #####################################
+#############################################################################
+mediaCallbackUrl={{ EDOPS_MEDIA_CALLBACK_URL }}
+#############################################################################
+########################### 腾讯LCiC高版本直播 ###############################
+#############################################################################
+#应用id
+sdkAppId={{ EDOPS_LCIC_SDK_APP_ID }}
+#http录播
+classroomLiveUrl={{ EDOPS_LCIC_CLASSROOM_LIVE_URL }}
+#rtmp录播
+rtmpClassroomLiveUrl={{ EDOPS_LCIC_RTMP_CLASSROOM_LIVE_URL }}
+#开启录制屏幕分享流id
+openScreenSharingStreamId={{ EDOPS_LCIC_OPEN_SCREEN_SHARING_STREAM_ID }}
+#关闭录制屏幕分享流id
+closeScreenSharingStreamId={{ EDOPS_LCIC_CLOSE_SCREEN_SHARING_STREAM_ID }}
+#开启录播https后缀
+enableRecordingHttpsSuffix={{ EDOPS_LCIC_ENABLE_RECORDING_HTTPS_SUFFIX }}
+#开启录播rtmp后缀
+enableRecordingRtmpSuffix={{ EDOPS_LCIC_ENABLE_RECORDING_RTMP_SUFFIX }}
+#关闭录播https后缀
+closeRecordingHttpsSuffix={{ EDOPS_LCIC_CLOSE_RECORDING_HTTPS_SUFFIX }}
+#关闭录播rtmp后缀
+closeRecordingRtmpSuffix={{ EDOPS_LCIC_CLOSE_RECORDING_RTMP_SUFFIX }}
+#分辨率。可以有如下取值：1 标清 2 高清 3 全高清  
+resolution={{ EDOPS_LCIC_RESOLUTION }}
+#最大连麦人数（不包括老师）。取值范围[0, 16] 当前值大于6就会将分辨率设置为1
+maxMicNumber={{ EDOPS_LCIC_MAX_MIC_NUMBER }}
+#房间子类型 videodoc 文档+视频 video 纯视频 coteaching 双师
+subType={{ EDOPS_LCIC_SUB_TYPE }}
+#进入房间时是否自动连麦 0 不自动连麦（默认值） 1 自动连麦
+autoMic={{ EDOPS_LCIC_AUTO_MIC }}
+#高音质模式。 0 不开启高音质（默认值） 1 开启高音质
+audioQuality={{ EDOPS_LCIC_AUDIO_QUALITY }}
+#禁止录制 0 不禁止录制（默认值） 1 禁止录制  
+disableRecord={{ EDOPS_LCIC_DISABLE_RECORD }}
+#录制布局  
+recordLayout={{ EDOPS_LCIC_RECORD_LAYOUT }}
+#browser环境
+browserEnv={{ EDOPS_LCIC_BROWSER_ENV }}
+#browser版本
+browserVersion={{ EDOPS_LCIC_BROWSER_VERSION }}
+#browser域名
+browserDomainName={{ EDOPS_LCIC_BROWSER_DOMAIN_NAME }}
+#browser场景
+browserScene={{ EDOPS_LCIC_BROWSER_SCENE }}
+#pc环境
+pcEnv={{ EDOPS_LCIC_PC_ENV }}
+#pc版本
+pcVersion={{ EDOPS_LCIC_PC_VERSION }}
+#pc域名
+pcDomainName={{ EDOPS_LCIC_PC_DOMAIN_NAME }}
+#———————————————————————————————腾讯云相关配置 finish —————————————————————————#
+
+#——————————————————————————————————RTC直播配置 begin ——————————————————————————#
+#############################################################################
+############################### rtc音视频配置 ################################
+#############################################################################
+#音视频资源
+rtcSource={{ EDOPS_RTC_SOURCE }}
+#端点
+rtcEndpoint={{ EDOPS_RTC_END_POINT }}
+#在 云API密钥 上申请的标识身份的 SecretId，一个 SecretId 对应唯一的 SecretKey ，而 SecretKey 会用来生成请求签名 Signature。
+rtcSecretId={{ EDOPS_RTC_SECRET_ID }}
+#SecretKey
+rtcSecretKey={{ EDOPS_RTC_SECRET_KEY }}
+#回调callback_key
+rtcCallbackKey={{ EDOPS_RTC_CALLBACK_KEY }}
+#课中调转地址
+rtcJoinUrl={{ EDOPS_RTC_JOIN_URL }}
+#使用音视频资源列表
+rtcUsingSources={{ EDOPS_RTC_USING_SOURCES }}
+#############################################################################
+################################## 觅听配置 ##################################
+#############################################################################
+#觅听域名
+meetingDomain={{ EDOPS_MEETING_DOMAIN }}
+#觅听muc
+meetingMuc={{ EDOPS_MEETING_MUC }}
+#觅听bosh  
+meetingBosh={{ EDOPS_MEETING_BOSH }}
+#——————————————————————————————————RTC直播配置 finish ——————————————————————————#
+
+#——————————————————————————————————物联相关配置 begin ———————————————————————————#
+############################################################################
+#############################和风天气########################################
+############################################################################
+weatherKey={{ EDOPS_WEATHER_KEY }}
+weatherUpdateSecond={{ EDOPS_WEATHER_UPDATE_SECOND }}
+weatherProvince={{ EDOPS_WEATHER_PROVINCE }}
+weatherCity={{ EDOPS_WEATHER_CITY }}
+#############################################################################
+############################# mqtt控制台配置 #################################
+#############################################################################
+#mqtt控制台主机地址
+mqttDashboardHost={{ EDOPS_MASTER_NODE_IP }}
+#mqtt控制台主机端口
+mqttDashboardPort={{ EDOPS_EMQX_DASHBOARD_PORT }}
+#mqtt控制台admin账号
+mqttDashboardAdmin={{ EDOPS_EMQX_DASHBOARD_ADMIN }}
+#mqtt控制台admin密码
+mqttDashboardPassword={{ EDOPS_EMQX_DASHBOARD_PASSWORD }}
+#——————————————————————————————————物联相关配置 finish ——————————————————————————#
+
+#——————————————————————————————————对象存储配置 begin ———————————————————————————#
+#############################################################################
+############################## 回放minio集群配置 #############################
+#############################################################################
+#minio集群ip,minio没有做集群时填部署时的minio服务ip
+minioClusterIp1=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_API_PORT }}
+minioClusterIp2=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_API_PORT }}
+minioClusterIp3=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_API_PORT }}
+minioClusterIp4=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_API_PORT }}
+#minio控制台集群ip,minio没有做集群时填部署时的minio控制台ip
+minioClusterConsoleIp1=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_CONSOLE_PORT }}
+minioClusterConsoleIp2=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_CONSOLE_PORT }}
+minioClusterConsoleIp3=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_CONSOLE_PORT }}
+minioClusterConsoleIp4=http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_CONSOLE_PORT }}
+#存储桶
+minioClusterVideoBucketName={{ EDOPS_VIDEO_BUCKET_NAME }}
+#——————————————————————————————————对象存储配置 finish ———————————————————————————#
+
+#——————————————————————————————————流媒体相关配置 begin ———————————————————————————#
+#############################################################################
+############################### 流媒体服务器配置 ##############################
+#############################################################################
+#是否启用
+zlmEnabled={{ EDOPS_ZLMEDIAKIT_ENABLED }}
+#api密钥
+zlmSecret={{ EDOPS_ZLM_SECRET }}
+#播放协议，默认http，添加ssl证书后可支持https
+playProtocol={{ EDOPS_ZLM_PLAY_PROTOCOL }}
+#http端口，如果是默认的80、443端口可以为空，其他端口需指定
+httpPort={{ EDOPS_ZLM_HTTP_PORT }}
+#rtsp端口，默认是rtsp 554端口
+rtspPort={{ EDOPS_ZLM_RTSP_PORT }}
+#rtmp端口，默认是rtmp 1935端口
+rtmpPort={{ EDOPS_ZLM_RTMP_PORT }}
+#############################################################################
+############################## 视频回放存储配置 ###############################
+#############################################################################
+#流媒体服务器，录制视频源站地址索引目录，固定为record
+rootPath={{ EDOPS_VIDEO_ROOT_PATH }}
+#视频回放存储桶
+videoBucketName={{ EDOPS_VIDEO_BUCKET_NAME }}
+#流媒体迁移数据量
+videoMigrateNum={{ EDOPS_VIDEO_MIGRATE_NUM }}
+#以下参数为控制程序执行策略,可不做改动
+downloadMode={{ EDOPS_VIDEO_DOWNLOAD_MODE }}
+uploadMode={{ EDOPS_VIDEO_UPLOAD_MODE }}
+programMode={{ EDOPS_VIDEO_PROGRAM_MODE }}
+deleteMode={{ EDOPS_VIDEO_DELETE_MODE }}
+deleteEnabled={{ EDOPS_VIDEO_DELETE_ENABLED }}
+minioStorage={{ EDOPS_VIDEO_MINIO_STORAGE }}
+storageView={{ EDOPS_VIDEO_STORAGE_VIEW }}
+hookUploadMode={{ EDOPS_VIDEO_HOOK_UPLOAD_MODE }}
+recordCompensate={{ EDOPS_VIDEO_RECORD_COMPENSATE }}
+compensateExecute={{ EDOPS_VIDEO_COMPENSATE_EXECUTE }}
+isJudgment={{ EDOPS_VIDEO_IS_JUDGMENT }}
+#以上参数为控制程序执行策略
+#——————————————————————————————————流媒体相关配置 finish ———————————————————————————#
+
+
+
+################################################################分割线，以下是需要抽象到系统参数的配置########################################################
+
+
+#############################################################################
+################################ 二维码配置 ##################################
+#############################################################################
+#二维码跳转uri
+qrcodeJumpUri={{ EDOPS_QRCODE_JUMP_URI }}
+#############################################################################
+################################## 认证企微配置 ##############################
+#############################################################################
+wxCpCofigsCorpId01={{ EDOPS_WXCP_CORP_ID }}
+wxCpCofigsCorpSecret01={{ EDOPS_WXCP_CORP_SECRET }}
+wxCpCofigsAgentId01={{ EDOPS_WXCP_AGENT_ID }}
+wxCpCofigsToken01={{ EDOPS_WXCP_TOKEN }}
+wxCpCofigsAesKey01={{ EDOPS_WXCP_AES_KEY }}
+wxCpCofigsKey01={{ EDOPS_WXCP_KEY }}
+wxCpCofigsPageOAuth2RedirectUri01={{ EDOPS_WXCP_PAGE_OAUTH2_REDIRECT_URI }}
+wxCpCofigsQrcodeOAuth2RedirectUriToWeb01={{ EDOPS_WXCP_QRCODE_OAUTH2_REDIRECT_URI_TO_WEB }}
+wxCpCofigsQrcodeOAuth2RedirectUriToServer01={{ EDOPS_WXCP_QRCODE_OAUTH2_REDIRECT_URI_TO_SERVER }}
+
+#############################################################################
+################################## 基础数据企微配置 ###########################
+#############################################################################
+basicWxCpCofigsCorpId={{ EDOPS_BASIC_WXCP_CORP_ID }}
+basicWxCpCofigsCorpSecret={{ EDOPS_BASIC_WXCP_CORP_SECRET }}
+basicWxCpCofigsAgentId={{ EDOPS_BASIC_WXCP_AGENT_ID }}
+basicWxCpCofigsToken={{ EDOPS_BASIC_WXCP_TOKEN }}
+basicWxCpCofigsAesKey={{ EDOPS_BASIC_WXCP_AES_KEY }}
+
+#############################################################################
+############################### dingding配置 #################################
+#############################################################################
+dingAppKey={{ EDOPS_DING_APP_KEY }}
+dingAppSecret={{ EDOPS_DING_APP_SECRET }}
+
+#############################################################################
+################################### 签到 #####################################
+#############################################################################
+signNotStartImgUri={{ EDOPS_SIGN_NOT_START_IMG_URI }}
+signQrcodeExpiredTime={{ EDOPS_SIGN_QRCODE_EXPIRED_TIME }}
+#############################################################################
+################################### 评审链接地址 #####################################
+#############################################################################
+reviewLinkAppKey={{ EDOPS_REVIEW_LINK_APP_KEY }}
+reviewLinkAppSecret={{ EDOPS_REVIEW_LINK_APP_SECRET }}
+reviewLinkAddress={{ EDOPS_REVIEW_LINK_ADDRESS }}
+
+################################## 课程服务数据同步参数#############################
+syncClassroomTable={{ EDOPS_SYNC_CLASSROOM_TABLE }}
+syncClassroomUser={{ EDOPS_SYNC_CLASSROOM_USER }}
+

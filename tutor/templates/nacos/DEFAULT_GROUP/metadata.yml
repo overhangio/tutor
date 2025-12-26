@@ -1,0 +1,203 @@
+# Nacos 配置元数据
+# 描述每个配置文件的变量依赖关系和元信息
+
+services:
+  ly-ac-tenant-svc:
+    data_id: ly-ac-tenant-svc.yaml
+    group: DEFAULT_GROUP
+    template: services/ly-ac-tenant-svc.yaml.j2
+    variables:
+      required:
+        - EDOPS_MYSQL_HOST
+        - EDOPS_MYSQL_PORT
+        - EDOPS_MYSQL_ROOT_USER
+        - EDOPS_MYSQL_ROOT_PASSWORD
+        - EDOPS_TENANT_SECRET_KEY
+      optional:
+        - EDOPS_SES_ENABLED
+        - EDOPS_SES_NAME
+        - EDOPS_SES_END_POINT
+        - EDOPS_SES_SECRET_ID
+        - EDOPS_SES_SECRET_KEY
+        - EDOPS_SES_FROM_EMAIL_ADDRESS
+        - EDOPS_TENANT_PREFIX_INITIALIZE_LINK
+        - EDOPS_TENANT_PUBLIC_KEY
+        - EDOPS_TENANT_PRIVATE_KEY
+    dependencies: []
+
+  ly-ac-user-svc:
+    data_id: ly-ac-user-svc.yaml
+    group: DEFAULT_GROUP
+    template: services/ly-ac-user-svc.yaml.j2
+    variables:
+      required:
+        - EDOPS_MYSQL_HOST
+        - EDOPS_MYSQL_PORT
+        - EDOPS_MYSQL_ROOT_USER
+        - EDOPS_MYSQL_ROOT_PASSWORD
+        - EDOPS_KAFKA_HOST
+        - EDOPS_KAFKA_PORT
+      optional:
+        - EDOPS_SMS_ENABLED
+        - EDOPS_SMS_NAME
+        - EDOPS_SMS_ACCESS_KEY
+        - EDOPS_SMS_SECRET_KEY
+        - EDOPS_SMS_SIGN_NAME
+        - EDOPS_CAPTCHA_ENABLED
+        - EDOPS_SES_ENABLED
+    dependencies: []
+
+  ly-ac-classroom-svc:
+    data_id: ly-ac-classroom-svc.yaml
+    group: DEFAULT_GROUP
+    template: services/ly-ac-classroom-svc.yaml.j2
+    variables:
+      required:
+        - EDOPS_MYSQL_HOST
+        - EDOPS_MYSQL_PORT
+        - EDOPS_MYSQL_ROOT_USER
+        - EDOPS_MYSQL_ROOT_PASSWORD
+        - EDOPS_REDIS_HOST
+        - EDOPS_REDIS_PORT
+        - EDOPS_REDIS_PASSWORD
+        - EDOPS_REDIS_DATABASE
+      optional:
+        - EDOPS_REVIEW_LINK_APP_KEY
+        - EDOPS_REVIEW_LINK_APP_SECRET
+        - EDOPS_REVIEW_LINK_ADDRESS
+        - EDOPS_MASTER_NODE_IP
+        - EDOPS_API_GATEWAY_PORT
+    dependencies: []
+
+  ly-ac-rtc-svc:
+    data_id: ly-ac-rtc-svc.yaml
+    group: DEFAULT_GROUP
+    template: services/ly-ac-rtc-svc.yaml.j2
+    variables:
+      required:
+        - EDOPS_MYSQL_HOST
+        - EDOPS_MYSQL_PORT
+        - EDOPS_MYSQL_ROOT_USER
+        - EDOPS_MYSQL_ROOT_PASSWORD
+      optional:
+        - EDOPS_RTC_SOURCE
+        - EDOPS_RTC_END_POINT
+        - EDOPS_RTC_SECRET_ID
+        - EDOPS_RTC_SECRET_KEY
+        - EDOPS_LCIC_SDK_APP_ID
+        - EDOPS_ZLMEDIAKIT_ENABLED
+        - EDOPS_ZLM_SECRET
+        - EDOPS_ZLM_ADDRESS
+        - EDOPS_VIDEO_BUCKET_NAME
+    dependencies: []
+
+  ly-ac-gateway-svc:
+    data_id: ly-ac-gateway-svc.yaml
+    group: DEFAULT_GROUP
+    template: services/ly-ac-gateway-svc.yaml.j2
+    variables:
+      required: []
+      optional: []
+    dependencies: []
+
+  ly-ac-basic-data-svc:
+    data_id: ly-ac-basic-data-svc.yaml
+    group: DEFAULT_GROUP
+    template: services/ly-ac-basic-data-svc.yaml.j2
+    variables:
+      required:
+        - EDOPS_MYSQL_HOST
+        - EDOPS_MYSQL_PORT
+        - EDOPS_MYSQL_ROOT_USER
+        - EDOPS_MYSQL_ROOT_PASSWORD
+      optional:
+        - EDOPS_BASIC_WXCP_CORP_ID
+        - EDOPS_BASIC_WXCP_CORP_SECRET
+        - EDOPS_BASIC_WXCP_AGENT_ID
+    dependencies: []
+
+  ly-ac-admin-svc:
+    data_id: ly-ac-admin-svc.yaml
+    group: DEFAULT_GROUP
+    template: services/ly-ac-admin-svc.yaml.j2
+    variables:
+      required:
+        - EDOPS_MYSQL_HOST
+        - EDOPS_MYSQL_PORT
+        - EDOPS_MYSQL_ROOT_USER
+        - EDOPS_MYSQL_ROOT_PASSWORD
+        - EDOPS_TENANT_PUBLIC_MODE
+        - EDOPS_TENANT_SCHOOL_ID
+        - EDOPS_API_TENANT_URL
+      optional: []
+    dependencies: []
+
+shared:
+  ly-config:
+    data_id: ly-config.properties
+    group: DEFAULT_GROUP
+    template: shared/ly-config.properties.j2
+    variables:
+      required:
+        - EDOPS_SERVICE_VERSION
+        - EDOPS_MASTER_NODE_IP
+        - EDOPS_API_TENANT_URL
+        - EDOPS_KAFKA_HOST
+        - EDOPS_KAFKA_PORT
+        - EDOPS_MYSQL_HOST
+        - EDOPS_MYSQL_PORT
+        - EDOPS_REDIS_HOST
+        - EDOPS_REDIS_PORT
+        - EDOPS_REDIS_PASSWORD
+        - EDOPS_RABBITMQ_HOST
+        - EDOPS_RABBITMQ_PORT
+        - EDOPS_RABBITMQ_DEFAULT_USER
+        - EDOPS_RABBITMQ_DEFAULT_PASS
+        - EDOPS_ELASTICSEARCH_ADDRESS
+      optional:
+        - EDOPS_TENANT_PUBLIC_MODE
+        - EDOPS_TENANT_PREFIX_INITIALIZE_LINK
+        - EDOPS_TENANT_SCHOOL_ID
+        - EDOPS_STORAGE_ENDPOINT
+        - EDOPS_STORAGE_ENDPOINT_INTERNAL
+        - EDOPS_STORAGE_BUCKET_NAME
+        - EDOPS_ZLM_STREAMS_ENDPOINT
+        - EDOPS_ZLM_ADDRESS
+        - EDOPS_SMS_ENABLED
+        - EDOPS_SES_ENABLED
+    dependencies: []
+
+  ly:
+    data_id: ly.yaml
+    group: DEFAULT_GROUP
+    template: shared/ly.yml.j2
+    variables:
+      required:
+        - EDOPS_REDIS_HOST
+        - EDOPS_REDIS_PORT
+        - EDOPS_REDIS_PASSWORD
+        - EDOPS_REDIS_DATABASE
+        - EDOPS_RABBITMQ_HOST
+        - EDOPS_RABBITMQ_PORT
+        - EDOPS_RABBITMQ_VIRTUAL_HOST
+        - EDOPS_RABBITMQ_DEFAULT_USER
+        - EDOPS_RABBITMQ_DEFAULT_PASS
+        - EDOPS_ELASTICSEARCH_ADDRESS
+        - EDOPS_ELASTICSEARCH_USERNAME
+        - EDOPS_ELASTICSEARCH_PASSWORD
+        - EDOPS_MASTER_NODE_IP
+        - EDOPS_XXL_JOB_ADDRESSES
+        - EDOPS_MQTT_BROKER_URL
+        - EDOPS_MQTT_USERNAME
+        - EDOPS_MQTT_PASSWORD
+      optional:
+        - EDOPS_MQTT_CONFIG_ENABLE
+        - EDOPS_MQTT_ACCOUNT
+        - EDOPS_MQTT_ACCOUNT_PASSWORD
+        - EDOPS_MQTT_DOMAIN_NAME
+        - EDOPS_MQTT_PORT
+        - EDOPS_MQTT_PROTOCOL_PORT
+        - EDOPS_MQTT_URL
+        - EDOPS_API_PERMISSION_ENABLE
+    dependencies: []
+

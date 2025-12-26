@@ -1,0 +1,40 @@
+spring:
+  cloud:
+    nacos:
+      discovery: 
+        ip: ${spring.application.name}
+        port: 50005
+  ####################################################################################
+ ####################################################################################
+  ###################################DataSource Config################################
+  ####################################################################################
+  datasource:
+    # JDBC 配置
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://{{ EDOPS_MYSQL_HOST }}:{{ EDOPS_MYSQL_PORT }}/ly_ac_admin_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: {{ EDOPS_MYSQL_ROOT_USER }}
+    password: {{ EDOPS_MYSQL_ROOT_PASSWORD }}
+    
+ ########################## 当前租户RSA配置 ##################################
+tenant:
+  public: {{ EDOPS_TENANT_PUBLIC_MODE }}
+  school-id: {{ EDOPS_TENANT_SCHOOL_ID }}
+  enable: true
+  secure-key: UIuqNdAyioWvFdfr
+  # 默认指向正式环境域名，https://restapi.118class.com:800
+  connect-prefix-url: {{ EDOPS_API_TENANT_URL }}
+  system:
+    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0PQ+YoFEwyawO8gu0+k5Fm0afRKfwxCYeJRZ4tiDWEg1yCicgNw82RBiauRFyZhmVJHYPs2KkhP3NFh5+4cQn3NyO9dp0QYaDjtaMQMnYHRS9sP6jxx80+xFkRFqpKcnnL1+1ZPLvE3o7EeiDd3pi5O/iZd3UlhvZ16jWoCtkTQeZeNuMlx1jgTf3L3jwz/aeGN6ZJ41u+Sr2T1lJkMnM7Om+2ugzOphtPt/HqsRjuo7ow0mcj3Y/RB2yin5IOfwEDP4VBijqt7H8ljVxz7gVL76B+5b1op1im1RLqx9DfqfwCvpq9fVBUEcoDsBQuMNe9TE7w2ZPRjrjPTHAfytqwIDAQAB
+  local:
+    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvGa7zcSBxp9GjNJQKueGugi3AySzV1JJEasw5aA9qqVrxoixMqioI3nH8pP6EBjIh331ryHmM5v2PBdq03VF2Sk/A0JcAn2LVdbgGqFKrxNJlIiIgfvs3/mT12GFuj85fZV+urZgdFsf5RaBywfaXlF9b5doJR3XQorgrcvzu67pn6/RkOPUSXcTWXL52OwbvyHsh7Dr8if706l6+VBpIUdtfpoLpKgHnnpTmAtirN9GJxlWCCUBAW4cxiCY7t02Vd3d3g/DufCwnCWXJ+GyN9bvVcZYbnOMWGUQrW00Px5QdThza/XMa8sLx8uGRTnN8CYUzKkjR8p9m9B46Qsq9wIDAQAB
+    private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC8ZrvNxIHGn0aM0lAq54a6CLcDJLNXUkkRqzDloD2qpWvGiLEyqKgjecfyk/oQGMiHffWvIeYzm/Y8F2rTdUXZKT8DQlwCfYtV1uAaoUqvE0mUiIiB++zf+ZPXYYW6Pzl9lX66tmB0Wx/lFoHLB9peUX1vl2glHddCiuCty/O7rumfr9GQ49RJdxNZcvnY7Bu/IeyHsOvyJ/vTqXr5UGkhR21+mgukqAeeelOYC2Ks30YnGVYIJQEBbhzGIJju3TZV3d3eD8O58LCcJZcn4bI31u9Vxlhuc4xYZRCtbTQ/HlB1OHNr9cxrywvHy4ZFOc3wJhTMqSNHyn2b0HjpCyr3AgMBAAECggEBALoqLdOTJMWWp4kJXMw4gcmcSPNjNY/IsIk0BxowMB9KXGgOtEIhpBuB/9C05jk3tBcmoTnQHn/K0hLo9NdEn6OJfUmELhUL5z4IGORXksvTHDcYfwMqZBOhs7P1GsZCKVXt/g8TndX8IVUm21Q7S0096tv02aUrioSnZIJ38Tz3VKHv0uEO1Ab9pIPU29nG+FgvYcPvamRPAj2A1ZKh73m5RJuUtYjEBqhCPB5z8DaiyRxZ4fggmXIVBD773+zy7BpDhNzw1c6ExKxDisgJ+Tv9Y72zaUFeZEs4SfNaDy4Rg9jqPAPmRhS3FSTvranbxODZ2ikomer75u9TGiVd8mECgYEA4L5OGdLe1D4xrjs3UbiOfygGfPqFZSR/ESzhOOx5as+nBQGFBsf++bUz6lMLQQFvGAgXqEtLRGyjnVr5lANOK+9P6CHV+y26aN4NNWpgrywc6svueQ2FYpeuSQ6qSeDdCz0bM2/0hkiH7HiC4+yn2wNPW0tqD92Lsw6VUjPy/nECgYEA1pqELIGItbfckG87H9QLJChrwmVMVAjYJnbPlTTDqYmkryKoP5x/wSL3n8KzmLUpsnKAGiHVq6rFwLBBo878eHx+7wBTyLdesjg843/C26Adx5nMJNLthCBmnyhPYzDXvgJM1XqcQIpIpTavJeRLmq5ib4m8E7yjCulYsuswQ+cCgYEAtiRFs9Qc17KYHPbM/KQwiIltyLhYiAIuIUNYPQQZ2yDz4bC7mSVZVhMvQgePpV1+JeHZGoH7PDc32v2yK+0J272V6zIQ9AK5gugDmHjgZte/j+M7IEx+/8qia39BL6LYQpWBiAyCBpqd3l5E5mgUGgHyvLDAAp+w6qs1BWwo0WECgYAGJktfUx7txiUF5ooVMWhYUugzm9+CEPbQs1rjda2dsBoOAro7iGqIyE28QEIRQC+/s1REa2/KCYy9Js/at9W4RikFBEdiWw7VoJLuGf0legMgcyHMdFbmEF+gc/FCcGXeRgaZn3fWyZ+nTFfciBw6hIDBnXrMPf2WFHW8Os0ZRQKBgGJTNIWg2jJHsf4BIzroCOr7h5blxTFYmNM8Aja/OUX/gTyCtq/Vbqgth7pzwHCWv6B05CnOdf+e9cmY1orpS5SIpeH1c56GXPqr8XUemdnYM37PO1oGE6OEMaVZG0lZmEHAmp0ndhHvhmWSIAjKbPXhbArZVZBTrNx5QxLOyKUn
+
+########################## LY配置 ##################################
+ly:
+  tenant:
+    tenant-mode: true
+    exclude-tables:
+      - ly_jx_xtgl_xtcsb
+      - ly_jx_xtgl_dlpzb
+

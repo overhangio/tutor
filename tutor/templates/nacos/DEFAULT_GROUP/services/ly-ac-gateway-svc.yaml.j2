@@ -1,0 +1,100 @@
+########################## 数据库同步 ##################################
+db-script-sync:
+  enabled: false
+
+########################
+ly:
+  token:
+    state: true
+  secure:
+    skip-url:
+      - /v1/oauth/logout
+      - /v1/oauth2/token
+      - /index/hook/**
+      - /v1/system-param/auth
+      - /v1/heartbeat
+      - /v1/system-param/code/*
+      - /v1/wxs/**
+      - /index/hook/**
+      - /v1/oauth/cp-web-callback
+      - /v1/oauth/accessToken
+      - /v1/oauth/refresh
+      - /v1/oauth/login
+      - /v1/oauth/token
+      - /v1/oauth/authorize
+      - /v1/code/send
+      - /v1/code/check
+      - /v1/users/register
+      - /v1/users/registered
+      - /v1/users/password/forgot
+      - /v1/schools/select
+      - /v3/ding/scan-code
+      - /v1/users/version
+      - /client/auths/**
+      - /v1/system-param/**
+      - /v1/system-param/redirect-web-url
+      - /v1/system-param/redirect-class-url
+      - /v1/system-param/user-register-state
+      - /v1/system-param/*/code/*
+      - /v1/test
+      - /v1/oss/**
+      - /v1/rtc/**
+      - /v1/schedule/select
+      - /v1/system-param/mqtt-information
+      - /v1/console/resources/activate-code/activate
+      - /v1/console/resources/activate-code/{activateCode}/schools/{schoolId}/school-information
+      - /v1/console/resources/activate-code/{activateCode}/device-address/{deviceAddress}/activate-status
+      - /v1/console/tenants/tenant-detail
+      - /v1/console/tenants/tenant-product-list
+      - /v1/console/tenants/init
+      - /v1/console/resources/page
+      - /v1/classrooms/users/token
+      - /v1/console/spaces/tree
+      - /v1/spaces/tree*
+      - /v1/system-param/code/AUTH_CENTER_URI
+      - /v1/console/tenants/tenant-list
+      - /v1/console/tenants/simple-tenant-detail
+      - /v1/console/tenants/cloud/tenant-detail
+      - /v1/console/tenants/cloud/tenant-product-list
+      - /v1/console/tenants/all
+      - /v1/console/tenants/schools/{schoolId}/tenant-activate-status      
+      - /v1/console/versions/{versionId}/verify
+      - /v1/console/screens/{screenId}/spaces/{spaceId}/bind
+      - /v1/console/screens/{screenId}/unbind-space
+      - /v1/streams/auto-create/pushAddress
+      - /v1/streams/{streamId}/update
+      - /v1/streams
+      - /v1/streams/{streamId}/binding/space/{spaceId}
+      - /v1/streams/{streamId}/unbinding/space
+      - /v1/recording/record-playback*
+      - /v1/video-review*
+      - /v1/video-review/callback
+      - /v1/recording/callback
+      - /v1/recording/record-playback/v2
+      - /v1/streams/{equipmentId}/detail
+      - /v1/cas/config
+      - /v1/cas/token/cas/ticket
+      - /v1/streams/detail
+      # 奕课堂虚拟直接连设备使用
+      - /v3/direct-devices/register
+      - /v3/direct-devices/{deviceId}
+      - /v3/direct-devices/space/{spaceId}
+      - /api/ac-classroom/v1/tour/class/link/*/judge
+      # 奕管设备回调
+      - /v3/device-callback/dy-poe-lock/record
+      - /v3/device-callback/dy-poe-lock/state
+      - /v1/console/login-config
+            # 结束巡课
+      - /v1/patrol-class/records/{patrolClassRecordId}/status/update
+      - /media/hook/recording/finish
+      - /media/hook/process/finish
+      - /v1/oss/files/direct-upload/result-cos
+      - /v1/oss/files/direct-upload/result-minio
+        #直播回调
+      - /v1/live/recording/finish
+      - /v1/live/cover/update
+         #课堂服务行为详情接口
+      - /v1/behavior-analysis/detail
+      - /v1/classroom/ai/evaluation/callback
+      - /v1/classroom/ai/evaluation/test/callback
+

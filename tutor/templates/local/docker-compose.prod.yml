@@ -26,6 +26,7 @@ services:
     {% endif %}
 
   ############# LMS and CMS workers
+  {% if RUN_OPENEDX -%}
   lms-worker:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -67,5 +68,6 @@ services:
       {%- endfor %}
     depends_on:
       - cms
+  {%- endif %}
 
   {{ patch("local-docker-compose-prod-services")|indent(2) }}

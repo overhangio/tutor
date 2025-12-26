@@ -151,6 +151,8 @@ source ~/.zshrc
 
 ## 首次部署流程
 
+### 单环境部署
+
 ```bash
 # 1. 激活环境
 cd /Users/zhumin/zhjx/edops
@@ -170,9 +172,44 @@ edops local status
 edops local healthcheck
 ```
 
+### 多环境部署
+
+EdOps 支持通过 `--root` 选项管理多个独立环境配置：
+
+```bash
+# 1. 创建新环境目录
+mkdir -p ~/edops-envs/school-a
+
+# 2. 初始化环境配置
+edops --root ~/edops-envs/school-a config save --init \
+  --set EDOPS_IMAGE_REGISTRY=zhjx-images.tencentcloudcr.com \
+  --set EDOPS_MASTER_NODE_IP=192.168.1.10 \
+  --set EDOPS_SCHOOL_ID=school-a
+
+# 3. 验证配置
+edops --root ~/edops-envs/school-a config validate
+
+# 4. 启动服务
+edops --root ~/edops-envs/school-a local launch --pullimages
+
+# 5. 查看状态
+edops --root ~/edops-envs/school-a local status
+```
+
+**提示**：也可以使用 `TUTOR_ROOT` 环境变量设置默认环境：
+
+```bash
+export TUTOR_ROOT=~/edops-envs/school-a
+edops config save --init
+edops local launch
+```
+
+更多多环境配置管理信息，请参考 [多环境配置管理文档](docs/MULTI_ENV_CONFIG_CN.md)。
+
 ## 文档链接
 
 - 完整 CLI 文档：`docs/edops-cli.md`
+- 多环境配置管理：`docs/MULTI_ENV_CONFIG_CN.md` ⭐ **推荐阅读**
 - 模块说明：`docs/zhjx-modules.md`
 - 设计决策：`docs/DESIGN_DECISIONS_CN.md`
 - 实施报告：`docs/reports/` 目录

@@ -197,8 +197,7 @@ def build(
     """
     Build docker images
 
-    Build the docker images necessary for an Open edX platform. By default, the remote
-    registry cache will be used for better performance.
+    构建 EdOps 平台所需的 docker 镜像。默认情况下，将使用远程仓库缓存以获得更好的性能。
     """
     config = tutor_config.load(context.root)
     command_args = []

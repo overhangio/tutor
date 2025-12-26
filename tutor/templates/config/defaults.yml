@@ -1,49 +1,352 @@
 ---
-# This file includes all Tutor setting defaults. Settings that do not have a
-# default value, such as passwords, should be stored in base.yml.
-# This must be defined early
-ATLAS_REVISION: "{% if OPENEDX_COMMON_VERSION == 'master' %}main{% else %}{{ OPENEDX_COMMON_VERSION }}{% endif %}"
-ATLAS_REPOSITORY: "openedx/openedx-translations"
-ATLAS_OPTIONS: ""
-CADDY_HTTP_PORT: 80
-CMS_HOST: "studio.{{ LMS_HOST }}"
-CMS_OAUTH2_KEY_SSO: "cms-sso"
-CMS_OAUTH2_KEY_SSO_DEV: "cms-sso-dev"
-CONTACT_EMAIL: "contact@{{ LMS_HOST }}"
-DEV_PROJECT_NAME: "{{ TUTOR_APP }}_dev"
+# ============================================================================
+# EdOps 配置默认值文件
+# ============================================================================
+# 本文件包含所有配置项的默认值。没有默认值的配置项（如密码）应存储在 base.yml 中。
+# 
+# 配置分类：
+# 1. 共享配置：Open edX 和 zhjx 业务都可能使用的通用配置
+# 2. Open edX 专用：仅在使用 Open edX 功能时需要的配置
+# 3. zhjx 专用：仅在使用 zhjx 业务功能时需要的配置
+# ============================================================================
+
+# ============================================================================
+# 一、共享配置（Shared Configuration）
+# ============================================================================
+# 这些配置项可能被 Open edX 和 zhjx 业务共同使用
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 1.1 Docker 镜像仓库配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Docker 镜像的仓库地址和镜像标签
+# 影响范围：所有 Docker 镜像的拉取和构建
+# 填写建议：
+#   - DOCKER_REGISTRY: 默认使用 Docker Hub，如需使用私有仓库请修改
+#   - 镜像标签建议使用固定版本号而非 latest，确保部署一致性
+
+# Docker 镜像仓库地址（默认使用 Docker Hub）
+# 如需使用私有仓库，格式：registry.example.com/（注意末尾斜杠）
 DOCKER_REGISTRY: "docker.io/"
-DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"
-DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev:{{ TUTOR_VERSION }}"
-# https://hub.docker.com/_/caddy/tags
-DOCKER_IMAGE_CADDY: "docker.io/caddy:2.7.4"
-# https://hub.docker.com/r/getmeili/meilisearch/tags
-DOCKER_IMAGE_MEILISEARCH: "docker.io/getmeili/meilisearch:v1.8.4"
-# https://hub.docker.com/_/mongo/tags
-DOCKER_IMAGE_MONGODB: "docker.io/mongo:7.0.7"
+
+# EdOps 镜像仓库地址（zhjx 业务专用镜像仓库）
+# 作用：定义 zhjx 业务服务的镜像仓库地址
+# 影响范围：所有 zhjx 业务服务的镜像拉取
+# 填写建议：填写您的私有镜像仓库地址，如腾讯云容器镜像服务
+EDOPS_IMAGE_REGISTRY: "zhjx-images.tencentcloudcr.com"
+
+# ----------------------------------------------------------------------------
+# 1.2 基础中间件镜像配置
+# ----------------------------------------------------------------------------
+# 作用：定义基础中间件服务的 Docker 镜像版本
+# 影响范围：MySQL、Redis、MongoDB 等基础服务的运行
+# 填写建议：
+#   - 生产环境建议固定版本号，避免自动升级导致的不兼容
+#   - 修改前请确认新版本与现有服务的兼容性
+
+# MySQL 镜像（Open edX 和 zhjx 共享）
 # https://hub.docker.com/_/mysql/tags
 DOCKER_IMAGE_MYSQL: "docker.io/mysql:8.4.0"
-DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"
+
+# Redis 镜像（Open edX 和 zhjx 共享）
 # https://hub.docker.com/_/redis/tags
 DOCKER_IMAGE_REDIS: "docker.io/redis:7.4.5"
-# https://hub.docker.com/r/devture/exim-relay/tags
-DOCKER_IMAGE_SMTP: "docker.io/devture/exim-relay:4.96-r1-0"
+
+# MongoDB 镜像（Open edX 专用，zhjx 不使用）
+# https://hub.docker.com/_/mongo/tags
+DOCKER_IMAGE_MONGODB: "docker.io/mongo:7.0.7"
+
+# Permissions 镜像（用于设置数据目录权限）
+# 作用：在容器启动前设置数据目录的所有权，避免权限问题
+# 影响范围：所有有数据目录挂载的服务
+# 填写建议：使用 zhjx 自己的镜像仓库，版本号建议固定
+DOCKER_IMAGE_PERMISSIONS: "{{ EDOPS_IMAGE_REGISTRY }}/library/permissions:1.0.0"
+
+# ----------------------------------------------------------------------------
+# 1.3 基础服务配置
+# ----------------------------------------------------------------------------
+# 作用：定义基础中间件服务的连接信息
+# 影响范围：所有依赖这些服务的应用
+# 填写建议：
+#   - 生产环境必须修改密码（在 base.yml 中生成随机密码）
+#   - 端口号如无冲突可保持默认值
+
+# MySQL 配置
+# 作用：定义 MySQL 数据库的连接信息
+# 影响范围：所有需要数据库的服务
+# 填写建议：
+#   - MYSQL_HOST: 容器内使用服务名（如 "mysql"），外部访问使用 IP
+#   - MYSQL_PORT: 默认 3306，如被占用需修改
+#   - MYSQL_ROOT_USERNAME: 默认 root，生产环境建议创建专用用户
+MYSQL_HOST: "mysql"
+MYSQL_PORT: 3306
+MYSQL_ROOT_USERNAME: "root"
+# MYSQL_ROOT_PASSWORD 在 base.yml 中随机生成
+
+# Redis 配置
+# 作用：定义 Redis 缓存的连接信息
+# 影响范围：所有使用 Redis 的服务（缓存、会话存储等）
+# 填写建议：
+#   - REDIS_HOST: 容器内使用服务名（如 "redis"），外部访问使用 IP
+#   - REDIS_PORT: 默认 6379，如被占用需修改
+#   - REDIS_PASSWORD: 生产环境建议设置密码
+REDIS_HOST: "redis"
+REDIS_PORT: 6379
+REDIS_USERNAME: ""
+REDIS_PASSWORD: ""
+
+# ----------------------------------------------------------------------------
+# 1.4 项目命名和路径配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Docker Compose 项目名称和基础路径
+# 影响范围：Docker Compose 服务命名、数据目录路径
+# 填写建议：
+#   - 多环境部署时，建议通过 --root 参数使用不同目录
+#   - 路径建议使用绝对路径，避免相对路径导致的混淆
+
+# Docker Compose 项目名称
+# 作用：用于区分不同环境的 Docker Compose 项目
+# 影响范围：docker-compose 命令的服务命名空间
+# 填写建议：开发环境可用 _dev，生产环境可用 _prod
+DEV_PROJECT_NAME: "{{ TUTOR_APP }}_dev"
+LOCAL_PROJECT_NAME: "{{ TUTOR_APP }}_local"
+
+# 基础路径配置（zhjx 专用）
+# 作用：定义配置文件、证书等文件的存储路径
+# 影响范围：Nginx 配置、SSL 证书、媒体文件等路径解析
+# 填写建议：
+#   - 使用绝对路径，如 /home/zhjx 或 /opt/zhjx
+#   - 确保路径存在且具有适当的权限
+EDOPS_BASE_PATH: "/home/zhjx"
+
+# ----------------------------------------------------------------------------
+# 1.5 网络配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Docker 网络名称
+# 影响范围：容器间网络通信
+# 填写建议：多环境部署时建议使用不同的网络名称
+
+# Docker 网络名称（zhjx 专用）
+# 作用：定义所有 zhjx 服务使用的 Docker 网络
+# 影响范围：所有 zhjx 服务的网络隔离和通信
+# 填写建议：默认值即可，除非需要网络隔离
+EDOPS_NETWORK_NAME: "zhjx-network"
+
+# ----------------------------------------------------------------------------
+# 1.6 服务开关（基础服务）
+# ----------------------------------------------------------------------------
+# 作用：控制基础中间件服务的启用/禁用
+# 影响范围：对应服务的启动和资源占用
+# 填写建议：
+#   - 如使用外部数据库/缓存，可禁用对应服务
+#   - 禁用前请确保外部服务已正确配置
+
+# MySQL 服务开关
+# 作用：控制是否启动内置 MySQL 容器
+# 影响范围：如禁用，需配置外部 MySQL 连接信息
+RUN_MYSQL: true
+
+# Redis 服务开关
+# 作用：控制是否启动内置 Redis 容器
+# 影响范围：如禁用，需配置外部 Redis 连接信息
+RUN_REDIS: true
+
+# MongoDB 服务开关（Open edX 专用）
+# 作用：控制是否启动内置 MongoDB 容器
+# 影响范围：仅影响 Open edX 平台
+RUN_MONGODB: true
+
+# ============================================================================
+# 二、Open edX 专用配置（Open edX Specific Configuration）
+# ============================================================================
+# 这些配置项仅在启用 Open edX 功能时需要
+# 注意：如果仅部署 zhjx 业务，可以将 RUN_OPENEDX 设置为 false
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 2.1 Open edX 平台开关
+# ----------------------------------------------------------------------------
+# 作用：控制是否启用 Open edX 相关服务和功能
+# 影响范围：LMS、CMS、相关中间件服务的启动
+# 填写建议：
+#   - 仅部署 zhjx 业务时设置为 false
+#   - 同时部署 Open edX 和 zhjx 时设置为 true
+
+RUN_OPENEDX: false
+
+# ----------------------------------------------------------------------------
+# 2.2 Open edX 镜像配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 平台使用的 Docker 镜像
+# 影响范围：Open edX LMS/CMS 服务的运行
+# 填写建议：
+#   - 使用官方镜像或自定义构建的镜像
+#   - 版本号建议固定，避免自动升级
+
+DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"
+DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev:{{ TUTOR_VERSION }}"
+
+# ----------------------------------------------------------------------------
+# 2.3 Open edX 平台域名配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 平台的访问域名
+# 影响范围：LMS、CMS、预览等服务的 URL 生成
+# 填写建议：
+#   - 生产环境必须修改为实际域名
+#   - 确保域名已正确解析到服务器 IP
+
+# 主域名（LMS 访问地址）
+# 作用：定义 Open edX 学习平台的访问域名
+# 影响范围：所有 Open edX 服务的 URL 生成、邮件链接等
+LMS_HOST: "www.myopenedx.com"
+
+# CMS 域名（课程管理平台）
+# 作用：定义 Open edX 课程管理平台的访问域名
+CMS_HOST: "studio.{{ LMS_HOST }}"
+
+# 预览域名
+# 作用：定义课程预览功能的访问域名
+PREVIEW_LMS_HOST: "preview.{{ LMS_HOST }}"
+
+# 平台名称
+# 作用：显示在 Open edX 平台界面上的名称
+PLATFORM_NAME: "My Open edX"
+
+# 联系邮箱
+# 作用：用于系统通知和用户联系
+CONTACT_EMAIL: "contact@{{ LMS_HOST }}"
+
+# ----------------------------------------------------------------------------
+# 2.4 Open edX 版本和代码仓库配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 平台代码版本和仓库地址
+# 影响范围：Open edX 功能的完整性和兼容性
+# 填写建议：
+#   - 使用稳定版本分支，避免使用 master
+#   - 如需自定义代码，可指向 fork 的仓库
+
+# Open edX 通用版本
+# 作用：定义所有 Open edX 组件的版本分支
+# 影响范围：edx-platform、edx-notes-api 等所有 Open edX 组件
+# 填写建议：使用稳定版本，如 "release/teak.2"
+OPENEDX_COMMON_VERSION: "release/teak.2"
+
+# edx-platform 仓库地址
+# 作用：定义 Open edX 平台代码的 Git 仓库地址
+# 影响范围：构建 Open edX 镜像时使用的代码源
 EDX_PLATFORM_REPOSITORY: "https://github.com/openedx/edx-platform.git"
+
+# edx-platform 版本
+# 作用：定义 edx-platform 的具体版本
+# 影响范围：默认使用 OPENEDX_COMMON_VERSION
 EDX_PLATFORM_VERSION: "{{ OPENEDX_COMMON_VERSION }}"
+
+# 翻译仓库配置
+ATLAS_REPOSITORY: "openedx/openedx-translations"
+ATLAS_REVISION: "{% if OPENEDX_COMMON_VERSION == 'master' %}main{% else %}{{ OPENEDX_COMMON_VERSION }}{% endif %}"
+ATLAS_OPTIONS: ""
+
+# ----------------------------------------------------------------------------
+# 2.5 Open edX 数据库配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 平台使用的数据库配置
+# 影响范围：LMS、CMS 的数据存储
+# 填写建议：
+#   - 生产环境建议使用专用数据库用户，而非 root
+#   - 数据库名称建议使用有意义的名称
+
+OPENEDX_MYSQL_DATABASE: "openedx"
+OPENEDX_MYSQL_USERNAME: "openedx"
+
+# ----------------------------------------------------------------------------
+# 2.6 Open edX 缓存和任务队列配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 使用的 Redis 数据库编号
+# 影响范围：缓存和 Celery 任务队列的数据隔离
+# 填写建议：如与其他服务共享 Redis，确保数据库编号不冲突
+
+OPENEDX_CACHE_REDIS_DB: 1
+OPENEDX_CELERY_REDIS_DB: 0
+
+# ----------------------------------------------------------------------------
+# 2.7 Open edX 性能配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 服务的性能参数
+# 影响范围：服务响应速度和资源占用
+# 填写建议：
+#   - 根据服务器资源调整 worker 数量
+#   - 高并发场景建议增加 worker 数量
+
+OPENEDX_LMS_UWSGI_WORKERS: 2
+OPENEDX_CMS_UWSGI_WORKERS: 2
+
+# ----------------------------------------------------------------------------
+# 2.8 Open edX 安全配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 平台的安全密钥
+# 影响范围：用户会话、JWT 令牌、数据加密等
+# 填写建议：
+#   - 生产环境必须修改，使用强随机字符串
+#   - 密钥泄露会导致安全风险，请妥善保管
+
+OPENEDX_SECRET_KEY: "{{ 50|random_string }}"
+JWT_COMMON_AUDIENCE: "openedx"
+JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}"
+JWT_COMMON_ISSUER: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"
+
+# OAuth2 配置
+CMS_OAUTH2_KEY_SSO: "cms-sso"
+CMS_OAUTH2_KEY_SSO_DEV: "cms-sso-dev"
+
+# ----------------------------------------------------------------------------
+# 2.9 Open edX HTTPS 和代理配置
+# ----------------------------------------------------------------------------
+# 作用：控制是否启用 HTTPS 和 Web 代理
+# 影响范围：服务访问协议、反向代理配置
+# 填写建议：
+#   - 生产环境必须启用 HTTPS
+#   - 开发环境可禁用以简化配置
+
 ENABLE_HTTPS: false
 ENABLE_WEB_PROXY: true
-JWT_COMMON_AUDIENCE: "openedx"
-JWT_COMMON_ISSUER: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2"
-JWT_COMMON_SECRET_KEY: "{{ OPENEDX_SECRET_KEY }}"
-K8S_NAMESPACE: "openedx"
-LANGUAGE_CODE: "en"
-LMS_HOST: "www.myopenedx.com"
-LOCAL_PROJECT_NAME: "{{ TUTOR_APP }}_local"
+
+# ----------------------------------------------------------------------------
+# 2.10 Open edX 其他服务配置
+# ----------------------------------------------------------------------------
+# 作用：定义 Open edX 使用的其他服务配置
+# 影响范围：搜索、邮件、语言等功能的可用性
+
+# Meilisearch 配置（全文搜索服务）
+# 作用：提供 Open edX 平台的全文搜索功能
+# 影响范围：课程搜索、内容检索等
+RUN_MEILISEARCH: true
 MEILISEARCH_HOST: "meilisearch.{{ LMS_HOST }}"
 MEILISEARCH_URL: "http://meilisearch:7700"
 MEILISEARCH_PUBLIC_URL: "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ MEILISEARCH_HOST }}"
 MEILISEARCH_INDEX_PREFIX: "tutor_"
-MONGODB_AUTH_MECHANISM: ""
-MONGODB_AUTH_SOURCE: "admin"
+DOCKER_IMAGE_MEILISEARCH: "docker.io/getmeili/meilisearch:v1.8.4"
+
+# SMTP 配置（邮件服务）
+# 作用：提供 Open edX 平台的邮件发送功能
+# 影响范围：用户注册、密码重置、通知邮件等
+RUN_SMTP: true
+DOCKER_IMAGE_SMTP: "docker.io/devture/exim-relay:4.96-r1-0"
+SMTP_HOST: "smtp"
+SMTP_PORT: 8025
+SMTP_USERNAME: ""
+SMTP_PASSWORD: ""
+SMTP_USE_TLS: false
+SMTP_USE_SSL: false
+
+# Caddy 配置（Web 服务器和反向代理）
+# 作用：提供 HTTPS 终止和反向代理功能
+# 影响范围：所有通过 Web 访问的服务
+DOCKER_IMAGE_CADDY: "docker.io/caddy:2.7.4"
+CADDY_HTTP_PORT: 80
+
+# MongoDB 配置（Open edX 使用）
+# 作用：存储 Open edX 的某些数据（如用户会话）
+# 影响范围：部分 Open edX 功能的可用性
 MONGODB_HOST: "mongodb"
 MONGODB_DATABASE: "openedx"
 MONGODB_PORT: 27017
@@ -51,62 +354,491 @@ MONGODB_USERNAME: ""
 MONGODB_PASSWORD: ""
 MONGODB_REPLICA_SET: ""
 MONGODB_USE_SSL: false
-MOUNTS: []
+MONGODB_AUTH_MECHANISM: ""
+MONGODB_AUTH_SOURCE: "admin"
+
+# 语言配置
+LANGUAGE_CODE: "en"
+
+# NPM 仓库配置
+NPM_REGISTRY: "https://registry.npmjs.org/"
+
+# Kubernetes 命名空间（如使用 K8s 部署）
+K8S_NAMESPACE: "openedx"
+
+# AWS 配置（可选，用于 S3 存储）
 OPENEDX_AWS_ACCESS_KEY: ""
 OPENEDX_AWS_SECRET_ACCESS_KEY: ""
-OPENEDX_CACHE_REDIS_DB: 1
-OPENEDX_CELERY_REDIS_DB: 0
-OPENEDX_CMS_UWSGI_WORKERS: 2
-OPENEDX_LMS_UWSGI_WORKERS: 2
-OPENEDX_MYSQL_DATABASE: "openedx"
-OPENEDX_MYSQL_USERNAME: "openedx"
-# the common version will be automatically set to "master" in the main branch
-OPENEDX_COMMON_VERSION: "release/teak.2"
-OPENEDX_EXTRA_PIP_REQUIREMENTS: []
-MYSQL_HOST: "mysql"
-MYSQL_PORT: 3306
-MYSQL_ROOT_USERNAME: "root"
-NPM_REGISTRY: "https://registry.npmjs.org/"
-PLATFORM_NAME: "My Open edX"
-PREVIEW_LMS_HOST: "preview.{{ LMS_HOST }}"
-REDIS_HOST: "redis"
-REDIS_PORT: 6379
-REDIS_USERNAME: ""
-REDIS_PASSWORD: ""
-RUN_MEILISEARCH: true
-RUN_MONGODB: true
-RUN_MYSQL: true
-RUN_REDIS: true
-RUN_SMTP: true
 
-# EdOps defaults
+# 额外 Python 依赖
+OPENEDX_EXTRA_PIP_REQUIREMENTS: []
+
+# 挂载点配置（用于开发时挂载本地代码）
+MOUNTS: []
+
+# ============================================================================
+# 三、zhjx 专用配置（zhjx Specific Configuration）
+# ============================================================================
+# 这些配置项仅在部署 zhjx 业务功能时需要
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 3.1 zhjx 模块开关
+# ----------------------------------------------------------------------------
+# 作用：控制各个 zhjx 模块的启用/禁用
+# 影响范围：对应模块的服务启动和资源占用
+# 填写建议：
+#   - base 和 common 通常必须启用
+#   - 其他模块根据业务需求选择性启用
+
+# 基础模块（必选）
+# 作用：提供 Nginx、RabbitMQ、Redis、Nacos、MinIO 等基础服务
+# 影响范围：所有 zhjx 业务服务的基础依赖
+RUN_ZHJX_BASE: true
+
+# 通用模块（必选）
+# 作用：提供网关、认证、用户管理等核心业务服务
+# 影响范围：所有业务功能的基础服务
+RUN_ZHJX_COMMON: true
+
+# ZLMediaKit 模块（可选）
+# 作用：提供流媒体服务（RTMP、RTSP、HLS 等）
+# 影响范围：直播、录播等流媒体功能
+RUN_ZHJX_ZLMEDIAKIT: false
+
+# ----------------------------------------------------------------------------
+# 3.2 zhjx 应用标识配置
+# ----------------------------------------------------------------------------
+# 作用：定义 zhjx 应用的标识信息
+# 影响范围：日志、监控、多租户隔离等
+# 填写建议：
+#   - 多租户场景下，每个租户使用不同的 SCHOOL_ID
+#   - APP_NAME 用于区分不同的应用实例
+
 EDOPS_APP_NAME: "edops"
-EDOPS_NETWORK_NAME: "zhjx-network"
-EDOPS_BASE_PATH: "/home/zhjx"
+EDOPS_SCHOOL_ID: "demo-school"
+
+# ----------------------------------------------------------------------------
+# 3.3 zhjx 镜像版本配置
+# ----------------------------------------------------------------------------
+# 作用：定义 zhjx 业务服务的镜像版本
+# 影响范围：业务服务的功能和兼容性
+# 填写建议：
+#   - 生产环境必须使用固定版本号，避免使用 latest
+#   - 升级前请充分测试新版本的兼容性
+
+# 默认服务版本
+# 作用：所有业务服务的默认镜像版本
+# 影响范围：所有未单独指定版本的业务服务
+EDOPS_VERSION_SVC_DEFAULT: "latest"
+
+# UI 服务版本
+EDOPS_VERSION_UI_AUTH: "latest"
+EDOPS_VERSION_UI_CONSOLE: "latest"
+
+# ----------------------------------------------------------------------------
+# 3.4 zhjx 网络和节点配置
+# ----------------------------------------------------------------------------
+# 作用：定义主节点 IP 和网络配置
+# 影响范围：服务间通信、外部访问地址生成
+# 填写建议：
+#   - MASTER_NODE_IP 必须填写实际服务器 IP
+#   - 多节点部署时，填写主节点 IP
+
+# 主节点 IP 地址
+# 作用：用于生成服务的外部访问 URL
+# 影响范围：前端访问后端 API 的地址、MinIO 等服务的访问地址
+# 填写建议：填写服务器的实际 IP 地址或域名
+EDOPS_MASTER_NODE_IP: "127.0.0.1"
+
+# ----------------------------------------------------------------------------
+# 3.5 zhjx 存储路径配置
+# ----------------------------------------------------------------------------
+# 作用：定义配置文件和证书的存储路径
+# 影响范围：Nginx 配置加载、SSL 证书使用
+# 填写建议：
+#   - 使用绝对路径
+#   - 确保路径存在且文件权限正确
+
 EDOPS_NGINX_CONF: "{{ EDOPS_BASE_PATH }}/nginx.conf"
 EDOPS_CERT_KEY_FILE: "{{ EDOPS_BASE_PATH }}/portal_ly-sky_com.key"
 EDOPS_CERT_CRT_FILE: "{{ EDOPS_BASE_PATH }}/portal_ly-sky_com.crt"
-EDOPS_IMAGE_REGISTRY: "zhjx-images.tencentcloudcr.com"
-EDOPS_MASTER_NODE_IP: "127.0.0.1"
-EDOPS_SCHOOL_ID: "demo-school"
-EDOPS_VERSION_SVC_DEFAULT: "latest"
-EDOPS_VERSION_UI_CONSOLE: "latest"
-EDOPS_VERSION_UI_AUTH: "latest"
-EDOPS_RABBITMQ_DEFAULT_USER: "admin"
-EDOPS_MINIO_ROOT_USER: "admin"
-EDOPS_MINIO_API_PORT: 59000
-EDOPS_MINIO_CONSOLE_PORT: 59001
-EDOPS_API_GATEWAY_URL: "http://ly-ac-gateway-svc:50000"
-EDOPS_API_TENANT_PORT: 50004
-EDOPS_API_OBJECT_STORAGE_PORT: 50007
 EDOPS_MEDIA_CONF_PATH: "{{ EDOPS_BASE_PATH }}/media/conf"
 EDOPS_MEDIA_LOG_PATH: "{{ EDOPS_BASE_PATH }}/media/log"
 EDOPS_MEDIA_WEB_PATH: "{{ EDOPS_BASE_PATH }}/media/www"
+
+# ----------------------------------------------------------------------------
+# 3.6 zhjx 基础服务配置
+# ----------------------------------------------------------------------------
+# 作用：定义 zhjx 使用的基础中间件服务配置
+# 影响范围：所有依赖这些服务的业务服务
+# 填写建议：
+#   - 容器内访问使用服务名（如 "zhjx-redis"）
+#   - 外部访问使用 IP 地址
+#   - 生产环境必须设置密码
+
+# MySQL 配置（zhjx 使用）
+EDOPS_MYSQL_HOST: "{{ EDOPS_MASTER_NODE_IP }}"
+EDOPS_MYSQL_PORT: 3306
+EDOPS_MYSQL_ROOT_USER: "root"
+# EDOPS_MYSQL_ROOT_PASSWORD 在 base.yml 中随机生成
+
+# Redis 配置（zhjx 使用）
+EDOPS_REDIS_HOST: "zhjx-redis"
+EDOPS_REDIS_PORT: 6379
+# EDOPS_REDIS_PASSWORD: ""  # 可选，生产环境建议设置
+
+# RabbitMQ 配置
+# 作用：提供消息队列服务
+# 影响范围：异步任务、事件通知等
+# 填写建议：
+#   - 生产环境必须修改默认密码
+#   - 管理端口用于访问 RabbitMQ 管理界面
+EDOPS_RABBITMQ_DEFAULT_USER: "admin"
+EDOPS_RABBITMQ_HOST: "zhjx-rabbitmq"
+EDOPS_RABBITMQ_PORT: 5672
+EDOPS_RABBITMQ_MANAGEMENT_PORT: 15672
+EDOPS_RABBITMQ_VIRTUAL_HOST: "zhjx-ykt3"
+# EDOPS_RABBITMQ_DEFAULT_PASS 在 base.yml 中随机生成
+
+# Nacos 配置
+# 作用：提供服务注册与发现、配置管理
+# 影响范围：所有微服务的服务发现和配置管理
+# 填写建议：
+#   - 生产环境建议修改默认密码
+#   - SERVER_ADDR 使用容器内服务名
+EDOPS_NACOS_HOST: "zhjx-nacos"
+EDOPS_NACOS_PORT: 8848
+EDOPS_NACOS_USER: "nacos"
+EDOPS_NACOS_SERVER_ADDR: "http://zhjx-nacos:8848"
+# EDOPS_NACOS_PASSWORD: ""  # 可复用 RabbitMQ 密码或单独设置
+
+# MinIO 配置
+# 作用：提供对象存储服务（S3 兼容）
+# 影响范围：文件上传、媒体存储等
+# 填写建议：
+#   - 生产环境必须修改默认密码
+#   - API_PORT 和 CONSOLE_PORT 确保不与现有服务冲突
+EDOPS_MINIO_ROOT_USER: "admin"
+EDOPS_MINIO_API_PORT: 59000
+EDOPS_MINIO_CONSOLE_PORT: 59001
+EDOPS_MINIO_HOST: "zhjx-minio"
+EDOPS_MINIO_SERVER_URL: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_MINIO_API_PORT }}"
+EDOPS_MINIO_CLUSTER_IP: "{{ EDOPS_MASTER_NODE_IP }}"
+EDOPS_MINIO_CLUSTER_ENDPOINT: "http://{{ EDOPS_MINIO_CLUSTER_IP }}:{{ EDOPS_MINIO_API_PORT }}"
+# EDOPS_MINIO_ROOT_PASSWORD 在 base.yml 中随机生成
+
+# Elasticsearch 配置
+# 作用：提供全文搜索和日志分析功能
+# 影响范围：搜索功能、日志检索等
+# 填写建议：
+#   - 生产环境建议设置密码
+#   - 根据数据量调整 JVM 内存参数
+EDOPS_ELASTICSEARCH_HOST: "zhjx-elasticsearch"
+EDOPS_ELASTICSEARCH_PORT: 9200
+EDOPS_ELASTICSEARCH_ADDRESS: "{{ EDOPS_ELASTICSEARCH_HOST }}:{{ EDOPS_ELASTICSEARCH_PORT }}"
+EDOPS_ELASTICSEARCH_USERNAME: "elastic"
+# EDOPS_ELASTICSEARCH_PASSWORD 在 base.yml 中随机生成
+
+# Kafka 配置
+# 作用：提供高吞吐量的消息队列服务
+# 影响范围：大数据处理、日志收集等
+EDOPS_KAFKA_HOST: "zhjx-kafka"
+EDOPS_KAFKA_PORT: 9092
+
+# EMQX 配置（MQTT 消息 broker）
+# 作用：提供 MQTT 协议的消息服务
+# 影响范围：物联网设备连接、实时消息推送等
+# 填写建议：
+#   - 生产环境必须修改默认密码
+#   - 端口号确保不与现有服务冲突
+EDOPS_EMQX_HOST: "zhjx-emqx"
+EDOPS_EMQX_MQTT_PORT: 1883
+EDOPS_EMQX_WS_PORT: 8083
+EDOPS_EMQX_WSS_PORT: 8084
+EDOPS_EMQX_DASHBOARD_PORT: 18083
+EDOPS_EMQX_DASHBOARD_ADMIN: "admin"
+EDOPS_EMQX_DASHBOARD_PASSWORD: ""
+
+# ----------------------------------------------------------------------------
+# 3.7 zhjx 业务服务配置
+# ----------------------------------------------------------------------------
+# 作用：定义业务服务的连接信息和配置
+# 影响范围：前端访问后端 API、服务间调用
+# 填写建议：
+#   - API 地址使用容器内服务名或外部 IP
+#   - 端口号确保不与现有服务冲突
+
+# API 网关配置
+# 作用：统一入口，路由所有 API 请求
+# 影响范围：所有前端对后端 API 的访问
+EDOPS_API_GATEWAY_URL: "http://ly-ac-gateway-svc:50000"
+EDOPS_API_GATEWAY_HOST: "ly-ac-gateway-svc"
+EDOPS_API_GATEWAY_PORT: 50000
+
+# 租户服务配置
+# 作用：提供多租户管理功能
+# 影响范围：租户初始化、租户数据隔离等
+EDOPS_API_TENANT_URL: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_API_TENANT_PORT }}"
+EDOPS_API_TENANT_PORT: 50004
+EDOPS_API_TENANT_HOST: "ly-ac-tenant-svc"
+
+# 对象存储服务配置
+# 作用：提供文件上传、下载、管理功能
+# 影响范围：所有文件相关的业务功能
+EDOPS_API_OBJECT_STORAGE_URL: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_API_OBJECT_STORAGE_PORT }}"
+EDOPS_API_OBJECT_STORAGE_PORT: 50007
+EDOPS_API_OBJECT_STORAGE_HOST: "ly-ac-object-storage-svc"
+
+# 服务通用配置
+# 作用：定义所有 Spring Boot 微服务的通用配置
+# 影响范围：JVM 参数、服务发现、配置中心等
+EDOPS_SVC_JVM_OPTS: "-Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication"
+EDOPS_SVC_DISCOVERY: "zhjx-nacos"
+EDOPS_SVC_NACOS_GROUP: "DEFAULT_GROUP"
+EDOPS_SVC_PROFILE_ACTIVE: "dev"
+
+# ----------------------------------------------------------------------------
+# 3.8 zhjx 存储配置
+# ----------------------------------------------------------------------------
+# 作用：定义对象存储的配置信息
+# 影响范围：文件存储、媒体文件访问等
+# 填写建议：
+#   - 生产环境建议使用外部对象存储（如腾讯云 COS）
+#   - 内部存储使用 MinIO
+
+EDOPS_STORAGE_ENDPOINT: ""
+EDOPS_STORAGE_ENDPOINT_INTERNAL: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_MINIO_API_PORT }}"
+EDOPS_STORAGE_BUCKET_NAME: "ly-zhjx"
+
+# ----------------------------------------------------------------------------
+# 3.9 zhjx 任务调度配置
+# ----------------------------------------------------------------------------
+# 作用：定义分布式任务调度服务配置
+# 影响范围：定时任务、异步任务执行
+EDOPS_XXL_JOB_PORT: 5006
+EDOPS_XXL_JOB_ADDRESSES: "http://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_XXL_JOB_PORT }}"
+
+# ----------------------------------------------------------------------------
+# 3.10 zhjx MQTT 配置
+# ----------------------------------------------------------------------------
+# 作用：定义 MQTT 消息服务的配置
+# 影响范围：实时消息推送、设备连接等
+# 填写建议：
+#   - 生产环境必须设置密码
+#   - DOMAIN_NAME 填写实际的域名或 IP
+
+EDOPS_MQTT_BROKER_URL: "tcp://{{ EDOPS_MASTER_NODE_IP }}:{{ EDOPS_EMQX_MQTT_PORT }}"
+EDOPS_MQTT_USERNAME: "ly_zhjx_platform"
+EDOPS_MQTT_PASSWORD: ""
+EDOPS_MQTT_CONFIG_ENABLE: true
+EDOPS_MQTT_ACCOUNT: "ly_yg_platform"
+EDOPS_MQTT_ACCOUNT_PASSWORD: ""
+EDOPS_MQTT_DOMAIN_NAME: ""
+EDOPS_MQTT_PORT: 8084
+EDOPS_MQTT_PROTOCOL_PORT: 1883
+EDOPS_MQTT_URL: ""
+
+# ----------------------------------------------------------------------------
+# 3.11 zhjx ZLMediaKit 配置
+# ----------------------------------------------------------------------------
+# 作用：定义流媒体服务的配置
+# 影响范围：直播、录播、流媒体推拉流等
+# 填写建议：
+#   - 仅在启用流媒体功能时需要配置
+#   - 端口号确保不与现有服务冲突
+
 EDOPS_ZLMEDIAKIT_IMAGE: "{{ EDOPS_IMAGE_REGISTRY }}/library/zlmediakit:master"
+EDOPS_ZLMEDIAKIT_HOST: "zlmediakit"
+EDOPS_ZLMEDIAKIT_HTTP_PORT: 80
+EDOPS_ZLMEDIAKIT_RTMP_PORT: 1935
+EDOPS_ZLMEDIAKIT_RTSP_PORT: 554
+EDOPS_ZLMEDIAKIT_ENABLED: true
+
+# ZLMediaKit 流配置
+EDOPS_ZLM_STREAMS_ENDPOINT: ""
+EDOPS_ZLM_ADDRESS: ""
+EDOPS_ZLM_PUSH_HOST: ""
+EDOPS_ZLM_PLAY_HOST: ""
+EDOPS_ZLM_SECRET: ""
+EDOPS_ZLM_PLAY_PROTOCOL: "https"
+EDOPS_ZLM_HTTP_PORT: ""
+EDOPS_ZLM_RTSP_PORT: 554
+EDOPS_ZLM_RTMP_PORT: 1935
+
+# 视频存储配置
+EDOPS_VIDEO_BUCKET_NAME: "video-storage"
+EDOPS_VIDEO_MIGRATE_NUM: 30
+EDOPS_VIDEO_ROOT_PATH: "record"
+EDOPS_VIDEO_DOWNLOAD_MODE: false
+EDOPS_VIDEO_UPLOAD_MODE: false
+EDOPS_VIDEO_PROGRAM_MODE: false
+EDOPS_VIDEO_DELETE_MODE: false
+EDOPS_VIDEO_DELETE_ENABLED: true
+EDOPS_VIDEO_MINIO_STORAGE: true
+EDOPS_VIDEO_STORAGE_VIEW: true
+EDOPS_VIDEO_HOOK_UPLOAD_MODE: true
+EDOPS_VIDEO_RECORD_COMPENSATE: false
+EDOPS_VIDEO_COMPENSATE_EXECUTE: false
+EDOPS_VIDEO_IS_JUDGMENT: false
+
+# ----------------------------------------------------------------------------
+# 3.12 zhjx 第三方服务集成配置（可选）
+# ----------------------------------------------------------------------------
+# 作用：定义与第三方服务的集成配置
+# 影响范围：对应功能的可用性
+# 填写建议：
+#   - 仅在需要使用对应功能时配置
+#   - 敏感信息（密钥、密码）建议通过环境变量或密钥管理服务提供
+
+# 腾讯云短信服务（SMS）
+EDOPS_SMS_ENABLED: false
+EDOPS_SMS_NAME: ""
+EDOPS_SMS_TEMPLATE_ID: ""
+EDOPS_SMS_ACCESS_KEY: ""
+EDOPS_SMS_SECRET_KEY: ""
+EDOPS_SMS_SIGN_NAME: ""
+
+# 腾讯云邮件服务（SES）
+EDOPS_SES_ENABLED: false
+EDOPS_SES_NAME: ""
+EDOPS_SES_END_POINT: ""
+EDOPS_SES_SECRET_ID: ""
+EDOPS_SES_SECRET_KEY: ""
+EDOPS_SES_FROM_EMAIL_ADDRESS: ""
+EDOPS_SES_CAPTCHA_IS_ENABLE: false
+EDOPS_SES_CAPTCHA_TEMPLATE_ID: ""
+EDOPS_SES_CAPTCHA_TEMPLATE_DATA: '{ "code":"codeValue" }'
+EDOPS_SES_CAPTCHA_SUBJECT: "邮箱验证码"
+
+# 腾讯云验证码服务
+EDOPS_CAPTCHA_ENABLED: false
+EDOPS_CAPTCHA_NAME: ""
+EDOPS_CAPTCHA_APP_ID: ""
+EDOPS_CAPTCHA_ACCESS_KEY: ""
+EDOPS_CAPTCHA_SECRET_KEY: ""
+EDOPS_CAPTCHA_TENCENT_APP_ID: ""
+EDOPS_CAPTCHA_TENCENT_SECRET_KEY: ""
+EDOPS_CAPTCHA_TYPE: "9"
+
+# 腾讯云实时音视频（LCIC）
+EDOPS_LCIC_SDK_APP_ID: ""
+EDOPS_LCIC_CLASSROOM_LIVE_URL: ""
+EDOPS_LCIC_RTMP_CLASSROOM_LIVE_URL: ""
+EDOPS_LCIC_OPEN_SCREEN_SHARING_STREAM_ID: ""
+EDOPS_LCIC_CLOSE_SCREEN_SHARING_STREAM_ID: ""
+EDOPS_LCIC_ENABLE_RECORDING_HTTPS_SUFFIX: "_mix.m3u8"
+EDOPS_LCIC_ENABLE_RECORDING_RTMP_SUFFIX: "_mix"
+EDOPS_LCIC_CLOSE_RECORDING_HTTPS_SUFFIX: "_aux.m3u8"
+EDOPS_LCIC_CLOSE_RECORDING_RTMP_SUFFIX: "_aux"
+EDOPS_LCIC_RESOLUTION: 3
+EDOPS_LCIC_MAX_MIC_NUMBER: 6
+EDOPS_LCIC_SUB_TYPE: "college"
+EDOPS_LCIC_AUTO_MIC: 0
+EDOPS_LCIC_AUDIO_QUALITY: 0
+EDOPS_LCIC_DISABLE_RECORD: 0
+EDOPS_LCIC_RECORD_LAYOUT: 3
+EDOPS_LCIC_BROWSER_ENV: "prod"
+EDOPS_LCIC_BROWSER_VERSION: "1.7.5"
+EDOPS_LCIC_BROWSER_DOMAIN_NAME: ""
+EDOPS_LCIC_BROWSER_SCENE: "ykt-3.0"
+EDOPS_LCIC_PC_ENV: "prod"
+EDOPS_LCIC_PC_VERSION: "1.7.5"
+EDOPS_LCIC_PC_DOMAIN_NAME: ""
+
+# RTC 配置
+EDOPS_RTC_SOURCE: ""
+EDOPS_RTC_END_POINT: ""
+EDOPS_RTC_SECRET_ID: ""
+EDOPS_RTC_SECRET_KEY: ""
+EDOPS_RTC_CALLBACK_KEY: ""
+EDOPS_RTC_JOIN_URL: ""
+EDOPS_RTC_USING_SOURCES: ""
+
+# 会议服务（觅听）配置
+EDOPS_MEETING_DOMAIN: ""
+EDOPS_MEETING_MUC: ""
+EDOPS_MEETING_BOSH: ""
+
+# 媒体处理配置
+EDOPS_MEDIA_CALLBACK_URL: ""
+EDOPS_MEDIA_IS_ENABLE: false
+EDOPS_MEDIA_SECRET_ID: ""
+EDOPS_MEDIA_SECRET_KEY: ""
+EDOPS_MEDIA_END_POINT: ""
+EDOPS_MEDIA_REVIEW_TEMPLATE_ID: ""
+EDOPS_MEDIA_RECOGNITION_TEMPLATE_ID: ""
+
+# 天气服务配置
+EDOPS_WEATHER_KEY: ""
+EDOPS_WEATHER_UPDATE_SECOND: 1800
+EDOPS_WEATHER_PROVINCE: ""
+EDOPS_WEATHER_CITY: ""
+
+# CAS 单点登录配置
+EDOPS_CAS_LOGIN_URL: ""
+EDOPS_CAS_LOGOUT_URL: ""
+EDOPS_CAS_SERVICE_URL: ""
+EDOPS_CAS_VALIDATE_URL: ""
+EDOPS_CAS_USER_ID_XPATH: "/serviceResponse/authenticationSuccess/attributes/username"
+EDOPS_CAS_PHONE_XPATH: ""
+EDOPS_CAS_EMAIL_XPATH: ""
+EDOPS_CAS_SERVER_NICK: ""
+
+# 企业微信（企微）配置
+EDOPS_WXCP_CORP_ID: ""
+EDOPS_WXCP_CORP_SECRET: ""
+EDOPS_WXCP_AGENT_ID: ""
+EDOPS_WXCP_TOKEN: ""
+EDOPS_WXCP_AES_KEY: ""
+EDOPS_WXCP_KEY: ""
+EDOPS_WXCP_PAGE_OAUTH2_REDIRECT_URI: ""
+EDOPS_WXCP_QRCODE_OAUTH2_REDIRECT_URI_TO_WEB: ""
+EDOPS_WXCP_QRCODE_OAUTH2_REDIRECT_URI_TO_SERVER: ""
+EDOPS_BASIC_WXCP_CORP_ID: ""
+EDOPS_BASIC_WXCP_CORP_SECRET: ""
+EDOPS_BASIC_WXCP_AGENT_ID: ""
+EDOPS_BASIC_WXCP_TOKEN: ""
+EDOPS_BASIC_WXCP_AES_KEY: ""
+
+# 钉钉配置
+EDOPS_DING_APP_KEY: ""
+EDOPS_DING_APP_SECRET: ""
+
+# 审核链接配置
+EDOPS_REVIEW_LINK_APP_KEY: ""
+EDOPS_REVIEW_LINK_APP_SECRET: ""
+EDOPS_REVIEW_LINK_ADDRESS: ""
+
+# 二维码配置
+EDOPS_QRCODE_JUMP_URI: ""
+
+# 签到配置
+EDOPS_SIGN_NOT_START_IMG_URI: ""
+EDOPS_SIGN_QRCODE_EXPIRED_TIME: 20
+
+# ----------------------------------------------------------------------------
+# 3.13 zhjx 业务逻辑配置
+# ----------------------------------------------------------------------------
+# 作用：定义业务功能的开关和参数
+# 影响范围：对应功能的可用性和行为
+
+# 数据同步配置
+EDOPS_SYNC_CLASSROOM_TABLE: true
+EDOPS_SYNC_CLASSROOM_USER: true
+
+# API 权限配置
+EDOPS_API_PERMISSION_ENABLE: false
+
+# 服务版本和租户配置
+EDOPS_SERVICE_VERSION: "3.5.2"
+EDOPS_TENANT_PUBLIC_MODE: false
+EDOPS_TENANT_PREFIX_INITIALIZE_LINK: ""
+EDOPS_TENANT_SCHOOL_ID: ""
+
+# 模块配置
 EDOPS_ENABLED_MODULES: []
-SMTP_HOST: "smtp"
-SMTP_PORT: 8025
-SMTP_USERNAME: ""
-SMTP_PASSWORD: ""
-SMTP_USE_TLS: false
-SMTP_USE_SSL: false
+
+# HTTPS 配置
+EDOPS_ENABLE_HTTPS: false
+# EDOPS_ISPOT_APP_SOURCE 在 base.yml 中随机生成

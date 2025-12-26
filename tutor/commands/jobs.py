@@ -86,7 +86,7 @@ def initialise(limit: t.Optional[str]) -> t.Iterator[tuple[str, str]]:
     fmt.echo_info("所有服务已初始化。")
 
 
-@click.command(help="创建 Open edX 用户并交互式设置密码")
+@click.command(help="创建用户并交互式设置密码")
 @click.option("--superuser", is_flag=True, help="创建超级用户")
 @click.option("--staff", is_flag=True, help="创建职员用户")
 @click.option(
@@ -110,6 +110,11 @@ def createuser(
 
     密码可以作为选项传递，或以交互方式设置。
     """
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  createuser 指令暂未启用，待后续支持...")
+    return iter([])
+
+    # 以下为原有逻辑（暂未启用）
     yield ("lms", create_user_template(superuser, staff, name, email, password))
 
 
@@ -136,6 +141,11 @@ def createuser(
 def importdemocourse(
     repo: str, repo_dir: str, version: t.Optional[str]
 ) -> t.Iterable[tuple[str, str]]:
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  importdemocourse 指令暂未启用，待后续支持...")
+    return iter([])
+
+    # 以下为原有逻辑（暂未启用）
     version = version or "{{ OPENEDX_COMMON_VERSION }}"
     template = f"""
 # Clone the repo
@@ -191,6 +201,11 @@ python ./manage.py cms import ../data "$course_root"
 def importdemolibraries(
     owner_username: str, repo: str, version: t.Optional[str]
 ) -> t.Iterable[tuple[str, str]]:
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  importdemolibraries 指令暂未启用，待后续支持...")
+    return iter([])
+
+    # 以下为原有逻辑（暂未启用）
     version = version or "{{ OPENEDX_COMMON_VERSION }}"
     template = f"""
 # Clone the repo
@@ -234,6 +249,11 @@ done"""
 def print_edx_platform_setting(
     setting: str, service: str
 ) -> t.Iterable[tuple[str, str]]:
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  print-edx-platform-setting 指令暂未启用，待后续支持...")
+    return iter([])
+
+    # 以下为原有逻辑（暂未启用）
     command = f"./manage.py {service} shell -c 'from django.conf import settings; print(settings.{setting})'"
     yield (service, command)
 
@@ -256,6 +276,11 @@ def settheme(domains: list[str], theme_name: str) -> t.Iterable[tuple[str, str]]
 
     To reset to the default theme , use 'default' as the theme name.
     """
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  settheme 指令暂未启用，待后续支持...")
+    return iter([])
+
+    # 以下为原有逻辑（暂未启用）
     yield ("lms", set_theme_template(theme_name, domains))
 
 
@@ -268,6 +293,11 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     Extra arguments will be passed to the `mysql` command verbatim. For instance, to
     show tables from the "openedx" database, run `do sqlshell openedx -e 'show tables'`.
     """
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  sqlshell 指令暂未启用，待后续支持...")
+    return iter([])
+
+    # 以下为原有逻辑（暂未启用）
     command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --default-character-set=utf8mb4"
     if args:
         command += " " + shlex.join(args)
@@ -317,7 +347,11 @@ def convert_mysql_utf8mb4_charset(
 
     Can specify whether to upgrade all tables, or include certain tables/apps or to exclude certain tables/apps
     """
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  convert-mysql-utf8mb4-charset 指令暂未启用，待后续支持...")
+    return iter([])
 
+    # 以下为原有逻辑（暂未启用）
     config = tutor_config.load(context.root)
 
     if not config["RUN_MYSQL"]:
@@ -399,7 +433,11 @@ def update_mysql_authentication_plugin(
     Update the authentication plugin of MySQL users from mysql_native_password to caching_sha2_password
     Handy command utilized when upgrading to v8.4 of MySQL which deprecates mysql_native_password
     """
+    # 临时处理：此指令暂未启用，待后续支持
+    fmt.echo_info("⚠️  update-mysql-authentication-plugin 指令暂未启用，待后续支持...")
+    return iter([])
 
+    # 以下为原有逻辑（暂未启用）
     config = tutor_config.load(context.root)
 
     if not config["RUN_MYSQL"]:

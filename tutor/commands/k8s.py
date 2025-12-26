@@ -208,13 +208,13 @@ class K8sContext(BaseTaskContext):
         return K8sTaskRunner(self.root, config)
 
 
-@click.group(help="在 Kubernetes 上运行 Open edX")
+@click.group(help="在 Kubernetes 上运行 EdOps 平台")
 @click.pass_context
 def k8s(context: click.Context) -> None:
     context.obj = K8sContext(context.obj.root)
 
 
-@click.command(help="从头配置并运行 Open edX")
+@click.command(help="从头配置并运行 EdOps 平台")
 @click.option("-I", "--non-interactive", is_flag=True, help="非交互式运行")
 @click.pass_context
 def launch(context: click.Context, non_interactive: bool) -> None:
@@ -256,7 +256,7 @@ Press enter when you are ready to continue"""
 
     config = tutor_config.load(context.obj.root)
     fmt.echo_info(
-        """Your Open edX platform is ready and can be accessed at the following urls:
+        """EdOps 平台已准备就绪，可通过以下 URL 访问：
 
     {http}://{lms_host}
     {http}://{cms_host}
@@ -269,9 +269,9 @@ Press enter when you are ready to continue"""
 
 
 @click.command(
-    short_help="Run all configured Open edX resources",
+    short_help="运行所有已配置的 EdOps 资源",
     help=(
-        "Run all configured Open edX resources. You may limit this command to "
+        "运行所有已配置的 EdOps 资源。您可以限制此命令仅运行 "
         "some resources by passing name arguments."
     ),
 )
@@ -504,8 +504,8 @@ def upgrade(context: click.Context, from_release: Optional[str]) -> None:
         fmt.echo_info("Your environment is already up-to-date")
     else:
         fmt.echo_alert(
-            "This command only performs a partial upgrade of your Open edX platform. "
-            "To perform a full upgrade, you should run `tutor k8s launch`."
+            "此命令仅执行 EdOps 平台的部分升级。"
+            "要执行完整升级，请运行 `edops k8s launch`。"
         )
         upgrade_from(context, from_release)
     # We update the environment to update the version

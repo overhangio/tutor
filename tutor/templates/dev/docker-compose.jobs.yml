@@ -1,3 +1,4 @@
+{% if RUN_OPENEDX -%}
 x-openedx-job-service:
   &openedx-job-service
   image: {{ DOCKER_IMAGE_OPENEDX_DEV }}
@@ -14,9 +15,11 @@ x-openedx-job-service:
     - ../apps/openedx/config:/openedx/config:ro
     # theme files
     - ../build/openedx/themes:/openedx/themes
+{%- endif %}
 
 services:
 
+  {% if RUN_OPENEDX -%}
   lms-job:
     <<: *openedx-job-service
     environment:
@@ -27,5 +30,6 @@ services:
     <<: *openedx-job-service
     environment:
       DJANGO_SETTINGS_MODULE: cms.envs.tutor.development
+  {%- endif %}
 
   {{ patch("dev-docker-compose-jobs-services")|indent(2) }}

@@ -16,10 +16,94 @@ from tutor.commands.params import ConfigLoaderParam
 from tutor.types import Config, ConfigValue
 
 
+def _validate_required_config(config: Config) -> None:
+    """
+    Validate that required configuration items are set.
+    
+    Raises TutorError if any required configuration is missing.
+    """
+    required_vars = [
+        "EDOPS_IMAGE_REGISTRY",
+        "EDOPS_MASTER_NODE_IP",
+    ]
+    
+    # Optional but recommended for production
+    recommended_vars = [
+        "EDOPS_MYSQL_ROOT_PASSWORD",
+        "EDOPS_REDIS_PASSWORD",
+    ]
+    
+    errors = []
+    for var in required_vars:
+        value = config.get(var)
+        if not value or (isinstance(value, str) and not value.strip()):
+            errors.append(f"必需配置项未设置: {var}")
+    
+    # Warn about recommended but not required vars
+    warnings = []
+    for var in recommended_vars:
+        value = config.get(var)
+        if not value or (isinstance(value, str) and not value.strip()):
+            warnings.append(f"建议配置项未设置: {var} (生产环境建议设置)")
+    
+    if errors:
+        fmt.echo_error("配置验证失败：")
+        for error in errors:
+            fmt.echo_error(f"  - {error}")
+        raise exceptions.TutorError("配置验证失败，请设置必需的配置项")
+    
+    if warnings:
+        fmt.echo_alert("配置警告：")
+        for warning in warnings:
+            fmt.echo_alert(f"  - {warning}")
+
+
+def _ensure_data_directories(root: str, config: Config) -> None:
+    """
+    Create data/ subdirectories to ensure they exist before permissions service runs.
+    
+    This helps avoid permission issues when Docker creates directories as root.
+    """
+    import os
+    from pathlib import Path
+    
+    data_dir = Path(root) / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    
+    # List of data subdirectories used by zhjx modules
+    data_subdirs = [
+        "rabbitmq",
+        "redis",
+        "minio",
+        "elasticsearch",
+        "kafka",
+        "kkfileview",
+    ]
+    
+    # Add zlmediakit subdirectories if module is enabled
+    if config.get("RUN_ZHJX_ZLMEDIAKIT", False):
+        data_subdirs.extend([
+            "zlmediakit/conf",
+            "zlmediakit/log",
+            "zlmediakit/www",
+        ])
+    
+    # Create subdirectories with appropriate permissions
+    for subdir in data_subdirs:
+        subdir_path = data_dir / subdir
+        subdir_path.mkdir(parents=True, exist_ok=True)
+        # Set permissions to 755 (rwxr-xr-x) to allow container processes to access
+        try:
+            os.chmod(subdir_path, 0o755)
+        except OSError:
+            # Ignore permission errors (may not have sufficient privileges)
+            pass
+
+
 @click.group(
     name="config",
-    short_help="Configure Open edX",
-    help="""Configure Open edX and store configuration values in $TUTOR_ROOT/config.yml""",
+    short_help="配置 EdOps",
+    help="""配置 EdOps 平台并将配置值存储在 $TUTOR_ROOT/config.yml 中""",
 )
 def config_command() -> None:
     pass
@@ -144,6 +228,12 @@ class ConfigListKeyValParamType(ConfigKeyValParamType):
     is_flag=True,
     help="Remove everything in the env directory before save",
 )
+@click.option(
+    "--init",
+    "init_env",
+    is_flag=True,
+    help="Initialize a new environment (equivalent to --clean)",
+)
 @click.pass_obj
 def save(
     context: Context,
@@ -154,7 +244,12 @@ def save(
     unset_vars: list[str],
     env_only: bool,
     clean_env: bool,
+    init_env: bool,
 ) -> None:
+    # --init is equivalent to --clean
+    if init_env:
+        clean_env = True
+
     config = tutor_config.load_minimal(context.root)
 
     # Add question to interactive prompt, such that the environment is automatically
@@ -206,6 +301,15 @@ def save(
                 values.remove(value)
     for key in unset_vars:
         config.pop(key, None)
+    
+    # Validate required configuration items before saving
+    if not env_only:
+        _validate_required_config(config)
+    
+    # Create data/ subdirectories to ensure they exist before permissions service runs
+    if not env_only:
+        _ensure_data_directories(context.root, config)
+    
     if not env_only:
         tutor_config.save_config_file(context.root, config)
 
@@ -316,39 +420,6 @@ def validate(context: Context) -> None:
     fmt.echo(fmt.info("✓ 配置验证通过"))
 
 
-@click.command(help="渲染指定模块的模板")
-@click.argument("module_name")
-@click.pass_obj
-def render(context: Context, module_name: str) -> None:
-    """将指定的 EdOps 模块模板渲染到输出目录。"""
-    from tutor.edops import modules as edops_modules
-
-    config = tutor_config.load_full(context.root)
-
-    # 加载模块定义
-    try:
-        all_modules = edops_modules._load_modules()
-        if module_name not in all_modules:
-            available = ", ".join(all_modules.keys())
-            msg = f"未知模块 '{module_name}'。"
-            msg += f"可用模块: {available}"
-            raise exceptions.TutorError(msg)
-
-        module_def = all_modules[module_name]
-
-        # 渲染模块模板
-        renderer = env.Renderer(config)
-        content = renderer.render_template(module_def.template)
-
-        # 写入目标路径
-        dst = os.path.join(context.root, "env", module_def.target)
-        env.write_to(content, dst)
-
-        fmt.echo(fmt.info(f"✓ 已将模块 '{module_name}' 渲染到 {dst}"))
-
-    except Exception as e:
-        msg = f"渲染模块 '{module_name}' 失败: {e}"
-        raise exceptions.TutorError(msg) from e
 
 
 @click.group(name="patches", help="Commands related to patches in configurations")
@@ -408,7 +479,6 @@ config_command.add_command(printvalue)
 config_command.add_command(get)
 config_command.add_command(list_config)
 config_command.add_command(validate)
-config_command.add_command(render)
 patches_command.add_command(patches_list)
 patches_command.add_command(patches_show)
 config_command.add_command(patches_command)

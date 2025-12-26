@@ -1,3 +1,4 @@
+{% if RUN_ZHJX_COMMON %}
 x-ui-environment:
   &ui-environment
   spring.cloud.inetutils.preferred-networks: 10.10.0
@@ -9,124 +10,172 @@ x-ui-environment:
 
 x-svc-environment:
   &svc-environment
-  discovery: zhjx-nacos
-  nacosGroup: DEFAULT_GROUP
-  mysqlHost: "{{ EDOPS_MASTER_NODE_IP }}"
-  mysqlPort: 3306
-  mysqlUser: root
+  discovery: "{{ EDOPS_SVC_DISCOVERY }}"
+  nacosGroup: "{{ EDOPS_SVC_NACOS_GROUP }}"
+  mysqlHost: "{{ EDOPS_MYSQL_HOST }}"
+  mysqlPort: {{ EDOPS_MYSQL_PORT }}
+  mysqlUser: "{{ EDOPS_MYSQL_ROOT_USER }}"
   mysqlPassword: "{{ EDOPS_MYSQL_ROOT_PASSWORD }}"
-  serverAddr: "http://zhjx-nacos:8848"
+  serverAddr: "{{ EDOPS_NACOS_SERVER_ADDR }}"
 
 services:
   ly-ac-auth-ui:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-auth-ui:{{ EDOPS_VERSION_UI_AUTH }}
     init: true
+    restart: unless-stopped
     environment: *ui-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-nacos
 
   ly-ac-console-ui:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-console-ui:{{ EDOPS_VERSION_UI_CONSOLE }}
     init: true
+    restart: unless-stopped
     environment: *ui-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-nacos
 
   ly-ac-gateway-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-gateway-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
+    restart: unless-stopped
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     environment:
-      - nacosServerAddr=zhjx-nacos:8848
-      - nacosGroup=DEFAULT_GROUP
-      - nacosUser=nacos
-      - nacosPassword=37621040
-      - profilActive=dev
+      - nacosServerAddr={{ EDOPS_NACOS_SERVER_ADDR }}
+      - nacosGroup={{ EDOPS_SVC_NACOS_GROUP }}
+      - nacosUser={{ EDOPS_NACOS_USER }}
+      - nacosPassword={{ EDOPS_RABBITMQ_DEFAULT_PASS }}
+      - profilActive={{ EDOPS_SVC_PROFILE_ACTIVE }}
       - sentinelDashboard=zhjx-sentinel:8858
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-sentinel
 
   ly-ac-job-admin-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-job-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
   ly-ac-object-storage-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-object-storage-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-minio
 
   ly-ac-admin-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-admin-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
   ly-ac-auth-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-auth-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
   ly-ac-basic-data-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-basic-data-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
   ly-ac-user-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-user-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
   ly-ac-rtc-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-rtc-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Shanghai /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
   ly-ac-course-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-course-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     hostname: ly-ac-course-svc
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
   ly-ac-classroom-svc:
     image: {{ EDOPS_IMAGE_REGISTRY }}/ly-sky.com/ly-ac-classroom-svc:{{ EDOPS_VERSION_SVC_DEFAULT }}
     init: true
     hostname: ly-ac-classroom-svc
+    restart: unless-stopped
     environment: *svc-environment
     networks:
       - {{ EDOPS_NETWORK_NAME }}
     entrypoint: [""]
     command: ["sh", "-c", "java -Xms1G -Xmx2G -XX:MaxMetaspaceSize=256M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+UseStringDeduplication -jar /usr/local/app.jar"]
+    depends_on:
+      - zhjx-nacos
+      - zhjx-redis
 
 networks:
   {{ EDOPS_NETWORK_NAME }}:
     external: true
+{% endif %}
+

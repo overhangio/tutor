@@ -1,0 +1,192 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        ip: ${spring.application.name}
+        port: 50011
+  application:
+    name: ly-ac-rtc-svc
+  #########################################################################################
+  ################################### DataSource Config ####################################
+  #########################################################################################
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://{{ EDOPS_MYSQL_HOST }}:{{ EDOPS_MYSQL_PORT }}/ly_ac_rtc_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: {{ EDOPS_MYSQL_ROOT_USER }}
+    password: {{ EDOPS_MYSQL_ROOT_PASSWORD }}
+
+############################################################################################
+##################################### rtc音视频配置  ########################################
+############################################################################################
+rtc-config:
+  source: {{ EDOPS_RTC_SOURCE }}
+  endPoint: {{ EDOPS_RTC_END_POINT }}
+  secretId: {{ EDOPS_RTC_SECRET_ID }}
+  secretKey: {{ EDOPS_RTC_SECRET_KEY }}
+  callbackKey: {{ EDOPS_RTC_CALLBACK_KEY }}
+  joinUrl: {{ EDOPS_RTC_JOIN_URL }}
+  usingSources: {{ EDOPS_RTC_USING_SOURCES }}
+
+############################################################################################
+################################## 腾讯会议高版本直播 ########################################
+############################################################################################
+# 腾讯会议高版本直播
+lcic:
+  # 应用id
+  sdkAppId: {{ EDOPS_LCIC_SDK_APP_ID }}
+  # http录播
+  classroomLiveUrl: {{ EDOPS_LCIC_CLASSROOM_LIVE_URL }}
+  # rtmp录播
+  rtmpClassroomLiveUrl: {{ EDOPS_LCIC_RTMP_CLASSROOM_LIVE_URL }}
+  # 开启录制屏幕分享流id
+  openScreenSharingStreamId: {{ EDOPS_LCIC_OPEN_SCREEN_SHARING_STREAM_ID }}
+  # 关闭录制屏幕分享流id
+  closeScreenSharingStreamId: {{ EDOPS_LCIC_CLOSE_SCREEN_SHARING_STREAM_ID }}
+  # 开启录播https后缀
+  enableRecordingHttpsSuffix: {{ EDOPS_LCIC_ENABLE_RECORDING_HTTPS_SUFFIX }}
+  # 开启录播rtmp后缀
+  enableRecordingRtmpSuffix: {{ EDOPS_LCIC_ENABLE_RECORDING_RTMP_SUFFIX }}
+  # 关闭录播https后缀
+  closeRecordingHttpsSuffix: {{ EDOPS_LCIC_CLOSE_RECORDING_HTTPS_SUFFIX }}
+  # 关闭录播rtmp后缀
+  closeRecordingRtmpSuffix: {{ EDOPS_LCIC_CLOSE_RECORDING_RTMP_SUFFIX }}
+
+  browser-url:
+    env: {{ EDOPS_LCIC_BROWSER_ENV }}
+    version: {{ EDOPS_LCIC_BROWSER_VERSION }}
+    domainName: {{ EDOPS_LCIC_BROWSER_DOMAIN_NAME }}
+    scene: {{ EDOPS_LCIC_BROWSER_SCENE }}
+  pc-url:
+    env: {{ EDOPS_LCIC_PC_ENV }}
+    version: {{ EDOPS_LCIC_PC_VERSION }}
+    domainName: {{ EDOPS_LCIC_PC_DOMAIN_NAME }}
+  room:
+    # 分辨率。可以有如下取值：1 标清 2 高清 3 全高清
+    resolution: {{ EDOPS_LCIC_RESOLUTION }}
+    # 最大连麦人数（不包括老师）。取值范围[0, 16]   当前值大于6就会将分辨率设置为1
+    maxMicNumber: {{ EDOPS_LCIC_MAX_MIC_NUMBER }}
+    # 房间子类型 videodoc 文档+视频  video 纯视频  coteaching 双师
+    subType: {{ EDOPS_LCIC_SUB_TYPE }}
+    # 进入房间时是否自动连麦 0 不自动连麦（默认值） 1 自动连麦
+    autoMic: {{ EDOPS_LCIC_AUTO_MIC }}
+    # 高音质模式。 0 不开启高音质（默认值）  1 开启高音质
+    audioQuality: {{ EDOPS_LCIC_AUDIO_QUALITY }}
+    # 禁止录制 0 不禁止录制（默认值） 1 禁止录制
+    disableRecord: {{ EDOPS_LCIC_DISABLE_RECORD }}
+    # 录制布局
+    recordLayout: {{ EDOPS_LCIC_RECORD_LAYOUT }}
+
+############################################################################################
+####################################### 觅听配置 ############################################
+############################################################################################
+meeting:
+  hosts:
+    domain: {{ EDOPS_MEETING_DOMAIN }}
+    muc: {{ EDOPS_MEETING_MUC }}
+  bosh: {{ EDOPS_MEETING_BOSH }}
+
+############################################################################################
+################################# 腾讯云媒体处理能力配置 #####################################
+############################################################################################
+media:
+  isEnable: {{ EDOPS_MEDIA_IS_ENABLE }}
+  secretId: {{ EDOPS_MEDIA_SECRET_ID }}
+  secretKey: {{ EDOPS_MEDIA_SECRET_KEY }}
+  endpoint: {{ EDOPS_MEDIA_END_POINT }}
+  reviewTemplateId: {{ EDOPS_MEDIA_REVIEW_TEMPLATE_ID }}
+  recognitionTemplateId: {{ EDOPS_MEDIA_RECOGNITION_TEMPLATE_ID }}
+  callback:
+    url: {{ EDOPS_MEDIA_CALLBACK_URL }}
+
+############################################################################################
+#################################### 流媒体服务器配置 ########################################
+############################################################################################
+ly:
+  stream:
+    zlm:
+      enabled: {{ EDOPS_ZLMEDIAKIT_ENABLED }}
+      secret: {{ EDOPS_ZLM_SECRET }}
+      host: {{ EDOPS_ZLM_ADDRESS }}
+
+# 流媒体业务配置
+streams-config:
+  secret: {{ EDOPS_ZLM_SECRET }}
+  # 第三方主动推流配置
+  other:
+    streamingProtocol: rtmp
+    appName: channels
+  # 桌面推流插件配置
+  windows:
+    streamingProtocol: rtsp
+    appName: computerDesktops
+  # 班牌推流配置
+  classcard:
+    streamingProtocol: rtmp
+    appName: classCard
+  # 点播参数配置
+  # http播放协议，协议头
+  playbackProtocol: {{ EDOPS_ZLM_PLAY_PROTOCOL }}
+  # http协议ip或域名
+  ip: {{ EDOPS_ZLM_PLAY_HOST }}
+  # http协议端口
+  playbackPort: {{ EDOPS_ZLM_HTTP_PORT }}
+  vhost: __defaultVhost__
+  # rtsp推流域名和端口
+  rtsp:
+    schema: rtsp
+    domain: {{ EDOPS_ZLM_PLAY_HOST }}
+    port: {{ EDOPS_ZLM_RTSP_PORT }}
+  # rtmp推流域名和端口
+  rtmp:
+    schema: rtmp
+    domain: {{ EDOPS_ZLM_PLAY_HOST }}
+    port: {{ EDOPS_ZLM_RTMP_PORT }}
+
+
+#############################################################################
+############################## 视频回放存储配置 ###############################
+#############################################################################
+streams-storage-config:
+  #流媒体域名，有域名填域名(有域名的情况下一般写 域名/zlapi 例如：https://stu.118class.com/zlapi)，没有域名填ip
+  streams-endpoint: {{ EDOPS_ZLM_STREAMS_ENDPOINT }}
+  #流媒体服务ip
+  streams-ip: {{ EDOPS_ZLM_ADDRESS }}
+  #流媒体存储桶
+  video-bucket-name: {{ EDOPS_VIDEO_BUCKET_NAME }}
+  #流媒体迁移数据量
+  video-migrate-num: {{ EDOPS_VIDEO_MIGRATE_NUM }}
+
+  #以下参数为控制程序执行策略
+  download-mode: {{ EDOPS_VIDEO_DOWNLOAD_MODE }}
+  upload-mode: {{ EDOPS_VIDEO_UPLOAD_MODE }}
+  program-mode: {{ EDOPS_VIDEO_PROGRAM_MODE }}
+  delete-mode: {{ EDOPS_VIDEO_DELETE_MODE }}
+  delete-enabled: {{ EDOPS_VIDEO_DELETE_ENABLED }}
+  minio-storage: {{ EDOPS_VIDEO_MINIO_STORAGE }}
+  storage-view: {{ EDOPS_VIDEO_STORAGE_VIEW }}
+  hook-upload-mode: {{ EDOPS_VIDEO_HOOK_UPLOAD_MODE }}
+  record-compensate: {{ EDOPS_VIDEO_RECORD_COMPENSATE }}
+  compensate-execute: {{ EDOPS_VIDEO_COMPENSATE_EXECUTE }}
+  is-judgment: {{ EDOPS_VIDEO_IS_JUDGMENT }}
+  #以上参数为控制程序执行策略
+
+  #流媒体录制视频源站地址索引
+  root-path: {{ EDOPS_VIDEO_ROOT_PATH }}
+  #租户ID
+  school-id: {{ EDOPS_TENANT_SCHOOL_ID }}
+  upload-date:
+  enableFilter: false
+  storageService: https://cdn.files.118class.com
+###########################################################################################################
+################################################### 录制配置 ################################################
+###########################################################################################################
+recording:
+  media-api-domain: https://zlm.live.118class.com/mediaclip
+  media-callback-url: https://cloud.118class.com/api/ac-rtc/media/hook/recording/finish
+  media-video-process-callback-url: https://cloud.118class.com/api/ac-rtc/media/hook/process/finish
+  api-key: {{ EDOPS_ZLM_SECRET }}
+################################################音频转换流地址##########################################
+audio:
+  video-url: https://zlm.live.118class.com/mediaclip
+

@@ -1,0 +1,36 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        ip: ${spring.application.name}
+        port: 50002
+  application:
+    name: ly-ac-basic-data-svc
+  ####################################################################################
+  ###################################DataSource Config################################
+  ####################################################################################
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://{{ EDOPS_MYSQL_HOST }}:{{ EDOPS_MYSQL_PORT }}/ly_ac_basic_data_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: {{ EDOPS_MYSQL_ROOT_USER }}
+    password: {{ EDOPS_MYSQL_ROOT_PASSWORD }}
+
+#######################################################################################
+##################################### 数据库同步 #######################################
+#######################################################################################
+ly:
+  tenant:
+    tenant-mode: true
+    column: XXM
+    exclude-tables:
+      - ly_jx_xtgl_xxxxb
+
+wx:
+  cp:
+    corpId: {{ EDOPS_BASIC_WXCP_CORP_ID }}
+    corpSecret: {{ EDOPS_BASIC_WXCP_CORP_SECRET }}
+    token: {{ EDOPS_BASIC_WXCP_TOKEN }}
+    aesKey: {{ EDOPS_BASIC_WXCP_AES_KEY }}
+    agentId: {{ EDOPS_BASIC_WXCP_AGENT_ID }}
+

@@ -50,7 +50,7 @@ class LocalContext(compose.BaseComposeContext):
         return LocalTaskRunner(self.root, config)
 
 
-@click.group(help="Run Open edX locally with docker-compose")
+@click.group(help="使用 docker-compose 在本地运行 EdOps 平台")
 @click.pass_context
 def local(context: click.Context) -> None:
     context.obj = LocalContext(context.obj.root)

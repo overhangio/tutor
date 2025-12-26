@@ -1,0 +1,126 @@
+spring:
+  application:
+    name: ly-ac-user-svc
+  cloud:
+    nacos:
+      discovery:
+        ip: ${spring.application.name}
+        port: 50001
+  ####################################################################################
+  ###################################DataSource Config################################
+  ####################################################################################
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://{{ EDOPS_MYSQL_HOST }}:{{ EDOPS_MYSQL_PORT }}/ly_ac_user_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: {{ EDOPS_MYSQL_ROOT_USER }}
+    password: {{ EDOPS_MYSQL_ROOT_PASSWORD }}
+  ############################################ kafka ###########################################
+  kafka:
+    bootstrap-servers: {{ EDOPS_KAFKA_HOST }}:{{ EDOPS_KAFKA_PORT }} #这个是你server.properties中配置的
+    producer: # 生产者配置
+      retries: 3 # 客户端发送服务端失败的重试次数，设置大于0的值，则客户端会将发送失败的记录重新发送
+      #多个记录被发送到同一个分区时,生产者将尝试将记录一起批处理成更少的请求.
+      #此设置有助于提高客户端和服务器的性能,配置控制默认批量大小(以字节为单位)
+      batch-size: 16384 #16K
+      #生产者可用于缓冲等待发送到服务器的记录的总内存字节数(以字节为单位)
+      buffer-memory: 33554432 #32M
+      acks: -1
+      # 指定消息key和消息体的编解码方式
+      # 序列化key的类
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 反序列化value的类
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      enable-auto-commit: false # 关闭自动提交，如果为true，则消费者的偏移量将在后台定期提交，默认值为true
+      max-poll-records: 10000 #一次调用poll返回的最大记录条数，批量消费每次最多消费多少条消息
+      #client-id: kafka.consumer.client.id #ID在发出请求时传递给服务器;用于服务器端日志记录。不设置时，系统会自动生成
+      fetch-max-wait: 450 #请求阻塞的最大等待时间(毫秒)
+      auto-offset-reset: earliest
+      # 反序列化key的类
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 反序列化value的类
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        session:
+          timeout:
+            # session超时，超过这个时间consumer没有发送心跳,就会触发rebalance操作
+            ms: 120000
+        request:
+          timeout:
+            # 请求超时
+            ms: 120000
+        spring:
+          json:
+            #            type:
+            #              mapping: cat:com.mycat.Cat,hat:com.myhat.Hat
+            trusted:
+              packages: '*'
+    listener: #侦听器的AckMode,当enable.auto.commit的值设置为false时，该值会生效；为true时不会生效
+      ack-mode: manual_immediate
+      concurrency: 3
+      type: batch
+
+##############################################################################################
+################################# sms短信配置-腾讯云（不可更改）##################################
+##############################################################################################
+sms:
+  enabled: {{ EDOPS_SMS_ENABLED }}
+  name: {{ EDOPS_SMS_NAME }}
+  templateId: {{ EDOPS_SMS_TEMPLATE_ID }}
+  accessKey: {{ EDOPS_SMS_ACCESS_KEY }}
+  secretKey: {{ EDOPS_SMS_SECRET_KEY }}
+  signName: {{ EDOPS_SMS_SIGN_NAME }}
+
+# 腾讯天御验证码防刷
+captcha:
+  enabled: {{ EDOPS_CAPTCHA_ENABLED }}
+  name: {{ EDOPS_CAPTCHA_NAME }}
+  appId: {{ EDOPS_CAPTCHA_APP_ID }}
+  accessKey: {{ EDOPS_CAPTCHA_ACCESS_KEY }}
+  secretKey: {{ EDOPS_CAPTCHA_SECRET_KEY }}
+  captchaAppId: {{ EDOPS_CAPTCHA_TENCENT_APP_ID }}
+  captchaSecretKey: {{ EDOPS_CAPTCHA_TENCENT_SECRET_KEY }}
+  captchaType: {{ EDOPS_CAPTCHA_TYPE }}
+# 邮件配置
+ses:
+  enabled: {{ EDOPS_SES_ENABLED }}
+  name: {{ EDOPS_SES_NAME }}
+  endPoint: {{ EDOPS_SES_END_POINT }}
+  secretId: {{ EDOPS_SES_SECRET_ID }}
+  secretKey: {{ EDOPS_SES_SECRET_KEY }}
+  # 发信邮件地址
+  fromEmailAddress: {{ EDOPS_SES_FROM_EMAIL_ADDRESS }}
+  template-info-map:
+    captcha:
+      is-enable: {{ EDOPS_SES_CAPTCHA_IS_ENABLE }}
+      template-id: {{ EDOPS_SES_CAPTCHA_TEMPLATE_ID }}
+      template-data: {{ EDOPS_SES_CAPTCHA_TEMPLATE_DATA }}
+      subject: {{ EDOPS_SES_CAPTCHA_SUBJECT }}
+
+ly:
+  tenant:
+    tenant-mode: true
+    exclude-tables:
+      - ly_jx_yh_yhxxb
+      - ly_jx_yh_yhkzb
+      - ly_jx_yh_yhzdpzb
+      - ly_jx_yh_yhczjlb
+    
+########################################### 数据同步配置 #############################################
+edu:
+  sync:
+    push:
+      callback:
+        user:
+          topic: buss-service-publish-topic-user
+      consume:
+        user:
+          topic: data-sync-publish-topic-user
+          groupId: ly-ac-data-sync-svc-user-consume
+
+sun:
+  secret: 1dstw8
+  aeskey: sysuksulNB/cuj+8UdDINkXj9Kabb6e2AjIXyevSXWs=
+  issueId: 111111
+

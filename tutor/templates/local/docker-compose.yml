@@ -6,16 +6,20 @@ services:
     restart: on-failure
     entrypoint: []
     command: ["sh", "/usr/local/bin/setowners.sh"]
+    {% if RUN_OPENEDX -%}
     environment:
       OPENEDX_USER_ID: "1000"
+    {%- endif %}
     volumes:
       # Command script
       - ../apps/permissions/setowners.sh:/usr/local/bin/setowners.sh:ro
       # Bind-mounted volumes to set ownership
+      {% if RUN_OPENEDX -%}
       - ../../data/lms:/mounts/lms
       - ../../data/cms:/mounts/cms
       - ../../data/openedx-media:/mounts/openedx
       - ../../data/openedx-media-private:/mounts/openedx-private
+      {%- endif %}
       {% if RUN_MONGODB %}- ../../data/mongodb:/mounts/mongodb{% endif %}
       {% if RUN_MYSQL %}- ../../data/mysql:/mounts/mysql{% endif %}
       {% if RUN_MEILISEARCH %}- ../../data/meilisearch:/mounts/meilisearch{% endif %}
@@ -92,6 +96,7 @@ services:
 
   ############# LMS and CMS
 
+  {% if RUN_OPENEDX -%}
   lms:
     image: {{ DOCKER_IMAGE_OPENEDX }}
     environment:
@@ -146,5 +151,6 @@ services:
       {% if RUN_REDIS %}- redis{% endif %}
       {% if RUN_SMTP %}- smtp{% endif %}
       {{ patch("local-docker-compose-cms-dependencies")|indent(6) }}
+  {%- endif %}
 
   {{ patch("local-docker-compose-services")|indent(2) }}
