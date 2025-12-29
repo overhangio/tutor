@@ -1,0 +1,10 @@
+--interface wsgi
+--host 0.0.0.0
+--port 8000
+--workers $GRANIAN_WORKERS
+--static-path-route /static
+--static-path-mount /openedx/staticfiles/
+--reload
+--reload-paths /openedx/granian-reload-path
+--http1-buffer-size 8192
+$SERVICE_VARIANT.wsgi:application
