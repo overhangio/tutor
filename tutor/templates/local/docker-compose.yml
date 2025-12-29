@@ -97,13 +97,13 @@ services:
     environment:
       SERVICE_VARIANT: lms
       DJANGO_SETTINGS_MODULE: lms.envs.tutor.production
-      UWSGI_WORKERS: {{ OPENEDX_LMS_UWSGI_WORKERS }}
+      GRANIAN_WORKERS: {{ OPENEDX_LMS_GRANIAN_WORKERS }}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
       - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
       - ../apps/openedx/config:/openedx/config:ro
-      - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:ro
+      - ../apps/openedx/granian-config:/openedx/granian-config:ro
       - ../../data/lms:/openedx/data
       - ../../data/openedx-media:/openedx/media
       - ../../data/openedx-media-private:/openedx/media-private
@@ -124,13 +124,13 @@ services:
     environment:
       SERVICE_VARIANT: cms
       DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
-      UWSGI_WORKERS: {{ OPENEDX_CMS_UWSGI_WORKERS }}
+      GRANIAN_WORKERS: {{ OPENEDX_CMS_GRANIAN_WORKERS }}
     restart: unless-stopped
     volumes:
       - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
       - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
       - ../apps/openedx/config:/openedx/config:ro
-      - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:ro
+      - ../apps/openedx/granian-config:/openedx/granian-config:ro
       - ../../data/cms:/openedx/data
       - ../../data/openedx-media:/openedx/media
       - ../../data/openedx-media-private:/openedx/media-private
