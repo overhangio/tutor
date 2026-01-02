@@ -11,7 +11,7 @@ Quite often, there is already a web proxy running on the host, and this web prox
 
 With these changes, Tutor will no longer listen to ports 80 and 443 on the host. In this configuration, the Caddy container will only listen to port 81 on the host. Web requests will follow this path::
 
-    Client → Web proxy (http(s)://yourhost) → Caddy (0.0.0.0:81) → uwsgi (LMS/CMS/...)
+    Client → Web proxy (http(s)://yourhost) → Caddy (0.0.0.0:81) → Granian (LMS/CMS/...)
 
 .. warning::
     In this setup, the Caddy HTTP port (81) will be exposed to the world. Make sure to configure your server firewall to block unwanted connections to the Caddy container. Alternatively, you can configure the Caddy container to accept only local connections::

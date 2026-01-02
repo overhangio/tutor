@@ -390,13 +390,13 @@ File: ``apps/redis/redis.conf``
 
 Implement this patch to override hard-coded Redis configuration values. See the `Redis configuration reference <https://redis.io/docs/management/config-file/>`__`.
 
-``uwsgi-config``
+``granian-config``
 ================
 
-File: ``apps/openedx/settings/uwsgi.ini``
+File: ``apps/openedx/settings/granian-config``
 
-A .INI formatted file used to extend or override the uWSGI configuration.
+A file used to extend or override the Granian configuration.
 
-Check the uWSGI documentation for more details about the `.INI format <https://uwsgi-docs.readthedocs.io/en/latest/Configuration.html#ini-files>`__ and the `list of available options <https://uwsgi-docs.readthedocs.io/en/latest/Options.html>`__.
+Check the Granian documentation for the `list of available options <https://github.com/emmett-framework/granian>`__.
 
-.. patch:: uwsgi-config
+.. patch:: granian-config
