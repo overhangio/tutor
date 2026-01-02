@@ -142,7 +142,7 @@ def _mount_python_requirements_build(
     for image_name, regex in hooks.Filters.MOUNTED_DIRECTORIES.iterate():
         if re.match(regex, name):
             volumes.append((image_name, f"mnt-{name}"))
-    return volumes
+    return list(set(volumes))
 
 
 @hooks.Filters.COMPOSE_MOUNTS.add()
@@ -156,7 +156,7 @@ def _mount_edx_platform_python_requirements_compose(
         if re.match(regex, folder_name):
             # Bind-mount requirement
             volumes.append((image_name, f"/mnt/{folder_name}"))
-    return volumes
+    return list(set(volumes))
 
 
 def iter_mounted_directories(mounts: list[str], image_name: str) -> t.Iterator[str]:
