@@ -321,6 +321,33 @@ This configuration parameter sets the Contact Email.
 
 This configuration parameter sets the Platform Name.
 
+SITE_ID and email branding
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We do **not** override ``SITE_ID`` during initial Tutor setup.
+
+Leaving ``SITE_ID`` unset allows Django to create sites correctly:
+
+- ``example.com`` → ``id = 1``
+- LMS site → ``id = 2``
+
+Overriding ``SITE_ID`` too early may result in the LMS site using ``id = 3`` and
+``example.com`` using ``id = 2``.
+
+When to set SITE_ID
+*******************
+
+For features that rely on site context (for example bulk emails or other
+personalized emails), explicitly set::
+
+    SITE_ID = 2
+
+Add this setting in the ``openedx-common-settings`` patch::
+
+    patches:
+      openedx-common-settings: |
+        SITE_ID = 2
+
 Custom Open edX docker image
 ----------------------------
 
