@@ -19,7 +19,7 @@ DOCKER_IMAGE_CADDY: "docker.io/caddy:2.7.4"
 # https://hub.docker.com/r/getmeili/meilisearch/tags
 DOCKER_IMAGE_MEILISEARCH: "docker.io/getmeili/meilisearch:v1.8.4"
 # https://hub.docker.com/_/mongo/tags
-DOCKER_IMAGE_MONGODB: "docker.io/mongo:7.0.7"
+DOCKER_IMAGE_MONGODB: "docker.io/mongo:7.0.28"
 # https://hub.docker.com/_/mysql/tags
 DOCKER_IMAGE_MYSQL: "docker.io/mysql:8.4.0"
 DOCKER_IMAGE_PERMISSIONS: "{{ DOCKER_REGISTRY }}overhangio/openedx-permissions:{{ TUTOR_VERSION }}"

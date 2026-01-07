@@ -227,7 +227,7 @@ def upgrade_from_quince(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Quince"))
     upgrade_mongodb(context, config, "5.0.26", "5.0")
     upgrade_mongodb(context, config, "6.0.14", "6.0")
-    upgrade_mongodb(context, config, "7.0.7", "7.0")
+    upgrade_mongodb(context, config, "7.0.28", "7.0")
 
 
 def upgrade_mongodb(
