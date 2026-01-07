@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-20.0.5'></a>
+## v20.0.5 (2026-01-07)
+
+- [Bugfix] Fix duplicate volume mounts error caused by same repo/package name(e.g. openedx-scorm-xblock) matching multiple expressions(("openedx", r".*[xX][bB]lock.*"), ("openedx", r"openedx-.*")) in MOUNTED_DIRECTORIES. (by @Faraz32123)
+
+- [BugFix] Update MongoDB to v7.0.28, resolving a critical upstream security issue https://jira.mongodb.org/browse/SERVER-115508. (by @Faraz32123)
+
 <a id='changelog-20.0.4'></a>
 ## v20.0.4 (2025-12-22)
 
