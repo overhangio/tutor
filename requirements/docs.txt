@@ -156,7 +156,7 @@ typing-extensions==4.15.0
     # via
     #   -r base.txt
     #   mypy
-urllib3==2.6.0
+urllib3==2.6.3
     # via
     #   -r base.txt
     #   kubernetes
