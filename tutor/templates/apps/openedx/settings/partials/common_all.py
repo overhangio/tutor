@@ -246,5 +246,11 @@ OPENEDX_LEARNING = {
     }
 }
 
+# edx-event-bus-redis settings
+EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
+EVENT_BUS_REDIS_CONNECTION_URL = 'redis://@redis:6379/'
+EVENT_BUS_TOPIC_PREFIX = 'dev'
+EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
+
 {{ patch("openedx-common-settings") }}
 ######## End of settings common to LMS and CMS
