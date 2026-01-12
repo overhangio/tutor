@@ -1,0 +1,2 @@
+{% include "build/openedx/settings/granian-config" %}
+{{ patch("granian-config") }}

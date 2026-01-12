@@ -51,9 +51,9 @@ configMapGenerator:
   options:
     labels:
         app.kubernetes.io/name: openedx
-- name: openedx-uwsgi-config
+- name: openedx-granian-config
   files:
-  - apps/openedx/uwsgi.ini
+  - apps/openedx/granian-config
   options:
     labels:
         app.kubernetes.io/name: openedx
