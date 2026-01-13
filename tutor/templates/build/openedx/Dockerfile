@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Install pyenv
 # https://www.python.org/downloads/
 # https://github.com/pyenv/pyenv/releases
-ARG PYTHON_VERSION=3.11.8
+ARG PYTHON_VERSION=3.12.12
 ENV PYENV_ROOT=/opt/pyenv
 RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.36 --depth 1
 
@@ -139,7 +139,7 @@ ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
 RUN $PIP_COMMAND install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=20.19.5 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=24.12.0 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
