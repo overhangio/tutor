@@ -10,6 +10,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt update && \
     apt install -y build-essential curl git language-pack-en
 ENV LC_ALL=en_US.UTF-8
+
+COPY --from=ghcr.io/astral-sh/uv:0.9.18 /uv /usr/local/bin/uv
+ARG PIP_COMMAND="uv pip"
+
 {{ patch("openedx-dockerfile-minimal") }}
 
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
@@ -25,7 +29,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Install pyenv
 # https://www.python.org/downloads/
 # https://github.com/pyenv/pyenv/releases
-ARG PYTHON_VERSION=3.11.8
+ARG PYTHON_VERSION=3.12.12
 ENV PYENV_ROOT=/opt/pyenv
 RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.36 --depth 1
 
@@ -54,10 +58,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patches in Main node
 {%- else %}
 # Patches in non-Main mode (i.e., Release mode)
-# Security patch for "CourseLimitedStaffRole should not be able to access studio."
-# https://github.com/openedx/edx-platform/security/advisories/GHSA-rh64-vc2h-7wfj
-# https://discuss.openedx.org/t/security-upcoming-security-release-for-edx-platform-on-2025-12-16/17787
-RUN curl -fsSL https://github.com/openedx/edx-platform/commit/ea63816f91f5b7b1caf6b6d8f6aa6c45d346e80f.patch | git am
 {%- endif %}
 
 {# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
@@ -79,6 +79,7 @@ FROM python AS python-requirements
 ENV PATH=/openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV=/openedx/venv/
 ENV XDG_CACHE_HOME=/openedx/.cache
+ENV UV_CACHE_DIR=$XDG_CACHE_HOME/pip
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -90,7 +91,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # Install the right version of pip/setuptools
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install \
+    $PIP_COMMAND install \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
@@ -100,11 +101,11 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
     --mount=type=bind,from=edx-platform,source=/requirements/edx/assets.txt,target=/openedx/edx-platform/requirements/edx/assets.txt \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
+    $PIP_COMMAND install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install \
+    $PIP_COMMAND install \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.4.0
 
@@ -114,26 +115,27 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 # https://github.com/xmlsec/python-xmlsec/issues/320
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     UWSGI_PROFILE_OVERRIDE="xml=no" \
-    pip install --no-cache-dir --compile uwsgi==2.0.24
+    $PIP_COMMAND install --no-cache-dir --compile uwsgi==2.0.24
 
 # Install scorm xblock
-RUN pip install "openedx-scorm-xblock>=19.0.0,<20.0.0"
+RUN $PIP_COMMAND install "openedx-scorm-xblock>=19.0.0,<20.0.0"
 
 {{ patch("openedx-dockerfile-post-python-requirements") }}
 
 {% for extra_requirements in OPENEDX_EXTRA_PIP_REQUIREMENTS %}
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install '{{ extra_requirements }}'
+    $PIP_COMMAND install '{{ extra_requirements }}'
 {% endfor %}
 
 ###### Install nodejs with nodeenv in /openedx/nodeenv
 FROM python AS nodejs-requirements
+ENV VIRTUAL_ENV=/openedx/venv/
 ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
-RUN pip install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=20.19.5 --prebuilt
+RUN $PIP_COMMAND install nodeenv==1.9.1
+RUN nodeenv /openedx/nodeenv --node=24.12.0 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
@@ -189,12 +191,12 @@ WORKDIR /openedx/edx-platform
 {# Install auto-mounted directories as Python packages. #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=mnt-{{ name }} / /mnt/{{ name }}
-RUN pip install -e "/mnt/{{ name }}"
+RUN $PIP_COMMAND install -e "/mnt/{{ name }}"
 {% endfor %}
 
 # We install edx-platform here because it creates an egg-info folder in the current
 # repo. We need both the source code and the virtualenv to run this command.
-RUN pip install -e .
+RUN $PIP_COMMAND install -e .
 
 # Create folder that will store lms/cms.env.yml files, as well as
 # the tutor-specific settings files.
@@ -275,16 +277,16 @@ USER app
 
 # Install dev python requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install -r requirements/edx/development.txt
+    $PIP_COMMAND install -r requirements/edx/development.txt
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install ipdb==0.13.13 ipython==8.24.0
+    $PIP_COMMAND install ipdb==0.13.13 ipython==8.24.0
 
 {# Re-install mounted requirements, otherwise they will be superseded by upstream reqs #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=mnt-{{ name }} / /mnt/{{ name }}
-RUN pip install -e "/mnt/{{ name }}"
+RUN $PIP_COMMAND install -e "/mnt/{{ name }}"
 {% endfor %}
 
 # Add ipdb as default PYTHONBREAKPOINT

@@ -20,3 +20,12 @@ fi
 ./manage.py cms reindex_studio --experimental --init
 # Create the courseware content index
 ./manage.py cms reindex_course --active
+
+# Load default policies for the Open edX Authorization framework
+# Check if openedx-authz package is installed if not skip loading policies and exit
+if python -c "import pkg_resources; pkg_resources.require('openedx-authz')" 2>/dev/null; then
+    ./manage.py cms load_policies
+else
+    echo "openedx-authz package is not installed, skipping loading default policies"
+    exit 1
+fi

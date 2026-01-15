@@ -20,6 +20,39 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.0'></a>
+## v21.0.0 (2026-01-07)
+
+- [Improvement] Use [`uv`](https://github.com/astral-sh/uv) as a replacement for
+  pip for installing and resolving packages. uv provides a faster package
+  resolution and installation steps, reducing the python-requirements layer
+  build time by about ~2-5x.
+
+  For the most part uv is a drop-in replacement for main pip functionality with
+  the exception of VCS editable requirements. The main use of VCS editable
+  requirements is to copy all the files in the VCS repository when installing
+  the package. This can be avoided by making proper use of a `MANIFEST.in` file.
+  It's possible to also use the `PIP_COMMAND=pip` build argument to keep using
+  pip.
+
+- 💥[Deprecation] Remove preview page configuration as the page has been migrated to the learning MFE. (by @Danyal-Faheem)
+
+💥[Deprecation] Remove deprecated WebUI plugin in favor of Tutor Deck. (by @Abdul-Muqadim-Arbisoft)
+
+💥[Feature] Upgrade to Ulmo. (by @ahmed-arb)
+
+- [Feature] Add authorization policy loading functionality to LMS/CMS services. (by @mariajgrimaldi)
+
+- 💥[Improvement] Replacing "patchesStrategicMerge" key with "patches" key in the main Kustomization file (by @jfavellar90). [patchesStrategicMerge](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patchesstrategicmerge/) was deprecated in the release v5.0.0 of the Kustomization API. It is replaced by the [patches](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/) key which is more powerful and allows defining different patch types. This has the following consequences:
+    - The patch "kustomization-patches-strategic-merge" was renamed to "kustomization-patches"
+    - Extra Kustomization patches added via the "kustomization-patches" Tutor patch must respect the format specified [here](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/). It implies moving old "patchesStrategicMerge" extra patches to the "patches" format.
+
+- [Feature] Add tutor livedeps to the list of plugins available by default. (by @mlabeeb03)
+
+- [Bugfix] Add correct EVENT_BUS_REDIS_CONNECTION_URL settings for event-bus. (by @Faraz32123)
+
+- [Bugfix] The version of Python and Node.js were behind what edx-platform currently supports so update both. Python is now 3.12 and Node.js is now 24.
+
 <a id='changelog-20.0.5'></a>
 ## v20.0.5 (2026-01-07)
 
