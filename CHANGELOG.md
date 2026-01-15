@@ -49,6 +49,10 @@ instructions, because git commits are used to generate release notes:
 
 - [Feature] Add tutor livedeps to the list of plugins available by default. (by @mlabeeb03)
 
+- [Bugfix] Add correct EVENT_BUS_REDIS_CONNECTION_URL settings for event-bus. (by @Faraz32123)
+
+- [Bugfix] The version of Python and Node.js were behind what edx-platform currently supports so update both. Python is now 3.12 and Node.js is now 24.
+
 <a id='changelog-20.0.5'></a>
 ## v20.0.5 (2026-01-07)
 
