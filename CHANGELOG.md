@@ -51,7 +51,7 @@ instructions, because git commits are used to generate release notes:
 
 - [Bugfix] Add correct EVENT_BUS_REDIS_CONNECTION_URL settings for event-bus. (by @Faraz32123)
 
-- [Bugfix] The version of Python and Node.js were behind what edx-platform currently supports so update both. Python is now 3.12 and Node.js is now 24.
+- [Bugfix] Update Node.js to version 24. Python remains at 3.11 as upstream edx-platform does not fully support it yet.
 
 <a id='changelog-20.0.5'></a>
 ## v20.0.5 (2026-01-07)
