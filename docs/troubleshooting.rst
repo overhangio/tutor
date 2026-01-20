@@ -226,3 +226,20 @@ The handy :ref:`update-mysql-authentication-plugin <update_mysql_authentication_
 
     tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME)
     tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME)
+
+Emails sent without correct branding
+------------------------------------
+
+**Cause**
+
+When the platform cannot determine the site from the request, it falls back to
+``SITE_ID``. If ``SITE_ID`` points to ``example.com``, emails are sent without
+proper branding.
+
+**Fix**
+
+Ensure your LMS site uses ``id = 2`` and set::
+
+    SITE_ID = 2
+
+in the ``openedx-common-settings`` patch, then restart Tutor.
