@@ -80,7 +80,7 @@ def _mount_edx_platform_build(
     Automatically add an edx-platform repo from the host to the build context whenever
     it is added to the `MOUNTS` setting.
     """
-    if os.path.basename(path) == "edx-platform":
+    if os.path.basename(path) in ["edx-platform", "openedx-platform"]:
         volumes += [
             ("openedx", "edx-platform"),
             ("openedx-dev", "edx-platform"),
@@ -96,7 +96,7 @@ def _mount_edx_platform_compose(
     When mounting edx-platform with `tutor mounts add /path/to/edx-platform`,
     bind-mount the host repo in the lms/cms containers.
     """
-    if name == "edx-platform":
+    if name in ["edx-platform", "openedx-platform"]:
         path = "/openedx/edx-platform"
         volumes.append(("openedx", path))
     return volumes
@@ -109,7 +109,10 @@ hooks.Filters.MOUNTED_DIRECTORIES.add_items(
         ("openedx", "edx-enterprise"),
         ("openedx", "edx-ora2"),
         ("openedx", "edx-search"),
-        ("openedx", r"openedx-.*"),
+        (
+            "openedx",
+            r"openedx-(?!platform)(.*)",
+        ),  # any openedx-* repo except openedx-platform
         ("openedx", "opaque-keys"),
         ("openedx", r"platform-plugin-.*"),
     ]

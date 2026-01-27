@@ -1,0 +1,1 @@
+- [Feature] Add support for mounting `openedx-platform`, the which is new name of `edx-platform`. Mounting by the old name, `edx-platform`, will continue to work for now as well (by @kdmccormick).
