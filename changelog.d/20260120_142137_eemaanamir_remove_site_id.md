@@ -1,1 +1,1 @@
-- 💥[Bugfix] Stop early SITE_ID override and document correct email configuration (by @eemaanamir)
+- [Bugfix] Stop early SITE_ID override and document correct email configuration (by @eemaanamir)
