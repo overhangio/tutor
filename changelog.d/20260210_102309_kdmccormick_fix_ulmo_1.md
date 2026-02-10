@@ -1,0 +1,3 @@
+- [Bugfix] Upgrade edx-search to 4.4.0 to fix Catalog MFE (by @kdmccormick)
+- [Security] Upgrade Django from 5.2.7 to 5.2.11 (by @kdmccormick)
+- [Bugfix] Upgrade ora2 to address pkg\_resources build failure (by @kdmccormick)

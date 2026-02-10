@@ -58,9 +58,18 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patches in Main node
 {%- else %}
 # Patches in non-Main mode (i.e., Release mode)
+## Update edx-search to 4.4.0 to fix the Catalog MFE
+RUN curl -fsSL https://github.com/openedx/openedx-platform/commit/1db37f309f710fa54e2372b1a3ca6dbb9b05640f.patch | git am
+## Bump Django 5.2.7->5.2.11 for security fix
+RUN curl -fsSL https://github.com/openedx/openedx-platform/commit/5f95ef0ba14baf145652d93be33176c51f926c6e.patch | git am
+## Upgrade edx-ora2 to fix pkg_resources build error
+RUN curl -fsSL https://github.com/openedx/openedx-platform/commit/e05ed0afb1a291635a91efc8c1620d06858f65c6.patch | git am
 {%- endif %}
 
-{# Example: RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
+{# Add new patches like this: #}
+{# RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
+{# Include a comment on why the patch is neccessary. #}
+
 {{ patch("openedx-dockerfile-post-git-checkout") }}
 
 ##### Empty layer with just the repo at the root.
