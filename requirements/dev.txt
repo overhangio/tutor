@@ -39,7 +39,7 @@ click-log==0.4.0
     # via scriv
 coverage==7.10.7
     # via -r dev.in
-cryptography==46.0.3
+cryptography==46.0.5
     # via secretstorage
 docutils==0.22.2
     # via readme-renderer
