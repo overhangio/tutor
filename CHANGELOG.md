@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.1'></a>
+## v21.0.1 (2026-02-11)
+
+- [Feature] Add support for mounting `openedx-platform`, the which is new name of `edx-platform`. Mounting by the old name, `edx-platform`, will continue to work for now as well (by @kdmccormick).
+
+- [Bugfix] Upgrade edx-search to 4.4.0 to fix Catalog MFE (by @kdmccormick)
+- [Security] Upgrade Django from 5.2.7 to 5.2.11 (by @kdmccormick)
+- [Bugfix] Upgrade ora2 to address pkg\_resources build failure (by @kdmccormick)
+
 <a id='changelog-21.0.0'></a>
 ## v21.0.0 (2026-01-07)
 
