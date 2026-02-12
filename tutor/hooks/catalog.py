@@ -94,6 +94,16 @@ class Actions:
     #: :parameter kwargs: job named arguments.
     DO_JOB: Action[[str, Any]] = Action()
 
+    #: This action is called at the end of the tutor.env.save function after all
+    #: the changes to the environment have been applied, all obsolete config has
+    #: been upgraded.
+    #: Modifying the config object will not trigger changes in the configuration.
+    #: For all purposes, it should be considered read-only.
+    #:
+    #: :parameter str root: project root.
+    #: :parameter dict config: project configuration.
+    ENV_SAVED: Action[[str, Config]] = Action()
+
     #: Triggered when a single plugin needs to be loaded. Only plugins that have previously been
     #: discovered can be loaded (see :py:data:`CORE_READY`).
     #:
