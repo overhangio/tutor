@@ -44,7 +44,7 @@ packaging==25.0
     # via -r base.in
 pathspec==0.12.1
     # via mypy
-pyasn1==0.6.1
+pyasn1==0.6.2
     # via
     #   pyasn1-modules
     #   rsa
