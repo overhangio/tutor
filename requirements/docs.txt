@@ -81,7 +81,7 @@ pathspec==0.12.1
     # via
     #   -r base.txt
     #   mypy
-pyasn1==0.6.1
+pyasn1==0.6.2
     # via
     #   -r base.txt
     #   pyasn1-modules
