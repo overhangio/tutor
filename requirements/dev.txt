@@ -119,6 +119,7 @@ packaging==25.0
     #   pyinstaller
     #   pyinstaller-hooks-contrib
     #   twine
+    #   wheel
 pathspec==0.12.1
     # via
     #   -r base.txt
@@ -221,7 +222,7 @@ websocket-client==1.8.0
     # via
     #   -r base.txt
     #   kubernetes
-wheel==0.45.1
+wheel==0.46.2
     # via pip-tools
 zipp==3.23.0
     # via
