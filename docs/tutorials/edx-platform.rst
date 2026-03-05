@@ -152,7 +152,6 @@ Then, run unit tests with ``pytest`` commands::
 
     # Run tests on common apps
     unset DJANGO_SETTINGS_MODULE
-    unset SERVICE_VARIANT
     pytest common
     pytest openedx
     pytest xmodule
