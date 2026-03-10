@@ -430,13 +430,13 @@ A possible approach is:
 
    ::
 
-   msgid ""
-   msgstr ""
-   "Content-Type: text/plain; charset=utf-8\n"
-   "Content-Transfer-Encoding: 8bit\n"
+      msgid ""
+      msgstr ""
+      "Content-Type: text/plain; charset=utf-8\n"
+      "Content-Transfer-Encoding: 8bit\n"
 
-   msgid "Discover courses"
-   msgstr "Kurse suchen"
+      msgid "Discover courses"
+      msgstr "Kurse suchen"
 
 
   The header with charset specification is required. Without it, `msgfmt` compilation will fail for non-ASCII characters.
@@ -445,42 +445,42 @@ A possible approach is:
 
    ::
 
-   msgfmt django.po -o django.mo
+      msgfmt django.po -o django.mo
 
 3. Patch the Open edX Dockerfile (using a Tutor plugin) to copy the locale folder into the image:
 
    ::
 
-   hooks.Filters.ENV_PATCHES.add_item((
-   "openedx-dockerfile-pre-assets",
-   """
-   COPY --chown=app:app ./locale /openedx/extra_locale
-   """
-   ))
+      hooks.Filters.ENV_PATCHES.add_item((
+      "openedx-dockerfile-pre-assets",
+      """
+      COPY --chown=app:app ./locale /openedx/extra_locale
+      """
+      ))
 
 4. Register the additional locale path in both LMS and CMS:
 
    ::
 
-   hooks.Filters.ENV_PATCHES.add_item((
-   "lms-env",
-   """
-   LOCALE_PATHS: ["/openedx/extra_locale"]
-   """
-   ))
-   hooks.Filters.ENV_PATCHES.add_item((
-   "cms-env",
-   """
-   LOCALE_PATHS: ["/openedx/extra_locale"]
-   """
-   ))
+      hooks.Filters.ENV_PATCHES.add_item((
+      "lms-env",
+      """
+      LOCALE_PATHS: ["/openedx/extra_locale"]
+      """
+      ))
+      hooks.Filters.ENV_PATCHES.add_item((
+      "cms-env",
+      """
+      LOCALE_PATHS: ["/openedx/extra_locale"]
+      """
+      ))
 
 5. Rebuild and restart:
 
    ::
 
-   tutor images build openedx
-   tutor local reboot
+      tutor images build openedx
+      tutor local reboot
 
 This ensures Django loads your theme-specific overrides alongside Atlas-pulled translations.
 
