@@ -390,7 +390,7 @@ If you don't create your fork from this tag, you *will* have important compatibi
 .. _i18n:
 
 Getting and customizing Translations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 Tutor builds images with the latest translations using the ``atlas pull`` `command <https://github.com/openedx/openedx-atlas>`_.
 
@@ -413,6 +413,97 @@ Once you've applied your changes, you'll need to do the following:
 #. Run the command ``tutor images build mfe``
 
 #. Restart with ``tutor local restart``
+
+Overriding Theme Translations (e.g. Indigo)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Atlas-managed translations do not automatically include custom theme-level overrides.
+If you need to override strings coming specifically from a Tutor theme (for example, the Indigo theme), you must provide additional locale paths and patch the Open edX image.
+
+A possible approach is:
+
+1. Create a `django.po` file inside the theme repository:
+
+   `tutor-plugins/tutor-indigo/tutorindigo/locale/<lang>/LC_Messages/django.po`
+
+   Example:
+
+   ::
+
+      msgid ""
+      msgstr ""
+      "Content-Type: text/plain; charset=utf-8\n"
+      "Content-Transfer-Encoding: 8bit\n"
+
+      msgid "Discover courses"
+      msgstr "Kurse suchen"
+
+
+  The header with charset specification is required. Without it, `msgfmt` compilation will fail for non-ASCII characters.
+
+2. Compile the file using gettext:
+
+   ::
+
+      msgfmt django.po -o django.mo
+
+3. Patch the Open edX Dockerfile (using a Tutor plugin) to copy the locale folder into the image:
+
+   ::
+
+      hooks.Filters.ENV_PATCHES.add_item((
+      "openedx-dockerfile-pre-assets",
+      """
+      COPY --chown=app:app ./locale /openedx/extra_locale
+      """
+      ))
+
+4. Register the additional locale path in both LMS and CMS:
+
+   ::
+
+      hooks.Filters.ENV_PATCHES.add_item((
+      "lms-env",
+      """
+      LOCALE_PATHS: ["/openedx/extra_locale"]
+      """
+      ))
+      hooks.Filters.ENV_PATCHES.add_item((
+      "cms-env",
+      """
+      LOCALE_PATHS: ["/openedx/extra_locale"]
+      """
+      ))
+
+5. Rebuild and restart:
+
+   ::
+
+      tutor images build openedx
+      tutor local reboot
+
+This ensures Django loads your theme-specific overrides alongside Atlas-pulled translations.
+
+Handling Translations in Custom or Forked Repositories
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For more advanced setups involving multiple MFEs, plugins, themes, or forked repositories, a structured translation workflow may be required.
+
+For example, in a Teak-based Wikimedia deployment:
+
+- ``openedx-translations`` was forked.
+- Upstream translations were pulled using Atlas into a dedicated directory.
+- Wikimedia-specific translations were stored separately.
+- A merge process rebuilt the final translations directory on every workflow run.
+- ``ATLAS_REPOSITORY`` and ``ATLAS_REVISION`` were overridden to point to the fork.
+
+For the custom Indigo-based theme in that setup:
+
+- **Theme translations are merged into edx-platform translations.**
+- If a ``msgid`` exists in both upstream and theme files, the theme value overrides it (if non-empty).
+- No upstream files are modified directly.
+
+For more detailed examples of handling translations across custom repositories (platform, MFEs, plugins, themes), refer to the `Wikimedia openedx-translations fork <https://github.com/wikimedia/openedx-translations>`_ for a full example.
 
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
