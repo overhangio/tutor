@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.2'></a>
+## v21.0.2 (2026-03-13)
+
+- [Feature] Upgrade to Open edX Ulmo.2 (by @ahmed-arb)
+
 <a id='changelog-21.0.1'></a>
 ## v21.0.1 (2026-02-11)
 
