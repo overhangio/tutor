@@ -34,22 +34,22 @@ Tutor simplifies the deployment of Open edX by:
   :width: 500px
   :align: center
 
-Because Docker containers are becoming an industry-wide standard, that means that with Tutor it becomes possible to run Open edX anywhere: for now, Tutor supports deploying on a local server, with `docker-compose <https://docs.docker.com/compose/overview/>`_, and in a large cluster, with `Kubernetes <http://kubernetes.io/>`_. But in the future, Tutor may support other deployment platforms.
+Because Docker containers are becoming an industry-wide standard, that means that with Tutor it becomes possible to run Open edX anywhere: for now, Tutor supports deploying on a local server, with `docker compose <https://docs.docker.com/compose/overview/>`_, and in a large cluster, with `Kubernetes <http://kubernetes.io/>`_. But in the future, Tutor may support other deployment platforms.
 
 Where can I try Open edX and Tutor?
 -----------------------------------
 
-A demo Open edX platform is available at https://demo.openedx.overhang.io. This platform was deployed using Tutor and the `Indigo theme <https://github.com/overhangio/indigo>`__. Feel free to play around with the following credentials:
+A sandbox Open edX platform is available at https://sandbox.openedx.edly.io. This platform was deployed using Tutor and the `Indigo theme <https://github.com/overhangio/indigo>`__. Feel free to play around with the following credentials:
 
 * Admin user: username=admin email=admin@overhang.io password=admin
 * Student user: username=student email=student@overhang.io password=student
 
-The Android mobile application for this demo platform can be downloaded at this url: https://mobile.demo.openedx.overhang.io/app.apk
+The Android mobile application for this demo platform can be downloaded at this url: https://mobile.sandbox.openedx.edly.io/app.apk
 
 Urls:
 
-* LMS: https://demo.openedx.overhang.io
-* Studio (CMS): https://studio.demo.openedx.overhang.io
+* LMS: https://sandbox.openedx.edly.io
+* Studio (CMS): https://studio.sandbox.openedx.edly.io
 
 The platform is reset every day at 9:00 AM, `Paris (France) time <https://time.is/Paris>`__, so feel free to try and break things as much as you want.
 
