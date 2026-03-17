@@ -126,7 +126,7 @@ pathspec==0.12.1
     #   mypy
 pip-tools==7.5.0
     # via -r dev.in
-pyasn1==0.6.2
+pyasn1==0.6.3
     # via
     #   -r base.txt
     #   pyasn1-modules
