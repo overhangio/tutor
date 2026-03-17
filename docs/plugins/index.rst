@@ -27,10 +27,6 @@ Enable/disable a plugin::
     tutor plugins enable myplugin
     tutor plugins disable myplugin
 
-After enabling or disabling a plugin, the environment should be re-generated with::
-
-    tutor config save
-
 .. it'd be nice to use ref for the plugins cli link instead, see https://github.com/click-contrib/sphinx-click/issues/15
 
 The full plugins CLI is described in the `reference documentation <../reference/cli/tutor.html#tutor-plugins>`_.
@@ -45,13 +41,12 @@ Many plugins are available from plugin indexes. These indexes are lists of plugi
     tutor plugins update
     tutor plugins search
 
-More plugins can be downloaded from the "contrib" and "wizard" indexes::
+Many plugins are available from plugin indexes. These indexes are lists of plugins, similar to the `pypi <https://pypi.org>`__ or `npm <npmjs.com/>`__ indexes. By default, Tutor comes with the "main" and "contrib" plugin indexes. You can check available plugins from this index by running::
 
-    tutor plugins index add contrib
-    tutor plugins index add wizard
+    tutor plugins update
     tutor plugins search
 
-The "main", "contrib" and "wizard" indexes include a curated list of plugins that are well maintained and introduce useful features to Open edX. These indexes are maintained by `Overhang.IO <https://overhang.io>`__. For more information about these indexes, refer to the official `overhangio/tpi <https://github.com/overhangio/tpi>`__ repository.
+The "main" and "contrib" indexes include a curated list of plugins that are well maintained and introduce useful features to Open edX. These indexes are maintained by `Edly <https://edly.io>`__. For more information about these indexes, refer to the official `overhangio/tpi <https://github.com/overhangio/tpi>`__ repository.
 
 Thanks to these indexes, it is very easy to download and upgrade plugins. For instance, to install the `notes plugin <https://github.com/overhangio/tutor-notes/>`__::
 
@@ -64,5 +59,9 @@ Upgrade all your plugins with::
 To list indexes that you are downloading plugins from, run::
 
     tutor plugins index list
+
+To disable an index, for instance "contrib", use the ``plugins index remove`` command::
+
+    tutor plugins index remove contrib
 
 For more information about these indexes, check the `official Tutor plugin indexes (TPI) <https://github.com/overhangio/tpi/>`__ repository.

@@ -29,4 +29,4 @@ You can now take advantage of the Tutor-powered CLI (item #3) to bootstrap your 
 
     tutor local launch
 
-Under the hood, Tutor simply runs ``docker-compose`` and ``docker`` commands to launch your platform. These commands are printed in the standard output, such that you are free to replicate the same behaviour by simply copying/pasting the same commands.
+Under the hood, Tutor simply runs ``docker compose`` and ``docker`` commands to launch your platform. These commands are printed in the standard output, such that you are free to replicate the same behaviour by simply copying/pasting the same commands.
