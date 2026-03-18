@@ -1,3 +1,5 @@
+.. _quickstart:
+
 Quickstart (1-click install)
 ============================
 

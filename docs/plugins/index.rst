@@ -65,3 +65,8 @@ To disable an index, for instance "contrib", use the ``plugins index remove`` co
     tutor plugins index remove contrib
 
 For more information about these indexes, check the `official Tutor plugin indexes (TPI) <https://github.com/overhangio/tpi/>`__ repository.
+
+Development
+===========
+
+For information on developing your own Tutor plugins, see the :ref:`plugin_development` guide.
