@@ -1,4 +1,5 @@
 .. _tutor:
+.. _development:
 
 Tutor development
 =================

@@ -53,12 +53,26 @@ nitpick_ignore = [
     ("py:class", "click.core.Command"),
     # Python 3.12
     ("py:class", "FilterCallbackFunc"),
+    # Sphinx internals that may leak through rendered type hints
+    ("py:class", "TypeAliasForwardRef"),
+    # ParamSpec objects are not classes but may be referenced as such
+    ("py:class", "tutor.core.hooks.actions.T"),
+    ("py:class", "typing_extensions.ParamSpec"),
 ]
+
+# Even outside nitpicky mode, some type-hint rendering can produce "ref.class"
+# warnings for typing-related objects that are not meaningfully documentable here.
+# These warnings are not actionable for Tutor maintainers and would otherwise fail
+# the build because `make docs` runs with `-W`.
+suppress_warnings = ["ref.class"]
 # Resolve type aliases here
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_type_aliases
 autodoc_type_aliases: dict[str, str] = {
     # python 3.10
-    "T": "tutor.core.hooks.actions.T",
+    # ParamSpec instances (like `tutor.core.hooks.actions.T`) are not classes, and Sphinx
+    # will attempt to resolve them as `py:class` when rendering type hints. Point to the
+    # ParamSpec type itself to avoid unresolved references.
+    "T": "typing_extensions.ParamSpec",
     "T2": "tutor.core.hooks.filters.T2",
     # # python 3.12
     "L": "tutor.core.hooks.filters.L",
