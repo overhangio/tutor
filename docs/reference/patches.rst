@@ -138,6 +138,16 @@ File: ``kustomization.yml``
 
 File: ``kustomization.yml``
 
+.. warning::
+   ``kustomization-commonlabels`` is deprecated and will be removed in the next major release. 
+   Please use ``kustomization-labels`` for adding custom labels.
+
+``kustomization-labels``
+==============================
+
+File: ``kustomization.yml``
+
+
 .. patch:: kustomization-configmapgenerator
 
 ``kustomization-configmapgenerator``
