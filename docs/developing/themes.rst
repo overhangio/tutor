@@ -1,7 +1,10 @@
 .. _theme_development:
 
-Open edX theme development 
+Open edX theme development
 --------------------------
+
+.. note::
+    This page covers developing and modifying themes. To install a pre-built theme on your platform, see :ref:`Installing a custom theme <theming>`.
 
 With Tutor, it's pretty easy to develop your own themes. Start by placing your files inside the ``env/build/openedx/themes`` directory. For instance, you could start from the ``red-theme`` theme present inside the ``edx-platform`` repository::
 

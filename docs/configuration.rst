@@ -477,6 +477,9 @@ Then you must rebuild the openedx Docker image::
 
 Finally, you should enable your theme with the :ref:`settheme command <settheme>`.
 
+.. note::
+    To modify or develop a new theme from scratch, see :ref:`Open edX theme development <theme_development>`.
+
 
 Using Google Mail as an SMTP server
 -----------------------------------
