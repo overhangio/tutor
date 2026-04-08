@@ -475,7 +475,9 @@ Then you must rebuild the openedx Docker image::
 
     tutor images build openedx
 
-Finally, you should enable your theme with the :ref:`settheme command <settheme>`.
+Then you should enable your theme with the :ref:`settheme command <settheme>`. Finally, by restarting the services, you'll be able to see your theme::
+
+    tutor local restart
 
 .. note::
     To modify or develop a new theme from scratch, see :ref:`Open edX theme development <theme_development>`.
