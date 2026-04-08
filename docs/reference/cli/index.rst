@@ -4,6 +4,12 @@ Command line interface (CLI)
 ============================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    tutor
+   config
+   dev
+   images
+   k8s
+   local
+   plugins

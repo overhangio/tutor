@@ -1,5 +1,5 @@
-Command line interface (CLI)
-============================
+Using the CLI
+=============
 
 How do I navigate Tutor's command-line interface?
 -------------------------------------------------

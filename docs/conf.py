@@ -135,12 +135,6 @@ redirects = {
     "reference/index": "../reference/cli/index.html",
     "reference/indexes": "../developing/plugins/indexes.html",
     "reference/patches": "../reference/patches/index.html",
-    "reference/cli/config": "index.html",
-    "reference/cli/dev": "index.html",
-    "reference/cli/images": "index.html",
-    "reference/cli/k8s": "index.html",
-    "reference/cli/local": "index.html",
-    "reference/cli/plugins": "index.html",
 }
 # This is to avoid the addition of the local username to the docs
 os.environ["HOME"] = "~"
@@ -157,7 +151,7 @@ html_context = {
     "display_github": True,
     "github_user": "overhangio",
     "github_repo": "tutor",
-    "github_version": "master",
+    "github_version": "release",
     "conf_py_path": "/docs/",
 }
 html_static_path = ["img"]

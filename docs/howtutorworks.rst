@@ -21,7 +21,7 @@ Then, to view the result of the above command::
 
 The ``config.yml`` file contains your user-specific Open edX settings (item #1 above). The ``env/`` folder contains the rendered templates which will be used to run your Open edX platform (item #2). For instance, the ``env/local`` folder contains the ``docker-compose.yml`` file to run Open edX locally.
 
-The values from ``config.yml`` are used to generate the environment files in ``env/``. As a consequence, **every time the values from** ``config.yml`` **are modified, the environment must be regenerated** with ``tutor config save``..
+The values from ``config.yml`` are used to generate the environment files in ``env/``. As a consequence, **every time the values from** ``config.yml`` **are modified, the environment must be regenerated** with ``tutor config save``.
 
 Because the Tutor environment is generated entirely from the values in ``config.yml``, you can ``rm -rf`` the ``env/`` folder at any time and re-create it with ``tutor config save``. Another consequence is that **any manual change made to a file in** ``env/`` **will be overwritten by** ``tutor config save`` **commands**. Consider yourself warned!
 
