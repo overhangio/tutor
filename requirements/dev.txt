@@ -39,7 +39,7 @@ click-log==0.4.0
     # via scriv
 coverage==7.10.7
     # via -r dev.in
-cryptography==46.0.5
+cryptography==46.0.6
     # via secretstorage
 docutils==0.22.2
     # via readme-renderer
@@ -126,7 +126,7 @@ pathspec==0.12.1
     #   mypy
 pip-tools==7.5.0
     # via -r dev.in
-pyasn1==0.6.2
+pyasn1==0.6.3
     # via
     #   -r base.txt
     #   pyasn1-modules
@@ -139,7 +139,7 @@ pycparser==2.23
     # via cffi
 pycryptodome==3.23.0
     # via -r base.txt
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   readme-renderer
     #   rich
