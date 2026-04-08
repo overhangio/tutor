@@ -49,7 +49,7 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
    :maxdepth: 1
    :caption: Developer guide
 
-   sysadmin/main
+   developing/main
    developing/plugins/index
    tutor
    developing/openedx
