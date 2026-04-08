@@ -29,7 +29,7 @@ labels:
   includeSelectors: true
   includeTemplates: true
 {%- if patch("kustomization-commonlabels") %}
-# TODO: Depreciated Kustomiation-commonlabels, only being kept for backward compatibility
+# TODO: Deprecated Kustomiation-commonlabels, only being kept for backward compatibility
 - pairs:
     {{ patch("kustomization-commonlabels")|indent(4) }}
   includeSelectors: true
