@@ -36,12 +36,7 @@ The full plugins CLI is described in the `reference documentation <../reference/
 Existing plugins
 ================
 
-Many plugins are available from plugin indexes. These indexes are lists of plugins, similar to the `pypi <https://pypi.org>`__ or `npm <npmjs.com/>`__ indexes. By default, Tutor comes with the "main" plugin index. You can check available plugins from this index by running::
-
-    tutor plugins update
-    tutor plugins search
-
-Many plugins are available from plugin indexes. These indexes are lists of plugins, similar to the `pypi <https://pypi.org>`__ or `npm <npmjs.com/>`__ indexes. By default, Tutor comes with the "main" and "contrib" plugin indexes. You can check available plugins from this index by running::
+Many plugins are available from plugin indexes. These indexes are lists of plugins, similar to the `pypi <https://pypi.org>`__ or `npm <https://www.npmjs.com/>`__ indexes. By default, Tutor comes with the "main" and "contrib" plugin indexes. You can check available plugins from this index by running::
 
     tutor plugins update
     tutor plugins search

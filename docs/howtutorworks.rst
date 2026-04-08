@@ -9,7 +9,7 @@ Tutor is a piece of software that takes care of exactly three things:
 2. Template rendering: all the files that are necessary to run your platform are generated from a set of templates and user-specific settings.
 3. Command-line interface (CLI): frequently-used administration commands are gathered in a convenient, unified CLI.
 
-You can experiment with Tutor very quickly: start by `installing <install>`_ Tutor. Then run::
+You can experiment with Tutor very quickly: start by :doc:`installing <gettingstarted/installation>` Tutor. Then run::
 
     $ tutor config save --interactive
 

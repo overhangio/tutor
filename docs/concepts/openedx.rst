@@ -6,10 +6,10 @@ Open edX
 What is Open edX?
 -----------------
 
-`Open edX <http://open.edx.org/>`_ is a thriving open source project, backed by a great community, for running an online learning platform at scale. Open edX comes with an LMS (Learning Management System) where students access course contents, a CMS (Content Management System) that course staff uses to design courses, and a few other components to provide more services to students, course staff, and platform administrators.
+`Open edX <https://openedx.org/>`_ is a thriving open source project, backed by a great community, for running an online learning platform at scale. Open edX comes with an LMS (Learning Management System) where students access course contents, a CMS (Content Management System) that course staff uses to design courses, and a few other components to provide more services to students, course staff, and platform administrators.
 
-Should I use Open edX?
-----------------------
+Why should I use Open edX?
+--------------------------
 
 Open edX competitors include `Moodle <https://moodle.org/>`__, `Instructure's Canvas <https://www.instructure.com/>`__, `Blackboard's Open LMS <https://www.blackboard.com>`__, as well as a slew of hosted, closed source alternatives. Open edX is the only online learning system that satisfies all following properties:
 
@@ -18,4 +18,4 @@ Open edX competitors include `Moodle <https://moodle.org/>`__, `Instructure's Ca
 * Multiple extension points for comprehensive customization
 * Modern, intuitive user interface to keep students engaged
 
-Open edX is a safe bet: it is backed by edX.org, a US-based non-profit that is committed to open source and which runs Open edX to service its millions of learners. With Open edX you can be sure that the features you need will be available. If it's good enough for Harvard, the MIT, or the French government, then it will probably also work for you.
+Open edX is a safe bet: it is managed by the open-source community and governed by `Axim Collaborative <https://axim.org>`__, a non-profit committed to advancing open source education technology. With Open edX you can be sure that the features you need will be available. If it's good enough for Harvard, the MIT, or the French government, then it will probably also work for you.

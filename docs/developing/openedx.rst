@@ -282,7 +282,7 @@ You should then run the development server as usual, with ``start``. Every chang
 Running edx-platform unit tests
 -------------------------------
 
-It's possible to run the full set of unit tests that ship with `edx-platform <https://github.com/openedx/edx-platform/>`__. To do so, run a shell in the LMS development container::
+It's possible to run the full set of unit tests that ship with `openedx-platform <https://github.com/openedx/openedx-platform/>`__. To do so, run a shell in the LMS development container::
 
     tutor dev run lms bash
 

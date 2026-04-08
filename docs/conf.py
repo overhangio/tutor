@@ -89,6 +89,59 @@ autodoc_type_aliases: dict[str, str] = {
 # -- Sphinx-Click configuration
 # https://sphinx-click.readthedocs.io/
 extensions.append("sphinx_click")
+
+# -- Redirects for pages that were moved or removed
+# https://github.com/sphinx-contrib/sphinx-reredirects
+extensions.append("sphinx_reredirects")
+redirects = {
+    # Removed top-level pages
+    "install": "gettingstarted/installation.html",
+    "intro": "index.html",
+    "gettingstarted": "gettingstarted/quickstart.html",
+    # Renamed top-level pages
+    "dev": "developing/openedx.html",
+    "quickstart": "gettingstarted/quickstart.html",
+    "whatnext": "gettingstarted/whatsnext.html",
+    # download/ → gettingstarted/download/
+    "download/binary": "../gettingstarted/download/binary.html",
+    "download/pip": "../gettingstarted/download/pip.html",
+    # tutorials/ → developing/  (development-focused tutorials)
+    "tutorials/nightly": "../developing/nightly.html",
+    "tutorials/plugin": "../developing/plugins/creating.html",
+    "tutorials/theming": "../developing/themes.html",
+    # tutorials/ → sysadmin/  (operations-focused tutorials)
+    "tutorials/index": "../sysadmin/index.html",
+    "tutorials/arm64": "../sysadmin/arm64.html",
+    "tutorials/datamigration": "../sysadmin/datamigration.html",
+    "tutorials/edx-platform": "../sysadmin/edx-platform.html",
+    "tutorials/edx-platform-settings": "../sysadmin/edx-platform.html",
+    "tutorials/google-smtp": "../sysadmin/main.html",
+    "tutorials/main": "../sysadmin/main.html",
+    "tutorials/multiplatforms": "../sysadmin/multiplatforms.html",
+    "tutorials/oldreleases": "../sysadmin/oldreleases.html",
+    "tutorials/podman": "../sysadmin/podman.html",
+    "tutorials/portainer": "../sysadmin/portainer.html",
+    "tutorials/proxy": "../sysadmin/proxy.html",
+    "tutorials/scale": "../sysadmin/scale.html",
+    # plugins/ restructured
+    "plugins/intro": "../plugins/index.html",
+    "plugins/examples": "../developing/plugins/examples.html",
+    # plugins/v0/ → developing/legacy/
+    "plugins/v0/api": "../../developing/legacy/api.html",
+    "plugins/v0/gettingstarted": "../../developing/legacy/gettingstarted.html",
+    "plugins/v0/index": "../../developing/legacy/index.html",
+    "plugins/v0/legacy": "../../developing/legacy/legacy.html",
+    # reference/ restructured
+    "reference/index": "../reference/cli/index.html",
+    "reference/indexes": "../developing/plugins/indexes.html",
+    "reference/patches": "../reference/patches/index.html",
+    "reference/cli/config": "index.html",
+    "reference/cli/dev": "index.html",
+    "reference/cli/images": "index.html",
+    "reference/cli/k8s": "index.html",
+    "reference/cli/local": "index.html",
+    "reference/cli/plugins": "index.html",
+}
 # This is to avoid the addition of the local username to the docs
 os.environ["HOME"] = "~"
 # Make sure that sphinx-click can find the tutor module
