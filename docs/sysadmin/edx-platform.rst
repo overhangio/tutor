@@ -3,7 +3,7 @@
 Working on edx-platform as a developer
 ======================================
 
-Tutor supports running in development with ``tutor dev`` commands. Developers frequently need to work on a fork of some repository. The question then becomes: how to make their changes available within the "openedx" Docker container? 
+Tutor supports running in development with ``tutor dev`` commands. Developers frequently need to work on a fork of some repository. The question then becomes: how to make their changes available within the "openedx" Docker container?
 
 For instance, when troubleshooting an issue in `edx-platform <https://github.com/openedx/edx-platform>`__, we would like to make some changes to a local fork of that repository, and then apply these changes immediately in the "lms" and the "cms" containers (but also "lms-worker", "cms-worker", etc.)
 
