@@ -3,7 +3,7 @@
 Kubernetes deployment
 =====================
 
-With the same docker images we created for :ref:`single server deployment <local>` and :ref:`local development <development>`, we can launch an Open edX platform on Kubernetes. Always in 1 click, of course :)
+With the same docker images we created for :ref:`single server deployment <local>` and :ref:`local development <openedx_development>`, we can launch an Open edX platform on Kubernetes. Always in 1 click, of course :)
 
 A word of warning: managing a Kubernetes platform is a fairly advanced endeavour. In this documentation, we assume familiarity with Kubernetes. Running an Open edX platform with Tutor on a single server or in a Kubernetes cluster are two very different things. The local Open edX install was designed such that users with no prior experience with system administration could still launch an Open edX platform. It is *not* the case for the installation method outlined here.
 
@@ -49,7 +49,7 @@ S3-like object storage with `MinIO <https://www.minio.io/>`__
 
 Like many web applications, Open edX needs to persist data. In particular, it needs to persist files uploaded by students and course designers. In the local installation, these files are persisted to disk, on the host filesystem. But on Kubernetes, it is difficult to share a single filesystem between different pods. This would require persistent volume claims with `ReadWriteMany` access mode, and these are difficult to set up.
 
-Luckily, there is another solution: at `edx.org <edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on-premises. This is achieved thanks to `MinIO <https://www.minio.io/>`__. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
+Luckily, there is another solution: at `edx.org <https://edx.org>`_, uploaded files are persisted on AWS S3: Open edX is compatible out-of-the-box with the S3 API for storing user-generated files. The problem with S3 is that it introduces a dependency on AWS. To solve this problem, Tutor comes with a plugin that emulates the S3 API but stores files on-premises. This is achieved thanks to `MinIO <https://www.minio.io/>`__. If you want to deploy a production platform to Kubernetes, you will most certainly need to enable the ``minio`` plugin::
 
     tutor plugins enable minio
 
@@ -135,7 +135,7 @@ Utilizing the dry-run feature ensures a more robust deployment process for the O
 Executing commands inside service pods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Tutor and plugin documentation usually often instructions to execute some ``tutor local run ...`` commands. These commands are only valid when running Tutor locally with docker compose, and will not work on Kubernetes. Instead, you should run ``tutor k8s exec ...`` commands. Arguments and options should be identical.
+The Tutor and plugin documentation often includes instructions to execute some ``tutor local run ...`` commands. These commands are only valid when running Tutor locally with docker compose, and will not work on Kubernetes. Instead, you should run ``tutor k8s exec ...`` commands. Arguments and options should be identical.
 
 For instance, to run a Python shell in the lms container, run::
 

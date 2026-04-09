@@ -131,6 +131,8 @@ sphinx==7.4.7
     #   sphinxcontrib-jquery
 sphinx-click==6.0.0
     # via -r docs.in
+sphinx-reredirects==0.1.5
+    # via -r docs.in
 sphinx-rtd-theme==3.0.2
     # via -r docs.in
 sphinxcontrib-applehelp==2.0.0

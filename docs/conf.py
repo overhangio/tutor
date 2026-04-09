@@ -53,12 +53,26 @@ nitpick_ignore = [
     ("py:class", "click.core.Command"),
     # Python 3.12
     ("py:class", "FilterCallbackFunc"),
+    # Sphinx internals that may leak through rendered type hints
+    ("py:class", "TypeAliasForwardRef"),
+    # ParamSpec objects are not classes but may be referenced as such
+    ("py:class", "tutor.core.hooks.actions.T"),
+    ("py:class", "typing_extensions.ParamSpec"),
 ]
+
+# Even outside nitpicky mode, some type-hint rendering can produce "ref.class"
+# warnings for typing-related objects that are not meaningfully documentable here.
+# These warnings are not actionable for Tutor maintainers and would otherwise fail
+# the build because `make docs` runs with `-W`.
+suppress_warnings = ["ref.class"]
 # Resolve type aliases here
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_type_aliases
 autodoc_type_aliases: dict[str, str] = {
     # python 3.10
-    "T": "tutor.core.hooks.actions.T",
+    # ParamSpec instances (like `tutor.core.hooks.actions.T`) are not classes, and Sphinx
+    # will attempt to resolve them as `py:class` when rendering type hints. Point to the
+    # ParamSpec type itself to avoid unresolved references.
+    "T": "typing_extensions.ParamSpec",
     "T2": "tutor.core.hooks.filters.T2",
     # # python 3.12
     "L": "tutor.core.hooks.filters.L",
@@ -75,6 +89,53 @@ autodoc_type_aliases: dict[str, str] = {
 # -- Sphinx-Click configuration
 # https://sphinx-click.readthedocs.io/
 extensions.append("sphinx_click")
+
+# -- Redirects for pages that were moved or removed
+# https://github.com/sphinx-contrib/sphinx-reredirects
+extensions.append("sphinx_reredirects")
+redirects = {
+    # Removed top-level pages
+    "install": "gettingstarted/installation.html",
+    "intro": "index.html",
+    "gettingstarted": "gettingstarted/quickstart.html",
+    # Renamed top-level pages
+    "dev": "developing/openedx.html",
+    "quickstart": "gettingstarted/quickstart.html",
+    "whatnext": "gettingstarted/whatsnext.html",
+    # download/ → gettingstarted/download/
+    "download/binary": "../gettingstarted/download/binary.html",
+    "download/pip": "../gettingstarted/download/pip.html",
+    # tutorials/ → developing/  (development-focused tutorials)
+    "tutorials/nightly": "../developing/nightly.html",
+    "tutorials/plugin": "../developing/plugins/creating.html",
+    "tutorials/theming": "../developing/themes.html",
+    # tutorials/ → sysadmin/  (operations-focused tutorials)
+    "tutorials/index": "../sysadmin/index.html",
+    "tutorials/arm64": "../sysadmin/arm64.html",
+    "tutorials/datamigration": "../sysadmin/datamigration.html",
+    "tutorials/edx-platform": "../sysadmin/edx-platform.html",
+    "tutorials/edx-platform-settings": "../sysadmin/edx-platform.html",
+    "tutorials/google-smtp": "../configuration.html#using-google-mail-as-an-smtp-server",
+    "tutorials/main": "../developing/main.html",
+    "tutorials/multiplatforms": "../sysadmin/multiplatforms.html",
+    "tutorials/oldreleases": "../sysadmin/oldreleases.html",
+    "tutorials/podman": "../sysadmin/podman.html",
+    "tutorials/portainer": "../sysadmin/portainer.html",
+    "tutorials/proxy": "../sysadmin/proxy.html",
+    "tutorials/scale": "../sysadmin/scale.html",
+    # plugins/ restructured
+    "plugins/intro": "../plugins/index.html",
+    "plugins/examples": "../developing/plugins/examples.html",
+    # plugins/v0/ → developing/legacy/
+    "plugins/v0/api": "../../developing/legacy/api.html",
+    "plugins/v0/gettingstarted": "../../developing/legacy/gettingstarted.html",
+    "plugins/v0/index": "../../developing/legacy/index.html",
+    "plugins/v0/legacy": "../../developing/legacy/legacy.html",
+    # reference/ restructured
+    "reference/index": "../reference/cli/index.html",
+    "reference/indexes": "../developing/plugins/indexes.html",
+    "reference/patches": "../reference/patches/index.html",
+}
 # This is to avoid the addition of the local username to the docs
 os.environ["HOME"] = "~"
 # Make sure that sphinx-click can find the tutor module
@@ -90,7 +151,7 @@ html_context = {
     "display_github": True,
     "github_user": "overhangio",
     "github_repo": "tutor",
-    "github_version": "master",
+    "github_version": "release",
     "conf_py_path": "/docs/",
 }
 html_static_path = ["img"]

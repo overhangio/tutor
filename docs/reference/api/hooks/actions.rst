@@ -10,5 +10,6 @@ Actions are one of the two types of hooks (the other being :ref:`filters`) that 
     :members:
 
 .. The following are only to ensure that the docs build without warnings
-.. class:: tutor.core.hooks.actions.T
-.. class:: tutor.types.Config
+.. py:class:: tutor.core.hooks.actions.T
+.. py:class:: tutor.types.Config
+.. py:class:: typing_extensions.ParamSpec
