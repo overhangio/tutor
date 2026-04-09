@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.3'></a>
+## v21.0.3 (2026-04-09)
+
+- [Bugfix] Fix permission denied error when uploading files to Libraries v2 by adding `/mounts/openedx-private` to the permissions script. This resolves the issue where the `openedx-media-private` directory was mounted but ownership was not properly set for the app user. (by @ahmed-arb)
+
+- [Improvement] Replace deprecated `commonLabels` with `labels` in `kustomization.yml` to fix kustomize deprecation warning. The `kustomization-commonlabels` patch is preserved for backwards compatibility. (by @Syed-Ali-Abbas-568)
+
+- [Improvement] Restructure Tutor documentation and add backward-compatible redirects for moved pages. (by @Faraz32123, @brian-smith-tcril)
+
 <a id='changelog-21.0.2'></a>
 ## v21.0.2 (2026-03-13)
 
