@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.4'></a>
+## v21.0.4 (2026-04-10)
+
+- [Security] Backport fix to remove `activation_key` exposure from `/api/user/v1/accounts/{username}`, preventing email verification bypass via OAuth2 password grant flow (source: upstream edx-platform commit 21cead238466ca398ba368518f1d3288431d68f4).
+
 <a id='changelog-21.0.3'></a>
 ## v21.0.3 (2026-04-09)
 
