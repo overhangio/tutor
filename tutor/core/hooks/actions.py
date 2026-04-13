@@ -14,6 +14,7 @@ from .contexts import Contextualized
 
 #: Action generic signature.
 T = ParamSpec("T")
+T.__module__ = __name__
 
 ActionCallbackFunc = t.Callable[T, None]
 

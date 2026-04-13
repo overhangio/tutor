@@ -13,10 +13,13 @@ from . import contexts, priorities
 
 #: Filter generic return value, which is also the type of the first callback argument.
 T1 = t.TypeVar("T1")
+T1.__module__ = __name__
 #: Filter generic signature for all arguments after the first one.
 T2 = ParamSpec("T2")
+T2.__module__ = __name__
 #: Specialized typevar for list elements
 L = t.TypeVar("L")
+L.__module__ = __name__
 
 FilterCallbackFunc = t.Callable[Concatenate[T1, T2], T1]
 
