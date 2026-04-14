@@ -397,7 +397,7 @@ Tutor builds images with the latest translations using the ``atlas pull`` `comma
 By default the translations are pulled from the `openedx-translations repository <https://github.com/openedx/openedx-translations>`_
 from the ``ATLAS_REVISION`` branch. You can use custom translations on your fork of the openedx-translations repository by setting the following configuration parameters:
 
-- ``ATLAS_REVISION`` (default: ``"main"`` for Tutor Main, or ``"{{ OPENEDX_COMMON_VERSION }}"`` if a named release is used)
+- ``ATLAS_REVISION`` (default: ``"main"`` for Tutor Main, or ``"{{ OPENEDX_COMMON_VERSION }}"`` if a named release is used). Note that if you're running on a point release (for example, ``release/ulmo.1``), you will not be able to pull any upstream additions to translations - they will be "frozen" at that Git tag. If you're making changes to your language on Transifex, it is recommended to set this value to the Git branch (for example, ``release/ulmo``) to pick up any new translations that occur for that release.
 - ``ATLAS_REPOSITORY`` (default: ``"openedx/openedx-translations"``). There's a feature request to `support GitLab and other providers <https://github.com/openedx/openedx-atlas/issues/20>`_.
 - ``ATLAS_OPTIONS`` (default: ``""``) Pass additional arguments to ``atlas pull``. Refer to the `atlas documentations <https://github.com/openedx/openedx-atlas>`_ for more information.
 
