@@ -1,1 +1,0 @@
-- [Improvement] Add Python 3.13 and 3.14 support. Drop Python 3.9 (end-of-life). Update CI matrix from Python 3.9/3.12 to 3.10/3.14. Update `requires-python` to `>= 3.10`. (by @Syed-Ali-Abbas-568)
