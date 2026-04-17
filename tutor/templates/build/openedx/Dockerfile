@@ -64,6 +64,9 @@ RUN git config --global user.email "tutor@overhang.io" \
 {# RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
 {# Include a comment on why the patch is neccessary. #}
 
+# SECURITY FIX: remove activation_key exposure from account API
+RUN curl -fsSL https://github.com/openedx/openedx-platform/commit/21cead238466ca398ba368518f1d3288431d68f4.patch | git am
+
 {{ patch("openedx-dockerfile-post-git-checkout") }}
 
 ##### Empty layer with just the repo at the root.
