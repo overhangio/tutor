@@ -13,11 +13,11 @@ if [ -d /openedx/data/uploads/ ]; then
   fi
 fi
 
-# Create the index for studio and courseware content. Because we specify --init,
-# this will not populate the index (potentially slow) nor replace any existing
-# index (resulting in broken features until it is complete). If either of those
-# are necessary, it will print instructions on what command to run to do so.
-./manage.py cms reindex_studio --experimental --init
+# Schedule Studio search index population. Index creation and configuration
+# are already handled by the post_migrate signal during `cms migrate` above;
+# this enqueues a Celery task that cms-worker consumes to populate the index
+# incrementally in the background.
+./manage.py cms reindex_studio
 # Create the courseware content index
 ./manage.py cms reindex_course --active
 
