@@ -1,1 +1,1 @@
-- [Bugfix] Fixes wrong LMS_HOST when `tutor dev launch -I` is executed. After this change, it will set to `local.openedx.io` instead of `www.myopenedx.com`
+- [Bugfix] Fixes wrong LMS_HOST when `tutor dev launch -I` is executed. After this change, it will set to `local.openedx.io` instead of `www.myopenedx.com` (by @muhammadadeeltajamul)
