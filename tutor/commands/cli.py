@@ -70,10 +70,13 @@ class TutorCli(click.Group):
             # That's ok, we just ignore it.
             return
         if not self.IS_ROOT_READY:
-            hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
-            self.IS_ROOT_READY = True
-            for cmd in hooks.Filters.CLI_COMMANDS.iterate():
-                self.add_command(cmd)
+            try:
+                hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
+                self.IS_ROOT_READY = True
+                for cmd in hooks.Filters.CLI_COMMANDS.iterate():
+                    self.add_command(cmd)
+            except Exception as exc:
+                raise click.ClickException(f"Error enabling plugins: {exc}") from exc
 
 
 @click.group(
