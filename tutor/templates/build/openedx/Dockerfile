@@ -58,14 +58,14 @@ RUN git config --global user.email "tutor@overhang.io" \
 # Patches in Main node
 {%- else %}
 # Patches in non-Main mode (i.e., Release mode)
+
+# SECURITY FIX: remove activation_key exposure from account API
+RUN curl -fsSL https://github.com/openedx/openedx-platform/commit/21cead238466ca398ba368518f1d3288431d68f4.patch | git am
 {%- endif %}
 
 {# Add new patches like this: #}
 {# RUN curl -fsSL https://github.com/openedx/edx-platform/commit/<GITSHA1>.patch | git am #}
 {# Include a comment on why the patch is neccessary. #}
-
-# SECURITY FIX: remove activation_key exposure from account API
-RUN curl -fsSL https://github.com/openedx/openedx-platform/commit/21cead238466ca398ba368518f1d3288431d68f4.patch | git am
 
 {{ patch("openedx-dockerfile-post-git-checkout") }}
 
