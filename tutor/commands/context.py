@@ -1,3 +1,7 @@
+from typing import TypeVar
+
+import click
+
 from tutor.tasks import BaseTaskRunner
 from tutor.types import Config
 
@@ -12,8 +16,9 @@ class Context:
         $ tutor --root=... local run ...
     """
 
-    def __init__(self, root: str) -> None:
+    def __init__(self, root: str, ignore_plugin_errors: bool = False) -> None:
         self.root = root
+        self.ignore_plugin_errors = ignore_plugin_errors
 
 
 class BaseTaskContext(Context):
@@ -28,3 +33,18 @@ class BaseTaskContext(Context):
         Return a runner capable of running docker-compose/kubectl commands.
         """
         raise NotImplementedError
+
+
+CMD = TypeVar("CMD", bound=click.Command)
+
+
+def ignore_plugin_errors(command: CMD) -> CMD:
+    """
+    Ignore plugins errors for commands marked with this.
+
+    Commands decorated with this will run even if there were errors when loading
+    plugins. This needs to be the first decorator and only works for top-level
+    command, exempting all subcommands.
+    """
+    setattr(command, "ignore_plugin_errors", True)
+    return command
