@@ -83,6 +83,8 @@ autodoc_type_aliases: dict[str, str] = {
     # https://github.com/emdgroup/baybe/pull/67
     "Action": "tutor.core.hooks.actions.Action",
     "Filter": "tutor.core.hooks.filters.Filter",
+    # Python 3.14
+    "ActionCallbackFunc": "tutor.core.hooks.actions.ActionCallbackFunc",
 }
 
 
