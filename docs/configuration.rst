@@ -132,7 +132,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"release/ulmo.2"``, or ``master`` in :ref:`Tutor Main <main>`)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"release/verawood.master"``, or ``master`` in :ref:`Tutor Main <main>`)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
@@ -383,9 +383,9 @@ Note that your edx-platform version must be a fork of the latest release **tag**
 
 If you don't create your fork from this tag, you *will* have important compatibility issues with other services. In particular:
 
-- Do not try to run a fork from an older (pre-Ulmo) version of edx-platform: this will simply not work.
+- Do not try to run a fork from an older (pre-Verawood) version of edx-platform: this will simply not work.
 - Do not try to run a fork from the edx-platform master branch: there is a 99% probability that it will fail.
-- Do not try to run a fork from the release/ulmo branch: Tutor will attempt to apply security and bug fix patches that might already be included in the release/ulmo but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the release/ulmo branch.
+- Do not try to run a fork from the release/verawood branch: Tutor will attempt to apply security and bug fix patches that might already be included in the release/verawood but which were not yet applied to the latest release tag. Patch application will thus fail if you base your fork from the release/verawood branch.
 
 .. _i18n:
 
@@ -397,7 +397,7 @@ Tutor builds images with the latest translations using the ``atlas pull`` `comma
 By default the translations are pulled from the `openedx-translations repository <https://github.com/openedx/openedx-translations>`_
 from the ``ATLAS_REVISION`` branch. You can use custom translations on your fork of the openedx-translations repository by setting the following configuration parameters:
 
-- ``ATLAS_REVISION`` (default: ``"main"`` for Tutor Main, or ``"{{ OPENEDX_COMMON_VERSION }}"`` if a named release is used). Note that if you're running on a point release (for example, ``release/ulmo.1``), you will not be able to pull any upstream additions to translations - they will be "frozen" at that Git tag. If you're making changes to your language on Transifex, it is recommended to set this value to the Git branch (for example, ``release/ulmo``) to pick up any new translations that occur for that release.
+- ``ATLAS_REVISION`` (default: ``"main"`` for Tutor Main, or ``"{{ OPENEDX_COMMON_VERSION }}"`` if a named release is used). Note that if you're running on a point release (for example, ``release/verawood.1``), you will not be able to pull any upstream additions to translations - they will be "frozen" at that Git tag. If you're making changes to your language on Transifex, it is recommended to set this value to the Git branch (for example, ``release/verawood``) to pick up any new translations that occur for that release.
 - ``ATLAS_REPOSITORY`` (default: ``"openedx/openedx-translations"``). There's a feature request to `support GitLab and other providers <https://github.com/openedx/openedx-atlas/issues/20>`_.
 - ``ATLAS_OPTIONS`` (default: ``""``) Pass additional arguments to ``atlas pull``. Refer to the `atlas documentations <https://github.com/openedx/openedx-atlas>`_ for more information.
 

@@ -80,4 +80,5 @@ Instructions for installing the appropriate Tutor version for older Open edX rel
 | Teak              | v20           | pip install 'tutor[full]>=20.0.0,<21.0.0'  |
 +-------------------+---------------+--------------------------------------------+
 | Ulmo              | v21           | pip install 'tutor[full]>=21.0.0,<22.0.0'  |
+| Verawood           | v22           | pip install 'tutor[full]>=22.0.0,<23.0.0'  |
 +-------------------+---------------+--------------------------------------------+
