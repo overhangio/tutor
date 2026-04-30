@@ -7,6 +7,16 @@ from . import env, exceptions, fmt, hooks
 from .types import Config, get_typed
 
 
+def set_run_mode_defaults(config: Config) -> None:
+    dev_values: Config = {
+        "LMS_HOST": "local.openedx.io",
+        "CMS_HOST": "studio.local.openedx.io",
+        "ENABLE_HTTPS": False,
+    }
+    for key, value in dev_values.items():
+        config[key] = value
+
+
 def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
     """
     Interactively ask questions to collect configuration values from the user.
@@ -34,17 +44,12 @@ def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
             default=run_for_prod,
         )
     if not run_for_prod:
-        dev_values: Config = {
-            "LMS_HOST": "local.openedx.io",
-            "CMS_HOST": "studio.local.openedx.io",
-            "ENABLE_HTTPS": False,
-        }
+        set_run_mode_defaults(config)
         fmt.echo_info(
             """As you are not running this platform in production, we automatically set the following configuration values:"""
         )
-        for k, v in dev_values.items():
-            config[k] = v
-            fmt.echo_info(f"    {k} = {v}")
+        for key in ["LMS_HOST", "CMS_HOST", "ENABLE_HTTPS"]:
+            fmt.echo_info(f"    {key} = {config[key]}")
     else:
         ask("Your website domain name for students (LMS)", "LMS_HOST", config, defaults)
         lms_host = get_typed(config, "LMS_HOST", str)
