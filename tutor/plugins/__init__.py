@@ -62,6 +62,7 @@ def load_all(names: t.Iterable[str]) -> None:
             load(name)
         except Exception as e:
             fmt.echo_alert(f"Failed to enable plugin '{name}': {e}")
+            raise
     hooks.Actions.PLUGINS_LOADED.do()
 
 
