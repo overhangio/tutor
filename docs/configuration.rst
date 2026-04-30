@@ -487,23 +487,56 @@ This ensures Django loads your theme-specific overrides alongside Atlas-pulled t
 Handling Translations in Custom or Forked Repositories
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For more advanced setups involving multiple MFEs, plugins, themes, or forked repositories, a structured translation workflow may be required.
+If your deployment includes forked repositories, custom plugins, or additional MFEs alongside upstream Open edX components, a layered translation workflow keeps your custom strings separate from upstream ones and makes future upgrades easier.
 
-For example, in a Teak-based Wikimedia deployment:
+The recommended approach is to fork `openedx-translations <https://github.com/openedx/openedx-translations>`_ and organise it into three layers:
 
-- ``openedx-translations`` was forked.
-- Upstream translations were pulled using Atlas into a dedicated directory.
-- Wikimedia-specific translations were stored separately.
-- A merge process rebuilt the final translations directory on every workflow run.
-- ``ATLAS_REPOSITORY`` and ``ATLAS_REVISION`` were overridden to point to the fork.
+.. code-block:: text
 
-For the custom Indigo-based theme in that setup:
+    openedx-translations/
+    ├── translations-upstream/   # pulled from upstream via Atlas, never edited
+    ├── translations-custom/     # only your custom/fork-specific strings
+    └── translations/            # final merged output, rebuilt on every run
 
-- **Theme translations are merged into edx-platform translations.**
-- If a ``msgid`` exists in both upstream and theme files, the theme value overrides it (if non-empty).
-- No upstream files are modified directly.
+**Step 1 — Pull upstream translations**
 
-For more detailed examples of handling translations across custom repositories (platform, MFEs, plugins, themes), refer to the `Wikimedia openedx-translations fork <https://github.com/wikimedia/openedx-translations>`_ for a full example.
+Use Atlas to fetch the latest upstream translations into ``translations-upstream/``::
+
+    atlas pull translations --output-dir translations-upstream
+
+This folder is read-only and acts as your baseline.
+
+**Step 2 — Collect strings from your custom repositories**
+
+For each forked or new repository, extract translation source strings into ``translations-custom/``. The exact command depends on the repository type:
+
+- *Python / Django repositories*: ``django-admin makemessages`` or ``i18n_tool extract``
+- *JavaScript / MFE repositories*: ``npm run i18n:extract``
+
+**Step 3 — Isolate your custom strings**
+
+Compare ``translations-custom/`` against ``translations-upstream/`` and remove any ``msgid`` entries that already exist upstream. This keeps your fork lean and prevents duplicating strings that upstream translators already maintain.
+
+**Step 4 — Merge into the final output**
+
+Overlay ``translations-custom/`` on top of ``translations-upstream/`` to produce the ``translations/`` directory. The merge rule is simple: if a ``msgid`` exists in both layers, the custom value wins (as long as it is non-empty); otherwise the upstream value is used.
+
+For theme repositories (such as a custom Indigo fork), theme translations should be merged into ``edx-platform`` translations rather than kept in a separate locale path, because the platform loads theme strings from its own locale directory at runtime.
+
+**Step 5 — Point Tutor at your fork**
+
+Override the Atlas configuration parameters to pull from your fork::
+
+    tutor config save \
+        --set ATLAS_REPOSITORY=your-org/openedx-translations \
+        --set ATLAS_REVISION=your-branch
+
+Then rebuild and restart::
+
+    tutor images build openedx mfe
+    tutor local reboot
+
+This workflow cleanly separates what is yours from what comes from upstream, so rebasing onto a new Open edX release only requires re-running the merge step rather than resolving conflicts across hundreds of files.
 
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
