@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.5'></a>
+## v21.0.5 (2026-05-05)
+
+- [Bugfix] Fixes wrong LMS_HOST when `tutor dev launch -I` is executed. After this change, it will set to `local.openedx.io` instead of `www.myopenedx.com` (by @muhammadadeeltajamul)
+
+- [Feature] Upgrade OPENEDX_COMMON_VERSION to release/ulmo.3 (by @ahmed-arb)
+
 <a id='changelog-21.0.4'></a>
 ## v21.0.4 (2026-04-10)
 

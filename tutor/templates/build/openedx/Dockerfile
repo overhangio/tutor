@@ -59,8 +59,6 @@ RUN git config --global user.email "tutor@overhang.io" \
 {%- else %}
 # Patches in non-Main mode (i.e., Release mode)
 
-# SECURITY FIX: remove activation_key exposure from account API
-RUN curl -fsSL https://github.com/openedx/openedx-platform/commit/21cead238466ca398ba368518f1d3288431d68f4.patch | git am
 {%- endif %}
 
 {# Add new patches like this: #}
