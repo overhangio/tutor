@@ -135,6 +135,9 @@ class K8sTaskRunner(BaseTaskRunner):
             with open(tmp.name, "w", encoding="utf-8") as job_file:
                 serialize.dump(job, job_file)
             utils.kubectl("apply", "-f", tmp.name)
+        except Exception as e:
+            fmt.echo_error(f"Failed to apply job {job_name}: {e}")
+            raise
         finally:
             os.unlink(tmp.name)
 
