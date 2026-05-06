@@ -228,8 +228,6 @@ def interactive_configuration(
             config,
             run_for_prod=run_for_prod,
         )
-    elif not run_for_prod:
-        interactive_config.set_run_mode_defaults(config)
     tutor_config.save_config_file(context.obj.root, config)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)
