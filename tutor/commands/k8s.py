@@ -1,4 +1,5 @@
 import os
+import tempfile
 from datetime import datetime
 from time import sleep
 from typing import Any, Iterable, List, Optional, Type
@@ -79,8 +80,6 @@ class K8sTaskRunner(BaseTaskRunner):
 
     def run_task(self, service: str, command: str) -> int:
         canonical_job_name = f"{service}-job"
-        all_jobs = list(self._load_jobs())
-        job = self._find_job(canonical_job_name, all_jobs)
         # Create a unique job name to make it deduplicate jobs and make it easier to
         # find later. Logs of older jobs will remain available for some time.
         job_name = canonical_job_name + "-" + datetime.now().strftime("%Y%m%d%H%M%S")
@@ -94,6 +93,18 @@ class K8sTaskRunner(BaseTaskRunner):
                 f"Waiting for active jobs to terminate: {' '.join(active_jobs)}"
             )
             sleep(5)
+
+        # Render the full kustomization first so that patches in k8s-override are applied
+        # against canonical job names (e.g. "lms-job") before we rename for uniqueness.
+        # This fixes kustomize v5 failing with "failed to find unique target for patch
+        # Job.v1.batch/lms-job" when the job was renamed prior to kustomize running.
+        rendered = utils.check_output(
+            "kubectl", "kustomize", tutor_env.pathjoin(self.root)
+        ).decode()
+        rendered_jobs = [
+            m for m in serialize.load_all(rendered) if m.get("kind") == "Job"
+        ]
+        job = self._find_job(canonical_job_name, rendered_jobs)
 
         # Configure job
         job["metadata"]["name"] = job_name
@@ -114,18 +125,18 @@ class K8sTaskRunner(BaseTaskRunner):
         job["spec"]["backoffLimit"] = 1
         job["spec"]["ttlSecondsAfterFinished"] = 3600
 
-        with open(
-            tutor_env.pathjoin(self.root, "k8s", "jobs.yml"), "w", encoding="utf-8"
-        ) as job_file:
-            serialize.dump_all(all_jobs, job_file)
-
-        # We cannot use the k8s API to create the job: configMap and volume names need
-        # to be found with the right suffixes.
-        kubectl_apply(
-            self.root,
-            "--selector",
-            f"app.kubernetes.io/name={job_name}",
+        # Apply the configured job directly from a temp file. ConfigMap name suffixes are
+        # already resolved by the kustomize render above, so we don't need --kustomize here.
+        tmp = tempfile.NamedTemporaryFile(
+            mode="w", suffix=".yml", delete=False, encoding="utf-8"
         )
+        tmp.close()
+        try:
+            with open(tmp.name, "w", encoding="utf-8") as job_file:
+                serialize.dump(job, job_file)
+            utils.kubectl("apply", "-f", tmp.name)
+        finally:
+            os.unlink(tmp.name)
 
         message = (
             "Job {job_name} is running. To view the logs from this job, run:\n\n"
