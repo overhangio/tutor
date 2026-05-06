@@ -52,8 +52,8 @@ class ConfigTests(unittest.TestCase):
 
         self.assertIn("MYSQL_ROOT_PASSWORD", config)
         self.assertEqual(8, len(get_typed(config, "MYSQL_ROOT_PASSWORD", str)))
-        self.assertEqual("www.myopenedx.com", config["LMS_HOST"])
-        self.assertEqual("studio.www.myopenedx.com", config["CMS_HOST"])
+        self.assertEqual("local.openedx.io", config["LMS_HOST"])
+        self.assertEqual("studio.local.openedx.io", config["CMS_HOST"])
 
     def test_is_service_activated(self) -> None:
         config: Config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}

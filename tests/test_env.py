@@ -115,7 +115,7 @@ class EnvTests(PluginsTestCase):
                     os.path.join(env.base_dir(root), "apps", "caddy", "Caddyfile"),
                     encoding="utf-8",
                 ) as f:
-                    self.assertIn("www.myopenedx.com{$default_site_port}", f.read())
+                    self.assertIn("local.openedx.io{$default_site_port}", f.read())
 
     def test_patch(self) -> None:
         patches = {"plugin1": "abcd", "plugin2": "efgh"}
