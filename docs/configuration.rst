@@ -366,6 +366,14 @@ Then, the ``openedx`` docker image must be rebuilt::
 
     tutor images build openedx
 
+Then, restart tutor for the changes to take effect::
+
+    tutor local start -d
+
+If your extra requirements have database migrations, those need to be run as well. If you are unsure of whether this is required, it is always good to run this command as it is idempotent::
+
+    tutor local do init
+
 .. _edx_platform_fork:
 
 Running a fork of ``edx-platform``
