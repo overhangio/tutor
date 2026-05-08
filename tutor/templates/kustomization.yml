@@ -68,12 +68,14 @@ configMapGenerator:
   options:
     labels:
         app.kubernetes.io/name: openedx
+{% if RUN_REDIS %}
 - name: redis-config
   files:
   - apps/redis/redis.conf
   options:
     labels:
         app.kubernetes.io/name: redis
+{% endif %}
 {{ patch("kustomization-configmapgenerator") }}
 
 {%- if patch("k8s-override") or patch("kustomization-patches") %}
