@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.6'></a>
+## v21.0.6 (2026-05-08)
+
+- [Bugfix] Fix `tutor local launch --non-interactive` overwriting `LMS_HOST`, `CMS_HOST`, and `ENABLE_HTTPS` with development defaults on every run. The non-interactive dev-defaults branch added in #1375 fired for any falsy `run_for_prod`, including the `None` value used for `local`, silently clobbering production configuration. Reverts the `interactive_configuration` change from #1375 and instead fixes the underlying issue (#1372) by changing the default `LMS_HOST` to `local.openedx.io` so a fresh `tutor dev launch -I` lands on dev-friendly defaults without forcing them.
+
 <a id='changelog-21.0.5'></a>
 ## v21.0.5 (2026-05-05)
 
