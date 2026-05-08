@@ -123,17 +123,18 @@ six==1.17.0
     #   python-dateutil
 snowballstemmer==3.0.1
     # via sphinx
-sphinx==7.4.7
+sphinx>=9.1.0; python_version >= "3.14"
+sphinx==7.4.7; python_version < "3.14"
     # via
     #   -r docs.in
     #   sphinx-click
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
-sphinx-click==6.0.0
+sphinx-click>=6.1.0
     # via -r docs.in
 sphinx-reredirects==0.1.5
     # via -r docs.in
-sphinx-rtd-theme==3.0.2
+sphinx-rtd-theme==3.1.0
     # via -r docs.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
