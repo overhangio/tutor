@@ -181,3 +181,39 @@ def assign_theme(name, domain):
     for domain_name in domain_names:
         python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
     return f'./manage.py lms shell -c "{python_command}"'
+
+
+def tests_setup_template(
+    admin_username: str,
+    admin_email: str,
+    admin_password: str,
+    oauth_client_id: str,
+    oauth_client_secret: str,
+) -> str:
+    return f"""
+# Create test admin user (idempotent: manage_user updates staff/superuser flags if user exists)
+./manage.py lms manage_user --staff --superuser {admin_username} {admin_email}
+./manage.py lms shell -c "
+from django.contrib.auth import get_user_model
+u = get_user_model().objects.get(username='{admin_username}')
+u.set_password('{admin_password}')
+u.save()
+print('Test admin ready: {admin_username}')"
+
+# Create OAuth2 client for tests (idempotent)
+./manage.py lms shell -c "
+from oauth2_provider.models import Application
+from django.contrib.auth import get_user_model
+user = get_user_model().objects.get(username='{admin_username}')
+app, created = Application.objects.get_or_create(
+    client_id='{oauth_client_id}',
+    defaults=dict(
+        user=user,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        client_secret='{oauth_client_secret}',
+        name='Tutor Tests',
+    ),
+)
+print('OAuth2 client ' + ('created' if created else 'already exists'))"
+"""

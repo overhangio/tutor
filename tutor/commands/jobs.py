@@ -5,19 +5,23 @@ Common jobs that must be added both to local, dev and k8s commands.
 from __future__ import annotations
 
 import functools
+import os
 import shlex
+import subprocess
+import sys
 import typing as t
 
 import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, fmt, hooks
-from tutor.commands.context import Context
+from tutor import env, exceptions, fmt, hooks
+from tutor.commands.context import BaseTaskContext, Context
 from tutor.commands.jobs_utils import (
     create_user_template,
     get_mysql_change_charset_query,
     set_theme_template,
+    tests_setup_template,
 )
 from tutor.hooks import priorities
 
@@ -540,6 +544,121 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
         runner.run_task_from_str(service, command)
 
 
+@click.command(
+    name="tests",
+    help="Run platform smoke and integration tests.",
+)
+@click.argument("suite", required=False, default=None, metavar="[SUITE]")
+@click.option(
+    "-l",
+    "--limit",
+    help="Limit to tests registered by this plugin or service.",
+)
+@click.option(
+    "--admin-username",
+    default="admin",
+    show_default=True,
+    help="Username of the test admin account.",
+)
+@click.option(
+    "--admin-email",
+    default="admin@example.com",
+    show_default=True,
+    help="Email of the test admin account.",
+)
+@click.option(
+    "--admin-password",
+    default="",
+    help=(
+        "Password for the test admin account. "
+        "When provided, creates or updates the admin user and OAuth2 client before running tests."
+    ),
+)
+@click.option(
+    "--oauth-client-id",
+    default="tutor-tests",
+    show_default=True,
+    help="OAuth2 client ID used by the tests to obtain JWT tokens.",
+)
+@click.option(
+    "--oauth-client-secret",
+    default="",
+    help="OAuth2 client secret. Required when --admin-password is set.",
+)
+@click.option(
+    "--course-id",
+    default="course-v1:OpenedX+DemoX+DemoCourse",
+    show_default=True,
+    help="Course ID used in enrollment and course content tests.",
+)
+@click.option(
+    "-s",
+    "--service",
+    default="lms",
+    show_default=True,
+    help="Service to run the test setup in.",
+)
+@click.pass_obj
+def tests_command(
+    context: BaseTaskContext,
+    suite: t.Optional[str],
+    limit: t.Optional[str],
+    admin_username: str,
+    admin_email: str,
+    admin_password: str,
+    oauth_client_id: str,
+    oauth_client_secret: str,
+    course_id: str,
+    service: str,
+) -> t.Iterable[tuple[str, str]]:
+    config = tutor_config.load(context.root)
+
+    if admin_password:
+        fmt.echo_info("Setting up test prerequisites...")
+        yield (
+            service,
+            tests_setup_template(
+                admin_username,
+                admin_email,
+                admin_password,
+                oauth_client_id,
+                oauth_client_secret,
+            ),
+        )
+
+    filter_context = hooks.Contexts.app(limit).name if limit else None
+    test_paths: list[str] = []
+    for test_suite, path in hooks.Filters.TESTS.iterate_from_context(filter_context):
+        if (suite is None or test_suite == suite) and path not in test_paths:
+            test_paths.append(path)
+
+    if not test_paths:
+        suite_str = f" suite '{suite}'" if suite else ""
+        limit_str = f" for plugin '{limit}'" if limit else ""
+        fmt.echo_alert(f"No tests found{suite_str}{limit_str}.")
+        return
+
+    test_env = {
+        **os.environ,
+        "LMS_HOST": str(config["LMS_HOST"]),
+        "CMS_HOST": str(config["CMS_HOST"]),
+        "ENABLE_HTTPS": "true" if config.get("ENABLE_HTTPS") else "false",
+        "OAUTH2_CLIENT_ID": oauth_client_id,
+        "OAUTH2_CLIENT_SECRET": oauth_client_secret,
+        "TEST_USERNAME": admin_username,
+        "TEST_PASSWORD": admin_password,
+        "TEST_EMAIL": admin_email,
+        "TEST_COURSE_ID": course_id,
+    }
+
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--tb=short", "-v", *test_paths],
+        env=test_env,
+    )
+    if result.returncode != 0:
+        raise exceptions.TutorError("Tests failed. See output above for details.")
+
+
 hooks.Filters.CLI_DO_COMMANDS.add_items(
     [
         convert_mysql_utf8mb4_charset,
@@ -550,6 +669,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         print_edx_platform_setting,
         settheme,
         sqlshell,
+        tests_command,
         update_mysql_authentication_plugin,
     ]
 )
