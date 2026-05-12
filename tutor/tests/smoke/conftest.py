@@ -90,7 +90,7 @@ def _jwt_via_client_credentials(session: requests.Session) -> str:
     assert resp.status_code == 200, (
         f"client_credentials grant failed: HTTP {resp.status_code} — {resp.text[:300]}"
     )
-    token = resp.json().get("access_token")
+    token: str = resp.json().get("access_token")
     assert token, f"No access_token in response: {resp.json()}"
     return token
 
@@ -111,6 +111,6 @@ def _jwt_via_password_grant(session: requests.Session) -> str:
     assert resp.status_code == 200, (
         f"password grant failed: HTTP {resp.status_code} — {resp.text[:300]}"
     )
-    token = resp.json().get("access_token")
+    token: str = resp.json().get("access_token")
     assert token, f"No access_token in response: {resp.json()}"
     return token

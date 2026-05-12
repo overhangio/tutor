@@ -20,7 +20,9 @@ class TestUserAPI:
         )
         assert "username" in resp.json()
 
-    def test_account_endpoint(self, auth_session: requests.Session, lms_url: str) -> None:
+    def test_account_endpoint(
+        self, auth_session: requests.Session, lms_url: str
+    ) -> None:
         if not TEST_USERNAME:
             pytest.skip("TEST_USERNAME not set.")
         resp = auth_session.get(
@@ -44,7 +46,10 @@ class TestUserAPI:
 
 class TestCreateUser:
     def test_create_new_user(
-        self, auth_session: requests.Session, http_session: requests.Session, lms_url: str
+        self,
+        auth_session: requests.Session,
+        http_session: requests.Session,
+        lms_url: str,
     ) -> None:
         """
         Register a new user via the public registration API.

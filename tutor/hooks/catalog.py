@@ -527,7 +527,7 @@ class Filters:
     #: :param list[str] command: the list of parameters to use as the celery command.
     CMS_WORKER_COMMAND: Filter[list[str], []] = Filter()
 
-    #: List of test suites registered by plugins, run via ``tutor local/dev/k8s do tests``.
+    #: List of test suites registered by plugins.
     #:
     #: Each item is a ``(suite_name, path)`` tuple where ``suite_name`` is a tag such as
     #: ``"smoke"`` and ``path`` is an absolute path to a pytest-collectible file or

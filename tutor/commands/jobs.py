@@ -18,10 +18,15 @@ from tutor import config as tutor_config
 from tutor import env, exceptions, fmt, hooks
 from tutor.commands.context import BaseTaskContext, Context
 from tutor.commands.jobs_utils import (
+    TEST_DEFAULTS,
     create_user_template,
     get_mysql_change_charset_query,
+    load_env_file,
+    parse_test_env_var,
     set_theme_template,
     tests_setup_template,
+    tests_teardown_cms_template,
+    tests_teardown_lms_template,
 )
 from tutor.hooks import priorities
 
@@ -471,6 +476,157 @@ def update_mysql_authentication_plugin(
     )
 
 
+@click.command(
+    name="tests",
+    help="Run platform smoke/integration/e2e tests.",
+)
+@click.argument("suite", required=False, default=None, metavar="[SUITE]")
+@click.option(
+    "-l",
+    "--limit",
+    help="Limit to tests registered by this plugin or service.",
+)
+@click.option(
+    "--env-file",
+    "env_file",
+    default=None,
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, resolve_path=True),
+    help=(
+        "Path to a YAML file of KEY: value pairs passed as env vars to the test process. "
+        "Merged before -e flags. Plugins document their own required keys."
+    ),
+)
+@click.option(
+    "-e",
+    "--env",
+    "env_vars",
+    multiple=True,
+    metavar="KEY=VALUE",
+    help=(
+        "Set a test env var (KEY=VALUE). May be repeated. Overrides --env-file values."
+    ),
+)
+@click.option(
+    "--setup/--no-setup",
+    default=False,
+    show_default=True,
+    help=(
+        "Create the test admin user and OAuth2 client before running tests. "
+        "Requires TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD, "
+        "OAUTH2_CLIENT_ID, and OAUTH2_CLIENT_SECRET in the merged env."
+    ),
+)
+@click.option(
+    "-s",
+    "--service",
+    default="lms",
+    show_default=True,
+    help="Service to run the test setup in.",
+)
+@click.option(
+    "--cleanup/--no-cleanup",
+    default=True,
+    show_default=True,
+    help=(
+        "Delete smoke test artifacts (user, course) from the database after the run. "
+        "Disable with --no-cleanup to inspect state after a failure."
+    ),
+)
+@click.option(
+    "-I",
+    "--non-interactive",
+    is_flag=True,
+    help="Skip confirmation prompts. Useful for CI/headless scripts.",
+)
+@click.pass_obj
+def tests_command(
+    context: BaseTaskContext,
+    suite: t.Optional[str],
+    limit: t.Optional[str],
+    env_file: t.Optional[str],
+    env_vars: tuple[str, ...],
+    setup: bool,
+    service: str,
+    cleanup: bool,
+    non_interactive: bool,
+) -> t.Iterable[tuple[str, str]]:
+    config = tutor_config.load(context.root)
+
+    # Build merged env: defaults < os.environ < --env-file < -e flags < tutor config
+    merged: dict[str, str] = dict(TEST_DEFAULTS)
+    merged.update({k: v for k, v in os.environ.items()})
+    if env_file:
+        merged.update(load_env_file(env_file))
+    for raw in env_vars:
+        k, v = parse_test_env_var(raw)
+        merged[k] = v
+    # Tutor-derived vars always win — must match the running platform
+    merged["LMS_HOST"] = str(config["LMS_HOST"])
+    merged["CMS_HOST"] = str(config["CMS_HOST"])
+    merged["ENABLE_HTTPS"] = "true" if config.get("ENABLE_HTTPS") else "false"
+
+    if setup:
+        required = [
+            "TEST_USERNAME",
+            "TEST_EMAIL",
+            "TEST_PASSWORD",
+            "OAUTH2_CLIENT_ID",
+            "OAUTH2_CLIENT_SECRET",
+        ]
+        missing = [k for k in required if not merged.get(k)]
+        if missing:
+            raise exceptions.TutorError(
+                "--setup requires these env vars but they are empty or missing: "
+                + ", ".join(missing)
+                + ". Pass them via -e KEY=VALUE or --env-file."
+            )
+        fmt.echo_info("Setting up test prerequisites...")
+        yield (
+            service,
+            tests_setup_template(
+                merged["TEST_USERNAME"],
+                merged["TEST_EMAIL"],
+                merged["TEST_PASSWORD"],
+                merged["OAUTH2_CLIENT_ID"],
+                merged["OAUTH2_CLIENT_SECRET"],
+            ),
+        )
+
+    filter_context = hooks.Contexts.app(limit).name if limit else None
+    test_paths: list[str] = []
+    for test_suite, path in hooks.Filters.TESTS.iterate_from_context(filter_context):
+        if (suite is None or test_suite == suite) and path not in test_paths:
+            test_paths.append(path)
+
+    if not test_paths:
+        suite_str = f" suite '{suite}'" if suite else ""
+        limit_str = f" for plugin '{limit}'" if limit else ""
+        fmt.echo_alert(f"No tests found{suite_str}{limit_str}.")
+        return
+
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--tb=short", "-v", *test_paths],
+        env=merged,
+    )
+
+    if cleanup:
+        smoke_username = merged["SMOKE_USERNAME"]
+        smoke_course_id = merged["SMOKE_COURSE_ID"]
+        fmt.echo_alert(
+            f"About to delete smoke test artifacts from the database: "
+            f"user '{smoke_username}', course '{smoke_course_id}'."
+        )
+        if not non_interactive:
+            if not click.confirm("Proceed with cleanup?", prompt_suffix=" "):
+                cleanup = False
+    if cleanup:
+        yield ("lms", tests_teardown_lms_template(merged["SMOKE_USERNAME"]))
+        yield ("cms", tests_teardown_cms_template(merged["SMOKE_COURSE_ID"]))
+
+    if result.returncode != 0:
+        raise exceptions.TutorError("Tests failed. See output above for details.")
+
+
 def add_job_commands(do_command_group: click.Group) -> None:
     """
     This is meant to be called with the `local/dev/k8s do` group commands, to add the
@@ -542,121 +698,6 @@ def do_callback(service_commands: t.Iterable[tuple[str, str]]) -> None:
     runner = context.job_runner(config)
     for service, command in service_commands:
         runner.run_task_from_str(service, command)
-
-
-@click.command(
-    name="tests",
-    help="Run platform smoke and integration tests.",
-)
-@click.argument("suite", required=False, default=None, metavar="[SUITE]")
-@click.option(
-    "-l",
-    "--limit",
-    help="Limit to tests registered by this plugin or service.",
-)
-@click.option(
-    "--admin-username",
-    default="admin",
-    show_default=True,
-    help="Username of the test admin account.",
-)
-@click.option(
-    "--admin-email",
-    default="admin@example.com",
-    show_default=True,
-    help="Email of the test admin account.",
-)
-@click.option(
-    "--admin-password",
-    default="",
-    help=(
-        "Password for the test admin account. "
-        "When provided, creates or updates the admin user and OAuth2 client before running tests."
-    ),
-)
-@click.option(
-    "--oauth-client-id",
-    default="tutor-tests",
-    show_default=True,
-    help="OAuth2 client ID used by the tests to obtain JWT tokens.",
-)
-@click.option(
-    "--oauth-client-secret",
-    default="",
-    help="OAuth2 client secret. Required when --admin-password is set.",
-)
-@click.option(
-    "--course-id",
-    default="course-v1:OpenedX+DemoX+DemoCourse",
-    show_default=True,
-    help="Course ID used in enrollment and course content tests.",
-)
-@click.option(
-    "-s",
-    "--service",
-    default="lms",
-    show_default=True,
-    help="Service to run the test setup in.",
-)
-@click.pass_obj
-def tests_command(
-    context: BaseTaskContext,
-    suite: t.Optional[str],
-    limit: t.Optional[str],
-    admin_username: str,
-    admin_email: str,
-    admin_password: str,
-    oauth_client_id: str,
-    oauth_client_secret: str,
-    course_id: str,
-    service: str,
-) -> t.Iterable[tuple[str, str]]:
-    config = tutor_config.load(context.root)
-
-    if admin_password:
-        fmt.echo_info("Setting up test prerequisites...")
-        yield (
-            service,
-            tests_setup_template(
-                admin_username,
-                admin_email,
-                admin_password,
-                oauth_client_id,
-                oauth_client_secret,
-            ),
-        )
-
-    filter_context = hooks.Contexts.app(limit).name if limit else None
-    test_paths: list[str] = []
-    for test_suite, path in hooks.Filters.TESTS.iterate_from_context(filter_context):
-        if (suite is None or test_suite == suite) and path not in test_paths:
-            test_paths.append(path)
-
-    if not test_paths:
-        suite_str = f" suite '{suite}'" if suite else ""
-        limit_str = f" for plugin '{limit}'" if limit else ""
-        fmt.echo_alert(f"No tests found{suite_str}{limit_str}.")
-        return
-
-    test_env = {
-        **os.environ,
-        "LMS_HOST": str(config["LMS_HOST"]),
-        "CMS_HOST": str(config["CMS_HOST"]),
-        "ENABLE_HTTPS": "true" if config.get("ENABLE_HTTPS") else "false",
-        "OAUTH2_CLIENT_ID": oauth_client_id,
-        "OAUTH2_CLIENT_SECRET": oauth_client_secret,
-        "TEST_USERNAME": admin_username,
-        "TEST_PASSWORD": admin_password,
-        "TEST_EMAIL": admin_email,
-        "TEST_COURSE_ID": course_id,
-    }
-
-    result = subprocess.run(
-        [sys.executable, "-m", "pytest", "--tb=short", "-v", *test_paths],
-        env=test_env,
-    )
-    if result.returncode != 0:
-        raise exceptions.TutorError("Tests failed. See output above for details.")
 
 
 hooks.Filters.CLI_DO_COMMANDS.add_items(

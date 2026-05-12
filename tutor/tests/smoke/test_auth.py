@@ -6,11 +6,13 @@ import base64
 
 import requests
 
-from .conftest import HTTP_TIMEOUT, OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET
+from .conftest import HTTP_TIMEOUT
 
 
 class TestOAuth2:
-    def test_token_endpoint_exists(self, http_session: requests.Session, lms_url: str) -> None:
+    def test_token_endpoint_exists(
+        self, http_session: requests.Session, lms_url: str
+    ) -> None:
         """POST with no credentials should return 400/401, not 404."""
         resp = http_session.post(
             f"{lms_url}/oauth2/access_token",

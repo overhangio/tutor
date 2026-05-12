@@ -41,7 +41,9 @@ def _migrate_obsolete_nightly_root(root: str) -> None:
         os.rename(nightly_plugins_root, PLUGINS_ROOT)
 
 
-_SMOKE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tests", "smoke"))
+_SMOKE_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "tests", "smoke")
+)
 
 with hooks.Contexts.app("lms").enter():
     hooks.Filters.TESTS.add_items(

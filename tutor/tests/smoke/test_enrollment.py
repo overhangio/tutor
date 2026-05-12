@@ -83,7 +83,9 @@ class TestEnrollUser:
             f"Enrollment POST returned HTTP {resp.status_code}: {resp.text[:500]}"
         )
         data = resp.json()
-        assert data.get("is_active") is True, f"Enrollment did not set is_active=True: {data}"
+        assert data.get("is_active") is True, (
+            f"Enrollment did not set is_active=True: {data}"
+        )
         assert data.get("mode") == "audit", f"Enrollment mode mismatch: {data}"
 
     def test_enrollment_is_present_after_enroll(

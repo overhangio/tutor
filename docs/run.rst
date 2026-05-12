@@ -22,10 +22,8 @@ Once your platform is running, you can verify it with the built-in smoke test su
 
     tutor local do tests smoke
 
-To run authenticated tests (user API, enrollment, course creation), supply credentials::
+To also create the test admin user and OAuth2 client and run authenticated tests::
 
-    tutor local do tests smoke \
-        --admin-password=yourpassword \
-        --oauth-client-secret=yoursecret
+    tutor local do tests smoke --setup
 
-For full documentation on CLI options, writing plugin tests, and the ``--limit`` flag, see the :ref:`smoke tests guide <smoketests>`.
+For full documentation on CLI options, writing plugin tests, and the ``--limit`` flag, see the :ref:`testing guide <testing>`.

@@ -7,7 +7,7 @@ import urllib.parse
 import pytest
 import requests
 
-from .conftest import HTTP_TIMEOUT, TEST_COURSE_ID, TEST_USERNAME
+from .conftest import HTTP_TIMEOUT, TEST_COURSE_ID
 
 _SMOKE_ORG = "TutorSmokeOrg"
 _SMOKE_NUMBER = "SMOKE101"
@@ -22,9 +22,7 @@ class TestCoursesAPI:
         resp = http_session.get(
             f"{lms_url}/api/courses/v1/courses/", timeout=HTTP_TIMEOUT
         )
-        assert resp.status_code == 200, (
-            f"Course list returned HTTP {resp.status_code}"
-        )
+        assert resp.status_code == 200, f"Course list returned HTTP {resp.status_code}"
         data = resp.json()
         assert "results" in data
 
@@ -89,7 +87,9 @@ class TestDemoCourse:
         assert resp.status_code == 200
         data = resp.json()
         for field in ("id", "name", "org", "number", "start"):
-            assert field in data, f"Demo course response missing field '{field}': {data}"
+            assert field in data, (
+                f"Demo course response missing field '{field}': {data}"
+            )
 
 
 class TestCreateCourse:
