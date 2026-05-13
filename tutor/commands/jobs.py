@@ -554,8 +554,8 @@ def tests_command(
         k, v = parse_test_env_var(raw)
         merged[k] = v
     # Tutor-derived vars always win — must match the running platform
-    merged["LMS_HOST"] = str(config["LMS_HOST"])
-    merged["CMS_HOST"] = str(config["CMS_HOST"])
+    merged["LMS_HOST"] = t.cast(str, config["LMS_HOST"])
+    merged["CMS_HOST"] = t.cast(str, config["CMS_HOST"])
     merged["ENABLE_HTTPS"] = "true" if config.get("ENABLE_HTTPS") else "false"
 
     # Auto-generate missing credentials and tell the user to save them
