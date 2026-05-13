@@ -117,16 +117,16 @@ Plugins register test paths via the ``TESTS`` filter. Each entry is a ``(suite, 
     from tutor import hooks
 
     hooks.Filters.TESTS.add_item(
-        ("smoke", str(_pkg.files("tutormyplugin") / "tests" / "smoke")),
+        ("lms", "smoke", str(_pkg.files("tutormyplugin") / "tests" / "smoke")),
     )
 
 Because hooks registered at the plugin module level are automatically tagged with the plugin's own context, the tests above will be selected when the user passes ``--limit=myplugin``.
 
-To limit tests to a specific service context (e.g. only when testing the CMS), wrap the registration::
+The first element of each tuple is the **service** — the container that ``--setup`` runs in for this group of tests. To limit tests to a specific service context and run setup in a different container (e.g. only when testing the CMS), wrap the registration::
 
     with hooks.Contexts.app("cms").enter():
         hooks.Filters.TESTS.add_item(
-            ("smoke", str(_pkg.files("tutormyplugin") / "tests" / "smoke" / "test_cms.py")),
+            ("cms", "smoke", str(_pkg.files("tutormyplugin") / "tests" / "smoke" / "test_cms.py")),
         )
 
 Writing plugin tests

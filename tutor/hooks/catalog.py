@@ -529,16 +529,15 @@ class Filters:
 
     #: List of test suites registered by plugins.
     #:
-    #: Each item is a ``(suite_name, path)`` tuple where ``suite_name`` is a tag such as
-    #: ``"smoke"`` and ``path`` is an absolute path to a pytest-collectible file or
-    #: directory. Use the context system to associate items with a plugin so that
-    #: ``--limit=<plugin>`` filters correctly::
+    #: Each item is a ``(service, suite_name, path)`` tuple where ``service`` is the
+    #: container to run setup/cleanup in (e.g. ``"lms"``), ``suite_name`` is a tag such
+    #: as ``"smoke"``, and ``path`` is an absolute path to a pytest-collectible file or
+    #: directory::
     #:
-    #:     with hooks.Contexts.app("myplugin").enter():
-    #:         hooks.Filters.TESTS.add_item(("smoke", "/path/to/tests/smoke"))
+    #:         hooks.Filters.TESTS.add_item(("lms", "smoke", "/path/to/tests/smoke"))
     #:
-    #: :parameter list[tuple[str, str]] suites: list of ``(suite_name, path)`` tuples.
-    TESTS: Filter[list[tuple[str, str]], []] = Filter()
+    #: :parameter list[tuple[str, str, str]] suites: list of ``(service, suite_name, path)`` tuples.
+    TESTS: Filter[list[tuple[str, str, str]], []] = Filter()
 
 
 class Contexts:

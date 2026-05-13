@@ -513,15 +513,9 @@ def update_mysql_authentication_plugin(
     help=(
         "Create the test admin user and OAuth2 client before running tests. "
         "Requires TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD, "
-        "OAUTH2_CLIENT_ID, and OAUTH2_CLIENT_SECRET in the merged env."
+        "OAUTH2_CLIENT_ID, and OAUTH2_CLIENT_SECRET in the merged env. "
+        "The service is taken from the first matched TESTS filter entry."
     ),
-)
-@click.option(
-    "-s",
-    "--service",
-    default="lms",
-    show_default=True,
-    help="Service to run the test setup in.",
 )
 @click.option(
     "--cleanup/--no-cleanup",
@@ -546,7 +540,6 @@ def tests_command(
     env_file: t.Optional[str],
     env_vars: tuple[str, ...],
     setup: bool,
-    service: str,
     cleanup: bool,
     non_interactive: bool,
 ) -> t.Iterable[tuple[str, str]]:
@@ -578,6 +571,22 @@ def tests_command(
             "Save them to an env file if you want to reuse them across runs:\n" + lines
         )
 
+    filter_context = hooks.Contexts.app(limit).name if limit else None
+    test_entries: list[tuple[str, str]] = []  # (service, path)
+    for test_service, test_suite, path in hooks.Filters.TESTS.iterate_from_context(
+        filter_context
+    ):
+        if (suite is None or test_suite == suite) and path not in [
+            p for _, p in test_entries
+        ]:
+            test_entries.append((test_service, path))
+
+    if not test_entries:
+        suite_str = f" suite '{suite}'" if suite else ""
+        limit_str = f" for plugin '{limit}'" if limit else ""
+        fmt.echo_alert(f"No tests found{suite_str}{limit_str}.")
+        return
+
     if setup:
         required = [
             "TEST_USERNAME",
@@ -593,9 +602,10 @@ def tests_command(
                 + ", ".join(missing)
                 + ". Pass them via -e KEY=VALUE or --env-file."
             )
-        fmt.echo_info("Setting up test prerequisites...")
+        setup_service = test_entries[0][0]
+        fmt.echo_info(f"Setting up test prerequisites in '{setup_service}'...")
         yield (
-            service,
+            setup_service,
             tests_setup_template(
                 merged["TEST_USERNAME"],
                 merged["TEST_EMAIL"],
@@ -605,18 +615,7 @@ def tests_command(
             ),
         )
 
-    filter_context = hooks.Contexts.app(limit).name if limit else None
-    test_paths: list[str] = []
-    for test_suite, path in hooks.Filters.TESTS.iterate_from_context(filter_context):
-        if (suite is None or test_suite == suite) and path not in test_paths:
-            test_paths.append(path)
-
-    if not test_paths:
-        suite_str = f" suite '{suite}'" if suite else ""
-        limit_str = f" for plugin '{limit}'" if limit else ""
-        fmt.echo_alert(f"No tests found{suite_str}{limit_str}.")
-        return
-
+    test_paths = [path for _, path in test_entries]
     result = subprocess.run(
         [sys.executable, "-m", "pytest", "--tb=short", "-v", *test_paths],
         env=merged,
