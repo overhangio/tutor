@@ -4,7 +4,7 @@
 Platform Testing
 ======================
 
-Tutor includes a pluggable testing system that lets you verify a running Open edX platform. Core test suites are built in, and plugins can register their own test files without any changes to Tutor itself.
+Tutor includes a pluggable testing system that lets you verify a running Open edX platform. Plugins register test suites via the ``TESTS`` filter without any changes to Tutor core.
 
 Running tests
 -------------
@@ -67,7 +67,7 @@ CLI reference
    * - ``--setup / --no-setup``
      - Create the test admin user and OAuth2 client before running tests. Requires ``TEST_USERNAME``, ``TEST_EMAIL``, ``TEST_PASSWORD``, ``OAUTH2_CLIENT_ID``, and ``OAUTH2_CLIENT_SECRET`` in the merged env. Default: ``--no-setup``.
    * - ``--cleanup / --no-cleanup``
-     - Delete smoke test artifacts from the database after the run. Use ``--no-cleanup`` to inspect state after a failure. Default: ``--cleanup``.
+     - Run post-test cleanup commands inside the service container after the test run. Use ``--no-cleanup`` to skip cleanup and inspect state after a failure. Default: ``--cleanup``.
    * - ``-I, --non-interactive``
      - Skip confirmation prompts. Required for CI/headless scripts.
    * - ``-s, --service``
@@ -105,31 +105,6 @@ Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from y
    * - ``TEST_COURSE_ID``
      - ``course-v1:OpenedX+DemoX+DemoCourse``
      - Course ID used in enrollment and content tests.
-   * - ``SMOKE_USERNAME``
-     - ``tutor_smoke_user``
-     - Username of the transient user created by the smoke tests.
-   * - ``SMOKE_COURSE_ID``
-     - ``course-v1:TutorSmokeOrg+SMOKE101+smoke``
-     - Course ID of the transient course created by the smoke tests.
-
-Built-in test suites
---------------------
-
-Tutor ships with a ``smoke`` suite that verifies a freshly deployed platform:
-
-* **LMS & CMS accessibility** — homepage, login/register pages, heartbeat endpoints.
-* **OAuth2 authentication** — token endpoint, JWT issuance, invalid-credential rejection.
-* **User API** — ``/api/user/v1/me``, account lookup, user registration.
-* **Enrollment API** — enrollment listing, enrollment modes, user enrollment.
-* **Courses API** — course listing (authenticated & unauthenticated), pagination, demo course verification, course creation in Studio.
-
-LMS-focused tests run under the ``lms`` context; Studio/course tests run under the ``cms`` context::
-
-    tutor local do tests smoke --limit=lms
-    tutor local do tests smoke --limit=cms
-
-After the suite finishes, the transient user and course created during the run are deleted from the database. Pass ``--no-cleanup`` to skip this step and inspect the database state manually.
-
 Adding tests from a plugin
 --------------------------
 

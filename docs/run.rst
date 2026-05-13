@@ -14,16 +14,3 @@ Importing a demo course
 -----------------------
 
 To get a glimpse of the possibilities of Open edX, we recommend you import the `official demo test course <https://github.com/openedx/edx-demo-course>`__. Tutor provides a :ref:`simple command for that <democourse>`.
-
-Verifying your platform with smoke tests
------------------------------------------
-
-Once your platform is running, you can verify it with the built-in smoke test suite::
-
-    tutor local do tests smoke
-
-To also create the test admin user and OAuth2 client and run authenticated tests::
-
-    tutor local do tests smoke --setup
-
-For full documentation on CLI options, writing plugin tests, and the ``--limit`` flag, see the :ref:`testing guide <testing>`.
