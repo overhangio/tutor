@@ -1,5 +1,41 @@
 from __future__ import annotations
 
+from tutor import exceptions, serialize
+
+TEST_DEFAULTS: dict[str, str] = {
+    "TEST_USERNAME": "admin",
+    "TEST_EMAIL": "admin@example.com",
+    "TEST_PASSWORD": "",
+    "OAUTH2_CLIENT_ID": "tutor-tests",
+    "OAUTH2_CLIENT_SECRET": "",
+    "TEST_COURSE_ID": "course-v1:OpenedX+DemoX+DemoCourse",
+    "SMOKE_TESTS_USERNAME": "tutor_smoke_user",
+    "SMOKE_TESTS_COURSE_ID": "course-v1:TutorSmokeOrg+SMOKE101+smoke",
+}
+
+
+def load_env_file(path: str) -> dict[str, str]:
+    """Load a YAML file of KEY: value pairs for use as test env vars."""
+    with open(path, encoding="utf-8") as f:
+        data = serialize.load(f.read())
+    if not isinstance(data, dict):
+        raise exceptions.TutorError(
+            f"Env file '{path}' must be a YAML mapping, got {type(data).__name__}"
+        )
+    return {str(k): str(v) for k, v in data.items()}
+
+
+def parse_test_env_var(raw: str) -> tuple[str, str]:
+    """Parse KEY=VALUE as plain strings (no YAML coercion — unlike serialize.parse_key_value)."""
+    if "=" not in raw:
+        raise exceptions.TutorError(
+            f"Invalid env var '{raw}': expected KEY=VALUE format."
+        )
+    key, _, value = raw.partition("=")
+    if not key:
+        raise exceptions.TutorError(f"Invalid env var '{raw}': key cannot be empty.")
+    return key, value
+
 
 def create_user_template(
     superuser: str, staff: bool, username: str, email: str, password: str
@@ -181,3 +217,52 @@ def assign_theme(name, domain):
     for domain_name in domain_names:
         python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
     return f'./manage.py lms shell -c "{python_command}"'
+
+
+def tests_teardown_lms_template(smoke_username: str) -> str:
+    return f"""
+./manage.py lms shell -c "
+from django.contrib.auth import get_user_model
+n, _ = get_user_model().objects.filter(username='{smoke_username}').delete()
+print(f'Smoke user cleanup: removed {{n}} object(s)')"
+"""
+
+
+def tests_teardown_cms_template(smoke_course_id: str) -> str:
+    return f"./manage.py cms delete_course {smoke_course_id} --commit || true"
+
+
+def tests_setup_template(
+    admin_username: str,
+    admin_email: str,
+    admin_password: str,
+    oauth_client_id: str,
+    oauth_client_secret: str,
+) -> str:
+    return f"""
+# Create test admin user (idempotent: manage_user updates staff/superuser flags if user exists)
+./manage.py lms manage_user --staff --superuser {admin_username} {admin_email}
+./manage.py lms shell -c "
+from django.contrib.auth import get_user_model
+u = get_user_model().objects.get(username='{admin_username}')
+u.set_password('{admin_password}')
+u.save()
+print('Test admin ready: {admin_username}')"
+
+# Create OAuth2 client for tests (idempotent)
+./manage.py lms shell -c "
+from oauth2_provider.models import Application
+from django.contrib.auth import get_user_model
+user = get_user_model().objects.get(username='{admin_username}')
+app, created = Application.objects.get_or_create(
+    client_id='{oauth_client_id}',
+    defaults=dict(
+        user=user,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
+        client_secret='{oauth_client_secret}',
+        name='Tutor Tests',
+    ),
+)
+print('OAuth2 client ' + ('created' if created else 'already exists'))"
+"""

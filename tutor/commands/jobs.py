@@ -5,19 +5,28 @@ Common jobs that must be added both to local, dev and k8s commands.
 from __future__ import annotations
 
 import functools
+import os
 import shlex
+import subprocess
+import sys
 import typing as t
 
 import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, fmt, hooks
-from tutor.commands.context import Context
+from tutor import env, exceptions, fmt, hooks, utils
+from tutor.commands.context import BaseTaskContext, Context
 from tutor.commands.jobs_utils import (
+    TEST_DEFAULTS,
     create_user_template,
     get_mysql_change_charset_query,
+    load_env_file,
+    parse_test_env_var,
     set_theme_template,
+    tests_setup_template,
+    tests_teardown_cms_template,
+    tests_teardown_lms_template,
 )
 from tutor.hooks import priorities
 
@@ -467,6 +476,169 @@ def update_mysql_authentication_plugin(
     )
 
 
+@click.command(
+    name="tests",
+    help="Run platform smoke/integration/e2e tests.",
+)
+@click.argument("suite", required=False, default=None, metavar="[SUITE]")
+@click.option(
+    "-l",
+    "--limit",
+    help="Limit to tests registered by this plugin or service.",
+)
+@click.option(
+    "--env-file",
+    "env_file",
+    default=None,
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, resolve_path=True),
+    help=(
+        "Path to a YAML file of KEY: value pairs passed as env vars to the test process. "
+        "Merged before -e flags. Plugins document their own required keys."
+    ),
+)
+@click.option(
+    "-e",
+    "--env",
+    "env_vars",
+    multiple=True,
+    metavar="KEY=VALUE",
+    help=(
+        "Set a test env var (KEY=VALUE). May be repeated. Overrides --env-file values."
+    ),
+)
+@click.option(
+    "--setup/--no-setup",
+    default=False,
+    show_default=True,
+    help=(
+        "Create the test admin user and OAuth2 client before running tests. "
+        "Requires TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD, "
+        "OAUTH2_CLIENT_ID, and OAUTH2_CLIENT_SECRET in the merged env. "
+        "The service is taken from the first matched TESTS filter entry."
+    ),
+)
+@click.option(
+    "--cleanup/--no-cleanup",
+    default=True,
+    show_default=True,
+    help=(
+        "Delete smoke test artifacts (user, course) from the database after the run. "
+        "Disable with --no-cleanup to inspect state after a failure."
+    ),
+)
+@click.option(
+    "-I",
+    "--non-interactive",
+    is_flag=True,
+    help="Skip confirmation prompts. Useful for CI/headless scripts.",
+)
+@click.pass_obj
+def tests_command(
+    context: BaseTaskContext,
+    suite: t.Optional[str],
+    limit: t.Optional[str],
+    env_file: t.Optional[str],
+    env_vars: tuple[str, ...],
+    setup: bool,
+    cleanup: bool,
+    non_interactive: bool,
+) -> t.Iterable[tuple[str, str]]:
+    config = tutor_config.load(context.root)
+
+    # Build merged env: defaults < os.environ < --env-file < -e flags < tutor config
+    merged: dict[str, str] = dict(TEST_DEFAULTS)
+    merged.update({k: v for k, v in os.environ.items()})
+    if env_file:
+        merged.update(load_env_file(env_file))
+    for raw in env_vars:
+        k, v = parse_test_env_var(raw)
+        merged[k] = v
+    # Tutor-derived vars always win — must match the running platform
+    merged["LMS_HOST"] = t.cast(str, config["LMS_HOST"])
+    merged["CMS_HOST"] = t.cast(str, config["CMS_HOST"])
+    merged["ENABLE_HTTPS"] = "true" if config.get("ENABLE_HTTPS") else "false"
+
+    # Auto-generate missing credentials and tell the user to save them
+    generated: list[tuple[str, str]] = []
+    for key in ("TEST_PASSWORD", "OAUTH2_CLIENT_SECRET"):
+        if not merged.get(key):
+            merged[key] = utils.random_string(8)
+            generated.append((key, merged[key]))
+    if generated:
+        lines = "\n".join(f"  {k}: {v}" for k, v in generated)
+        fmt.echo_alert(
+            "The following credentials were randomly generated for this run.\n"
+            "Save them to an env file if you want to reuse them across runs:\n" + lines
+        )
+
+    filter_context = hooks.Contexts.app(limit).name if limit else None
+    test_entries: list[tuple[str, str]] = []  # (service, path)
+    for test_service, test_suite, path in hooks.Filters.TESTS.iterate_from_context(
+        filter_context
+    ):
+        if (suite is None or test_suite == suite) and path not in [
+            p for _, p in test_entries
+        ]:
+            test_entries.append((test_service, path))
+
+    if not test_entries:
+        suite_str = f" suite '{suite}'" if suite else ""
+        limit_str = f" for plugin '{limit}'" if limit else ""
+        fmt.echo_alert(f"No tests found{suite_str}{limit_str}.")
+        return
+
+    if setup:
+        required = [
+            "TEST_USERNAME",
+            "TEST_EMAIL",
+            "TEST_PASSWORD",
+            "OAUTH2_CLIENT_ID",
+            "OAUTH2_CLIENT_SECRET",
+        ]
+        missing = [k for k in required if not merged.get(k)]
+        if missing:
+            raise exceptions.TutorError(
+                "--setup requires these env vars but they are empty or missing: "
+                + ", ".join(missing)
+                + ". Pass them via -e KEY=VALUE or --env-file."
+            )
+        setup_service = test_entries[0][0]
+        fmt.echo_info(f"Setting up test prerequisites in '{setup_service}'...")
+        yield (
+            setup_service,
+            tests_setup_template(
+                merged["TEST_USERNAME"],
+                merged["TEST_EMAIL"],
+                merged["TEST_PASSWORD"],
+                merged["OAUTH2_CLIENT_ID"],
+                merged["OAUTH2_CLIENT_SECRET"],
+            ),
+        )
+
+    test_paths = [path for _, path in test_entries]
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--tb=short", "-v", *test_paths],
+        env=merged,
+    )
+
+    if cleanup:
+        smoke_username = merged["SMOKE_USERNAME"]
+        smoke_course_id = merged["SMOKE_COURSE_ID"]
+        fmt.echo_alert(
+            f"About to delete smoke test artifacts from the database: "
+            f"user '{smoke_username}', course '{smoke_course_id}'."
+        )
+        if not non_interactive:
+            if not click.confirm("Proceed with cleanup?", prompt_suffix=" "):
+                cleanup = False
+    if cleanup:
+        yield ("lms", tests_teardown_lms_template(merged["SMOKE_USERNAME"]))
+        yield ("cms", tests_teardown_cms_template(merged["SMOKE_COURSE_ID"]))
+
+    if result.returncode != 0:
+        raise exceptions.TutorError("Tests failed. See output above for details.")
+
+
 def add_job_commands(do_command_group: click.Group) -> None:
     """
     This is meant to be called with the `local/dev/k8s do` group commands, to add the
@@ -550,6 +722,7 @@ hooks.Filters.CLI_DO_COMMANDS.add_items(
         print_edx_platform_setting,
         settheme,
         sqlshell,
+        tests_command,
         update_mysql_authentication_plugin,
     ]
 )
