@@ -1,4 +1,4 @@
-.. _testing:
+.. _platform_testing:
 
 ======================
 Platform Testing
@@ -105,6 +105,7 @@ Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from y
    * - ``TEST_COURSE_ID``
      - ``course-v1:OpenedX+DemoX+DemoCourse``
      - Course ID used in enrollment and content tests.
+
 Adding tests from a plugin
 --------------------------
 
