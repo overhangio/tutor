@@ -15,7 +15,7 @@ import click
 from typing_extensions import ParamSpec
 
 from tutor import config as tutor_config
-from tutor import env, exceptions, fmt, hooks
+from tutor import env, exceptions, fmt, hooks, utils
 from tutor.commands.context import BaseTaskContext, Context
 from tutor.commands.jobs_utils import (
     TEST_DEFAULTS,
@@ -564,6 +564,19 @@ def tests_command(
     merged["LMS_HOST"] = str(config["LMS_HOST"])
     merged["CMS_HOST"] = str(config["CMS_HOST"])
     merged["ENABLE_HTTPS"] = "true" if config.get("ENABLE_HTTPS") else "false"
+
+    # Auto-generate missing credentials and tell the user to save them
+    generated: list[tuple[str, str]] = []
+    for key in ("TEST_PASSWORD", "OAUTH2_CLIENT_SECRET"):
+        if not merged.get(key):
+            merged[key] = utils.random_string(8)
+            generated.append((key, merged[key]))
+    if generated:
+        lines = "\n".join(f"  {k}: {v}" for k, v in generated)
+        fmt.echo_alert(
+            "The following credentials were randomly generated for this run.\n"
+            "Save them to an env file if you want to reuse them across runs:\n" + lines
+        )
 
     if setup:
         required = [

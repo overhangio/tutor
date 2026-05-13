@@ -92,14 +92,16 @@ Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from y
      - ``admin@example.com``
      - Admin email address.
    * - ``TEST_PASSWORD``
-     - *(empty)*
-     - Admin password. Required when ``--setup`` is used.
+     - *(auto-generated)*
+     - Admin password. Auto-generated if not provided — Tutor will print the
+       value and ask you to save it.
    * - ``OAUTH2_CLIENT_ID``
      - ``tutor-tests``
      - OAuth2 client ID for JWT token acquisition.
    * - ``OAUTH2_CLIENT_SECRET``
-     - *(empty)*
-     - OAuth2 client secret. Required when ``--setup`` is used.
+     - *(auto-generated)*
+     - OAuth2 client secret. Auto-generated if not provided — Tutor will print
+       the value and ask you to save it.
    * - ``TEST_COURSE_ID``
      - ``course-v1:OpenedX+DemoX+DemoCourse``
      - Course ID used in enrollment and content tests.
