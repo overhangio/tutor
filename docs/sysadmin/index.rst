@@ -5,7 +5,6 @@ System administration
    :maxdepth: 1
 
    edx-platform
-   custom-translations
    scale
    portainer
    podman

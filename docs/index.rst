@@ -54,6 +54,7 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
    tutor
    developing/openedx
    developing/themes
+   developing/custom-translations
    developing/legacy/index
 
 .. toctree::
