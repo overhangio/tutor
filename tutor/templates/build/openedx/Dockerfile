@@ -116,7 +116,7 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
 # granian server https://pypi.org/project/granian/
 # We need the reload dependency so install it as well
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install --no-cache-dir --compile granian[reload]==2.6.0
+    $PIP_COMMAND install --no-cache-dir --compile granian[reload]==2.7.4
 
 # Install scorm xblock
 RUN $PIP_COMMAND install "openedx-scorm-xblock>=19.0.0,<20.0.0"

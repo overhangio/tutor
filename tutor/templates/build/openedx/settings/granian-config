@@ -4,6 +4,8 @@
 --workers $GRANIAN_WORKERS
 --static-path-route /static
 --static-path-mount /openedx/staticfiles/
+--static-path-route /media
+--static-path-mount /openedx/media/
 --reload
 --reload-paths /openedx/granian-reload-path
 --http1-buffer-size 8192
