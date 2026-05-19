@@ -40,7 +40,7 @@ google-auth==2.40.3
     # via
     #   -r base.txt
     #   kubernetes
-idna==3.10
+idna==3.15
     # via
     #   -r base.txt
     #   requests
@@ -127,6 +127,7 @@ sphinx==7.4.7
     # via
     #   -r docs.in
     #   sphinx-click
+    #   sphinx-reredirects
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
 sphinx-click==6.0.0

@@ -53,7 +53,7 @@ google-auth==2.40.3
     #   kubernetes
 id==1.5.0
     # via twine
-idna==3.10
+idna==3.15
     # via
     #   -r base.txt
     #   requests
