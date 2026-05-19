@@ -414,6 +414,10 @@ Once you've applied your changes, you'll need to do the following:
 
 #. Restart with ``tutor local restart``
 
+For advanced translation customization — including overriding theme translations and managing
+translations for forked repositories, custom plugins, and additional MFEs — see
+:ref:`Customizing and Overriding Translations <custom-translations>`.
+
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
