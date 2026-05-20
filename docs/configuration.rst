@@ -366,6 +366,14 @@ Then, the ``openedx`` docker image must be rebuilt::
 
     tutor images build openedx
 
+Then, restart tutor for the changes to take effect::
+
+    tutor local reboot -d
+
+If your extra requirements have database migrations, those need to be run as well. If you are unsure of whether this is required, it is always good to run this command as it is idempotent::
+
+    tutor local do init
+
 .. _edx_platform_fork:
 
 Running a fork of ``edx-platform``
@@ -413,6 +421,10 @@ Once you've applied your changes, you'll need to do the following:
 #. Run the command ``tutor images build mfe``
 
 #. Restart with ``tutor local restart``
+
+For advanced translation customization — including overriding theme translations and managing
+translations for forked repositories, custom plugins, and additional MFEs — see
+:ref:`Customizing and Overriding Translations <custom-translations>`.
 
 Running a different ``openedx`` Docker image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
