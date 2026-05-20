@@ -103,6 +103,10 @@ To rebuild assets, you can run the ``build-dev`` NPM script that comes with edx-
 
     tutor dev run lms npm run build-dev
 
+If you've added any new migrations to your codebase, you can run them as well::
+
+    tutor dev run lms ./manage.py lms migrate
+    tutor dev run cms ./manage.py cms migrate
 
 .. _specialized for developer usage:
 
