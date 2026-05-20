@@ -4,6 +4,46 @@ import os
 
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
+
+def _get_default_site_domain():
+    service_variant = os.environ.get("SERVICE_VARIANT", "lms")
+    if service_variant == "cms":
+        return globals().get("CMS_BASE")
+    return globals().get("LMS_BASE")
+
+
+def _configure_site_id():
+    domain = _get_default_site_domain()
+    if not domain:
+        return
+
+    from django.conf import settings
+    from django.contrib.sites.models import Site
+
+    site, _ = Site.objects.get_or_create(
+        domain=domain,
+        defaults={"domain": domain, "name": domain},
+    )
+    settings.SITE_ID = site.pk
+
+
+def _patch_django_setup_with_site_id():
+    import django
+
+    if getattr(django.setup, "_tutor_site_id_patched", False):
+        return
+
+    original_setup = django.setup
+
+    def setup_with_site_id(*args, **kwargs):
+        result = original_setup(*args, **kwargs)
+        _configure_site_id()
+        return result
+
+    setup_with_site_id._tutor_site_id_patched = True
+    django.setup = setup_with_site_id
+
+
 # Mongodb connection parameters: simply modify `mongodb_parameters` to affect all connections to MongoDb.
 mongodb_parameters = {
     "db": "{{ MONGODB_DATABASE }}",
@@ -89,6 +129,8 @@ CACHES = {
 # The default Django contrib site is the one associated to the LMS domain name. 1 is
 # usually "example.com", so it's the next available integer.
 SITE_ID = 2
+_patch_django_setup_with_site_id()
+
 
 # Contact addresses
 CONTACT_MAILING_ADDRESS = "{{ PLATFORM_NAME }} - {% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}"
