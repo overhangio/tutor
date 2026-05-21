@@ -400,13 +400,13 @@ File: ``apps/redis/redis.conf``
 
 Implement this patch to override hard-coded Redis configuration values. See the `Redis configuration reference <https://redis.io/docs/management/config-file/>`__`.
 
+.. patch:: granian-config
+
 ``granian-config``
-================
+==================
 
 File: ``apps/openedx/settings/granian-config``
 
 A file used to extend or override the Granian configuration.
 
 Check the Granian documentation for the `list of available options <https://github.com/emmett-framework/granian>`__.
-
-.. patch:: granian-config
