@@ -20,11 +20,15 @@ def _configure_site_id():
     from django.conf import settings
     from django.contrib.sites.models import Site
 
-    site, _ = Site.objects.get_or_create(
-        domain=domain,
-        defaults={"domain": domain, "name": domain},
-    )
-    settings.SITE_ID = site.pk
+    try:
+        site, _ = Site.objects.get_or_create(
+            domain=domain,
+            defaults={"name": domain},
+        )
+        settings.SITE_ID = site.pk
+    except Exception:
+        # use default SITE_ID. This can happen if the database is not yet migrated, or if the Sites framework is not installed.
+        pass
 
 
 def _patch_django_setup_with_site_id():
