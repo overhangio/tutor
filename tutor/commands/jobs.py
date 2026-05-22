@@ -557,6 +557,10 @@ def tests_command(
     merged["LMS_HOST"] = t.cast(str, config["LMS_HOST"])
     merged["CMS_HOST"] = t.cast(str, config["CMS_HOST"])
     merged["ENABLE_HTTPS"] = "true" if config.get("ENABLE_HTTPS") else "false"
+    # Dev mode exposes LMS/CMS on non-standard ports
+    if getattr(context, "NAME", "local") == "dev":
+        merged.setdefault("LMS_PORT", "8000")
+        merged.setdefault("CMS_PORT", "8001")
 
     # Auto-generate missing credentials and tell the user to save them
     generated: list[tuple[str, str]] = []

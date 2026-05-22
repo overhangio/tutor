@@ -9,8 +9,8 @@ TEST_DEFAULTS: dict[str, str] = {
     "OAUTH2_CLIENT_ID": "tutor-tests",
     "OAUTH2_CLIENT_SECRET": "",
     "TEST_COURSE_ID": "course-v1:OpenedX+DemoX+DemoCourse",
-    "SMOKE_TESTS_USERNAME": "tutor_smoke_user",
-    "SMOKE_TESTS_COURSE_ID": "course-v1:TutorSmokeOrg+SMOKE101+smoke",
+    "SMOKE_USERNAME": "tutor_smoke_user",
+    "SMOKE_COURSE_ID": "course-v1:TutorSmokeOrg+SMOKE101+smoke",
 }
 
 

@@ -41,6 +41,28 @@ def _migrate_obsolete_nightly_root(root: str) -> None:
         os.rename(nightly_plugins_root, PLUGINS_ROOT)
 
 
+_SMOKE_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "tests", "smoke")
+)
+
+with hooks.Contexts.app("lms").enter():
+    hooks.Filters.TESTS.add_items(
+        [
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_lms.py")),
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_auth.py")),
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_users.py")),
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_enrollment.py")),
+        ]
+    )
+
+with hooks.Contexts.app("cms").enter():
+    hooks.Filters.TESTS.add_items(
+        [
+            ("cms", "smoke", os.path.join(_SMOKE_DIR, "test_courses.py")),
+        ]
+    )
+
+
 @hooks.Filters.CONFIG_DEFAULTS.add()
 def _set_openedx_common_version_in_main(
     items: list[tuple[str, t.Any]],
