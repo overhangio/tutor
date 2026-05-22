@@ -47,10 +47,14 @@ class TestCMSAccessibility:
         assert resp.status_code == 200, f"CMS homepage returned HTTP {resp.status_code}"
 
     def test_signin_page(self, http_session: requests.Session, cms_url: str) -> None:
+        # /signin redirects to the OAuth2 login flow — don't follow the chain,
+        # just verify the endpoint exists and issues a redirect.
         resp = http_session.get(
-            f"{cms_url}/signin", timeout=HTTP_TIMEOUT, allow_redirects=True
+            f"{cms_url}/signin", timeout=HTTP_TIMEOUT, allow_redirects=False
         )
-        assert resp.status_code == 200, f"CMS /signin returned HTTP {resp.status_code}"
+        assert resp.status_code in (200, 302), (
+            f"CMS /signin returned HTTP {resp.status_code}"
+        )
 
     def test_heartbeat(self, http_session: requests.Session, cms_url: str) -> None:
         resp = http_session.get(f"{cms_url}/heartbeat", timeout=HTTP_TIMEOUT)

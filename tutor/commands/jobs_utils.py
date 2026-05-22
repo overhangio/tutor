@@ -229,7 +229,7 @@ print(f'Smoke user cleanup: removed {{n}} object(s)')"
 
 
 def tests_teardown_cms_template(smoke_course_id: str) -> str:
-    return f"./manage.py cms delete_course {smoke_course_id} --commit || true"
+    return f"yes | ./manage.py cms delete_course {smoke_course_id} || true"
 
 
 def tests_setup_template(
@@ -254,7 +254,7 @@ print('Test admin ready: {admin_username}')"
 from oauth2_provider.models import Application
 from django.contrib.auth import get_user_model
 user = get_user_model().objects.get(username='{admin_username}')
-app, created = Application.objects.get_or_create(
+app, created = Application.objects.update_or_create(
     client_id='{oauth_client_id}',
     defaults=dict(
         user=user,
@@ -264,5 +264,5 @@ app, created = Application.objects.get_or_create(
         name='Tutor Tests',
     ),
 )
-print('OAuth2 client ' + ('created' if created else 'already exists'))"
+print('OAuth2 client ' + ('created' if created else 'updated'))"
 """
