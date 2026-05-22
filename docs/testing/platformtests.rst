@@ -70,8 +70,6 @@ CLI reference
      - Run post-test cleanup commands inside the service container after the test run. Use ``--no-cleanup`` to skip cleanup and inspect state after a failure. Default: ``--cleanup``.
    * - ``-I, --non-interactive``
      - Skip confirmation prompts. Required for CI/headless scripts.
-   * - ``-s, --service``
-     - Service container to run test setup in (default: ``lms``).
 
 Environment variables
 ~~~~~~~~~~~~~~~~~~~~~
