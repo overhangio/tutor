@@ -20,6 +20,17 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.7'></a>
+## v21.0.7 (2026-05-25)
+
+- [BugFix] Redis configmap will not be generated & deployed with tutor k8s when RUN_REDIS is False. (by @Faraz32123)
+
+- [BugFix] Fix k8s-override patches not applying to jobs by rendering kustomization before renaming job. (by @Faraz32123)
+
+- [Improvement] Add tutorial for customizing and overriding translations, covering theme translation overrides (e.g. Indigo) and managing translations for forked repositories, custom plugins, and additional MFEs. (by @eemaanamir)
+
+- [BugFix] Temporarily pin kubernetes to v35 as kubernetes v36 in-cluster config no longer attaches Authorization header. (by @Faraz32123)
+
 <a id='changelog-21.0.6'></a>
 ## v21.0.6 (2026-05-08)
 
