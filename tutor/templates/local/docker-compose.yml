@@ -12,16 +12,16 @@ services:
       # Command script
       - ../apps/permissions/setowners.sh:/usr/local/bin/setowners.sh:ro
       # Bind-mounted volumes to set ownership
-      - ../../data/lms:/mounts/lms
-      - ../../data/cms:/mounts/cms
-      - ../../data/lms-job:/mounts/lms-job
-      - ../../data/cms-job:/mounts/cms-job
-      - ../../data/openedx-media:/mounts/openedx
-      - ../../data/openedx-media-private:/mounts/openedx-private
-      {% if RUN_MONGODB %}- ../../data/mongodb:/mounts/mongodb{% endif %}
-      {% if RUN_MYSQL %}- ../../data/mysql:/mounts/mysql{% endif %}
-      {% if RUN_MEILISEARCH %}- ../../data/meilisearch:/mounts/meilisearch{% endif %}
-      {% if RUN_REDIS %}- ../../data/redis:/mounts/redis{% endif %}
+      - ../../data/lms:/mounts/lms:z
+      - ../../data/cms:/mounts/cms:z
+      - ../../data/lms-job:/mounts/lms-job:z
+      - ../../data/cms-job:/mounts/cms-job:z
+      - ../../data/openedx-media:/mounts/openedx:z
+      - ../../data/openedx-media-private:/mounts/openedx-private:z
+      {% if RUN_MONGODB %}- ../../data/mongodb:/mounts/mongodb:z{% endif %}
+      {% if RUN_MYSQL %}- ../../data/mysql:/mounts/mysql:z{% endif %}
+      {% if RUN_MEILISEARCH %}- ../../data/meilisearch:/mounts/meilisearch:z{% endif %}
+      {% if RUN_REDIS %}- ../../data/redis:/mounts/redis:z{% endif %}
       {{ patch("local-docker-compose-permissions-volumes")|indent(6) }}
 
   ############# External services
@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     user: "999:999"
     volumes:
-      - ../../data/mongodb:/data/db
+      - ../../data/mongodb:/data/db:z
     depends_on:
       - permissions
   {%- endif %}
@@ -51,7 +51,7 @@ services:
     restart: unless-stopped
     user: "999:999"
     volumes:
-      - ../../data/mysql:/var/lib/mysql
+      - ../../data/mysql:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
   {%- endif %}
@@ -62,7 +62,7 @@ services:
     environment:
       MEILI_MASTER_KEY: "{{ MEILISEARCH_MASTER_KEY }}"
     volumes:
-      - ../../data/meilisearch:/meili_data
+      - ../../data/meilisearch:/meili_data:z
     restart: unless-stopped
     user: "1000:1000"
     depends_on:
@@ -75,8 +75,8 @@ services:
     working_dir: /openedx/redis/data
     user: "1000:1000"
     volumes:
-      - ../apps/redis/redis.conf:/openedx/redis/config/redis.conf:ro
-      - ../../data/redis:/openedx/redis/data
+      - ../apps/redis/redis.conf:/openedx/redis/config/redis.conf:roz
+      - ../../data/redis:/openedx/redis/data:z
     command: redis-server /openedx/redis/config/redis.conf
     restart: unless-stopped
     depends_on:
@@ -102,15 +102,15 @@ services:
       UWSGI_WORKERS: {{ OPENEDX_LMS_UWSGI_WORKERS }}
     restart: unless-stopped
     volumes:
-      - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
-      - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
-      - ../apps/openedx/config:/openedx/config:ro
-      - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:ro
-      - ../../data/lms:/openedx/data
-      - ../../data/openedx-media:/openedx/media
-      - ../../data/openedx-media-private:/openedx/media-private
+      - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:roz
+      - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:roz
+      - ../apps/openedx/config:/openedx/config:roz
+      - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:roz
+      - ../../data/lms:/openedx/data:z
+      - ../../data/openedx-media:/openedx/media:z
+      - ../../data/openedx-media-private:/openedx/media-private:z
       {%- for mount in iter_mounts(MOUNTS, "openedx", "lms") %}
-      - {{ mount }}
+      - {{ mount }}:z
       {%- endfor %}
     depends_on:
       - permissions
@@ -129,15 +129,15 @@ services:
       UWSGI_WORKERS: {{ OPENEDX_CMS_UWSGI_WORKERS }}
     restart: unless-stopped
     volumes:
-      - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
-      - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
-      - ../apps/openedx/config:/openedx/config:ro
-      - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:ro
-      - ../../data/cms:/openedx/data
-      - ../../data/openedx-media:/openedx/media
-      - ../../data/openedx-media-private:/openedx/media-private
+      - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:roz
+      - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:roz
+      - ../apps/openedx/config:/openedx/config:roz
+      - ../apps/openedx/uwsgi.ini:/openedx/uwsgi.ini:roz
+      - ../../data/cms:/openedx/data:z
+      - ../../data/openedx-media:/openedx/media:z
+      - ../../data/openedx-media-private:/openedx/media-private:z
       {%- for mount in iter_mounts(MOUNTS, "openedx", "cms") %}
-      - {{ mount }}
+      - {{ mount }}:z
       {%- endfor %}
     depends_on:
       - permissions
