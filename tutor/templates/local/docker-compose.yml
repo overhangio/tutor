@@ -14,6 +14,8 @@ services:
       # Bind-mounted volumes to set ownership
       - ../../data/lms:/mounts/lms
       - ../../data/cms:/mounts/cms
+      - ../../data/lms-job:/mounts/lms-job
+      - ../../data/cms-job:/mounts/cms-job
       - ../../data/openedx-media:/mounts/openedx
       - ../../data/openedx-media-private:/mounts/openedx-private
       {% if RUN_MONGODB %}- ../../data/mongodb:/mounts/mongodb{% endif %}
