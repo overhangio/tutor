@@ -66,8 +66,8 @@ CLI reference
      - Set a single test environment variable. Can be repeated. Overrides ``--env-file`` values.
    * - ``--setup / --no-setup``
      - Create the test admin user and OAuth2 client before running tests. Requires ``TEST_USERNAME``, ``TEST_EMAIL``, ``TEST_PASSWORD``, ``OAUTH2_CLIENT_ID``, and ``OAUTH2_CLIENT_SECRET`` in the merged env. Default: ``--no-setup``.
-   * - ``--cleanup / --no-cleanup``
-     - Run post-test cleanup commands inside the service container after the test run. Use ``--no-cleanup`` to skip cleanup and inspect state after a failure. Default: ``--cleanup``.
+   * - ``--cleanup [run|dry-run|skip]``
+     - Post-test cleanup of smoke test artifacts. ``run`` (default): delete the transient user and course. ``dry-run``: print what would be deleted without executing. ``skip``: leave artifacts in place for manual inspection.
    * - ``-I, --non-interactive``
      - Skip confirmation prompts. Required for CI/headless scripts.
 
@@ -134,7 +134,7 @@ LMS-focused tests run under the ``lms`` context; Studio/course tests run under t
     tutor local do tests smoke --limit=lms
     tutor local do tests smoke --limit=cms
 
-After the suite finishes, the transient user and course created during the run are deleted from the database. Pass ``--no-cleanup`` to skip this step and inspect the database state manually.
+After the suite finishes, the transient user and course created during the run are deleted from the database. Pass ``--cleanup skip`` to leave them in place for manual inspection, or ``--cleanup dry-run`` to preview what would be deleted without executing.
 
 Adding tests from a plugin
 --------------------------

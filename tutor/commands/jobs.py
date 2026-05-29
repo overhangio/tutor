@@ -518,12 +518,16 @@ def update_mysql_authentication_plugin(
     ),
 )
 @click.option(
-    "--cleanup/--no-cleanup",
-    default=True,
+    "--cleanup",
+    "cleanup",
+    type=click.Choice(["run", "dry-run", "skip"]),
+    default="run",
     show_default=True,
     help=(
-        "Delete smoke test artifacts (user, course) from the database after the run. "
-        "Disable with --no-cleanup to inspect state after a failure."
+        "Post-test cleanup of smoke test artifacts. "
+        "``run``: delete user and course (default). "
+        "``dry-run``: print what would be deleted without executing. "
+        "``skip``: leave artifacts in place (useful for manual inspection after failure)."
     ),
 )
 @click.option(
@@ -540,7 +544,7 @@ def tests_command(
     env_file: t.Optional[str],
     env_vars: tuple[str, ...],
     setup: bool,
-    cleanup: bool,
+    cleanup: str,
     non_interactive: bool,
 ) -> t.Iterable[tuple[str, str]]:
     config = tutor_config.load(context.root)
@@ -625,17 +629,18 @@ def tests_command(
         env=merged,
     )
 
-    if cleanup:
+    if cleanup in ("run", "dry-run"):
         smoke_username = merged["SMOKE_USERNAME"]
         smoke_course_id = merged["SMOKE_COURSE_ID"]
-        fmt.echo_alert(
-            f"About to delete smoke test artifacts from the database: "
-            f"user '{smoke_username}', course '{smoke_course_id}'."
-        )
-        if not non_interactive:
-            if not click.confirm("Proceed with cleanup?", prompt_suffix=" "):
-                cleanup = False
-    if cleanup:
+        fmt.echo_info(f"Cleanup: user '{smoke_username}', course '{smoke_course_id}'.")
+        if cleanup == "dry-run":
+            fmt.echo_info("Dry-run mode — no artifacts will be deleted.")
+        else:
+            if not non_interactive and not click.confirm(
+                "Proceed with cleanup?", prompt_suffix=" "
+            ):
+                cleanup = "skip"
+    if cleanup == "run":
         yield ("lms", tests_teardown_lms_template(merged["SMOKE_USERNAME"]))
         yield ("cms", tests_teardown_cms_template(merged["SMOKE_COURSE_ID"]))
 
