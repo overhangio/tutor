@@ -74,7 +74,7 @@ CLI reference
 Environment variables
 ~~~~~~~~~~~~~~~~~~~~~
 
-Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from your Tutor config — these always reflect the running platform and cannot be overridden via ``--env-file`` or ``-e``. The following variables have defaults that can be overridden:
+Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from your Tutor config — these always reflect the running platform and cannot be overridden via ``--env-file`` or ``-e``. In ``tutor dev`` mode, ``LMS_PORT`` and ``CMS_PORT`` are also set automatically (to ``8000`` and ``8001``) so that tests reach the dev servers directly; you can still override them via ``-e``. The following variables have defaults that can be overridden:
 
 .. list-table::
    :widths: 30 30 40
@@ -109,6 +109,14 @@ Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from y
    * - ``SMOKE_COURSE_ID``
      - ``course-v1:TutorSmokeOrg+SMOKE101+smoke``
      - Course ID of the transient course created by the smoke tests.
+   * - ``LMS_PORT``
+     - *(empty — set to* ``8000`` *in dev mode)*
+     - Port appended to the LMS base URL. Auto-set to ``8000`` by ``tutor dev``
+       so tests reach the dev server; empty (no port) for ``local`` and ``k8s``.
+   * - ``CMS_PORT``
+     - *(empty — set to* ``8001`` *in dev mode)*
+     - Port appended to the CMS base URL. Auto-set to ``8001`` by ``tutor dev``;
+       empty for ``local`` and ``k8s``.
 
 Built-in test suites
 --------------------
