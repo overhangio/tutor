@@ -58,6 +58,10 @@ nitpick_ignore = [
     # ParamSpec objects are not classes but may be referenced as such
     ("py:class", "tutor.core.hooks.actions.T"),
     ("py:class", "typing_extensions.ParamSpec"),
+    # Python 3.14: TypeVar references in autodoc are emitted as py:obj with
+    # the `typing.~T` short-name form, which has no resolvable target.
+    ("py:obj", "typing.~T"),
+    ("py:obj", "typing.~T2"),
 ]
 
 # Even outside nitpicky mode, some type-hint rendering can produce "ref.class"
