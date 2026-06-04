@@ -1,0 +1,81 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version (e.g. 21.0.8)"
+        required: true
+        type: string
+      openedx_common_version:
+        description: "OPENEDX_COMMON_VERSION (e.g. release/ulmo.4) Leave blank to use current version"
+        required: false
+        type: string
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set version variables
+        run: |
+          echo "VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=v${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install scriv
+        run: pip install scriv
+
+      - name: Bump version
+        run: |
+          sed -i 's/^__version__ = ".*"$/__version__ = "${{ github.event.inputs.version }}"/' tutor/__about__.py
+
+      - name: Resolve OPENEDX_COMMON_VERSION
+        id: resolve_version
+        run: |
+          INPUT="${{ github.event.inputs.openedx_common_version }}"
+          if [ -n "$INPUT" ]; then
+            echo "openedx_common_version=$INPUT" >> "$GITHUB_OUTPUT"
+          else
+            CURRENT=$(grep '^OPENEDX_COMMON_VERSION:' tutor/templates/config/defaults.yml | sed 's/OPENEDX_COMMON_VERSION: "\(.*\)"/\1/')
+            echo "openedx_common_version=$CURRENT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update OPENEDX_COMMON_VERSION in defaults.yml
+        run: |
+          sed -i 's|^OPENEDX_COMMON_VERSION: ".*"$|OPENEDX_COMMON_VERSION: "${{ steps.resolve_version.outputs.openedx_common_version }}"|' tutor/templates/config/defaults.yml
+
+      - name: Update OPENEDX_COMMON_VERSION in docs/configuration.rst
+        run: |
+          sed -i 's|``OPENEDX_COMMON_VERSION`` (default: ``"[^"]*"|``OPENEDX_COMMON_VERSION`` (default: ``"${{ steps.resolve_version.outputs.openedx_common_version }}"|' docs/configuration.rst
+
+      - name: Collect changelog entries
+        run: scriv collect
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b $RELEASE_TAG
+          git add -A
+          git commit -m "$RELEASE_TAG"
+          git push origin $RELEASE_TAG
+
+      - name: Create Pull Request
+        run: |
+          gh pr create \
+            --title "$RELEASE_TAG" \
+            --body "Release preparation for $RELEASE_TAG" \
+            --base "${{ github.event.repository.default_branch }}" \
+            --head "$RELEASE_TAG"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
