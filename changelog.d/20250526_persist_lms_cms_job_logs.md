@@ -1,0 +1,1 @@
+- [Feature] Persist lms and cms job logs (by @muhammadadeeltajamul)
