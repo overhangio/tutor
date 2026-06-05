@@ -1,9 +1,12 @@
 name: Bump Version
-
+# This action should only be used for Major and Minor version bumps of tutor.
+# For Release version bumps, the process is manual as defined here: https://github.com/overhangio/tutor/blob/release/docs/tutor.rst#releasing-a-new-version-1
 on:
   workflow_dispatch:
     inputs:
       version:
+        # These versions should follow the tutor version format, aka RELEASE.MAJOR.MINOR(-BRANCH)
+        # More details for versioning are here: https://github.com/overhangio/tutor/blob/release/docs/tutor.rst#versioning
         description: "New version (e.g. 21.0.8)"
         required: true
         type: string
