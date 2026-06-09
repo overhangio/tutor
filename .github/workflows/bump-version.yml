@@ -27,7 +27,8 @@ jobs:
 
       - name: Set version variables
         run: |
-          echo "VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+          VERSION=$(echo "${{ github.event.inputs.version }}" | sed 's/^[vV]//')
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "RELEASE_TAG=v$VERSION" >> "$GITHUB_ENV"
 
       - name: Prevent Release version bump
