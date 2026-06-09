@@ -23,12 +23,12 @@ services:
         SERVICE_VARIANT: lms
         DJANGO_SETTINGS_MODULE: lms.envs.tutor.production
       volumes:
-        - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
-        - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
-        - ../apps/openedx/config:/openedx/config:ro
-        - ../../data/lms-job:/openedx/data
+        - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:roz
+        - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:roz
+        - ../apps/openedx/config:/openedx/config:roz
+        - ../../data/lms-job:/openedx/data:z
         {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-job") %}
-        - {{ mount }}
+        - {{ mount }}:z
         {%- endfor %}
       depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB), ("meilisearch", RUN_MEILISEARCH)]|list_if }}
 
@@ -38,12 +38,12 @@ services:
         SERVICE_VARIANT: cms
         DJANGO_SETTINGS_MODULE: cms.envs.tutor.production
       volumes:
-        - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:ro
-        - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:ro
-        - ../apps/openedx/config:/openedx/config:ro
-        - ../../data/cms-job:/openedx/data
+        - ../apps/openedx/settings/lms:/openedx/edx-platform/lms/envs/tutor:roz
+        - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:roz
+        - ../apps/openedx/config:/openedx/config:roz
+        - ../../data/cms-job:/openedx/data:z
         {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-job") %}
-        - {{ mount }}
+        - {{ mount }}:z
         {%- endfor %}
       depends_on: {{ [("mysql", RUN_MYSQL), ("mongodb", RUN_MONGODB), ("meilisearch", RUN_MEILISEARCH), ("redis", RUN_REDIS)]|list_if }}
 

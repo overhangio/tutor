@@ -5,7 +5,7 @@ x-openedx-service:
   tty: true
   volumes:
     # theme files
-    - ../build/openedx/themes:/openedx/themes
+    - ../build/openedx/themes:/openedx/themes:z
 
 services:
   permissions:
