@@ -28,7 +28,16 @@ jobs:
       - name: Set version variables
         run: |
           echo "VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
-          echo "RELEASE_TAG=v${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=v$VERSION" >> "$GITHUB_ENV"
+
+      - name: Prevent Release version bump
+        run: |
+          CURRENT_RELEASE=$(make version | cut -d. -f1)
+          INPUT_RELEASE=$(echo "$VERSION" | cut -d. -f1)
+          if [ "$INPUT_RELEASE" != "$CURRENT_RELEASE" ]; then
+            echo "Error: Release version bump detected. Use the manual release process as documented here (https://github.com/overhangio/tutor/blob/release/docs/tutor.rst#releasing-a-new-version-1) for Release version bums."
+            exit 1
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v6
