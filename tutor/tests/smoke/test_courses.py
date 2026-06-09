@@ -1,13 +1,11 @@
-"""Course API tests: list courses, verify demo course, create a new course in Studio."""
+"""Course API tests: list courses and create/verify the smoke course in Studio."""
 
 from __future__ import annotations
-
-import urllib.parse
 
 import pytest
 import requests
 
-from .conftest import HTTP_TIMEOUT, TEST_COURSE_ID
+from .conftest import HTTP_TIMEOUT
 
 _SMOKE_ORG = "TutorSmokeOrg"
 _SMOKE_NUMBER = "SMOKE101"
@@ -47,49 +45,6 @@ class TestCoursesAPI:
         data = resp.json()
         pagination = data.get("pagination", data)
         assert "count" in pagination or "num_pages" in pagination
-
-
-class TestDemoCourse:
-    def test_demo_course_exists(
-        self, auth_session: requests.Session, lms_url: str
-    ) -> None:
-        """
-        Verify the demo course is present on the platform.
-        Skipped if the course has not been imported yet — run
-        `tutor local do importdemocourse` to import it.
-        """
-        if not TEST_COURSE_ID:
-            pytest.skip("TEST_COURSE_ID not set.")
-        encoded = urllib.parse.quote(TEST_COURSE_ID, safe="")
-        resp = auth_session.get(
-            f"{lms_url}/api/courses/v1/courses/{encoded}/", timeout=HTTP_TIMEOUT
-        )
-        if resp.status_code == 404:
-            pytest.skip(
-                f"Demo course '{TEST_COURSE_ID}' not found. "
-                "Run `tutor local do importdemocourse` to import it first."
-            )
-        assert resp.status_code == 200, (
-            f"Demo course detail returned HTTP {resp.status_code}: {resp.text[:300]}"
-        )
-
-    def test_demo_course_has_required_fields(
-        self, auth_session: requests.Session, lms_url: str
-    ) -> None:
-        if not TEST_COURSE_ID:
-            pytest.skip("TEST_COURSE_ID not set.")
-        encoded = urllib.parse.quote(TEST_COURSE_ID, safe="")
-        resp = auth_session.get(
-            f"{lms_url}/api/courses/v1/courses/{encoded}/", timeout=HTTP_TIMEOUT
-        )
-        if resp.status_code == 404:
-            pytest.skip(f"Demo course '{TEST_COURSE_ID}' not imported yet.")
-        assert resp.status_code == 200
-        data = resp.json()
-        for field in ("id", "name", "org", "number", "start"):
-            assert field in data, (
-                f"Demo course response missing field '{field}': {data}"
-            )
 
 
 class TestCreateCourse:

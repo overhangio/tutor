@@ -28,6 +28,11 @@ class TestUserAPI:
         resp = auth_session.get(
             f"{lms_url}/api/user/v1/accounts/{TEST_USERNAME}", timeout=HTTP_TIMEOUT
         )
+        if resp.status_code == 404:
+            pytest.skip(
+                f"User '{TEST_USERNAME}' not found on the platform. "
+                "Run with --setup to create the test admin user first."
+            )
         assert resp.status_code == 200, (
             f"/api/user/v1/accounts/{TEST_USERNAME} returned HTTP {resp.status_code}"
         )

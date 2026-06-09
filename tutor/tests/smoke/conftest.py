@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import os
+import urllib.parse
 
 import pytest
 import requests
@@ -26,11 +27,11 @@ CMS_BASE_URL: str = (
 
 OAUTH2_CLIENT_ID: str = os.environ.get("OAUTH2_CLIENT_ID", "").strip()
 OAUTH2_CLIENT_SECRET: str = os.environ.get("OAUTH2_CLIENT_SECRET", "").strip()
-TEST_USERNAME: str = os.environ.get("TEST_USERNAME", "admin").strip()
+TEST_USERNAME: str = os.environ.get("TEST_USERNAME", "tutor_test_admin").strip()
 TEST_PASSWORD: str = os.environ.get("TEST_PASSWORD", "").strip()
 TEST_EMAIL: str = os.environ.get("TEST_EMAIL", "").strip()
-TEST_COURSE_ID: str = os.environ.get(
-    "TEST_COURSE_ID", "course-v1:OpenedX+DemoX+DemoCourse"
+SMOKE_COURSE_ID: str = os.environ.get(
+    "SMOKE_COURSE_ID", "course-v1:TutorSmokeOrg+SMOKE101+smoke"
 ).strip()
 
 HTTP_TIMEOUT: tuple[int, int] = (10, 30)
@@ -76,6 +77,30 @@ def auth_session(http_session: requests.Session, jwt_token: str) -> requests.Ses
     session.verify = _HTTPS
     session.headers["Authorization"] = f"JWT {jwt_token}"
     return session
+
+
+@pytest.fixture(scope="session")
+def smoke_course_id(http_session: requests.Session, lms_url: str) -> str:
+    """
+    Verifies the smoke course exists on the platform and returns its ID.
+    Any test that declares this fixture is automatically skipped when the
+    course is not yet present.
+
+    The smoke course is created by ``TestCreateCourse`` earlier in the suite.
+    Run the full suite (or at least ``test_courses.py``) before running
+    enrollment tests in isolation.
+    """
+    encoded = urllib.parse.quote(SMOKE_COURSE_ID, safe="")
+    resp = http_session.get(
+        f"{lms_url}/api/courses/v1/courses/{encoded}/",
+        timeout=HTTP_TIMEOUT,
+    )
+    if resp.status_code == 404:
+        pytest.skip(
+            f"Smoke course '{SMOKE_COURSE_ID}' not found. "
+            "Run the full suite so TestCreateCourse creates it first."
+        )
+    return SMOKE_COURSE_ID
 
 
 # ---------------------------------------------------------------------------

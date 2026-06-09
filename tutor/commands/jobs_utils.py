@@ -3,12 +3,11 @@ from __future__ import annotations
 from tutor import exceptions, serialize
 
 TEST_DEFAULTS: dict[str, str] = {
-    "TEST_USERNAME": "admin",
-    "TEST_EMAIL": "admin@example.com",
+    "TEST_USERNAME": "tutor_test_admin",
+    "TEST_EMAIL": "tutor_test_admin@example.com",
     "TEST_PASSWORD": "",
     "OAUTH2_CLIENT_ID": "tutor-tests",
     "OAUTH2_CLIENT_SECRET": "",
-    "TEST_COURSE_ID": "course-v1:OpenedX+DemoX+DemoCourse",
     "SMOKE_USERNAME": "tutor_smoke_user",
     "SMOKE_COURSE_ID": "course-v1:TutorSmokeOrg+SMOKE101+smoke",
 }

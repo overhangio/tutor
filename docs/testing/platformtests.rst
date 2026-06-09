@@ -19,6 +19,16 @@ Pass a suite name to run only tests belonging to that suite::
 
     tutor local do tests smoke
 
+Prerequisites
+~~~~~~~~~~~~~
+
+Authenticated tests require a test admin user and an OAuth2 client.
+Create them once before running the suite::
+
+    tutor local do tests --setup smoke
+
+``--setup`` creates the test admin user and an OAuth2 client application and is idempotent — re-running it is safe. No other prerequisites are needed: the smoke course used by enrollment and course tests is created during the test run itself by ``TestCreateCourse``.
+
 Providing credentials
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -27,18 +37,17 @@ Tests that exercise authenticated API endpoints require credentials. The recomme
 .. code-block:: yaml
 
     # tests-env.yaml
-    TEST_USERNAME: admin
-    TEST_EMAIL: admin@example.com
+    TEST_USERNAME: tutor_test_admin
+    TEST_EMAIL: tutor_test_admin@example.com
     TEST_PASSWORD: "yourpassword"
     OAUTH2_CLIENT_ID: tutor-tests
     OAUTH2_CLIENT_SECRET: "yoursecret"
-    TEST_COURSE_ID: course-v1:OpenedX+DemoX+DemoCourse
 
 Then run::
 
     tutor local do tests --env-file tests-env.yaml --setup smoke
 
-The ``--setup`` flag creates (or updates) the test admin user and OAuth2 client before the test run. Setup is idempotent — re-running it is safe.
+The ``--setup`` flag creates (or updates) the test admin user and OAuth2 client before the test run. Setup is idempotent, re-running it is safe.
 
 For CI or headless environments, pass credentials inline without a file::
 
@@ -84,10 +93,10 @@ Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from y
      - Default
      - Description
    * - ``TEST_USERNAME``
-     - ``admin``
+     - ``tutor_test_admin``
      - Admin username for authenticated tests.
    * - ``TEST_EMAIL``
-     - ``admin@example.com``
+     - ``tutor_test_admin@example.com``
      - Admin email address.
    * - ``TEST_PASSWORD``
      - *(auto-generated)*
@@ -100,9 +109,6 @@ Tutor automatically sets ``LMS_HOST``, ``CMS_HOST``, and ``ENABLE_HTTPS`` from y
      - *(auto-generated)*
      - OAuth2 client secret. Auto-generated if not provided — Tutor will print
        the value and ask you to save it.
-   * - ``TEST_COURSE_ID``
-     - ``course-v1:OpenedX+DemoX+DemoCourse``
-     - Course ID used in enrollment and content tests.
    * - ``SMOKE_USERNAME``
      - ``tutor_smoke_user``
      - Username of the transient user created by the smoke tests.
@@ -134,7 +140,14 @@ LMS-focused tests run under the ``lms`` context; Studio/course tests run under t
     tutor local do tests smoke --limit=lms
     tutor local do tests smoke --limit=cms
 
-After the suite finishes, the transient user and course created during the run are deleted from the database. Pass ``--cleanup skip`` to leave them in place for manual inspection, or ``--cleanup dry-run`` to preview what would be deleted without executing.
+**Cleanup behaviour**
+
+After the suite finishes, the cleanup step removes the artifacts created during the run:
+
+* The transient smoke user (``SMOKE_USERNAME``, default ``tutor_smoke_user``)
+* The transient smoke course (``SMOKE_COURSE_ID``, default ``course-v1:TutorSmokeOrg+SMOKE101+smoke``)
+
+Pass ``--cleanup skip`` to leave artifacts in place for manual inspection, or ``--cleanup dry-run`` to preview what would be deleted without executing.
 
 Adding tests from a plugin
 --------------------------

@@ -1,21 +1,24 @@
-"""Enrollment API tests: list enrollments and enroll a user in the demo course."""
+"""Enrollment API tests: list enrollments and enroll a user in the smoke course."""
 
 from __future__ import annotations
 
 import pytest
 import requests
 
-from .conftest import HTTP_TIMEOUT, TEST_COURSE_ID, TEST_USERNAME
+from .conftest import HTTP_TIMEOUT, TEST_USERNAME
 
 
 class TestEnrollmentAPI:
     def test_enrollment_info_public(
-        self, http_session: requests.Session, lms_url: str
+        self, http_session: requests.Session, lms_url: str, smoke_course_id: str
     ) -> None:
-        if not TEST_COURSE_ID:
-            pytest.skip("TEST_COURSE_ID not set.")
+        """
+        Checks the public enrollment info endpoint for the smoke course.
+        Skipped automatically when the smoke course has not been created yet
+        (run the full suite so TestCreateCourse creates it first).
+        """
         resp = http_session.get(
-            f"{lms_url}/api/enrollment/v1/course/{TEST_COURSE_ID}",
+            f"{lms_url}/api/enrollment/v1/course/{smoke_course_id}",
             timeout=HTTP_TIMEOUT,
         )
         assert resp.status_code == 200, (
@@ -45,26 +48,26 @@ class TestEnrollmentAPI:
 
 
 class TestEnrollUser:
-    def test_enroll_user_in_demo_course(
-        self, auth_session: requests.Session, lms_url: str
+    def test_enroll_user_in_smoke_course(
+        self, auth_session: requests.Session, lms_url: str, smoke_course_id: str
     ) -> None:
         """
-        Enroll the test user in the demo course.
-        Skipped if either TEST_USERNAME or TEST_COURSE_ID is not set.
+        Enroll the test user in the smoke course.
+        Skipped if TEST_USERNAME is not set or the smoke course does not exist yet.
         Already-enrolled users return 200 with is_active=True, so this is idempotent.
         """
-        if not TEST_USERNAME or not TEST_COURSE_ID:
-            pytest.skip("TEST_USERNAME and TEST_COURSE_ID must both be set.")
+        if not TEST_USERNAME:
+            pytest.skip("TEST_USERNAME not set.")
 
         check = auth_session.get(
-            f"{lms_url}/api/enrollment/v1/enrollment/{TEST_USERNAME},{TEST_COURSE_ID}",
+            f"{lms_url}/api/enrollment/v1/enrollment/{TEST_USERNAME},{smoke_course_id}",
             timeout=HTTP_TIMEOUT,
         )
         if check.status_code == 200:
             try:
                 if check.json().get("is_active"):
                     pytest.skip(
-                        f"User '{TEST_USERNAME}' is already enrolled in '{TEST_COURSE_ID}'"
+                        f"User '{TEST_USERNAME}' is already enrolled in '{smoke_course_id}'"
                     )
             except requests.exceptions.JSONDecodeError:
                 pass  # empty body means not enrolled
@@ -75,7 +78,7 @@ class TestEnrollUser:
                 "user": TEST_USERNAME,
                 "mode": "audit",
                 "is_active": True,
-                "course_details": {"course_id": TEST_COURSE_ID},
+                "course_details": {"course_id": smoke_course_id},
             },
             timeout=HTTP_TIMEOUT,
         )
@@ -89,13 +92,16 @@ class TestEnrollUser:
         assert data.get("mode") == "audit", f"Enrollment mode mismatch: {data}"
 
     def test_enrollment_is_present_after_enroll(
-        self, auth_session: requests.Session, lms_url: str
+        self, auth_session: requests.Session, lms_url: str, smoke_course_id: str
     ) -> None:
-        """Verify the enrollment record exists after the enroll test."""
-        if not TEST_USERNAME or not TEST_COURSE_ID:
-            pytest.skip("TEST_USERNAME and TEST_COURSE_ID must both be set.")
+        """
+        Verify the enrollment record exists after the enroll test.
+        Skipped automatically when the smoke course has not been created yet.
+        """
+        if not TEST_USERNAME:
+            pytest.skip("TEST_USERNAME not set.")
         resp = auth_session.get(
-            f"{lms_url}/api/enrollment/v1/enrollment/{TEST_USERNAME},{TEST_COURSE_ID}",
+            f"{lms_url}/api/enrollment/v1/enrollment/{TEST_USERNAME},{smoke_course_id}",
             timeout=HTTP_TIMEOUT,
         )
         assert resp.status_code in (200, 404), (
