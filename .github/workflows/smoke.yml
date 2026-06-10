@@ -1,0 +1,78 @@
+name: Smoke Tests
+# Builds a tutor local (docker-compose) deployment, then runs the built-in
+# smoke test suite via `tutor local do tests smoke`. Intended as a fast
+# sanity-check for LMS/CMS API health on any branch or fork.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tutor_remote:
+        description: "GitHub user or org to check out tutor from (default: overhangio). Useful when testing a fork branch — dispatch workflows can only run from the main repo, so cross-fork testing requires specifying both this and tutor_ref."
+        required: false
+        default: "overhangio"
+      tutor_ref:
+        description: "Tutor branch, or tag to check out (Leave empty to use current branch)"
+        required: false
+        default: ""
+      plugins:
+        description: 'Space-separated list of tutor plugins to enable (e.g. "indigo mfe discovery")'
+        required: false
+        default: "indigo mfe"
+      images:
+        description: 'Space-separated list of tutor images to build (e.g. "openedx mfe discovery")'
+        required: false
+        default: "openedx"
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tutor
+        uses: actions/checkout@v6
+        with:
+          # repository defaults to overhangio/tutor; set tutor_remote to test a fork branch
+          repository: ${{ format('{0}/tutor', github.event.inputs.tutor_remote || 'overhangio') }}
+          ref: ${{ github.event.inputs.tutor_ref || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          # TODO: Update to 3.10 in main as 3.9 is EOL
+          python-version: "3.9"
+
+      - name: Install tutor
+        run: pip install -e .[dev]
+
+      - name: Install tutor plugins
+        run: pip install -r requirements/plugins.txt
+
+      - name: Enable tutor plugins
+        run: tutor plugins enable ${{ github.event.inputs.plugins || 'indigo mfe' }}
+
+      - name: Build tutor images
+        run: tutor images build ${{ github.event.inputs.images || 'openedx' }}
+
+      - name: Add OpenEdX domains to /etc/hosts
+        run: |
+          echo "127.0.0.1 local.openedx.io studio.local.openedx.io apps.local.openedx.io" | sudo tee -a /etc/hosts
+
+      - name: Configure tutor for CI
+        run: |
+          tutor config save \
+            --set LMS_HOST=local.openedx.io \
+            --set CMS_HOST=studio.local.openedx.io \
+            --set ENABLE_HTTPS=false \
+            --set PLATFORM_NAME="Open edX CI" \
+            --set OPENEDX_LMS_UWSGI_WORKERS=1 \
+            --set OPENEDX_CMS_UWSGI_WORKERS=1
+
+      - name: Launch tutor local
+        run: tutor local launch --non-interactive
+        timeout-minutes: 60
+
+      - name: Run smoke tests
+        run: |
+          tutor local do tests smoke \
+            --setup \
+            --non-interactive \
+            --cleanup run
