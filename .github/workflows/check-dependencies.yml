@@ -1,0 +1,125 @@
+# This workflow runs every Monday and checks whether the Docker images pinned in
+# tutor/templates/config/defaults.yml are up to date within their designated version
+# cycle. For each outdated dependency it opens a separate PR that bumps the version
+# string and adds a changelog entry.
+#
+# Versions are looked up via the endoflife.date public API which tracks the latest
+# patch release for a given product/cycle (e.g. mysql/8.4 -> 8.4.9).
+#
+# NOTE: This workflow only handles patch-level bumps within a pinned major.minor
+# cycle. Upgrading to a new cycle (e.g. MySQL 8.4 -> 9.x, MongoDB 7.0 -> 8.0)
+# requires migration code and must be done manually. To change the tracked cycle for
+# a dependency, update the `eol_cycle` field for that entry in the strategy matrix
+# below.
+#
+# To add a new dependency, add a new entry to the matrix with:
+#   name        - short identifier used in branch names
+#   display     - human-readable name used in PR titles and changelog entries
+#   eol_product - product slug on endoflife.date (https://endoflife.date)
+#   eol_cycle   - the version cycle to track (e.g. "8.4", "7.0")
+#   image_key   - the YAML key in tutor/templates/config/defaults.yml
+#   image_prefix - the image reference prefix up to and including the colon
+
+name: Check Outdated Dependencies
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" # Every 5 minutes (for testing; change back to "0 9 * * 1" for production)
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      matrix:
+        include:
+          - name: caddy
+            display: Caddy
+            eol_product: caddy
+            eol_cycle: "2"
+            image_key: DOCKER_IMAGE_CADDY
+            image_prefix: "docker.io/caddy:"
+
+          - name: mysql
+            display: MySQL
+            eol_product: mysql
+            eol_cycle: "8.4"
+            image_key: DOCKER_IMAGE_MYSQL
+            image_prefix: "docker.io/mysql:"
+
+          - name: mongodb
+            display: MongoDB
+            eol_product: mongodb
+            eol_cycle: "7.0"
+            image_key: DOCKER_IMAGE_MONGODB
+            image_prefix: "docker.io/mongo:"
+
+          - name: redis
+            display: Redis
+            eol_product: redis
+            eol_cycle: "7.4"
+            image_key: DOCKER_IMAGE_REDIS
+            image_prefix: "docker.io/redis:"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check latest version
+        id: check
+        run: |
+          CURRENT=$(grep '${{ matrix.image_key }}' tutor/templates/config/defaults.yml \
+            | grep -oP '(?<=${{ matrix.image_prefix }})[^"]+')
+          LATEST=$(curl -sf \
+            "https://endoflife.date/api/${{ matrix.eol_product }}/${{ matrix.eol_cycle }}.json" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['latest'])")
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+          if [ "$CURRENT" = "$LATEST" ]; then
+            echo "outdated=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "outdated=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update version in defaults.yml
+        if: steps.check.outputs.outdated == 'true'
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: '${{ matrix.image_key }}: "${{ matrix.image_prefix }}${{ steps.check.outputs.current }}"'
+          replace: '${{ matrix.image_key }}: "${{ matrix.image_prefix }}${{ steps.check.outputs.latest }}"'
+          include: "tutor/templates/config/defaults.yml"
+          regex: false
+
+      - name: Install scriv
+        if: steps.check.outputs.outdated == 'true'
+        run: pip install scriv
+
+      - name: Create changelog entry
+        if: steps.check.outputs.outdated == 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          FRAGMENT=$(scriv create --no-edit | awk '{print $2}')
+          printf '- [Improvement] Upgrade ${{ matrix.display }} from ${{ steps.check.outputs.current }} to ${{ steps.check.outputs.latest }}. (by @github-actions[bot])\n' > "$FRAGMENT"
+
+      - name: Create Pull Request
+        if: steps.check.outputs.outdated == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: upgrade ${{ matrix.display }} to ${{ steps.check.outputs.latest }}"
+          branch: "bump-${{ matrix.name }}-to-${{ steps.check.outputs.latest }}"
+          title: "Upgrade ${{ matrix.display }} to ${{ steps.check.outputs.latest }}"
+          body: |
+            Bumps `${{ matrix.image_key }}` from `${{ steps.check.outputs.current }}` to `${{ steps.check.outputs.latest }}`.
+
+            This is a patch-level update within the pinned `${{ matrix.eol_cycle }}` cycle. No migration changes are required.
+
+            Part of #1400.
+
+            ### Testing
+            - [ ] `tutor local launch` and verify ${{ matrix.display }} starts cleanly
+          base: ${{ github.event.repository.default_branch }}
