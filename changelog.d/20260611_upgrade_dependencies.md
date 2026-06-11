@@ -1,0 +1,2 @@
+- [Improvement] Upgrade Caddy to v2.11.4, Redis to v7.4.9, and Meilisearch to v1.36.0. The Meilisearch jump changes the on-disk index format; the standard `init` jobs rebuild the indexes, so re-run platform initialisation after upgrading. (by @ahmed-arb)
+- [Improvement] Upgrade Python to v3.12.13 and Node.js to v24.16.0 in the Open edX Docker image. (by @ahmed-arb)
