@@ -1,0 +1,138 @@
+name: K8s Smoke Tests
+# Spins up a kind (Kubernetes-in-Docker) cluster, deploys tutor k8s on it,
+# then runs the built-in smoke test suite via `tutor k8s do tests smoke`.
+# Validates that the k8s deployment path works end-to-end on any branch or fork.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tutor_remote:
+        description: "GitHub user or org to check out tutor from (default: overhangio). Useful when testing a fork branch — dispatch workflows can only run from the main repo, so cross-fork testing requires specifying both this and tutor_ref."
+        required: false
+        default: "overhangio"
+      tutor_ref:
+        description: "Tutor branch, or tag to check out (Leave empty to use current branch)"
+        required: false
+        default: ""
+      plugins:
+        description: 'Space-separated list of tutor plugins to enable (e.g. "indigo mfe discovery")'
+        required: false
+        default: "indigo mfe"
+      images:
+        description: 'Space-separated list of tutor images to build (e.g. "openedx mfe discovery")'
+        required: false
+        default: "openedx"
+
+jobs:
+  e2e-k8s:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout tutor
+        uses: actions/checkout@v6
+        with:
+          # repository defaults to overhangio/tutor; set tutor_remote to test a fork branch
+          repository: ${{ format('{0}/tutor', github.event.inputs.tutor_remote || 'overhangio') }}
+          ref: ${{ github.event.inputs.tutor_ref || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          # TODO: Update to 3.10 in main as 3.9 is EOL
+          python-version: "3.9"
+
+      # kind is preferred over minikube for CI: no VM overhead (~300 MB for
+      # control-plane vs ~2 GB), no tunnel daemon needed for LoadBalancer, and
+      # no version breakage issues seen on ubuntu-latest in 2024-2025.
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.14.0
+        with:
+          cluster_name: openedx
+
+      # cloud-provider-kind watches the cluster and assigns IPs from the Docker
+      # bridge subnet (172.18.x.x) to LoadBalancer services. On Linux (GitHub
+      # runners), these IPs are directly reachable from the host — no tunnel.
+      # Tutor k8s creates a caddy LoadBalancer service that needs this.
+      - name: Start cloud-provider-kind for LoadBalancer support
+        run: |
+          go install sigs.k8s.io/cloud-provider-kind@latest
+          kubectl label node openedx-control-plane \
+            node.kubernetes.io/exclude-from-external-load-balancers- || true
+          sudo "$(go env GOPATH)/bin/cloud-provider-kind" &
+
+      - name: Install tutor
+        run: pip install -e .[dev]
+
+      # We install using the plugins file instead of tutor plugins install
+      # as we want the workflow in the main branch to install plugins on
+      # the main branch as well. plugins.txt automatically manages this.
+      - name: Install tutor plugins
+        run: pip install -r requirements/plugins.txt
+
+      - name: Enable tutor plugins
+        run: tutor plugins enable ${{ github.event.inputs.plugins || 'indigo mfe' }}
+
+      - name: Build tutor images
+        run: tutor images build ${{ github.event.inputs.images || 'openedx' }}
+
+      # After building locally, images must be loaded into kind — otherwise
+      # k8s will try to pull them from the registry and fail or get stale versions.
+      # Tutor stores each image name under DOCKER_IMAGE_<UPPERCASE_NAME>, so we
+      # derive the config key from each entry in the images input and look it up.
+      - name: Load built images into kind
+        run: |
+          for image in ${{ github.event.inputs.images || 'openedx' }}; do
+            CONFIG_KEY="DOCKER_IMAGE_$(echo "$image" | tr '[:lower:]-' '[:upper:]_')"
+            IMG=$(tutor config printvalue "$CONFIG_KEY" 2>/dev/null)
+            if [ -n "$IMG" ]; then
+              echo "Loading $IMG into kind (from $CONFIG_KEY)..."
+              kind load docker-image "$IMG" --name openedx
+            else
+              echo "WARNING: no tutor config key $CONFIG_KEY found for image '$image', skipping"
+            fi
+          done
+
+      - name: Configure tutor for CI
+        run: |
+          tutor config save \
+            --set LMS_HOST=local.openedx.io \
+            --set CMS_HOST=studio.local.openedx.io \
+            --set ENABLE_HTTPS=false \
+            --set PLATFORM_NAME="Open edX CI" \
+            --set OPENEDX_LMS_UWSGI_WORKERS=1 \
+            --set OPENEDX_CMS_UWSGI_WORKERS=1
+
+      - name: Launch tutor k8s
+        run: tutor k8s launch --non-interactive
+        timeout-minutes: 60
+
+      # cloud-provider-kind assigns an IP from the Docker bridge subnet to the
+      # caddy LoadBalancer service after launch. We poll until it appears, then
+      # write it to /etc/hosts so local.openedx.io resolves correctly.
+      - name: Configure /etc/hosts with caddy LoadBalancer IP
+        run: |
+          echo "Waiting for caddy LoadBalancer IP..."
+          for i in $(seq 1 30); do
+            IP=$(kubectl get svc caddy --namespace openedx \
+              -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+            if [ -n "$IP" ]; then
+              echo "Caddy IP: $IP"
+              echo "$IP local.openedx.io studio.local.openedx.io apps.local.openedx.io" \
+                | sudo tee -a /etc/hosts
+              break
+            fi
+            echo "Attempt $i/30: not assigned yet, retrying in 10s..."
+            sleep 10
+          done
+          if [ -z "$IP" ]; then
+            echo "ERROR: caddy LoadBalancer IP never assigned. Service state:"
+            kubectl get svc --namespace openedx
+            exit 1
+          fi
+
+      - name: Run smoke tests
+        run: |
+          tutor k8s do tests smoke \
+            --setup \
+            --non-interactive \
+            --cleanup run
