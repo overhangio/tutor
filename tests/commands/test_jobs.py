@@ -1,7 +1,12 @@
+import os
+import tempfile
+import unittest
 from unittest.mock import patch
 
 from tests.helpers import PluginsTestCase, temporary_root
 from tutor.commands import jobs
+from tutor.commands.jobs_utils import load_env_file, parse_test_env_var
+from tutor.exceptions import TutorError
 
 from .base import TestCommandMixin
 
@@ -209,3 +214,61 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIn("caching_sha2_password", dc_args[-1])
             self.assertIn("mypluginuser", dc_args[-1])
             self.assertIn("mypluginpassword", dc_args[-1])
+
+
+class TestEnvHelpers(unittest.TestCase):
+    # --- parse_test_env_var ---
+
+    def test_parse_env_var_basic(self) -> None:
+        self.assertEqual(("KEY", "VALUE"), parse_test_env_var("KEY=VALUE"))
+
+    def test_parse_env_var_empty_value(self) -> None:
+        self.assertEqual(("KEY", ""), parse_test_env_var("KEY="))
+
+    def test_parse_env_var_value_contains_equals(self) -> None:
+        self.assertEqual(("KEY", "a=b=c"), parse_test_env_var("KEY=a=b=c"))
+
+    def test_parse_env_var_no_equals_raises(self) -> None:
+        with self.assertRaises(TutorError):
+            parse_test_env_var("NOEQUALS")
+
+    def test_parse_env_var_empty_key_raises(self) -> None:
+        with self.assertRaises(TutorError):
+            parse_test_env_var("=VALUE")
+
+    # --- load_env_file ---
+
+    def test_load_env_file_valid(self) -> None:
+        content = "KEY1: value1\nKEY2: value2\n"
+        with tempfile.NamedTemporaryFile("w", suffix=".yml", delete=False) as f:
+            f.write(content)
+            path = f.name
+        try:
+            result = load_env_file(path)
+            self.assertEqual({"KEY1": "value1", "KEY2": "value2"}, result)
+        finally:
+            os.unlink(path)
+
+    def test_load_env_file_coerces_values_to_str(self) -> None:
+        content = "PORT: 8080\nDEBUG: true\n"
+        with tempfile.NamedTemporaryFile("w", suffix=".yml", delete=False) as f:
+            f.write(content)
+            path = f.name
+        try:
+            result = load_env_file(path)
+            self.assertIsInstance(result["PORT"], str)
+            self.assertEqual("8080", result["PORT"])
+            self.assertIsInstance(result["DEBUG"], str)
+        finally:
+            os.unlink(path)
+
+    def test_load_env_file_non_dict_raises(self) -> None:
+        content = "- item1\n- item2\n"
+        with tempfile.NamedTemporaryFile("w", suffix=".yml", delete=False) as f:
+            f.write(content)
+            path = f.name
+        try:
+            with self.assertRaises(TutorError):
+                load_env_file(path)
+        finally:
+            os.unlink(path)
