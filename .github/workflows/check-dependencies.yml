@@ -103,7 +103,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           FRAGMENT=$(scriv create --no-edit 2>&1 | awk '{print $NF}')
-          printf '- [Improvement] Upgrade ${{ matrix.display }} from ${{ steps.check.outputs.current }} to ${{ steps.check.outputs.latest }}. (by @github-actions[bot])\n' > "$FRAGMENT"
+          printf '%s\n' '- [Improvement] Upgrade ${{ matrix.display }} from ${{ steps.check.outputs.current }} to ${{ steps.check.outputs.latest }}. (by @github-actions[bot])' > "$FRAGMENT"
 
       - name: Create Pull Request
         if: steps.check.outputs.outdated == 'true'
