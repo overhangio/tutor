@@ -29,9 +29,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Install pyenv
 # https://www.python.org/downloads/
 # https://github.com/pyenv/pyenv/releases
-ARG PYTHON_VERSION=3.11.8
+ARG PYTHON_VERSION=3.12.12
 ENV PYENV_ROOT=/opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.3.36 --depth 1
+RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.6.18 --depth 1
 
 # Install Python
 RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
