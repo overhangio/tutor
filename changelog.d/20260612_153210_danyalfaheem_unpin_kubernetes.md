@@ -1,0 +1,1 @@
+- [Improvement] Unpin kubernetes<36 constraint as the upstream authentication bug has been resolved. 
