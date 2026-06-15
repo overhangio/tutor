@@ -41,6 +41,37 @@ def _migrate_obsolete_nightly_root(root: str) -> None:
         os.rename(nightly_plugins_root, PLUGINS_ROOT)
 
 
+_SMOKE_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "tests", "smoke")
+)
+
+with hooks.Contexts.app("lms").enter():
+    hooks.Filters.TESTS.add_items(
+        [
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_lms.py")),
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_auth.py")),
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_users.py")),
+        ]
+    )
+
+# test_courses.py must run before test_enrollment.py: the smoke_course_id fixture
+# checks the course exists via the LMS API and skips if it gets a 404. The course
+# is created by TestCreateCourse in test_courses.py.
+with hooks.Contexts.app("cms").enter():
+    hooks.Filters.TESTS.add_items(
+        [
+            ("cms", "smoke", os.path.join(_SMOKE_DIR, "test_courses.py")),
+        ]
+    )
+
+with hooks.Contexts.app("lms").enter():
+    hooks.Filters.TESTS.add_items(
+        [
+            ("lms", "smoke", os.path.join(_SMOKE_DIR, "test_enrollment.py")),
+        ]
+    )
+
+
 @hooks.Filters.CONFIG_DEFAULTS.add()
 def _set_openedx_common_version_in_main(
     items: list[tuple[str, t.Any]],
