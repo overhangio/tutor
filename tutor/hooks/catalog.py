@@ -527,6 +527,18 @@ class Filters:
     #: :param list[str] command: the list of parameters to use as the celery command.
     CMS_WORKER_COMMAND: Filter[list[str], []] = Filter()
 
+    #: List of test suites registered by plugins.
+    #:
+    #: Each item is a ``(service, suite_name, path)`` tuple where ``service`` is the
+    #: container to run setup/cleanup in (e.g. ``"lms"``), ``suite_name`` is a tag such
+    #: as ``"smoke"``, and ``path`` is an absolute path to a pytest-collectible file or
+    #: directory::
+    #:
+    #:         hooks.Filters.TESTS.add_item(("lms", "smoke", "/path/to/tests/smoke"))
+    #:
+    #: :parameter list[tuple[str, str, str]] suites: list of ``(service, suite_name, path)`` tuples.
+    TESTS: Filter[list[tuple[str, str, str]], []] = Filter()
+
 
 class Contexts:
     """
