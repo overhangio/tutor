@@ -1,0 +1,1 @@
+- [Improvement] Upgrade MySQL to v8.4.9, the latest patch on the 8.4 LTS line. (by @ahmed-arb)
