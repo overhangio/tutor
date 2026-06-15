@@ -39,6 +39,7 @@ Tutor: the Docker-based Open edX distribution designed for peace of mind
    run
    configuration
    plugins/index
+   testing/index
    sysadmin/index
    upgrading
    uninstallation

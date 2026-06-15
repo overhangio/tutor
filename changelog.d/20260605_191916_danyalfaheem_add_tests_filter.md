@@ -1,0 +1,9 @@
+- [Feature] Add a TESTS filter to tutor to include smoke/integration tests for tutor core and plugins. (by @Danyal Faheem)
+- [Feature] Add a new `tutor local do tests <suite> --limit <service>` command to run tests aggregated across tutor core and plugins using the TESTS filter. (by @Danyal-Faheem)
+- [Feature] Add idempotent smoke tests to quickly verify that a newly launched tutor instance is working. (by @Danyal-Faheem)
+  - These smoke tests check for the following basic necessities:
+    - User Management and Authentication
+    - Course import, course creation
+    - User enrollment
+    - Basic healthchecks
+    - OAuth Application creation
