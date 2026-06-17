@@ -23,3 +23,5 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    ignore:
+      - dependency-name: "tutor-*" # requirements/plugins.txt is manually controlled
