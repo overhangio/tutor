@@ -1,0 +1,1 @@
+- [Improvement] Run smoke workflows on Python 3.10 instead of 3.9 as it has reached EOL. (by @Danyal-Faheem)

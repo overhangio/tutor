@@ -1,0 +1,1 @@
+- [Improvement] Add a manually executable GitHub Action workflow to create version bump PRs for Major and Minor releases. (by @Danyal-Faheem)

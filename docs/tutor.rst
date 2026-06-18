@@ -137,6 +137,14 @@ Releasing a new version
 
 When releasing a new version:
 
+For Major and Minor version bumps, run the Bump Version GitHub action. It should take care of the necessary steps.
+
+The action takes input for the new version number. For detailed guidelines on version numbering, refer to the (versioning guidelines :ref:`versioning`).
+
+In case of an openedx-platform version update, provide the updated version as input to the action as well.
+
+For Release version bumps, the process is a little manual on purpose to incorporate other changes: 
+
 - **Version Number**: Update the version number in `__about__.py`. For detailed guidelines on version numbering, refer to the (versioning guidelines :ref:`versioning`).
 - **Changelog Compilation**: Compile all changelog entries using ``make changelog``.
 - **Git Commit for Release**: Use the format ``git commit -a -m "vX.Y.Z"`` to indicate the new version in the git commit title.

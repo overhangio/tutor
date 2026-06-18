@@ -4,94 +4,98 @@
 #
 #    pip-compile requirements/dev.in
 #
-altgraph==0.17.4
-    # via pyinstaller
+altgraph==0.17.5
+    # via
+    #   macholib
+    #   pyinstaller
 appdirs==1.4.4
-    # via -r base.txt
-attrs==25.3.0
+    # via -r requirements/base.txt
+attrs==26.1.0
     # via scriv
 backports-tarfile==1.2.0
     # via jaraco-context
-build==1.3.0
+build==1.4.4
     # via pip-tools
 cachetools==5.5.2
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   google-auth
 certifi==2025.8.3
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
     #   requests
-cffi==2.0.0
-    # via cryptography
-charset-normalizer==3.4.3
+charset-normalizer==3.4.7
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   requests
 click==8.1.8
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   click-log
     #   pip-tools
     #   scriv
 click-log==0.4.0
     # via scriv
 coverage==7.10.7
-    # via -r dev.in
-cryptography==46.0.7
-    # via secretstorage
-docutils==0.22.2
+    # via -r requirements/dev.in
+docutils==0.22.4
     # via readme-renderer
 durationpy==0.10
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
+exceptiongroup==1.3.1
+    # via pytest
 google-auth==2.40.3
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
-id==1.5.0
+id==1.6.1
     # via twine
-idna==3.10
+idna==3.16
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   requests
-importlib-metadata==8.7.0
+importlib-metadata==8.7.1
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   build
     #   keyring
     #   pyinstaller
     #   pyinstaller-hooks-contrib
     #   twine
 importlib-resources==6.5.2
-    # via -r base.txt
+    # via -r requirements/base.txt
+iniconfig==2.1.0
+    # via pytest
 jaraco-classes==3.4.0
     # via keyring
-jaraco-context==6.0.1
+jaraco-context==6.1.1
     # via keyring
-jaraco-functools==4.3.0
+jaraco-functools==4.4.0
     # via keyring
-jeepney==0.9.0
-    # via
-    #   keyring
-    #   secretstorage
 jinja2==3.1.6
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   scriv
-keyring==25.6.0
+keyring==25.7.0
     # via twine
-kubernetes==33.1.0
-    # via -r base.txt
+kubernetes==35.0.0
+    # via -r requirements/base.txt
+librt==0.11.0
+    # via
+    #   -r requirements/base.txt
+    #   mypy
+macholib==1.16.4
+    # via pyinstaller
 markdown-it-py==3.0.0
     # via
     #   rich
     #   scriv
-markupsafe==3.0.2
+markupsafe==3.0.3
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   jinja2
 mdurl==0.1.2
     # via markdown-it-py
@@ -99,72 +103,75 @@ more-itertools==10.8.0
     # via
     #   jaraco-classes
     #   jaraco-functools
-mypy==1.18.2
-    # via -r base.txt
+mypy==1.19.1
+    # via -r requirements/base.txt
 mypy-extensions==1.1.0
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   mypy
-nh3==0.3.0
+nh3==0.3.5
     # via readme-renderer
 oauthlib==3.3.1
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==25.0
+packaging==26.2
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   build
     #   pyinstaller
     #   pyinstaller-hooks-contrib
+    #   pytest
     #   twine
     #   wheel
-pathspec==0.12.1
+pathspec==1.1.1
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   mypy
-pip-tools==7.5.0
-    # via -r dev.in
+pip-tools==7.5.3
+    # via -r requirements/dev.in
+pluggy==1.6.0
+    # via pytest
 pyasn1==0.6.3
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   pyasn1-modules
     #   rsa
 pyasn1-modules==0.4.2
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   google-auth
-pycparser==2.23
-    # via cffi
 pycryptodome==3.23.0
-    # via -r base.txt
+    # via -r requirements/base.txt
 pygments==2.20.0
     # via
+    #   pytest
     #   readme-renderer
     #   rich
-pyinstaller==6.16.0
-    # via -r dev.in
-pyinstaller-hooks-contrib==2025.8
+pyinstaller==6.20.0
+    # via -r requirements/dev.in
+pyinstaller-hooks-contrib==2026.5
     # via pyinstaller
 pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
+pytest==8.4.2
+    # via -r requirements/dev.in
 python-dateutil==2.9.0.post0
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
 readme-renderer==44.0
     # via twine
 requests==2.32.5
     # via
-    #   -r base.txt
-    #   id
+    #   -r requirements/base.txt
     #   kubernetes
     #   requests-oauthlib
     #   requests-toolbelt
@@ -172,61 +179,63 @@ requests==2.32.5
     #   twine
 requests-oauthlib==2.0.0
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
 requests-toolbelt==1.0.0
     # via twine
 rfc3986==2.0.0
     # via twine
-rich==14.1.0
+rich==15.0.0
     # via twine
 rsa==4.9.1
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   google-auth
-ruff==0.14.0
-    # via -r dev.in
+ruff==0.15.14
+    # via -r requirements/dev.in
 scriv==1.7.0
-    # via -r dev.in
-secretstorage==3.3.3
-    # via keyring
+    # via -r requirements/dev.in
 six==1.17.0
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
     #   python-dateutil
-tomli==2.2.1
+tomli==2.4.1
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   build
     #   mypy
     #   pip-tools
+    #   pytest
 twine==6.2.0
-    # via -r dev.in
-types-docutils==0.22.1.20250923
-    # via -r dev.in
+    # via -r requirements/dev.in
+types-docutils==0.22.3.20251115
+    # via -r requirements/dev.in
 types-pyyaml==6.0.12.20250915
-    # via -r dev.in
+    # via -r requirements/dev.in
+types-requests==2.32.4.20260107
+    # via -r requirements/dev.in
 typing-extensions==4.15.0
     # via
-    #   -r base.txt
-    #   cryptography
+    #   -r requirements/base.txt
+    #   exceptiongroup
     #   mypy
 urllib3==2.6.3
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
+    #   id
     #   kubernetes
     #   requests
     #   twine
-websocket-client==1.8.0
+websocket-client==1.9.0
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   kubernetes
-wheel==0.46.2
+wheel==0.47.0
     # via pip-tools
-zipp==3.23.0
+zipp==3.23.1
     # via
-    #   -r base.txt
+    #   -r requirements/base.txt
     #   importlib-metadata
     #   importlib-resources
 
