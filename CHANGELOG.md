@@ -20,6 +20,29 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.8'></a>
+## v21.0.8 (2026-06-23)
+
+- [Feature] Persist lms and cms job logs (by @muhammadadeeltajamul)
+
+- [Bugfix] Compatibility with Fedora/SELinux systems: volume bind-mounts must indicate that they are shared between different containers. Otherwise, SELinux fails to mount them. (by @regisb)
+
+- [Improvement] Add a manually executable GitHub Action workflow to create version bump PRs for Major and Minor releases. (by @Danyal-Faheem)
+
+- [Feature] Add a TESTS filter to tutor to include smoke/integration tests for tutor core and plugins. (by @Danyal Faheem)
+- [Feature] Add a new `tutor local do tests <suite> --limit <service>` command to run tests aggregated across tutor core and plugins using the TESTS filter. (by @Danyal-Faheem)
+- [Feature] Add idempotent smoke tests to quickly verify that a newly launched tutor instance is working. (by @Danyal-Faheem)
+  - These smoke tests check for the following basic necessities:
+    - User Management and Authentication
+    - Course import, course creation
+    - User enrollment
+    - Basic healthchecks
+    - OAuth Application creation
+
+- [Improvement] Add a manually executable ci workflow to verify launch and smoke tests for local and k8s environments. (by @Danyal-Faheem)
+
+- [Improvement] Unpin kubernetes<36 constraint as the upstream authentication bug has been resolved.
+
 <a id='changelog-21.0.7'></a>
 ## v21.0.7 (2026-05-25)
 
