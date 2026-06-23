@@ -1,1 +1,0 @@
-- [Improvement] Add a manually executable ci workflow to verify launch and smoke tests for local and k8s environments. (by @Danyal-Faheem)
