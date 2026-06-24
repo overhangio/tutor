@@ -1,0 +1,1 @@
+- [Improvement] Set charset utf8mb4 for all databases, not only ran by Tutor. (by @angonz)
