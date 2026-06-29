@@ -14,6 +14,24 @@ ENV LC_ALL=en_US.UTF-8
 COPY --from=ghcr.io/astral-sh/uv:0.9.18 /uv /usr/local/bin/uv
 ARG PIP_COMMAND="uv pip"
 
+# Pin the build-time dependencies used inside the isolated environments that
+# uv/pip create when building packages from source (PEP 517 build isolation).
+# Without this, the *latest* setuptools is fetched to build every sdist,
+# regardless of the version installed in the venv. That made builds
+# non-reproducible and broke them when setuptools 81 removed pkg_resources,
+# which some build scripts still import (e.g. loremipsum, a transitive
+# dependency of edx-ora2). The constraint is inherited by every downstream
+# stage, so it applies to all "$PIP_COMMAND install" calls below (base.txt,
+# assets.txt, development.txt, extra requirements, editable installs, ...).
+# UV_BUILD_CONSTRAINT is read by "uv pip" (build environments only); plain
+# "pip" reads PIP_CONSTRAINT. We only constrain setuptools: wheel is pinned by
+# edx-platform's own requirements, and pip is not a build dependency.
+# Keep this version in sync with the setuptools installed in the venv below.
+# https://github.com/overhangio/tutor/issues/1350
+RUN echo "setuptools==69.1.1" > /etc/openedx-build-constraints.txt
+ENV UV_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
+ENV PIP_CONSTRAINT=/etc/openedx-build-constraints.txt
+
 {{ patch("openedx-dockerfile-minimal") }}
 
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
@@ -96,6 +114,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     $PIP_COMMAND install \
     # https://pypi.org/project/setuptools/
+    # Keep setuptools in sync with /etc/openedx-build-constraints.txt above.
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
     setuptools==69.1.1 pip==24.0 wheel==0.43.0
