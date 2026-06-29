@@ -1,0 +1,3 @@
+#! /bin/bash
+echo "Reloading granian process..."
+date +%s > /openedx/granian-reload-path
