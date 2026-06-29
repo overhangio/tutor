@@ -14,6 +14,16 @@ ENV LC_ALL=en_US.UTF-8
 COPY --from=ghcr.io/astral-sh/uv:0.9.18 /uv /usr/local/bin/uv
 ARG PIP_COMMAND="uv pip"
 
+# Constrain the build-time setuptools used in the isolated (PEP 517) build
+# environments that uv/pip create for source builds; without it the latest
+# setuptools is used regardless of the venv pin, which broke builds when
+# setuptools 81 removed pkg_resources. Inherited by all stages, and reused as
+# the single source of truth for the venv setuptools pin below.
+# https://github.com/overhangio/tutor/issues/1350
+RUN echo "setuptools==69.1.1" > /etc/openedx-build-constraints.txt
+ENV UV_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
+ENV PIP_CONSTRAINT=/etc/openedx-build-constraints.txt
+
 {{ patch("openedx-dockerfile-minimal") }}
 
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
@@ -93,13 +103,14 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     libxml2-dev \
     libxmlsec1-openssl
 
-# Install the right version of pip/setuptools
+# Install the right version of pip/setuptools. setuptools is left unpinned and
+# resolved from the build-constraints file above, so its version lives in one place.
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install \
+    $PIP_COMMAND install -c /etc/openedx-build-constraints.txt \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools==69.1.1 pip==24.0 wheel==0.43.0
+    setuptools pip==24.0 wheel==0.43.0
 
 # Install base requirements and asset-building requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
