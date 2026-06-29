@@ -67,7 +67,7 @@ This configuration parameter defines the name of the Docker image to run the dev
 
 .. https://hub.docker.com/r/devture/exim-relay/tags
 
-- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.6.2"``)
+- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.11.4"``)
 
 This configuration parameter defines which Caddy Docker image to use.
 
@@ -87,7 +87,7 @@ This configuration parameter defines which MySQL Docker image to use.
 
 .. https://hub.docker.com/_/redis/tags
 
-- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:7.4.5"``)
+- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:7.4.9"``)
 
 This configuration parameter defines which Redis Docker image to use.
 
