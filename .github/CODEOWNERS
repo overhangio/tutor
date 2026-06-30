@@ -1,0 +1,8 @@
+# Code owners for Tutor.
+# Owners listed here are automatically requested for review when a matching
+# file is changed. This also drives reviewer assignment for Dependabot PRs.
+# https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# GitHub Actions workflows and Dependabot config (incl. Dependabot version bumps)
+/.github/workflows/ @ahmed-arb
+/.github/dependabot.yml @ahmed-arb
