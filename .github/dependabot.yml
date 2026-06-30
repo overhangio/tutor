@@ -1,0 +1,13 @@
+# Keep GitHub Actions up to date so workflows don't fall behind on
+# runner/Node deprecations. See:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
