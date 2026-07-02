@@ -5,7 +5,7 @@
 #    pip-compile requirements/base.in
 #
 appdirs==1.4.4
-    # via -r base.in
+    # via -r requirements/base.in
 certifi==2026.5.20
     # via
     #   kubernetes
@@ -13,40 +13,40 @@ certifi==2026.5.20
 charset-normalizer==3.4.7
     # via requests
 click==8.1.8
-    # via -r base.in
+    # via -r requirements/base.in
 durationpy==0.10
     # via kubernetes
 idna==3.16
     # via requests
-importlib-metadata==8.7.1
-    # via -r base.in
+importlib-metadata==9.0.0
+    # via -r requirements/base.in
 importlib-resources==6.5.2
-    # via -r base.in
+    # via -r requirements/base.in
 jinja2==3.1.6
-    # via -r base.in
+    # via -r requirements/base.in
 kubernetes==35.0.0
-    # via -r base.in
+    # via -r requirements/base.in
 librt==0.11.0
     # via mypy
 markupsafe==3.0.3
     # via jinja2
 mypy==1.19.1
-    # via -r base.in
+    # via -r requirements/base.in
 mypy-extensions==1.1.0
     # via mypy
 oauthlib==3.3.1
     # via requests-oauthlib
 packaging==26.2
-    # via -r base.in
+    # via -r requirements/base.in
 pathspec==1.1.1
     # via mypy
 pycryptodome==3.23.0
-    # via -r base.in
+    # via -r requirements/base.in
 python-dateutil==2.9.0.post0
     # via kubernetes
 pyyaml==6.0.3
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   kubernetes
 requests==2.32.5
     # via
@@ -62,7 +62,7 @@ tomli==2.4.1
     # via mypy
 typing-extensions==4.15.0
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   mypy
 urllib3==2.6.3
     # via
@@ -71,6 +71,4 @@ urllib3==2.6.3
 websocket-client==1.9.0
     # via kubernetes
 zipp==3.23.1
-    # via
-    #   importlib-metadata
-    #   importlib-resources
+    # via importlib-metadata
