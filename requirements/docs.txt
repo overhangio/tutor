@@ -39,10 +39,8 @@ idna==3.16
 imagesize==1.5.0
     # via sphinx
 importlib-metadata==8.7.1
-    # via
-    #   -r requirements/base.txt
-    #   sphinx
-importlib-resources==6.5.2
+    # via -r requirements/base.txt
+importlib-resources==7.1.0
     # via -r requirements/base.txt
 jinja2==3.1.6
     # via
@@ -154,4 +152,3 @@ zipp==3.23.1
     # via
     #   -r requirements/base.txt
     #   importlib-metadata
-    #   importlib-resources
