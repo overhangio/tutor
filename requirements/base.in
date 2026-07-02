@@ -8,5 +8,5 @@ packaging
 pycryptodome>=3.17.0
 pyyaml>=6.0
 typing-extensions>=4.4.0
-importlib-metadata>=7.0.1
+importlib-metadata>=9.0.0
 importlib-resources>=6.1.1
