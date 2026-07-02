@@ -4,10 +4,30 @@
 #
 #    pip-compile requirements/docs.in
 #
+aiohappyeyeballs==2.7.1
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
+aiohttp==3.14.1
+    # via
+    #   -r requirements/base.txt
+    #   kubernetes
+aiosignal==1.4.0
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
 alabaster==0.7.16
     # via sphinx
 appdirs==1.4.4
     # via -r requirements/base.txt
+async-timeout==5.0.1
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
+attrs==26.1.0
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
 babel==2.18.0
     # via sphinx
 certifi==2026.5.20
@@ -32,23 +52,27 @@ durationpy==0.10
     # via
     #   -r requirements/base.txt
     #   kubernetes
+frozenlist==1.8.0
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
+    #   aiosignal
 idna==3.16
     # via
     #   -r requirements/base.txt
     #   requests
+    #   yarl
 imagesize==1.5.0
     # via sphinx
 importlib-metadata==8.7.1
-    # via
-    #   -r requirements/base.txt
-    #   sphinx
+    # via -r requirements/base.txt
 importlib-resources==6.5.2
     # via -r requirements/base.txt
 jinja2==3.1.6
     # via
     #   -r requirements/base.txt
     #   sphinx
-kubernetes==35.0.0
+kubernetes==36.0.2
     # via -r requirements/base.txt
 librt==0.11.0
     # via
@@ -58,6 +82,11 @@ markupsafe==3.0.3
     # via
     #   -r requirements/base.txt
     #   jinja2
+multidict==6.7.1
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
+    #   yarl
 mypy==1.19.1
     # via -r requirements/base.txt
 mypy-extensions==1.1.0
@@ -76,6 +105,11 @@ pathspec==1.1.1
     # via
     #   -r requirements/base.txt
     #   mypy
+propcache==0.5.2
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
+    #   yarl
 pycryptodome==3.23.0
     # via -r requirements/base.txt
 pygments==2.20.0
@@ -140,6 +174,9 @@ tomli==2.4.1
 typing-extensions==4.15.0
     # via
     #   -r requirements/base.txt
+    #   aiohttp
+    #   aiosignal
+    #   multidict
     #   mypy
 urllib3==2.6.3
     # via
@@ -150,8 +187,11 @@ websocket-client==1.9.0
     # via
     #   -r requirements/base.txt
     #   kubernetes
+yarl==1.24.2
+    # via
+    #   -r requirements/base.txt
+    #   aiohttp
 zipp==3.23.1
     # via
     #   -r requirements/base.txt
     #   importlib-metadata
-    #   importlib-resources
