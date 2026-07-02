@@ -1,4 +1,4 @@
-FROM docker.io/alpine:3.13.6
+FROM docker.io/alpine:3.24.1
 LABEL maintainer="Overhang.io <contact@overhang.io>"
 
 COPY ./setowner.sh /usr/local/bin/setowner
