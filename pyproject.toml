@@ -9,17 +9,18 @@ authors = [
 ]
 description = "The Docker-based Open edX distribution designed for peace of mind"
 readme = {file = "README.rst", content-type = "text/x-rst"}
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: GNU Affero General Public License v3",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 # these fields will be set by hatch_build.py
 dynamic = ["version", "dependencies", "optional-dependencies"]
