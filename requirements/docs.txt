@@ -39,9 +39,7 @@ idna==3.16
 imagesize==1.5.0
     # via sphinx
 importlib-metadata==8.7.1
-    # via
-    #   -r requirements/base.txt
-    #   sphinx
+    # via -r requirements/base.txt
 importlib-resources==6.5.2
     # via -r requirements/base.txt
 jinja2==3.1.6
@@ -112,7 +110,7 @@ sphinx==7.4.7
     #   sphinx-reredirects
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
-sphinx-click==6.0.0
+sphinx-click==6.2.0
     # via -r requirements/docs.in
 sphinx-reredirects==0.1.6
     # via -r requirements/docs.in
@@ -154,4 +152,3 @@ zipp==3.23.1
     # via
     #   -r requirements/base.txt
     #   importlib-metadata
-    #   importlib-resources
