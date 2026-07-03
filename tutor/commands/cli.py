@@ -32,6 +32,23 @@ def main() -> None:
         sys.exit(1)
 
 
+def check_plugin_errors(ignore: bool) -> None:
+    """
+    Check for plugin loading errors and exit with code 1 if any were found,
+    unless --ignore-plugin-errors is set.
+    """
+    errors: list[tuple[str, str]] = list(hooks.Filters.PLUGIN_ERRORS.iterate())
+    if not errors:
+        return
+    for plugin, error in errors:
+        if ignore:
+            fmt.echo_alert(f"Failed to enable plugin '{plugin}': {error}")
+        else:
+            fmt.echo_error(f"Plugin '{plugin}' failed to load: {error}")
+    if errors and not ignore:
+        sys.exit(1)
+
+
 class TutorCli(click.Group):
     """
     Dynamically load subcommands at runtime.
@@ -70,13 +87,10 @@ class TutorCli(click.Group):
             # That's ok, we just ignore it.
             return
         if not self.IS_ROOT_READY:
-            try:
-                hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
-                self.IS_ROOT_READY = True
-                for cmd in hooks.Filters.CLI_COMMANDS.iterate():
-                    self.add_command(cmd)
-            except Exception as exc:
-                raise click.ClickException(f"Error enabling plugins: {exc}") from exc
+            hooks.Actions.PROJECT_ROOT_READY.do(ctx.params["root"])
+            self.IS_ROOT_READY = True
+            for cmd in hooks.Filters.CLI_COMMANDS.iterate():
+                self.add_command(cmd)
 
 
 @click.group(
@@ -102,18 +116,36 @@ class TutorCli(click.Group):
     is_flag=True,
     help="Print this help",
 )
+@click.option(
+    "--ignore-plugin-errors",
+    "ignore_plugin_errors",
+    is_flag=True,
+    default=False,
+    help="Continue running even if plugin loading fails",
+)
 @click.pass_context
-def cli(context: click.Context, root: str, show_help: bool) -> None:
+def cli(
+    context: click.Context, root: str, show_help: bool, ignore_plugin_errors: bool
+) -> None:
     if utils.is_root():
         fmt.echo_alert(
             "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
             " the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com"
             "/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
         )
-    context.obj = Context(root)
+    context.obj = Context(root, ignore_plugin_errors)
     context.help_option_names = ["-h", "--help"]
     if context.invoked_subcommand is None or show_help:
         click.echo(context.get_help())
+
+
+@cli.result_callback()
+@click.pass_context
+def _after_subcommand(context: click.Context, result: t.Any, **kwargs: t.Any) -> None:
+    """
+    Runs after the invoked subcommand has finished.
+    """
+    check_plugin_errors(context.obj.ignore_plugin_errors)
 
 
 @click.command(help="Print this help", name="help")
