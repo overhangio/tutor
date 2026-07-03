@@ -475,6 +475,15 @@ class Filters:
     #:   regular expression. For instance: ``("openedx", r".*xblock.*")``.
     MOUNTED_DIRECTORIES: Filter[list[tuple[str, str]], []] = Filter()
 
+    #: List of plugins that failed to load, along with the corresponding error
+    #: message. This filter is populated by :py:func:`tutor.plugins.load_all` when
+    #: a plugin raises an exception during loading. It is consumed by the CLI to
+    #: report errors after the subcommand has finished.
+    #:
+    #: :parameter list[tuple[str, str]] errors: list of ``(plugin_name, error_message)``
+    #:   tuples.
+    PLUGIN_ERRORS: Filter[list[tuple[str, str]], []] = Filter()
+
     #: List of plugin indexes that are loaded when we run ``tutor plugins update``. By
     #: default, the plugin indexes are stored in the user configuration. This filter makes
     #: it possible to extend and modify this list with plugins.
