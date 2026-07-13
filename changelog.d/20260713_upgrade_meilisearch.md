@@ -6,3 +6,7 @@
       tutor local do init
       tutor local exec cms ./manage.py cms reindex_studio
       tutor local exec cms ./manage.py cms reindex_course --active
+
+- On a large site, the reindex takes a while and search stays incomplete until it finishes, so plan a maintenance window.
+
+- Rolling back is not just reverting the image tag. Because the format only moves forward, v1.8.4 cannot read a v1.36.0 database either, so you also need to restore your pre-upgrade data/meilisearch/data.ms backup.
