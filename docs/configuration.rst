@@ -71,7 +71,7 @@ This configuration parameter defines the name of the Docker image to run the dev
 
 This configuration parameter defines which Caddy Docker image to use.
 
-- ``DOCKER_IMAGE_MEILISEARCH`` (default: ``"docker.io/getmeili/meilisearch:v1.8.4"``)
+- ``DOCKER_IMAGE_MEILISEARCH`` (default: ``"docker.io/getmeili/meilisearch:v1.36.0"``)
 
 This configuration parameter defines which Meilisearch Docker image to use.
 
