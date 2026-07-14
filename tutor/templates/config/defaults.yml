@@ -17,7 +17,7 @@ DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev:{{ TUTOR_VERSION }}"
 # https://hub.docker.com/_/caddy/tags
 DOCKER_IMAGE_CADDY: "docker.io/caddy:2.11.4"
 # https://hub.docker.com/r/getmeili/meilisearch/tags
-DOCKER_IMAGE_MEILISEARCH: "docker.io/getmeili/meilisearch:v1.8.4"
+DOCKER_IMAGE_MEILISEARCH: "docker.io/getmeili/meilisearch:v1.36.0"
 # https://hub.docker.com/_/mongo/tags
 DOCKER_IMAGE_MONGODB: "docker.io/mongo:7.0.35"
 # https://hub.docker.com/_/mysql/tags
