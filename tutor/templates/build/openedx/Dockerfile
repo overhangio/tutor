@@ -59,6 +59,12 @@ RUN git config --global user.email "tutor@overhang.io" \
 {%- else %}
 # Patches in non-Main mode (i.e., Release mode)
 
+# SECURITY FIX: bump vendored pdf.js from 1.0.907 to 5.7.284
+# Addresses XSS vulnerability GHSA-mj74-gfq3-2v9f (CVE pending)
+# https://discuss.openedx.org/t/security-upcoming-security-release-for-openedx-platform/19128
+RUN git fetch origin 4d2e220d6f709b675018b8900ed1116f3d482ad9 \
+    && git cherry-pick 4d2e220d6f709b675018b8900ed1116f3d482ad9
+
 {%- endif %}
 
 {# Add new patches like this: #}
