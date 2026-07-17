@@ -86,8 +86,13 @@ CACHES = {
     }
 }
 
-# The default Django contrib site is the one associated to the LMS domain name. 1 is
-# usually "example.com", so it's the next available integer.
+# The Django contrib site associated to the LMS domain name. On a fresh install
+# the LMS init job (tutor/templates/jobs/init/lms.sh) renames the auto-generated
+# "example.com" site to the platform domain in place, so that SITE_ID points at
+# the real site. This ensures request-less code paths (e.g. bulk emails sent from
+# Celery workers, where Django cannot infer the site from the request and falls
+# back to SITE_ID) use the correct domain and branding instead of "example.com".
+# See https://github.com/overhangio/tutor/issues/1182
 SITE_ID = 2
 
 # Contact addresses

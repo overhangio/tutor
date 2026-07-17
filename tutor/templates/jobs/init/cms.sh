@@ -4,6 +4,20 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 ./manage.py cms migrate
 
+# Ensure a Site object exists for the CMS domain. The SITE_ID site itself is
+# owned by the LMS init job (LMS and CMS share the same Site table), so here we
+# only make sure Studio has its own Site to resolve from.
+# https://github.com/overhangio/tutor/issues/1182
+./manage.py cms shell -c "
+from django.conf import settings
+from django.contrib.sites.models import Site
+domain = settings.CMS_BASE
+name = '{{ PLATFORM_NAME }}'[:Site._meta.get_field('name').max_length]
+site, created = Site.objects.get_or_create(domain=domain, defaults={'name': name})
+verb = 'Created' if created else 'Found'
+print(f'{verb} CMS site id={site.pk} for {domain}')
+"
+
 # Fix incorrect uploaded file path
 if [ -d /openedx/data/uploads/ ]; then
   if [ -n "$(ls -A /openedx/data/uploads/)" ]; then

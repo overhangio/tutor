@@ -4,6 +4,8 @@ import unittest
 from unittest.mock import patch
 
 from tests.helpers import PluginsTestCase, temporary_root
+from tutor import config as tutor_config
+from tutor import env
 from tutor.commands import jobs
 from tutor.commands.jobs_utils import load_env_file, parse_test_env_var
 from tutor.exceptions import TutorError
@@ -19,6 +21,31 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIsNone(result.exception)
             self.assertEqual(0, result.exit_code)
             self.assertIn("All services initialised.", result.output)
+
+    def test_init_lms_configures_site_id(self) -> None:
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            config = tutor_config.load_full(root)
+            rendered = env.render_file(config, "jobs", "init", "lms.sh")
+            assert isinstance(rendered, str)
+            # The LMS init job repoints the SITE_ID site away from "example.com"
+            # to the LMS domain, so that request-less features use the right site.
+            self.assertIn("from django.contrib.sites.models import Site", rendered)
+            self.assertIn("settings.LMS_BASE", rendered)
+            self.assertIn("example.com", rendered)
+            self.assertIn("SITE_ID", rendered)
+            # When two candidate sites exist, the database must be left untouched.
+            self.assertIn("two candidate sites exist", rendered)
+
+    def test_init_cms_ensures_site(self) -> None:
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            config = tutor_config.load_full(root)
+            rendered = env.render_file(config, "jobs", "init", "cms.sh")
+            assert isinstance(rendered, str)
+            self.assertIn("from django.contrib.sites.models import Site", rendered)
+            self.assertIn("settings.CMS_BASE", rendered)
+            self.assertIn("get_or_create", rendered)
 
     def test_create_user_template_without_staff(self) -> None:
         command = jobs.create_user_template(
