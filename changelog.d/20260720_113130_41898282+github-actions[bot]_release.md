@@ -1,0 +1,1 @@
+- [Improvement] Upgrade Redis from 7.4.5 to 7.4.9. (by @github-actions[bot])
