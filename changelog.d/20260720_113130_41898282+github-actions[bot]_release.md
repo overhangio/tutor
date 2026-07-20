@@ -1,0 +1,1 @@
+- [Improvement] Upgrade Caddy from 2.7.4 to 2.11.4. (by @github-actions[bot])
