@@ -33,7 +33,7 @@ jobs:
     steps:
       ##### Setup environment
       # https://github.com/actions/checkout
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Python
         # https://github.com/actions/setup-python
         uses: actions/setup-python@v6
