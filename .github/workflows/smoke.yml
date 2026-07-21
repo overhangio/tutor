@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tutor
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # repository defaults to overhangio/tutor; set tutor_remote to test a fork branch
           repository: ${{ format('{0}/tutor', github.event.inputs.tutor_remote || 'overhangio') }}
