@@ -36,7 +36,7 @@ jobs:
           ref: ${{ github.event.inputs.tutor_ref || github.ref }}
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           # TODO: Update to 3.10 in main as 3.9 is EOL
           python-version: "3.9"
