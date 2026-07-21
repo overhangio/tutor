@@ -10,6 +10,46 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 ./manage.py lms migrate
 
+# Point the SITE_ID site at the LMS domain instead of the default "example.com"
+# site that Django auto-creates during the first migration. Otherwise, code paths
+# that run outside of an HTTP request (e.g. bulk emails sent from Celery workers)
+# fall back to SITE_ID and send links/branding for "example.com".
+# https://github.com/overhangio/tutor/issues/1182
+./manage.py lms shell -c "
+from django.conf import settings
+from django.contrib.sites.models import Site
+site_id = settings.SITE_ID
+domain = settings.LMS_BASE
+name = '{{ PLATFORM_NAME }}'[:Site._meta.get_field('name').max_length]
+current = Site.objects.filter(pk=site_id).first()
+existing = Site.objects.filter(domain=domain).first()
+current_domain = current.domain if current else None
+if existing and existing.pk == site_id:
+    print(f'SITE_ID {site_id} already points at {domain}')
+elif existing:
+    # Two sites exist: the SITE_ID site and a separate site for the LMS domain.
+    # Both may have data attached (SiteConfiguration, themes, ...), so we cannot
+    # safely guess which to keep. Leave the database untouched and let the
+    # operator decide.
+    print('WARNING: cannot automatically fix SITE_ID: two candidate sites exist.')
+    print(f'WARNING:   - SITE_ID={site_id} currently points at site id={current.pk if current else None} ({current_domain!r})')
+    print(f'WARNING:   - the LMS domain {domain!r} is site id={existing.pk}')
+    print('WARNING: the database was left unchanged. Request-less features (e.g. bulk')
+    print(f'WARNING: email) will keep using {current_domain!r}.')
+    print('WARNING: to fix, review both sites, delete the one you do not need, and set')
+    print('WARNING: SITE_ID (via a plugin) to the id of the site you keep.')
+elif current is None:
+    Site.objects.create(pk=site_id, domain=domain, name=name)
+    print(f'Created site id={site_id} for {domain}')
+elif current.domain == 'example.com':
+    current.domain = domain
+    current.name = name
+    current.save()
+    print(f'Renamed default site id={site_id} from example.com to {domain}')
+else:
+    print(f'SITE_ID {site_id} points at {current.domain} - leaving unchanged')
+"
+
 # Create meilisearch indexes
 ./manage.py lms shell -c "import search.meilisearch; search.meilisearch.create_indexes()"
 

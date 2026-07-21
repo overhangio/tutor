@@ -226,3 +226,20 @@ The handy :ref:`update-mysql-authentication-plugin <update_mysql_authentication_
 
     tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME)
     tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME)
+
+Emails or other request-less features use "example.com" instead of my domain
+----------------------------------------------------------------------------
+
+Some features run outside of an HTTP request (for instance, bulk emails sent from a Celery worker). In that situation Django cannot determine the current site from the request, and falls back to the site referenced by the ``SITE_ID`` setting. On a fresh installation Tutor makes sure that site is your LMS domain, but on installations that already had both an ``example.com`` site *and* a separate site for your domain, Tutor cannot safely guess which one to keep, so it leaves the database untouched and prints a warning during initialisation.
+
+To fix such an installation, open the Django admin at ``http(s)://<your LMS domain>/admin/sites/site/`` and look at the ``Site`` objects. Decide which one is the "real" one (usually the one that has your ``SiteConfiguration`` and theme attached), delete the other, and set ``SITE_ID`` to the id of the site you keep. This is done with the ``openedx-common-settings`` patch, from a :ref:`plugin <plugins>`. For instance, if the correct site has id 3::
+
+    from tutor import hooks
+    hooks.Filters.ENV_PATCHES.add_item(
+        ("openedx-common-settings", "SITE_ID = 3")
+    )
+
+Then re-generate the environment and restart the platform::
+
+    tutor config save
+    tutor local restart
