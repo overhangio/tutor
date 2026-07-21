@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.9'></a>
+## v21.0.9 (2026-07-16)
+
+- [Security] Backport fix to bump vendored pdf.js from 1.0.907 to 5.7.284, addressing XSS vulnerability GHSA-mj74-gfq3-2v9f (source: upstream edx-platform commit 4d2e220d6f709b675018b8900ed1116f3d482ad9).
+
 <a id='changelog-21.0.8'></a>
 ## v21.0.8 (2026-06-23)
 
