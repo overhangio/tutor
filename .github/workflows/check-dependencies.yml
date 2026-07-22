@@ -1,7 +1,8 @@
 # This workflow runs every Monday and checks whether the Docker images pinned in
 # tutor/templates/config/defaults.yml are up to date within their designated version
-# cycle. For each outdated dependency it opens a separate PR that bumps the version
-# string and adds a changelog entry.
+# cycle. For each outdated dependency it opens a separate PR against `main` that
+# bumps the pinned version everywhere it appears (defaults.yml, the configuration
+# reference docs and the vendor-image test) and adds a changelog entry.
 #
 # Versions are looked up via the endoflife.date public API which tracks the latest
 # patch release for a given product/cycle (e.g. mysql/8.4 -> 8.4.9).
@@ -23,6 +24,7 @@
 name: Check Outdated Dependencies
 
 on:
+  workflow_dispatch: # allow manual/test runs from the Actions tab
   schedule:
     - cron: "0 9 * * 1" # Every Monday at 9 AM UTC
 
@@ -66,6 +68,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          # Dependency maintenance happens on main, not the default branch.
+          # Check out main so current versions and the PR branch are based on it.
+          ref: main
 
       - name: Check latest version
         id: check
@@ -83,14 +89,34 @@ jobs:
             echo "outdated=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Update version in defaults.yml
+      - name: Bump version across all references
         if: steps.check.outputs.outdated == 'true'
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: '${{ matrix.image_key }}: "${{ matrix.image_prefix }}${{ steps.check.outputs.current }}"'
-          replace: '${{ matrix.image_key }}: "${{ matrix.image_prefix }}${{ steps.check.outputs.latest }}"'
-          include: "tutor/templates/config/defaults.yml"
-          regex: false
+        env:
+          IMAGE_PREFIX: "${{ matrix.image_prefix }}"
+          LATEST: "${{ steps.check.outputs.latest }}"
+        run: |
+          # The pinned image tag is hardcoded in a few places beyond defaults.yml:
+          # the configuration reference docs and a vendor-image test. Rewrite the tag
+          # in every one so they can never drift apart (this also heals any existing
+          # drift). The trailing quote anchors the match, and \Q..\E keeps the prefix
+          # literal since it contains "/", "." and ":".
+          FILES=(
+            tutor/templates/config/defaults.yml
+            docs/configuration.rst
+            tests/commands/test_images.py
+          )
+          for f in "${FILES[@]}"; do
+            if [ -f "$f" ]; then
+              perl -pi -e 's#\Q'"$IMAGE_PREFIX"'\E[^"]+"#'"$IMAGE_PREFIX$LATEST"'"#g' "$f"
+            fi
+          done
+          # Guard: fail loudly if any of those files still pins a version other than
+          # $LATEST, so a missed reference surfaces as a red run instead of a PR that
+          # silently leaves the docs or test behind.
+          if git grep -nP "\Q$IMAGE_PREFIX\E[^\"]+\"" -- "${FILES[@]}" | grep -vF "$IMAGE_PREFIX$LATEST\""; then
+            echo "::error::Some references to $IMAGE_PREFIX were not updated to $LATEST."
+            exit 1
+          fi
 
       - name: Install scriv
         if: steps.check.outputs.outdated == 'true'
@@ -119,4 +145,4 @@ jobs:
 
             ### Testing
             - [ ] `tutor local launch` and verify ${{ matrix.display }} starts cleanly
-          base: ${{ github.event.repository.default_branch }}
+          base: main
