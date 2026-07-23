@@ -41,8 +41,8 @@ Where can I try Open edX and Tutor?
 
 A sandbox Open edX platform is available at https://sandbox.openedx.edly.io. This platform was deployed using Tutor and the `Indigo theme <https://github.com/overhangio/indigo>`__. Feel free to play around with the following credentials:
 
-* Admin user: username=admin email=admin@overhang.io password=admin
-* Student user: username=student email=student@overhang.io password=student
+* Admin user: username=admin email=admin@edly.io password=admin
+* Student user: username=student email=student@edly.io password=student
 
 The Android mobile application for this demo platform can be downloaded at this url: https://mobile.sandbox.openedx.edly.io/app.apk
 

@@ -7,8 +7,25 @@ license = {text = "AGPL-3.0-only"}
 authors = [
   {name = "Edly"}, { email = "hello@edly.io"}
 ]
+maintainers = [
+  {name = "Edly"}, { email = "hello@edly.io"},
+  {name = "Ahmed Khalid"}, { email = "ahmed.khalid@arbisoft.com"}
+]
 description = "The Docker-based Open edX distribution designed for peace of mind"
 readme = {file = "README.rst", content-type = "text/x-rst"}
+keywords = [
+    "open-edx",
+    "openedx",
+    "edly",
+    "edly-tutor",
+    "tutor-openedx",
+    "open-edx-installer",
+    "openedx-distribution",
+    "edly-maintained",
+    "lms",
+    "elearning",
+    "docker-openedx",
+]
 requires-python = ">= 3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -35,6 +52,7 @@ Source = "https://github.com/overhangio/tutor"
 Issues = "https://github.com/overhangio/tutor/issues"
 Changelog = "https://github.com/overhangio/tutor/blob/master/CHANGELOG.md"
 Community = "https://discuss.openedx.org/tag/tutor"
+"Maintained by" = "https://edly.io"
 
 # hatch-specific configuration
 [tool.hatch.metadata.hooks.custom]
