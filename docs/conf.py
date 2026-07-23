@@ -12,7 +12,7 @@ import docutils.parsers.rst
 
 project = "Tutor"
 copyright = ""
-author = "Overhang.IO"
+author = "Edly"
 
 # The short X.Y version
 version = ""
@@ -177,6 +177,11 @@ with io.open(
     exec(f.read(), about)
 rst_prolog = f"""
 .. |tutor_version| replace:: {about["__version__"]}
+
+.. meta::
+   :author: Edly
+   :description: Tutor is the official Open edX distribution, maintained by Edly.
+   :keywords: tutor, open-edx, openedx, edly, edly-tutor, open-edx-installer, openedx-distribution
 """
 
 
