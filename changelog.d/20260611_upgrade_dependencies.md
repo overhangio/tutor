@@ -1,0 +1,2 @@
+- [Improvement] Upgrade Caddy to v2.11.4 and Redis to v7.4.9. (by @ahmed-arb)
+- [Improvement] Upgrade Python to v3.12.13 and Node.js to v24.16.0 in the Open edX Docker image. (by @ahmed-arb)
