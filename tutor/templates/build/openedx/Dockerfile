@@ -20,7 +20,7 @@ ARG PIP_COMMAND="uv pip"
 # setuptools 81 removed pkg_resources. Inherited by all stages, and reused as
 # the single source of truth for the venv setuptools pin below.
 # https://github.com/overhangio/tutor/issues/1350
-RUN echo "setuptools==69.1.1" > /etc/openedx-build-constraints.txt
+RUN echo "setuptools==80.9.0" > /etc/openedx-build-constraints.txt
 ENV UV_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
 ENV PIP_CONSTRAINT=/etc/openedx-build-constraints.txt
 
