@@ -15,7 +15,7 @@ DOCKER_REGISTRY: "docker.io/"
 DOCKER_IMAGE_OPENEDX: "{{ DOCKER_REGISTRY }}overhangio/openedx:{{ TUTOR_VERSION }}"
 DOCKER_IMAGE_OPENEDX_DEV: "openedx-dev:{{ TUTOR_VERSION }}"
 # https://hub.docker.com/_/caddy/tags
-DOCKER_IMAGE_CADDY: "docker.io/caddy:2.7.4"
+DOCKER_IMAGE_CADDY: "docker.io/caddy:2.11.4"
 # https://hub.docker.com/r/getmeili/meilisearch/tags
 DOCKER_IMAGE_MEILISEARCH: "docker.io/getmeili/meilisearch:v1.8.4"
 # https://hub.docker.com/_/mongo/tags
