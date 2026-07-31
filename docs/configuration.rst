@@ -75,7 +75,7 @@ This configuration parameter defines which Caddy Docker image to use.
 
 This configuration parameter defines which Meilisearch Docker image to use.
 
-- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:7.0.28"``)
+- ``DOCKER_IMAGE_MONGODB`` (default: ``"docker.io/mongo:7.0.39"``)
 
 This configuration parameter defines which MongoDB Docker image to use.
 
