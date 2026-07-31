@@ -24,7 +24,6 @@
 name: Check Outdated Dependencies
 
 on:
-  workflow_dispatch: # allow manual/test runs from the Actions tab
   schedule:
     - cron: "0 9 * * 1" # Every Monday at 9 AM UTC
 
