@@ -1,1 +1,0 @@
-- [Improvement] Add a weekly GitHub Actions workflow to automatically open PRs when pinned Docker image dependencies (Caddy, MySQL, MongoDB, Redis) fall behind their latest patch release, and a Dependabot configuration to keep GitHub Actions, Dockerfiles, and Python requirements up to date. (by @Danyal-Faheem)
