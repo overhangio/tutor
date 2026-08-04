@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+title: "Tutor: the Docker-based Open edX distribution"
+message: "If you use Tutor, please cite it as below."
+type: software
+authors:
+  - name: "Edly"
+    website: "https://edly.io"
+    email: "hello@edly.io"
+repository-code: "https://github.com/overhangio/tutor"
+url: "https://docs.tutor.edly.io"
+license: AGPL-3.0-only
+version: "21.0.8"
+date-released: "2026-06-23"
+keywords:
+  - open-edx
+  - openedx
+  - edly
+  - edly-tutor
+  - openedx-distribution
+abstract: >-
+  Tutor is the official Docker-based Open edX distribution, owned and
+  maintained by Edly. Originally created by Régis Behmo at Overhang.io in
+  2019, it is the de facto standard for installing Open edX.
