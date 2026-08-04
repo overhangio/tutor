@@ -105,6 +105,25 @@ Finally, if no container or other programs are making use of port 3306, check th
 Check whether the MySQL container is crashing upon startup, and if so, what is causing it to crash.
 
 
+Docker is using too much disk space
+-----------------------------------
+
+Docker does not automatically remove unused objects, so images and build cache can consume a large amount of disk space over time. Check Docker's disk usage with::
+
+    docker system df
+
+Before pruning, start the Tutor platform whose images you want to keep. For example::
+
+    tutor local start
+
+Then remove unused Docker objects with::
+
+    docker system prune -a
+
+.. warning::
+    This command removes all stopped containers, unused networks and images, and unused build cache. Review Docker's confirmation prompt before proceeding. Do not add the ``--volumes`` option unless you intend to remove unused volumes, which may contain persistent data.
+
+
 Help! The Docker containers are eating all my RAM/CPU/CHEESE
 ------------------------------------------------------------
 
