@@ -8,18 +8,16 @@ updates:
       day: "monday"
 
   - package-ecosystem: "docker"
-    directory: "/tutor/templates/build/openedx"
-    target-branch: "main"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-
-  - package-ecosystem: "docker"
     directory: "/tutor/templates/build/permissions"
     target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
+    ignore:
+      - dependency-name: "alpine"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
 
   - package-ecosystem: "pip"
     directory: "/"
