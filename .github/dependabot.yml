@@ -2,24 +2,28 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
 
   - package-ecosystem: "docker"
     directory: "/tutor/templates/build/openedx"
+    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
 
   - package-ecosystem: "docker"
     directory: "/tutor/templates/build/permissions"
+    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
 
   - package-ecosystem: "pip"
     directory: "/"
+    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
