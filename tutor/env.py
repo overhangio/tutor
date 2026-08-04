@@ -342,6 +342,15 @@ def save(root: str, config: Config) -> None:
         save_all_from(src, os.path.join(root_env, dst), config)
 
     upgrade_obsolete(root)
+
+    config_copy = deepcopy(config)
+    hooks.Actions.ENV_SAVED.do(root_env, config_copy)
+    if config_copy != config:
+        fmt.echo_alert(
+            "A plugin just modified the config during the ENV_SAVED hook. "
+            "This could have unintended consequences."
+        )
+
     fmt.echo_info(f"Environment generated in {base_dir(root)}")
 
 
@@ -478,6 +487,7 @@ def get_release(version: str) -> str:
         "19": "sumac",
         "20": "teak",
         "21": "ulmo",
+        "22": "verawood",
     }[version.split(".", maxsplit=1)[0]]
 
 
