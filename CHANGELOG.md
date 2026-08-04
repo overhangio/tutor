@@ -20,6 +20,15 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.9'></a>
+## v21.0.9 (2026-08-04)
+
+- [Improvement] Add a weekly GitHub Actions workflow to automatically open PRs when pinned Docker image dependencies (Caddy, MySQL, MongoDB, Redis) fall behind their latest patch release, and a Dependabot configuration to keep GitHub Actions, Dockerfiles, and Python requirements up to date. (by @Danyal-Faheem)
+
+- [Bugfix] Pin the build-time `setuptools` used inside the isolated PEP 517 build environments that uv/pip create when building Python packages from source. Previously the latest `setuptools` was fetched to build every sdist regardless of the version installed in the venv, which made builds non-reproducible and broke them when `setuptools` 81 removed `pkg_resources` (e.g. when building `loremipsum`, a transitive dependency of `edx-ora2`). The constraint is set via `UV_BUILD_CONSTRAINT`/`PIP_CONSTRAINT` in the base image stage, so it applies to all requirement installs (base.txt, assets.txt, development.txt, extra requirements and editable installs). (by @Abdul-Muqadim-Arbisoft)
+
+- [Feature] Upgrade OPENEDX_COMMON_VERSION to release/ulmo.4 (by @ahmed-arb)
+
 <a id='changelog-21.0.8'></a>
 ## v21.0.8 (2026-06-23)
 
