@@ -25,9 +25,13 @@ updates:
 
   - package-ecosystem: "pip"
     directory: "/"
-    target-branch: "main"
+    target-branch: "release"
     schedule:
       interval: "weekly"
       day: "monday"
     ignore:
       - dependency-name: "tutor-*" # requirements/plugins.txt is manually controlled
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
