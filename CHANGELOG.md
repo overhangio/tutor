@@ -20,6 +20,48 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.0.0'></a>
+## v22.0.0 (2026-08-04)
+
+- [Feature] Add ENV_SAVED Action that allows hooks to run after a save
+  operation. (by @xitij2000)
+
+[Improvement] Update to use Python 3.12 for edx-platform
+
+- 💥[Improvement] Add Python 3.13 and 3.14 support. Drop Python 3.9 (end-of-life). Update CI matrix from Python 3.9/3.12 to 3.10/3.14. Update `requires-python` to `>= 3.10`. Use `sphinx>=9.1.0` for Python 3.14+ and `sphinx>=7.4.7` for Python 3.10 to account for Sphinx 9.x dropping Python 3.10 support. (by @Syed-Ali-Abbas-568)
+
+- 💥[Feature] Upgrade to Verawood. (by @ahmed-arb)
+
+- [Improvement] Upgrade Caddy to v2.11.4 and Redis to v7.4.9. (by @ahmed-arb)
+- [Improvement] Upgrade Python to v3.12.13 and Node.js to v24.16.0 in the Open edX Docker image. (by @ahmed-arb)
+
+- [Security] Upgrade MongoDB to v7.0.35 to pull in upstream security patches, remaining on the 7.0 line that Open edX tests against. (by @ahmed-arb)
+
+- [Improvement] Upgrade MySQL to v8.4.9, the latest patch on the 8.4 LTS line. (by @ahmed-arb)
+
+- [Bugfix] On the main branch, bump the pinned build-time `setuptools` to 80.9.0 (the release branch keeps 69.1.1). The older version cannot build packages that declare their license with the PEP 639 `project.license` field (e.g. `mysqlclient`) against the Open edX master branch, which broke `tutor images build openedx` on main. (by @Abdul-Muqadim-Arbisoft)
+
+- [Improvement] Run smoke workflows on Python 3.10 instead of 3.9 as it has reached EOL. (by @Danyal-Faheem)
+
+- 💥[Improvement] Upgrade Meilisearch to v1.36.0. This changes the on-disk index format, so v1.36.0 refuses to start on a database created by v1.8.4: the container restart-loops with a "database version (1.8.4) is incompatible with your current engine version (1.36.0)" error. Meilisearch is only a derived index in Open edX and never a source of truth, so the existing index must be discarded and rebuilt after upgrading. Stop the platform, delete `data/meilisearch/data.ms`, then re-run initialisation and reindex: (by @HammadYousaf01)
+
+      tutor local stop
+      rm -rf "$(tutor config printroot)/data/meilisearch/data.ms"
+      tutor local start -d
+      tutor local do init
+      tutor local exec cms ./manage.py cms reindex_studio
+      tutor local exec cms ./manage.py cms reindex_course --active
+
+- On a large site, the reindex takes a while and search stays incomplete until it finishes, so plan a maintenance window.
+
+- Rolling back is not just reverting the image tag. Because the format only moves forward, v1.8.4 cannot read a v1.36.0 database either, so you also need to restore your pre-upgrade data/meilisearch/data.ms backup.
+
+- [Improvement] Upgrade MySQL from 8.4.9 to 8.4.11. (by @github-actions[bot])
+
+- [Improvement] Upgrade MongoDB from 7.0.35 to 7.0.39. (by @github-actions[bot])
+
+- [Improvement] Upgrade Redis from 7.4.9 to 7.4.10. (by @github-actions[bot])
+
 <a id='changelog-21.0.9'></a>
 ## v21.0.9 (2026-08-04)
 
