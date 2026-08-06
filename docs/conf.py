@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import os
 import sys
+from pathlib import Path
 from typing import Any, Dict, List
 
 import docutils
@@ -93,6 +94,7 @@ extensions.append("sphinx_click")
 # -- Redirects for pages that were moved or removed
 # https://github.com/sphinx-contrib/sphinx-reredirects
 extensions.append("sphinx_reredirects")
+extensions.append("sphinx_llms_txt")
 redirects = {
     # Removed top-level pages
     "install": "gettingstarted/installation.html",
@@ -142,6 +144,7 @@ os.environ["HOME"] = "~"
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 # -- Options for HTML output -------------------------------------------------
+html_baseurl = "https://docs.tutor.edly.io/"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "logo_only": True,
@@ -160,6 +163,7 @@ html_static_path = ["img"]
 html_logo = "https://overhang.io/static/img/tutor-logo.svg"
 html_favicon = "./img/favicon.png"
 html_show_sourcelink = False
+html_copy_source = False
 html_display_github = True
 html_show_sphinx = False
 html_github_user = "overhangio"
@@ -167,6 +171,14 @@ html_github_repo = "tutor"
 # Images do not link to themselves
 html_scaled_image_link = False
 html_show_copyright = False
+
+llms_txt_title = "Tutor"
+llms_txt_summary = (
+    Path(__file__).with_name("llms-summary.txt").read_text(encoding="utf-8").strip()
+)
+llms_txt_uri_template = "{base_url}{docname}.html"
+llms_txt_exclude = ["search", "genindex"]
+llms_txt_full_file = False
 
 # Custom variables
 here = os.path.abspath(os.path.dirname(__file__))
