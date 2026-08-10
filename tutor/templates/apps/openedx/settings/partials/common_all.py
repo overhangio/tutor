@@ -162,7 +162,7 @@ try:
     warnings.filterwarnings("ignore", category=DeprecationWarning, module="pgpy.constants")
 except ImportError:
     pass # If the warnings don't exist we don't need to filter them.
-    
+
 # Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
 # Forward all emails from edX's Automated Communication Engine (ACE) to django.
@@ -176,6 +176,19 @@ LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Allow the platform to include itself in an iframe
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+{% if ENABLE_HTTPS %}
+# Properly set the "secure" attribute on session/csrf cookies. This is required in
+# Chrome to support samesite=none cookies.
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "None"
+{% else %}
+# When we cannot provide secure session/csrf cookies, we must disable samesite=none
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
+{% endif %}
 
 {% set jwt_rsa_key | rsa_import_key %}{{ JWT_RSA_PRIVATE_KEY }}{% endset %}
 JWT_AUTH["JWT_ISSUER"] = "{{ JWT_COMMON_ISSUER }}"
