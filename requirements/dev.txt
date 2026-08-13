@@ -64,7 +64,6 @@ importlib-metadata==8.7.1
     #   keyring
     #   pyinstaller
     #   pyinstaller-hooks-contrib
-    #   twine
 importlib-resources==6.5.2
     # via -r requirements/base.txt
 iniconfig==2.1.0
@@ -207,7 +206,7 @@ tomli==2.4.1
     #   mypy
     #   pip-tools
     #   pytest
-twine==6.2.0
+twine==7.0.0
     # via -r requirements/dev.in
 types-docutils==0.22.3.20251115
     # via -r requirements/dev.in
