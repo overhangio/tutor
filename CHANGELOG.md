@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.0.1'></a>
+## v22.0.1 (2026-08-13)
+
+- [Security] Move secure cookie configuration to the common production settings so it applies to both LMS and CMS. (by @jfavellar90)
+
+- [Bugfix] Bump twine to 7.0.0 so that the Python package can be checked and published again. Older twine versions rejected the `Metadata-Version: 2.5` field emitted by hatchling 1.32.0. (by @Abdul-Muqadim-Arbisoft)
+
 <a id='changelog-22.0.0'></a>
 ## v22.0.0 (2026-08-04)
 
