@@ -476,8 +476,8 @@ class Filters:
     MOUNTED_DIRECTORIES: Filter[list[tuple[str, str]], []] = Filter()
 
     #: List of plugins that failed to load, along with the corresponding error
-    #: message. This filter is populated by :py:func:`tutor.plugins.load_all` when
-    #: a plugin raises an exception during loading. It is consumed by the CLI to
+    #: message. This filter is populated by `tutor.plugins.load_all` when a
+    #: plugin raises an exception during loading. It is consumed by the CLI to
     #: report errors after the subcommand has finished.
     #:
     #: :parameter list[tuple[str, str]] errors: list of ``(plugin_name, error_message)``
