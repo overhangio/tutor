@@ -1,5 +1,6 @@
 import unittest
 from contextlib import contextmanager
+from typing import Iterator
 
 from tests.helpers import PluginsTestCase, temporary_root
 from tutor import config as tutor_config
@@ -7,6 +8,7 @@ from tutor import hooks
 from tutor.__about__ import __version__
 from tutor.commands.cli import check_plugin_errors
 from tutor.commands.context import Context
+from tutor.types import Config
 
 from .base import TestCommandMixin
 
@@ -44,7 +46,7 @@ class PluginErrorExitCodeTests(PluginsTestCase):
             hooks.Filters.PLUGIN_ERRORS.add_item(("badplugin", "test error"))
 
     @contextmanager
-    def _prev_config(self, ignore_errors=False):
+    def _prev_config(self, ignore_errors=False) -> Iterator[tuple[Context, Config]]:
         with temporary_root() as root:
             context = Context(root, ignore_errors)
             yield context, tutor_config.get_user(root)
