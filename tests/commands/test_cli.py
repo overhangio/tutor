@@ -46,7 +46,9 @@ class PluginErrorExitCodeTests(PluginsTestCase):
             hooks.Filters.PLUGIN_ERRORS.add_item(("badplugin", "test error"))
 
     @contextmanager
-    def _prev_config(self, ignore_errors=False) -> Iterator[tuple[Context, Config]]:
+    def _prev_config(
+        self, ignore_errors: bool = False
+    ) -> Iterator[tuple[Context, Config]]:
         with temporary_root() as root:
             context = Context(root, ignore_errors)
             yield context, tutor_config.get_user(root)
