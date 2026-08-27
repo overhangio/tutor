@@ -3,8 +3,10 @@ dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
 {%- if MONGODB_HOST.startswith("mongodb+srv://") %}
 echo "MongoDB is using SRV records, so we cannot wait for it to be ready"
 {%- elif ',' in MONGODB_HOST %}
-echo "Waiting for MongoDB (replica set, checking first member)"
-dockerize -wait tcp://{{ MONGODB_HOST.split(',')[0] }}:{{ MONGODB_PORT }} -timeout 20s
+echo "Waiting for MongoDB (replica set, checking all members)"
+{%- for host in MONGODB_HOST.split(',') %}
+dockerize -wait tcp://{{ host.strip() }}:{{ MONGODB_PORT }} -timeout 20s
+{%- endfor %}
 {%- else %}
 dockerize -wait tcp://{{ MONGODB_HOST }}:{{ MONGODB_PORT }} -timeout 20s
 {%- endif %}
