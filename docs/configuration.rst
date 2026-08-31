@@ -247,7 +247,7 @@ MongoDB
 
 - ``RUN_MONGODB`` (default: ``true``)
 - ``MONGODB_DATABASE`` (default: ``"openedx"``)
-- ``MONGODB_HOST`` (default: ``"mongodb"``)
+- ``MONGODB_HOST`` (default: ``"mongodb"``): accepts a comma-separated list of hosts for replica set configs.
 - ``MONGODB_PASSWORD`` (default: ``""``)
 - ``MONGODB_PORT`` (default: ``27017``)
 - ``MONGODB_USERNAME`` (default: ``""``)
