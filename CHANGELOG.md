@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.0.2'></a>
+## v22.0.2 (2026-08-31)
+
+[Bugfix] Fix LMS init job failure when MONGODB_HOST contains comma-separated replica set members. (by @carlos-marquez-wgu)
+
 <a id='changelog-22.0.1'></a>
 ## v22.0.1 (2026-08-13)
 
