@@ -1,0 +1,2 @@
+- [Bugfix] Set feature toggles as flat Django settings instead of `FEATURES` dict entries, which edx-platform no longer reads from downstream settings modules. (by @arbrandes)
+- [Bugfix] Remove the `ENABLE_COURSEWARE_MICROFRONTEND = False` override from the LMS development settings. (by @arbrandes)
