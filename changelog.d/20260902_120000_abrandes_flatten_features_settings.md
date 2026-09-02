@@ -1,0 +1,1 @@
+- [Bugfix] Set feature toggles as flat Django settings instead of `FEATURES` dict entries, which edx-platform no longer reads from downstream settings modules. (by @arbrandes)
