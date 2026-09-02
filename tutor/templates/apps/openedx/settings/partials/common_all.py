@@ -92,6 +92,11 @@ CACHES = {
 # the real site. This ensures request-less code paths (e.g. bulk emails sent from
 # Celery workers, where Django cannot infer the site from the request and falls
 # back to SITE_ID) use the correct domain and branding instead of "example.com".
+# This setting is shared by the LMS and the CMS, which both read from the same
+# django_site table. Open edX patches Site.objects.get_current() (see the
+# django-sites-extensions package) to match the request host first and to fall
+# back to SITE_ID only when there is no request or no site matches the host.
+# SITE_ID thus only comes into play for request-less code paths.
 # See https://github.com/overhangio/tutor/issues/1182
 SITE_ID = 2
 

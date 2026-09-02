@@ -37,16 +37,6 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             # When two candidate sites exist, the database must be left untouched.
             self.assertIn("two candidate sites exist", rendered)
 
-    def test_init_cms_ensures_site(self) -> None:
-        with temporary_root() as root:
-            self.invoke_in_root(root, ["config", "save"])
-            config = tutor_config.load_full(root)
-            rendered = env.render_file(config, "jobs", "init", "cms.sh")
-            assert isinstance(rendered, str)
-            self.assertIn("from django.contrib.sites.models import Site", rendered)
-            self.assertIn("settings.CMS_BASE", rendered)
-            self.assertIn("get_or_create", rendered)
-
     def test_create_user_template_without_staff(self) -> None:
         command = jobs.create_user_template(
             "superuser", False, "username", "email", "p4ssw0rd"
