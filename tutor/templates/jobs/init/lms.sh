@@ -20,7 +20,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 site_id = settings.SITE_ID
 domain = settings.LMS_BASE
-name = '{{ PLATFORM_NAME }}'[:Site._meta.get_field('name').max_length]
+name = str(settings.PLATFORM_NAME)[:Site._meta.get_field('name').max_length]
 current = Site.objects.filter(pk=site_id).first()
 existing = Site.objects.filter(domain=domain).first()
 current_domain = current.domain if current else None
