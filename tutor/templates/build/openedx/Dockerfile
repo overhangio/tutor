@@ -113,10 +113,10 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     setuptools pip==24.0 wheel==0.43.0
 
 # Install base requirements and asset-building requirements
-RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
-    --mount=type=bind,from=edx-platform,source=/requirements/edx/assets.txt,target=/openedx/edx-platform/requirements/edx/assets.txt \
+RUN --mount=type=bind,from=edx-platform,source=/pyproject.toml,target=/openedx/edx-platform/pyproject.toml \
+    --mount=type=bind,from=edx-platform,source=/uv.lock,target=/openedx/edx-platform/uv.lock \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
+    cd /openedx/edx-platform && uv sync --frozen --no-default-groups --group bundled --group assets --no-install-project --active
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -292,7 +292,8 @@ USER app
 
 # Install dev python requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install -r requirements/edx/development.txt
+    uv export --frozen --no-hashes --no-default-groups --group development | \
+    $PIP_COMMAND install -r /dev/stdin
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
