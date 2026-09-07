@@ -1,0 +1,1 @@
+- [Improvement] Upgrade MongoDB from 7.0.39 to 7.0.40. (by @github-actions[bot])
