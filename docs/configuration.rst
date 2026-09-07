@@ -87,7 +87,7 @@ This configuration parameter defines which MySQL Docker image to use.
 
 .. https://hub.docker.com/_/redis/tags
 
-- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:7.4.10"``)
+- ``DOCKER_IMAGE_REDIS`` (default: ``"docker.io/redis:7.4.11"``)
 
 This configuration parameter defines which Redis Docker image to use.
 
