@@ -86,17 +86,21 @@ CACHES = {
     }
 }
 
-# The Django contrib site associated to the LMS domain name. On a fresh install
-# the LMS init job (tutor/templates/jobs/init/lms.sh) renames the auto-generated
-# "example.com" site to the platform domain in place, so that SITE_ID points at
-# the real site. This ensures request-less code paths (e.g. bulk emails sent from
-# Celery workers, where Django cannot infer the site from the request and falls
-# back to SITE_ID) use the correct domain and branding instead of "example.com".
-# This setting is shared by the LMS and the CMS, which both read from the same
-# django_site table. Open edX patches Site.objects.get_current() (see the
-# django-sites-extensions package) to match the request host first and to fall
-# back to SITE_ID only when there is no request or no site matches the host.
-# SITE_ID thus only comes into play for request-less code paths.
+# The Django contrib site associated to the LMS domain name. Django creates the
+# initial "example.com" site at pk=SITE_ID during the first migration, and the LMS
+# init job (tutor/templates/jobs/init/lms.sh) renames it in place to the platform
+# domain, so that SITE_ID points at the real site instead of "example.com".
+#
+# Open edX resolves the current site from the request host first (see the
+# django-sites-extensions package) and falls back to SITE_ID only when there is no
+# request, so this setting is what request-less code paths use, such as bulk emails
+# sent from Celery workers. The CMS shares it, and the django_site table: Studio
+# requests resolve to a site matching the Studio domain when one exists ("do
+# settheme" creates one) and to this site otherwise.
+#
+# Keep the value at 2. Existing installations have their site, and whatever
+# SiteConfiguration or theme is attached to it, at that id; pointing SITE_ID
+# somewhere else leaves them raising Site.DoesNotExist (see the revert of #1323).
 # See https://github.com/overhangio/tutor/issues/1182
 SITE_ID = 2
 
