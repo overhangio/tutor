@@ -62,11 +62,11 @@ jobs:
       - name: Install tutor
         run: pip install -e .[dev]
 
-      # We install using the plugins file instead of tutor plugins install
+      # We install using the "full" extra instead of tutor plugins install
       # as we want the workflow in the main branch to install plugins on
-      # the main branch as well. plugins.txt automatically manages this.
+      # the main branch as well. .hatch_build.py automatically manages this.
       - name: Install tutor plugins
-        run: pip install -r requirements/plugins.txt
+        run: pip install -e .[full]
 
       - name: Enable tutor plugins
         run: tutor plugins enable ${{ github.event.inputs.plugins || 'indigo mfe' }}
