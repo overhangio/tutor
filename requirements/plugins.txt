@@ -1,4 +1,8 @@
-# change version ranges when upgrading from verawood
+# Official plugins, pinned to PyPI version ranges. Change the ranges when
+# upgrading to a new Open edX release.
+# In Tutor Main these are automatically installed from the main branch of their
+# GitHub repositories instead (see .hatch_build.py), so this file must be kept
+# identical between the main and release branches.
 tutor-android>=22.0.0,<23.0.0
 tutor-cairn>=22.0.0,<23.0.0
 tutor-credentials>=22.0.0,<23.0.0
