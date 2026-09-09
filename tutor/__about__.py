@@ -12,6 +12,13 @@ __version__ = "22.0.2"
 # conflicts when merging branches.
 __version_suffix__ = "main"
 
+# The main branch is where the next Open edX release is prepared, so it carries the
+# version of that upcoming release. It is derived from the RELEASE number above instead
+# of being stored there, such that the __version__ line remains identical on all
+# branches and merging the release branch into main never conflicts.
+if __version_suffix__ == "main":
+    __version__ = f"{int(__version__.split('.', maxsplit=1)[0]) + 1}.0.0"
+
 # Package version, as installed by pip, does not include the version suffix.
 # Otherwise, Tutor Main plugins will automatically install non-Main Tutor
 # version.

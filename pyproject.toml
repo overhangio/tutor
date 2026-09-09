@@ -42,7 +42,11 @@ Community = "https://discuss.openedx.org/tag/tutor"
 path = ".hatch_build.py"
 
 [tool.hatch.version]
+# The "code" source, and not the default regex source: on the main branch the version is
+# derived in __about__.py and cannot be read from the __version__ literal.
+source = "code"
 path = "tutor/__about__.py"
+expression = "__package_version__"
 
 [build-system]
 requires = ["hatchling"]
