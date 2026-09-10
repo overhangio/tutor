@@ -140,10 +140,10 @@ This defines the default version that will be pulled from all Open edX git repos
 
 This defines the version that will be pulled from just the Open edX platform git repositories. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_CMS_UWSGI_WORKERS`` (default: ``2``)
-- ``OPENEDX_LMS_UWSGI_WORKERS`` (default: ``2``)
+- ``OPENEDX_CMS_GRANIAN_WORKERS`` (default: ``2``)
+- ``OPENEDX_LMS_GRANIAN_WORKERS`` (default: ``2``)
 
-By default, there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.io/en/latest/Options.html#processes>`__ to serve requests for the LMS and the CMS. However, each worker requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
+By default, there are 2 Granian worker processes to serve requests for the LMS and the CMS. You should reduce this value to 1 if your computer/server does not have enough memory. You can increase it when you need higher throughput, as long as CPU and memory resources are available.
 
 - ``OPENEDX_CELERY_REDIS_DB`` (default: ``0``)
 - ``OPENEDX_CACHE_REDIS_DB`` (default: ``1``)

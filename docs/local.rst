@@ -206,9 +206,9 @@ To update the course search index, run::
 Reloading Open edX settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) or just a single service (``tutor local restart lms``) but that is overkill. A quicker alternative is to send the HUP signal to the uwsgi processes running inside the containers. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
+After modifying Open edX settings, for instance when running ``tutor config save``, you will want to restart the web processes of the LMS and the CMS to take into account those new settings. It is possible to simply restart the whole platform (with ``tutor local reboot``) or just a single service (``tutor local restart lms``) but that is overkill. A quicker alternative is to restart just the web server process running inside the containers. This can be done by updating a file in the granian's "--reload-paths" config. The "openedx" Docker image comes with a convenient script that does just that. To run it, execute::
 
-    tutor local exec lms reload-uwsgi
+    tutor local exec lms reload-granian
 
 
 Customizing the deployed services
