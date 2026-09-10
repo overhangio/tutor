@@ -34,7 +34,7 @@ To pull the latest upstream changes, you should first upgrade Tutor Main::
     cd ./tutor
     git pull
 
-Then, you will have to generate a more recent version of the main Docker images. Images for running Tutor Main are published daily to docker.io (see `here <https://hub.docker.com/r/overhangio/openedx/tags?page=1&ordering=last_updated&name=main>`__). You can fetch the latest images with::
+Then, you will have to generate a more recent version of the main Docker images. Images for running Tutor Main are published to docker.io on every commit to the main branch (see `here <https://hub.docker.com/r/overhangio/openedx/tags?page=1&ordering=last_updated&name=main>`__). You can fetch the latest images with::
 
     tutor images pull all
 
