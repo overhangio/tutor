@@ -63,6 +63,9 @@ def upgrade_from(context: click.Context, from_release: str) -> None:
     if running_release == "ulmo":
         running_release = "verawood"
 
+    if running_release == "verawood":
+        running_release = "willow"
+
 
 def upgrade_from_ironwood(context: click.Context, config: Config) -> None:
     click.echo(fmt.title("Upgrading from Ironwood"))
