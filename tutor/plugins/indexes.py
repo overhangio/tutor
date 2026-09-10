@@ -13,6 +13,8 @@ from tutor.types import Config, get_typed
 PLUGIN_INDEXES_KEY = "PLUGIN_INDEXES"
 # Current release name ('zebulon' or 'main') and version (1-26)
 RELEASE = __version_suffix__ or env.get_current_open_edx_release_name()
+# This constant is unused within Tutor itself, but it is part of the module API
+# and may be imported by plugins (REMOVE-AFTER-V23).
 MAJOR_VERSION = int(__version__.split(".", maxsplit=1)[0])
 
 
