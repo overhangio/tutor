@@ -103,6 +103,13 @@ An optional BRANCH suffix may be appended to the release name to indicate that e
 
 The ``main`` branch always carries the version of the *upcoming* release: it increments the RELEASE number, so while Verawood (v22) is the latest release, ``main`` is at v23.0.0-main. This happens on its own, as soon as a new Open edX release is cut. Plugin developers can rely on it to depend on the next major version of Tutor while that version is still being developed, instead of waiting for the release to be cut.
 
+Development releases of Tutor Main are published to PyPI on every merge to the ``main`` branch, as pre-releases of that upcoming version (for instance ``23.0.0.dev4821``). Pip ignores pre-releases unless they are explicitly asked for, so ``pip install tutor`` keeps installing the latest actual release. Plugin developers who work against Tutor Main can depend on them:
+
+- ``tutor>=23.0.0.dev0,<24.0.0.dev0`` to follow the whole development cycle;
+- ``tutor>=23.0.0.dev4821`` to require a change that landed in a specific development release.
+
+Beware that ``tutor>=23.0.0`` never matches a development release: as per `PEP 440 <https://peps.python.org/pep-0440/#handling-of-pre-releases>`__, pre-releases are excluded unless the specifier itself mentions one. This is also why the upper bound is written ``<24.0.0.dev0``: a specifier that permits pre-releases would otherwise pick up the *next* cycle's development releases. Development releases do not ship the ``full`` extra, because the plugin versions it lists are not published from their main branches.
+
 `Officially-supported plugins <https://edly.io/tutor/plugins-and-themes/>`__ follow the same versioning pattern. As a third-party plugin developer, you are encouraged to use the same pattern to make it immediately clear to your end-users which Open edX versions are supported.
 
 In Tutor and its officially-supported plugins, certain features, API endpoints, and older depenency versions are periodically deprecated. Generally, warnings are added to the Changelogs and/or the command-line interface one major release before support for any behavior is removed. In order to keep track of pending removals in the source code, comments containing the string ``REMOVE-AFTER-VXX`` should be used, where ``<XX>`` is the last major version that must support the behavior. For example::

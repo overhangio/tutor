@@ -24,6 +24,14 @@ if __version_suffix__ == "main":
 # version.
 __package_version__ = __version__
 
+# Development releases are published to PyPI from the main branch, on every merge.
+# The dev release number is set by CI at build time. It deliberately applies to the
+# package version only: __version__ determines the Docker image tags, which must not
+# change on every commit.
+__dev_release__ = os.environ.get("TUTOR_DEV_RELEASE")
+if __dev_release__:
+    __package_version__ += f".dev{__dev_release__}"
+
 # The app name will be used to define the name of the default tutor root and
 # plugin directory. To avoid conflicts between multiple locally-installed
 # versions, the version suffix is also appended to the default app name.
