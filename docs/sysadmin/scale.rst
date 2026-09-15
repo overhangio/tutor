@@ -23,11 +23,11 @@ Fortunately, Open edX was designed to run at scale -- most notably at `edX.org <
 Increasing web server capacity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As the server CPU and memory are increased, the request throughput can be increased by adjusting the number of uWSGI workers (see :ref:`configuration docs <openedx_configuration>`). By default, the "lms" and "cms" containers each spawn 2 uWSGI workers. The number of workers should be increased if you observe an increase in the latency of user requests but CPU usage remains below 100%. To increase the number of workers for the LMS and the CMS, run for example::
+As the server CPU and memory are increased, the request throughput can be increased by adjusting the number of Granian workers (see :ref:`configuration docs <openedx_configuration>`). By default, the "lms" and "cms" containers each spawn 2 Granian workers. The number of workers should be increased if you observe an increase in the latency of user requests but CPU usage remains below 100%. To increase the number of workers for the LMS and the CMS, run for example::
 
     tutor config save \
-      --set OPENEDX_LMS_UWSGI_WORKERS=8 \
-      --set OPENEDX_CMS_UWSGI_WORKERS=4
+      --set OPENEDX_LMS_GRANIAN_WORKERS=8 \
+      --set OPENEDX_CMS_GRANIAN_WORKERS=4
     tutor local restart lms cms
 
 The right values will very much depend on your server's available memory and CPU performance, as well as the maximum number of simultaneous users who use your platform. As an example data point, it was reported that a large Open edX platform can serve up to 500k unique users per week on a virtual server with 8 vCPU and 16 GB memory.
