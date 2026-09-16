@@ -4,6 +4,14 @@ import os
 
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
+# Re-bind the FEATURES proxy to this settings module, so that both flat feature
+# settings and legacy FEATURES["..."] reads and writes resolve here.
+try:
+    from openedx.core.lib.features_setting_proxy import FeaturesProxy
+    FEATURES = FeaturesProxy(globals())
+except ImportError:
+    pass
+
 # Mongodb connection parameters: simply modify `mongodb_parameters` to affect all connections to MongoDb.
 mongodb_parameters = {
     "db": "{{ MONGODB_DATABASE }}",
@@ -229,9 +237,9 @@ JWT_AUTH["JWT_ISSUERS"] = [
 ]
 
 # Enable/Disable some features globally
-FEATURES["ENABLE_DISCUSSION_SERVICE"] = False
-FEATURES["PREVENT_CONCURRENT_LOGINS"] = False
-FEATURES["ENABLE_CORS_HEADERS"] = True
+ENABLE_DISCUSSION_SERVICE = False
+PREVENT_CONCURRENT_LOGINS = False
+ENABLE_CORS_HEADERS = True
 
 # CORS
 CORS_ALLOW_CREDENTIALS = True
