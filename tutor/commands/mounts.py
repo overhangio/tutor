@@ -12,7 +12,7 @@ from tutor.commands.context import Context
 from tutor.commands.params import ConfigLoaderParam
 
 
-class MountParamType(ConfigLoaderParam):
+class MountParamType(ConfigLoaderParam[str]):
     name = "mount"
 
     def shell_complete(
