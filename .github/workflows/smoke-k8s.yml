@@ -44,7 +44,7 @@ jobs:
       # control-plane vs ~2 GB), no tunnel daemon needed for LoadBalancer, and
       # no version breakage issues seen on ubuntu-latest in 2024-2025.
       - name: Create kind cluster
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@v1.15.0
         with:
           cluster_name: openedx
 
