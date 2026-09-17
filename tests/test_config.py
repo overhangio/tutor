@@ -55,6 +55,47 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual("local.openedx.io", config["LMS_HOST"])
         self.assertEqual("studio.local.openedx.io", config["CMS_HOST"])
 
+    def test_meilisearch_url_default(self) -> None:
+        # MEILISEARCH_URL_DEFAULT is hardcoded, so make sure it does not drift
+        # away from the actual default.
+        self.assertEqual(
+            tutor_config.get_template("defaults.yml")["MEILISEARCH_URL"],
+            tutor_config.MEILISEARCH_URL_DEFAULT,
+        )
+
+    @patch.object(fmt, "echo")
+    def test_check_meilisearch_url(self, echo: Mock) -> None:
+        def alerts() -> list[str]:
+            return [str(call.args[0]) for call in echo.call_args_list]
+
+        # Tutor runs its own Meilisearch: no warning
+        tutor_config._check_meilisearch_url(
+            {
+                "RUN_MEILISEARCH": True,
+                "MEILISEARCH_URL": tutor_config.MEILISEARCH_URL_DEFAULT,
+            }
+        )
+        self.assertFalse(alerts())
+
+        # Meilisearch is hosted externally, but the URL was not changed: warn
+        tutor_config._check_meilisearch_url(
+            {
+                "RUN_MEILISEARCH": False,
+                "MEILISEARCH_URL": tutor_config.MEILISEARCH_URL_DEFAULT,
+            }
+        )
+        self.assertTrue(any("MEILISEARCH_URL" in alert for alert in alerts()))
+
+        # Meilisearch is hosted externally and the URL points to it: no new warning
+        echo.reset_mock()
+        tutor_config._check_meilisearch_url(
+            {
+                "RUN_MEILISEARCH": False,
+                "MEILISEARCH_URL": "http://meilisearch.example.com:7700",
+            }
+        )
+        self.assertFalse(alerts())
+
     def test_is_service_activated(self) -> None:
         config: Config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
