@@ -43,7 +43,7 @@ jobs:
         run: pip install -e .[dev]
 
       - name: Install tutor plugins
-        run: pip install -r requirements/plugins.txt
+        run: pip install -e .[full]
 
       - name: Enable tutor plugins
         run: tutor plugins enable ${{ github.event.inputs.plugins || 'indigo mfe' }}
