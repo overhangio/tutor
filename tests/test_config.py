@@ -31,6 +31,17 @@ class ConfigTests(unittest.TestCase):
         # Check that merge does not perform a rendering
         self.assertNotEqual("abcd", config["MYSQL_ROOT_PASSWORD"])
 
+    def test_upgrade_obsolete_uwsgi_workers(self) -> None:
+        config: Config = {
+            "OPENEDX_LMS_UWSGI_WORKERS": 4,
+            "OPENEDX_CMS_UWSGI_WORKERS": 3,
+        }
+        tutor_config.upgrade_obsolete(config)
+        self.assertEqual(
+            {"OPENEDX_LMS_GRANIAN_WORKERS": 4, "OPENEDX_CMS_GRANIAN_WORKERS": 3},
+            config,
+        )
+
     @patch.object(fmt, "echo")
     def test_update_twice_should_return_same_config(self, _: Mock) -> None:
         with temporary_root() as root:

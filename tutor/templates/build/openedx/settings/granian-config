@@ -2,11 +2,12 @@
 --host 0.0.0.0
 --port 8000
 --workers $GRANIAN_WORKERS
+# Granian defaults to hundreds of threads per wsgi worker
+--blocking-threads 8
+# Respawn crashed workers instead of shutting down the whole server
+--respawn-failed-workers
 --static-path-route /static
 --static-path-mount /openedx/staticfiles/
 --static-path-route /media
 --static-path-mount /openedx/media/
---reload
---reload-paths /openedx/granian-reload-path
---http1-buffer-size 8192
 $SERVICE_VARIANT.wsgi:application

@@ -405,7 +405,7 @@ Implement this patch to override hard-coded Redis configuration values. See the 
 ``granian-config``
 ==================
 
-File: ``apps/openedx/settings/granian-config``
+File: ``apps/openedx/granian-config``
 
 A file used to extend or override the Granian configuration.
 

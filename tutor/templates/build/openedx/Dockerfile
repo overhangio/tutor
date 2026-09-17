@@ -114,9 +114,8 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     django-redis==5.4.0
 
 # granian server https://pypi.org/project/granian/
-# We need the reload dependency so install it as well
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install --no-cache-dir --compile granian[reload]==2.7.4
+    $PIP_COMMAND install --no-cache-dir --compile granian==2.7.4
 
 # Install scorm xblock
 RUN $PIP_COMMAND install "openedx-scorm-xblock>=19.0.0,<20.0.0"
@@ -250,6 +249,9 @@ RUN ./manage.py lms collectstatic --noinput --settings=tutor.assets && \
 # Create a data directory, which might be used (or not)
 RUN mkdir /openedx/data
 
+# Create the media directory: granian refuses to start if a static path mount does not exist
+RUN mkdir /openedx/media
+
 # If this "canary" file is missing from a container, then that indicates that a
 # local edx-platform was bind-mounted into that container, thus overwriting the
 # canary. This information is useful during edx-platform initialisation.
@@ -320,13 +322,7 @@ ENV GRANIAN_WORKERS=2
 # Copy granian configuration file
 COPY --chown=app:app settings/granian-config /openedx
 
-# Create the reload marker file
-RUN touch /openedx/granian-reload-path \
-    && chown app:app /openedx/granian-reload-path
-
-# Run server
-# Note that we wrap the granian command inside python so that it can use a config file. 
-# Granian does not support config files out of the box. 
+# Run server: granian has no config file support, so run-granian converts /openedx/granian-config to CLI arguments
 CMD ["run-granian"]
 
 {{ patch("openedx-dockerfile-final") }}

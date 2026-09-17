@@ -1,33 +1,17 @@
 #!/usr/bin/env python3
+"""
+Start granian with the options listed in /openedx/granian-config.
+
+Granian has no config file support and only accepts command-line options, so
+this wrapper converts the file into an argument list, one option per line,
+with environment variables expanded.
+"""
+
 import os
+import shlex
+
 from granian.cli import cli
 
-
-def parse_args_file() -> list[str]:
-    args = []
-    with open("/openedx/granian-config") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                # skip empty lines and comments
-                continue
-
-            # Expand environment variables like $VAR_NAME
-            line = os.path.expandvars(line)
-
-            # Split by first space (for options with values)
-            if " " in line:
-                option, value = line.split(" ", 1)
-                args.append(option)
-                args.append(value)
-            else:
-                # flags without values
-                args.append(line)
-    return args
-
-
-def run():
-    cli(args=parse_args_file(), standalone_mode=False)
-
-if __name__ == "__main__":
-    run()
+with open("/openedx/granian-config", encoding="utf-8") as f:
+    args = shlex.split(os.path.expandvars(f.read()), comments=True)
+cli(args=args)
