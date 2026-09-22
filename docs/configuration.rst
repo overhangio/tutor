@@ -231,6 +231,9 @@ By default, a running Open edX platform deployed with Tutor includes all necessa
 Meilisearch
 ***********
 
+.. note::
+    Meilisearch is a required component of the Open edX platform. Setting ``RUN_MEILISEARCH: false`` does not disable it: it only tells Tutor that Meilisearch is hosted externally, in which case the settings below must point to that instance.
+
 - ``MEILISEARCH_URL`` (default: ``"http://meilisearch:7700"``): internal URL used for backend-to-backend communication.
 - ``MEILISEARCH_PUBLIC_URL`` (default: ``"{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://meilisearch.{{ LMS_HOST }}"``): external URL from which the frontend will access the Meilisearch instance.
 - ``MEILISEARCH_INDEX_PREFIX`` (default: ``"tutor_"``)
