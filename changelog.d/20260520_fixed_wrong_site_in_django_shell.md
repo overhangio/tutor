@@ -1,0 +1,1 @@
+- [Bugfix] Fixes wrong site when site is accessed from celery task or accessed inside a management command. (by @muhammadadeeltajamul)
