@@ -12,8 +12,9 @@ class Context:
         $ tutor --root=... local run ...
     """
 
-    def __init__(self, root: str) -> None:
+    def __init__(self, root: str, ignore_plugin_errors: bool = False) -> None:
         self.root = root
+        self.ignore_plugin_errors = ignore_plugin_errors
 
 
 class BaseTaskContext(Context):
