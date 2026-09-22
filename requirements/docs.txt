@@ -109,9 +109,12 @@ sphinx==7.4.7
     # via
     #   -r requirements/docs.in
     #   sphinx-click
+    #   sphinx-llms-txt
     #   sphinx-reredirects
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
+sphinx-llms-txt==0.7.1
+    # via -r requirements/docs.in
 sphinx-click==6.0.0
     # via -r requirements/docs.in
 sphinx-reredirects==0.1.6
