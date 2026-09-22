@@ -11,6 +11,13 @@ HERE = os.path.dirname(__file__)
 # GitHub organization, in a repository that has the same name as the package.
 PLUGINS_GITHUB_ORG = "https://github.com/overhangio"
 
+# Plugin requirements must be of the form "<name><version specifier>", such as
+# "tutor-mfe>=22.0.0,<23.0.0". Extras, environment markers and URLs are rejected
+# rather than silently dropped when the requirement is rewritten for Tutor Main.
+PLUGIN_REQUIREMENT_REGEX = re.compile(
+    r"^(?P<name>[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(?P<specifier>([<>=!~]=?[^;\[\]@]*)?)$"
+)
+
 
 class MetaDataHook(MetadataHookInterface):
     def update(self, metadata: dict[str, t.Any]) -> None:
@@ -49,10 +56,13 @@ def load_plugin_requirements() -> list[str]:
         return requirements
     main_requirements = []
     for requirement in requirements:
-        match = re.match(r"^([A-Za-z0-9][A-Za-z0-9._-]*)", requirement)
+        match = PLUGIN_REQUIREMENT_REGEX.match(requirement)
         if not match:
-            raise ValueError(f"Invalid plugin requirement: '{requirement}'")
-        name = match.group(1)
+            raise ValueError(
+                f"Unsupported plugin requirement: '{requirement}'. Expected "
+                "'<name><version specifier>' with no extras, markers or URL."
+            )
+        name = match.group("name")
         main_requirements.append(f"{name}@git+{PLUGINS_GITHUB_ORG}/{name}@main")
     return main_requirements
 
