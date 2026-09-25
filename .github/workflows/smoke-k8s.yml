@@ -98,8 +98,8 @@ jobs:
             --set CMS_HOST=studio.local.openedx.io \
             --set ENABLE_HTTPS=false \
             --set PLATFORM_NAME="Open edX CI" \
-            --set OPENEDX_LMS_UWSGI_WORKERS=1 \
-            --set OPENEDX_CMS_UWSGI_WORKERS=1
+            --set OPENEDX_LMS_GRANIAN_WORKERS=1 \
+            --set OPENEDX_CMS_GRANIAN_WORKERS=1
 
       - name: Launch tutor k8s
         run: tutor k8s launch --non-interactive
