@@ -45,11 +45,11 @@ At this point your environment was updated, but there would not be any change th
 Modifying existing files with patches
 -------------------------------------
 
-We'll start by modifying some of our Open edX settings files. It's a frequent requirement to modify the ``FEATURES`` setting from the LMS or the CMS in edx-platform. In the legacy native installation, this was done by modifying the ``lms.env.yml`` and ``cms.env.yml`` files. Here we'll modify the Python setting files that define the edx-platform configuration. To achieve that we'll make use of two concepts from the Tutor API: :ref:`patches` and :ref:`filters`.
+We'll start by modifying some of our Open edX settings files. It's a frequent requirement to modify feature toggle settings from the LMS or the CMS in edx-platform. In the legacy native installation, this was done by modifying the ``lms.env.yml`` and ``cms.env.yml`` files. Here we'll modify the Python setting files that define the edx-platform configuration. To achieve that we'll make use of two concepts from the Tutor API: :ref:`patches` and :ref:`filters`.
 
 If you have not already read :ref:`how_tutor_works` now would be a good time ☺️ Tutor uses templates to generate various files, such as settings, Dockerfiles, etc. These templates include ``{{ patch("patch-name") }}`` statements that allow plugins to insert arbitrary content in there. These patches are located at strategic locations. See :ref:`patches` for more information.
 
-Let's say that we would like to limit access to our brand new Open edX platform. It is not ready for prime-time yet, so we want to prevent users from registering new accounts. There is a feature flag for that in the LMS: `FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] <https://docs.openedx.org/projects/edx-platform/en/latest/references/featuretoggles.html#featuretoggle-FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION']>`__. By default this flag is set to a true value, enabling anyone to create an account. In the following we'll set it to false.
+Let's say that we would like to limit access to our brand new Open edX platform. It is not ready for prime-time yet, so we want to prevent users from registering new accounts. There is a feature flag for that in the LMS: `ALLOW_PUBLIC_ACCOUNT_CREATION <https://docs.openedx.org/projects/edx-platform/en/latest/references/featuretoggles.html#featuretoggle-ALLOW_PUBLIC_ACCOUNT_CREATION>`__. By default this flag is set to a true value, enabling anyone to create an account. In the following we'll set it to false.
 
 Add the following content to the ``myplugin.py`` file that you created earlier::
 
@@ -58,7 +58,7 @@ Add the following content to the ``myplugin.py`` file that you created earlier::
     hooks.Filters.ENV_PATCHES.add_item(
         (
             "openedx-lms-common-settings",
-            "FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False"
+            "ALLOW_PUBLIC_ACCOUNT_CREATION = False"
         )
     )
 
@@ -79,7 +79,7 @@ This imports the ``hooks`` module from Tutor, which grants us access to ``hooks.
 
 This means "add ``<content>`` to the ``{{ patch("<name>") }}`` statement, thanks to the :py:data:`tutor.hooks.Filters.ENV_PATCHES` filter". In our case, we want to modify the LMS settings, both in production and development. The right patch for that is :patch:`openedx-lms-common-settings`. We add one item, which is a single Python-formatted line of code::
 
-    "FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False"
+    "ALLOW_PUBLIC_ACCOUNT_CREATION = False"
 
 .. note:: Notice how "False" starts with a capital "F"? That's how booleans are created in Python.
 
@@ -90,8 +90,8 @@ Now, re-render your environment with::
 You can check that the feature was added to your environment::
 
     $ grep -r ALLOW_PUBLIC_ACCOUNT_CREATION "$(tutor config printroot)/env"
-    /home/yourusername/.local/share/tutor/env/apps/openedx/settings/lms/production.py:FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False
-    /home/yourusername/.local/share/tutor/env/apps/openedx/settings/lms/development.py:FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False
+    /home/yourusername/.local/share/tutor/env/apps/openedx/settings/lms/production.py:ALLOW_PUBLIC_ACCOUNT_CREATION = False
+    /home/yourusername/.local/share/tutor/env/apps/openedx/settings/lms/development.py:ALLOW_PUBLIC_ACCOUNT_CREATION = False
 
 Your new settings will be taken into account by restarting your platform::
 
@@ -115,7 +115,7 @@ As an example, we'll make it possible to configure public account creation on th
     hooks.Filters.ENV_PATCHES.add_item(
         (
             "openedx-lms-common-settings",
-            "FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = {% if MYPLUGIN_PLATFORM_IS_PUBLIC %}True{% else %}False{% endif %}",
+            "ALLOW_PUBLIC_ACCOUNT_CREATION = {% if MYPLUGIN_PLATFORM_IS_PUBLIC %}True{% else %}False{% endif %}",
         )
     )
 
@@ -302,13 +302,13 @@ Eventually, our plugin is composed of the following files, all stored within the
     hooks.Filters.ENV_PATCHES.add_item(
         (
             "openedx-lms-common-settings",
-            "FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False"
+            "ALLOW_PUBLIC_ACCOUNT_CREATION = False"
         )
     )
     hooks.Filters.ENV_PATCHES.add_item(
         (
             "openedx-lms-common-settings",
-            "FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = {% if MYPLUGIN_PLATFORM_IS_PUBLIC %}True{% else %}False{% endif %}",
+            "ALLOW_PUBLIC_ACCOUNT_CREATION = {% if MYPLUGIN_PLATFORM_IS_PUBLIC %}True{% else %}False{% endif %}",
         )
     )
     hooks.Filters.ENV_PATCHES.add_item(
