@@ -29,7 +29,7 @@ charset-normalizer==3.4.7
     # via
     #   -r requirements/base.txt
     #   requests
-click==8.1.8
+click==8.5.0
     # via
     #   -r requirements/base.txt
     #   click-log

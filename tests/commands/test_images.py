@@ -56,7 +56,7 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
         self.assertRegex(
-            result.output, rf"docker.io/overhangio/openedx:{__version__}\n"
+            result.stdout, rf"docker.io/overhangio/openedx:{__version__}\n"
         )
 
     def test_images_printtag_plugin(self) -> None:
@@ -75,7 +75,7 @@ class ImagesTests(PluginsTestCase, TestCommandMixin):
         result = self.invoke(["images", "printtag", "service1"])
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code, result)
-        self.assertEqual(result.output, "service1:1.0.0\n")
+        self.assertEqual(result.stdout, "service1:1.0.0\n")
 
     @patch.object(images, "build", return_value=None)
     def test_images_build_plugin(self, mock_image_build: Mock) -> None:
