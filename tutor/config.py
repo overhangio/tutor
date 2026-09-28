@@ -268,12 +268,105 @@ def convert_json2yml(root: str) -> None:
     )
 
 
-def save_config_file(root: str, config: Config) -> None:
+def save_config_file(
+    root: str, config: Config, explicit: t.Optional[t.Iterable[str]] = None
+) -> None:
+    """
+    Write the configuration to config.yml.
+
+    The file is not re-generated from scratch: instead, the document that is
+    already on disk is modified in place, such that comments, key order and
+    hand-written Jinja expressions are all preserved. Only the entries that
+    actually changed are written, and the file is left untouched when there is
+    nothing to change.
+
+    `explicit` lists the entries that the user set explicitly, for instance with
+    `tutor config save --set KEY=VALUE`. Those are always written as literal
+    values, even when the file happens to contain a Jinja expression that
+    renders to the same result.
+    """
     path = config_path(root)
+    document, layout = load_config_document(path)
+    if not update_config_document(document, config, set(explicit or [])):
+        # Nothing changed: leave the file alone, mtime included.
+        return
     utils.ensure_file_directory_exists(path)
     with open(path, "w", encoding="utf-8") as of:
-        serialize.dump(config, of)
+        serialize.dump_round_trip(document, of, layout)
     fmt.echo_info(f"Configuration saved to {path}")
+
+
+def load_config_document(path: str) -> tuple[t.Any, serialize.YamlLayout]:
+    """
+    Load config.yml as an editable document that remembers its own formatting.
+
+    An empty document is returned when the file does not exist yet, or when it
+    does not hold a mapping.
+    """
+    if not os.path.exists(path):
+        return serialize.empty_document(), serialize.YamlLayout()
+    with open(path, encoding="utf-8") as f:
+        document, layout = serialize.load_round_trip(f.read())
+    if not isinstance(document, dict):
+        return serialize.empty_document(), layout
+    return document, layout
+
+
+def update_config_document(document: t.Any, config: Config, explicit: set[str]) -> bool:
+    """
+    Apply `config` to an existing config.yml document, in place.
+
+    Return True if the document was modified, and thus needs to be written back
+    to disk.
+    """
+    changed = False
+    for key, value in config.items():
+        if key not in document:
+            # New entry: append it at the end of the document.
+            document[key] = value
+            changed = True
+            continue
+        if document[key] == value:
+            continue
+        if key not in explicit and is_stable_expression(config, document[key]):
+            # The file holds a Jinja expression that is re-evaluated on every
+            # load, so the value we have in memory is derived data: saving it
+            # would replace the expression by one of its results. Leave it be.
+            continue
+        document[key] = value
+        changed = True
+    for key in [key for key in document if key not in config]:
+        del document[key]
+        changed = True
+    return changed
+
+
+def is_stable_expression(config: Config, raw_value: t.Any) -> bool:
+    """
+    Check whether `raw_value`, as read from config.yml, is a Jinja expression
+    that always renders to the same result.
+
+    This is what allows a hand-written entry such as:
+
+        CMS_HOST: "studio.{{ LMS_HOST }}"
+
+    to survive a save, instead of being flattened to its result. Expressions
+    that render to something different every time, such as
+    "{{ 24|random_string }}", are not stable: those are frozen to a literal,
+    which is how generated secrets have always behaved.
+
+    Rendering happens against the final configuration, so an expression that
+    points at another entry keeps working even when that other entry just
+    changed.
+    """
+    try:
+        rendered = env.render_unknown(config, raw_value)
+        if rendered == raw_value:
+            # Not an expression at all, just a plain value.
+            return False
+        return bool(rendered == env.render_unknown(config, raw_value))
+    except exceptions.TutorError:
+        return False
 
 
 def config_path(root: str) -> str:
