@@ -54,6 +54,10 @@ requests==2.32.5
     #   requests-oauthlib
 requests-oauthlib==2.0.0
     # via kubernetes
+ruamel-yaml==0.19.1
+    # via -r base.in
+ruamel-yaml-clib==0.2.15
+    # via ruamel-yaml
 six==1.17.0
     # via
     #   kubernetes
