@@ -302,6 +302,17 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "-c", 'if [ "$(stat -c %g /meili_data)" = 1000 ]; then echo already-owned; else chown -R 1000:1000 /meili_data && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /meili_data
+              name: data
       containers:
         - name: meilisearch
           image: {{ DOCKER_IMAGE_MEILISEARCH }}
@@ -344,6 +355,17 @@ spec:
         runAsGroup: 999
         fsGroup: 999
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "-c", 'if [ "$(stat -c %g /data/db)" = 999 ]; then echo already-owned; else chown -R 999:999 /data/db && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /data/db
+              name: data
       containers:
         - name: mongodb
           image: {{ DOCKER_IMAGE_MONGODB }}
@@ -384,6 +406,17 @@ spec:
         runAsGroup: 999
         fsGroup: 999
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "-c", 'if [ "$(stat -c %g /var/lib/mysql)" = 999 ]; then echo already-owned; else chown -R 999:999 /var/lib/mysql && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: data
       containers:
         - name: mysql
           image: {{ DOCKER_IMAGE_MYSQL }}
@@ -458,6 +491,17 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "-c", 'if [ "$(stat -c %g /openedx/redis/data)" = 1000 ]; then echo already-owned; else chown -R 1000:1000 /openedx/redis/data && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /openedx/redis/data
+              name: data
       containers:
         - name: redis
           image: {{ DOCKER_IMAGE_REDIS }}

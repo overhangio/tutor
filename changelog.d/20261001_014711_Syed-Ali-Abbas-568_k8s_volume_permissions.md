@@ -1,0 +1,1 @@
+- [Bugfix] Fix MongoDB (and MySQL, Redis, Meilisearch) crashing on first `tutor k8s launch` when the cluster's storage provisioner does not support `fsGroup` (e.g. Minikube, kind): add an init container that fixes volume ownership before the main container starts. (by @Syed-Ali-Abbas-568)
