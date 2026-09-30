@@ -305,7 +305,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
-          command: ["sh", "-c", 'if [ "$(stat -c %g /meili_data)" = 1000 ]; then echo already-owned; else chown -R 1000:1000 /meili_data && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "1000", "1000", "/meili_data"]
           securityContext:
             runAsUser: 0
             runAsGroup: 0
@@ -313,6 +313,8 @@ spec:
           volumeMounts:
             - mountPath: /meili_data
               name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: meilisearch
           image: {{ DOCKER_IMAGE_MEILISEARCH }}
@@ -330,6 +332,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: meilisearch
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {% if RUN_MONGODB %}
 ---
@@ -358,7 +363,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
-          command: ["sh", "-c", 'if [ "$(stat -c %g /data/db)" = 999 ]; then echo already-owned; else chown -R 999:999 /data/db && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "999", "999", "/data/db"]
           securityContext:
             runAsUser: 0
             runAsGroup: 0
@@ -366,6 +371,8 @@ spec:
           volumeMounts:
             - mountPath: /data/db
               name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: mongodb
           image: {{ DOCKER_IMAGE_MONGODB }}
@@ -381,6 +388,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mongodb
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {% if RUN_MYSQL %}
 ---
@@ -409,7 +419,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
-          command: ["sh", "-c", 'if [ "$(stat -c %g /var/lib/mysql)" = 999 ]; then echo already-owned; else chown -R 999:999 /var/lib/mysql && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "999", "999", "/var/lib/mysql"]
           securityContext:
             runAsUser: 0
             runAsGroup: 0
@@ -417,6 +427,8 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: mysql
           image: {{ DOCKER_IMAGE_MYSQL }}
@@ -440,6 +452,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mysql
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {% if RUN_SMTP %}
 ---
@@ -494,7 +509,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
-          command: ["sh", "-c", 'if [ "$(stat -c %g /openedx/redis/data)" = 1000 ]; then echo already-owned; else chown -R 1000:1000 /openedx/redis/data && echo fixed-ownership || echo "chown failed, continuing" >&2; fi']
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "1000", "1000", "/openedx/redis/data"]
           securityContext:
             runAsUser: 0
             runAsGroup: 0
@@ -502,6 +517,8 @@ spec:
           volumeMounts:
             - mountPath: /openedx/redis/data
               name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: redis
           image: {{ DOCKER_IMAGE_REDIS }}
@@ -523,5 +540,8 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: redis
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {{ patch("k8s-deployments") }}
