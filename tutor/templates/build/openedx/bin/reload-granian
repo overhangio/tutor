@@ -1,0 +1,4 @@
+#! /bin/bash
+echo "Reloading granian workers..."
+# Granian runs as PID 1 and respawns its workers on SIGHUP
+kill -HUP 1

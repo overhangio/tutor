@@ -247,6 +247,11 @@ def upgrade_obsolete(config: Config) -> None:
         config["ENABLE_WEB_PROXY"] = config.pop("RUN_CADDY")
     if "NGINX_HTTP_PORT" in config:
         config["CADDY_HTTP_PORT"] = config.pop("NGINX_HTTP_PORT")
+    # Replace uwsgi by granian
+    if "OPENEDX_LMS_UWSGI_WORKERS" in config:
+        config["OPENEDX_LMS_GRANIAN_WORKERS"] = config.pop("OPENEDX_LMS_UWSGI_WORKERS")
+    if "OPENEDX_CMS_UWSGI_WORKERS" in config:
+        config["OPENEDX_CMS_GRANIAN_WORKERS"] = config.pop("OPENEDX_CMS_UWSGI_WORKERS")
 
 
 def convert_json2yml(root: str) -> None:
