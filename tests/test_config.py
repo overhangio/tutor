@@ -104,3 +104,162 @@ class ConfigPluginTestCase(PluginsTestCase):
 
         self.assertEqual("abcd", password1)
         self.assertEqual("efgh", password2)
+
+
+class ConfigRoundTripTests(unittest.TestCase):
+    """
+    Check that saving the configuration does not destroy what users wrote by hand
+    in config.yml. See https://github.com/overhangio/tutor/issues/1272.
+    """
+
+    HAND_WRITTEN = """\
+---
+# Domain names
+# See https://example.com/tickets/1234
+LMS_HOST: lms.example.com
+CMS_HOST: "studio.{{ LMS_HOST }}"
+
+# Temporarily disabled while we debug the indexer
+RUN_MEILISEARCH: false
+
+PLUGINS:
+  - mfe
+"""
+
+    def write_config(self, root: str, contents: str) -> str:
+        path = os.path.join(root, tutor_config.CONFIG_FILENAME)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(contents)
+        return path
+
+    def read_config(self, path: str) -> str:
+        with open(path, encoding="utf-8") as f:
+            return f.read()
+
+    @patch.object(fmt, "echo")
+    def test_unchanged_save_leaves_file_untouched(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            tutor_config.save_config_file(root, config)
+            self.assertEqual(self.HAND_WRITTEN, self.read_config(path))
+
+    @patch.object(fmt, "echo")
+    def test_changed_entry_preserves_comments_and_order(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            config["LMS_HOST"] = "lms.example.org"
+            tutor_config.save_config_file(root, config, explicit=["LMS_HOST"])
+
+            contents = self.read_config(path)
+            self.assertIn("# Domain names", contents)
+            self.assertIn("# See https://example.com/tickets/1234", contents)
+            self.assertIn("# Temporarily disabled while we debug the indexer", contents)
+            self.assertIn("LMS_HOST: lms.example.org", contents)
+            # Keys keep their original, non-alphabetical order
+            self.assertLess(contents.index("LMS_HOST"), contents.index("CMS_HOST"))
+            self.assertLess(
+                contents.index("CMS_HOST"), contents.index("RUN_MEILISEARCH")
+            )
+            # The document marker and the sequence indentation are kept too
+            self.assertTrue(contents.startswith("---\n"))
+            self.assertIn("PLUGINS:\n  - mfe\n", contents)
+
+    @patch.object(fmt, "echo")
+    def test_templated_entry_is_not_flattened(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            self.assertEqual("studio.lms.example.com", config["CMS_HOST"])
+
+            tutor_config.save_config_file(root, config)
+            self.assertIn('CMS_HOST: "studio.{{ LMS_HOST }}"', self.read_config(path))
+
+    @patch.object(fmt, "echo")
+    def test_templated_entry_survives_change_to_the_entry_it_points_at(
+        self, _: Mock
+    ) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            # Changing LMS_HOST also changes what CMS_HOST renders to. Note that
+            # the CMS_HOST we hold in memory is now stale, exactly as it is after
+            # `tutor config save --set LMS_HOST=...`: the expression must survive
+            # all the same, instead of being frozen to its previous result.
+            config["LMS_HOST"] = "lms.example.org"
+            self.assertEqual("studio.lms.example.com", config["CMS_HOST"])
+            tutor_config.save_config_file(root, config, explicit=["LMS_HOST"])
+
+            contents = self.read_config(path)
+            self.assertIn("LMS_HOST: lms.example.org", contents)
+            self.assertIn('CMS_HOST: "studio.{{ LMS_HOST }}"', contents)
+
+    @patch.object(fmt, "echo")
+    def test_explicit_entry_is_written_as_a_literal(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            # `tutor config save --set CMS_HOST=studio.lms.example.com` asks for a
+            # literal, even though the file holds an expression that renders to it.
+            tutor_config.save_config_file(root, config, explicit=["CMS_HOST"])
+
+            contents = self.read_config(path)
+            # The expression is gone, but the quoting style the user chose is kept.
+            self.assertIn('CMS_HOST: "studio.lms.example.com"', contents)
+            self.assertNotIn("{{ LMS_HOST }}", contents)
+
+    @patch.object(fmt, "echo")
+    def test_non_deterministic_expression_is_frozen(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(
+                root, 'MYSQL_ROOT_PASSWORD: "{{ 8|random_string }}"\n'
+            )
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            password = get_typed(config, "MYSQL_ROOT_PASSWORD", str)
+            tutor_config.save_config_file(root, config)
+
+            contents = self.read_config(path)
+            self.assertNotIn("random_string", contents)
+            self.assertIn(password, contents)
+
+    @patch.object(fmt, "echo")
+    def test_new_entries_are_appended(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            config["ENABLE_HTTPS"] = True
+            tutor_config.save_config_file(root, config, explicit=["ENABLE_HTTPS"])
+
+            contents = self.read_config(path)
+            self.assertIn("# Domain names", contents)
+            self.assertLess(contents.index("PLUGINS"), contents.index("ENABLE_HTTPS"))
+
+    @patch.object(fmt, "echo")
+    def test_removed_entry_is_deleted_from_file(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            tutor_config.render_full(config)
+            config.pop("RUN_MEILISEARCH")
+            tutor_config.save_config_file(root, config)
+
+            contents = self.read_config(path)
+            self.assertNotIn("RUN_MEILISEARCH", contents)
+            self.assertIn("# Domain names", contents)
+
+    @patch.object(fmt, "echo")
+    def test_file_is_created_when_missing(self, _: Mock) -> None:
+        with temporary_root() as root:
+            config: Config = {"LMS_HOST": "lms.example.com"}
+            tutor_config.save_config_file(root, config)
+            path = os.path.join(root, tutor_config.CONFIG_FILENAME)
+            self.assertTrue(os.path.exists(path))
+            self.assertIn("LMS_HOST: lms.example.com", self.read_config(path))
