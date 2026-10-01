@@ -34,7 +34,7 @@ mypy==1.19.1
     # via -r base.in
 mypy-extensions==1.1.0
     # via mypy
-oauthlib==3.3.1
+oauthlib==4.0.0
     # via requests-oauthlib
 packaging==26.2
     # via -r base.in
@@ -71,6 +71,4 @@ urllib3==2.6.3
 websocket-client==1.9.0
     # via kubernetes
 zipp==3.23.1
-    # via
-    #   importlib-metadata
-    #   importlib-resources
+    # via importlib-metadata
