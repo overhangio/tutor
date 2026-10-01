@@ -14,7 +14,17 @@ jobs:
     name: Add issue and bugs to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@v0.5.0
+      # Mint a short-lived token from the organisation-owned GitHub App, so that
+      # adding items to the project does not depend on any one maintainer's
+      # personal access token.
+      # https://github.com/actions/create-github-app-token
+      - uses: actions/create-github-app-token@v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.PROJECT_APP_ID }}
+          private-key: ${{ secrets.PROJECT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+      - uses: actions/add-to-project@v2.0.0
         with:
           project-url: https://github.com/orgs/overhangio/projects/4
-          github-token: ${{ secrets.GH_PROJECT_PERSONAL_ACCESS_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}

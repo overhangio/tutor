@@ -20,6 +20,92 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.0.2'></a>
+## v22.0.2 (2026-08-31)
+
+[Bugfix] Fix LMS init job failure when MONGODB_HOST contains comma-separated replica set members. (by @carlos-marquez-wgu)
+
+<a id='changelog-22.0.1'></a>
+## v22.0.1 (2026-08-13)
+
+- [Security] Move secure cookie configuration to the common production settings so it applies to both LMS and CMS. (by @jfavellar90)
+
+- [Bugfix] Bump twine to 7.0.0 so that the Python package can be checked and published again. Older twine versions rejected the `Metadata-Version: 2.5` field emitted by hatchling 1.32.0. (by @Abdul-Muqadim-Arbisoft)
+
+<a id='changelog-22.0.0'></a>
+## v22.0.0 (2026-08-04)
+
+- [Feature] Add ENV_SAVED Action that allows hooks to run after a save
+  operation. (by @xitij2000)
+
+[Improvement] Update to use Python 3.12 for edx-platform
+
+- 💥[Improvement] Add Python 3.13 and 3.14 support. Drop Python 3.9 (end-of-life). Update CI matrix from Python 3.9/3.12 to 3.10/3.14. Update `requires-python` to `>= 3.10`. Use `sphinx>=9.1.0` for Python 3.14+ and `sphinx>=7.4.7` for Python 3.10 to account for Sphinx 9.x dropping Python 3.10 support. (by @Syed-Ali-Abbas-568)
+
+- 💥[Feature] Upgrade to Verawood. (by @ahmed-arb)
+
+- [Improvement] Upgrade Caddy to v2.11.4 and Redis to v7.4.9. (by @ahmed-arb)
+- [Improvement] Upgrade Python to v3.12.13 and Node.js to v24.16.0 in the Open edX Docker image. (by @ahmed-arb)
+
+- [Security] Upgrade MongoDB to v7.0.35 to pull in upstream security patches, remaining on the 7.0 line that Open edX tests against. (by @ahmed-arb)
+
+- [Improvement] Upgrade MySQL to v8.4.9, the latest patch on the 8.4 LTS line. (by @ahmed-arb)
+
+- [Bugfix] On the main branch, bump the pinned build-time `setuptools` to 80.9.0 (the release branch keeps 69.1.1). The older version cannot build packages that declare their license with the PEP 639 `project.license` field (e.g. `mysqlclient`) against the Open edX master branch, which broke `tutor images build openedx` on main. (by @Abdul-Muqadim-Arbisoft)
+
+- [Improvement] Run smoke workflows on Python 3.10 instead of 3.9 as it has reached EOL. (by @Danyal-Faheem)
+
+- 💥[Improvement] Upgrade Meilisearch to v1.36.0. This changes the on-disk index format, so v1.36.0 refuses to start on a database created by v1.8.4: the container restart-loops with a "database version (1.8.4) is incompatible with your current engine version (1.36.0)" error. Meilisearch is only a derived index in Open edX and never a source of truth, so the existing index must be discarded and rebuilt after upgrading. Stop the platform, delete `data/meilisearch/data.ms`, then re-run initialisation and reindex: (by @HammadYousaf01)
+
+      tutor local stop
+      rm -rf "$(tutor config printroot)/data/meilisearch/data.ms"
+      tutor local start -d
+      tutor local do init
+      tutor local exec cms ./manage.py cms reindex_studio
+      tutor local exec cms ./manage.py cms reindex_course --active
+
+- On a large site, the reindex takes a while and search stays incomplete until it finishes, so plan a maintenance window.
+
+- Rolling back is not just reverting the image tag. Because the format only moves forward, v1.8.4 cannot read a v1.36.0 database either, so you also need to restore your pre-upgrade data/meilisearch/data.ms backup.
+
+- [Improvement] Upgrade MySQL from 8.4.9 to 8.4.11. (by @github-actions[bot])
+
+- [Improvement] Upgrade MongoDB from 7.0.35 to 7.0.39. (by @github-actions[bot])
+
+- [Improvement] Upgrade Redis from 7.4.9 to 7.4.10. (by @github-actions[bot])
+
+<a id='changelog-21.0.9'></a>
+## v21.0.9 (2026-08-04)
+
+- [Improvement] Add a weekly GitHub Actions workflow to automatically open PRs when pinned Docker image dependencies (Caddy, MySQL, MongoDB, Redis) fall behind their latest patch release, and a Dependabot configuration to keep GitHub Actions, Dockerfiles, and Python requirements up to date. (by @Danyal-Faheem)
+
+- [Bugfix] Pin the build-time `setuptools` used inside the isolated PEP 517 build environments that uv/pip create when building Python packages from source. Previously the latest `setuptools` was fetched to build every sdist regardless of the version installed in the venv, which made builds non-reproducible and broke them when `setuptools` 81 removed `pkg_resources` (e.g. when building `loremipsum`, a transitive dependency of `edx-ora2`). The constraint is set via `UV_BUILD_CONSTRAINT`/`PIP_CONSTRAINT` in the base image stage, so it applies to all requirement installs (base.txt, assets.txt, development.txt, extra requirements and editable installs). (by @Abdul-Muqadim-Arbisoft)
+
+- [Feature] Upgrade OPENEDX_COMMON_VERSION to release/ulmo.4 (by @ahmed-arb)
+
+<a id='changelog-21.0.8'></a>
+## v21.0.8 (2026-06-23)
+
+- [Feature] Persist lms and cms job logs (by @muhammadadeeltajamul)
+
+- [Bugfix] Compatibility with Fedora/SELinux systems: volume bind-mounts must indicate that they are shared between different containers. Otherwise, SELinux fails to mount them. (by @regisb)
+
+- [Improvement] Add a manually executable GitHub Action workflow to create version bump PRs for Major and Minor releases. (by @Danyal-Faheem)
+
+- [Feature] Add a TESTS filter to tutor to include smoke/integration tests for tutor core and plugins. (by @Danyal Faheem)
+- [Feature] Add a new `tutor local do tests <suite> --limit <service>` command to run tests aggregated across tutor core and plugins using the TESTS filter. (by @Danyal-Faheem)
+- [Feature] Add idempotent smoke tests to quickly verify that a newly launched tutor instance is working. (by @Danyal-Faheem)
+  - These smoke tests check for the following basic necessities:
+    - User Management and Authentication
+    - Course import, course creation
+    - User enrollment
+    - Basic healthchecks
+    - OAuth Application creation
+
+- [Improvement] Add a manually executable ci workflow to verify launch and smoke tests for local and k8s environments. (by @Danyal-Faheem)
+
+- [Improvement] Unpin kubernetes<36 constraint as the upstream authentication bug has been resolved.
+
 <a id='changelog-21.0.7'></a>
 ## v21.0.7 (2026-05-25)
 

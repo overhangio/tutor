@@ -1,0 +1,1 @@
+- [Bugfix] Do not append the version suffix to the app name when it was explicitly set with the `TUTOR_APP` environment variable. (by @arbrandes)

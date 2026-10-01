@@ -1,0 +1,1 @@
+- [Bugfix] Make the MySQL init job tolerate CREATE USER IF NOT EXISTS failing with "referenced as a definer account in a view" (MySQL bug 107139). This happens on managed databases where the admin user lacks SET\_USER\_ID (MySQL 8.0) or ALLOW\_NONEXISTENT\_DEFINER (MySQL 8.4) once edx-enterprise has created its view. (by @Kelketek)

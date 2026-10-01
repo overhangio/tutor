@@ -1,4 +1,4 @@
-# Note: don't forget to change this when we upgrade from ulmo
+# Note: don't forget to change this when we upgrade from willow
 OPENEDX_RELEASE_NAMES = [
     "ironwood",
     "juniper",
@@ -13,4 +13,6 @@ OPENEDX_RELEASE_NAMES = [
     "sumac",
     "teak",
     "ulmo",
+    "verawood",
+    "willow",
 ]

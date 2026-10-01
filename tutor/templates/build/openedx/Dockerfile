@@ -14,6 +14,16 @@ ENV LC_ALL=en_US.UTF-8
 COPY --from=ghcr.io/astral-sh/uv:0.9.18 /uv /usr/local/bin/uv
 ARG PIP_COMMAND="uv pip"
 
+# Constrain the build-time setuptools used in the isolated (PEP 517) build
+# environments that uv/pip create for source builds; without it the latest
+# setuptools is used regardless of the venv pin, which broke builds when
+# setuptools 81 removed pkg_resources. Inherited by all stages, and reused as
+# the single source of truth for the venv setuptools pin below.
+# https://github.com/overhangio/tutor/issues/1350
+RUN echo "setuptools==80.9.0" > /etc/openedx-build-constraints.txt
+ENV UV_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
+ENV PIP_CONSTRAINT=/etc/openedx-build-constraints.txt
+
 {{ patch("openedx-dockerfile-minimal") }}
 
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
@@ -29,9 +39,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Install pyenv
 # https://www.python.org/downloads/
 # https://github.com/pyenv/pyenv/releases
-ARG PYTHON_VERSION=3.12.12
+ARG PYTHON_VERSION=3.12.13
 ENV PYENV_ROOT=/opt/pyenv
-RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.6.18 --depth 1
+RUN git clone https://github.com/pyenv/pyenv $PYENV_ROOT --branch v2.7.2 --depth 1
 
 # Install Python
 RUN $PYENV_ROOT/bin/pyenv install $PYTHON_VERSION
@@ -93,19 +103,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     libxml2-dev \
     libxmlsec1-openssl
 
-# Install the right version of pip/setuptools
+# Install the right version of pip/setuptools. setuptools is left unpinned and
+# resolved from the build-constraints file above, so its version lives in one place.
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install \
+    $PIP_COMMAND install -c /etc/openedx-build-constraints.txt \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools==69.1.1 pip==24.0 wheel==0.43.0
+    setuptools pip==24.0 wheel==0.43.0
 
 # Install base requirements and asset-building requirements
-RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
-    --mount=type=bind,from=edx-platform,source=/requirements/edx/assets.txt,target=/openedx/edx-platform/requirements/edx/assets.txt \
+RUN --mount=type=bind,from=edx-platform,source=/pyproject.toml,target=/openedx/edx-platform/pyproject.toml \
+    --mount=type=bind,from=edx-platform,source=/uv.lock,target=/openedx/edx-platform/uv.lock \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
+    cd /openedx/edx-platform && uv sync --frozen --no-default-groups --group bundled --group assets --no-install-project --active
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -135,7 +146,7 @@ ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
 RUN $PIP_COMMAND install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=24.12.0 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=24.16.0 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
@@ -280,7 +291,8 @@ USER app
 
 # Install dev python requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install -r requirements/edx/development.txt
+    uv export --frozen --no-hashes --no-default-groups --group development | \
+    $PIP_COMMAND install -r /dev/stdin
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \

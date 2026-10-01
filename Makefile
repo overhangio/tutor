@@ -20,7 +20,7 @@ build-pythonpackage: ## Build the "tutor" python package for upload to pypi
 	python -m build --sdist
 
 push-pythonpackage: ## Push python package to pypi
-	twine upload --skip-existing dist/tutor-$(shell make version).tar.gz
+	twine upload --verbose --skip-existing dist/tutor-$(shell make version).tar.gz
 
 test: test-lint test-unit test-types test-format test-pythonpackage ## Run all tests by decreasing order of priority
 

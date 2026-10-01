@@ -1,0 +1,4 @@
+Tutor is the Open edX distribution and deployment system for installing,
+configuring, developing, and operating Open edX environments. This
+documentation covers installation, configuration, plugins, development
+workflows, and operations topics for local and Kubernetes deployments.

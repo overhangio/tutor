@@ -1,1 +1,0 @@
-- [Bugfix] Compatibility with Fedora/SELinux systems: volume bind-mounts must indicate that they are shared between different containers. Otherwise, SELinux fails to mount them. (by @regisb)

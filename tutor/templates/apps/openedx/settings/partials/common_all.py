@@ -4,6 +4,14 @@ import os
 
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
+# Re-bind the FEATURES proxy to this settings module, so that both flat feature
+# settings and legacy FEATURES["..."] reads and writes resolve here.
+try:
+    from openedx.core.lib.features_setting_proxy import FeaturesProxy
+    FEATURES = FeaturesProxy(globals())
+except ImportError:
+    pass
+
 # Mongodb connection parameters: simply modify `mongodb_parameters` to affect all connections to MongoDb.
 mongodb_parameters = {
     "db": "{{ MONGODB_DATABASE }}",
@@ -86,8 +94,22 @@ CACHES = {
     }
 }
 
-# The default Django contrib site is the one associated to the LMS domain name. 1 is
-# usually "example.com", so it's the next available integer.
+# The Django contrib site associated to the LMS domain name. Django creates the
+# initial "example.com" site at pk=SITE_ID during the first migration, and the LMS
+# init job (tutor/templates/jobs/init/lms.sh) renames it in place to the platform
+# domain, so that SITE_ID points at the real site instead of "example.com".
+#
+# Open edX resolves the current site from the request host first (see the
+# django-sites-extensions package) and falls back to SITE_ID only when there is no
+# request, so this setting is what request-less code paths use, such as bulk emails
+# sent from Celery workers. The CMS shares it, and the django_site table: Studio
+# requests resolve to a site matching the Studio domain when one exists ("do
+# settheme" creates one) and to this site otherwise.
+#
+# Keep the value at 2. Existing installations have their site, and whatever
+# SiteConfiguration or theme is attached to it, at that id; pointing SITE_ID
+# somewhere else leaves them raising Site.DoesNotExist (see the revert of #1323).
+# See https://github.com/overhangio/tutor/issues/1182
 SITE_ID = 2
 
 # Contact addresses
@@ -162,7 +184,7 @@ try:
     warnings.filterwarnings("ignore", category=DeprecationWarning, module="pgpy.constants")
 except ImportError:
     pass # If the warnings don't exist we don't need to filter them.
-    
+
 # Email
 EMAIL_USE_SSL = {{ SMTP_USE_SSL }}
 # Forward all emails from edX's Automated Communication Engine (ACE) to django.
@@ -176,6 +198,19 @@ LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Allow the platform to include itself in an iframe
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+{% if ENABLE_HTTPS %}
+# Properly set the "secure" attribute on session/csrf cookies. This is required in
+# Chrome to support samesite=none cookies.
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "None"
+{% else %}
+# When we cannot provide secure session/csrf cookies, we must disable samesite=none
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
+{% endif %}
 
 {% set jwt_rsa_key | rsa_import_key %}{{ JWT_RSA_PRIVATE_KEY }}{% endset %}
 JWT_AUTH["JWT_ISSUER"] = "{{ JWT_COMMON_ISSUER }}"
@@ -216,9 +251,9 @@ JWT_AUTH["JWT_ISSUERS"] = [
 ]
 
 # Enable/Disable some features globally
-FEATURES["ENABLE_DISCUSSION_SERVICE"] = False
-FEATURES["PREVENT_CONCURRENT_LOGINS"] = False
-FEATURES["ENABLE_CORS_HEADERS"] = True
+ENABLE_DISCUSSION_SERVICE = False
+PREVENT_CONCURRENT_LOGINS = False
+ENABLE_CORS_HEADERS = True
 
 # CORS
 CORS_ALLOW_CREDENTIALS = True

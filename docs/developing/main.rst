@@ -34,7 +34,7 @@ To pull the latest upstream changes, you should first upgrade Tutor Main::
     cd ./tutor
     git pull
 
-Then, you will have to generate a more recent version of the main Docker images. Images for running Tutor Main are published daily to docker.io (see `here <https://hub.docker.com/r/overhangio/openedx/tags?page=1&ordering=last_updated&name=main>`__). You can fetch the latest images with::
+Then, you will have to generate a more recent version of the main Docker images. Images for running Tutor Main are published to docker.io on every commit to the main branch (see `here <https://hub.docker.com/r/overhangio/openedx/tags?page=1&ordering=last_updated&name=main>`__). You can fetch the latest images with::
 
     tutor images pull all
 
@@ -45,6 +45,19 @@ Alternatively, you may want to build the images yourself. As usual, this is done
 However, these images include the application master branch at the point in time when the image was built. The Docker layer caching mechanism might cause the ``git clone`` step from the build to be skipped. In such cases, you will have to bypass the caching mechanism with::
 
     tutor images build --no-cache all
+
+.. note::
+    On the ``main`` branch, image tags carry a ``-main`` suffix. Only the ``openedx`` and ``indigo`` images are published to Docker Hub with that suffix; the ``-main`` images for other plugins are not. As a result, ``tutor images pull all`` cannot fetch them and you must build these images yourself, for example::
+
+        tutor images build mfe
+
+    On Kubernetes, the images also need to be available from a registry that the cluster can reach. Set the ``DOCKER_REGISTRY`` configuration value (with a trailing slash) to a registry you can push to, then build and push the plugin images::
+
+        tutor config save --set DOCKER_REGISTRY=docker.io/myusername/
+        tutor images build mfe
+        tutor images push mfe
+
+    If you do not specifically need the master branches, running a :ref:`tagged release <install>` avoids this step entirely.
 
 Running Tutor Main alongside the latest release
 -----------------------------------------------

@@ -1,1 +1,0 @@
-- [Security] Upgrade MongoDB to v7.0.35 to pull in upstream security patches, remaining on the 7.0 line that Open edX tests against. (by @ahmed-arb)
