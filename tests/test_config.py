@@ -96,6 +96,16 @@ class ConfigTests(unittest.TestCase):
         )
         self.assertFalse(alerts())
 
+    @patch.object(fmt, "echo")
+    def test_check_meilisearch_url_on_load(self, echo: Mock) -> None:
+        with temporary_root() as root:
+            tutor_config.save_config_file(root, {"RUN_MEILISEARCH": False})
+            echo.reset_mock()
+            tutor_config.load_full(root)
+        self.assertTrue(
+            any("MEILISEARCH_URL" in str(call.args[0]) for call in echo.call_args_list)
+        )
+
     def test_is_service_activated(self) -> None:
         config: Config = {"RUN_SERVICE1": True, "RUN_SERVICE2": False}
         self.assertTrue(tutor_config.is_service_activated(config, "service1"))
