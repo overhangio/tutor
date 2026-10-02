@@ -76,6 +76,9 @@ configMapGenerator:
     labels:
         app.kubernetes.io/name: redis
 {% endif %}
+- name: fix-permissions
+  files:
+  - apps/permissions/fix-volume-permissions.sh
 {{ patch("kustomization-configmapgenerator") }}
 
 {%- if patch("k8s-override") or patch("kustomization-patches") %}
