@@ -1,0 +1,290 @@
+name: Smoke Tests (PR command)
+# Runs the local and/or k8s smoke workflows against a pull request when a
+# member of @overhangio/tutor-maintainers comments on it, and reports the
+# results back on the pull request.
+#
+# Usage: comment on a pull request, with the command on the first line:
+#
+#   /smoke                      run both local and k8s (same as /smoke all)
+#   /smoke local                run smoke.yml only (tutor local, ~45 min)
+#   /smoke k8s                  run smoke-k8s.yml only (tutor k8s on kind, ~75 min)
+#   /smoke all                  run both, in parallel
+#
+# Optional arguments, after the mode, override the workflow defaults:
+#
+#   plugins="indigo mfe"        plugins to enable (default: "indigo mfe")
+#   images="openedx"            images to build (default: "openedx")
+#
+#   e.g. /smoke local plugins="indigo mfe discovery" images="openedx discovery"
+#
+# What happens:
+#   - The commenter (and whoever re-runs the workflow) must be an active member
+#     of @overhangio/tutor-maintainers. Anyone else gets a 👎 reaction and
+#     nothing runs.
+#   - The pull request head commit is pinned when the command is accepted.
+#     Commits pushed afterwards are not tested; comment /smoke again for those.
+#   - A 👀 reaction is added, and a reply is posted with a link to the run.
+#     That reply is edited with the results when the run finishes, and a
+#     "smoke / local" and/or "smoke / k8s" commit status is set on the commit.
+#   - A new /smoke for the same mode on the same pull request cancels the
+#     run in progress.
+#
+# Notes for maintainers:
+#   - GitHub runs issue_comment workflows from the default branch, so changes
+#     to this file, smoke.yml or smoke-k8s.yml only apply once merged there.
+#     To try a pull request that edits smoke.yml or smoke-k8s.yml, dispatch
+#     that workflow manually with tutor_ref set to the pull request branch.
+#   - Team membership is read with a token from the tutor-project-automation
+#     GitHub App, which needs the organization "Members: read" permission.
+#     GITHUB_TOKEN cannot read team membership.
+#   - The smoke jobs run code from the pull request, so they only get
+#     contents: read and no secrets.
+
+on:
+  issue_comment:
+    types:
+      - created
+
+permissions: {}
+
+env:
+  ORG: overhangio
+  TEAM: tutor-maintainers
+
+jobs:
+  gate:
+    name: Check permissions and start
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/smoke')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      statuses: write
+    outputs:
+      sha: ${{ steps.start.outputs.sha }}
+      local: ${{ steps.parse.outputs.local }}
+      k8s: ${{ steps.parse.outputs.k8s }}
+      plugins: ${{ steps.parse.outputs.plugins }}
+      images: ${{ steps.parse.outputs.images }}
+      comment_id: ${{ steps.start.outputs.comment_id }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.issue.number }}
+      COMMENT_ID: ${{ github.event.comment.id }}
+      COMMENTER: ${{ github.event.comment.user.login }}
+    steps:
+      # https://github.com/actions/create-github-app-token
+      - uses: actions/create-github-app-token@v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.PROJECT_APP_ID }}
+          private-key: ${{ secrets.PROJECT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      # Re-running a workflow replays the original comment, so whoever clicked
+      # "Re-run" (triggering_actor) is checked as well as the commenter.
+      - name: Check team membership
+        env:
+          ORG_TOKEN: ${{ steps.app-token.outputs.token }}
+          TRIGGERER: ${{ github.triggering_actor }}
+        run: |
+          for user in "$COMMENTER" "$TRIGGERER"; do
+            if ! state=$(GH_TOKEN="$ORG_TOKEN" gh api "orgs/$ORG/teams/$TEAM/memberships/$user" --jq .state 2> error.txt); then
+              if grep -q "HTTP 404" error.txt; then
+                state=none
+              else
+                cat error.txt
+                echo "::error::Could not read @$ORG/$TEAM membership. The tutor-project-automation App needs the organization Members: read permission."
+                exit 1
+              fi
+            fi
+            if [ "$state" != "active" ]; then
+              echo "::error::@$user is not an active member of @$ORG/$TEAM"
+              gh api -X POST "repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content=-1 > /dev/null
+              exit 1
+            fi
+          done
+
+      - name: Parse command
+        id: parse
+        env:
+          BODY: ${{ github.event.comment.body }}
+        shell: python
+        run: |
+          import os
+          import re
+          import shlex
+
+          error = ""
+          mode, options = "all", {"plugins": "indigo mfe", "images": "openedx"}
+          try:
+              args = shlex.split(os.environ["BODY"].strip().splitlines()[0])
+          except ValueError as e:
+              args, error = [], f"could not parse arguments ({e})"
+          if not error and args[0] != "/smoke":
+              error = f"unknown command `{args[0]}`"
+          rest = args[1:]
+          if not error and rest and rest[0] in ("local", "k8s", "all"):
+              mode = rest.pop(0)
+          for arg in rest if not error else []:
+              key, sep, value = arg.partition("=")
+              if not sep or key not in options:
+                  error = f"unexpected argument `{arg}`"
+              elif not re.fullmatch(r"[a-z0-9_ -]+", value):
+                  error = f"invalid {key} value `{value}`"
+              else:
+                  options[key] = value
+              if error:
+                  break
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"error={error}\n")
+              f.write(f"local={str(mode in ('local', 'all')).lower()}\n")
+              f.write(f"k8s={str(mode in ('k8s', 'all')).lower()}\n")
+              f.write(f"plugins={options['plugins']}\n")
+              f.write(f"images={options['images']}\n")
+
+      - name: Reply with usage
+        if: steps.parse.outputs.error != ''
+        env:
+          ERROR: ${{ steps.parse.outputs.error }}
+        run: |
+          gh api -X POST "repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content=confused > /dev/null
+          gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$(cat <<EOF
+          @$COMMENTER $ERROR. Usage:
+
+          \`\`\`
+          /smoke [local|k8s|all] [plugins="indigo mfe"] [images="openedx"]
+          \`\`\`
+
+          See [smoke-command.yml](https://github.com/$REPO/blob/${{ github.event.repository.default_branch }}/.github/workflows/smoke-command.yml) for details.
+          EOF
+          )" > /dev/null
+          exit 1
+
+      - name: Pin commit and announce run
+        id: start
+        env:
+          LOCAL: ${{ steps.parse.outputs.local }}
+          K8S: ${{ steps.parse.outputs.k8s }}
+          PLUGINS: ${{ steps.parse.outputs.plugins }}
+          IMAGES: ${{ steps.parse.outputs.images }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          pr=$(gh api "repos/$REPO/pulls/$PR")
+          if [ "$(jq -r .state <<< "$pr")" != "open" ]; then
+            echo "::error::Pull request #$PR is not open"
+            gh api -X POST "repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content=confused > /dev/null
+            exit 1
+          fi
+          sha=$(jq -r .head.sha <<< "$pr")
+          gh api -X POST "repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content=eyes > /dev/null
+
+          rows=""
+          for mode in local k8s; do
+            selected=$LOCAL; [ "$mode" = k8s ] && selected=$K8S
+            [ "$selected" = true ] || continue
+            rows+="| $mode | ⏳ running | |"$'\n'
+            gh api -X POST "repos/$REPO/statuses/$sha" \
+              -f state=pending -f context="smoke / $mode" -f target_url="$RUN_URL" \
+              -f description="Requested by @$COMMENTER" > /dev/null
+          done
+          body="Smoke tests requested by @$COMMENTER, on ${sha:0:7}:
+
+          | Mode | Result | Tests |
+          |---|---|---|
+          $rows
+          Plugins: \`$PLUGINS\`, images: \`$IMAGES\`. [Workflow run]($RUN_URL)"
+          comment_id=$(gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$body" --jq .id)
+
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "comment_id=$comment_id" >> "$GITHUB_OUTPUT"
+
+  local:
+    name: Local
+    needs: gate
+    if: needs.gate.outputs.local == 'true'
+    concurrency:
+      group: smoke-command-${{ github.event.issue.number }}-local
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    uses: ./.github/workflows/smoke.yml
+    with:
+      tutor_ref: ${{ needs.gate.outputs.sha }}
+      plugins: ${{ needs.gate.outputs.plugins }}
+      images: ${{ needs.gate.outputs.images }}
+
+  k8s:
+    name: K8s
+    needs: gate
+    if: needs.gate.outputs.k8s == 'true'
+    concurrency:
+      group: smoke-command-${{ github.event.issue.number }}-k8s
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    uses: ./.github/workflows/smoke-k8s.yml
+    with:
+      tutor_ref: ${{ needs.gate.outputs.sha }}
+      plugins: ${{ needs.gate.outputs.plugins }}
+      images: ${{ needs.gate.outputs.images }}
+
+  report:
+    name: Report results
+    needs: [gate, local, k8s]
+    if: always() && needs.gate.outputs.comment_id != ''
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      statuses: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.issue.number }}
+      COMMENT_ID: ${{ github.event.comment.id }}
+      COMMENTER: ${{ github.event.comment.user.login }}
+      SHA: ${{ needs.gate.outputs.sha }}
+      REPLY_ID: ${{ needs.gate.outputs.comment_id }}
+      PLUGINS: ${{ needs.gate.outputs.plugins }}
+      IMAGES: ${{ needs.gate.outputs.images }}
+      LOCAL_RESULT: ${{ needs.local.result }}
+      LOCAL_TESTS: ${{ needs.local.outputs.tests }}
+      K8S_RESULT: ${{ needs.k8s.result }}
+      K8S_TESTS: ${{ needs.k8s.outputs.tests }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      # A cancelled run was usually replaced by a newer /smoke, so its commit
+      # status is left alone rather than overwriting the newer run's.
+      - name: Update reply and commit statuses
+        run: |
+          rows=""
+          reaction=""
+          for mode in local k8s; do
+            result=$LOCAL_RESULT tests=$LOCAL_TESTS
+            [ "$mode" = k8s ] && result=$K8S_RESULT tests=$K8S_TESTS
+            case "$result" in
+              success) label="✅ passed" state=success; reaction=${reaction:-rocket} ;;
+              failure) label="❌ failed" state=failure reaction=confused ;;
+              cancelled) label="⚪ cancelled" state="" ;;
+              *) continue ;;
+            esac
+            rows+="| $mode | $label | $tests |"$'\n'
+            if [ -n "$state" ]; then
+              gh api -X POST "repos/$REPO/statuses/$SHA" \
+                -f state="$state" -f context="smoke / $mode" -f target_url="$RUN_URL" \
+                -f description="${tests:-$result}" > /dev/null
+            fi
+          done
+          body="Smoke tests requested by @$COMMENTER, on ${SHA:0:7}:
+
+          | Mode | Result | Tests |
+          |---|---|---|
+          $rows
+          Plugins: \`$PLUGINS\`, images: \`$IMAGES\`. [Workflow run]($RUN_URL) (logs are attached to failed runs)"
+          gh api -X PATCH "repos/$REPO/issues/comments/$REPLY_ID" -f body="$body" > /dev/null
+          if [ -n "$reaction" ]; then
+            gh api -X POST "repos/$REPO/issues/comments/$COMMENT_ID/reactions" -f content="$reaction" > /dev/null
+          fi

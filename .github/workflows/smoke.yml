@@ -2,6 +2,9 @@ name: Smoke Tests
 # Builds a tutor local (docker-compose) deployment, then runs the built-in
 # smoke test suite via `tutor local do tests smoke`. Intended as a fast
 # sanity-check for LMS/CMS API health on any branch or fork.
+#
+# Can be run manually (workflow_dispatch) or from a pull request comment via
+# smoke-command.yml (workflow_call). See smoke-command.yml for the PR command.
 
 on:
   workflow_dispatch:
@@ -22,17 +25,44 @@ on:
         description: 'Space-separated list of tutor images to build (e.g. "openedx mfe discovery")'
         required: false
         default: "openedx"
+  workflow_call:
+    inputs:
+      tutor_remote:
+        type: string
+        required: false
+        default: "overhangio"
+      tutor_ref:
+        description: "Tutor branch, tag or commit SHA to check out from overhangio/tutor. Commits from fork pull requests are reachable here too."
+        type: string
+        required: true
+      plugins:
+        type: string
+        required: false
+        default: "indigo mfe"
+      images:
+        type: string
+        required: false
+        default: "openedx"
+    outputs:
+      tests:
+        description: "One-line summary of the smoke test results"
+        value: ${{ jobs.e2e.outputs.tests }}
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    outputs:
+      tests: ${{ steps.report.outputs.tests }}
+    env:
+      PLUGINS: ${{ inputs.plugins || 'indigo mfe' }}
+      IMAGES: ${{ inputs.images || 'openedx' }}
     steps:
       - name: Checkout tutor
         uses: actions/checkout@v6
         with:
           # repository defaults to overhangio/tutor; set tutor_remote to test a fork branch
-          repository: ${{ format('{0}/tutor', github.event.inputs.tutor_remote || 'overhangio') }}
-          ref: ${{ github.event.inputs.tutor_ref || github.ref }}
+          repository: ${{ format('{0}/tutor', inputs.tutor_remote || 'overhangio') }}
+          ref: ${{ inputs.tutor_ref || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -46,10 +76,10 @@ jobs:
         run: pip install -r requirements/plugins.txt
 
       - name: Enable tutor plugins
-        run: tutor plugins enable ${{ github.event.inputs.plugins || 'indigo mfe' }}
+        run: tutor plugins enable $PLUGINS
 
       - name: Build tutor images
-        run: tutor images build ${{ github.event.inputs.images || 'openedx' }}
+        run: tutor images build $IMAGES
 
       - name: Add OpenEdX domains to /etc/hosts
         run: |
@@ -69,9 +99,64 @@ jobs:
         run: tutor local launch --non-interactive
         timeout-minutes: 60
 
+      # The test process inherits this environment, so pytest writes a junit
+      # report that the next step turns into a summary.
       - name: Run smoke tests
+        env:
+          PYTEST_ADDOPTS: --junitxml=${{ github.workspace }}/smoke-junit.xml
         run: |
           tutor local do tests smoke \
             --setup \
             --non-interactive \
             --cleanup run
+
+      - name: Summarize test results
+        id: report
+        if: always()
+        # Kept inline rather than in a script file: the checkout is the code
+        # under test, which may be an older pull request without that file.
+        shell: python
+        run: |
+          import os
+          import xml.etree.ElementTree as ET
+
+          counts = {"passed": 0, "failed": 0, "skipped": 0}
+          rows = []
+          try:
+              root = ET.parse("smoke-junit.xml").getroot()
+          except (OSError, ET.ParseError):
+              root = None
+          for case in root.iter("testcase") if root is not None else []:
+              if case.find("failure") is not None or case.find("error") is not None:
+                  status = "failed"
+              elif case.find("skipped") is not None:
+                  status = "skipped"
+              else:
+                  status = "passed"
+              counts[status] += 1
+              rows.append(f"| `{case.get('name')}` | {status} |")
+
+          if root is None:
+              tests = "no test report (failed before tests ran)"
+          else:
+              tests = ", ".join(f"{n} {k}" for k, n in counts.items())
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"tests={tests}\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+              f.write(f"### Smoke tests: {tests}\n\n")
+              if rows:
+                  f.write("| Test | Result |\n|---|---|\n" + "\n".join(rows) + "\n")
+
+      - name: Collect logs
+        if: failure()
+        run: tutor local logs --tail=1000 > tutor-logs.txt 2>&1 || true
+
+      - name: Upload logs and test report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-local
+          path: |
+            smoke-junit.xml
+            tutor-logs.txt
+          if-no-files-found: ignore
