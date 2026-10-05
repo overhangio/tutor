@@ -443,6 +443,12 @@ def do(context: K8sContext) -> None:
         for name in ["meilisearch", "mysql", "mongodb"]:
             if tutor_config.is_service_activated(config, name):
                 wait_for_deployment_ready(config, name)
+        # LMS and CMS are not optional services (unlike the ones above, they have no
+        # RUN_* toggle), but jobs such as `tests smoke` make live HTTP requests against
+        # them. Without this, `do` would hand off to those jobs while the Deployments
+        # are still mid-rollout, which is a reliable source of transient 502s.
+        for name in ["lms", "cms"]:
+            wait_for_deployment_ready(config, name)
 
 
 @click.command(help="Initialise all applications")
