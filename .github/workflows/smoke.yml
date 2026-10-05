@@ -48,9 +48,13 @@ on:
         description: "One-line summary of the smoke test results"
         value: ${{ jobs.e2e.outputs.tests }}
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     outputs:
       tests: ${{ steps.report.outputs.tests }}
     env:
@@ -63,6 +67,8 @@ jobs:
           # repository defaults to overhangio/tutor; set tutor_remote to test a fork branch
           repository: ${{ format('{0}/tutor', inputs.tutor_remote || 'overhangio') }}
           ref: ${{ inputs.tutor_ref || github.ref }}
+          # The code under test must not be able to read the token from .git/config.
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
