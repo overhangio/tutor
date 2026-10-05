@@ -9,6 +9,11 @@ from tutor.types import Config, ConfigValue, cast_config, get_typed
 
 CONFIG_FILENAME = "config.yml"
 
+# Default value of the MEILISEARCH_URL setting. It is duplicated here from
+# config/defaults.yml because loading the configuration defaults is slow. The
+# two values are checked to be in sync by the unit tests.
+MEILISEARCH_URL_DEFAULT = "http://meilisearch:7700"
+
 
 def load(root: str) -> Config:
     """
@@ -342,3 +347,23 @@ def _update_enabled_plugins_on_unload(_plugin: str, _root: str, config: Config) 
     Note that this action must be performed after the plugin has been unloaded, hence the low priority.
     """
     save_enabled_plugins(config)
+
+
+@hooks.Actions.CONFIG_LOADED.add()
+def _check_meilisearch_url(config: Config) -> None:
+    """
+    Warn the user in case Meilisearch is not run by Tutor while MEILISEARCH_URL
+    still points at the Tutor-managed instance.
+
+    Meilisearch is a required component of the Open edX platform: RUN_MEILISEARCH=false
+    does not disable it, it only indicates that it is hosted externally.
+    """
+    if get_typed(config, "RUN_MEILISEARCH", bool, True):
+        return
+    if get_typed(config, "MEILISEARCH_URL", str, "") == MEILISEARCH_URL_DEFAULT:
+        fmt.echo_alert(
+            f'Warning: RUN_MEILISEARCH=false, but MEILISEARCH_URL is still set to its default value "{MEILISEARCH_URL_DEFAULT}". '
+            "Meilisearch is a required component of the Open edX platform, so RUN_MEILISEARCH=false only means that it is hosted "
+            "externally. Set MEILISEARCH_URL to the URL of an existing, preconfigured Meilisearch instance, or set "
+            "RUN_MEILISEARCH=true to have Tutor run its own."
+        )
