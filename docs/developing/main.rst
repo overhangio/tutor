@@ -15,7 +15,7 @@ Running Tutor Main requires more than setting a few configuration variables: bec
 
 As usual, it is strongly recommended to run the command above in a `Python virtual environment <https://docs.python.org/3/tutorial/venv.html>`__.
 
-In addition to installing Tutor Main itself, this will install automatically the main versions of all official Tutor plugins (which are enumerated in `plugins.txt <https://github.com/overhangio/tutor/tree/main/requirements/plugins.txt>`_). Alternatively, if you wish to hack on an official plugin or install a custom plugin, you can clone that plugin's repository and install it. For instance::
+In addition to installing Tutor Main itself, this will install automatically the main versions of all official Tutor plugins (which are enumerated in `plugins.txt <https://github.com/overhangio/tutor/tree/main/requirements/plugins.txt>`_: in Tutor Main, they are installed from the main branch of their GitHub repositories rather than from PyPI). Alternatively, if you wish to hack on an official plugin or install a custom plugin, you can clone that plugin's repository and install it. For instance::
 
     git clone --branch=main https://github.com/myorganization/tutor-contrib-myplugin.git
     pip install -e ./tutor-contrib-myplugin
