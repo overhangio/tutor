@@ -12,7 +12,7 @@ from tutor import config as tutor_config
 from tutor import env, exceptions, fmt, hooks, serialize, utils
 from tutor import interactive as interactive_config
 from tutor.commands.context import Context
-from tutor.commands.params import ConfigLoaderParam
+from tutor.commands.params import ConfigLoaderParam, ParamValue
 from tutor.types import Config, ConfigValue
 
 
@@ -25,7 +25,7 @@ def config_command() -> None:
     pass
 
 
-class ConfigKeyParamType(ConfigLoaderParam):
+class ConfigKeyParamType(ConfigLoaderParam[ParamValue]):
     name = "configkey"
 
     def shell_complete(
@@ -49,7 +49,7 @@ class ConfigKeyParamType(ConfigLoaderParam):
         yield from self.config.items()
 
 
-class ConfigKeyValParamType(ConfigKeyParamType):
+class ConfigKeyValParamType(ConfigKeyParamType[tuple[str, t.Any]]):
     """
     Parser for <KEY>=<YAML VALUE> command line arguments.
     """
@@ -131,7 +131,7 @@ class ConfigListKeyValParamType(ConfigKeyValParamType):
     "--unset",
     "unset_vars",
     multiple=True,
-    type=ConfigKeyParamType(),
+    type=ConfigKeyParamType[str](),
     help="Remove a configuration value (can be used multiple times)",
 )
 @click.option(
@@ -221,7 +221,7 @@ def printroot(context: Context) -> None:
 
 
 @click.command(help="Print a configuration value")
-@click.argument("key", type=ConfigKeyParamType())
+@click.argument("key", type=ConfigKeyParamType[str]())
 @click.pass_obj
 def printvalue(context: Context, key: str) -> None:
     config = tutor_config.load(context.root)

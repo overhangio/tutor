@@ -20,7 +20,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             result = self.invoke_in_root(root, ["local", "do", "init"])
             self.assertIsNone(result.exception)
             self.assertEqual(0, result.exit_code)
-            self.assertIn("All services initialised.", result.output)
+            self.assertIn("All services initialised.", result.stdout)
 
     def test_init_lms_configures_site_id(self) -> None:
         with temporary_root() as root:

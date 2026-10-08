@@ -23,7 +23,8 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
         self.assertEqual(0, result.exit_code)
 
     def test_config_save_interactive(self) -> None:
-        result = self.invoke(["config", "save", "-i"])
+        # Accept all the default values by answering every prompt with a newline
+        result = self.invoke(["config", "save", "-i"], stdin="\n" * 10)
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
 
@@ -38,7 +39,7 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
             result2 = self.invoke_in_root(root, ["config", "printvalue", "key"])
         self.assertFalse(result1.exception)
         self.assertEqual(0, result1.exit_code)
-        self.assertIn("value", result2.output)
+        self.assertIn("value", result2.stdout)
 
     def test_config_save_unset_value(self) -> None:
         with temporary_root() as root:
@@ -53,7 +54,7 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
             result = self.invoke_in_root(root, ["config", "printroot"])
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
-        self.assertIn(root, result.output)
+        self.assertIn(root, result.stdout)
 
     def test_config_printvalue(self) -> None:
         with temporary_root() as root:
@@ -63,7 +64,7 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
             )
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
-        self.assertTrue(result.output)
+        self.assertTrue(result.stdout)
 
     def test_config_append(self) -> None:
         with temporary_root() as root:

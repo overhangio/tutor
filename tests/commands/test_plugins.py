@@ -17,14 +17,14 @@ class PluginsTests(unittest.TestCase, TestCommandMixin):
         result = self.invoke(["plugins", "printroot"])
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
-        self.assertTrue(result.output)
+        self.assertTrue(result.stdout)
 
     @patch.object(plugins, "iter_info", return_value=[])
     def test_plugins_list(self, _iter_info: Mock) -> None:
         result = self.invoke(["plugins", "list"])
         self.assertIsNone(result.exception)
         self.assertEqual(0, result.exit_code)
-        self.assertEqual("NAME\tSTATUS\tVERSION\n", result.output)
+        self.assertEqual("NAME\tSTATUS\tVERSION\n", result.stdout)
         _iter_info.assert_called()
 
     def test_plugins_install_not_found_plugin(self) -> None:

@@ -19,7 +19,7 @@ from tutor.types import Config
 from .context import Context
 
 
-class PluginName(click.ParamType):
+class PluginName(click.ParamType[str]):
     """
     Convenient param type that supports autocompletion of installed plugin names.
     """
@@ -44,7 +44,7 @@ class PluginName(click.ParamType):
         return [name for name in candidates if name.startswith(incomplete)]
 
 
-class IndexPluginName(click.ParamType):
+class IndexPluginName(click.ParamType[str]):
     """
     Param type for auto-completion of plugin names found in index cache.
     """

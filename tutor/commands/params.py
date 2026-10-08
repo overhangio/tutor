@@ -6,8 +6,12 @@ from tutor import config as tutor_config
 from tutor import hooks
 from tutor.types import Config
 
+# Type of the value produced by the param type `convert` method. Since click 8.4,
+# `click.ParamType` is generic and must be parameterized with that type.
+ParamValue = t.TypeVar("ParamValue")
 
-class ConfigLoaderParam(click.ParamType):
+
+class ConfigLoaderParam(click.ParamType[ParamValue]):
     """
     Convenient param child class that automatically loads the user configuration on auto-complete.
     """
