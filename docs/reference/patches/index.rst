@@ -87,6 +87,17 @@ Files: ``apps/openedx/config/cms.env.yml``, ``apps/openedx/config/lms.env.yml``
 
 File: ``dev/docker-compose.jobs.yml``
 
+.. patch:: granian-config
+
+``granian-config``
+==================
+
+File: ``apps/openedx/granian-config``
+
+A file used to extend or override the Granian configuration.
+
+Check the Granian documentation for the `list of available options <https://github.com/emmett-framework/granian>`__.
+
 .. patch:: k8s-deployments
 
 ``k8s-deployments``
@@ -399,14 +410,3 @@ Python-formatted LMS settings in production. Values defined here override the va
 File: ``apps/redis/redis.conf``
 
 Implement this patch to override hard-coded Redis configuration values. See the `Redis configuration reference <https://redis.io/docs/management/config-file/>`__`.
-
-``uwsgi-config``
-================
-
-File: ``apps/openedx/settings/uwsgi.ini``
-
-A .INI formatted file used to extend or override the uWSGI configuration.
-
-Check the uWSGI documentation for more details about the `.INI format <https://uwsgi-docs.readthedocs.io/en/latest/Configuration.html#ini-files>`__ and the `list of available options <https://uwsgi-docs.readthedocs.io/en/latest/Options.html>`__.
-
-.. patch:: uwsgi-config

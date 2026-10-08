@@ -124,13 +124,9 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # Use redis as a django cache https://pypi.org/project/django-redis/
     django-redis==5.4.0
 
-# uwsgi server https://pypi.org/project/uWSGI/
-# We don't need xml configuration support in uwsgi so don't install it, as it causes
-# uwsgi to crash
-# https://github.com/xmlsec/python-xmlsec/issues/320
+# granian server https://pypi.org/project/granian/
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    UWSGI_PROFILE_OVERRIDE="xml=no" \
-    $PIP_COMMAND install --no-cache-dir --compile uwsgi==2.0.24
+    $PIP_COMMAND install --no-cache-dir --compile granian==2.7.4
 
 # Install scorm xblock
 RUN $PIP_COMMAND install "openedx-scorm-xblock>=19.0.0,<20.0.0"
@@ -264,6 +260,9 @@ RUN ./manage.py lms collectstatic --noinput --settings=tutor.assets && \
 # Create a data directory, which might be used (or not)
 RUN mkdir /openedx/data
 
+# Create the media directory: granian refuses to start if a static path mount does not exist
+RUN mkdir /openedx/media
+
 # If this "canary" file is missing from a container, then that indicates that a
 # local edx-platform was bind-mounted into that container, thus overwriting the
 # canary. This information is useful during edx-platform initialisation.
@@ -329,14 +328,14 @@ CMD ["./manage.py", "$SERVICE_VARIANT", "runserver", "0.0.0.0:8000"]
 ###### Final image with production cmd
 FROM production AS final
 
-# Default amount of uWSGI processes
-ENV UWSGI_WORKERS=2
+# Default amount of Granian worker processes
+ENV GRANIAN_WORKERS=2
 
-# Copy the default uWSGI configuration
-COPY --chown=app:app settings/uwsgi.ini /openedx
+# Copy granian configuration file
+COPY --chown=app:app settings/granian-config /openedx
 
-# Run server
-CMD ["uwsgi", "/openedx/uwsgi.ini"]
+# Run server: granian has no config file support, so run-granian converts /openedx/granian-config to CLI arguments
+CMD ["run-granian"]
 
 {{ patch("openedx-dockerfile-final") }}
 
