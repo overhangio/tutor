@@ -10,6 +10,11 @@ on:
       - release
       - main
 
+# This workflow restores the pip cache, which other workflows can write to (see
+# smoke-command.yml), so it must not get a write token.
+permissions:
+  contents: read
+
 jobs:
   tests:
     runs-on: ubuntu-latest
