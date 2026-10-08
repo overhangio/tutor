@@ -302,6 +302,19 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "1000", "1000", "/meili_data"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /meili_data
+              name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: meilisearch
           image: {{ DOCKER_IMAGE_MEILISEARCH }}
@@ -319,6 +332,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: meilisearch
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {% if RUN_MONGODB %}
 ---
@@ -344,6 +360,19 @@ spec:
         runAsGroup: 999
         fsGroup: 999
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "999", "999", "/data/db"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /data/db
+              name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: mongodb
           image: {{ DOCKER_IMAGE_MONGODB }}
@@ -359,6 +388,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mongodb
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {% if RUN_MYSQL %}
 ---
@@ -384,6 +416,19 @@ spec:
         runAsGroup: 999
         fsGroup: 999
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "999", "999", "/var/lib/mysql"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: mysql
           image: {{ DOCKER_IMAGE_MYSQL }}
@@ -407,6 +452,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mysql
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {% if RUN_SMTP %}
 ---
@@ -458,6 +506,19 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: fix-permissions
+          image: {{ DOCKER_IMAGE_PERMISSIONS }}
+          command: ["sh", "/scripts/fix-volume-permissions.sh", "1000", "1000", "/openedx/redis/data"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /openedx/redis/data
+              name: data
+            - mountPath: /scripts
+              name: fix-permissions-script
       containers:
         - name: redis
           image: {{ DOCKER_IMAGE_REDIS }}
@@ -479,5 +540,8 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: redis
+        - name: fix-permissions-script
+          configMap:
+            name: fix-permissions
 {% endif %}
 {{ patch("k8s-deployments") }}
