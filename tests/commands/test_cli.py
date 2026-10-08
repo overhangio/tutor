@@ -20,4 +20,4 @@ class CliTests(unittest.TestCase, TestCommandMixin):
         result = self.invoke(["--version"])
         self.assertEqual(0, result.exit_code)
         self.assertIsNone(result.exception)
-        self.assertRegex(result.output, rf"cli, version {__version__}\n")
+        self.assertRegex(result.stdout, rf"cli, version {__version__}\n")

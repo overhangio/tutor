@@ -18,7 +18,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             result = self.invoke_in_root(root, ["local", "do", "init"])
             self.assertIsNone(result.exception)
             self.assertEqual(0, result.exit_code)
-            self.assertIn("All services initialised.", result.output)
+            self.assertIn("All services initialised.", result.stdout)
 
     def test_create_user_template_without_staff(self) -> None:
         command = jobs.create_user_template(

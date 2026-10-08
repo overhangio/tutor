@@ -88,7 +88,7 @@ def _add_core_images_to_push(
     return remote_images
 
 
-class ImageNameParam(ConfigLoaderParam):
+class ImageNameParam(ConfigLoaderParam[str]):
     """
     Convenient auto-completion of image names.
     """
