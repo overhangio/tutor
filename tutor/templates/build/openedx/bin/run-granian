@@ -12,6 +12,7 @@ import shlex
 
 from granian.cli import cli
 
-with open("/openedx/granian-config", encoding="utf-8") as f:
-    args = shlex.split(os.path.expandvars(f.read()), comments=True)
-cli(args=args)
+if __name__ == "__main__":
+    with open("/openedx/granian-config", encoding="utf-8") as f:
+        args = shlex.split(os.path.expandvars(f.read()), comments=True)
+    cli(args=args)
