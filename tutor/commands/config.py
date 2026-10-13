@@ -207,7 +207,18 @@ def save(
     for key in unset_vars:
         config.pop(key, None)
     if not env_only:
-        tutor_config.save_config_file(context.root, config)
+        # Entries that the user named on the command line are saved as literal
+        # values, even when config.yml holds a Jinja expression that renders to
+        # the same result. Answers to interactive questions are deliberately not
+        # part of this list: accepting a default is not a request to replace an
+        # expression by its result.
+        explicit = (
+            [key for key, _value in set_vars]
+            + [key for key, _value in append_vars]
+            + [key for key, _value in remove_vars]
+            + list(unset_vars)
+        )
+        tutor_config.save_config_file(context.root, config, explicit=explicit)
 
     # Reload configuration, without version checking
     config = tutor_config.load_full(context.root)

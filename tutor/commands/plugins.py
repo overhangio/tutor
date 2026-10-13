@@ -143,7 +143,9 @@ def enable(context: click.Context, plugin_names: list[str]) -> None:
         plugins.load(plugin)
         fmt.echo_info(f"Plugin {plugin} enabled")
     tutor_config.save_enabled_plugins(config)
-    tutor_config.save_config_file(context.obj.root, config)
+    tutor_config.save_config_file(
+        context.obj.root, config, explicit=[tutor_config.PLUGINS_CONFIG_KEY]
+    )
     context.invoke(config_save_command, env_only=True)
 
 
@@ -166,7 +168,9 @@ def disable(context: click.Context, plugin_names: list[str]) -> None:
             disabled.append(plugin)
             fmt.echo_info(f"Plugin {plugin} disabled")
     if disabled:
-        tutor_config.save_config_file(context.obj.root, config)
+        tutor_config.save_config_file(
+            context.obj.root, config, explicit=[tutor_config.PLUGINS_CONFIG_KEY]
+        )
         context.invoke(config_save_command, env_only=True)
 
 
@@ -458,7 +462,9 @@ def index_add(context: Context, url: str) -> None:
     """
     config = tutor_config.load_minimal(context.root)
     if indexes.add(url, config):
-        tutor_config.save_config_file(context.root, config)
+        tutor_config.save_config_file(
+            context.root, config, explicit=[indexes.PLUGIN_INDEXES_KEY]
+        )
         update_indexes(config)
     else:
         fmt.echo_alert("Plugin index was already added")
@@ -473,7 +479,9 @@ def index_remove(context: Context, url: str) -> None:
     """
     config = tutor_config.load_minimal(context.root)
     if indexes.remove(url, config):
-        tutor_config.save_config_file(context.root, config)
+        tutor_config.save_config_file(
+            context.root, config, explicit=[indexes.PLUGIN_INDEXES_KEY]
+        )
         update_indexes(config)
     else:
         fmt.echo_alert("Plugin index not present")
