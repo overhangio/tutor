@@ -11,6 +11,11 @@ if [ "$current_gid" = "$gid" ]; then
 fi
 
 echo "$path: group is $current_gid, expected $gid; fixing ownership"
+# chown -R processes children before the directory itself (verified: it is a
+# post-order walk), so if the timeout below kills it partway through, $path's
+# own group is the last thing that would have been updated. A partial failure
+# therefore still reads as "not done" above on the next restart, instead of
+# silently looking complete while some descendant is left unfixed.
 if timeout 60 chown --recursive "$uid:$gid" "$path"; then
   echo "$path: ownership fixed"
 else

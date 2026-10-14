@@ -59,7 +59,12 @@ jobs:
       tests: ${{ steps.report.outputs.tests }}
     env:
       PLUGINS: ${{ inputs.plugins || 'indigo mfe' }}
-      IMAGES: ${{ inputs.images || 'openedx' }}
+      # `permissions` is appended unconditionally: it's a core dependency of any
+      # k8s launch with mongodb/mysql/redis/meilisearch enabled (volume-ownership
+      # init containers), not an optional component like the images above, and it
+      # must be preloaded into kind the same way or kubelet pulls it from the
+      # registry on first use instead of using the locally built image.
+      IMAGES: "${{ inputs.images || 'openedx' }} permissions"
     steps:
       - name: Checkout tutor
         uses: actions/checkout@v6

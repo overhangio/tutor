@@ -245,3 +245,10 @@ The handy :ref:`update-mysql-authentication-plugin <update_mysql_authentication_
 
     tutor local do update-mysql-authentication-plugin $(tutor config printvalue OPENEDX_MYSQL_USERNAME)
     tutor local do update-mysql-authentication-plugin $(tutor config printvalue MYSQL_ROOT_USERNAME)
+
+"Permission denied" crash on MongoDB, MySQL, Redis or Meilisearch on Kubernetes
+--------------------------------------------------------------------------------
+
+On Kubernetes, these four services each run with a ``fix-permissions`` init container that fixes volume ownership before the main container starts (useful on clusters, such as Minikube or kind, whose storage provisioner does not support ``fsGroup``). If that init container fails or times out, it does not block the pod — it logs a warning and lets the main container start anyway, which means it can then crash with the original permission error with no obvious explanation in its own logs. If you see a service crash with a permission error on Kubernetes, check the init container's logs first::
+
+    kubectl logs --namespace <namespace> deployment/<mongodb|mysql|redis|meilisearch> -c fix-permissions

@@ -307,9 +307,13 @@ spec:
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
           command: ["sh", "/scripts/fix-volume-permissions.sh", "1000", "1000", "/meili_data"]
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
+            capabilities:
+              add: ["CHOWN"]
+              drop: ["ALL"]
           volumeMounts:
             - mountPath: /meili_data
               name: data
@@ -365,9 +369,13 @@ spec:
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
           command: ["sh", "/scripts/fix-volume-permissions.sh", "999", "999", "/data/db"]
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+            runAsUser: 999
+            runAsGroup: 999
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
+            capabilities:
+              add: ["CHOWN"]
+              drop: ["ALL"]
           volumeMounts:
             - mountPath: /data/db
               name: data
@@ -421,9 +429,13 @@ spec:
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
           command: ["sh", "/scripts/fix-volume-permissions.sh", "999", "999", "/var/lib/mysql"]
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+            runAsUser: 999
+            runAsGroup: 999
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
+            capabilities:
+              add: ["CHOWN"]
+              drop: ["ALL"]
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: data
@@ -511,9 +523,13 @@ spec:
           image: {{ DOCKER_IMAGE_PERMISSIONS }}
           command: ["sh", "/scripts/fix-volume-permissions.sh", "1000", "1000", "/openedx/redis/data"]
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
+            capabilities:
+              add: ["CHOWN"]
+              drop: ["ALL"]
           volumeMounts:
             - mountPath: /openedx/redis/data
               name: data
