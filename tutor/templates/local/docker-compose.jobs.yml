@@ -27,6 +27,8 @@ services:
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:roz
         - ../apps/openedx/config:/openedx/config:roz
         - ../../data/lms-job:/openedx/data:z
+        - ../../data/openedx-media:/openedx/media:z
+        - ../../data/openedx-media-private:/openedx/media-private:z
         {%- for mount in iter_mounts(MOUNTS, "openedx", "lms-job") %}
         - {{ mount }}:z
         {%- endfor %}
@@ -42,6 +44,8 @@ services:
         - ../apps/openedx/settings/cms:/openedx/edx-platform/cms/envs/tutor:roz
         - ../apps/openedx/config:/openedx/config:roz
         - ../../data/cms-job:/openedx/data:z
+        - ../../data/openedx-media:/openedx/media:z
+        - ../../data/openedx-media-private:/openedx/media-private:z
         {%- for mount in iter_mounts(MOUNTS, "openedx", "cms-job") %}
         - {{ mount }}:z
         {%- endfor %}
