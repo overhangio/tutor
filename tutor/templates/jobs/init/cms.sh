@@ -17,7 +17,13 @@ fi
 # are already handled by the post_migrate signal during `cms migrate` above;
 # this enqueues a Celery task that cms-worker consumes to populate the index
 # incrementally in the background.
-./manage.py cms reindex_studio
+#
+# --init is kept for compatibility with edx-platform versions that don't yet
+# default reindex_studio to this async/incremental behavior: there, it takes
+# the fast, non-populating setup path instead of a full synchronous reindex.
+# On versions where the async default already exists, --init is a no-op
+# (logs a deprecation warning) and the task is still enqueued as above.
+./manage.py cms reindex_studio --init
 # Create the courseware content index
 ./manage.py cms reindex_course --active
 
