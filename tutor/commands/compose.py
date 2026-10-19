@@ -222,13 +222,14 @@ def interactive_configuration(
     run_for_prod: t.Optional[bool] = None,
 ) -> None:
     config = tutor_config.load_minimal(context.obj.root)
+    answered: list[str] = []
     if interactive:
         click.echo(fmt.title("Interactive platform configuration"))
-        interactive_config.ask_questions(
+        answered = interactive_config.ask_questions(
             config,
             run_for_prod=run_for_prod,
         )
-    tutor_config.save_config_file(context.obj.root, config)
+    tutor_config.save_config_file(context.obj.root, config, explicit=answered)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)
 

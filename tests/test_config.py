@@ -325,3 +325,91 @@ PLUGINS:
             path = os.path.join(root, tutor_config.CONFIG_FILENAME)
             self.assertTrue(os.path.exists(path))
             self.assertIn("LMS_HOST: lms.example.com", self.read_config(path))
+
+    @patch.object(fmt, "echo")
+    def test_interactive_answer_replaces_expression(self, _: Mock) -> None:
+        def mock_prompt(question: str, **kwargs: str) -> str:
+            if "teachers" in question:
+                return "teach.example.com"
+            return kwargs["default"]
+
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.load_minimal(root)
+            with patch.object(click, "prompt", new=mock_prompt):
+                with patch.object(click, "confirm", new=mock_prompt):
+                    answered = interactive.ask_questions(config, run_for_prod=True)
+            self.assertIn("CMS_HOST", answered)
+            self.assertNotIn("LMS_HOST", answered)
+            tutor_config.save_config_file(root, config, explicit=answered)
+
+            contents = self.read_config(path)
+            self.assertIn('CMS_HOST: "teach.example.com"', contents)
+            self.assertEqual(
+                "teach.example.com", tutor_config.get_user(root)["CMS_HOST"]
+            )
+
+    @patch.object(fmt, "echo")
+    def test_interactive_default_keeps_expression(self, _: Mock) -> None:
+        def mock_prompt(*_args: None, **kwargs: str) -> str:
+            return kwargs["default"]
+
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.load_minimal(root)
+            with patch.object(click, "prompt", new=mock_prompt):
+                with patch.object(click, "confirm", new=mock_prompt):
+                    answered = interactive.ask_questions(config, run_for_prod=True)
+            self.assertNotIn("CMS_HOST", answered)
+            tutor_config.save_config_file(root, config, explicit=answered)
+
+            self.assertIn('CMS_HOST: "studio.{{ LMS_HOST }}"', self.read_config(path))
+
+    @patch.object(fmt, "echo")
+    def test_yaml_11_keyword_string_is_quoted(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(root, self.HAND_WRITTEN)
+            config = tutor_config.get_user(root)
+            # Under YAML 1.2 these are plain strings, but PyYAML, which reads
+            # config.yml, would load them as a boolean, an integer and a null.
+            config["MY_FLAG"] = "on"
+            config["MY_MODE"] = "0777"
+            config["MY_NULL"] = "~"
+            tutor_config.save_config_file(
+                root, config, explicit=["MY_FLAG", "MY_MODE", "MY_NULL"]
+            )
+
+            contents = self.read_config(path)
+            self.assertIn("MY_FLAG: 'on'", contents)
+            reloaded = tutor_config.get_user(root)
+            self.assertEqual("on", reloaded["MY_FLAG"])
+            self.assertEqual("0777", reloaded["MY_MODE"])
+            self.assertEqual("~", reloaded["MY_NULL"])
+
+    @patch.object(fmt, "echo")
+    def test_yaml_11_keyword_is_not_rewritten(self, _: Mock) -> None:
+        with temporary_root() as root:
+            hand_written = self.HAND_WRITTEN + "ENABLE_HTTPS: yes\nMY_MODE: 0777\n"
+            path = self.write_config(root, hand_written)
+            config = tutor_config.get_user(root)
+            self.assertIs(True, config["ENABLE_HTTPS"])
+            self.assertEqual(0o777, config["MY_MODE"])
+            tutor_config.save_config_file(root, config)
+            self.assertEqual(hand_written, self.read_config(path))
+
+    @patch.object(fmt, "echo")
+    def test_duplicate_keys_keep_the_last_value(self, _: Mock) -> None:
+        with temporary_root() as root:
+            path = self.write_config(
+                root,
+                "# Domain names\nLMS_HOST: lms.example.com\nLMS_HOST: lms.example.org\n",
+            )
+            config = tutor_config.get_user(root)
+            self.assertEqual("lms.example.org", config["LMS_HOST"])
+            config["PLATFORM_NAME"] = "My platform"
+            tutor_config.save_config_file(root, config, explicit=["PLATFORM_NAME"])
+
+            contents = self.read_config(path)
+            self.assertIn("# Domain names", contents)
+            self.assertEqual(1, contents.count("LMS_HOST"))
+            self.assertEqual("lms.example.org", tutor_config.get_user(root)["LMS_HOST"])

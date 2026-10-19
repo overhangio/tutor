@@ -7,6 +7,7 @@ from _io import TextIOWrapper
 import yaml
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
+from ruamel.yaml.resolver import VersionedResolver
 from ruamel.yaml.util import load_yaml_guess_indent
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
@@ -47,6 +48,27 @@ class YamlLayout(t.NamedTuple):
     explicit_start: bool = False
 
 
+class Yaml11Resolver(VersionedResolver):
+    """
+    Resolve plain scalars with the YAML 1.1 rules, which are the ones used by
+    PyYAML, instead of the YAML 1.2 rules that ruamel.yaml applies by default.
+
+    Files that are written by the round-trip dumper are read back with PyYAML, so
+    both must agree on the type of every value. Under YAML 1.2, `on`, `yes` and
+    `0777` are a string, a string and the integer 777, while PyYAML loads them as
+    True, True and 511. With this resolver, the round-trip loader returns the same
+    values as PyYAML, and the dumper quotes any string that PyYAML would load as
+    something else.
+
+    Note that ruamel.yaml would also switch to YAML 1.1 if we set `YAML.version`,
+    but then every document would be dumped with a "%YAML 1.1" directive.
+    """
+
+    @property
+    def processing_version(self) -> t.Any:
+        return (1, 1)
+
+
 def round_trip_yaml(layout: YamlLayout) -> YAML:
     """
     YAML parser/dumper that preserves comments, key order and quoting style.
@@ -56,6 +78,12 @@ def round_trip_yaml(layout: YamlLayout) -> YAML:
     hand, such as config.yml.
     """
     yaml_rt = YAML(typ="rt")
+    yaml_rt.Resolver = Yaml11Resolver
+    # PyYAML keeps the last of duplicate keys, while ruamel.yaml refuses to load
+    # them. Accept them too: ruamel.yaml keeps the first value, but the save then
+    # sees that it differs from the one we loaded with PyYAML, and writes the
+    # latter back, once.
+    yaml_rt.allow_duplicate_keys = True
     yaml_rt.preserve_quotes = True
     yaml_rt.default_flow_style = False
     yaml_rt.allow_unicode = True
@@ -76,28 +104,18 @@ def load_round_trip(text: str) -> tuple[t.Any, YamlLayout]:
 
     Return the document, along with the layout that must be passed back to
     `dump_round_trip` for the document to be written out as the user wrote it.
+    The layout does not affect parsing, so the default one is good enough to load
+    the document with.
     """
-    layout = guess_layout(text)
-    return round_trip_yaml(layout).load(text), layout
-
-
-def guess_layout(text: str) -> YamlLayout:
-    """
-    Work out how a yaml document is laid out, such that it can be written back
-    the way its author wrote it.
-
-    Note that `load_yaml_guess_indent` parses the document a second time. We
-    cannot use the document that it returns, because it loads it without
-    `preserve_quotes`, and passing it our own parser is only supported from
-    ruamel.yaml 0.19 onwards. Parsing a file as small as config.yml twice is a
-    small price to pay for not having to pin a recent ruamel.yaml.
-    """
-    _document, sequence_indent, dash_offset = load_yaml_guess_indent(text)
-    return YamlLayout(
+    document, sequence_indent, dash_offset = load_yaml_guess_indent(
+        text, yaml=round_trip_yaml(YamlLayout())
+    )
+    layout = YamlLayout(
         sequence_indent=2 if sequence_indent is None else int(sequence_indent),
         sequence_dash_offset=0 if dash_offset is None else int(dash_offset),
         explicit_start=has_explicit_start(text),
     )
+    return document, layout
 
 
 def has_explicit_start(text: str) -> bool:

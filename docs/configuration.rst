@@ -33,7 +33,7 @@ Alternatively, you can set each parameter from the command line::
 
     tutor config save --set PARAM1=VALUE1 --set PARAM2=VALUE2
 
-Values set this way are always written as literals: use them to store a result, and edit ``config.yml`` by hand to store an expression.
+Values set this way are always written as literals: use them to store a result, and edit ``config.yml`` by hand to store an expression. The same goes for the answers to ``tutor config save --interactive`` and ``tutor local launch``, unless you accept the current value.
 
 Or from the system environment::
 

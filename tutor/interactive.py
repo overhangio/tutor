@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List, Optional
 
 import click
@@ -7,7 +8,7 @@ from . import env, exceptions, fmt, hooks
 from .types import Config, get_typed
 
 
-def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
+def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> List[str]:
     """
     Interactively ask questions to collect configuration values from the user.
 
@@ -16,8 +17,10 @@ def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
         run_for_prod: Whether platform should be configured for production.
             If None, then ask the user.
     Returns:
-        None
+        The names of the entries whose value was changed by the answers. Entries
+        whose default value was accepted are not part of this list.
     """
+    before = deepcopy(config)
     defaults = tutor_config.get_defaults()
     if run_for_prod is None:
         run_for_prod = config.get("LMS_HOST") not in [
@@ -153,6 +156,12 @@ def ask_questions(config: Config, run_for_prod: Optional[bool] = None) -> None:
         )
 
     hooks.Actions.CONFIG_INTERACTIVE.do(config)
+
+    return [
+        key
+        for key in set(before) | set(config)
+        if key not in before or key not in config or before[key] != config[key]
+    ]
 
 
 def ask(question: str, key: str, config: Config, defaults: Config) -> None:

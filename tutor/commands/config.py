@@ -170,8 +170,9 @@ def save(
             if run_clean:
                 env.delete_env_dir(context.root)
 
+    answered: list[str] = []
     if interactive:
-        interactive_config.ask_questions(config)
+        answered = interactive_config.ask_questions(config)
     elif clean_env:
         env.delete_env_dir(context.root)
     if set_vars:
@@ -209,11 +210,12 @@ def save(
     if not env_only:
         # Entries that the user named on the command line are saved as literal
         # values, even when config.yml holds a Jinja expression that renders to
-        # the same result. Answers to interactive questions are deliberately not
-        # part of this list: accepting a default is not a request to replace an
-        # expression by its result.
+        # the same result. So are the interactive answers that differ from the
+        # current value, but not the accepted defaults: accepting a default is
+        # not a request to replace an expression by its result.
         explicit = (
-            [key for key, _value in set_vars]
+            answered
+            + [key for key, _value in set_vars]
             + [key for key, _value in append_vars]
             + [key for key, _value in remove_vars]
             + list(unset_vars)
