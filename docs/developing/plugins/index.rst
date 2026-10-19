@@ -8,5 +8,6 @@ Tutor plugin development
    :maxdepth: 2
 
    creating
+   patches
    examples
    indexes
