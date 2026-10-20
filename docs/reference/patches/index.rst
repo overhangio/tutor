@@ -4,7 +4,7 @@
 Template patch catalog
 ======================
 
-This is the list of all patches used across Tutor (outside of any plugin). Alternatively, you can search for patches in Tutor templates by grepping the source code::
+This is the list of all patches used across Tutor (outside of any plugin). To learn what patches are and how to use them in your plugins, check :ref:`template_patches`. Alternatively, you can search for patches in Tutor templates by grepping the source code::
 
     git clone https://github.com/overhangio/tutor
     cd tutor
