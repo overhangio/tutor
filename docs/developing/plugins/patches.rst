@@ -42,7 +42,7 @@ Multiple patches can be added at once with ``add_items``::
         ]
     )
 
-Patches are applied when the environment is rendered. Thus, after you modify a patch, you should run ``tutor config save`` (or ``tutor local launch``) for your changes to be taken into account.
+Patches are applied when the environment is rendered. Thus, after you modify a patch, you should run ``tutor config save`` (or ``tutor local launch``) for your changes to be taken into account. Patches that modify a Dockerfile, such as :patch:`openedx-dockerfile-post-python-requirements`, are only taken into account once the corresponding Docker image is rebuilt, for instance with ``tutor images build openedx``.
 
 .. _template_patches_files:
 
@@ -88,7 +88,7 @@ You should thus write the content of your patch without any leading indentation,
     hooks.Filters.ENV_PATCHES.add_item(
         (
             "local-docker-compose-services",
-            """
+            """\
     myservice:
       image: docker.io/myservice:latest
       restart: unless-stopped
