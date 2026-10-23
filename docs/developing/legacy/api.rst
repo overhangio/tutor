@@ -49,7 +49,7 @@ This configuration from the "myplugin" plugin will set the following values:
 patches
 ~~~~~~~
 
-Plugin patches affect the rendered environment templates. In many places the Tutor templates include calls to ``{{ patch("patchname") }}``. This grants plugin developers the possibility to modify the content of rendered templates. Plugins can add content in these places by adding values to the ``patches`` attribute. See :ref:`patches` for the complete list available patches.
+Plugin patches affect the rendered environment templates. In many places the Tutor templates include calls to ``{{ patch("patchname") }}``. This grants plugin developers the possibility to modify the content of rendered templates. Plugins can add content in these places by adding values to the ``patches`` attribute. See :ref:`patches` for the complete list available patches, and :ref:`template_patches` for a detailed explanation of how patches work.
 
 Example::
 

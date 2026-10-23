@@ -287,6 +287,10 @@ class Filters:
     DOCKER_BUILD_COMMAND: Filter[list[str], []] = Filter()
 
     #: List of patches that should be inserted in a given location of the templates.
+    #: Each ``{{ patch("name") }}`` statement in the templates is replaced by the
+    #: rendered content of all the patches with the same name. See :ref:`template_patches`
+    #: for a detailed explanation and the :ref:`template patch catalog <patches>` for
+    #: the list of all available patches.
     #:
     #: :parameter list[tuple[str, str]] patches: pairs of (name, content) tuples. Use this
     #:   filter to modify the Tutor templates.
@@ -325,7 +329,7 @@ class Filters:
     #: - ``list_if``: In a list of ``(value, condition)`` tuples, return the list of ``value`` for which the ``condition`` is true.
     #: - ``long_to_base64``: Base-64 encode a long integer.
     #: - ``iter_values_named``: Yield the values of the configuration settings that match a certain pattern. Example: ``{% for value in iter_values_named(prefix="KEY", suffix="SUFFIX")%}...{% endfor %}``. By default, only non-empty values are yielded. To iterate also on empty values, pass the ``allow_empty=True`` argument.
-    #: - ``patch``: See :ref:`patches <v0_plugin_patches>`.
+    #: - ``patch``: See :ref:`template_patches`.
     #: - ``random_string``: Return a random string of the given length composed of ASCII letters and digits. Example: ``{{ 8|random_string }}``.
     #: - ``reverse_host``: Reverse a domain name (see `reference <https://en.wikipedia.org/wiki/Reverse_domain_name_notation>`__). Example: ``{{ "demo.myopenedx.com"|reverse_host }}`` is equal to "com.myopenedx.demo".
     #: - ``rsa_import_key``: Import a PEM-formatted RSA key and return the corresponding object.
