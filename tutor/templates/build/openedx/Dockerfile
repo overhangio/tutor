@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
-    apt install -y build-essential curl git language-pack-en
+    apt install -y build-essential ca-certificates curl git language-pack-en
 ENV LC_ALL=en_US.UTF-8
 {{ patch("openedx-dockerfile-minimal") }}
 
@@ -94,13 +94,18 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools==69.1.1 pip==24.0 wheel==0.43.0
+    setuptools==69.1.1 pip==26.2.2 wheel==0.43.0
 
 # Install base requirements and asset-building requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
     --mount=type=bind,from=edx-platform,source=/requirements/edx/assets.txt,target=/openedx/edx-platform/requirements/edx/assets.txt \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
+
+# Upgrade certifi until edx-platform pins a version without the compromised emSign roots
+# https://emudhra.we-have-a-problem.com/
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install "certifi>=2026.10.19"
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -133,7 +138,7 @@ ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
 RUN pip install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=20.19.5 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=22.23.4 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
