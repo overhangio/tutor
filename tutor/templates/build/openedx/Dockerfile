@@ -23,6 +23,8 @@ ARG PIP_COMMAND="uv pip"
 RUN echo "setuptools==69.1.1" > /etc/openedx-build-constraints.txt
 ENV UV_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
 ENV PIP_CONSTRAINT=/etc/openedx-build-constraints.txt
+# pip 26 no longer applies PIP_CONSTRAINT to build dependencies
+ENV PIP_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
 
 {{ patch("openedx-dockerfile-minimal") }}
 
