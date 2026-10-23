@@ -241,10 +241,11 @@ def launch(context: click.Context, non_interactive: bool) -> None:
         )
 
     config = tutor_config.load_minimal(context.obj.root)
+    answered: list[str] = []
     if not non_interactive:
         click.echo(fmt.title("Interactive platform configuration"))
-        interactive_config.ask_questions(config, run_for_prod=True)
-    tutor_config.save_config_file(context.obj.root, config)
+        answered = interactive_config.ask_questions(config, run_for_prod=True)
+    tutor_config.save_config_file(context.obj.root, config, explicit=answered)
     config = tutor_config.load_full(context.obj.root)
     tutor_env.save(context.obj.root, config)
 

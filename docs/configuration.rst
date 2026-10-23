@@ -23,9 +23,19 @@ By default, this file contains only the required configuration parameters for ru
 
     vim "$(tutor config printroot)/config.yml"
 
+Tutor edits this file in place, so the comments, the blank lines and the order of the entries that you write there are all preserved. Entries that hold a Jinja expression are preserved as well, and re-evaluated every time the configuration is loaded::
+
+    CMS_HOST: "studio.{{ LMS_HOST }}"
+
+The exception is an expression that produces a different result every time, such as ``"{{ 24|random_string }}"``: those are replaced by one of their results, so that generated passwords and secret keys do not change behind your back.
+
+Note that the spelling of booleans is not preserved: a hand-written ``yes``, ``no``, ``on`` or ``off`` keeps its meaning, but it is written back as ``true`` or ``false`` whenever the file is saved for another reason.
+
 Alternatively, you can set each parameter from the command line::
 
     tutor config save --set PARAM1=VALUE1 --set PARAM2=VALUE2
+
+Values set this way are always written as literals: use them to store a result, and edit ``config.yml`` by hand to store an expression. The same goes for the answers to ``tutor config save --interactive`` and ``tutor local launch``, unless you accept the current value.
 
 Or from the system environment::
 

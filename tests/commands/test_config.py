@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from tests.helpers import temporary_root
@@ -27,6 +28,44 @@ class ConfigTests(unittest.TestCase, TestCommandMixin):
         result = self.invoke(["config", "save", "-i"], stdin="\n" * 10)
         self.assertFalse(result.exception)
         self.assertEqual(0, result.exit_code)
+
+    def test_config_save_interactive_answer_replaces_expression(self) -> None:
+        with temporary_root() as root:
+            path = os.path.join(root, tutor_config.CONFIG_FILENAME)
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(
+                    'LMS_HOST: lms.example.com\nCMS_HOST: "studio.{{ LMS_HOST }}"\n'
+                )
+            runner_input = "\n".join(
+                [
+                    "y",  # production platform
+                    "",  # LMS_HOST: accept the default
+                    "teach.example.com",  # CMS_HOST
+                    "",  # PLATFORM_NAME
+                    "",  # CONTACT_EMAIL
+                    "",  # LANGUAGE_CODE
+                    "",  # ENABLE_HTTPS
+                ]
+            )
+            # Accept the defaults of any question that plugins may add
+            runner_input += "\n" * 5
+            result = self.invoke_in_root(
+                root, ["config", "save", "-i"], stdin=runner_input
+            )
+            config = tutor_config.load(root)
+        self.assertFalse(result.exception)
+        self.assertEqual(0, result.exit_code)
+        self.assertEqual("lms.example.com", config["LMS_HOST"])
+        self.assertEqual("teach.example.com", config["CMS_HOST"])
+
+    def test_config_save_set_yaml_11_keyword(self) -> None:
+        with temporary_root() as root:
+            result = self.invoke_in_root(
+                root, ["config", "save", "--set", "MY_FLAG='on'"]
+            )
+            config = tutor_config.load(root)
+        self.assertFalse(result.exception)
+        self.assertEqual("on", config["MY_FLAG"])
 
     def test_config_save_skip_update(self) -> None:
         result = self.invoke(["config", "save", "-e"])
