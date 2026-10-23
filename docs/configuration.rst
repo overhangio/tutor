@@ -29,6 +29,8 @@ Tutor edits this file in place, so the comments, the blank lines and the order o
 
 The exception is an expression that produces a different result every time, such as ``"{{ 24|random_string }}"``: those are replaced by one of their results, so that generated passwords and secret keys do not change behind your back.
 
+Note that the spelling of booleans is not preserved: a hand-written ``yes``, ``no``, ``on`` or ``off`` keeps its meaning, but it is written back as ``true`` or ``false`` whenever the file is saved for another reason.
+
 Alternatively, you can set each parameter from the command line::
 
     tutor config save --set PARAM1=VALUE1 --set PARAM2=VALUE2
