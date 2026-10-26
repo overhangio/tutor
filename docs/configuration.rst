@@ -67,7 +67,7 @@ This configuration parameter defines the name of the Docker image to run the dev
 
 .. https://hub.docker.com/r/devture/exim-relay/tags
 
-- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.11.4"``)
+- ``DOCKER_IMAGE_CADDY`` (default: ``"docker.io/caddy:2.11.7"``)
 
 This configuration parameter defines which Caddy Docker image to use.
 
