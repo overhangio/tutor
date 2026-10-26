@@ -294,6 +294,9 @@ USER app
 # Install dev python requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install -r requirements/edx/development.txt
+# development.txt pins the old certifi again, so upgrade it one more time
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install "certifi>=2026.10.19"
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
