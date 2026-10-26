@@ -8,8 +8,20 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
-    apt install -y build-essential curl git language-pack-en
+    apt install -y build-essential ca-certificates curl git language-pack-en
 ENV LC_ALL=en_US.UTF-8
+
+# Constrain the build-time setuptools used in the isolated (PEP 517) build
+# environments that pip creates for source builds; without it the latest
+# setuptools is used regardless of the venv pin, which broke builds when
+# setuptools 81 removed pkg_resources. Inherited by all stages, and reused as
+# the single source of truth for the venv setuptools pin below.
+# https://github.com/overhangio/tutor/issues/1350
+RUN echo "setuptools==69.1.1" > /etc/openedx-build-constraints.txt
+ENV PIP_CONSTRAINT=/etc/openedx-build-constraints.txt
+# pip 26 no longer applies PIP_CONSTRAINT to build dependencies
+ENV PIP_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
+
 {{ patch("openedx-dockerfile-minimal") }}
 
 ###### Install python with pyenv in /opt/pyenv and create virtualenv in /openedx/venv
@@ -88,19 +100,25 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     libxml2-dev \
     libxmlsec1-openssl
 
-# Install the right version of pip/setuptools
+# Install the right version of pip/setuptools. setuptools is left unpinned and
+# resolved from the build-constraints file above, so its version lives in one place.
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    pip install \
+    pip install -c /etc/openedx-build-constraints.txt \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools==69.1.1 pip==24.0 wheel==0.43.0
+    setuptools pip==26.2.2 wheel==0.43.0
 
 # Install base requirements and asset-building requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
     --mount=type=bind,from=edx-platform,source=/requirements/edx/assets.txt,target=/openedx/edx-platform/requirements/edx/assets.txt \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
+
+# Upgrade certifi until edx-platform pins a version without the compromised emSign roots
+# https://emudhra.we-have-a-problem.com/
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install "certifi>=2026.10.19"
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -133,7 +151,7 @@ ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
 RUN pip install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=20.19.5 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=22.23.4 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
@@ -276,6 +294,9 @@ USER app
 # Install dev python requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     pip install -r requirements/edx/development.txt
+# development.txt pins the old certifi again, so upgrade it one more time
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    pip install "certifi>=2026.10.19"
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
