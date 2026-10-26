@@ -6,7 +6,7 @@
 #
 appdirs==1.4.4
     # via -r base.in
-certifi==2026.5.20
+certifi==2026.10.19
     # via
     #   kubernetes
     #   requests
