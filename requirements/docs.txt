@@ -10,7 +10,7 @@ appdirs==1.4.4
     # via -r requirements/base.txt
 babel==2.18.0
     # via sphinx
-certifi==2026.5.20
+certifi==2026.10.19
     # via
     #   -r requirements/base.txt
     #   kubernetes

@@ -8,10 +8,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && \
-    apt install -y build-essential curl git language-pack-en
+    apt install -y build-essential ca-certificates curl git language-pack-en
 ENV LC_ALL=en_US.UTF-8
 
-COPY --from=ghcr.io/astral-sh/uv:0.9.18 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /usr/local/bin/uv
 ARG PIP_COMMAND="uv pip"
 
 # Constrain the build-time setuptools used in the isolated (PEP 517) build
@@ -23,6 +23,8 @@ ARG PIP_COMMAND="uv pip"
 RUN echo "setuptools==69.1.1" > /etc/openedx-build-constraints.txt
 ENV UV_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
 ENV PIP_CONSTRAINT=/etc/openedx-build-constraints.txt
+# pip 26 no longer applies PIP_CONSTRAINT to build dependencies
+ENV PIP_BUILD_CONSTRAINT=/etc/openedx-build-constraints.txt
 
 {{ patch("openedx-dockerfile-minimal") }}
 
@@ -110,13 +112,18 @@ RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     # https://pypi.org/project/setuptools/
     # https://pypi.org/project/pip/
     # https://pypi.org/project/wheel/
-    setuptools pip==24.0 wheel==0.43.0
+    setuptools pip==26.2.2 wheel==0.43.0
 
 # Install base requirements and asset-building requirements
 RUN --mount=type=bind,from=edx-platform,source=/requirements/edx/base.txt,target=/openedx/edx-platform/requirements/edx/base.txt \
     --mount=type=bind,from=edx-platform,source=/requirements/edx/assets.txt,target=/openedx/edx-platform/requirements/edx/assets.txt \
     --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     $PIP_COMMAND install -r /openedx/edx-platform/requirements/edx/base.txt -r /openedx/edx-platform/requirements/edx/assets.txt
+
+# Upgrade certifi until edx-platform pins a version without the compromised emSign roots
+# https://emudhra.we-have-a-problem.com/
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    $PIP_COMMAND install "certifi>=2026.10.19"
 
 # Install extra requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
@@ -150,7 +157,7 @@ ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
 RUN $PIP_COMMAND install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=24.12.0 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=24.22.1 --prebuilt
 
 # Install nodejs requirements
 ARG NPM_REGISTRY={{ NPM_REGISTRY }}
@@ -293,6 +300,9 @@ USER app
 # Install dev python requirements
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
     $PIP_COMMAND install -r requirements/edx/development.txt
+# development.txt pins the old certifi again, so upgrade it one more time
+RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
+    $PIP_COMMAND install "certifi>=2026.10.19"
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
 RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
