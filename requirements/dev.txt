@@ -112,7 +112,7 @@ oauthlib==3.3.1
     #   -r base.txt
     #   kubernetes
     #   requests-oauthlib
-packaging==25.0
+packaging==26.2
     # via
     #   -r base.txt
     #   build
@@ -177,7 +177,7 @@ requests-toolbelt==1.0.0
     # via twine
 rfc3986==2.0.0
     # via twine
-rich==14.1.0
+rich==15.0.0
     # via twine
 rsa==4.9.1
     # via
@@ -200,7 +200,7 @@ tomli==2.2.1
     #   build
     #   mypy
     #   pip-tools
-twine==6.2.0
+twine==7.0.0
     # via -r dev.in
 types-docutils==0.22.1.20250923
     # via -r dev.in
