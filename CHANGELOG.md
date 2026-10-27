@@ -20,6 +20,13 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-20.0.6'></a>
+## v20.0.6 (2026-10-27)
+
+- [Security] Upgrade certifi, pip and Node.js (v22) in the Open edX image, and Caddy, to stop trusting the compromised eMudhra/emSign CA certificates. See https://github.com/overhangio/tutor/issues/1515. (by @ahmed-arb)
+
+- [Bugfix] Pin `setuptools` in pip's isolated build environments, so that pip 26 can still build source packages such as `loremipsum`. Backport of #1411. (by @ahmed-arb)
+
 <a id='changelog-20.0.5'></a>
 ## v20.0.5 (2026-01-07)
 
