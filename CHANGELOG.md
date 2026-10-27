@@ -20,6 +20,24 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.0.3'></a>
+## v22.0.3 (2026-10-27)
+
+- [Feature] Added llms.txt file (by @muhammadadeeltajamul)
+
+- [Bugfix] Set feature toggles as flat Django settings instead of `FEATURES` dict entries, which edx-platform no longer reads from downstream settings modules. Rebind the `FEATURES` proxy in Tutor's settings modules, so that plugins which still assign to `FEATURES["..."]` keep working. (by @arbrandes)
+- [Bugfix] Remove the `ENABLE_COURSEWARE_MICROFRONTEND = False` override from the LMS development settings. (by @arbrandes)
+
+- [Bugfix] Make the MySQL init job tolerate CREATE USER IF NOT EXISTS failing with "referenced as a definer account in a view" (MySQL bug 107139). This happens on managed databases where the admin user lacks SET\_USER\_ID (MySQL 8.0) or ALLOW\_NONEXISTENT\_DEFINER (MySQL 8.4) once edx-enterprise has created its view. (by @Kelketek)
+
+- [Bugfix] Remove the temporary `click<8.3.0` constraint and require click>=8.4. The crash that motivated the pin ("expected string or bytes-like object, got 'Sentinel'" on `tutor dev launch`) was a click 8.3.0 bug that was fixed upstream in click 8.3.1. (by @ahmed-arb)
+
+- [Improvement] Warn the user when `RUN_MEILISEARCH` is `false` while `MEILISEARCH_URL` is still set to its default value. (by @fghaas)
+
+- [Bugfix] Mount the `openedx-media` and `openedx-media-private` volumes in the `lms-job` and `cms-job` services, like in the `lms` and `cms` services. Files written by jobs to the media folders were lost when the job container was removed: for instance, `importdemocourse` left the demo course with video transcripts whose files did not exist, so that transcript requests failed with a 500 error. Running `importdemocourse` again does not repair an existing demo course, because the transcript records already exist: delete the demo course (or its `edxval` `VideoTranscript` records) first, then import it again. (by @Faraz32123)
+
+- [Security] Upgrade certifi, pip, uv and Node.js (v24) in the Open edX image, and Caddy, to stop trusting the compromised eMudhra/emSign CA certificates. See https://github.com/overhangio/tutor/issues/1515. (by @ahmed-arb)
+
 <a id='changelog-22.0.2'></a>
 ## v22.0.2 (2026-08-31)
 
