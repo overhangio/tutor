@@ -91,7 +91,7 @@ This configuration parameter defines which MongoDB Docker image to use.
 
 .. https://hub.docker.com/_/mysql/tags?page=1&name=8.0
 
-- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:8.4.11"``)
+- ``DOCKER_IMAGE_MYSQL`` (default: ``"docker.io/mysql:8.4.13"``)
 
 This configuration parameter defines which MySQL Docker image to use.
 
