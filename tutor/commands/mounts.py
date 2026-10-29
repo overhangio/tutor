@@ -111,14 +111,20 @@ def mounts_add(context: click.Context, mounts: list[str]) -> None:
 
 
 @click.command(name="remove")
+@click.option("-a", "--all", "remove_all", is_flag=True, help="Remove all bind-mounts")
 @click.argument("mounts", metavar="mount", type=MountParamType(), nargs=-1)
 @click.pass_context
-def mounts_remove(context: click.Context, mounts: list[str]) -> None:
+def mounts_remove(context: click.Context, remove_all: bool, mounts: list[str]) -> None:
     """
     Remove a bind-mounted folder
 
-    The bind-mounted folder will be removed from the ``MOUNTS`` project setting.
+    The bind-mounted folder will be removed from the ``MOUNTS`` project setting. Pass
+    ``--all`` to remove all bind-mounted folders at once.
     """
+    if remove_all:
+        if mounts:
+            raise exceptions.TutorError("Cannot pass both --all and mount arguments")
+        mounts = bindmount.get_mounts(tutor_config.load(context.obj.root))
     removed_mounts = []
     for mount in mounts:
         if not bindmount.parse_explicit_mount(mount):
