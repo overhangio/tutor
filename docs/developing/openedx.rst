@@ -54,6 +54,10 @@ Now, use the ``tutor dev ...`` command-line interface to manage the development 
 
     tutor mounts remove ./edx-platform
 
+  To remove all bind-mounted folders at once, run::
+
+    tutor mounts remove --all
+
   At any time, check your configuration by running::
 
     tutor mounts list
