@@ -20,6 +20,11 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-21.0.11'></a>
+## v21.0.11 (2026-11-02)
+
+- [Security] Upgrade `OPENEDX_COMMON_VERSION` to `release/ulmo.5`, which includes several security fixes. (by @Abdul-Muqadim-Arbisoft)
+
 <a id='changelog-21.0.10'></a>
 ## v21.0.10 (2026-10-27)
 
