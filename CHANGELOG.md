@@ -20,6 +20,17 @@ instructions, because git commits are used to generate release notes:
 
 <!-- scriv-insert-here -->
 
+<a id='changelog-22.0.4'></a>
+## v22.0.4 (2026-11-03)
+
+- [Bugfix] Add an init container to the MongoDB, MySQL, Redis and Meilisearch Kubernetes deployments (unconditionally, on every cluster) that fixes volume ownership before the main container starts. This fixes a crash on first `tutor k8s launch` on clusters whose storage provisioner does not support `fsGroup`, such as Minikube or kind; it is a no-op on clusters where `fsGroup` already works. Air-gapped clusters must now also mirror the `openedx-permissions` image for Kubernetes deployments, not only for `tutor local`; mirror it by digest or with a tool that preserves the `security.capability` xattr, since the image's non-root init container relies on a file capability that some image re-layering tools silently strip, which would quietly bring back the original crash. (by @Syed-Ali-Abbas-568)
+
+- [Feature] Add a `--all` option to `tutor mounts remove` to remove all bind-mounts at once. (by @valkrypton)
+
+- [Security] Upgrade `OPENEDX_COMMON_VERSION` to `release/verawood.2`, which includes several security fixes. Verawood.2 moves Studio library content to a separate `studio_library_content` Meilisearch index: on existing platforms, this index is populated by the `reindex_studio` command that runs during `tutor local/k8s launch` (or `do init`). Library search in the Authoring MFE requires an MFE image built from Verawood.2, so also upgrade tutor-mfe. (by @Abdul-Muqadim-Arbisoft)
+
+- [Bugfix] Fix `ImportError: ... GLIBC_2.38 not found` when compiling assets in the openedx image, after an image of a Tutor release based on a newer Ubuntu was built on the same machine. The uv cache is now separate for each Ubuntu version. (by @ahmed-arb)
+
 <a id='changelog-22.0.3'></a>
 ## v22.0.3 (2026-10-27)
 
