@@ -102,7 +102,7 @@ ENV XDG_CACHE_HOME=/openedx/.cache
 # against, so keep a separate cache per base image: wheels built on a newer Ubuntu
 # (e.g. by another Tutor release) fail to import here. Keep in sync with the
 # "minimal" stage base image.
-ENV UV_CACHE_DIR=$XDG_CACHE_HOME/pip/ubuntu-22.04
+ENV UV_CACHE_DIR=$XDG_CACHE_HOME/pip/ubuntu-24.04
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
