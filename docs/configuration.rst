@@ -142,7 +142,7 @@ Open edX customisation
 
 This defines the git repository from which you install Open edX platform code. If you run an Open edX fork with custom patches, set this to your own git repository. You may also override this configuration parameter at build time, by providing a ``--build-arg`` option.
 
-- ``OPENEDX_COMMON_VERSION`` (default: ``"release/verawood.1"``, or ``master`` in :ref:`Tutor Main <main>`)
+- ``OPENEDX_COMMON_VERSION`` (default: ``"release/verawood.2"``, or ``master`` in :ref:`Tutor Main <main>`)
 
 This defines the default version that will be pulled from all Open edX git repositories.
 
