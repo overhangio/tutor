@@ -1,0 +1,1 @@
+- [Improvement] Scan the published Docker images for known vulnerabilities (CVEs) every week with Trivy. The reports are published in the repository's Security tab, and the triage policy is documented in SECURITY.md. (by @Faraz32123)
