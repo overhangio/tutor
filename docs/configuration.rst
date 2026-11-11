@@ -296,8 +296,13 @@ The following DNS records must exist and point to your server::
 
     LMS_HOST (e.g: myopenedx.com)
     CMS_HOST (e.g: studio.myopenedx.com)
+    MEILISEARCH_HOST (e.g: meilisearch.myopenedx.com)
+
+Plugins may add domain names of their own, which must also point to your server: the simplest way to cover all of them is to create a wildcard CNAME record for the subdomains of ``LMS_HOST``, as described in :ref:`dns_records`.
 
 Thus, **this feature will (probably) not work in development** because the DNS records will (probably) not point to your development machine.
+
+Let's Encrypt enforces `rate limits <https://letsencrypt.org/docs/rate-limits/>`__, which are reached sooner as the number of domain names of your platform grows: if certificates are not generated, check the :ref:`troubleshooting section <letsencrypt_rate_limits>`.
 
 If you would like to perform SSL/TLS termination with your own custom certificates, you will have to keep ``ENABLE_HTTPS=true`` and turn off the Caddy load balancing with ``ENABLE_WEB_PROXY=false``. See the corresponding :ref:`tutorial <web_proxy>` for more information.
 

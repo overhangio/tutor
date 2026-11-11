@@ -49,6 +49,37 @@ User who are more comfortable with a graphical user interface for viewing logs a
 
 The containerized Caddy needs to listen to ports 80 and 443 on the host. If there is already a webserver, such as Apache, Caddy, or Nginx, running on the host, the caddy container will not be able to start. To solve this issue, check the section on :ref:`how to setup a web proxy <web_proxy>`.
 
+.. _letsencrypt_rate_limits:
+
+SSL/TLS certificates are not generated: "rateLimited"
+-----------------------------------------------------
+
+When ``ENABLE_HTTPS`` and ``ENABLE_WEB_PROXY`` are ``true``, the Caddy container obtains one SSL/TLS certificate from `Let's Encrypt <https://letsencrypt.org/>`__ for each domain name of the platform: ``LMS_HOST``, ``CMS_HOST``, ``MEILISEARCH_HOST``, as well as the domain names that are added by plugins, such as ``MFE_HOST``. If HTTPS access to one of them does not work, check the Caddy logs::
+
+    tutor local logs --tail=100 caddy
+    # or, on Kubernetes:
+    tutor k8s logs --tail=100 caddy
+
+Errors of type "urn:ietf:params:acme:error:rateLimited", with messages such as "too many certificates already issued", "too many failed authorizations" or "too many registrations for this IP", mean that you reached one of the Let's Encrypt `rate limits <https://letsencrypt.org/docs/rate-limits/>`__. Caddy will keep trying, less and less often, and it will obtain the certificates once the limit is refilled, which can take from a few minutes to a few days. In most cases, there is nothing to do but wait. To avoid reaching these limits in the first place:
+
+- Create the DNS records of all domain names before you launch the platform (see :ref:`dns_records`): a wildcard CNAME record for the subdomains of ``LMS_HOST`` covers the domain names that are added by plugins, too. Let's Encrypt only allows 5 failed validations per domain name per hour.
+- Keep the Caddy data when you re-install the platform. Caddy stores its certificates in ``$(tutor config printroot)/data/caddy`` (or in the "caddy" persistent volume claim, on Kubernetes), together with the single Let's Encrypt account that it registers for all domain names. As long as this data is kept, Caddy does not request a certificate again until it must be renewed. Each time this data is deleted, for instance with the rest of the Tutor project root, Caddy registers a new account and requests all certificates again. Let's Encrypt issues at most 5 certificates per week for the same domain name, 50 certificates per week for all the subdomains of the same registered domain (e.g: "mydomain.com" for "learn.mydomain.com"), and allows at most 10 new accounts per IP address every 3 hours. The more domain names your platform has, the fewer re-installations it takes to reach the limit of 50 certificates, and all the platforms that share the same registered domain, such as a production and a staging platform, count towards it.
+
+If you need to re-install your platform many times, for instance to test your installation process, configure Caddy to obtain certificates from the Let's Encrypt `staging environment <https://letsencrypt.org/docs/staging-environment/>`__, which has much higher rate limits, with a :ref:`plugin <plugins>` that implements the :patch:`caddyfile-global` patch::
+
+    from tutor import hooks
+
+    hooks.Filters.ENV_PATCHES.add_item(
+        (
+            "caddyfile-global",
+            "acme_ca https://acme-staging-v02.api.letsencrypt.org/directory",
+        )
+    )
+
+Browsers do not trust the certificates of the staging environment. Once you are done testing, disable the plugin, run ``tutor config save``, and restart Caddy to obtain certificates from the production environment.
+
+By default, Caddy does not fall back to another certificate authority when Let's Encrypt fails. If you set an email address for the certificate authorities to contact you, with ``email you@mydomain.com`` in the same :patch:`caddyfile-global` patch, Caddy will also try `ZeroSSL <https://zerossl.com/>`__ when Let's Encrypt fails. Note that this email address will then be shared with both Let's Encrypt and ZeroSSL.
+
 "Couldn't connect to docker daemon"
 -----------------------------------
 
