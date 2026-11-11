@@ -164,6 +164,14 @@ def launch(
 {public_app_hosts}"""
         )
 
+    if context_name == "local":
+        # The dev platform does not run the Caddy container that generates certificates
+        utils.warn_https_certificates(
+            config,
+            storage=tutor_env.data_path(context.obj.root, "caddy"),
+            logs_command="tutor local logs -f caddy",
+        )
+
 
 def interactive_upgrade(
     context: click.Context, interactive: bool, run_for_prod: t.Optional[bool]
