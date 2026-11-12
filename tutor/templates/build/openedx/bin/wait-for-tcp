@@ -13,13 +13,22 @@ import sys
 import time
 
 
+USAGE = "Usage: wait-for-tcp HOST:PORT [TIMEOUT_SECONDS]"
+
+
 def main() -> None:
-    host, _, port = sys.argv[1].rpartition(":")
-    timeout = float(sys.argv[2]) if len(sys.argv) > 2 else 20
+    try:
+        host, _, port_str = sys.argv[1].rpartition(":")
+        port = int(port_str)
+        timeout = float(sys.argv[2]) if len(sys.argv) > 2 else 20
+        if not host or len(sys.argv) > 3:
+            raise ValueError
+    except (IndexError, ValueError):
+        sys.exit(USAGE)
     deadline = time.monotonic() + timeout
     while True:
         try:
-            with socket.create_connection((host, int(port)), timeout=1):
+            with socket.create_connection((host, port), timeout=1):
                 print(f"Connected to {host}:{port}")
                 return
         except OSError as e:
