@@ -1,4 +1,4 @@
-dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
+wait-for-tcp {{ MYSQL_HOST }}:{{ MYSQL_PORT }}
 
 echo "Loading settings $DJANGO_SETTINGS_MODULE"
 

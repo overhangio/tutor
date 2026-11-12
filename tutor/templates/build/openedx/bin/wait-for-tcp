@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+"""
+Wait until a TCP service accepts connections.
+
+Usage: wait-for-tcp HOST:PORT [TIMEOUT_SECONDS]
+
+Exits with a non-zero status if the service is still unreachable after the
+timeout (default: 20 seconds).
+"""
+
+import socket
+import sys
+import time
+
+
+USAGE = "Usage: wait-for-tcp HOST:PORT [TIMEOUT_SECONDS]"
+
+
+def main() -> None:
+    try:
+        host, _, port_str = sys.argv[1].rpartition(":")
+        port = int(port_str)
+        timeout = float(sys.argv[2]) if len(sys.argv) > 2 else 20
+        if not host or len(sys.argv) > 3:
+            raise ValueError
+    except (IndexError, ValueError):
+        sys.exit(USAGE)
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            with socket.create_connection((host, port), timeout=1):
+                print(f"Connected to {host}:{port}")
+                return
+        except OSError as e:
+            if time.monotonic() >= deadline:
+                sys.exit(f"Timeout after {timeout:g}s waiting for {host}:{port}: {e}")
+            print(f"Waiting for {host}:{port}: {e}")
+            time.sleep(1)
+
+
+if __name__ == "__main__":
+    main()

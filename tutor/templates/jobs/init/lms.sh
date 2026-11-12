@@ -1,14 +1,14 @@
-dockerize -wait tcp://{{ MYSQL_HOST }}:{{ MYSQL_PORT }} -timeout 20s
+wait-for-tcp {{ MYSQL_HOST }}:{{ MYSQL_PORT }}
 
 {%- if MONGODB_HOST.startswith("mongodb+srv://") %}
 echo "MongoDB is using SRV records, so we cannot wait for it to be ready"
 {%- elif ',' in MONGODB_HOST %}
 echo "Waiting for MongoDB (replica set, checking all members)"
 {%- for host in MONGODB_HOST.split(',') %}
-dockerize -wait tcp://{{ host.strip() }}:{{ MONGODB_PORT }} -timeout 20s
+wait-for-tcp {{ host.strip() }}:{{ MONGODB_PORT }}
 {%- endfor %}
 {%- else %}
-dockerize -wait tcp://{{ MONGODB_HOST }}:{{ MONGODB_PORT }} -timeout 20s
+wait-for-tcp {{ MONGODB_HOST }}:{{ MONGODB_PORT }}
 {%- endif %}
 
 echo "Loading settings $DJANGO_SETTINGS_MODULE"

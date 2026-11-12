@@ -193,8 +193,6 @@ USER ${APP_USER_ID}
 # since Linux's username->userid mapping is stored in a file (/etc/passwd), it means that we must
 # --chown with an integer user id ($APP_USER_ID) rather the a username (app).
 
-# https://hub.docker.com/r/powerman/dockerize/tags
-COPY --link --from=docker.io/powerman/dockerize:0.19.0 /usr/local/bin/dockerize /usr/local/bin/dockerize
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=edx-platform / /openedx/edx-platform
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=python /opt/pyenv /opt/pyenv
 COPY --link --chown=$APP_USER_ID:$APP_USER_ID --from=python-requirements /openedx/venv /openedx/venv
