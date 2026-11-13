@@ -87,6 +87,15 @@ Files: ``apps/openedx/config/cms.env.yml``, ``apps/openedx/config/lms.env.yml``
 
 File: ``dev/docker-compose.jobs.yml``
 
+.. patch:: k8s-cronjobs
+
+``k8s-cronjobs``
+================
+
+File: ``k8s/cronjobs.yml``
+
+Add Kubernetes ``CronJob`` resources here. Like other Tutor resources, they are created by ``tutor k8s start`` and deleted by ``tutor k8s stop``. Jobs spawned by a CronJob do not block ``tutor k8s do`` commands.
+
 .. patch:: k8s-deployments
 
 ``k8s-deployments``

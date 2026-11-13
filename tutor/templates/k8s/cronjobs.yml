@@ -1,0 +1,48 @@
+{% if OPENEDX_REINDEX_COURSES_SCHEDULE %}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cms-reindex-courses
+  labels:
+    app.kubernetes.io/component: cronjob
+    app.kubernetes.io/name: cms-reindex-courses
+spec:
+  schedule: {{ OPENEDX_REINDEX_COURSES_SCHEDULE|tojson }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: cms
+            image: {{ DOCKER_IMAGE_OPENEDX }}
+            args: ["./manage.py", "cms", "reindex_course", "--active"]
+            env:
+            - name: SERVICE_VARIANT
+              value: cms
+            - name: DJANGO_SETTINGS_MODULE
+              value: cms.envs.tutor.production
+            volumeMounts:
+              - mountPath: /openedx/edx-platform/lms/envs/tutor/
+                name: settings-lms
+              - mountPath: /openedx/edx-platform/cms/envs/tutor/
+                name: settings-cms
+              - mountPath: /openedx/config
+                name: config
+          volumes:
+          - name: settings-lms
+            configMap:
+              name: openedx-settings-lms
+          - name: settings-cms
+            configMap:
+              name: openedx-settings-cms
+          - name: config
+            configMap:
+              name: openedx-config
+{% endif %}
+{{ patch("k8s-cronjobs") }}

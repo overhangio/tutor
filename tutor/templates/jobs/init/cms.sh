@@ -18,8 +18,12 @@ fi
 # this enqueues a Celery task that cms-worker consumes to populate the index
 # incrementally in the background.
 ./manage.py cms reindex_studio
+{% if OPENEDX_INIT_REINDEX_COURSES %}
 # Create the courseware content index
 ./manage.py cms reindex_course --active
+{% else %}
+echo "Skipping courseware content reindex (OPENEDX_INIT_REINDEX_COURSES=false)"
+{% endif %}
 
 # Load default policies for the Open edX Authorization framework
 # Check if openedx-authz package is installed if not skip loading policies and exit
