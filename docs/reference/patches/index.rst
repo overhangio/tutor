@@ -94,7 +94,7 @@ File: ``dev/docker-compose.jobs.yml``
 
 File: ``k8s/cronjobs.yml``
 
-Add Kubernetes ``CronJob`` resources here. Give them the ``app.kubernetes.io/component: cronjob`` label so that ``tutor k8s start`` creates them and ``tutor k8s stop`` deletes them.
+Add Kubernetes ``CronJob`` resources here. Like other Tutor resources, they are created by ``tutor k8s start`` and deleted by ``tutor k8s stop``. Jobs spawned by a CronJob do not block ``tutor k8s do`` commands.
 
 .. patch:: k8s-deployments
 

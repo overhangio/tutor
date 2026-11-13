@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: cronjob
     app.kubernetes.io/name: cms-reindex-courses
 spec:
-  schedule: "{{ OPENEDX_REINDEX_COURSES_SCHEDULE }}"
+  schedule: {{ OPENEDX_REINDEX_COURSES_SCHEDULE|tojson }}
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
