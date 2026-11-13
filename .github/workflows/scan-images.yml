@@ -1,0 +1,93 @@
+# Weekly vulnerability scan of the Docker images that Tutor publishes to Docker Hub.
+# The reports land in the repository's Security tab (Code scanning), one category per
+# image stream, so that newly disclosed CVEs affecting already-published images are
+# visible without rebuilding anything.
+# See https://github.com/overhangio/tutor/issues/1543
+name: Scan published Docker images
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Every Monday at 6 AM UTC
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Scan a single image instead of the published ones (e.g. docker.io/overhangio/openedx:22.0.4-indigo)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  tags:
+    name: Resolve published image tags
+    runs-on: ubuntu-24.04
+    outputs:
+      images: ${{ steps.resolve.outputs.images }}
+    steps:
+      - name: Find the latest published tags on Docker Hub
+        id: resolve
+        shell: python
+        env:
+          MANUAL_IMAGE: ${{ inputs.image }}
+        run: |
+          import json
+          import os
+          import re
+          import urllib.request
+
+          def latest(repo: str, pattern: str) -> str:
+              """Return the highest published tag of `repo` matching `pattern`, or ""."""
+              url = f"https://hub.docker.com/v2/repositories/{repo}/tags?page_size=100"
+              with urllib.request.urlopen(url) as response:
+                  names = [tag["name"] for tag in json.load(response)["results"]]
+              matching = [name for name in names if re.fullmatch(pattern, name)]
+              if not matching:
+                  return ""
+              version = lambda name: [int(part) for part in name.split("-")[0].split(".")]
+              return f"docker.io/{repo}:{max(matching, key=version)}"
+
+          if os.environ["MANUAL_IMAGE"]:
+              images = [{"category": "trivy-manual", "image": os.environ["MANUAL_IMAGE"]}]
+          else:
+              images = [
+                  {"category": category, "image": image}
+                  for category, image in [
+                      ("trivy-openedx-release", latest("overhangio/openedx", r"\d+\.\d+\.\d+")),
+                      ("trivy-openedx-main", latest("overhangio/openedx", r"\d+\.\d+\.\d+-main")),
+                      ("trivy-permissions-release", latest("overhangio/openedx-permissions", r"\d+\.\d+\.\d+")),
+                  ]
+                  if image
+              ]
+          print("Images to scan:", json.dumps(images, indent=2))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"images={json.dumps(images)}\n")
+
+  scan:
+    name: Scan ${{ matrix.category }}
+    needs: tags
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.tags.outputs.images) }}
+    steps:
+      - name: Scan ${{ matrix.image }} with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ matrix.image }}
+          format: sarif
+          output: trivy.sarif
+          severity: CRITICAL,HIGH
+          # Most findings in these images have no released fix (e.g. Ubuntu kernel-header
+          # CVEs, which do not apply to containers anyway): they would drown the report in
+          # findings nobody can act on. Run trivy without this flag to see them.
+          ignore-unfixed: true
+      - name: Upload the report to the Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy.sarif
+          # The category identifies the image stream across runs, so a new release tag
+          # replaces last week's findings instead of creating a parallel report.
+          category: ${{ matrix.category }}
