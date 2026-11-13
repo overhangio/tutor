@@ -87,6 +87,15 @@ Files: ``apps/openedx/config/cms.env.yml``, ``apps/openedx/config/lms.env.yml``
 
 File: ``dev/docker-compose.jobs.yml``
 
+.. patch:: k8s-cronjobs
+
+``k8s-cronjobs``
+================
+
+File: ``k8s/cronjobs.yml``
+
+Add Kubernetes ``CronJob`` resources here. Give them the ``app.kubernetes.io/component: cronjob`` label so that ``tutor k8s start`` creates them and ``tutor k8s stop`` deletes them.
+
 .. patch:: k8s-deployments
 
 ``k8s-deployments``

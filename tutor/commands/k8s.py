@@ -359,7 +359,13 @@ def delete_resources(
 
     The load balancer is never deleted.
     """
-    resources = resources or ["deployments", "services", "configmaps", "jobs"]
+    resources = resources or [
+        "deployments",
+        "services",
+        "configmaps",
+        "jobs",
+        "cronjobs",
+    ]
     not_lb_selector = "app.kubernetes.io/component!=loadbalancer"
     name_selector = [f"app.kubernetes.io/name={name}"] if name else []
     utils.kubectl(
