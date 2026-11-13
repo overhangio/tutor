@@ -145,6 +145,18 @@ This defines the version that will be pulled from just the Open edX platform git
 
 By default, there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.io/en/latest/Options.html#processes>`__ to serve requests for the LMS and the CMS. However, each worker requires upwards of 500 Mb of RAM. You should reduce this value to 1 if your computer/server does not have enough memory.
 
+- ``OPENEDX_INIT_REINDEX_COURSES`` (default: ``true``)
+
+When enabled, ``tutor local/k8s launch`` and ``do init`` rebuild the courseware search index of all active courses with ``./manage.py cms reindex_course --active``. This step runs synchronously and can take a long time on instances with many courses. Set it to ``false`` to skip it; note that on-publish indexing only covers recently edited content, so you should then reindex courses on a schedule (see ``OPENEDX_REINDEX_COURSES_SCHEDULE`` below) or manually after importing courses or restoring Meilisearch data::
+
+    tutor local run cms ./manage.py cms reindex_course --active
+
+- ``OPENEDX_REINDEX_COURSES_SCHEDULE`` (default: ``""``)
+
+A `cron schedule expression <https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#schedule-syntax>`__, such as ``"0 1 * * *"`` for every day at 01:00. When set, ``tutor k8s start`` creates a ``cms-reindex-courses`` Kubernetes CronJob that runs ``./manage.py cms reindex_course --active`` on that schedule. Combine it with ``OPENEDX_INIT_REINDEX_COURSES: false`` to move course reindexing out of ``tutor k8s launch``. When you unset it later, run ``tutor k8s stop`` (or ``kubectl delete cronjob cms-reindex-courses``) to remove the existing CronJob. With ``tutor local``, which has no scheduler, add an equivalent entry to the host crontab instead::
+
+    0 1 * * * /path/to/tutor local exec cms ./manage.py cms reindex_course --active
+
 - ``OPENEDX_CELERY_REDIS_DB`` (default: ``0``)
 - ``OPENEDX_CACHE_REDIS_DB`` (default: ``1``)
 
