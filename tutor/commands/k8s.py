@@ -213,8 +213,18 @@ class K8sTaskRunner(BaseTaskRunner):
                 k8s_namespace(self.config),
                 label_selector="app.kubernetes.io/managed-by=tutor",
             ).items
-            if job.status.active
+            if job.status.active and not is_owned_by_cronjob(job)
         ]
+
+
+def is_owned_by_cronjob(job: Any) -> bool:
+    """
+    Jobs spawned by a CronJob inherit Tutor's labels, but they should not block
+    `do` commands: a scheduled task may legitimately run for hours.
+    """
+    return any(
+        owner.kind == "CronJob" for owner in (job.metadata.owner_references or [])
+    )
 
 
 class K8sContext(BaseTaskContext):
