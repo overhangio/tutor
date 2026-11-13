@@ -169,10 +169,11 @@ RUN $PIP_COMMAND install nodeenv==1.9.1
 RUN nodeenv /openedx/nodeenv --node=24.22.3 --prebuilt --clean-src
 # Node bundles an npm whose vendored dependencies (undici, brace-expansion) carry known
 # vulnerabilities; upgrade npm itself to a release that ships the fixed versions.
-RUN npm install -g npm@11.21.2
+ARG NPM_REGISTRY={{ NPM_REGISTRY }}
+RUN --mount=type=cache,target=/root/.npm,sharing=shared \
+    npm install -g npm@11.21.2 --registry=$NPM_REGISTRY
 
 # Install nodejs requirements
-ARG NPM_REGISTRY={{ NPM_REGISTRY }}
 WORKDIR /openedx/edx-platform
 RUN --mount=type=bind,from=edx-platform,source=/package.json,target=/openedx/edx-platform/package.json \
     --mount=type=bind,from=edx-platform,source=/package-lock.json,target=/openedx/edx-platform/package-lock.json \
