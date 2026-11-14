@@ -9,7 +9,7 @@ import click
 from tutor import exceptions, fmt, hooks, utils
 from tutor.__about__ import __app__, __version__
 from tutor.commands.config import config_command
-from tutor.commands.context import Context
+from tutor.commands.context import Context, ignore_plugin_errors
 from tutor.commands.dev import dev
 from tutor.commands.images import images_command
 from tutor.commands.k8s import k8s
@@ -30,6 +30,38 @@ def main() -> None:
     except exceptions.TutorError as e:
         fmt.echo_error(f"Error: {e.args[0]}")
         sys.exit(1)
+
+
+def check_plugin_errors(context: click.Context) -> None:
+    """
+    Check for plugin loading errors and exit with code 1 if any were found,
+    unless --ignore-plugin-errors is set.
+    """
+    errors: list[tuple[str, str]] = list(hooks.Filters.PLUGIN_ERRORS.iterate())
+    if not errors or context.invoked_subcommand is None:
+        return
+    subcommand = context.command.get_command(context, context.invoked_subcommand)
+    ignore = context.obj.ignore_plugin_errors or getattr(
+        subcommand, "ignore_plugin_errors", False
+    )
+
+    for plugin, error in errors:
+        if ignore:
+            fmt.echo_alert(f"Failed to enable plugin '{plugin}': {error}")
+        else:
+            fmt.echo_error(f"Plugin '{plugin}' failed to load: {error}")
+    # Only exit with an error code if:
+    #   - errors are not being ignored
+    #   - no exception has already been raised that would return its own error codek
+    if ignore:
+        return
+    match sys.exc_info()[1]:
+        case None:
+            sys.exit(1)
+        case SystemExit(code=code) | click.exceptions.Exit(exit_code=code) if code == 0:
+            sys.exit(1)
+        case _:
+            return
 
 
 class TutorCli(click.Group):
@@ -99,20 +131,37 @@ class TutorCli(click.Group):
     is_flag=True,
     help="Print this help",
 )
+@click.option(
+    "--ignore-plugin-errors",
+    "ignore_plugin_errors",
+    is_flag=True,
+    default=False,
+    help="Continue running even if plugin loading fails",
+)
 @click.pass_context
-def cli(context: click.Context, root: str, show_help: bool) -> None:
+def cli(
+    context: click.Context, root: str, show_help: bool, ignore_plugin_errors: bool
+) -> None:
     if utils.is_root():
         fmt.echo_alert(
             "You are running Tutor as root. This is strongly not recommended. If you are doing this in order to access"
             " the Docker daemon, you should instead add your user to the 'docker' group. (see https://docs.docker.com"
             "/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user)"
         )
-    context.obj = Context(root)
+    context.obj = Context(root, ignore_plugin_errors)
     context.help_option_names = ["-h", "--help"]
+    # If showing help, don't check plugin errors
+    is_showing_help = show_help or context.invoked_subcommand in (
+        None,
+        help_command.name,
+    )
+    if not is_showing_help:
+        check_plugin_errors(context)
     if context.invoked_subcommand is None or show_help:
         click.echo(context.get_help())
 
 
+@ignore_plugin_errors
 @click.command(help="Print this help", name="help")
 @click.pass_context
 def help_command(context: click.Context) -> None:
