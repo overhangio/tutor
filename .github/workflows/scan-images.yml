@@ -56,6 +56,9 @@ jobs:
                   for category, image in [
                       ("trivy-openedx-release", latest("overhangio/openedx", r"\d+\.\d+\.\d+")),
                       ("trivy-openedx-main", latest("overhangio/openedx", r"\d+\.\d+\.\d+-main")),
+                      # Indigo is enabled by default, so most installs actually run these images.
+                      ("trivy-openedx-indigo-release", latest("overhangio/openedx", r"\d+\.\d+\.\d+-indigo")),
+                      ("trivy-openedx-indigo-main", latest("overhangio/openedx", r"\d+\.\d+\.\d+-main-indigo")),
                       ("trivy-permissions-release", latest("overhangio/openedx-permissions", r"\d+\.\d+\.\d+")),
                   ]
                   if image
@@ -74,8 +77,12 @@ jobs:
         include: ${{ fromJSON(needs.tags.outputs.images) }}
     steps:
       - name: Scan ${{ matrix.image }} with Trivy
-        uses: aquasecurity/trivy-action@v0.36.0
+        # Pinned to a commit because trivy-action version tags were force-pushed to
+        # malicious commits in March 2026; Dependabot keeps the pin up to date.
+        # https://github.com/aquasecurity/trivy-action
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
+          version: v0.76.2
           image-ref: ${{ matrix.image }}
           format: sarif
           output: trivy.sarif
