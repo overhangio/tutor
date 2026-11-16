@@ -16,7 +16,7 @@ from tutor.plugins import indexes
 from tutor.plugins.base import PLUGINS_ROOT, PLUGINS_ROOT_ENV_VAR_NAME
 from tutor.types import Config
 
-from .context import Context
+from .context import Context, ignore_plugin_errors
 
 
 class PluginName(click.ParamType[str]):
@@ -74,6 +74,7 @@ class IndexPluginNameOrLocation(IndexPluginName):
         return autocompleted
 
 
+@ignore_plugin_errors
 @click.group(
     name="plugins",
     short_help="Manage Tutor plugins",
