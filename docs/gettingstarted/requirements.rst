@@ -35,6 +35,8 @@ To prevent conflicts with other Python packages and maintain a clean environment
 
 For more details on virtual environments, refer to the official `Python documentation <https://docs.python.org/3/library/venv.html>`_.
 
+.. _dns_records:
+
 Configuring DNS records
 -----------------------
 

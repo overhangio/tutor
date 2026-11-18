@@ -280,6 +280,11 @@ Press enter when you are ready to continue"""
             cms_host=config["CMS_HOST"],
         )
     )
+    utils.warn_https_certificates(
+        config,
+        storage='the "caddy" persistent volume claim',
+        logs_command="tutor k8s logs -f caddy",
+    )
 
 
 @click.command(

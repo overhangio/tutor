@@ -6,10 +6,34 @@ from io import StringIO
 from typing import List, Tuple
 from unittest.mock import MagicMock, mock_open, patch
 
-from tutor import exceptions, utils
+from tutor import exceptions, fmt, utils
 
 
 class UtilsTests(unittest.TestCase):
+    @patch.object(fmt, "echo")
+    def test_warn_https_certificates(self, echo: MagicMock) -> None:
+        def warn(enable_https: bool, enable_web_proxy: bool) -> List[str]:
+            echo.reset_mock()
+            utils.warn_https_certificates(
+                {"ENABLE_HTTPS": enable_https, "ENABLE_WEB_PROXY": enable_web_proxy},
+                storage="/tutor/data/caddy",
+                logs_command="tutor local logs -f caddy",
+            )
+            return [str(call.args[0]) for call in echo.call_args_list]
+
+        # Caddy generates the certificates: warn
+        alerts = warn(True, True)
+        self.assertEqual(1, len(alerts))
+        self.assertIn("rate limits", alerts[0])
+        self.assertIn("Do not delete /tutor/data/caddy", alerts[0])
+        self.assertIn("`tutor local logs -f caddy`", alerts[0])
+        self.assertIn("#letsencrypt-rate-limits", alerts[0])
+
+        # Plain http, or certificates managed by an external web proxy: no warning
+        self.assertEqual([], warn(False, True))
+        self.assertEqual([], warn(True, False))
+        self.assertEqual([], warn(False, False))
+
     def test_common_domain(self) -> None:
         self.assertEqual(
             "domain.com", utils.common_domain("sub1.domain.com", "sub2.domain.com")

@@ -22,6 +22,7 @@ from Crypto.PublicKey import RSA
 from Crypto.PublicKey.RSA import RsaKey
 
 from . import exceptions, fmt
+from .types import Config, get_typed
 
 
 def encrypt(text: str) -> str:
@@ -244,6 +245,37 @@ def check_output(*command: str) -> bytes:
         return subprocess.check_output(command)
     except Exception as e:
         raise exceptions.TutorError(f"Command failed: {literal_command}") from e
+
+
+def warn_https_certificates(config: Config, storage: str, logs_command: str) -> None:
+    """
+    When Caddy generates SSL/TLS certificates, warn the user about the Let's
+    Encrypt rate limits.
+
+    Caddy requests one certificate per domain name, and plugins add domain
+    names of their own, so these limits are reached sooner as the platform
+    grows. Caddy registers a single Let's Encrypt account, which it stores
+    together with the certificates: wiping that storage on every re-install
+    makes it request a new account and all certificates again.
+
+    Arguments:
+        storage: where Caddy stores its data, as it should be shown to the user.
+        logs_command: the command that prints the logs of the Caddy container.
+    """
+    if not (
+        get_typed(config, "ENABLE_HTTPS", bool, False)
+        and get_typed(config, "ENABLE_WEB_PROXY", bool, True)
+    ):
+        return
+    fmt.echo_alert(
+        f"""SSL/TLS certificates are generated automatically by Let's Encrypt, one for each domain name of the platform, including the domain names that are added by plugins. Let's Encrypt enforces rate limits, which are reached sooner as the number of domain names grows, and which can block certificate generation for hours or even days. To stay within these limits:
+
+- Make sure that the DNS records of all domain names point to this server: failed validations count towards the limits.
+- Do not delete {storage} when you re-install the platform: it stores the certificates and the Let's Encrypt account, which would otherwise be requested again.
+
+If HTTPS access does not work, check the logs with `{logs_command}`. See:
+https://docs.tutor.edly.io/troubleshooting.html#letsencrypt-rate-limits"""
+    )
 
 
 def warn_macos_docker_memory() -> None:
