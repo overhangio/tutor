@@ -52,11 +52,11 @@ fi
 # Completion tracking: add green ticks to every completed unit
 (./manage.py lms waffle_switch --list | grep completion.enable_completion_tracking) || ./manage.py lms waffle_switch --create completion.enable_completion_tracking on
 
-# Load default policies for the Open edX Authorization framework
-# Check if openedx-authz package is installed if not skip loading policies and exit
+# Load static role/permission definitions for the Open edX Authorization framework
+# Check if openedx-authz package is installed; otherwise skip schema loading and exit
 if python -c "import pkg_resources; pkg_resources.require('openedx-authz')" 2>/dev/null; then
-    ./manage.py lms load_policies
+    ./manage.py lms load_authz_schema
 else
-    echo "openedx-authz package is not installed, skipping loading default policies"
+    echo "openedx-authz package is not installed, skipping authorization schema loading"
     exit 1
 fi
