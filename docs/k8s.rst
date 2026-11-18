@@ -42,6 +42,10 @@ Use this external IP to configure your DNS records. Once the DNS records are con
 
     tutor k8s logs -f caddy
 
+You can also list the certificates that Caddy has obtained, and the ones that it has yet to request, with::
+
+    tutor k8s https-certificates
+
 If for some reason, you would like to deploy your own load balancer, you should set ``ENABLE_WEB_PROXY=false`` just like in the :ref:`local installation <web_proxy>`. Then, point your load balancer at the "caddy" service, which will be a `ClusterIP <https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types>`__.
 
 S3-like object storage with `MinIO <https://www.minio.io/>`__

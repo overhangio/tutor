@@ -68,12 +68,13 @@ class ComposeTaskRunner(BaseComposeTaskRunner):
         """
         return utils.docker_compose(*self._get_docker_compose_args(*command))
 
-    def docker_compose_output(self, *command: str) -> bytes:
+    def docker_compose_output(self, *command: str, echo: bool = True) -> bytes:
         """
         Same as the docker_compose method except that it returns the command output.
+        The command is printed first, unless `echo` is False.
         """
         return utils.check_output(
-            "docker", "compose", *self._get_docker_compose_args(*command)
+            "docker", "compose", *self._get_docker_compose_args(*command), echo=echo
         )
 
     def run_task(self, service: str, command: str) -> int:
@@ -170,6 +171,7 @@ def launch(
             config,
             storage=tutor_env.data_path(context.obj.root, "caddy"),
             logs_command="tutor local logs -f caddy",
+            certificates_command="tutor local https-certificates",
         )
 
 
