@@ -60,6 +60,12 @@ When ``ENABLE_HTTPS`` and ``ENABLE_WEB_PROXY`` are ``true``, the Caddy container
     # or, on Kubernetes:
     tutor k8s logs --tail=100 caddy
 
+To list the certificates that Caddy has obtained, with their expiration and renewal dates, as well as the ones that it has yet to request, run the command below. Renewals do not count towards the limit of new certificates per registered domain, and the renewals that Caddy coordinates with `ACME Renewal Information (ARI) <https://letsencrypt.org/docs/rate-limits/>`__, as it does by default, are exempt from all Let's Encrypt rate limits. ::
+
+    tutor local https-certificates
+    # or, on Kubernetes:
+    tutor k8s https-certificates
+
 Errors of type "urn:ietf:params:acme:error:rateLimited", with messages such as "too many certificates already issued", "too many failed authorizations" or "too many registrations for this IP", mean that you reached one of the Let's Encrypt `rate limits <https://letsencrypt.org/docs/rate-limits/>`__. Caddy will keep trying, less and less often, and it will obtain the certificates once the limit is refilled, which can take from a few minutes to a few days. In most cases, there is nothing to do but wait. To avoid reaching these limits in the first place:
 
 - Create the DNS records of all domain names before you launch the platform (see :ref:`dns_records`): a wildcard CNAME record for the subdomains of ``LMS_HOST`` covers the domain names that are added by plugins, too. Let's Encrypt only allows 5 failed validations per domain name per hour.

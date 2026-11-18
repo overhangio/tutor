@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import click
 
+from tutor import caddy, hooks
+from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import hooks
 from tutor.commands import compose
 from tutor.types import Config, get_typed
 
@@ -52,4 +53,29 @@ def _stop_on_dev_start(root: str, config: Config, project_name: str) -> None:
         runner.docker_compose("stop")
 
 
+@click.command(
+    name="https-certificates",
+    short_help=caddy.COMMAND_SHORT_HELP,
+    help=caddy.COMMAND_HELP,
+)
+@click.pass_obj
+def https_certificates(context: LocalContext) -> None:
+    config = tutor_config.load(context.root)
+    runner = context.job_runner(config)
+
+    def run_script(script: str) -> bytes:
+        return runner.docker_compose_output(
+            "exec", "-T", "caddy", "sh", "-c", script, echo=False
+        )
+
+    caddy.print_certificates(
+        config,
+        run_script,
+        start_command="tutor local start -d caddy",
+        restart_command="tutor local reboot -d caddy",
+        logs_command="tutor local logs --tail=100 caddy",
+    )
+
+
 compose.add_commands(local)
+local.add_command(https_certificates)

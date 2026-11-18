@@ -3,8 +3,9 @@ import tempfile
 import typing as t
 import unittest
 import unittest.result
+from datetime import datetime, timezone
 
-from tutor import hooks
+from tutor import caddy, hooks
 from tutor.commands.context import BaseTaskContext
 from tutor.core.hooks.contexts import enter as enter_context
 from tutor.tasks import BaseTaskRunner
@@ -76,3 +77,37 @@ class PluginsTestCase(unittest.TestCase):
         """
         with enter_context("unittests"):
             return super().run(result=result)
+
+
+def fixture(name: str) -> str:
+    """
+    Content of a file from tests/fixtures.
+    """
+    with open(
+        os.path.join(os.path.dirname(__file__), "fixtures", name), encoding="utf-8"
+    ) as f:
+        return f.read()
+
+
+def utc(
+    year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0
+) -> datetime:
+    return datetime(year, month, day, hour, minute, second, tzinfo=timezone.utc)
+
+
+def caddy_output(
+    adapted: str,
+    running: str = "",
+    certificates: t.Optional[list[tuple[str, str, str]]] = None,
+    default_site_port: str = "",
+) -> str:
+    """
+    Output of the script that runs in the Caddy container to list its certificates.
+    Certificates are (path, crt, json) tuples.
+    """
+    sep = caddy.SEPARATOR
+    output = f"{sep} default-site-port {default_site_port}\n{sep} adapted\n{adapted}\n"
+    output += f"{sep} adapt-status 0\n\n{sep} running\n{running}\n"
+    for path, crt, metadata in certificates or []:
+        output += f"{sep} crt {path}\n{crt}\n{sep} json\n{metadata}\n"
+    return output + f"{sep} end\n"

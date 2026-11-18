@@ -6,9 +6,9 @@ from typing import Any, Iterable, List, Optional, Type
 
 import click
 
+from tutor import caddy, exceptions, fmt, hooks, serialize, utils
 from tutor import config as tutor_config
 from tutor import env as tutor_env
-from tutor import exceptions, fmt, hooks, serialize, utils
 from tutor import interactive as interactive_config
 from tutor.commands import jobs
 from tutor.commands.config import save as config_save_command
@@ -284,6 +284,7 @@ Press enter when you are ready to continue"""
         config,
         storage='the "caddy" persistent volume claim',
         logs_command="tutor k8s logs -f caddy",
+        certificates_command="tutor k8s https-certificates",
     )
 
 
@@ -600,6 +601,39 @@ def status(context: K8sContext) -> int:
     return utils.kubectl("get", "all", *resource_namespace_selector(config))
 
 
+@click.command(
+    name="https-certificates",
+    short_help=caddy.COMMAND_SHORT_HELP,
+    help=caddy.COMMAND_HELP,
+)
+@click.pass_obj
+def https_certificates(context: K8sContext) -> None:
+    config = tutor_config.load(context.root)
+
+    def run_script(script: str) -> bytes:
+        return utils.check_output(
+            "kubectl",
+            "exec",
+            *resource_namespace_selector(config),
+            "deployment/caddy",
+            "--container=caddy",
+            "--",
+            "sh",
+            "-c",
+            script,
+            echo=False,
+        )
+
+    utils.check_kubectl()
+    caddy.print_certificates(
+        config,
+        run_script,
+        start_command="tutor k8s start caddy",
+        restart_command="tutor k8s start caddy",
+        logs_command="tutor k8s logs --tail=100 caddy",
+    )
+
+
 def kubectl_exec(config: Config, service: str, command: List[str]) -> int:
     selector = f"app.kubernetes.io/name={service}"
     pods = K8sClients.instance().core_api.list_namespaced_pod(
@@ -670,6 +704,7 @@ k8s.add_command(wait)
 k8s.add_command(upgrade)
 k8s.add_command(apply_command)
 k8s.add_command(status)
+k8s.add_command(https_certificates)
 
 
 @hooks.Actions.PLUGINS_LOADED.add()
