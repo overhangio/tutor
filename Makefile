@@ -20,7 +20,7 @@ build-pythonpackage: ## Build the "tutor" python package for upload to pypi
 	python -m build --sdist
 
 push-pythonpackage: ## Push python package to pypi
-	twine upload --verbose --skip-existing dist/tutor-$(shell make version).tar.gz
+	twine upload --verbose --skip-existing dist/tutor-$(shell $(MAKE) --no-print-directory version).tar.gz
 
 test: test-lint test-unit test-types test-format test-pythonpackage ## Run all tests by decreasing order of priority
 
@@ -39,7 +39,7 @@ test-types: ## Check type definitions
 	mypy --exclude=templates --ignore-missing-imports --implicit-reexport --strict ${SRC_DIRS}
 
 test-pythonpackage: build-pythonpackage ## Test that package can be uploaded to pypi
-	twine check dist/tutor-$(shell make version).tar.gz
+	twine check dist/tutor-$(shell $(MAKE) --no-print-directory version).tar.gz
 
 test-k8s: ## Validate the k8s format with kubectl. Not part of the standard test suite.
 	tutor k8s apply --dry-run=client --validate=true
