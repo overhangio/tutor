@@ -36,9 +36,11 @@ This will perform several tasks. It will:
 
 Additionally, when a local clone of edx-platform is bind-mounted, it will:
 
-* re-run setup.py,
-* clean-reinstall Node modules, and
-* regenerate static assets.
+* re-install edx-platform in editable mode, if the package metadata (``pyproject.toml``, ``setup.py``, ``setup.cfg``) changed,
+* clean-reinstall Node modules, if ``package.json``, ``package-lock.json`` or the Node.js version changed, and
+* regenerate static assets, if frontend sources, theme sources or compiled theme files changed.
+
+Steps whose inputs did not change since the previous ``launch`` are skipped. To force all of them to run again, delete the ``node_modules`` folder of your edx-platform clone.
 
 Once setup is complete, the platform will be running in the background:
 
