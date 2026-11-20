@@ -61,6 +61,7 @@ class K8sTests(unittest.TestCase, TestCommandMixin):
         cronjobs = [m for m in manifests if m and m["kind"] == "CronJob"]
         self.assertEqual(1, len(cronjobs))
         self.assertEqual('0 1 * * * "quoted"', cronjobs[0]["spec"]["schedule"])
+        self.assertEqual(1, cronjobs[0]["spec"]["jobTemplate"]["spec"]["backoffLimit"])
 
     def test_init_reindex_courses(self) -> None:
         config = _config()

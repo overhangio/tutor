@@ -147,7 +147,7 @@ By default, there are 2 `uwsgi worker processes <https://uwsgi-docs.readthedocs.
 
 - ``OPENEDX_INIT_REINDEX_COURSES`` (default: ``true``)
 
-When enabled, ``tutor local/k8s launch`` and ``do init`` rebuild the courseware search index of all active courses with ``./manage.py cms reindex_course --active``. This step runs synchronously and can take a long time on instances with many courses. Set it to ``false`` to skip it; note that on-publish indexing only covers recently edited content, so you should then reindex courses on a schedule (see ``OPENEDX_REINDEX_COURSES_SCHEDULE`` below) or manually after importing courses or restoring Meilisearch data::
+When enabled, ``tutor local/k8s/dev launch`` and ``do init`` rebuild the courseware search index of all active courses with ``./manage.py cms reindex_course --active``. This step runs synchronously and can take a long time on instances with many courses. Set it to ``false`` to skip it; note that on-publish indexing only covers recently edited content, so you should then reindex courses on a schedule (see ``OPENEDX_REINDEX_COURSES_SCHEDULE`` below) or manually after importing courses or restoring Meilisearch data::
 
     tutor local run cms ./manage.py cms reindex_course --active
 
