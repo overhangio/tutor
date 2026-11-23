@@ -11,11 +11,12 @@ import click.shell_completion
 from tutor import config as tutor_config
 from tutor import env, exceptions, fmt, hooks, serialize, utils
 from tutor import interactive as interactive_config
-from tutor.commands.context import Context
+from tutor.commands.context import Context, ignore_plugin_errors
 from tutor.commands.params import ConfigLoaderParam, ParamValue
 from tutor.types import Config, ConfigValue
 
 
+@ignore_plugin_errors
 @click.group(
     name="config",
     short_help="Configure Open edX",
