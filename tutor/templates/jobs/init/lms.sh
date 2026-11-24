@@ -15,30 +15,6 @@ echo "Loading settings $DJANGO_SETTINGS_MODULE"
 
 ./manage.py lms migrate
 
-# Create meilisearch indexes
-./manage.py lms shell -c "import search.meilisearch; search.meilisearch.create_indexes()"
-
-# Create oauth2 apps for CMS SSO
-# https://github.com/openedx/edx-platform/blob/master/docs/guides/studio_oauth.rst
-./manage.py lms manage_user cms cms@openedx --unusable-password
-./manage.py lms create_dot_application \
-  --grant-type authorization-code \
-  --redirect-uris "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ CMS_HOST }}/complete/edx-oauth2/" \
-  --client-id {{ CMS_OAUTH2_KEY_SSO }} \
-  --client-secret {{ CMS_OAUTH2_SECRET }} \
-  --scopes user_id \
-  --skip-authorization \
-  --update cms-sso cms
-./manage.py lms create_dot_application \
-  --grant-type authorization-code \
-  --redirect-uris "http://{{ CMS_HOST }}:8001/complete/edx-oauth2/" \
-  --client-id {{ CMS_OAUTH2_KEY_SSO_DEV }} \
-  --client-secret {{ CMS_OAUTH2_SECRET }} \
-  --scopes user_id \
-  --skip-authorization \
-  --update cms-sso-dev cms
-
-
 # Fix incorrect uploaded file path
 if [ -d /openedx/data/uploads/ ]; then
   if [ -n "$(ls -A /openedx/data/uploads/)" ]; then
@@ -48,15 +24,31 @@ if [ -d /openedx/data/uploads/ ]; then
   fi
 fi
 
+# Run all remaining steps in a single Django process: each `./manage.py` call boots
+# Django from scratch, which takes several seconds.
+cat <<'TUTOR_LMS_INIT_EOF' > /tmp/tutor_lms_init.py
+from django.core.management import call_command
+
+# Create meilisearch indexes
+import search.meilisearch
+search.meilisearch.create_indexes()
+
+# Service users, OAuth2 applications and waffle flags declared by Tutor and plugins
+{{ openedx_lms_init_script() }}
+
 # Create waffle switches to enable some features, if they have not been explicitly defined before
 # Completion tracking: add green ticks to every completed unit
-(./manage.py lms waffle_switch --list | grep completion.enable_completion_tracking) || ./manage.py lms waffle_switch --create completion.enable_completion_tracking on
+from waffle import get_waffle_switch_model
+if not get_waffle_switch_model().objects.filter(name="completion.enable_completion_tracking").exists():
+    call_command("waffle_switch", "completion.enable_completion_tracking", "on", "--create")
 
 # Load default policies for the Open edX Authorization framework
-# Check if openedx-authz package is installed if not skip loading policies and exit
-if python -c "import pkg_resources; pkg_resources.require('openedx-authz')" 2>/dev/null; then
-    ./manage.py lms load_policies
-else
-    echo "openedx-authz package is not installed, skipping loading default policies"
-    exit 1
-fi
+import importlib.metadata
+try:
+    importlib.metadata.distribution("openedx-authz")
+except importlib.metadata.PackageNotFoundError:
+    print("openedx-authz package is not installed, skipping loading default policies")
+    raise SystemExit(1)
+call_command("load_policies")
+TUTOR_LMS_INIT_EOF
+./manage.py lms shell -c "$(cat /tmp/tutor_lms_init.py)"
