@@ -124,7 +124,9 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=lms",
     )
-    k8s.wait_for_deployment_ready(config, "lms")
+    # The pod cannot be ready until migrations have run: we only need it to run
+    # to exec commands.
+    k8s.wait_for_pod_running(config, "lms")
 
     # Command backpopulate_user_tours
     k8s.kubectl_exec(
@@ -140,7 +142,9 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=cms",
     )
-    k8s.wait_for_deployment_ready(config, "cms")
+    # The pod cannot be ready until migrations have run: we only need it to run
+    # to exec commands.
+    k8s.wait_for_pod_running(config, "cms")
 
     # Command backfill_course_tabs
     k8s.kubectl_exec(
@@ -172,7 +176,9 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=lms",
     )
-    k8s.wait_for_deployment_ready(config, "lms")
+    # The pod cannot be ready until migrations have run: we only need it to run
+    # to exec commands.
+    k8s.wait_for_pod_running(config, "lms")
     k8s.kubectl_exec(
         config,
         "lms",

@@ -183,3 +183,36 @@ Plugins can customize any Kubernetes resource in Tutor by overriding the definit
         requests:
           storage: 10Gi
 
+
+Tuning health probes
+~~~~~~~~~~~~~~~~~~~~
+
+The lms and cms Deployments define a readiness probe on the ``/heartbeat`` endpoint, which checks the connection to MySQL and MongoDB: pods only receive traffic once they can serve requests. The mysql, mongodb, redis and meilisearch Deployments define startup, readiness and liveness probes. Database probes are plain TCP checks, and their startup probes allow 30 minutes, so that long crash recoveries are not interrupted. Probes can be tuned or removed with the same :patch:`k8s-override` patch. For instance, to give LMS pods more time to recover from a database outage before they stop receiving traffic, and to remove the MongoDB liveness probe::
+
+    # myplugin/tutormyplugin/patches/k8s-override
+
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: lms
+    spec:
+      template:
+        spec:
+          containers:
+            - name: lms
+              readinessProbe:
+                failureThreshold: 30
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: mongodb
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mongodb
+              livenessProbe: null
+
+.. note::
+    The lms and cms probes send requests with the ``lms`` and ``cms`` ``Host`` headers. If a plugin overrides the ``ALLOWED_HOSTS`` Django setting, it should keep these values, otherwise the probes will fail.

@@ -626,6 +626,30 @@ def kubectl_exec(config: Config, service: str, command: List[str]) -> int:
     )
 
 
+def wait_for_pod_running(config: Config, service: str, timeout: int = 600) -> None:
+    """
+    Wait for a pod of the service to run, whether it is ready or not.
+
+    This is useful to exec commands in pods that cannot be ready yet, for instance
+    because their readiness probe queries databases that are not upgraded yet.
+    """
+    fmt.echo_info(f"Waiting for a {service} pod to be running...")
+    for _ in range(max(1, timeout // 2)):
+        pods = K8sClients.instance().core_api.list_namespaced_pod(
+            namespace=k8s_namespace(config),
+            label_selector=f"app.kubernetes.io/name={service}",
+        )
+        if any(
+            pod.status.phase == "Running" and pod.metadata.deletion_timestamp is None
+            for pod in pods.items
+        ):
+            return
+        sleep(2)
+    raise exceptions.TutorError(
+        f"Timed out after {timeout}s while waiting for a {service} pod to be running"
+    )
+
+
 def wait_for_deployment_ready(config: Config, service: str) -> None:
     fmt.echo_info(f"Waiting for a {service} deployment to be ready...")
     utils.kubectl(
