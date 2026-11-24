@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -78,7 +79,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             script,
         )
         secret = 'local.openedx.io\'s "secret" \U0001f600'
-        self.assertIn(f"'--client-secret', {secret!r}", script)
+        self.assertIn(repr(f"--client-secret={secret}"), script)
         self.assertIn(
             "call_command('waffle_flag', 'myplugin.enabled', '--create', '--everyone')",
             script,
@@ -92,8 +93,38 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             script.index("'manage_user', 'myplugin'"),
             script.index("'myplugin-sso', 'myplugin')"),
         )
+        # Items are created after core init steps
+        self.assertLess(
+            script.index('call_command("load_policies")'),
+            script.index("'manage_user', 'myplugin'"),
+        )
         # All items are created in a single Django process
         self.assertEqual(1, script.count("./manage.py lms shell"))
+        self.assert_valid_python_scripts(script)
+
+    def test_initialise_cms_script(self) -> None:
+        hooks.Actions.CORE_READY.do()
+        tasks = self._run_init("--limit=cms")
+        self.assertEqual(["cms-job"], [service for service, _ in tasks])
+        self.assertEqual(1, tasks[0][1].count("./manage.py cms shell"))
+        self.assert_valid_python_scripts(tasks[0][1])
+
+    def test_initialise_limit_lms_includes_plugin_items_once(self) -> None:
+        hooks.Actions.CORE_READY.do()
+        self._add_lms_init_items()
+        tasks = self._run_init("--limit=lms")
+        # mounted-directories.sh + lms.sh, no extra task for the items
+        self.assertEqual(["lms-job", "lms-job"], [service for service, _ in tasks])
+        self.assertIn("'manage_user', 'myplugin'", tasks[1][1])
+
+    def assert_valid_python_scripts(self, script: str) -> None:
+        """
+        Check that the Python scripts written in heredocs are valid code.
+        """
+        bodies = re.findall(r"<<'(\w+)' > \S+\.py\n(.*?)\n\1\n", script, re.DOTALL)
+        self.assertTrue(bodies)
+        for _delimiter, body in bodies:
+            compile(body, "<init script>", "exec")
 
     def test_initialise_limit_runs_plugin_lms_init_items(self) -> None:
         hooks.Actions.CORE_READY.do()
@@ -103,6 +134,7 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
         tasks = self._run_init("--limit=myplugin")
         self.assertEqual(["lms-job", "myplugin-job"], [service for service, _ in tasks])
         script = tasks[0][1]
+        self.assert_valid_python_scripts(script)
         self.assertIn("'manage_user', 'myplugin'", script)
         self.assertIn("'myplugin-sso', 'myplugin')", script)
         # Core items are not included
@@ -136,6 +168,26 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
         with self.assertRaises(TutorError) as context:
             lms_init_script_template()
         self.assertIn("OPENEDX_WAFFLE_FLAGS", str(context.exception))
+
+    def test_lms_init_script_invalid_item_type(self) -> None:
+        hooks.Filters.OPENEDX_SERVICE_USERS.add_item("notes")  # type: ignore[arg-type]
+        with self.assertRaises(TutorError) as context:
+            lms_init_script_template()
+        self.assertIn("expected a dict", str(context.exception))
+
+    def test_lms_init_script_template_syntax_error(self) -> None:
+        hooks.Actions.CORE_READY.do()
+        with hooks.Contexts.app("myplugin").enter():
+            hooks.Filters.OPENEDX_SERVICE_USERS.add_item({"username": "{{ oops"})
+            hooks.Filters.CLI_DO_INIT_TASKS.add_item(("myplugin", "echo myplugin"))
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            with patch("tutor.utils.docker_compose"):
+                result = self.invoke_in_root(
+                    root, ["local", "do", "init", "--limit=myplugin"]
+                )
+        self.assertIsInstance(result.exception, TutorError)
+        self.assertIn("OPENEDX_SERVICE_USERS", str(result.exception))
 
     def test_lms_init_script_missing_required_key(self) -> None:
         hooks.Filters.OPENEDX_SERVICE_USERS.add_item({"staff": True})

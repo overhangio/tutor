@@ -321,7 +321,7 @@ def lms_init_script_template(context_name: t.Optional[str] = None) -> str:
     lines: list[str] = []
 
     for user in hooks.Filters.OPENEDX_SERVICE_USERS.iterate_from_context(context_name):
-        user = dict(user)
+        user = _copy_dict(user, "OPENEDX_SERVICE_USERS")
         username = _pop_required(user, "username", "OPENEDX_SERVICE_USERS")
         email = user.pop("email", f"{username}@openedx")
         args = [_py_str(username, "OPENEDX_SERVICE_USERS", "username")]
@@ -335,15 +335,20 @@ def lms_init_script_template(context_name: t.Optional[str] = None) -> str:
     for application in hooks.Filters.OPENEDX_OAUTH2_APPLICATIONS.iterate_from_context(
         context_name
     ):
-        application = dict(application)
+        application = _copy_dict(application, "OPENEDX_OAUTH2_APPLICATIONS")
         name = _pop_required(application, "name", "OPENEDX_OAUTH2_APPLICATIONS")
         username = _pop_required(application, "user", "OPENEDX_OAUTH2_APPLICATIONS")
         args = [repr("--update")]
         for key, option in _OAUTH2_APPLICATION_STRING_OPTIONS.items():
             if key in application:
                 value = application.pop(key)
-                args.append(repr(option))
-                args.append(_py_str(value, "OPENEDX_OAUTH2_APPLICATIONS", key))
+                # "--option=value" such that values that start with "-" are not
+                # parsed as options.
+                args.append(
+                    _py_str(
+                        value, "OPENEDX_OAUTH2_APPLICATIONS", key, prefix=f"{option}="
+                    )
+                )
         args += _pop_bool_options(
             application, _OAUTH2_APPLICATION_BOOL_OPTIONS, "OPENEDX_OAUTH2_APPLICATIONS"
         )
@@ -395,7 +400,13 @@ def openedx_lms_init_script(
     # Note that overlay() shares the filters dict with its parent, so we copy it.
     environment = context.environment.overlay()
     environment.filters = {**environment.filters, "tutor_python_str": repr}
-    return environment.from_string(template).render(context.get_all())
+    try:
+        return environment.from_string(template).render(context.get_all())
+    except jinja2.exceptions.TemplateSyntaxError as e:
+        raise exceptions.TutorError(
+            "Template syntax error in the OPENEDX_SERVICE_USERS, "
+            f"OPENEDX_OAUTH2_APPLICATIONS or OPENEDX_WAFFLE_FLAGS items: {e.message}"
+        ) from e
 
 
 hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(
@@ -407,15 +418,23 @@ def _call_command(command: str, args: list[str]) -> str:
     return f"call_command({command!r}, {', '.join(args)})"
 
 
-def _py_str(value: t.Any, filter_name: str, key: str) -> str:
+def _copy_dict(item: t.Any, filter_name: str) -> dict[str, t.Any]:
+    if not isinstance(item, dict):
+        raise exceptions.TutorError(
+            f"Invalid {filter_name} item: expected a dict, got {item!r}"
+        )
+    return dict(item)
+
+
+def _py_str(value: t.Any, filter_name: str, key: str, prefix: str = "") -> str:
     """
-    Return a Jinja template that renders `value` as a Python string literal.
+    Return a Jinja template that renders `prefix + value` as a Python string literal.
     """
     if not isinstance(value, str):
         raise exceptions.TutorError(
             f"Invalid '{key}' in {filter_name} item: expected a string, got {value!r}"
         )
-    return "{% filter tutor_python_str %}" + value + "{% endfilter %}"
+    return "{% filter tutor_python_str %}" + prefix + value + "{% endfilter %}"
 
 
 def _pop_required(item: dict[str, t.Any], key: str, filter_name: str) -> str:

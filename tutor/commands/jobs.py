@@ -114,7 +114,7 @@ LMS_INIT_LIMITED_TEMPLATE = """cat <<'TUTOR_LMS_INIT_EOF' > /tmp/tutor_lms_init.
 from django.core.management import call_command
 {{{{ openedx_lms_init_script({limit}) }}}}
 TUTOR_LMS_INIT_EOF
-./manage.py lms shell -c "$(cat /tmp/tutor_lms_init.py)"
+PYTHONUNBUFFERED=1 ./manage.py lms shell -c "$(cat /tmp/tutor_lms_init.py)"
 """
 
 

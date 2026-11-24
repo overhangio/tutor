@@ -33,9 +33,6 @@ from django.core.management import call_command
 import search.meilisearch
 search.meilisearch.create_indexes()
 
-# Service users, OAuth2 applications and waffle flags declared by Tutor and plugins
-{{ openedx_lms_init_script() }}
-
 # Create waffle switches to enable some features, if they have not been explicitly defined before
 # Completion tracking: add green ticks to every completed unit
 from waffle import get_waffle_switch_model
@@ -46,9 +43,17 @@ if not get_waffle_switch_model().objects.filter(name="completion.enable_completi
 import importlib.metadata
 try:
     importlib.metadata.distribution("openedx-authz")
+    openedx_authz_installed = True
 except importlib.metadata.PackageNotFoundError:
+    openedx_authz_installed = False
+if openedx_authz_installed:
+    call_command("load_policies")
+
+# Service users, OAuth2 applications and waffle flags declared by Tutor and plugins
+{{ openedx_lms_init_script() }}
+
+if not openedx_authz_installed:
     print("openedx-authz package is not installed, skipping loading default policies")
     raise SystemExit(1)
-call_command("load_policies")
 TUTOR_LMS_INIT_EOF
-./manage.py lms shell -c "$(cat /tmp/tutor_lms_init.py)"
+PYTHONUNBUFFERED=1 ./manage.py lms shell -c "$(cat /tmp/tutor_lms_init.py)"

@@ -24,8 +24,14 @@ from django.core.management import call_command
 # incrementally in the background.
 call_command("reindex_studio")
 
+# Reindexing may take a long time (e.g. in development, where Celery tasks run
+# synchronously): don't reuse database connections that may have timed out
+from django.db import connections
+connections.close_all()
+
 # Create the courseware content index
 call_command("reindex_course", "--active")
+connections.close_all()
 
 # Load default policies for the Open edX Authorization framework
 import importlib.metadata
@@ -36,4 +42,4 @@ except importlib.metadata.PackageNotFoundError:
     raise SystemExit(1)
 call_command("load_policies")
 TUTOR_CMS_INIT_EOF
-./manage.py cms shell -c "$(cat /tmp/tutor_cms_init.py)"
+PYTHONUNBUFFERED=1 ./manage.py cms shell -c "$(cat /tmp/tutor_cms_init.py)"
