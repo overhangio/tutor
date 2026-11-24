@@ -17,6 +17,16 @@ ENV LC_ALL=en_US.UTF-8
 COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /usr/local/bin/uv
 ARG PIP_COMMAND="uv pip"
 
+# Keep the uv/pip cache in /openedx/.cache in every stage: build stages mount a shared
+# build cache at /openedx/.cache/pip, and without these variables a stage that installs
+# packages outside such a mount leaks its package cache into the image layers.
+ENV XDG_CACHE_HOME=/openedx/.cache
+# uv reuses wheels it built from source regardless of the glibc they were linked
+# against, so keep a separate cache per base image: wheels built on a newer Ubuntu
+# (e.g. by another Tutor release) fail to import here. Keep in sync with the base
+# image above.
+ENV UV_CACHE_DIR=$XDG_CACHE_HOME/pip/ubuntu-24.04
+
 # Constrain the build-time setuptools used in the isolated (PEP 517) build
 # environments that uv/pip create for source builds; without it the latest
 # setuptools is used regardless of the venv pin, which broke builds when
@@ -97,12 +107,6 @@ FROM scratch AS mnt-{{ name }}
 FROM python AS python-requirements
 ENV PATH=/openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV=/openedx/venv/
-ENV XDG_CACHE_HOME=/openedx/.cache
-# uv reuses wheels it built from source regardless of the glibc they were linked
-# against, so keep a separate cache per base image: wheels built on a newer Ubuntu
-# (e.g. by another Tutor release) fail to import here. Keep in sync with the
-# "minimal" stage base image.
-ENV UV_CACHE_DIR=$XDG_CACHE_HOME/pip/ubuntu-24.04
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -160,10 +164,16 @@ ENV PATH=/openedx/nodeenv/bin:/openedx/venv/bin:${PATH}
 # Install nodeenv with the version provided by edx-platform
 # https://github.com/openedx/edx-platform/blob/master/requirements/edx/assets.txt
 RUN $PIP_COMMAND install nodeenv==1.9.1
-RUN nodeenv /openedx/nodeenv --node=24.22.1 --prebuilt
+# --clean-src drops the extracted Node tarball from /openedx/nodeenv/src (~200MB): it
+# is not needed at runtime and duplicates every CVE finding in Node's bundled npm.
+RUN nodeenv /openedx/nodeenv --node=24.22.3 --prebuilt --clean-src
+# Node bundles an npm whose vendored dependencies (undici, brace-expansion) carry known
+# vulnerabilities; upgrade npm itself to a release that ships the fixed versions.
+ARG NPM_REGISTRY={{ NPM_REGISTRY }}
+RUN --mount=type=cache,target=/root/.npm,sharing=shared \
+    npm install -g npm@11.21.2 --registry=$NPM_REGISTRY
 
 # Install nodejs requirements
-ARG NPM_REGISTRY={{ NPM_REGISTRY }}
 WORKDIR /openedx/edx-platform
 RUN --mount=type=bind,from=edx-platform,source=/package.json,target=/openedx/edx-platform/package.json \
     --mount=type=bind,from=edx-platform,source=/package-lock.json,target=/openedx/edx-platform/package-lock.json \
@@ -210,6 +220,12 @@ ENV STATIC_ROOT_LMS=/openedx/staticfiles
 ENV STATIC_ROOT_CMS=/openedx/staticfiles/studio
 
 WORKDIR /openedx/edx-platform
+
+# From this stage on (production, development, and plugin patches) package installs run
+# without a cache mount, so disable the uv/pip download caches: with them enabled, every
+# install would leak its cache into an image layer. The build stages above keep theirs.
+ENV UV_NO_CACHE=1
+ENV PIP_NO_CACHE_DIR=1
 
 {# Install auto-mounted directories as Python packages. #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}
@@ -302,16 +318,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 USER app
 
 # Install dev python requirements
-RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    uv export --frozen --no-hashes --no-default-groups --group development | \
+RUN uv export --frozen --no-hashes --no-default-groups --group development | \
     $PIP_COMMAND install -r /dev/stdin
 # The development dependency group pins the old certifi again, so upgrade it one more time
-RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install "certifi>=2026.10.19"
+RUN $PIP_COMMAND install "certifi>=2026.10.19"
 # https://pypi.org/project/ipdb/
 # https://pypi.org/project/ipython (>=Python 3.10 started with 8.20)
-RUN --mount=type=cache,target=/openedx/.cache/pip,sharing=shared \
-    $PIP_COMMAND install ipdb==0.13.13 ipython==8.24.0
+RUN $PIP_COMMAND install ipdb==0.13.13 ipython==8.24.0
 
 {# Re-install mounted requirements, otherwise they will be superseded by upstream reqs #}
 {% for name in iter_mounted_directories(MOUNTS, "openedx") %}

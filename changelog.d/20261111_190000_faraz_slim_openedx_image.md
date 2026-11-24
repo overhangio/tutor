@@ -1,0 +1,2 @@
+- [Improvement] Slim down the "openedx" Docker image by about 600MB: the uv package cache is no longer leaked into the image layers, and the extracted Node.js tarball is no longer kept in `/openedx/nodeenv/src`. (by @Faraz32123)
+- [Security] Upgrade Node.js from 24.22.1 to 24.22.3 and npm to 11.21.2 in the "openedx" image, fixing known vulnerabilities (CVEs) in Node.js and in npm's vendored dependencies (undici, brace-expansion). (by @Faraz32123)
