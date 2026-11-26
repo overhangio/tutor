@@ -64,13 +64,11 @@ typing-extensions==4.15.0
     # via
     #   -r base.in
     #   mypy
-urllib3==2.6.3
+urllib3==2.8.0
     # via
     #   kubernetes
     #   requests
 websocket-client==1.9.0
     # via kubernetes
 zipp==3.23.1
-    # via
-    #   importlib-metadata
-    #   importlib-resources
+    # via importlib-metadata
