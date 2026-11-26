@@ -341,13 +341,25 @@ def upgrade_mongodb(
     )
     mongo_binary = "mongosh" if mongo_version >= 6 else "mongo"
 
+    # Run the intermediate version without authentication, such that the admin
+    # command does not require credentials. Existing users are preserved.
+    set_options = f"--set DOCKER_IMAGE_MONGODB=mongo:{to_docker_version}"
+    unset_options = "--unset DOCKER_IMAGE_MONGODB"
+    password_note = ""
+    if config["MONGODB_USERNAME"] and config["MONGODB_PASSWORD"]:
+        set_options += " --set MONGODB_PASSWORD="
+        unset_options += " --unset MONGODB_PASSWORD"
+        password_note = """
+If you had set MONGODB_PASSWORD yourself, set it again instead of unsetting it.
+"""
+
     message = f"""Automatic release upgrade is unsupported in Kubernetes. You should manually upgrade
 your MongoDb cluster to {to_docker_version} by running something similar to:
 
     tutor k8s stop
-    tutor config save --set DOCKER_IMAGE_MONGODB=mongo:{to_docker_version}
+    tutor config save {set_options}
     tutor k8s start
     tutor k8s exec mongodb {mongo_binary} --eval 'db.adminCommand({admin_command})'
-    tutor config save --unset DOCKER_IMAGE_MONGODB
-    """
+    tutor config save {unset_options}
+    {password_note}"""
     fmt.echo_info(message)

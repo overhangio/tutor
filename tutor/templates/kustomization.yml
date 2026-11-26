@@ -68,6 +68,14 @@ configMapGenerator:
   options:
     labels:
         app.kubernetes.io/name: openedx
+{% if RUN_MONGODB %}
+- name: mongodb-config
+  files:
+  - apps/mongodb/entrypoint.sh
+  options:
+    labels:
+        app.kubernetes.io/name: mongodb
+{% endif %}
 {% if RUN_REDIS %}
 - name: redis-config
   files:

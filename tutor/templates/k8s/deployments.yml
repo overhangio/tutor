@@ -384,18 +384,33 @@ spec:
       containers:
         - name: mongodb
           image: {{ DOCKER_IMAGE_MONGODB }}
+          {%- if MONGODB_USERNAME and MONGODB_PASSWORD %}
+          # Create the Tutor user, then start MongoDB with authentication
+          command: ["bash", "/openedx/mongodb/entrypoint.sh"]
+          env:
+            - name: MONGODB_USERNAME
+              value: "{{ MONGODB_USERNAME }}"
+            - name: MONGODB_PASSWORD
+              value: "{{ MONGODB_PASSWORD }}"
+          {%- else %}
           args: ["mongod", "--storageEngine", "wiredTiger"]
+          {%- endif %}
           ports:
             - containerPort: 27017
           volumeMounts:
             - mountPath: /data/db
               name: data
+            - mountPath: /openedx/mongodb
+              name: config
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: mongodb
+        - name: config
+          configMap:
+            name: mongodb-config
         - name: fix-permissions-script
           configMap:
             name: fix-permissions

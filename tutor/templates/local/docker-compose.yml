@@ -29,12 +29,21 @@ services:
   {% if RUN_MONGODB -%}
   mongodb:
     image: {{ DOCKER_IMAGE_MONGODB }}
+    {%- if MONGODB_USERNAME and MONGODB_PASSWORD %}
+    # Create the Tutor user, then start MongoDB with authentication
+    entrypoint: ["bash", "/openedx/mongodb/entrypoint.sh"]
+    environment:
+      MONGODB_USERNAME: "{{ MONGODB_USERNAME }}"
+      MONGODB_PASSWORD: "{{ MONGODB_PASSWORD }}"
+    {%- else %}
     # Use WiredTiger in all environments, just like at edx.org
     command: mongod --storageEngine wiredTiger
+    {%- endif %}
     restart: unless-stopped
     user: "999:999"
     volumes:
       - ../../data/mongodb:/data/db:z
+      - ../apps/mongodb/entrypoint.sh:/openedx/mongodb/entrypoint.sh:roz
     depends_on:
       - permissions
   {%- endif %}
