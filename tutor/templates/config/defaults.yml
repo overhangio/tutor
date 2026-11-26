@@ -70,8 +70,10 @@ NPM_REGISTRY: "https://registry.npmjs.org/"
 PLATFORM_NAME: "My Open edX"
 REDIS_HOST: "redis"
 REDIS_PORT: 6379
-REDIS_USERNAME: ""
-REDIS_PASSWORD: ""
+# Credentials of the Redis instance run by Tutor. Set these explicitly to connect to an
+# external Redis server (RUN_REDIS: false).
+REDIS_USERNAME: "{% if RUN_REDIS %}default{% endif %}"
+REDIS_PASSWORD: "{% if RUN_REDIS %}{{ REDIS_INTERNAL_PASSWORD }}{% endif %}"
 RUN_MEILISEARCH: true
 RUN_MONGODB: true
 RUN_MYSQL: true
