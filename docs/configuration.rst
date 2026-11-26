@@ -261,13 +261,20 @@ MongoDB
 - ``RUN_MONGODB`` (default: ``true``)
 - ``MONGODB_DATABASE`` (default: ``"openedx"``)
 - ``MONGODB_HOST`` (default: ``"mongodb"``): accepts a comma-separated list of hosts for replica set configs.
-- ``MONGODB_PASSWORD`` (default: ``""``)
+- ``MONGODB_PASSWORD`` (default: ``"{{ MONGODB_INTERNAL_PASSWORD }}"`` when ``RUN_MONGODB`` is true, ``""`` otherwise)
 - ``MONGODB_PORT`` (default: ``27017``)
-- ``MONGODB_USERNAME`` (default: ``""``)
+- ``MONGODB_USERNAME`` (default: ``"openedx"`` when ``RUN_MONGODB`` is true and ``MONGODB_PASSWORD`` is not empty, ``""`` otherwise)
+- ``MONGODB_INTERNAL_PASSWORD`` (default: randomly generated): password of the MongoDB instance run by Tutor.
 - ``MONGODB_USE_SSL`` (default: ``false``)
 - ``MONGODB_REPLICA_SET`` (default: ``""``)
 - ``MONGODB_AUTH_MECHANISM`` (default: ``""``)
 - ``MONGODB_AUTH_SOURCE`` (default: ``"admin"``)
+
+The MongoDB instance run by Tutor requires authentication. Each time it starts, the ``MONGODB_USERNAME`` user is created in the ``admin`` database with the ``root`` role, or its password is reset to ``MONGODB_PASSWORD``. Its roles are only set on creation, so you can restrict them afterwards. Plugins that connect to MongoDB must use ``MONGODB_USERNAME``, ``MONGODB_PASSWORD`` and ``MONGODB_AUTH_SOURCE``. Commands that you run in the MongoDB container, such as ``mongosh`` or ``mongodump``, need the ``--username``, ``--password`` and ``--authenticationDatabase=admin`` options: the credentials are available there as the ``MONGODB_USERNAME`` and ``MONGODB_PASSWORD`` environment variables.
+
+To disable authentication, for instance to run MongoDB images older than 6.0, set ``MONGODB_PASSWORD`` to ``""``.
+
+Custom ``command`` (Docker Compose) or ``args`` (Kubernetes) of the ``mongodb`` service are passed as extra options to ``mongod``, which must not include ``--auth``, ``--bind_ip``, ``--port``, ``--fork``, ``--logpath`` or ``--replSet``. If you change ``MONGODB_USERNAME``, the previous user is not removed.
 
 Note that most of these settings will have to be modified to connect to a MongoDB cluster that runs separately of Tutor, such as `Atlas <https://www.mongodb.com/atlas>`__. In particular, the authentication source, mechanism and the SSL connection parameters should not be specified as part of the `host URI <https://www.mongodb.com/docs/manual/reference/connection-string/>`__ but as separate Tutor settings. Supported values for ``MONGODB_AUTH_MECHANISM`` are the same as for pymongo (see the `pymongo documentation <https://pymongo.readthedocs.io/en/stable/examples/authentication.html>`__).
 

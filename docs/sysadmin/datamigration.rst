@@ -33,6 +33,8 @@ To dump all data from the MySQL and Mongodb databases used on the platform, run 
         -e USERNAME="$(tutor config printvalue MYSQL_ROOT_USERNAME)" \
         -e PASSWORD="$(tutor config printvalue MYSQL_ROOT_PASSWORD)" \
         mysql sh -c 'mysqldump --all-databases --user=$USERNAME --password=$PASSWORD > /var/lib/mysql/dump.sql'
-    tutor local exec mongodb mongodump --out=/data/db/dump.mongodb
+    tutor local exec mongodb sh -c 'mongodump --username=$MONGODB_USERNAME --password=$MONGODB_PASSWORD --authenticationDatabase=admin --out=/data/db/dump.mongodb'
 
 The ``dump.sql`` and ``dump.mongodb`` files will be located in ``$(tutor config printroot)/data/mysql`` and ``$(tutor config printroot)/data/mongodb``.
+
+If you disabled MongoDB authentication (``MONGODB_PASSWORD: ""``), drop the ``--username``, ``--password`` and ``--authenticationDatabase`` options.

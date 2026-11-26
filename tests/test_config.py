@@ -7,7 +7,10 @@ import click
 
 from tests.helpers import PluginsTestCase, temporary_root
 from tutor import config as tutor_config
-from tutor import fmt, hooks, interactive, utils
+from tutor import env, fmt, hooks, interactive, utils
+from tutor.commands import (
+    compose,  # noqa: F401  # defines the "iter_mounts" template variable
+)
 from tutor.types import Config, get_typed
 
 
@@ -413,3 +416,125 @@ PLUGINS:
             self.assertIn("# Domain names", contents)
             self.assertEqual(1, contents.count("LMS_HOST"))
             self.assertEqual("lms.example.org", tutor_config.get_user(root)["LMS_HOST"])
+
+
+class MongoDbCredentialsTests(unittest.TestCase):
+    """
+    Credentials of the MongoDB instance run by Tutor are generated once and stored in
+    config.yml, but only applied when Tutor actually runs MongoDB.
+    """
+
+    def load(self, user_config: str = "", **environ: str) -> tuple[Config, Config]:
+        """
+        Save the configuration in a fresh root, then return both what was written to
+        config.yml and the full configuration.
+        """
+        with temporary_root() as root:
+            if user_config:
+                with open(tutor_config.config_path(root), "w", encoding="utf-8") as f:
+                    f.write(user_config)
+            with patch.dict(os.environ, environ), patch.object(fmt, "echo"):
+                tutor_config.save_config_file(root, tutor_config.load_minimal(root))
+                return tutor_config.get_user(root), tutor_config.load_full(root)
+
+    def test_credentials_are_generated(self) -> None:
+        saved, config = self.load()
+        password = get_typed(saved, "MONGODB_INTERNAL_PASSWORD", str)
+        self.assertEqual(24, len(password))
+        self.assertEqual("openedx", config["MONGODB_USERNAME"])
+        self.assertEqual(password, config["MONGODB_PASSWORD"])
+        # Derived values are never written to config.yml
+        self.assertNotIn("MONGODB_USERNAME", saved)
+        self.assertNotIn("MONGODB_PASSWORD", saved)
+
+    def test_credentials_are_stable(self) -> None:
+        with temporary_root() as root, patch.object(fmt, "echo"):
+            tutor_config.save_config_file(root, tutor_config.load_minimal(root))
+            password1 = tutor_config.load_full(root)["MONGODB_PASSWORD"]
+            tutor_config.save_config_file(root, tutor_config.load_minimal(root))
+            password2 = tutor_config.load_full(root)["MONGODB_PASSWORD"]
+        self.assertEqual(password1, password2)
+
+    def test_credentials_are_added_to_existing_config(self) -> None:
+        _saved, config = self.load("LMS_HOST: lms.example.org\n")
+        self.assertEqual("openedx", config["MONGODB_USERNAME"])
+        self.assertEqual(24, len(get_typed(config, "MONGODB_PASSWORD", str)))
+
+    def test_external_mongodb_without_credentials(self) -> None:
+        _saved, config = self.load("RUN_MONGODB: false\n")
+        self.assertEqual("", config["MONGODB_USERNAME"])
+        self.assertEqual("", config["MONGODB_PASSWORD"])
+
+    def test_external_mongodb_disabled_from_environment(self) -> None:
+        _saved, config = self.load(TUTOR_RUN_MONGODB="false")
+        self.assertEqual("", config["MONGODB_USERNAME"])
+        self.assertEqual("", config["MONGODB_PASSWORD"])
+
+    def test_external_mongodb_credentials_are_preserved(self) -> None:
+        _saved, config = self.load(
+            "RUN_MONGODB: false\nMONGODB_USERNAME: admin\nMONGODB_PASSWORD: secret\n"
+        )
+        self.assertEqual("admin", config["MONGODB_USERNAME"])
+        self.assertEqual("secret", config["MONGODB_PASSWORD"])
+
+    def render(self, user_config: str = "") -> tuple[Config, dict[str, str]]:
+        """
+        Save the configuration and the environment in a fresh root, and return the
+        full configuration along with a few rendered files.
+        """
+        with temporary_root() as root:
+            if user_config:
+                with open(tutor_config.config_path(root), "w", encoding="utf-8") as f:
+                    f.write(user_config)
+            with patch.object(fmt, "echo"):
+                tutor_config.save_config_file(root, tutor_config.load_minimal(root))
+                config = tutor_config.load_full(root)
+                env.save(root, config)
+            files = {}
+            for path in [
+                "apps/openedx/settings/lms/production.py",
+                "local/docker-compose.yml",
+                "k8s/deployments.yml",
+                "kustomization.yml",
+            ]:
+                with open(env.pathjoin(root, path), encoding="utf-8") as f:
+                    files[path] = f.read()
+        return config, files
+
+    def test_credentials_are_rendered(self) -> None:
+        config, files = self.render()
+        password = config["MONGODB_PASSWORD"]
+        settings = files["apps/openedx/settings/lms/production.py"]
+        self.assertIn('"user": "openedx",', settings)
+        self.assertIn(f'"password": "{password}",', settings)
+
+        compose = files["local/docker-compose.yml"]
+        self.assertIn('entrypoint: ["bash", "/openedx/mongodb/entrypoint.sh"]', compose)
+        self.assertIn(f'MONGODB_PASSWORD: "{password}"', compose)
+        self.assertNotIn("command: mongod", compose)
+
+        deployments = files["k8s/deployments.yml"]
+        self.assertIn(
+            'command: ["bash", "/openedx/mongodb/entrypoint.sh"]', deployments
+        )
+        self.assertIn(f'value: "{password}"', deployments)
+        self.assertIn("name: mongodb-config", deployments)
+        self.assertIn("apps/mongodb/entrypoint.sh", files["kustomization.yml"])
+
+    def test_mongodb_without_password_runs_without_authentication(self) -> None:
+        # Users can opt out by setting an empty password
+        config, files = self.render('MONGODB_PASSWORD: ""\n')
+        self.assertEqual("", config["MONGODB_USERNAME"])
+        self.assertIn('"user": None,', files["apps/openedx/settings/lms/production.py"])
+        compose = files["local/docker-compose.yml"]
+        self.assertIn("command: mongod --storageEngine wiredTiger", compose)
+        self.assertNotIn('entrypoint: ["bash", "/openedx/mongodb/', compose)
+        deployments = files["k8s/deployments.yml"]
+        self.assertIn('args: ["mongod", "--storageEngine", "wiredTiger"]', deployments)
+        self.assertNotIn('command: ["bash", "/openedx/mongodb/', deployments)
+
+    def test_entrypoint_is_not_altered_by_rendering(self) -> None:
+        _saved, config = self.load()
+        rendered = env.render_file(config, "apps", "mongodb", "entrypoint.sh")
+        raw = env.read_core_template_file("apps", "mongodb", "entrypoint.sh")
+        self.assertEqual(raw.strip(), rendered.strip())

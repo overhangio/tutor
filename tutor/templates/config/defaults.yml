@@ -47,8 +47,11 @@ MONGODB_AUTH_SOURCE: "admin"
 MONGODB_HOST: "mongodb"
 MONGODB_DATABASE: "openedx"
 MONGODB_PORT: 27017
-MONGODB_USERNAME: ""
-MONGODB_PASSWORD: ""
+# Credentials of the MongoDB instance run by Tutor. Set these explicitly to connect
+# to an external MongoDB server (RUN_MONGODB: false). Set MONGODB_PASSWORD to "" to
+# disable authentication.
+MONGODB_USERNAME: "{% if RUN_MONGODB and MONGODB_PASSWORD %}openedx{% endif %}"
+MONGODB_PASSWORD: "{% if RUN_MONGODB %}{{ MONGODB_INTERNAL_PASSWORD }}{% endif %}"
 MONGODB_REPLICA_SET: ""
 MONGODB_USE_SSL: false
 MOUNTS: []

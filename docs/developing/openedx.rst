@@ -290,7 +290,12 @@ You should then run the development server as usual, with ``start``. Every chang
 Running edx-platform unit tests
 -------------------------------
 
-It's possible to run the full set of unit tests that ship with `openedx-platform <https://github.com/openedx/openedx-platform/>`__. To do so, run a shell in the LMS development container::
+It's possible to run the full set of unit tests that ship with `openedx-platform <https://github.com/openedx/openedx-platform/>`__. These tests connect to MongoDB without credentials, so first disable MongoDB authentication::
+
+    tutor config save --set MONGODB_PASSWORD=
+    tutor dev start -d mongodb
+
+Then run a shell in the LMS development container::
 
     tutor dev run lms bash
 
@@ -311,6 +316,11 @@ Then, run unit tests with ``pytest`` commands::
     # Run tests on CMS
     export DJANGO_SETTINGS_MODULE=cms.envs.tutor.test
     pytest cms
+
+Once you are done, enable MongoDB authentication again::
+
+    tutor config save --unset MONGODB_PASSWORD
+    tutor dev reboot -d
 
 .. note::
     Getting all edx-platform unit tests to pass on Tutor is currently a work-in-progress. Some unit tests are still failing. If you manage to fix some of these, please report your findings in the `Open edX forum <https://discuss.openedx.org/tag/tutor>`__.

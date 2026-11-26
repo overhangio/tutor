@@ -260,6 +260,13 @@ def upgrade_mongodb(
     # Note that the DOCKER_IMAGE_MONGODB value is never saved, because we only save the
     # environment, not the configuration.
     config["DOCKER_IMAGE_MONGODB"] = f"mongo:{to_docker_version}"
+    # Intermediate versions run without authentication: they might not support it,
+    # and the admin command below does not require credentials. Like
+    # DOCKER_IMAGE_MONGODB, these values are never saved, so authentication is
+    # enabled again when the configuration is next loaded. Existing users are
+    # preserved.
+    config["MONGODB_USERNAME"] = ""
+    config["MONGODB_PASSWORD"] = ""
     tutor_env.save(context.obj.root, config)
     context.invoke(compose.start, detach=True, services=["mongodb"])
     fmt.echo_info("Waiting for mongodb to boot...")
