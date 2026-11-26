@@ -48,7 +48,7 @@ pyyaml==6.0.3
     # via
     #   -r base.in
     #   kubernetes
-requests==2.32.5
+requests==2.33.0
     # via
     #   kubernetes
     #   requests-oauthlib
@@ -71,6 +71,4 @@ urllib3==2.6.3
 websocket-client==1.9.0
     # via kubernetes
 zipp==3.23.1
-    # via
-    #   importlib-metadata
-    #   importlib-resources
+    # via importlib-metadata
