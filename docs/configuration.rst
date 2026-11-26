@@ -277,8 +277,11 @@ Redis
 - ``RUN_REDIS`` (default: ``true``)
 - ``REDIS_HOST`` (default: ``"redis"``)
 - ``REDIS_PORT`` (default: ``6379``)
-- ``REDIS_USERNAME`` (default: ``""``)
-- ``REDIS_PASSWORD`` (default: ``""``)
+- ``REDIS_USERNAME`` (default: ``"default"`` when ``RUN_REDIS`` is true, ``""`` otherwise)
+- ``REDIS_PASSWORD`` (default: ``"{{ REDIS_INTERNAL_PASSWORD }}"`` when ``RUN_REDIS`` is true, ``""`` otherwise)
+- ``REDIS_INTERNAL_PASSWORD`` (default: randomly generated): password of the Redis instance run by Tutor.
+
+The Redis instance run by Tutor requires a password. To connect to an external Redis server, set ``RUN_REDIS: false`` along with the ``REDIS_USERNAME`` and ``REDIS_PASSWORD`` of that server. Plugins that connect to Redis must include ``REDIS_USERNAME`` and ``REDIS_PASSWORD`` in their connection URLs. The password applies to the ``default`` Redis user: to use a different ``REDIS_USERNAME`` with the Redis instance run by Tutor, declare that user with a ``user`` directive in the ``redis-conf`` patch (see the `Redis ACL documentation <https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/>`__).
 
 Note that Redis has replaced Rabbitmq as the Celery message broker since Tutor v11.0.0.
 

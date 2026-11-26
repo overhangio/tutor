@@ -7,7 +7,7 @@ import click
 
 from tests.helpers import PluginsTestCase, temporary_root
 from tutor import config as tutor_config
-from tutor import fmt, hooks, interactive, utils
+from tutor import env, fmt, hooks, interactive, utils
 from tutor.types import Config, get_typed
 
 
@@ -413,3 +413,91 @@ PLUGINS:
             self.assertIn("# Domain names", contents)
             self.assertEqual(1, contents.count("LMS_HOST"))
             self.assertEqual("lms.example.org", tutor_config.get_user(root)["LMS_HOST"])
+
+
+class DataStoreCredentialsTests(unittest.TestCase):
+    """
+    Credentials of the data stores run by Tutor are generated once and stored in
+    config.yml, but only applied when Tutor actually runs the service.
+    """
+
+    def load(self, user_config: str = "", **env: str) -> tuple[Config, Config]:
+        """
+        Save the configuration in a fresh root, then return both what was written to
+        config.yml and the full configuration.
+        """
+        with temporary_root() as root:
+            if user_config:
+                with open(tutor_config.config_path(root), "w", encoding="utf-8") as f:
+                    f.write(user_config)
+            with patch.dict(os.environ, env), patch.object(fmt, "echo"):
+                tutor_config.save_config_file(root, tutor_config.load_minimal(root))
+                return tutor_config.get_user(root), tutor_config.load_full(root)
+
+    def test_redis_credentials_are_generated(self) -> None:
+        saved, config = self.load()
+        password = get_typed(saved, "REDIS_INTERNAL_PASSWORD", str)
+        self.assertEqual(24, len(password))
+        self.assertEqual("default", config["REDIS_USERNAME"])
+        self.assertEqual(password, config["REDIS_PASSWORD"])
+        # Derived values are never written to config.yml
+        self.assertNotIn("REDIS_USERNAME", saved)
+        self.assertNotIn("REDIS_PASSWORD", saved)
+
+    def test_redis_credentials_are_stable(self) -> None:
+        with temporary_root() as root, patch.object(fmt, "echo"):
+            tutor_config.save_config_file(root, tutor_config.load_minimal(root))
+            password1 = tutor_config.load_full(root)["REDIS_PASSWORD"]
+            tutor_config.save_config_file(root, tutor_config.load_minimal(root))
+            password2 = tutor_config.load_full(root)["REDIS_PASSWORD"]
+        self.assertEqual(password1, password2)
+
+    def test_redis_credentials_are_added_to_existing_config(self) -> None:
+        _saved, config = self.load("LMS_HOST: lms.example.org\n")
+        self.assertEqual("default", config["REDIS_USERNAME"])
+        self.assertEqual(24, len(get_typed(config, "REDIS_PASSWORD", str)))
+
+    def test_external_redis_without_credentials(self) -> None:
+        _saved, config = self.load("RUN_REDIS: false\n")
+        self.assertEqual("", config["REDIS_USERNAME"])
+        self.assertEqual("", config["REDIS_PASSWORD"])
+
+    def test_external_redis_disabled_from_environment(self) -> None:
+        _saved, config = self.load(TUTOR_RUN_REDIS="false")
+        self.assertEqual("", config["REDIS_USERNAME"])
+        self.assertEqual("", config["REDIS_PASSWORD"])
+
+    def test_external_redis_credentials_are_preserved(self) -> None:
+        _saved, config = self.load(
+            "RUN_REDIS: false\nREDIS_USERNAME: admin\nREDIS_PASSWORD: secret\n"
+        )
+        self.assertEqual("admin", config["REDIS_USERNAME"])
+        self.assertEqual("secret", config["REDIS_PASSWORD"])
+
+    def test_redis_credentials_are_rendered(self) -> None:
+        _saved, config = self.load()
+        password = config["REDIS_PASSWORD"]
+        redis_conf = env.render_file(config, "apps", "redis", "redis.conf")
+        self.assertIn(f'requirepass "{password}"', redis_conf)
+        settings = env.render_file(
+            config, "apps", "openedx", "settings", "lms", "production.py"
+        )
+        self.assertIn(
+            f'EVENT_BUS_REDIS_CONNECTION_URL = "redis://default:{password}@redis:6379/"',
+            settings,
+        )
+        self.assertIn(f"redis://default:{password}@redis:6379/1", settings)
+        lms_env = env.render_file(config, "apps", "openedx", "config", "lms.env.yml")
+        self.assertIn('CELERY_BROKER_USER: "default"', lms_env)
+        self.assertIn(f'CELERY_BROKER_PASSWORD: "{password}"', lms_env)
+
+    def test_redis_without_password_is_not_protected(self) -> None:
+        _saved, config = self.load("RUN_REDIS: false\n")
+        redis_conf = env.render_file(config, "apps", "redis", "redis.conf")
+        self.assertNotIn("requirepass", redis_conf)
+        settings = env.render_file(
+            config, "apps", "openedx", "settings", "lms", "production.py"
+        )
+        self.assertIn(
+            'EVENT_BUS_REDIS_CONNECTION_URL = "redis://@redis:6379/"', settings
+        )
