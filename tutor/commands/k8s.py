@@ -111,6 +111,9 @@ class K8sTaskRunner(BaseTaskRunner):
         job["metadata"].setdefault("labels", {})
         job["metadata"]["labels"]["app.kubernetes.io/name"] = job_name
         # Define k8s entrypoint/args
+        # Kubernetes expands "$(VAR)" references and replaces "$$" by "$" in container
+        # args: escape "$" such that the command reaches the shell unchanged.
+        command = command.replace("$", "$$")
         shell_command = ["sh", "-e", "-c"]
         if job["spec"]["template"]["spec"]["containers"][0].get("command") == []:
             # In some cases, we need to bypass the container entrypoint.

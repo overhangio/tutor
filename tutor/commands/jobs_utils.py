@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from tutor import exceptions, serialize
+import shlex
+
+from tutor import env, exceptions, serialize
 
 TEST_DEFAULTS: dict[str, str] = {
     "TEST_USERNAME": "tutor_test_admin",
@@ -36,24 +38,52 @@ def parse_test_env_var(raw: str) -> tuple[str, str]:
     return key, value
 
 
+def shell_join(*words: str) -> str:
+    """
+    Return a shell command made of these words, for inclusion in a ``do`` job script.
+
+    Job scripts are rendered as templates on the host, then run with ``sh`` in a
+    container. Each word is quoted such that it is interpreted neither by the template
+    engine nor by the shell, and the command receives it unchanged. Thus, this function
+    must be used to include untrusted values, such as command line arguments, in job
+    scripts.
+    """
+    return env.escape_template(shlex.join(words))
+
+
+def mysql_string(value: str) -> str:
+    """
+    Quote a value as a MySQL string literal.
+    """
+    return "'" + value.replace("\\", "\\\\").replace("'", "''") + "'"
+
+
+def mysql_identifier(value: str) -> str:
+    """
+    Quote a value as a MySQL identifier, such as a database name.
+    """
+    return "`" + value.replace("`", "``") + "`"
+
+
 def create_user_template(
     superuser: str, staff: bool, username: str, email: str, password: str
 ) -> str:
     """
     Helper utility to generate the necessary commands to create a user in openedx
     """
-    opts = ""
+    opts = []
     if superuser:
-        opts += " --superuser"
+        opts.append("--superuser")
     if staff:
-        opts += " --staff"
-    return f"""
-./manage.py lms manage_user {opts} {username} {email}
-./manage.py lms shell -c "
+        opts.append("--staff")
+    set_password = f"""
 from django.contrib.auth import get_user_model
-u = get_user_model().objects.get(username='{username}')
-u.set_password('{password}')
-u.save()"
+u = get_user_model().objects.get(username={username!r})
+u.set_password({password!r})
+u.save()"""
+    return f"""
+{shell_join("./manage.py", "lms", "manage_user", *opts, username, email)}
+{shell_join("./manage.py", "lms", "shell", "-c", set_password)}
 """
 
 
@@ -99,7 +129,7 @@ def get_mysql_change_charset_query(
                 FROM
                     INFORMATION_SCHEMA.COLUMNS
                 WHERE
-                    TABLE_SCHEMA = '{database}'
+                    TABLE_SCHEMA = {mysql_string(database)}
                     AND COLLATION_NAME IS NOT NULL {query_to_append};
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_columns_loop = TRUE;
                 OPEN columns_cur;
@@ -149,7 +179,7 @@ def get_mysql_change_charset_query(
                 DECLARE table_name_ VARCHAR(255);
                 DECLARE cur CURSOR FOR
                         SELECT table_name FROM information_schema.tables
-                        WHERE table_schema = '{database}' AND table_type = "BASE TABLE" AND table_collation not like 'utf8mb4_%' {query_to_append};
+                        WHERE table_schema = {mysql_string(database)} AND table_type = "BASE TABLE" AND table_collation not like 'utf8mb4_%' {query_to_append};
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
                 OPEN cur;
@@ -176,8 +206,8 @@ def get_mysql_change_charset_query(
             END$$
             DELIMITER ;
 
-            use {database};
-            ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};
+            use {mysql_identifier(database)};
+            ALTER DATABASE {mysql_identifier(database)} CHARACTER SET {charset} COLLATE {collation};
             CALL UpdateColumns();
             CALL UpdateTables();
             """
@@ -187,7 +217,6 @@ def set_theme_template(theme_name: str, domain_names: list[str]) -> str:
     """
     For each domain, get or create a Site object and assign the selected theme.
     """
-    # Note that there are no double quotes " in this piece of code
     python_command = """
 import sys
 from django.contrib.sites.models import Site
@@ -207,28 +236,22 @@ def assign_theme(name, domain):
     if name != 'default':
         site.themes.create(theme_dir_name=name)
 """
-    domain_names = domain_names or [
-        "{{ LMS_HOST }}",
-        "{{ LMS_HOST }}:8000",
-        "{{ CMS_HOST }}",
-        "{{ CMS_HOST }}:8001",
-    ]
     for domain_name in domain_names:
-        python_command += f"assign_theme('{theme_name}', '{domain_name}')\n"
-    return f'./manage.py lms shell -c "{python_command}"'
+        python_command += f"assign_theme({theme_name!r}, {domain_name!r})\n"
+    return shell_join("./manage.py", "lms", "shell", "-c", python_command)
 
 
 def tests_teardown_lms_template(smoke_username: str) -> str:
-    return f"""
-./manage.py lms shell -c "
+    delete_user = f"""
 from django.contrib.auth import get_user_model
-n, _ = get_user_model().objects.filter(username='{smoke_username}').delete()
-print(f'Smoke user cleanup: removed {{n}} object(s)')"
-"""
+n, _ = get_user_model().objects.filter(username={smoke_username!r}).delete()
+print(f'Smoke user cleanup: removed {{n}} object(s)')"""
+    return shell_join("./manage.py", "lms", "shell", "-c", delete_user)
 
 
 def tests_teardown_cms_template(smoke_course_id: str) -> str:
-    return f"yes | ./manage.py cms delete_course {smoke_course_id} || true"
+    delete_course = shell_join("./manage.py", "cms", "delete_course", smoke_course_id)
+    return f"yes | {delete_course} || true"
 
 
 def tests_setup_template(
@@ -238,30 +261,32 @@ def tests_setup_template(
     oauth_client_id: str,
     oauth_client_secret: str,
 ) -> str:
-    return f"""
-# Create test admin user (idempotent: manage_user updates staff/superuser flags if user exists)
-./manage.py lms manage_user --staff --superuser {admin_username} {admin_email}
-./manage.py lms shell -c "
+    set_admin_password = f"""
 from django.contrib.auth import get_user_model
-u = get_user_model().objects.get(username='{admin_username}')
-u.set_password('{admin_password}')
+u = get_user_model().objects.get(username={admin_username!r})
+u.set_password({admin_password!r})
 u.save()
-print('Test admin ready: {admin_username}')"
-
-# Create OAuth2 client for tests (idempotent)
-./manage.py lms shell -c "
+print('Test admin ready:', {admin_username!r})"""
+    create_oauth_client = f"""
 from oauth2_provider.models import Application
 from django.contrib.auth import get_user_model
-user = get_user_model().objects.get(username='{admin_username}')
+user = get_user_model().objects.get(username={admin_username!r})
 app, created = Application.objects.update_or_create(
-    client_id='{oauth_client_id}',
+    client_id={oauth_client_id!r},
     defaults=dict(
         user=user,
         client_type=Application.CLIENT_CONFIDENTIAL,
         authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
-        client_secret='{oauth_client_secret}',
+        client_secret={oauth_client_secret!r},
         name='Tutor Tests',
     ),
 )
-print('OAuth2 client ' + ('created' if created else 'updated'))"
+print('OAuth2 client ' + ('created' if created else 'updated'))"""
+    return f"""
+# Create test admin user (idempotent: manage_user updates staff/superuser flags if user exists)
+{shell_join("./manage.py", "lms", "manage_user", "--staff", "--superuser", admin_username, admin_email)}
+{shell_join("./manage.py", "lms", "shell", "-c", set_admin_password)}
+
+# Create OAuth2 client for tests (idempotent)
+{shell_join("./manage.py", "lms", "shell", "-c", create_oauth_client)}
 """

@@ -58,6 +58,27 @@ class EnvTests(PluginsTestCase):
             "hello world", env.render_str({"name": "world"}, "hello {{ name }}")
         )
 
+    def test_escape_template(self) -> None:
+        for text in [
+            "",
+            "hello world",
+            "{{ name }}",
+            "{{ 7*7 }}",
+            "{{ cycler.__init__.__globals__.os.popen('id').read() }}",
+            "{% raw %}{{ name }}{% endraw %}",
+            "{# comment #}",
+            "}} {{",
+            "'\"\\ \\n \n \r\n \t",
+            "unicodé 😀 \x00",
+        ]:
+            with self.subTest(text=text):
+                escaped = env.escape_template(text)
+                self.assertEqual(text, env.render_str({}, escaped))
+                self.assertEqual(
+                    f"world{text}!",
+                    env.render_str({"name": "world"}, "{{ name }}" + escaped + "!"),
+                )
+
     def test_render_unknown(self) -> None:
         config: Config = {
             "var1": "a",
