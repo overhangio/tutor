@@ -7,14 +7,8 @@ from unittest.mock import patch
 
 from tests.helpers import PluginsTestCase, temporary_root
 from tutor import env
-from tutor.commands import jobs
-from tutor.commands.jobs_utils import (
-    load_env_file,
-    parse_test_env_var,
-    tests_setup_template,
-    tests_teardown_cms_template,
-    tests_teardown_lms_template,
-)
+from tutor.commands import jobs, jobs_utils
+from tutor.commands.jobs_utils import load_env_file, parse_test_env_var
 from tutor.exceptions import TutorError
 
 from .base import TestCommandMixin
@@ -325,18 +319,27 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
                     "lms",
                     "shell",
                     "-c",
-                    "from django.conf import settings; print(getattr(settings, 'SECRET_KEY'))",
+                    "from django.conf import settings; print(settings.SECRET_KEY)",
                 ],
                 shlex.split(script),
             )
-            for value in UNTRUSTED_VALUES:
+            # The setting may be a Python expression, evaluated in the container, but
+            # it is neither rendered by Jinja2 nor interpreted by the shell.
+            for value in UNTRUSTED_VALUES + ["FEATURES['ENABLE_X']"]:
                 with self.subTest(value=value):
                     script = self.run_job(
                         root, ["print-edx-platform-setting", "--", value]
                     )
-                    words = shlex.split(script)
-                    self.assertEqual(5, len(words))
-                    self.assertEqual([value], python_strings(words[4]))
+                    self.assertEqual(
+                        [
+                            "./manage.py",
+                            "lms",
+                            "shell",
+                            "-c",
+                            f"from django.conf import settings; print(settings.{value})",
+                        ],
+                        shlex.split(script),
+                    )
 
     def test_sqlshell_untrusted_values(self) -> None:
         with temporary_root() as root:
@@ -447,7 +450,8 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
         for value in UNTRUSTED_VALUES:
             with self.subTest(value=value):
                 setup = env.render_str(
-                    {}, tests_setup_template(value, value, value, value, value)
+                    {},
+                    jobs_utils.tests_setup_template(value, value, value, value, value),
                 )
                 words = shlex.split(setup, comments=True)
                 self.assertEqual(17, len(words))
@@ -465,12 +469,16 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
                 # Username, client ID and client secret
                 self.assertEqual(3, python_strings(words[16]).count(value))
 
-                teardown_lms = env.render_str({}, tests_teardown_lms_template(value))
+                teardown_lms = env.render_str(
+                    {}, jobs_utils.tests_teardown_lms_template(value)
+                )
                 words = shlex.split(teardown_lms)
                 self.assertEqual(["./manage.py", "lms", "shell", "-c"], words[:4])
                 self.assertEqual(value, python_strings(words[4])[0])
 
-                teardown_cms = env.render_str({}, tests_teardown_cms_template(value))
+                teardown_cms = env.render_str(
+                    {}, jobs_utils.tests_teardown_cms_template(value)
+                )
                 self.assertEqual(
                     ["yes", "|", "./manage.py", "cms", "delete_course", value],
                     shlex.split(teardown_cms)[:6],

@@ -246,9 +246,9 @@ done"""
 def print_edx_platform_setting(
     setting: str, service: str
 ) -> t.Iterable[tuple[str, str]]:
-    print_setting = (
-        f"from django.conf import settings; print(getattr(settings, {setting!r}))"
-    )
+    # The setting may be an expression, such as "FEATURES['ENABLE_X']", which is
+    # evaluated in the container.
+    print_setting = f"from django.conf import settings; print(settings.{setting})"
     yield (service, shell_join("./manage.py", service, "shell", "-c", print_setting))
 
 
