@@ -418,6 +418,18 @@ def render_str(config: Config, text: str) -> str:
     return Renderer(config).render_str(text)
 
 
+def escape_template(text: str) -> str:
+    """
+    Escape `text` such that it renders to itself, unchanged, in a template.
+
+    Use this function to include untrusted values, such as command line arguments, in
+    a template. Otherwise, any Jinja2 markup they contain would be evaluated with the
+    rights of the user running Tutor. The text is wrapped in a Jinja2 expression
+    that contains it as a string literal.
+    """
+    return "{{ " + repr(text) + " }}"
+
+
 def check_is_up_to_date(root: str) -> None:
     if not is_up_to_date(root):
         fmt.echo_alert(

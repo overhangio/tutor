@@ -22,8 +22,10 @@ from tutor.commands.jobs_utils import (
     create_user_template,
     get_mysql_change_charset_query,
     load_env_file,
+    mysql_string,
     parse_test_env_var,
     set_theme_template,
+    shell_join,
     tests_setup_template,
     tests_teardown_cms_template,
     tests_teardown_lms_template,
@@ -145,15 +147,16 @@ def createuser(
 def importdemocourse(
     repo: str, repo_dir: str, version: t.Optional[str]
 ) -> t.Iterable[tuple[str, str]]:
-    version = version or "{{ OPENEDX_COMMON_VERSION }}"
+    version = shell_join(version) if version else "{{ OPENEDX_COMMON_VERSION }}"
     template = f"""
 # Clone the repo
-git clone {repo} --branch {version} --depth 1 /tmp/course
+git clone --branch {version} --depth 1 -- {shell_join(repo)} /tmp/course
 
 # Determine root directory for course import. If one is provided, use that.
 # Otherwise, use the directory containing course.xml, failing if there isn't exactly one.
-if [ -n "{repo_dir}" ] ; then
-    course_root=/tmp/course/{repo_dir}
+repo_dir={shell_join(repo_dir)}
+if [ -n "$repo_dir" ] ; then
+    course_root="/tmp/course/$repo_dir"
 else
     course_xml_first="$(find /tmp/course -name course.xml | head -n 1)"
     course_xml_extra="$(find /tmp/course -name course.xml | tail -n +2)"
@@ -200,10 +203,10 @@ python ./manage.py cms import ../data "$course_root"
 def importdemolibraries(
     owner_username: str, repo: str, version: t.Optional[str]
 ) -> t.Iterable[tuple[str, str]]:
-    version = version or "{{ OPENEDX_COMMON_VERSION }}"
+    version = shell_join(version) if version else "{{ OPENEDX_COMMON_VERSION }}"
     template = f"""
 # Clone the repo
-git clone {repo} --branch {version} --depth 1 /tmp/library
+git clone --branch {version} --depth 1 -- {shell_join(repo)} /tmp/library
 
 # Fail loudly if:
 # * there no library.xml files, or
@@ -222,7 +225,7 @@ for lib_root in $(find /tmp/library -name library.xml | xargs dirname) ; do
     fi
     rm -rf /tmp/library.tar.gz
     ( cd "$(dirname "$lib_root")" && tar czvf /tmp/library.tar.gz library )
-    yes | ./manage.py cms import_content_library /tmp/library.tar.gz {owner_username}
+    yes | ./manage.py cms import_content_library /tmp/library.tar.gz {shell_join(owner_username)}
 done"""
     yield ("cms", template)
 
@@ -243,8 +246,10 @@ done"""
 def print_edx_platform_setting(
     setting: str, service: str
 ) -> t.Iterable[tuple[str, str]]:
-    command = f"./manage.py {service} shell -c 'from django.conf import settings; print(settings.{setting})'"
-    yield (service, command)
+    print_setting = (
+        f"from django.conf import settings; print(getattr(settings, {setting!r}))"
+    )
+    yield (service, shell_join("./manage.py", service, "shell", "-c", print_setting))
 
 
 @click.command()
@@ -259,12 +264,20 @@ def print_edx_platform_setting(
     ),
 )
 @click.argument("theme_name")
-def settheme(domains: list[str], theme_name: str) -> t.Iterable[tuple[str, str]]:
+@click.pass_obj
+def settheme(
+    context: Context, domains: list[str], theme_name: str
+) -> t.Iterable[tuple[str, str]]:
     """
     Assign a theme to the LMS and the CMS.
 
     To reset to the default theme , use 'default' as the theme name.
     """
+    if not domains:
+        config = tutor_config.load(context.root)
+        lms_host = t.cast(str, config["LMS_HOST"])
+        cms_host = t.cast(str, config["CMS_HOST"])
+        domains = [lms_host, f"{lms_host}:8000", cms_host, f"{cms_host}:8001"]
     yield ("lms", set_theme_template(theme_name, domains))
 
 
@@ -279,7 +292,7 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     """
     command = "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --default-character-set=utf8mb4"
     if args:
-        command += " " + shlex.join(args)
+        command += " " + shell_join(*args)
     yield ("lms", command)
 
 
@@ -306,11 +319,8 @@ def sqlshell(args: list[str]) -> t.Iterable[tuple[str, str]]:
     "--database",
     is_flag=False,
     nargs=1,
-    default="{{ OPENEDX_MYSQL_DATABASE }}",
-    show_default=True,
-    required=True,
     type=str,
-    help="The database of which the tables are to be upgraded",
+    help="The database of which the tables are to be upgraded. If unspecified, will default to the value of the OPENEDX_MYSQL_DATABASE setting.",
 )
 @click.option("-I", "--non-interactive", is_flag=True, help="Run non-interactively")
 @click.pass_obj
@@ -318,7 +328,7 @@ def convert_mysql_utf8mb4_charset(
     context: Context,
     include: str,
     exclude: str,
-    database: str,
+    database: t.Optional[str],
     non_interactive: bool,
 ) -> t.Iterable[tuple[str, str]]:
     """
@@ -335,6 +345,7 @@ def convert_mysql_utf8mb4_charset(
             "responsibility to upgrade the charset and collation of your MySQL instance."
         )
         return
+    database = database or t.cast(str, config["OPENEDX_MYSQL_DATABASE"])
 
     # Prompt user for confirmation of upgrading all tables
     if not include and not exclude and not non_interactive:
@@ -358,7 +369,9 @@ def convert_mysql_utf8mb4_charset(
             for i in range(1, len(tables)):
                 table_names += f"|^{tables[i]}"
             # We use regexp for pattern matching the names from the start of the tablename
-            query_to_append = f"AND table_name {include} regexp '{table_names}' "
+            query_to_append = (
+                f"AND table_name {include} regexp {mysql_string(table_names)} "
+            )
             return query_to_append
 
         query_to_append += (
@@ -380,7 +393,7 @@ def convert_mysql_utf8mb4_charset(
 
     mysql_command = (
         "mysql --user={{ MYSQL_ROOT_USERNAME }} --password={{ MYSQL_ROOT_PASSWORD }} --host={{ MYSQL_HOST }} --port={{ MYSQL_PORT }} --skip-column-names --silent "
-        + shlex.join([f"--database={database}", "-e", query])
+        + shell_join(f"--database={database}", "-e", query)
     )
     yield ("lms", mysql_command)
     fmt.echo_info("MySQL charset and collation successfully upgraded")
@@ -456,7 +469,7 @@ def update_mysql_authentication_plugin(
 
     host = "%"
 
-    query = f"ALTER USER IF EXISTS '{user}'@'{host}' IDENTIFIED with caching_sha2_password BY '{password}';"
+    query = f"ALTER USER IF EXISTS {mysql_string(user)}@{mysql_string(host)} IDENTIFIED with caching_sha2_password BY {mysql_string(password)};"
 
     yield (
         "lms",
@@ -469,10 +482,10 @@ def update_mysql_authentication_plugin(
                 "--port={{ MYSQL_PORT }}",
                 "--database={{ OPENEDX_MYSQL_DATABASE }}",
                 "--show-warnings",
-                "-e",
-                query,
             ]
-        ),
+        )
+        + " "
+        + shell_join("-e", query),
     )
 
 
