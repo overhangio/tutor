@@ -209,6 +209,14 @@ class Filters:
     #:   added as subcommands to the ``local/dev/k8s do`` commands. They must return a list of
     #:   ("service name", "service command") tuples. Each "service command" will be executed
     #:   in the "service" container, both in local, dev and k8s mode.
+    #:
+    #: Service commands are scripts that may contain Jinja markup: they are rendered as
+    #: templates on the host, then run with ``sh`` in the container. Thus, untrusted
+    #: values, such as command line arguments, must never be included verbatim in
+    #: service commands. Instead, quote them for the shell with ``shlex.quote(value)``,
+    #: then escape the result with ``tutor.env.escape_template(...)``. Values that are
+    #: included in code, such as a Python script, must also be quoted for that language;
+    #: for instance with ``repr(value)`` in Python.
     CLI_DO_COMMANDS: Filter[list[Callable[[Any], Iterable[tuple[str, str]]]], []] = (
         Filter()
     )
