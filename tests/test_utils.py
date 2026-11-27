@@ -1,5 +1,6 @@
 import base64
 import os
+import subprocess
 import tempfile
 import unittest
 from io import StringIO
@@ -18,6 +19,7 @@ class UtilsTests(unittest.TestCase):
                 {"ENABLE_HTTPS": enable_https, "ENABLE_WEB_PROXY": enable_web_proxy},
                 storage="/tutor/data/caddy",
                 logs_command="tutor local logs -f caddy",
+                certificates_command="tutor local https-certificates",
             )
             return [str(call.args[0]) for call in echo.call_args_list]
 
@@ -27,12 +29,32 @@ class UtilsTests(unittest.TestCase):
         self.assertIn("rate limits", alerts[0])
         self.assertIn("Do not delete /tutor/data/caddy", alerts[0])
         self.assertIn("`tutor local logs -f caddy`", alerts[0])
+        self.assertIn("`tutor local https-certificates`", alerts[0])
         self.assertIn("#letsencrypt-rate-limits", alerts[0])
 
         # Plain http, or certificates managed by an external web proxy: no warning
         self.assertEqual([], warn(False, True))
         self.assertEqual([], warn(True, False))
         self.assertEqual([], warn(False, False))
+
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("subprocess.check_output", return_value=b"out")
+    def test_check_output(self, check_output: MagicMock, stdout: StringIO) -> None:
+        self.assertEqual(b"out", utils.check_output("echo", "out"))
+        self.assertIn("echo out", stdout.getvalue())
+
+        # A long script is printed as "...", but it is run unchanged
+        stdout.seek(0)
+        stdout.truncate(0)
+        script = "echo 'a long script'"
+        self.assertEqual(b"out", utils.check_output("sh", "-c", script, hidden=script))
+        self.assertEqual("sh -c ...", stdout.getvalue().strip())
+        check_output.assert_called_with(("sh", "-c", script))
+
+        check_output.side_effect = subprocess.CalledProcessError(2, "sh")
+        with self.assertRaises(exceptions.TutorError) as context:
+            utils.check_output("sh", "-c", script, hidden=script)
+        self.assertEqual("Command failed: sh -c ...", str(context.exception))
 
     def test_common_domain(self) -> None:
         self.assertEqual(

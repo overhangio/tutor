@@ -12,7 +12,7 @@ import struct
 import subprocess
 import sys
 import uuid as uuid_module
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -199,11 +199,15 @@ def docker_compose(*command: str) -> int:
 
 
 def kubectl(*command: str) -> int:
+    check_kubectl()
+    return execute("kubectl", *command)
+
+
+def check_kubectl() -> None:
     if shutil.which("kubectl") is None:
         raise exceptions.TutorError(
             "kubectl is not installed. Please follow instructions from https://kubernetes.io/docs/tasks/tools/install-kubectl/"
         )
-    return execute("kubectl", *command)
 
 
 def is_a_tty() -> bool:
@@ -238,8 +242,12 @@ def execute_silent(*command: str) -> int:
     return result
 
 
-def check_output(*command: str) -> bytes:
-    literal_command = shlex.join(command)
+def check_output(*command: str, hidden: Optional[str] = None) -> bytes:
+    """
+    Run a command and return its output. The command is printed first, with the
+    `hidden` argument, such as a long script, shortened to "...".
+    """
+    literal_command = shlex.join("..." if arg == hidden else arg for arg in command)
     click.echo(fmt.command(literal_command))
     try:
         return subprocess.check_output(command)
@@ -247,7 +255,9 @@ def check_output(*command: str) -> bytes:
         raise exceptions.TutorError(f"Command failed: {literal_command}") from e
 
 
-def warn_https_certificates(config: Config, storage: str, logs_command: str) -> None:
+def warn_https_certificates(
+    config: Config, storage: str, logs_command: str, certificates_command: str
+) -> None:
     """
     When Caddy generates SSL/TLS certificates, warn the user about the Let's
     Encrypt rate limits.
@@ -261,6 +271,7 @@ def warn_https_certificates(config: Config, storage: str, logs_command: str) -> 
     Arguments:
         storage: where Caddy stores its data, as it should be shown to the user.
         logs_command: the command that prints the logs of the Caddy container.
+        certificates_command: the command that lists the certificates of Caddy.
     """
     if not (
         get_typed(config, "ENABLE_HTTPS", bool, False)
@@ -273,7 +284,7 @@ def warn_https_certificates(config: Config, storage: str, logs_command: str) -> 
 - Make sure that the DNS records of all domain names point to this server: failed validations count towards the limits.
 - Do not delete {storage} when you re-install the platform: it stores the certificates and the Let's Encrypt account, which would otherwise be requested again.
 
-If HTTPS access does not work, check the logs with `{logs_command}`. See:
+If HTTPS access does not work, check the logs with `{logs_command}`. To list the certificates of Caddy, run `{certificates_command}`. See:
 https://docs.tutor.edly.io/troubleshooting.html#letsencrypt-rate-limits"""
     )
 
