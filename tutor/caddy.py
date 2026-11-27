@@ -36,7 +36,7 @@ CADDYFILE_PATH = "/etc/caddy/Caddyfile"
 CERTIFICATES_DIR = "/data/caddy/certificates"
 RUNNING_CONFIG_PATH = "/config/caddy/autosave.json"
 HTTP_PORT = 80
-MIN_TIME = datetime.min.replace(tzinfo=timezone.utc)
+MAX_TIME = datetime.max.replace(tzinfo=timezone.utc)
 
 # Issuers are identified by the directory where Caddy stores their certificates
 LETSENCRYPT_CA = "https://acme-v02.api.letsencrypt.org/directory"
@@ -186,7 +186,10 @@ def parse_stored_certificate(path: str, crt: str, metadata: str) -> StoredCertif
     Caddy stores certificates in <issuer>/<name>/<name>.crt, where <name> is the
     storage key of the domain name, and their metadata in <name>.json.
     """
-    issuer, name_dir = path.split("/")[-3:-1]
+    parts = path.split("/")
+    if len(parts) < 3:
+        raise exceptions.TutorError(f"Unexpected certificate path: {path}")
+    issuer, name_dir = parts[-3:-1]
     try:
         validity: t.Optional[tuple[datetime, datetime]] = parse_validity(crt)
     except (ValueError, IndexError, TypeError):
@@ -319,8 +322,11 @@ def managed_domains(adapted: dict[str, t.Any]) -> list[Domain]:
             or (listen and all(a.rsplit(":", 1)[-1] == http_port for a in listen))
         ):
             continue
-        skip = automatic_https.get("skip", [])
-        skip = [s.lower() for s in skip + automatic_https.get("skip_certificates", [])]
+        skip = [
+            s.lower()
+            for key in ("skip", "skip_certificates")
+            for s in automatic_https.get(key) or []
+        ]
         for route in server.get("routes") or []:
             for matcher in route.get("match") or []:
                 for name in [host.lower() for host in matcher.get("host") or []]:
@@ -334,13 +340,15 @@ def managed_domains(adapted: dict[str, t.Any]) -> list[Domain]:
 def _domain(name: str, policies: list[dict[str, t.Any]]) -> Domain:
     """
     The automation policy of a domain name is the first one that lists it in its
-    subjects, or that has no subjects. Wildcard subjects are not supported. Without
-    automation policies, Caddy issues certificates for all IP addresses from its
-    internal CA.
+    subjects, or that has no subjects. Wildcard subjects are not supported. Caddy
+    issues certificates for internal names from its internal CA, unless their policy
+    lists them in its subjects with issuers of its own (e.g. "tls { issuer acme }"),
+    and for all IP addresses when there are no policies.
     """
-    if is_internal(name) or (not policies and _ip_address(name)):
-        return Domain(name, (INTERNAL,), True)
     policy = next((p for p in policies if name in (p.get("subjects") or [name])), {})
+    explicit = name in (policy.get("subjects") or []) and policy.get("issuers")
+    if not explicit and (is_internal(name) or (not policies and _ip_address(name))):
+        return Domain(name, (INTERNAL,), True)
     issuers = policy.get("issuers") or [{"module": "acme"}]
     return Domain(
         name,
@@ -402,7 +410,8 @@ def build_report(
 ) -> Report:
     """
     For each one of its issuers, Caddy loads the certificate of a domain name from
-    <issuer>/<storage key>, and it uses the most recent one.
+    <issuer>/<storage key>, and it uses the most recent one. When a candidate cannot be
+    read, we cannot tell which one is the most recent, so it is the one we report.
     """
     rows = []
     used = []
@@ -418,7 +427,7 @@ def build_report(
                 new.append(domain)
             continue
         certificate = max(
-            candidates, key=lambda c: c.validity[0] if c.validity else MIN_TIME
+            candidates, key=lambda c: c.validity[0] if c.validity else MAX_TIME
         )
         used.append(certificate)
         status = certificate_status(certificate, now)
@@ -494,9 +503,13 @@ def _relative_time(when: datetime, now: datetime) -> str:
     seconds = abs((when - now).total_seconds())
     if seconds >= 86400:
         count, unit = int(seconds // 86400), "day"
-    else:
+    elif seconds >= 3600:
         count, unit = int(seconds // 3600), "hour"
+    else:
+        count, unit = int(seconds // 60), "minute"
     text = f"{count} {unit}{'' if count == 1 else 's'}"
+    if seconds < 60:
+        text = "less than a minute"
     return f"in {text}" if when >= now else f"{text} ago"
 
 
@@ -564,7 +577,7 @@ def print_certificates(
     report = build_report(managed_domains(output.adapted), output.stored, now)
     if not report.rows:
         fmt.echo_info(
-            "Caddy does not generate SSL/TLS certificates: no domain name is served over HTTPS."
+            "Caddy does not obtain SSL/TLS certificates automatically for any domain name."
         )
         return
 

@@ -37,7 +37,7 @@ class K8sTests(unittest.TestCase, TestCommandMixin):
                 ),
                 run.call_args.args[:-1],
             )
-            self.assertEqual({"echo": False}, run.call_args.kwargs)
+            self.assertEqual({"hidden": run.call_args.args[-1]}, run.call_args.kwargs)
 
             # Caddy is not running
             with patch("tutor.utils.check_output", side_effect=TutorError("failed")):

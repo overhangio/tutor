@@ -621,7 +621,7 @@ def https_certificates(context: K8sContext) -> None:
             "sh",
             "-c",
             script,
-            echo=False,
+            hidden=script,
         )
 
     utils.check_kubectl()

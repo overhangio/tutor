@@ -97,7 +97,7 @@ class LocalTests(unittest.TestCase, TestCommandMixin):
             command = run.call_args.args
             self.assertEqual(("docker", "compose"), command[:2])
             self.assertEqual(("exec", "-T", "caddy", "sh", "-c"), command[-6:-1])
-            self.assertEqual({"echo": False}, run.call_args.kwargs)
+            self.assertEqual({"hidden": command[-1]}, run.call_args.kwargs)
             lines = result.output.splitlines()
             self.assertTrue(lines[0].startswith("DOMAIN"))
             self.assertTrue(lines[1].startswith("learn.example.com"))

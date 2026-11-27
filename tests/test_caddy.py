@@ -94,6 +94,11 @@ class CertificateTests(unittest.TestCase):
         self.assertIsNone(stored.ari_time)
         self.assertIsNotNone(stored.validity)
 
+    def test_parse_stored_certificate_short_path(self) -> None:
+        with self.assertRaises(TutorError) as context:
+            caddy.parse_stored_certificate("a.test.crt", "", "")
+        self.assertIn("Unexpected certificate path: a.test.crt", str(context.exception))
+
     def test_parse_stored_certificate_invalid(self) -> None:
         path = "/certificates/local/wildcard_.example.com/wildcard_.example.com.crt"
         truncated = (
@@ -288,6 +293,11 @@ class ManagedDomainsTests(unittest.TestCase):
         skip = {"skip": ["A.test"], "skip_certificates": ["b.test"]}
         config = http_config("a.test", "b.test", "c.test", automatic_https=skip)
         self.assertEqual(["c.test"], self.names(config))
+        # The configuration is compared with the running one later: leave it unchanged
+        self.assertEqual(["A.test"], skip["skip"])
+        null_skip = {"skip": None, "skip_certificates": None}
+        config = http_config("a.test", automatic_https=null_skip)
+        self.assertEqual(["a.test"], self.names(config))
         self.assertEqual(
             ["*.wild.test"],
             self.names(http_config("{http.request.host}", "*.wild.test", "a..test")),
@@ -340,6 +350,22 @@ class ManagedDomainsTests(unittest.TestCase):
             ],
             caddy.managed_domains(
                 http_config("a.test", "dev.localhost", policies=policies)
+            ),
+        )
+        # An internal name with an issuer of its own ("tls { issuer acme }"), next to
+        # an internal name without one, as adapted by Caddy 2.11.7
+        policies = [
+            {"subjects": ["a.localhost"], "issuers": [pebble]},
+            {"subjects": ["b.localhost"]},
+            {"issuers": [pebble]},
+        ]
+        self.assertEqual(
+            [
+                caddy.Domain("a.localhost", (PEBBLE,), False),
+                caddy.Domain("b.localhost", (caddy.INTERNAL,), True),
+            ],
+            caddy.managed_domains(
+                http_config("a.localhost", "b.localhost", policies=policies)
             ),
         )
         # Global "email" option
@@ -444,6 +470,16 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(stored[1], report.rows[0].certificate)
         self.assertEqual(caddy.STATUS_NOT_USED, report.rows[1].status)
 
+        # We cannot tell whether an unreadable certificate is the most recent one:
+        # report it, rather than an older one
+        stored[1] = caddy.StoredCertificate(
+            caddy.LETSENCRYPT, "a.test", ("a.test",), None, None
+        )
+        report = caddy.build_report(domains, stored, utc(2026, 11, 12))
+        self.assertEqual(stored[1], report.rows[0].certificate)
+        self.assertEqual(caddy.STATUS_UNREADABLE, report.rows[0].status)
+        self.assertEqual(caddy.STATUS_NOT_USED, report.rows[1].status)
+
     def test_wildcard_and_unreadable(self) -> None:
         domains = [domain("*.wild.test"), domain("a.test")]
         stored = [
@@ -526,6 +562,21 @@ class FormatReportTests(unittest.TestCase):
         )
         lines = self.format_report(report, utc(2026, 11, 23, 19))
         self.assertIn("(in 5 hours)", lines[1])
+        lines = self.format_report(report, utc(2026, 11, 23, 23, 59, 30))
+        self.assertIn("(in less than a minute)", lines[1])
+
+    def test_relative_time(self) -> None:
+        now = utc(2026, 11, 23, 12)
+        for when, text in [
+            (utc(2026, 11, 23, 12, 1), "in 1 minute"),
+            (utc(2026, 11, 23, 12, 59, 59), "in 59 minutes"),
+            (utc(2026, 11, 23, 13), "in 1 hour"),
+            (utc(2026, 11, 23, 11, 15), "45 minutes ago"),
+            (utc(2026, 11, 22, 10), "1 day ago"),
+            (utc(2026, 11, 23, 12, 0, 59), "in less than a minute"),
+            (utc(2026, 11, 23, 11, 59, 30), "less than a minute ago"),
+        ]:
+            self.assertEqual(text, caddy._relative_time(when, now))
 
 
 class PrintCertificatesTests(unittest.TestCase):
@@ -592,7 +643,10 @@ class PrintCertificatesTests(unittest.TestCase):
         self.assertIn('"auto_https off"', output[0])
         adapted = http_config("a.test", listen=[":80"])
         output, _ = self.print_certificates(caddy_output(json.dumps(adapted)))
-        self.assertIn("no domain name is served over HTTPS", output[0])
+        self.assertIn("does not obtain SSL/TLS certificates automatically", output[0])
+        adapted = http_config("a.test", automatic_https={"disable_certificates": True})
+        output, _ = self.print_certificates(caddy_output(json.dumps(adapted)))
+        self.assertIn("does not obtain SSL/TLS certificates automatically", output[0])
 
     def test_storage_module(self) -> None:
         adapted = http_config("a.test")

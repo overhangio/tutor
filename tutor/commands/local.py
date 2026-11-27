@@ -65,7 +65,7 @@ def https_certificates(context: LocalContext) -> None:
 
     def run_script(script: str) -> bytes:
         return runner.docker_compose_output(
-            "exec", "-T", "caddy", "sh", "-c", script, echo=False
+            "exec", "-T", "caddy", "sh", "-c", script, hidden=script
         )
 
     caddy.print_certificates(

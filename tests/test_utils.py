@@ -43,15 +43,18 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual(b"out", utils.check_output("echo", "out"))
         self.assertIn("echo out", stdout.getvalue())
 
+        # A long script is printed as "...", but it is run unchanged
+        stdout.seek(0)
         stdout.truncate(0)
-        self.assertEqual(b"out", utils.check_output("echo", "out", echo=False))
-        self.assertEqual("", stdout.getvalue())
-        check_output.assert_called_with(("echo", "out"))
+        script = "echo 'a long script'"
+        self.assertEqual(b"out", utils.check_output("sh", "-c", script, hidden=script))
+        self.assertEqual("sh -c ...", stdout.getvalue().strip())
+        check_output.assert_called_with(("sh", "-c", script))
 
-        check_output.side_effect = subprocess.CalledProcessError(2, "echo")
+        check_output.side_effect = subprocess.CalledProcessError(2, "sh")
         with self.assertRaises(exceptions.TutorError) as context:
-            utils.check_output("echo", "out", echo=False)
-        self.assertEqual("Command failed: echo out", str(context.exception))
+            utils.check_output("sh", "-c", script, hidden=script)
+        self.assertEqual("Command failed: sh -c ...", str(context.exception))
 
     def test_common_domain(self) -> None:
         self.assertEqual(

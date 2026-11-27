@@ -12,7 +12,7 @@ import struct
 import subprocess
 import sys
 import uuid as uuid_module
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -242,14 +242,13 @@ def execute_silent(*command: str) -> int:
     return result
 
 
-def check_output(*command: str, echo: bool = True) -> bytes:
+def check_output(*command: str, hidden: Optional[str] = None) -> bytes:
     """
-    Run a command and return its output. The command is printed first, unless `echo`
-    is False.
+    Run a command and return its output. The command is printed first, with the
+    `hidden` argument, such as a long script, shortened to "...".
     """
-    literal_command = shlex.join(command)
-    if echo:
-        click.echo(fmt.command(literal_command))
+    literal_command = shlex.join("..." if arg == hidden else arg for arg in command)
+    click.echo(fmt.command(literal_command))
     try:
         return subprocess.check_output(command)
     except Exception as e:
