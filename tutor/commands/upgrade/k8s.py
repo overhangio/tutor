@@ -116,7 +116,9 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
             "--selector",
             "app.kubernetes.io/name=mysql",
         )
-        k8s.wait_for_deployment_ready(config, "mysql")
+        k8s.wait_for_deployment_ready(
+            config, "mysql", timeout=k8s.DATABASE_STARTUP_TIMEOUT
+        )
 
     # lms upgrade
     k8s.kubectl_apply(
@@ -124,7 +126,9 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=lms",
     )
-    k8s.wait_for_deployment_ready(config, "lms")
+    # MongoDB is not started in this step, so the pod cannot be ready: we only need
+    # it to run to exec commands.
+    k8s.wait_for_pod_running(config, "lms")
 
     # Command backpopulate_user_tours
     k8s.kubectl_exec(
@@ -140,7 +144,9 @@ def upgrade_from_maple(context: Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=cms",
     )
-    k8s.wait_for_deployment_ready(config, "cms")
+    # MongoDB is not started in this step, so the pod cannot be ready: we only need
+    # it to run to exec commands.
+    k8s.wait_for_pod_running(config, "cms")
 
     # Command backfill_course_tabs
     k8s.kubectl_exec(
@@ -172,7 +178,9 @@ def upgrade_from_olive(context: click.Context, config: Config) -> None:
         "--selector",
         "app.kubernetes.io/name=lms",
     )
-    k8s.wait_for_deployment_ready(config, "lms")
+    # The databases may not be running yet, so the pod cannot be ready: we only
+    # need it to run to exec commands.
+    k8s.wait_for_pod_running(config, "lms")
     k8s.kubectl_exec(
         config,
         "lms",
@@ -301,7 +309,9 @@ spec:
         "--selector",
         "app.kubernetes.io/name=mysql-81",
     )
-    k8s.wait_for_deployment_ready(config, "mysql-81")
+    k8s.wait_for_deployment_ready(
+        config, "mysql-81", timeout=k8s.DATABASE_STARTUP_TIMEOUT
+    )
     context.invoke(k8s.do.commands["init"], limit="mysql-8.1")
     context.invoke(k8s.stop, names=["mysql-81"])
 
@@ -315,7 +325,7 @@ spec:
         "--selector",
         "app.kubernetes.io/name=mysql",
     )
-    k8s.wait_for_deployment_ready(config, "mysql")
+    k8s.wait_for_deployment_ready(config, "mysql", timeout=k8s.DATABASE_STARTUP_TIMEOUT)
     context.invoke(k8s.do.commands["init"], limit="mysql")
     context.invoke(k8s.stop, names=["mysql"])
 

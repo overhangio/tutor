@@ -19,6 +19,9 @@ services:
         DJANGO_SETTINGS_MODULE: lms.envs.tutor.development
     ports:
         - "8000:8000"
+    # Do not flood the development server logs with heartbeat requests
+    healthcheck:
+      disable: true
     networks:
       default:
         aliases:
@@ -31,6 +34,9 @@ services:
         DJANGO_SETTINGS_MODULE: cms.envs.tutor.development
     ports:
         - "8001:8000"
+    # Do not flood the development server logs with heartbeat requests
+    healthcheck:
+      disable: true
 
   {% if RUN_MEILISEARCH -%}
   meilisearch:

@@ -88,6 +88,22 @@ spec:
             value: "{{ OPENEDX_CMS_GRANIAN_WORKERS }}"
           ports:
             - containerPort: 8000
+          # Pods only receive traffic once they can serve requests. The heartbeat
+          # endpoint checks the connection to MySQL and MongoDB. The Host header
+          # must match Django's ALLOWED_HOSTS.
+          # There are no startup or TCP liveness probes: the server socket accepts
+          # connections before the application is loaded, and even when all
+          # workers are stuck, so these probes would never fail.
+          readinessProbe:
+            httpGet:
+              path: /heartbeat
+              port: 8000
+              httpHeaders:
+                - name: Host
+                  value: cms
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 9
           volumeMounts:
             - mountPath: /openedx/edx-platform/lms/envs/tutor/
               name: settings-lms
@@ -199,6 +215,22 @@ spec:
             value: "{{ OPENEDX_LMS_GRANIAN_WORKERS }}"
           ports:
             - containerPort: 8000
+          # Pods only receive traffic once they can serve requests. The heartbeat
+          # endpoint checks the connection to MySQL and MongoDB. The Host header
+          # must match Django's ALLOWED_HOSTS.
+          # There are no startup or TCP liveness probes: the server socket accepts
+          # connections before the application is loaded, and even when all
+          # workers are stuck, so these probes would never fail.
+          readinessProbe:
+            httpGet:
+              path: /heartbeat
+              port: 8000
+              httpHeaders:
+                - name: Host
+                  value: lms
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 9
           volumeMounts:
             - mountPath: /openedx/edx-platform/lms/envs/tutor/
               name: settings-lms
@@ -327,6 +359,28 @@ spec:
               value: "{{ MEILISEARCH_MASTER_KEY }}"
           ports:
             - containerPort: 7700
+          # Index imports can take a long time before the server accepts
+          # connections: the startup probe allows 30 minutes.
+          startupProbe:
+            tcpSocket:
+              port: 7700
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 180
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 7700
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 7700
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
           securityContext:
             allowPrivilegeEscalation: false
           volumeMounts:
@@ -387,6 +441,28 @@ spec:
           args: ["mongod", "--storageEngine", "wiredTiger"]
           ports:
             - containerPort: 27017
+          # Database probes are plain TCP checks: they work with any image
+          # version and credentials. Crash recovery and upgrades of large data
+          # directories can take a long time before the server accepts
+          # connections: the startup probe allows 30 minutes.
+          startupProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 180
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
           volumeMounts:
             - mountPath: /data/db
               name: data
@@ -455,6 +531,28 @@ spec:
               value: "{{ MYSQL_ROOT_PASSWORD }}"
           ports:
             - containerPort: 3306
+          # Database probes are plain TCP checks: they work with any image
+          # version and credentials. Crash recovery and upgrades of large data
+          # directories can take a long time before the server accepts
+          # connections: the startup probe allows 30 minutes.
+          startupProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 180
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: data
@@ -542,6 +640,29 @@ spec:
           workingDir: /openedx/redis/data
           ports:
             - containerPort: {{ REDIS_PORT }}
+          # Database probes are plain TCP checks: they work with any image
+          # version and credentials. Crash recovery and upgrades of large data
+          # directories can take a long time before the server accepts
+          # connections: the startup probe allows 30 minutes.
+          # redis.conf binds port 6379 regardless of REDIS_PORT.
+          startupProbe:
+            tcpSocket:
+              port: 6379
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 180
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
           volumeMounts:
             - mountPath: /openedx/redis/config/
               name: config

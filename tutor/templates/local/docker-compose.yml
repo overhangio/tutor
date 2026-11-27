@@ -37,6 +37,15 @@ services:
       - ../../data/mongodb:/data/db:z
     depends_on:
       - permissions
+    healthcheck:
+      # HOME=/tmp keeps mongosh from writing logs to the data volume. MongoDB < 6
+      # images, which some users need on CPUs without AVX, only ship the legacy
+      # mongo shell.
+      test: ["CMD-SHELL", "export HOME=/tmp; mongosh --quiet --eval 'db.adminCommand(\"ping\").ok' || mongo --quiet --eval 'db.adminCommand(\"ping\").ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 1m
   {%- endif %}
 
   {% if RUN_MYSQL -%}
@@ -54,6 +63,15 @@ services:
       - ../../data/mysql:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
+    healthcheck:
+      # No credentials: mysqladmin ping succeeds whenever the server is up,
+      # even when authentication fails, and this keeps the root password out
+      # of `docker inspect` output.
+      test: ["CMD", "mysqladmin", "ping", "-h127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 2m
   {%- endif %}
 
   {% if RUN_MEILISEARCH -%}
@@ -67,6 +85,12 @@ services:
     user: "1000:1000"
     depends_on:
       - permissions
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   {%- endif %}
 
   {% if RUN_REDIS -%}
@@ -81,6 +105,14 @@ services:
     restart: unless-stopped
     depends_on:
       - permissions
+    healthcheck:
+      # redis-cli exits with 0 on error replies, such as LOADING. NOAUTH means that
+      # the server is up, but that a plugin requires a password.
+      test: ["CMD-SHELL", "redis-cli ping | grep -qE 'PONG|NOAUTH'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   {%- endif %}
 
   {% if RUN_SMTP -%}
@@ -112,6 +144,13 @@ services:
       {%- for mount in iter_mounts(MOUNTS, "openedx", "lms") %}
       - {{ mount }}:z
       {%- endfor %}
+    healthcheck:
+      # The Host header must match Django's ALLOWED_HOSTS.
+      test: ["CMD", "curl", "-fsS", "--max-time", "10", "-H", "Host: lms", "http://localhost:8000/heartbeat"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 5m
     depends_on:
       - permissions
       {% if RUN_MYSQL %}- mysql{% endif %}
@@ -139,6 +178,13 @@ services:
       {%- for mount in iter_mounts(MOUNTS, "openedx", "cms") %}
       - {{ mount }}:z
       {%- endfor %}
+    healthcheck:
+      # The Host header must match Django's ALLOWED_HOSTS.
+      test: ["CMD", "curl", "-fsS", "--max-time", "10", "-H", "Host: cms", "http://localhost:8000/heartbeat"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 5m
     depends_on:
       - permissions
       - lms

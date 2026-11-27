@@ -223,3 +223,13 @@ The values in this file will override the values from ``docker-compose.yml`` as 
 Services defined in ``docker-compose.prod.yml`` can be overriden in a ``docker-compose.prod.override.yml`` file in that same folder.
 
 Similarly, the job service configuration can be overridden by creating a ``docker-compose.jobs.override.yml`` file in that same folder.
+
+The lms, cms, mysql, mongodb, redis and meilisearch services define health checks, and their status is displayed by ``tutor local status``. Health checks can be tuned or disabled in the same ``docker-compose.override.yml`` file. For instance::
+
+    services:
+      lms:
+        healthcheck:
+          interval: 1m
+      mongodb:
+        healthcheck:
+          disable: true
