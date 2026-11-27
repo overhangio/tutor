@@ -4,7 +4,9 @@ import os
 import re
 import typing as t
 
-from tutor import bindmount, fmt, hooks
+import jinja2
+
+from tutor import bindmount, exceptions, fmt, hooks
 from tutor.__about__ import __version_suffix__
 from tutor.plugins.base import PLUGINS_ROOT
 
@@ -267,3 +269,200 @@ hooks.Filters.ENV_TEMPLATE_VARIABLES.add_items(
         ("iter_lms_celery_parameters", iter_lms_celery_parameters),
     ]
 )
+
+
+# Options of the "create_dot_application" management command, as keys of the
+# OPENEDX_OAUTH2_APPLICATIONS items.
+_OAUTH2_APPLICATION_STRING_OPTIONS = {
+    "client_id": "--client-id",
+    "client_secret": "--client-secret",
+    "grant_type": "--grant-type",
+    "redirect_uris": "--redirect-uris",
+    "scopes": "--scopes",
+}
+_OAUTH2_APPLICATION_BOOL_OPTIONS = {
+    "public": "--public",
+    "skip_authorization": "--skip-authorization",
+}
+# Options of the "manage_user" management command, as keys of the
+# OPENEDX_SERVICE_USERS items.
+_SERVICE_USER_BOOL_OPTIONS = {
+    "staff": "--staff",
+    "superuser": "--superuser",
+    "unusable_password": "--unusable-password",
+}
+
+
+def has_lms_init_items(context_name: t.Optional[str] = None) -> bool:
+    """
+    Return True if there are service users, OAuth2 applications or waffle flags to
+    create in the given context.
+    """
+    for items in (
+        hooks.Filters.OPENEDX_SERVICE_USERS.iterate_from_context(context_name),
+        hooks.Filters.OPENEDX_OAUTH2_APPLICATIONS.iterate_from_context(context_name),
+        hooks.Filters.OPENEDX_WAFFLE_FLAGS.iterate_from_context(context_name),
+    ):
+        for _item in items:
+            return True
+    return False
+
+
+def lms_init_script_template(context_name: t.Optional[str] = None) -> str:
+    """
+    Python code that creates all service users, OAuth2 applications and waffle flags
+    in the LMS. It is meant to be run with `./manage.py lms shell`, such that Django is
+    only booted once. `call_command` must be imported.
+
+    The result is a Jinja template: string values from the filters may contain
+    templates themselves, and they are rendered as Python string literals with
+    `{% filter tutor_python_str %}` (see `openedx_lms_init_script`).
+    """
+    lines: list[str] = []
+
+    for user in hooks.Filters.OPENEDX_SERVICE_USERS.iterate_from_context(context_name):
+        user = _copy_dict(user, "OPENEDX_SERVICE_USERS")
+        username = _pop_required(user, "username", "OPENEDX_SERVICE_USERS")
+        email = user.pop("email", f"{username}@openedx")
+        args = [_py_str(username, "OPENEDX_SERVICE_USERS", "username")]
+        args.append(_py_str(email, "OPENEDX_SERVICE_USERS", "email"))
+        args += _pop_bool_options(
+            user, _SERVICE_USER_BOOL_OPTIONS, "OPENEDX_SERVICE_USERS"
+        )
+        _check_no_extra_keys(user, "OPENEDX_SERVICE_USERS")
+        lines.append(_call_command("manage_user", args))
+
+    for application in hooks.Filters.OPENEDX_OAUTH2_APPLICATIONS.iterate_from_context(
+        context_name
+    ):
+        application = _copy_dict(application, "OPENEDX_OAUTH2_APPLICATIONS")
+        name = _pop_required(application, "name", "OPENEDX_OAUTH2_APPLICATIONS")
+        username = _pop_required(application, "user", "OPENEDX_OAUTH2_APPLICATIONS")
+        args = [repr("--update")]
+        for key, option in _OAUTH2_APPLICATION_STRING_OPTIONS.items():
+            if key in application:
+                value = application.pop(key)
+                # "--option=value" such that values that start with "-" are not
+                # parsed as options.
+                args.append(
+                    _py_str(
+                        value, "OPENEDX_OAUTH2_APPLICATIONS", key, prefix=f"{option}="
+                    )
+                )
+        args += _pop_bool_options(
+            application, _OAUTH2_APPLICATION_BOOL_OPTIONS, "OPENEDX_OAUTH2_APPLICATIONS"
+        )
+        _check_no_extra_keys(application, "OPENEDX_OAUTH2_APPLICATIONS")
+        args.append(_py_str(name, "OPENEDX_OAUTH2_APPLICATIONS", "name"))
+        args.append(_py_str(username, "OPENEDX_OAUTH2_APPLICATIONS", "user"))
+        lines.append(_call_command("create_dot_application", args))
+
+    flags = list(hooks.Filters.OPENEDX_WAFFLE_FLAGS.iterate_from_context(context_name))
+    if flags:
+        lines.append("from waffle import get_waffle_flag_model")
+        for flag in flags:
+            if not (isinstance(flag, (tuple, list)) and len(flag) == 2):
+                raise exceptions.TutorError(
+                    f"Invalid OPENEDX_WAFFLE_FLAGS item: expected a (name, everyone) tuple, got {flag!r}"
+                )
+            name, everyone = flag
+            if not isinstance(everyone, bool):
+                raise exceptions.TutorError(
+                    f"Invalid OPENEDX_WAFFLE_FLAGS item for '{name}': expected a boolean, got {everyone!r}"
+                )
+            name_str = _py_str(name, "OPENEDX_WAFFLE_FLAGS", "name")
+            lines.append(
+                f"if not get_waffle_flag_model().objects.filter(name={name_str}).exists():"
+            )
+            option = "--everyone" if everyone else "--deactivate"
+            lines.append(
+                "    "
+                + _call_command(
+                    "waffle_flag", [name_str, repr("--create"), repr(option)]
+                )
+            )
+
+    return "\n".join(lines)
+
+
+@jinja2.pass_context
+def openedx_lms_init_script(
+    context: jinja2.runtime.Context, limit: t.Optional[str] = None
+) -> str:
+    """
+    Template function that renders the output of `lms_init_script_template`. When
+    `limit` is defined, only the items from that app are included.
+    """
+    context_name = hooks.Contexts.app(limit).name if limit else None
+    template = lms_init_script_template(context_name)
+    # Python's repr is a valid Python string literal for any string, unlike the JSON
+    # strings produced by `tojson`, which encode non-BMP characters as surrogate pairs.
+    # Note that overlay() shares the filters dict with its parent, so we copy it.
+    environment = context.environment.overlay()
+    environment.filters = {**environment.filters, "tutor_python_str": repr}
+    try:
+        return environment.from_string(template).render(context.get_all())
+    except jinja2.exceptions.TemplateSyntaxError as e:
+        raise exceptions.TutorError(
+            "Template syntax error in the OPENEDX_SERVICE_USERS, "
+            f"OPENEDX_OAUTH2_APPLICATIONS or OPENEDX_WAFFLE_FLAGS items: {e.message}"
+        ) from e
+
+
+hooks.Filters.ENV_TEMPLATE_VARIABLES.add_item(
+    ("openedx_lms_init_script", openedx_lms_init_script)
+)
+
+
+def _call_command(command: str, args: list[str]) -> str:
+    return f"call_command({command!r}, {', '.join(args)})"
+
+
+def _copy_dict(item: t.Any, filter_name: str) -> dict[str, t.Any]:
+    if not isinstance(item, dict):
+        raise exceptions.TutorError(
+            f"Invalid {filter_name} item: expected a dict, got {item!r}"
+        )
+    return dict(item)
+
+
+def _py_str(value: t.Any, filter_name: str, key: str, prefix: str = "") -> str:
+    """
+    Return a Jinja template that renders `prefix + value` as a Python string literal.
+    """
+    if not isinstance(value, str):
+        raise exceptions.TutorError(
+            f"Invalid '{key}' in {filter_name} item: expected a string, got {value!r}"
+        )
+    return "{% filter tutor_python_str %}" + prefix + value + "{% endfilter %}"
+
+
+def _pop_required(item: dict[str, t.Any], key: str, filter_name: str) -> str:
+    if key not in item:
+        raise exceptions.TutorError(
+            f"Missing required key '{key}' in {filter_name} item: {item!r}"
+        )
+    value: str = item.pop(key)
+    return value
+
+
+def _pop_bool_options(
+    item: dict[str, t.Any], options: dict[str, str], filter_name: str
+) -> list[str]:
+    args = []
+    for key, option in options.items():
+        value = item.pop(key, False)
+        if not isinstance(value, bool):
+            raise exceptions.TutorError(
+                f"Invalid '{key}' in {filter_name} item: expected a boolean, got {value!r}"
+            )
+        if value:
+            args.append(repr(option))
+    return args
+
+
+def _check_no_extra_keys(item: dict[str, t.Any], filter_name: str) -> None:
+    if item:
+        raise exceptions.TutorError(
+            f"Unknown keys in {filter_name} item: {', '.join(sorted(item))}"
+        )

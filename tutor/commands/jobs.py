@@ -29,6 +29,7 @@ from tutor.commands.jobs_utils import (
     tests_teardown_lms_template,
 )
 from tutor.hooks import priorities
+from tutor.plugins.openedx import has_lms_init_items
 
 
 class DoGroup(click.Group):
@@ -74,10 +75,47 @@ def _add_core_init_tasks() -> None:
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("lms", env.read_core_template_file("jobs", "init", "lms.sh"))
         )
+        # Create oauth2 apps for CMS SSO
+        # https://github.com/openedx/edx-platform/blob/master/docs/guides/studio_oauth.rst
+        hooks.Filters.OPENEDX_SERVICE_USERS.add_item(
+            {"username": "cms", "unusable_password": True}
+        )
+        hooks.Filters.OPENEDX_OAUTH2_APPLICATIONS.add_items(
+            [
+                {
+                    "name": "cms-sso",
+                    "user": "cms",
+                    "grant_type": "authorization-code",
+                    "redirect_uris": "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ CMS_HOST }}/complete/edx-oauth2/",
+                    "client_id": "{{ CMS_OAUTH2_KEY_SSO }}",
+                    "client_secret": "{{ CMS_OAUTH2_SECRET }}",
+                    "scopes": "user_id",
+                    "skip_authorization": True,
+                },
+                {
+                    "name": "cms-sso-dev",
+                    "user": "cms",
+                    "grant_type": "authorization-code",
+                    "redirect_uris": "http://{{ CMS_HOST }}:8001/complete/edx-oauth2/",
+                    "client_id": "{{ CMS_OAUTH2_KEY_SSO_DEV }}",
+                    "client_secret": "{{ CMS_OAUTH2_SECRET }}",
+                    "scopes": "user_id",
+                    "skip_authorization": True,
+                },
+            ]
+        )
     with hooks.Contexts.app("cms").enter():
         hooks.Filters.CLI_DO_INIT_TASKS.add_item(
             ("cms", env.read_core_template_file("jobs", "init", "cms.sh"))
         )
+
+
+LMS_INIT_LIMITED_TEMPLATE = """cat <<'TUTOR_LMS_INIT_EOF' > /tmp/tutor_lms_init.py
+from django.core.management import call_command
+{{{{ openedx_lms_init_script({limit}) }}}}
+TUTOR_LMS_INIT_EOF
+PYTHONUNBUFFERED=1 ./manage.py lms shell -c "$(cat /tmp/tutor_lms_init.py)"
+"""
 
 
 @click.command("init", help="Initialise all applications")
@@ -85,6 +123,12 @@ def _add_core_init_tasks() -> None:
 def initialise(limit: t.Optional[str]) -> t.Iterator[tuple[str, str]]:
     fmt.echo_info("Initialising all services...")
     filter_context = hooks.Contexts.app(limit).name if limit else None
+
+    # Service users, OAuth2 applications and waffle flags are created by the lms init
+    # task. When it does not run, create the ones from the selected app separately.
+    if limit and limit != "lms" and has_lms_init_items(filter_context):
+        fmt.echo_info("Running init task in lms")
+        yield "lms", LMS_INIT_LIMITED_TEMPLATE.format(limit=repr(limit))
 
     for service, task in hooks.Filters.CLI_DO_INIT_TASKS.iterate_from_context(
         filter_context

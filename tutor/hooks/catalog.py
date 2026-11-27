@@ -217,6 +217,11 @@ class Filters:
     #: includes all database migrations, setting up, etc. To run some tasks before or
     #: after others, they should be assigned a different priority.
     #:
+    #: Each ``./manage.py`` call in a task boots Django, which takes several seconds. To
+    #: create LMS service users, OAuth2 applications and waffle flags, prefer the
+    #: :py:data:`OPENEDX_SERVICE_USERS`, :py:data:`OPENEDX_OAUTH2_APPLICATIONS` and
+    #: :py:data:`OPENEDX_WAFFLE_FLAGS` filters, which are applied in a single Django process.
+    #:
     #: :parameter list[tuple[str, str]] tasks: list of ``(service, task)`` tuples. Each
     #:   task is essentially a bash script to be run in the "service" container. Scripts
     #:   may contain Jinja markup, similar to templates.
@@ -478,6 +483,77 @@ class Filters:
     #: :parameter list[tuple[str, str]] name_regex: Each tuple is the name of an image and a
     #:   regular expression. For instance: ``("openedx", r".*xblock.*")``.
     MOUNTED_DIRECTORIES: Filter[list[tuple[str, str]], []] = Filter()
+
+    #: OAuth2 applications to create or update in the LMS during ``do init``. Example::
+    #:
+    #:     hooks.Filters.OPENEDX_OAUTH2_APPLICATIONS.add_item({
+    #:         "name": "notes",
+    #:         "user": "notes",
+    #:         "client_id": "notes",
+    #:         "client_secret": "{{ NOTES_OAUTH2_SECRET }}",
+    #:         "redirect_uris": "http://notes:8000",
+    #:         "skip_authorization": True,
+    #:     })
+    #:
+    #: Each item is converted to a call to the ``create_dot_application --update``
+    #: management command, so existing applications are updated in place.
+    #:
+    #: Items from this filter, :py:data:`OPENEDX_SERVICE_USERS` and
+    #: :py:data:`OPENEDX_WAFFLE_FLAGS` are applied in a single ``./manage.py lms shell``
+    #: call, at the end of the core lms init task. This is much faster than running one
+    #: ``./manage.py lms ...`` command per item in a :py:data:`CLI_DO_INIT_TASKS` script,
+    #: since each such command boots Django from scratch. Note that:
+    #:
+    #: - Items are added when the plugin is loaded, so they cannot depend on the Tutor
+    #:   configuration, except through templates in their string values.
+    #: - Items are applied after the core lms init steps, including migrations, and
+    #:   before the init tasks of all plugins. With ``do init --limit=<plugin>``, the items
+    #:   of that plugin are applied before all its init tasks.
+    #: - Any failure aborts the lms init task.
+    #: - ``do init --limit=lms`` applies the items of all plugins, while
+    #:   ``do init --limit=<plugin>`` applies only the items of that plugin.
+    #:
+    #: :parameter list[dict[str, Any]] applications: each application is a dict with
+    #:   required ``name`` and ``user`` keys, optional ``client_id``, ``client_secret``,
+    #:   ``grant_type``, ``redirect_uris`` and ``scopes`` string keys, and optional
+    #:   ``public`` and ``skip_authorization`` boolean keys. String values are templates
+    #:   that will be rendered with the Tutor configuration. The user must exist: declare it
+    #:   in :py:data:`OPENEDX_SERVICE_USERS` if needed.
+    OPENEDX_OAUTH2_APPLICATIONS: Filter[list[dict[str, Any]], []] = Filter()
+
+    #: Service users to create or update in the LMS during ``do init``, before the OAuth2
+    #: applications from :py:data:`OPENEDX_OAUTH2_APPLICATIONS` are created. Example::
+    #:
+    #:     hooks.Filters.OPENEDX_SERVICE_USERS.add_item({
+    #:         "username": "notes",
+    #:         "staff": True,
+    #:         "superuser": True,
+    #:     })
+    #:
+    #: Each item is converted to a call to the ``manage_user`` management command. See
+    #: :py:data:`OPENEDX_OAUTH2_APPLICATIONS` for when and how items are applied.
+    #:
+    #: :parameter list[dict[str, Any]] users: each user is a dict with a required
+    #:   ``username`` key, an optional ``email`` key (defaults to "<username>@openedx") and
+    #:   optional ``staff``, ``superuser`` and ``unusable_password`` boolean keys. String
+    #:   values are templates that will be rendered with the Tutor configuration.
+    OPENEDX_SERVICE_USERS: Filter[list[dict[str, Any]], []] = Filter()
+
+    #: Waffle flags to create in the LMS during ``do init``, if they do not exist yet.
+    #: Flags that already exist are left untouched, such that changes made by
+    #: administrators are preserved. Example::
+    #:
+    #:     hooks.Filters.OPENEDX_WAFFLE_FLAGS.add_item(("myplugin.enable_feature", True))
+    #:
+    #: See :py:data:`OPENEDX_OAUTH2_APPLICATIONS` for when and how items are applied.
+    #: Flags that should only exist depending on the configuration, or that should be
+    #: deleted, must still be managed in a :py:data:`CLI_DO_INIT_TASKS` script.
+    #:
+    #: :parameter list[tuple[str, bool]] flags: each item is a ``(name, everyone)`` tuple.
+    #:   When ``everyone`` is true, the flag is created with ``--everyone``; otherwise it is
+    #:   created with ``--deactivate``. The name is a template that will be rendered with
+    #:   the Tutor configuration.
+    OPENEDX_WAFFLE_FLAGS: Filter[list[tuple[str, bool]], []] = Filter()
 
     #: List of plugin indexes that are loaded when we run ``tutor plugins update``. By
     #: default, the plugin indexes are stored in the user configuration. This filter makes

@@ -1,12 +1,15 @@
 import os
+import re
 import tempfile
 import unittest
 from unittest.mock import patch
 
 from tests.helpers import PluginsTestCase, temporary_root
+from tutor import hooks
 from tutor.commands import jobs
 from tutor.commands.jobs_utils import load_env_file, parse_test_env_var
 from tutor.exceptions import TutorError
+from tutor.plugins.openedx import lms_init_script_template
 
 from .base import TestCommandMixin
 
@@ -19,6 +22,178 @@ class JobsTests(PluginsTestCase, TestCommandMixin):
             self.assertIsNone(result.exception)
             self.assertEqual(0, result.exit_code)
             self.assertIn("All services initialised.", result.stdout)
+
+    def _run_init(self, *args: str) -> list[tuple[str, str]]:
+        """
+        Run `local do init` and return the (job service, command) tuples.
+        """
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            with patch("tutor.utils.docker_compose") as mock_docker_compose:
+                result = self.invoke_in_root(root, ["local", "do", "init", *args])
+        self.assertIsNone(result.exception)
+        self.assertEqual(0, result.exit_code)
+        tasks = []
+        for call in mock_docker_compose.call_args_list:
+            services = [arg for arg in call.args if arg.endswith("-job")]
+            if services:
+                tasks.append((services[0], call.args[-1]))
+        return tasks
+
+    def _add_lms_init_items(self) -> None:
+        with hooks.Contexts.app("myplugin").enter():
+            hooks.Filters.OPENEDX_SERVICE_USERS.add_item(
+                {"username": "myplugin", "staff": True}
+            )
+            hooks.Filters.OPENEDX_OAUTH2_APPLICATIONS.add_item(
+                {
+                    "name": "myplugin-sso",
+                    "user": "myplugin",
+                    "client_id": "myplugin",
+                    "client_secret": '{{ LMS_HOST }}\'s "secret" \U0001f600',
+                    "skip_authorization": True,
+                }
+            )
+            hooks.Filters.OPENEDX_WAFFLE_FLAGS.add_items(
+                [("myplugin.enabled", True), ("myplugin.disabled", False)]
+            )
+
+    def test_initialise_lms_init_items(self) -> None:
+        # Declare core init tasks and items
+        hooks.Actions.CORE_READY.do()
+        self._add_lms_init_items()
+        tasks = self._run_init()
+        lms_tasks = [command for service, command in tasks if service == "lms-job"]
+        lms_init = [command for command in lms_tasks if "lms migrate" in command]
+        self.assertEqual(1, len(lms_init))
+        script = lms_init[0]
+        # Core items
+        self.assertIn(
+            "call_command('manage_user', 'cms', 'cms@openedx', '--unusable-password')",
+            script,
+        )
+        self.assertIn("'cms-sso-dev', 'cms')", script)
+        # Plugin items, with rendered and escaped values
+        self.assertIn(
+            "call_command('manage_user', 'myplugin', 'myplugin@openedx', '--staff')",
+            script,
+        )
+        secret = 'local.openedx.io\'s "secret" \U0001f600'
+        self.assertIn(repr(f"--client-secret={secret}"), script)
+        self.assertIn(
+            "call_command('waffle_flag', 'myplugin.enabled', '--create', '--everyone')",
+            script,
+        )
+        self.assertIn(
+            "call_command('waffle_flag', 'myplugin.disabled', '--create', '--deactivate')",
+            script,
+        )
+        # Users are created before the applications that reference them
+        self.assertLess(
+            script.index("'manage_user', 'myplugin'"),
+            script.index("'myplugin-sso', 'myplugin')"),
+        )
+        # Items are created after core init steps
+        self.assertLess(
+            script.index('call_command("load_policies")'),
+            script.index("'manage_user', 'myplugin'"),
+        )
+        # All items are created in a single Django process
+        self.assertEqual(1, script.count("./manage.py lms shell"))
+        self.assert_valid_python_scripts(script)
+
+    def test_initialise_cms_script(self) -> None:
+        hooks.Actions.CORE_READY.do()
+        tasks = self._run_init("--limit=cms")
+        self.assertEqual(["cms-job"], [service for service, _ in tasks])
+        self.assertEqual(1, tasks[0][1].count("./manage.py cms shell"))
+        self.assert_valid_python_scripts(tasks[0][1])
+
+    def test_initialise_limit_lms_includes_plugin_items_once(self) -> None:
+        hooks.Actions.CORE_READY.do()
+        self._add_lms_init_items()
+        tasks = self._run_init("--limit=lms")
+        # mounted-directories.sh + lms.sh, no extra task for the items
+        self.assertEqual(["lms-job", "lms-job"], [service for service, _ in tasks])
+        self.assertIn("'manage_user', 'myplugin'", tasks[1][1])
+
+    def assert_valid_python_scripts(self, script: str) -> None:
+        """
+        Check that the Python scripts written in heredocs are valid code.
+        """
+        bodies = re.findall(r"<<'(\w+)' > \S+\.py\n(.*?)\n\1\n", script, re.DOTALL)
+        self.assertTrue(bodies)
+        for _delimiter, body in bodies:
+            compile(body, "<init script>", "exec")
+
+    def test_initialise_limit_runs_plugin_lms_init_items(self) -> None:
+        hooks.Actions.CORE_READY.do()
+        self._add_lms_init_items()
+        with hooks.Contexts.app("myplugin").enter():
+            hooks.Filters.CLI_DO_INIT_TASKS.add_item(("myplugin", "echo myplugin"))
+        tasks = self._run_init("--limit=myplugin")
+        self.assertEqual(["lms-job", "myplugin-job"], [service for service, _ in tasks])
+        script = tasks[0][1]
+        self.assert_valid_python_scripts(script)
+        self.assertIn("'manage_user', 'myplugin'", script)
+        self.assertIn("'myplugin-sso', 'myplugin')", script)
+        # Core items are not included
+        self.assertNotIn("'cms-sso'", script)
+        self.assertNotIn("lms migrate", script)
+
+    def test_initialise_limit_without_lms_init_items(self) -> None:
+        with hooks.Contexts.app("myplugin").enter():
+            hooks.Filters.CLI_DO_INIT_TASKS.add_item(("myplugin", "echo myplugin"))
+        tasks = self._run_init("--limit=myplugin")
+        self.assertEqual(["myplugin-job"], [service for service, _ in tasks])
+
+    def test_lms_init_script_invalid_items(self) -> None:
+        hooks.Filters.OPENEDX_OAUTH2_APPLICATIONS.add_item(
+            {"name": "app", "user": "user", "redirect_uri": "http://typo"}
+        )
+        with self.assertRaises(TutorError) as context:
+            lms_init_script_template()
+        self.assertIn("redirect_uri", str(context.exception))
+
+    def test_lms_init_script_invalid_bool(self) -> None:
+        hooks.Filters.OPENEDX_SERVICE_USERS.add_item(
+            {"username": "user", "staff": "false"}
+        )
+        with self.assertRaises(TutorError) as context:
+            lms_init_script_template()
+        self.assertIn("'staff'", str(context.exception))
+
+    def test_lms_init_script_invalid_waffle_flag(self) -> None:
+        hooks.Filters.OPENEDX_WAFFLE_FLAGS.add_item(("flag", True, "extra"))  # type: ignore[arg-type]
+        with self.assertRaises(TutorError) as context:
+            lms_init_script_template()
+        self.assertIn("OPENEDX_WAFFLE_FLAGS", str(context.exception))
+
+    def test_lms_init_script_invalid_item_type(self) -> None:
+        hooks.Filters.OPENEDX_SERVICE_USERS.add_item("notes")  # type: ignore[arg-type]
+        with self.assertRaises(TutorError) as context:
+            lms_init_script_template()
+        self.assertIn("expected a dict", str(context.exception))
+
+    def test_lms_init_script_template_syntax_error(self) -> None:
+        hooks.Actions.CORE_READY.do()
+        with hooks.Contexts.app("myplugin").enter():
+            hooks.Filters.OPENEDX_SERVICE_USERS.add_item({"username": "{{ oops"})
+            hooks.Filters.CLI_DO_INIT_TASKS.add_item(("myplugin", "echo myplugin"))
+        with temporary_root() as root:
+            self.invoke_in_root(root, ["config", "save"])
+            with patch("tutor.utils.docker_compose"):
+                result = self.invoke_in_root(
+                    root, ["local", "do", "init", "--limit=myplugin"]
+                )
+        self.assertIsInstance(result.exception, TutorError)
+        self.assertIn("OPENEDX_SERVICE_USERS", str(result.exception))
+
+    def test_lms_init_script_missing_required_key(self) -> None:
+        hooks.Filters.OPENEDX_SERVICE_USERS.add_item({"staff": True})
+        with self.assertRaises(TutorError) as context:
+            lms_init_script_template()
+        self.assertIn("username", str(context.exception))
 
     def test_create_user_template_without_staff(self) -> None:
         command = jobs.create_user_template(
