@@ -434,7 +434,7 @@ def do(context: K8sContext) -> None:
     """
 
     @hooks.Actions.DO_JOB.add()
-    def _start_base_deployments(_job_name: str, *_args: Any, **_kwargs: Any) -> None:
+    def _start_base_deployments(job_name: str, *_args: Any, **_kwargs: Any) -> None:
         """
         We add this logic to an action callback because we do not want to trigger it
         whenever we run `tutor k8s do <job> --help`.
@@ -443,13 +443,18 @@ def do(context: K8sContext) -> None:
         wait_for_deployment_ready(config, "caddy")
         for name in ["meilisearch", "mysql", "mongodb"]:
             if tutor_config.is_service_activated(config, name):
-                wait_for_deployment_ready(config, name)
+                wait_for_deployment_ready(
+                    config, name, timeout=DATABASE_STARTUP_TIMEOUT
+                )
         # LMS and CMS are not optional services (unlike the ones above, they have no
         # RUN_* toggle), but jobs such as `tests smoke` make live HTTP requests against
         # them. Without this, `do` would hand off to those jobs while the Deployments
         # are still mid-rollout, which is a reliable source of transient 502s.
-        for name in ["lms", "cms"]:
-            wait_for_deployment_ready(config, name)
+        # Their readiness probe needs the database user that is created by the "init"
+        # job, so we must not wait for them before running it.
+        if job_name != "init":
+            for name in ["lms", "cms"]:
+                wait_for_deployment_ready(config, name)
 
 
 @click.command(help="Initialise all applications")
@@ -631,7 +636,9 @@ def wait_for_pod_running(config: Config, service: str, timeout: int = 600) -> No
     Wait for a pod of the service to run, whether it is ready or not.
 
     This is useful to exec commands in pods that cannot be ready yet, for instance
-    because their readiness probe queries databases that are not upgraded yet.
+    because the databases checked by their readiness probe are not running.
+
+    During a rolling update, this may return as soon as an old pod is running.
     """
     fmt.echo_info(f"Waiting for a {service} pod to be running...")
     for _ in range(max(1, timeout // 2)):
@@ -650,13 +657,17 @@ def wait_for_pod_running(config: Config, service: str, timeout: int = 600) -> No
     )
 
 
-def wait_for_deployment_ready(config: Config, service: str) -> None:
+# Database startup probes give this many seconds to long crash recoveries and upgrades
+DATABASE_STARTUP_TIMEOUT = 1800
+
+
+def wait_for_deployment_ready(config: Config, service: str, timeout: int = 600) -> None:
     fmt.echo_info(f"Waiting for a {service} deployment to be ready...")
     utils.kubectl(
         "wait",
         *resource_selector(config, f"app.kubernetes.io/name={service}"),
         "--for=condition=Available=True",
-        "--timeout=600s",
+        f"--timeout={timeout}s",
         "deployment",
     )
 

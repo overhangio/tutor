@@ -1,5 +1,7 @@
 echo "Initialising MySQL..."
-mysql_connection_max_attempts=10
+# On Kubernetes, the mysql service only routes connections once the readiness probe
+# succeeds, which may take a few more seconds after MySQL starts
+mysql_connection_max_attempts=30
 mysql_connection_attempt=0
 until mysql -u {{ MYSQL_ROOT_USERNAME }} --password="{{ MYSQL_ROOT_PASSWORD }}" --host "{{ MYSQL_HOST }}" --port {{ MYSQL_PORT }} -e 'exit'
 do

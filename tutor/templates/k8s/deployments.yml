@@ -91,9 +91,9 @@ spec:
           # Pods only receive traffic once they can serve requests. The heartbeat
           # endpoint checks the connection to MySQL and MongoDB. The Host header
           # must match Django's ALLOWED_HOSTS.
-          # There are no startup or TCP liveness probes: the uWSGI HTTP router
-          # accepts connections before the application is loaded, and even when
-          # all workers are stuck, so these probes would never fail.
+          # There are no startup or TCP liveness probes: the server socket accepts
+          # connections before the application is loaded, and even when all
+          # workers are stuck, so these probes would never fail.
           readinessProbe:
             httpGet:
               path: /heartbeat
@@ -218,9 +218,9 @@ spec:
           # Pods only receive traffic once they can serve requests. The heartbeat
           # endpoint checks the connection to MySQL and MongoDB. The Host header
           # must match Django's ALLOWED_HOSTS.
-          # There are no startup or TCP liveness probes: the uWSGI HTTP router
-          # accepts connections before the application is loaded, and even when
-          # all workers are stuck, so these probes would never fail.
+          # There are no startup or TCP liveness probes: the server socket accepts
+          # connections before the application is loaded, and even when all
+          # workers are stuck, so these probes would never fail.
           readinessProbe:
             httpGet:
               path: /heartbeat

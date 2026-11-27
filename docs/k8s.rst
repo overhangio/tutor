@@ -216,3 +216,6 @@ The lms and cms Deployments define a readiness probe on the ``/heartbeat`` endpo
 
 .. note::
     The lms and cms probes send requests with the ``lms`` and ``cms`` ``Host`` headers. If a plugin overrides the ``ALLOWED_HOSTS`` Django setting, it should keep these values, otherwise the probes will fail.
+
+.. note::
+    Because ``/heartbeat`` checks MySQL and MongoDB, an outage of either database marks all lms and cms pods as unready at the same time, and requests fail with a 502 error until the database is back.
